@@ -1,0 +1,318 @@
+//
+//  PurchasesViewController.swift
+//  Pigeon-project
+//
+//  Created by Cory McHattie on 5/30/19.
+//  Copyright © 2019 Immature Creations. All rights reserved.
+//
+
+import UIKit
+import Eureka
+import SplitRow
+import Firebase
+
+protocol UpdatePurchasesDelegate: class {
+    func updatePurchases(purchase: Purchase)
+}
+
+class PurchasesViewController: FormViewController {
+    
+    weak var delegate : UpdatePurchasesDelegate?
+    
+    var purchase: Purchase!
+    
+    var users = [User]()
+    var filteredUsers = [User]()
+    var selectedFalconUsers = [User]()
+    var userNames : [String] = []
+    var userNamesString: String = ""
+    
+    fileprivate var movingBackwards: Bool = true
+    
+    fileprivate var active: Bool = false
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupMainView()
+        
+        if purchase != nil {
+            active = true
+            self.navigationItem.rightBarButtonItem?.isEnabled = true
+            for ID in purchase!.participantsIDs!{
+                if let user = users.first(where: {$0.id == ID}) {
+                    selectedFalconUsers.append(user)
+                }
+            }
+            selectedFalconUsers = selectedFalconUsers.sorted { ($0.name! < $1.name!) }
+            for user in selectedFalconUsers {
+                userNames.append(user.name ?? "")
+            }
+            userNamesString = userNames.joined(separator:", ")
+            
+        } else {
+            purchase = Purchase(dictionary: ["name" : "Purchase Name" as AnyObject])
+        }
+        
+        initializeForm()
+        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        //when try to re-select location will default to nothing
+        if self.movingBackwards {
+            
+            delegate?.updatePurchases(purchase: purchase)
+        }
+    }
+    
+    fileprivate func setupMainView() {
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .never
+        }
+        navigationItem.title = "New Purchase"
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.sectionIndexBackgroundColor = view.backgroundColor
+        tableView.backgroundColor = view.backgroundColor
+        navigationItem.rightBarButtonItem =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
+        navigationItem.rightBarButtonItem?.isEnabled = false
+        
+        
+    }
+    
+    fileprivate func initializeForm() {
+        
+        form +++
+            Section()
+            
+            <<< TextRow("Purchase Name") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                if self.active {
+                    $0.value = self.purchase.name
+                    self.navigationItem.title = $0.value
+                } else {
+                    $0.cell.textField.becomeFirstResponder()
+                }
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                }
+                .onChange() { [unowned self] row in
+                    if row.value == nil {
+                        self.navigationItem.title = "New Purchase"
+                        self.navigationItem.rightBarButtonItem?.isEnabled = false
+                    } else {
+                        self.navigationItem.title = row.value
+                        self.rightBarButton()
+                    }
+            }
+            
+            <<< TextRow("Type of Purchase") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                if self.active && self.purchase.purchaseType != nil {
+                    $0.value = self.purchase.purchaseType
+                }
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+            
+            <<< TextAreaRow("Description") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                if self.active && self.purchase.purchaseDescription != nil {
+                    $0.value = self.purchase.purchaseDescription
+                }
+                }.cellUpdate({ (cell, row) in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                })
+            
+            <<< DecimalRow("Cost"){
+                $0.useFormatterDuringInput = true
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.title = $0.tag
+                $0.value = 0.00
+                if self.active {
+                    $0.value = self.purchase.cost
+                }
+                let formatter = CurrencyFormatter()
+                formatter.locale = .current
+                formatter.numberStyle = .currency
+                $0.formatter = formatter
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }.onChange() { [unowned self] row in
+                    if row.value == 0.00 {
+                        row.value = nil
+                    }
+                    self.rightBarButton()
+        }
+        
+        form +++
+            Section("Split up the purchase")
+        
+        if users.count > 1 {
+            form.last!
+            <<< CheckRow("Everyone") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.tintColor = FalconPalette.defaultBlue
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.title = $0.tag
+                if selectedFalconUsers == users {
+                    $0.value = true
+                } else {
+                    $0.value = false
+                }
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.tintColor = FalconPalette.defaultBlue
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }.onChange { row in
+                    if row.value == true {
+                        self.selectedFalconUsers = self.users
+                        for user in self.selectedFalconUsers {
+                            if let userName = user.name {
+                                let checkRow: CheckRow! = self.form.rowBy(tag: "\(userName)")
+                                checkRow.value = false
+                                checkRow.updateCell()
+                            }
+                        }
+                    }
+            }
+        }
+
+        for user in users {
+            if let userName = user.name {
+                form.last!
+                <<< CheckRow("\(userName)") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.tintColor = FalconPalette.defaultBlue
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.title = userName
+                    if users.count == 1 {
+                        if !selectedFalconUsers.contains(user) || selectedFalconUsers.isEmpty {
+                            $0.value = false
+                        } else {
+                            $0.value = true
+                        }
+                    } else {
+                        if selectedFalconUsers == users || !selectedFalconUsers.contains(user) || selectedFalconUsers.isEmpty {
+                            $0.value = false
+                        } else {
+                            $0.value = true
+                        }
+                    }
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.tintColor = FalconPalette.defaultBlue
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }.onChange { row in
+                        if row.value == true {
+                            if self.selectedFalconUsers == self.users {
+                                self.selectedFalconUsers.removeAll()
+                            }
+                            self.selectedFalconUsers.append(user)
+                            if let checkRow: CheckRow = self.form.rowBy(tag: "Everyone") {
+                                checkRow.value = false
+                                checkRow.updateCell()
+                            }
+                        } else {
+                            if let checkRow: CheckRow = self.form.rowBy(tag: "Everyone") {
+                                if checkRow.value == true {
+                                    return
+                                }
+                            }
+                            if let index = self.selectedFalconUsers.firstIndex(of: user) {
+                                self.selectedFalconUsers.remove(at: index)
+                            }
+                        }
+                }
+            }
+        }
+        
+        
+        
+    }
+    
+    fileprivate func rightBarButton() {
+        let nameRow: TextRow! = self.form.rowBy(tag: "Purchase Name")
+        let decimalRow: DecimalRow! = self.form.rowBy(tag: "Cost")
+        
+        if nameRow.value != nil && decimalRow.value != nil {
+            self.navigationItem.rightBarButtonItem?.isEnabled = true
+        } else {
+            self.navigationItem.rightBarButtonItem?.isEnabled = false
+        }
+    }
+    
+    @objc fileprivate func rightBarButtonTapped() {
+        movingBackwards = false
+        let valuesDictionary = form.values()
+        
+        purchase.name = valuesDictionary["Purchase Name"] as? String
+        
+        if let value = valuesDictionary["Type of Purchase"] as? String {
+            purchase.purchaseType = value
+        }
+        
+        if let value = valuesDictionary["Description"] as? String {
+            purchase.purchaseDescription = value
+        }
+        
+        purchase.cost = valuesDictionary["Cost"] as? Double
+        
+        let membersIDs = fetchMembersIDs()
+        
+        purchase.participantsIDs = membersIDs.0
+        
+        delegate?.updatePurchases(purchase: purchase)
+        
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    
+    func fetchMembersIDs() -> ([String], [String:AnyObject]) {
+        var membersIDs = [String]()
+        var membersIDsDictionary = [String:AnyObject]()
+        
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
+        
+        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
+        membersIDs.append(currentUserID)
+        
+        for selectedUser in selectedFalconUsers {
+            guard let id = selectedUser.id else { continue }
+            membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+            membersIDs.append(id)
+        }
+        
+        return (membersIDs, membersIDsDictionary)
+    }
+    
+    
+}

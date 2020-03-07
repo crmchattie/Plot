@@ -1,0 +1,117 @@
+[
+    {
+        "name": "Example Trip",
+        "activityType": "Vacation",
+        "activityDescription" : "Example Trip to Edinburgh and St Andrews with Schedule and Checklist.",
+        "activityOriginalPhotoURL" : "https://firebasestorage.googleapis.com/v0/b/messenging-app-94621.appspot.com/o/userProfilePictures%2F757D55C7-CA5D-4855-8E24-19BFDCB8110D?alt=media&token=12556a57-6756-4f9e-93db-6be4f19a29f9",
+        "activityThumbnailPhotoURL" : "https://firebasestorage.googleapis.com/v0/b/messenging-app-94621.appspot.com/o/userProfilePictures%2F1382053A-7F70-45C9-8177-58A88D070E92?alt=media&token=e2a6f527-54c6-4a04-b453-0e9c6b54a303",
+        "locationAddress" : {
+          "1 Dublin Street Lane North" : [ 55.9580803, -3.193311 ],
+          "Aizle" : [ 55.9418449, -3.1790042 ],
+          "The Kitchin" : [ 55.9769936, -3.1726382 ]
+        },
+        "locationName" : "locationName",
+        "isGroupActivity": true,
+        "checklist" : {
+          "checklist_1" : {
+            "Book Airbnbs" : true
+          },
+          "checklist_2" : {
+            "Dinner reservations" : true
+          },
+          "checklist_3" : {
+            "Book flights" : true
+          },
+          "checklist_4" : {
+            "Vatican tour" : false
+          },
+          "checklist_5" : {
+            "Car rental" : true
+          },
+          "checklist_6" : {
+            "Remember passport" : true
+          }
+        },
+        "notes" : "nothing",
+        "reminder" : "None",
+        "schedule" : [ {
+          "locationAddress" : {
+            "EWR Terminal B" : [ 40.690719227976444, -74.1768197484565 ]
+          },
+          "locationName" : "EWR Terminal B",
+          "name" : "Flight from EWR to DUB",
+          "scheduleDescription" : "nothing",
+          "scheduleType" : "Flight",
+          "transportation" : "nothing"
+        }, {
+          "locationAddress" : {
+            "Dublin Airport" : [ 53.42712825922956, -6.244525909423828 ]
+          },
+          "locationName" : "Dublin Airport",
+          "name" : "Flight from DUB to EDI",
+          "scheduleDescription" : "nothing",
+          "scheduleType" : "Flight",
+          "transportation" : "nothing"
+        }, {
+          "locationAddress" : {
+            "1 Dublin Street Lane North" : [ 55.9580803, -3.193311 ]
+          },
+          "locationName" : "1 Dublin Street Lane North",
+          "name" : "Edinburgh",
+          "reminder" : "None",
+          "scheduleDescription" : "Check-in after 3pm\nCheck-out before 11am\nStep 1: 4 digit code will be sent to you 24 hours prior arrival\n\nStep 2: Keys will be left for you in a lockbox outside. The box is attached to the wall, to the right of front door (next to the bins).\n\nStep 3: Use the 4 digit code to open lockbox. Please scramble the code once you’ve retrieved keys.",
+        }, {
+          "locationAddress" : {
+            "Aizle" : [ 55.9418449, -3.1790042 ]
+          },
+          "locationName" : "Aizle",
+          "name" : "Aizle Reservation",
+          "reminder" : "None",
+          "scheduleType" : "Dinner",
+        }, {
+          "locationAddress" : {
+            "The Kitchin" : [ 55.9769936, -3.1726382 ]
+          },
+          "locationName" : "The Kitchin",
+          "name" : "Kitchin Reservation",
+          "reminder" : "None",
+          "scheduleType" : "Dinner",
+        }, {
+          "checklist" : {
+            "checklist_1" : {
+              "Rental car reservation" : false
+            },
+            "checklist_2" : {
+              "Dinner reservation" : false
+            }
+          },
+          "locationAddress" : {
+            "Hotel Du Vin, St Andrews" : [ 56.3427936186478, -2.79940545558929 ]
+          },
+          "locationName" : "Hotel Du Vin, St Andrews",
+          "name" : "St. Andrews",
+          "reminder" : "None",
+          "scheduleDescription" : "nothing",
+          "scheduleType" : "Hotel",
+          "transportation" : "Car"
+        }, {
+          "locationAddress" : {
+            "Edinburgh Airport" : [ 55.94855102166327, -3.3640480041503906 ]
+          },
+          "locationName" : "Edinburgh Airport",
+          "name" : "Flight from EDI to DUB",
+          "scheduleDescription" : "nothing",
+          "scheduleType" : "Flight",
+          "transportation" : "nothing"
+        }, {
+          "locationAddress" : {
+            "Dublin Airport" : [ 53.42712825922956, -6.244525909423828 ]
+          },
+          "locationName" : "Dublin Airport",
+          "name" : "Flight from DUB to EWR",
+          "scheduleDescription" : "nothing",
+          "scheduleType" : "Flight",
+          "transportation" : "nothing"
+        } ],
+    }
+]

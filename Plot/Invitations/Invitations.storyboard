@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15508"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Invitations View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="InvitationsViewController" customModule="Plot" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Wob-EI-yiH">
+                                <rect key="frame" x="0.0" y="44" width="414" height="852"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="InvitationCell" id="DAJ-2e-rEp" customClass="InvitationCell" customModule="Plot" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="28" width="414" height="176"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="DAJ-2e-rEp" id="qQV-6r-edE">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="176"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Ski Trip" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fQB-LW-B2L">
+                                                    <rect key="frame" x="15" y="10" width="351" height="21.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="airplane" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Qtn-cz-08G">
+                                                    <rect key="frame" x="374" y="11.5" width="30" height="29"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="eVG-vA-oIT"/>
+                                                        <constraint firstAttribute="width" constant="30" id="fgy-dZ-pN8"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="message" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="SIV-IN-BAx">
+                                                    <rect key="frame" x="374" y="49.5" width="30" height="29.5"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="Qhq-6W-uzG"/>
+                                                        <constraint firstAttribute="width" constant="30" id="wDW-wf-tgD"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="map" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="fJG-Vf-thz">
+                                                    <rect key="frame" x="374" y="87.5" width="30" height="29"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="30" id="37F-Kx-ccM"/>
+                                                        <constraint firstAttribute="height" constant="30" id="n9G-TJ-bKr"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Wednesday October 23rd, 2019 All-day Sunday October 27th, 2019 All-day Whistler BC" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0me-n0-fl3">
+                                                    <rect key="frame" x="15" y="39.5" width="351" height="61"/>
+                                                    <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="KK6-42-91N">
+                                                    <rect key="frame" x="15" y="106.5" width="25" height="25"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="26" id="8x1-Z0-3oU"/>
+                                                        <constraint firstAttribute="width" constant="25" id="wyB-zF-QDF"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="AJS-oc-6is">
+                                                    <rect key="frame" x="48" y="106.5" width="25" height="25"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="25" id="Iuh-ek-jMp"/>
+                                                        <constraint firstAttribute="height" constant="26" id="VxC-eo-ECZ"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="yZA-9K-1uG">
+                                                    <rect key="frame" x="81" y="106.5" width="25" height="25"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="26" id="aam-2F-B2n"/>
+                                                        <constraint firstAttribute="width" constant="25" id="aeX-Go-WKf"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="xGG-d7-pdh">
+                                                    <rect key="frame" x="15" y="140" width="379" height="29"/>
+                                                    <segments>
+                                                        <segment title="Accept"/>
+                                                        <segment title="Maybe"/>
+                                                        <segment title="Decline"/>
+                                                    </segments>
+                                                    <color key="selectedSegmentTintColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </segmentedControl>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="xGG-d7-pdh" secondAttribute="trailing" constant="20" id="8Dc-lI-ykR"/>
+                                                <constraint firstItem="SIV-IN-BAx" firstAttribute="leading" secondItem="0me-n0-fl3" secondAttribute="trailing" constant="8" id="9Bp-Hd-qBI"/>
+                                                <constraint firstItem="xGG-d7-pdh" firstAttribute="leading" secondItem="qQV-6r-edE" secondAttribute="leading" constant="15" id="HHW-8e-0r3"/>
+                                                <constraint firstItem="yZA-9K-1uG" firstAttribute="leading" secondItem="AJS-oc-6is" secondAttribute="trailing" constant="8" id="HPG-ja-bvK"/>
+                                                <constraint firstItem="xGG-d7-pdh" firstAttribute="top" secondItem="AJS-oc-6is" secondAttribute="bottom" constant="8" id="KIk-Ft-oiN"/>
+                                                <constraint firstItem="0me-n0-fl3" firstAttribute="leading" secondItem="qQV-6r-edE" secondAttribute="leading" constant="15" id="LrJ-3o-wei"/>
+                                                <constraint firstItem="xGG-d7-pdh" firstAttribute="top" secondItem="KK6-42-91N" secondAttribute="bottom" constant="8" id="Sb4-3L-hUk"/>
+                                                <constraint firstItem="fJG-Vf-thz" firstAttribute="top" secondItem="SIV-IN-BAx" secondAttribute="bottom" constant="8" id="Vxm-V4-Tbh"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="yZA-9K-1uG" secondAttribute="bottom" constant="33" id="Z0F-4O-Ngt"/>
+                                                <constraint firstItem="Qtn-cz-08G" firstAttribute="leading" secondItem="fQB-LW-B2L" secondAttribute="trailing" constant="8" id="ZjO-7S-w93"/>
+                                                <constraint firstItem="Qtn-cz-08G" firstAttribute="top" secondItem="qQV-6r-edE" secondAttribute="top" constant="11" id="g8J-Pr-1UI"/>
+                                                <constraint firstItem="AJS-oc-6is" firstAttribute="leading" secondItem="KK6-42-91N" secondAttribute="trailing" constant="8" id="gd1-R8-EXc"/>
+                                                <constraint firstAttribute="trailing" secondItem="SIV-IN-BAx" secondAttribute="trailing" constant="10" id="iX3-Wz-VSS"/>
+                                                <constraint firstItem="KK6-42-91N" firstAttribute="leading" secondItem="qQV-6r-edE" secondAttribute="leading" constant="15" id="ioy-bX-k5Z"/>
+                                                <constraint firstItem="xGG-d7-pdh" firstAttribute="top" secondItem="yZA-9K-1uG" secondAttribute="bottom" constant="8" id="kcb-CB-vuZ"/>
+                                                <constraint firstAttribute="bottom" secondItem="xGG-d7-pdh" secondAttribute="bottom" constant="8" id="nCO-f5-psE"/>
+                                                <constraint firstItem="fQB-LW-B2L" firstAttribute="top" secondItem="qQV-6r-edE" secondAttribute="top" constant="10" id="oaQ-DM-LzN"/>
+                                                <constraint firstItem="0me-n0-fl3" firstAttribute="top" secondItem="fQB-LW-B2L" secondAttribute="bottom" constant="8" id="qOZ-rh-tu6"/>
+                                                <constraint firstItem="KK6-42-91N" firstAttribute="top" secondItem="0me-n0-fl3" secondAttribute="bottom" constant="5.5" id="tb5-jP-NgU"/>
+                                                <constraint firstItem="fQB-LW-B2L" firstAttribute="leading" secondItem="qQV-6r-edE" secondAttribute="leading" constant="15" id="w4b-Sd-gsQ"/>
+                                                <constraint firstAttribute="trailing" secondItem="fJG-Vf-thz" secondAttribute="trailing" constant="10" id="wgX-br-ev6"/>
+                                                <constraint firstItem="SIV-IN-BAx" firstAttribute="top" secondItem="Qtn-cz-08G" secondAttribute="bottom" constant="8" id="yKI-Y4-A1j"/>
+                                                <constraint firstAttribute="trailing" secondItem="Qtn-cz-08G" secondAttribute="trailing" constant="10" id="zS8-Gg-b3f"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="4Hf-eP-QJc"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="HqJ-oi-CRW"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="Wob-EI-yiH" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="KO5-qR-dxE"/>
+                            <constraint firstItem="Wob-EI-yiH" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="N8j-kA-Ycg"/>
+                            <constraint firstItem="Wob-EI-yiH" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="SBB-tn-cDZ"/>
+                            <constraint firstAttribute="bottom" secondItem="Wob-EI-yiH" secondAttribute="bottom" id="fjU-hz-U8W"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="94.20289855072464" y="173.4375"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="airplane" catalog="system" width="64" height="56"/>
+        <image name="circle" catalog="system" width="64" height="60"/>
+        <image name="map" catalog="system" width="64" height="56"/>
+        <image name="message" catalog="system" width="64" height="56"/>
+    </resources>
+</document>
