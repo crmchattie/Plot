@@ -34,9 +34,11 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+            
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = true
+        
+        title = "Meal"
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
@@ -79,7 +81,6 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
             cell.delegate = self
             if let recipe = recipe {
-                title = "Meal"
                 cell.nameLabel.text = recipe.title
                 if let categoryLabel = recipe.readyInMinutes, let subcategoryLabel = recipe.servings {
                     cell.categoryLabel.text = "Preparation time: \(categoryLabel) mins"

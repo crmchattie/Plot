@@ -34,6 +34,7 @@
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
 		103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103E968922C2B309007D6668 /* PurchaseRow.swift */; };
 		105BD06B22FB520100ECFA34 /* PhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105BD06A22FB520100ECFA34 /* PhotosViewController.swift */; };
+		105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66E824149DC600F6EDB6 /* EventDetailCell.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */; };
 		1092F2362414501D00E8CE16 /* MealDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2352414501D00E8CE16 /* MealDetailViewController.swift */; };
@@ -312,6 +313,7 @@
 		103E968922C2B309007D6668 /* PurchaseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseRow.swift; sourceTree = "<group>"; };
 		1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.release.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.release.xcconfig"; sourceTree = "<group>"; };
 		105BD06A22FB520100ECFA34 /* PhotosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhotosViewController.swift; path = ../../../PhotosViewController.swift; sourceTree = "<group>"; };
+		105F66E824149DC600F6EDB6 /* EventDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailCell.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCell.swift; sourceTree = "<group>"; };
 		1092F2352414501D00E8CE16 /* MealDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetailViewController.swift; sourceTree = "<group>"; };
@@ -673,6 +675,7 @@
 				1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */,
 				1092F23B2414580E00E8CE16 /* MealDetailCell.swift */,
 				1092F23F241482C600E8CE16 /* MealDetailViewCell.swift */,
+				105F66E824149DC600F6EDB6 /* EventDetailCell.swift */,
 				100A53E923E0DD3D004AA952 /* ActivityHeader.swift */,
 				100A53EB23E0DD9C004AA952 /* ActivityHeaderCell.swift */,
 				109F849223D671D6002C0044 /* SearchHeaderCell.swift */,
@@ -1777,6 +1780,7 @@
 				4BAEE49521272C5E0045AB10 /* ContactsTableViewCell.swift in Sources */,
 				4BAEE5DD212735E50045AB10 /* ImagePickerAction.swift in Sources */,
 				1024ABAD23C29ACF00A5875D /* BetterSnappingLayout.swift in Sources */,
+				105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */,
 				10B4E507227A0AE500700E0B /* LocationFinderTableViewController.swift in Sources */,
 				4BAEE51F21272D890045AB10 /* ChatsTableViewController+SearchHandlers.swift in Sources */,
 				4BAEE5BC212735E50045AB10 /* INSPhotoViewController.swift in Sources */,

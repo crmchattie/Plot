@@ -20,12 +20,22 @@ class WebViewController: UIViewController, WKUIDelegate {
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.uiDelegate = self
         view = webView
+
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+        navigationItem.rightBarButtonItem = doneBarButton
         
         if let url = urlString, let myURL = URL(string: url) {
             let myRequest = URLRequest(url: myURL)
             webView.load(myRequest)
+            webView.allowsBackForwardNavigationGestures = true
         }
-    }}
+    }
+    
+    @IBAction func done(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
+    }
+}
