@@ -36,6 +36,12 @@
 		105BD06B22FB520100ECFA34 /* PhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105BD06A22FB520100ECFA34 /* PhotosViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */; };
+		1092F2362414501D00E8CE16 /* MealDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2352414501D00E8CE16 /* MealDetailViewController.swift */; };
+		1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2372414503000E8CE16 /* EventDetailViewController.swift */; };
+		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
+		1092F23C2414580E00E8CE16 /* MealDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* MealDetailCell.swift */; };
+		1092F23E2414587E00E8CE16 /* MealExpandedDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23D2414587E00E8CE16 /* MealExpandedDetailViewController.swift */; };
+		1092F240241482C600E8CE16 /* MealDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* MealDetailViewCell.swift */; };
 		1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */; };
 		109F848E23D60113002C0044 /* ActivitySubTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109F848D23D60113002C0044 /* ActivitySubTypeViewController.swift */; };
 		109F849023D607C6002C0044 /* MealTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109F848F23D607C6002C0044 /* MealTypeViewController.swift */; };
@@ -308,6 +314,12 @@
 		105BD06A22FB520100ECFA34 /* PhotosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhotosViewController.swift; path = ../../../PhotosViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCell.swift; sourceTree = "<group>"; };
+		1092F2352414501D00E8CE16 /* MealDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetailViewController.swift; sourceTree = "<group>"; };
+		1092F2372414503000E8CE16 /* EventDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailViewController.swift; sourceTree = "<group>"; };
+		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
+		1092F23B2414580E00E8CE16 /* MealDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetailCell.swift; sourceTree = "<group>"; };
+		1092F23D2414587E00E8CE16 /* MealExpandedDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealExpandedDetailViewController.swift; sourceTree = "<group>"; };
+		1092F23F241482C600E8CE16 /* MealDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetailViewCell.swift; sourceTree = "<group>"; };
 		1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectActivityTableViewController.swift; sourceTree = "<group>"; };
 		109F848D23D60113002C0044 /* ActivitySubTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySubTypeViewController.swift; sourceTree = "<group>"; };
 		109F848F23D607C6002C0044 /* MealTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealTypeViewController.swift; sourceTree = "<group>"; };
@@ -571,6 +583,7 @@
 				109F849423D674C0002C0044 /* VerticalController.swift */,
 				109F849823D6860D002C0044 /* FilterViewController.swift */,
 				100A53ED23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift */,
+				1092F2392414507200E8CE16 /* WebViewController.swift */,
 				100A53EF23E0E839004AA952 /* HorizontalSnappingController.swift */,
 			);
 			path = ActivityTypeControllers;
@@ -611,6 +624,9 @@
 			isa = PBXGroup;
 			children = (
 				1027D09D23ECFBA10005D2A7 /* ActivityDetailViewController.swift */,
+				1092F2352414501D00E8CE16 /* MealDetailViewController.swift */,
+				1092F23D2414587E00E8CE16 /* MealExpandedDetailViewController.swift */,
+				1092F2372414503000E8CE16 /* EventDetailViewController.swift */,
 			);
 			path = DetailControllers;
 			sourceTree = "<group>";
@@ -655,6 +671,8 @@
 				26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */,
 				1024ABA823C1412200A5875D /* ActivitySubTypeCell.swift */,
 				1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */,
+				1092F23B2414580E00E8CE16 /* MealDetailCell.swift */,
+				1092F23F241482C600E8CE16 /* MealDetailViewCell.swift */,
 				100A53E923E0DD3D004AA952 /* ActivityHeader.swift */,
 				100A53EB23E0DD9C004AA952 /* ActivityHeaderCell.swift */,
 				109F849223D671D6002C0044 /* SearchHeaderCell.swift */,
@@ -1785,6 +1803,7 @@
 				4BAEE50621272D890045AB10 /* SelectedMediaCollectionCell.swift in Sources */,
 				10E6C1D122CC3BE300262900 /* ActivityAvatarOpenerDelegate.swift in Sources */,
 				4BAEE50121272D890045AB10 /* OutgoingPhotoMessageCell.swift in Sources */,
+				1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */,
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				1024ABAE23C29ACF00A5875D /* Extensions.swift in Sources */,
@@ -1850,6 +1869,7 @@
 				4BAEE5BB212735E50045AB10 /* INSPhotosOverlayView.swift in Sources */,
 				4BAEE50C21272D890045AB10 /* UserInfoTableViewController+handlers.swift in Sources */,
 				4BAEE50921272D890045AB10 /* SelectedMediaCollectionCell+timerHandlers.swift in Sources */,
+				1092F23E2414587E00E8CE16 /* MealExpandedDetailViewController.swift in Sources */,
 				4BAEE5DF212735E50045AB10 /* UIEdgeInsetsExtensions.swift in Sources */,
 				4BAEE5E8212735E50045AB10 /* EnterPhoneNumberController.swift in Sources */,
 				10EED1552295779A00D13D08 /* ScheduleViewController.swift in Sources */,
@@ -1859,6 +1879,7 @@
 				4BAEE48621272C4F0045AB10 /* OnboardingController.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
 				100A53EA23E0DD3D004AA952 /* ActivityHeader.swift in Sources */,
+				1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */,
 				102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */,
 				4B4F452F1F32230C00A6FF96 /* AppDelegate.swift in Sources */,
 				4BAEE48221272C4F0045AB10 /* UserProfileController.swift in Sources */,
@@ -1926,6 +1947,7 @@
 				4BAEE46F21272B380045AB10 /* NotificationsTableViewController.swift in Sources */,
 				4BAEE50421272D890045AB10 /* AutoSizingCollectionViewFlowLayout.swift in Sources */,
 				4BAEE5B8212735E50045AB10 /* INSPhotosInteractionAnimator.swift in Sources */,
+				1092F240241482C600E8CE16 /* MealDetailViewCell.swift in Sources */,
 				4BAEE5EA212735E50045AB10 /* Country.swift in Sources */,
 				4BAEE4FE21272D890045AB10 /* OutgoingVoiceMessageCell.swift in Sources */,
 				4BAEE51321272D890045AB10 /* ChatLogController+PhotoEditorDelegate.swift in Sources */,
@@ -1943,8 +1965,10 @@
 				4BAEE5DA212735E50045AB10 /* CameraCell.swift in Sources */,
 				4BAEE4FC21272D890045AB10 /* ChatLogController+ImageZoomHandlers.swift in Sources */,
 				4BAEE51221272D890045AB10 /* UserInfoPhoneNumberTableViewCell.swift in Sources */,
+				1092F2362414501D00E8CE16 /* MealDetailViewController.swift in Sources */,
 				265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */,
 				4BAEE4ED21272D890045AB10 /* LeaveGroupAndChangeAdminController.swift in Sources */,
+				1092F23C2414580E00E8CE16 /* MealDetailCell.swift in Sources */,
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,
 				4BAEE51421272D890045AB10 /* VoiceRecordingViewController.swift in Sources */,
 				4BAEE51121272D890045AB10 /* BaseMediaMessageCell.swift in Sources */,

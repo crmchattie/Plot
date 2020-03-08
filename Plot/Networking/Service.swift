@@ -46,6 +46,23 @@ class Service {
         
     }
     
+    func fetchRecipesInfo(id: Int, completion: @escaping ((Recipe?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "\(SpoonacularAPI.infoUrlString)/\(id)/information")!
+        }()
+        
+        let defaultParameters = ["includeNutrition": "true", "apiKey": "\(SpoonacularAPI.apiKey)"]
+//        let parameters = ["id": "\(id)"].merging(defaultParameters, uniquingKeysWith: +)
+    
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
+        print(encodedURLRequest)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
     func fetchEvents(segmentId: String, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
@@ -105,6 +122,7 @@ class Service {
 struct SpoonacularAPI {
     static let baseUrlString = "https://api.spoonacular.com/recipes/search"
     static let complexUrlString = "https://api.spoonacular.com/recipes/complexSearch"
+    static let infoUrlString = "https://api.spoonacular.com/recipes/"
     static let apiKey = "7c1e8c9cd7fc48718c4d903c53aa99d9"
 }
 

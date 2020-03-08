@@ -16,6 +16,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
 
     var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .type]
     var filterDictionary = [String: [String]]()
+    var sections: [String] = ["American", "Italian", "Vegetarian"]
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,17 +93,10 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     }
     
     fileprivate func fetchData() {
-        
-        if let navController = self.navigationController {
-            self.showSpinner(onView: navController.view)
-        } else {
-            self.showSpinner(onView: self.view)
-        }
                 
         headerheight = 0
         cellheight = 415
             
-        var recipes1: [Recipe]?
         var recipes2: [Recipe]?
         var recipes3: [Recipe]?
         
@@ -110,40 +104,37 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         let dispatchGroup = DispatchGroup()
         
         dispatchGroup.enter()
-        Service.shared.fetchRecipesComplex(query: "dinner", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-            recipes1 = search?.recipes
-            dispatchGroup.leave()
-        }
-        
-        dispatchGroup.enter()
-        Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: ["Vegetable"], diet: "", intolerances: [""], type: "") { (search, err) in
+        Service.shared.fetchRecipesComplex(query: "", cuisine: ["Italian"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
             recipes2 = search?.recipes
             dispatchGroup.leave()
+            
+            dispatchGroup.notify(queue: .main) {
+                self.removeSpinner()
+                if let group = recipes2 {
+                    self.groups.append(group)
+                } else {
+                    self.sections.removeAll{ $0 == "Italian"}
+                }
+                self.collectionView.reloadData()
+                
+                dispatchGroup.enter()
+                Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                    recipes3 = search?.recipes
+                    dispatchGroup.leave()
+                    
+                    dispatchGroup.notify(queue: .main) {
+                    self.removeSpinner()
+                    if let group = recipes3 {
+                        self.groups.append(group)
+                    } else {
+                        self.sections.removeAll{ $0 == "Vegetarian"}
+                    }
+                    self.collectionView.reloadData()
+                    }
+                }
+            }
         }
         
-        dispatchGroup.enter()
-        Service.shared.fetchRecipesComplex(query: "", cuisine: ["Italian"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-            recipes3 = search?.recipes
-            dispatchGroup.leave()
-        }
-        
-        
-        dispatchGroup.notify(queue: .main) {
-            self.removeSpinner()
-            if let group = recipes1 {
-                self.groups.append(group)
-                self.sections.append("Dinner")
-            }
-            if let group = recipes2 {
-                self.groups.append(group)
-                self.sections.append("Vegetarian")
-            }
-            if let group = recipes3 {
-                self.groups.append(group)
-                self.sections.append("Italian")
-            }
-            self.collectionView.reloadData()
-        }
     }
     
     
@@ -151,7 +142,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if showGroups {
-            return groups.count
+            return sections.count
         } else {
             return 0
         }
@@ -162,14 +153,23 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         cell.delegate = self
         if showGroups {
             cell.titleLabel.text = sections[indexPath.item]
-            let recipes = groups[indexPath.item]
-            cell.horizontalController.recipes = recipes
-    //        cell.horizontalController.didSelectHandler = { [weak self] recipe in
-    //            let controller = AppDetailController(appId: feedResult.id)
-    //            controller.navigationItem.title = feedResult.name
-    //            self?.navigationController?.pushViewController(controller, animated: true)
-    //        }
-            
+            if indexPath.item < groups.count {
+                let recipes = groups[indexPath.item]
+                cell.horizontalController.recipes = recipes
+                cell.horizontalController.collectionView.reloadData()
+                cell.horizontalController.didSelectHandler = { [weak self] recipe in
+                    if let recipe = recipe as? Recipe {
+                        print("meal \(recipe.title)")
+                        let destination = MealDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.recipe = recipe
+                        destination.users = self!.users
+                        destination.filteredUsers = self!.filteredUsers
+                        destination.conversations = self!.conversations
+                        self?.navigationController?.pushViewController(destination, animated: true)
+                    }
+                }
+            }
         }
         return cell
     }

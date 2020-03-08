@@ -201,7 +201,7 @@ class Activity: NSObject, Codable {
 }
 
 enum ActivityType: String {
-    case basic, complex, meal, workout
+    case basic, complex, meal, workout, trip
     
     var activityCategoryText: String {
         switch self {
@@ -209,6 +209,7 @@ enum ActivityType: String {
             case .complex: return "Build your own complex activity"
             case .meal: return "Build your own meal"
             case .workout: return "Build your own workout"
+            case .trip: return "Build your own trip"
         }
     }
     
@@ -218,6 +219,7 @@ enum ActivityType: String {
             case .complex: return "Includes basic activity fields plus a schedule, a checklist and purchases fields"
             case .meal: return "Includes sections for photo, name, ingredients, preparation and steps"
             case .workout: return "Able to pick and choose exercises, sets and weights"
+            case .trip: return "Add in transportation, lodgings and more"
         }
     }
     
@@ -227,6 +229,7 @@ enum ActivityType: String {
             case .complex: return "activityLarge"
             case .meal: return "meal"
             case .workout: return "workout"
+            case .trip: return "plane"
         }
     }
 }

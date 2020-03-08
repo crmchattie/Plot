@@ -79,6 +79,7 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+        cell.delegate = self
         if recipes != nil {
             let recipe = recipes![indexPath.item]
             cell.nameLabel.text = recipe.title
@@ -91,14 +92,14 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             return cell
         } else if events != nil {
             let event = events![indexPath.item]
-            cell.nameLabel.text = "\(event.name)"
-            if let startDateTime = event.dates.start.dateTime {
+            cell.nameLabel.text = "\(String(describing: event.name!))"
+            if let startDateTime = event.dates?.start?.dateTime {
                 let dateFormatter = DateFormatter()
                 dateFormatter.locale = Locale(identifier: "en_US_POSIX")
                 dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
                 let date = dateFormatter.date(from:startDateTime)!
                 let newDate = date.startDateTimeString()
-                cell.categoryLabel.text = "\(newDate)  @ \(event._embedded["venues"]?[0].name ?? "")"
+                cell.categoryLabel.text = "\(newDate)  @ \(event.embedded?.venues?[0].name ?? "")"
             }
             if let minPrice = event.priceRanges?[0].min, let maxPrice = event.priceRanges?[0].max {
                 let formatter = CurrencyFormatter()
@@ -110,7 +111,9 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             } else {
                 cell.subcategoryLabel.text = ""
             }
-            cell.imageView.sd_setImage(with: URL(string: event.images[3].url))
+            if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
+                cell.imageView.sd_setImage(with: URL(string: url))
+            }
             return cell
         } else {
             return cell
@@ -124,6 +127,21 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
         
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return .init(width: view.frame.width - 48, height: 415)
+    }
+    
+}
+
+extension VerticalController: ActivitySubTypeCellDelegate {
+    func plusButtonTapped() {
+        print("plusButtonTapped")
+    }
+    
+    func shareButtonTapped() {
+        print("shareButtonTapped")
+    }
+    
+    func heartButtonTapped() {
+        print("heartButtonTapped")
     }
     
 }

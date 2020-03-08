@@ -17,9 +17,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
-    
-    var sections = [String]()
-    
+        
     var timer: Timer?
     var headerheight: CGFloat = 0
     var cellheight: CGFloat = 0

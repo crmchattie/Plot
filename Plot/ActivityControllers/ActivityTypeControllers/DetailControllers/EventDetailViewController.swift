@@ -1,14 +1,14 @@
 //
-//  ActivityTypeDetailViewController.swift
+//  EventDetailViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 2/6/20.
+//  Created by Cory McHattie on 3/7/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import UIKit
 
-class ActivityDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class EventDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     private let kActivityDetailCell = "ActivityDetailCell"
     
@@ -66,19 +66,9 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
         cell.delegate = self
-        if let recipe = recipe {
-            title = "Meal"
-            cell.nameLabel.text = recipe.title
-            if let categoryLabel = recipe.readyInMinutes, let subcategoryLabel = recipe.servings {
-                cell.categoryLabel.text = "Preparation time: \(categoryLabel) mins"
-                cell.subcategoryLabel.text = "Servings: \(subcategoryLabel)"
-            }
-            let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
-                cell.imageView.sd_setImage(with: URL(string: recipeImage))
-            return cell
-        } else if let event = event {
+        if let event = event {
             title = "Event"
-            cell.nameLabel.text = "\(event.name)"
+            cell.nameLabel.text = "\(String(describing: event.name!))"
             if let startDateTime = event.dates?.start?.dateTime {
                 let dateFormatter = DateFormatter()
                 dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -115,7 +105,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     }
 }
 
-extension ActivityDetailViewController: ActivityDetailCellDelegate {
+extension EventDetailViewController: ActivityDetailCellDelegate {
     func plusButtonTapped() {
         print("plusButtonTapped")
     }

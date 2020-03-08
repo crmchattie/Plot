@@ -18,8 +18,9 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     private let musicSegmentID = "KZFzniwnSyZfZ7v7nJ"
     private let sportsSegmentID = "KZFzniwnSyZfZ7v7nE"
     
-    var sections = [String]()
-    var types: [ActivityType] = [.basic, .meal, .workout]
+    var sections: [String] = ["Recipes", "Concerts", "Sports"]
+    var types: [ActivityType] = [.basic, .trip, .meal, .workout]
+    var recipes = [Recipe]()
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -64,12 +65,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     }
     
     fileprivate func fetchData() {
-        
-        if let navController = self.navigationController {
-            self.showSpinner(onView: navController.view)
-        } else {
-            self.showSpinner(onView: self.view)
-        }
             
         var recipes: [Recipe]?
         var musicEvents: [Event]?
@@ -82,53 +77,83 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         Service.shared.fetchRecipesSimple(query: "healthy", cuisine: "American") { (search, err) in
             recipes = search?.recipes
             dispatchGroup.leave()
-        }
-        
-        if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
-            dispatchGroup.enter()
-            Service.shared.fetchEventsLatLong(segmentId: musicSegmentID, lat: locationManager.location?.coordinate.latitude ?? 0.0, long: locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                musicEvents = search?._embedded["events"]
-                dispatchGroup.leave()
-            }
             
-            dispatchGroup.enter()
-            Service.shared.fetchEventsLatLong(segmentId: sportsSegmentID, lat: locationManager.location?.coordinate.latitude ?? 0.0, long: locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                sportsEvents = search?._embedded["events"]
-                dispatchGroup.leave()
-            }
-        } else {
-            dispatchGroup.enter()
-            Service.shared.fetchEvents(segmentId: musicSegmentID) { (search, err) in
-                musicEvents = search?._embedded["events"]
-                dispatchGroup.leave()
-            }
-            
-            dispatchGroup.enter()
-            Service.shared.fetchEvents(segmentId: sportsSegmentID) { (search, err) in
-                sportsEvents = search?._embedded["events"]
-                dispatchGroup.leave()
-            }
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            self.removeSpinner()
-            
+            dispatchGroup.notify(queue: .main) {
                 if let group = recipes {
                     self.groups.append(group)
-                    self.sections.append("Meals")
+                    self.recipes = group
+                } else {
+                    self.sections.removeAll{ $0 == "Recipes"}
                 }
-                if let group = musicEvents {
-                    self.groups.append(group)
-                    self.sections.append("Concerts")
+                
+                self.collectionView.reloadData()
+        
+                if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+                    dispatchGroup.enter()
+                    Service.shared.fetchEventsLatLong(segmentId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        musicEvents = search?.embedded?.events
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            if let group = musicEvents {
+                                self.groups.append(group)
+                            } else {
+                                self.sections.removeAll{ $0 == "Concerts"}
+                            }
+                            
+                            self.collectionView.reloadData()
+                            dispatchGroup.enter()
+                            Service.shared.fetchEventsLatLong(segmentId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                                sportsEvents = search?.embedded?.events
+                                dispatchGroup.leave()
+                                
+                                dispatchGroup.notify(queue: .main) {
+                                    self.removeSpinner()
+                                    if let group = sportsEvents {
+                                        self.groups.append(group)
+                                    } else {
+                                        self.sections.removeAll{ $0 == "Sports"}
+                                    }
+                                
+                                    self.collectionView.reloadData()
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    dispatchGroup.enter()
+                    Service.shared.fetchEvents(segmentId: self.musicSegmentID) { (search, err) in
+                        musicEvents = search?.embedded?.events
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            if let group = musicEvents {
+                                self.groups.append(group)
+                            } else {
+                                self.sections.removeAll{ $0 == "Concerts"}
+                            }
+            
+                            self.collectionView.reloadData()
+                                
+                            dispatchGroup.enter()
+                            Service.shared.fetchEvents(segmentId: self.sportsSegmentID) { (search, err) in
+                                sportsEvents = search?.embedded?.events
+                                dispatchGroup.leave()
+                                
+                                dispatchGroup.notify(queue: .main) {
+                                    if let group = sportsEvents {
+                                        self.groups.append(group)
+                                    } else {
+                                        self.sections.removeAll{ $0 == "Sports"}
+                                    }
+                                
+                                    self.collectionView.reloadData()
+                                }
+                            }
+                        }
+                    }
                 }
-                if let group = sportsEvents {
-                    self.groups.append(group)
-                    self.sections.append("Sports")
-                }
-            self.collectionView.reloadData()
-            let layout = UICollectionViewFlowLayout()
-            self.collectionView.collectionViewLayout = layout
+            }
         }
+        
     }
     
     // MARK: UICollectionViewDataSource
@@ -137,30 +162,29 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerId, for: indexPath) as! ActivityHeader
         header.activityHeaderHorizontalController.customActivities = self.types
         header.activityHeaderHorizontalController.collectionView.reloadData()
+        header.activityHeaderHorizontalController.didSelectHandler = { [weak self] cellData in
         
-            header.activityHeaderHorizontalController.didSelectHandler = { [weak self] cellData in
-            
-                if let activityType = cellData as? ActivityType {
-                    let activityTypeName = activityType.rawValue
-                        switch activityTypeName {
-                        case "basic":
-                            print("basic")
-                            let destination = CreateActivityViewController()
-                            destination.hidesBottomBarWhenPushed = true
-                            destination.users = self!.users
-                            destination.filteredUsers = self!.filteredUsers
-                            destination.conversations = self!.conversations
-                            self?.navigationController?.pushViewController(destination, animated: true)
-                        case "meal":
-                            print("meal")
-                        case "workout":
-                            print("workout")
-                        default:
-                            print("default")
-                        }
-                }
-            
+            if let activityType = cellData as? ActivityType {
+                let activityTypeName = activityType.rawValue
+                    switch activityTypeName {
+                    case "basic":
+                        print("basic")
+                        let destination = CreateActivityViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.users = self!.users
+                        destination.filteredUsers = self!.filteredUsers
+                        destination.conversations = self!.conversations
+                        self?.navigationController?.pushViewController(destination, animated: true)
+                    case "meal":
+                        print("meal")
+                    case "workout":
+                        print("workout")
+                    default:
+                        print("default")
+                    }
             }
+        
+        }
         return header
 
     }
@@ -170,54 +194,53 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return groups.count
+        return sections.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
         cell.delegate = self
         cell.titleLabel.text = sections[indexPath.item]
-        var controllerTitle = sections[indexPath.item]
-        
-        let cellData = groups[indexPath.item]
-        if let customActivities = cellData as? [ActivityType] {
-            cell.horizontalController.customActivities = customActivities
-        } else if let recipes = cellData as? [Recipe] {
-            cell.horizontalController.recipes = recipes
-        } else if let events = cellData as? [Event] {
-            cell.horizontalController.events = events
-        } else {
-            cell.horizontalController.cellData = cellData
-        }
-        
-        cell.horizontalController.didSelectHandler = { [weak self] cellData in
-            
-            if let recipe = cellData as? Recipe {
-                print("meal \(recipe.title)")
-                let destination = ActivityDetailViewController()
-                destination.hidesBottomBarWhenPushed = true
-                destination.recipe = recipe
-                destination.title = controllerTitle
-                destination.users = self!.users
-                destination.filteredUsers = self!.filteredUsers
-                destination.conversations = self!.conversations
-                self?.navigationController?.pushViewController(destination, animated: true)
-            } else if let event = cellData as? Event {
-                print("event \(event.name)")
-                let destination = ActivityDetailViewController()
-                destination.hidesBottomBarWhenPushed = true
-                destination.event = event
-                destination.title = controllerTitle
-                destination.users = self!.users
-                destination.filteredUsers = self!.filteredUsers
-                destination.conversations = self!.conversations
-                self?.navigationController?.pushViewController(destination, animated: true)
+        if indexPath.item < groups.count {
+            let cellData = groups[indexPath.item]
+            if let customActivities = cellData as? [ActivityType] {
+                cell.horizontalController.customActivities = customActivities
+            } else if let recipes = cellData as? [Recipe] {
+                cell.horizontalController.recipes = recipes
+                cell.horizontalController.events = nil
+            } else if let events = cellData as? [Event] {
+                cell.horizontalController.events = events
+                cell.horizontalController.recipes = nil
             } else {
-                print("neither meals or events")
+                cell.horizontalController.cellData = cellData
             }
-            
+            cell.horizontalController.collectionView.reloadData()
+            cell.horizontalController.didSelectHandler = { [weak self] cellData in
+                
+                if let recipe = cellData as? Recipe {
+                    print("meal \(recipe.title)")
+                    let destination = MealDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
+                    destination.recipe = recipe
+                    destination.users = self!.users
+                    destination.filteredUsers = self!.filteredUsers
+                    destination.conversations = self!.conversations
+                    self?.navigationController?.pushViewController(destination, animated: true)
+                } else if let event = cellData as? Event {
+                    print("event \(String(describing: event.name))")
+                    let destination = EventDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
+                    destination.event = event
+                    destination.users = self!.users
+                    destination.filteredUsers = self!.filteredUsers
+                    destination.conversations = self!.conversations
+                    self?.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    print("neither meals or events")
+                }
+                
+            }
         }
-        
         return cell
         
     }
@@ -235,9 +258,12 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
 extension ActivityTypeViewController: ActivityTypeCellDelegate {
     func viewTapped(labelText: String) {
         switch labelText {
-        case "Meals":
+        case "Recipes":
             let destination = MealTypeViewController()
             destination.hidesBottomBarWhenPushed = true
+            if !recipes.isEmpty {
+                destination.groups.append(recipes)
+            }
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
