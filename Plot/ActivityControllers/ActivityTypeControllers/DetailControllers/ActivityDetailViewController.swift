@@ -111,7 +111,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 415)
+        return CGSize(width: view.frame.width, height: 397)
     }
 }
 

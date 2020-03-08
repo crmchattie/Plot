@@ -15,6 +15,8 @@ class WebViewController: UIViewController, WKUIDelegate {
     
     var urlString: String?
     
+    var controllerTitle: String?
+    
     override func loadView() {
         let webConfiguration = WKWebViewConfiguration()
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
@@ -24,6 +26,8 @@ class WebViewController: UIViewController, WKUIDelegate {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        title = controllerTitle
 
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.rightBarButtonItem = doneBarButton

@@ -86,39 +86,12 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
         if recipes != nil {
             self.activityIndicatorView.stopAnimating()
             let recipe = recipes![indexPath.item]
-            cell.nameLabel.text = recipe.title
-            if let categoryLabel = recipe.readyInMinutes, let subcategoryLabel = recipe.servings {
-                cell.categoryLabel.text = "Preparation time: \(categoryLabel) mins"
-                cell.subcategoryLabel.text = "Servings: \(subcategoryLabel)"
-            }
-            let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
-                cell.imageView.sd_setImage(with: URL(string: recipeImage))
+            cell.recipe = recipe
             return cell
         } else if events != nil {
             self.activityIndicatorView.stopAnimating()
             let event = events![indexPath.item]
-            cell.nameLabel.text = "\(String(describing: event.name!))"
-            if let startDateTime = event.dates?.start?.dateTime {
-                let dateFormatter = DateFormatter()
-                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-                let date = dateFormatter.date(from:startDateTime)!
-                let newDate = date.startDateTimeString()
-                cell.categoryLabel.text = "\(newDate)  @ \(event.embedded?.venues?[0].name ?? "")"
-            }
-            if let minPrice = event.priceRanges?[0].min, let maxPrice = event.priceRanges?[0].max {
-                let formatter = CurrencyFormatter()
-                formatter.locale = .current
-                formatter.numberStyle = .currency
-                let minPriceString = formatter.string(for: minPrice)!
-                let maxPriceString = formatter.string(for: maxPrice)!
-                cell.subcategoryLabel.text = "Price range: \(minPriceString) to \(maxPriceString)"
-            } else {
-                cell.subcategoryLabel.text = ""
-            }
-            if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
-                cell.imageView.sd_setImage(with: URL(string: url))
-            }
+            cell.event = event
             return cell
         } else {
             return cell

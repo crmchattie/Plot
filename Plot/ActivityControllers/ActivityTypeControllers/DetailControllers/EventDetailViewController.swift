@@ -65,28 +65,7 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
             cell.delegate = self
             if let event = event {
-                cell.nameLabel.text = "\(String(describing: event.name!))"
-                if let startDateTime = event.dates?.start?.dateTime {
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-                    let date = dateFormatter.date(from:startDateTime)!
-                    let newDate = date.startDateTimeString()
-                    cell.categoryLabel.text = "\(newDate)  @ \(event.embedded?.venues?[0].name ?? "")"
-                }
-                if let minPrice = event.priceRanges?[0].min, let maxPrice = event.priceRanges?[0].max {
-                    let formatter = CurrencyFormatter()
-                    formatter.locale = .current
-                    formatter.numberStyle = .currency
-                    let minPriceString = formatter.string(for: minPrice)!
-                    let maxPriceString = formatter.string(for: maxPrice)!
-                    cell.subcategoryLabel.text = "Price range: \(minPriceString) to \(maxPriceString)"
-                } else {
-                    cell.subcategoryLabel.text = ""
-                }
-                if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
-                    cell.imageView.sd_setImage(with: URL(string: url))
-                }
+                cell.event = event
                 return cell
             } else {
                 return cell
@@ -103,10 +82,18 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var height: CGFloat = 5
         if indexPath.item == 0 {
-            return CGSize(width: view.frame.width, height: 356)
+            let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 5))
+            dummyCell.event = event
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 5))
+            height = estimatedSize.height
+            print("height: \(height)")
+            return CGSize(width: view.frame.width, height: height)
         } else {
-            return CGSize(width: view.frame.width, height: 15)
+            height = 20
+            return CGSize(width: view.frame.width, height: height)
         }
         
     }
@@ -128,10 +115,11 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
 }
 
 extension EventDetailViewController: EventDetailCellDelegate {
-    func labelTapped() {
-        print("label tapped")
+    func viewTapped() {
+        print("view tapped")
         let destination = WebViewController()
         destination.urlString = event?.url
+        destination.controllerTitle = "Tickets"
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }

@@ -9,7 +9,7 @@
 import UIKit
 
 protocol EventDetailCellDelegate: class {
-    func labelTapped()
+    func viewTapped()
 }
 
 class EventDetailCell: UICollectionViewCell {
@@ -24,6 +24,13 @@ class EventDetailCell: UICollectionViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    let clickView: UIView = {
+        let view = UIView()
+        view.isUserInteractionEnabled = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
    
     let getTixLabel: UILabel = {
         let label = UILabel()
@@ -36,16 +43,20 @@ class EventDetailCell: UICollectionViewCell {
     }()
    
     func setupViews() {
-        addSubview(getTixLabel)
+        
+        clickView.constrainHeight(constant: 20)
+        addSubview(clickView)
+        clickView.addSubview(getTixLabel)
 
-        getTixLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 0))
+        clickView.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: -10, left: 0, bottom: 0, right: 0))
+        getTixLabel.anchor(top: clickView.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 0))
        
-        let labelGesture = UITapGestureRecognizer(target: self, action: #selector(labelTapped(_:)))
-        getTixLabel.addGestureRecognizer(labelGesture)
+        let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
+        clickView.addGestureRecognizer(viewGesture)
             
     }
         
-    @objc func labelTapped(_ sender: UITapGestureRecognizer) {
-        self.delegate?.labelTapped()
+    @objc func viewTapped(_ sender: UITapGestureRecognizer) {
+        self.delegate?.viewTapped()
     }
 }

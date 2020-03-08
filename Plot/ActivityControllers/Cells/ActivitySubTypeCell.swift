@@ -16,6 +16,45 @@ protocol ActivitySubTypeCellDelegate: class {
 
 class ActivitySubTypeCell: UICollectionViewCell {
     
+    var recipe: Recipe! {
+        didSet {
+            nameLabel.text = recipe.title
+            if let category = recipe.readyInMinutes, let subcategory = recipe.servings {
+                categoryLabel.text = "Preparation time: \(category) mins"
+                subcategoryLabel.text = "Servings: \(subcategory)"
+            }
+            let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
+                imageView.sd_setImage(with: URL(string: recipeImage))
+        }
+    }
+    
+    var event: Event! {
+        didSet {
+            nameLabel.text = "\(String(describing: event.name!))"
+            if let startDateTime = event.dates?.start?.dateTime {
+                let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                let date = dateFormatter.date(from:startDateTime)!
+                let newDate = date.startDateTimeString()
+                categoryLabel.text = "\(newDate) @ \(event.embedded?.venues?[0].name ?? "")"
+            }
+            if let minPrice = event.priceRanges?[0].min, let maxPrice = event.priceRanges?[0].max {
+                let formatter = CurrencyFormatter()
+                formatter.locale = .current
+                formatter.numberStyle = .currency
+                let minPriceString = formatter.string(for: minPrice)!
+                let maxPriceString = formatter.string(for: maxPrice)!
+                subcategoryLabel.text = "Price range: \(minPriceString) to \(maxPriceString)"
+            } else {
+                subcategoryLabel.text = ""
+            }
+            if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
+                imageView.sd_setImage(with: URL(string: url))
+            }
+        }
+    }
+    
     weak var delegate: ActivitySubTypeCellDelegate?
     
     override init(frame: CGRect) {
@@ -26,18 +65,6 @@ class ActivitySubTypeCell: UICollectionViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    let buttonView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    let labelView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
     
     let borderView: UIView = {
         let view = UIView()
@@ -76,7 +103,6 @@ class ActivitySubTypeCell: UICollectionViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.text = "Cheesy Chicken Enchilada Quinoa Casserole"
         label.font = UIFont.systemFont(ofSize: 18)
         label.numberOfLines = 0
         return label
@@ -85,7 +111,6 @@ class ActivitySubTypeCell: UICollectionViewCell {
     let categoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.text = "Preparation time: 30 mins"
         label.font = UIFont.systemFont(ofSize: 13)
         label.numberOfLines = 0
         return label
@@ -94,7 +119,6 @@ class ActivitySubTypeCell: UICollectionViewCell {
     let subcategoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.text = "Servings: 4"
         label.font = UIFont.systemFont(ofSize: 13)
         label.numberOfLines = 0
         return label
@@ -104,11 +128,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
     
 
     func setupViews() {
-        
-        buttonView.constrainHeight(constant: 40)
-//        borderView.constrainWidth(constant: 80)
-//        borderView.constrainHeight(constant: 40)
-        
+                        
         heartButton.constrainWidth(constant: 40)
         heartButton.constrainHeight(constant: 40)
         
@@ -120,26 +140,16 @@ class ActivitySubTypeCell: UICollectionViewCell {
 
         imageView.constrainHeight(constant: 231)
         
-        buttonView.addSubview(plusButton)
-        buttonView.addSubview(shareButton)
-        buttonView.addSubview(heartButton)
-        labelView.addSubview(nameLabel)
-        labelView.addSubview(categoryLabel)
-        labelView.addSubview(subcategoryLabel)
 
-        
-        plusButton.anchor(top: buttonView.topAnchor, leading: buttonView.leadingAnchor, bottom: buttonView.bottomAnchor, trailing: nil, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        shareButton.anchor(top: buttonView.topAnchor, leading: plusButton.trailingAnchor, bottom: buttonView.bottomAnchor, trailing: nil, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        heartButton.anchor(top: buttonView.topAnchor, leading: shareButton.trailingAnchor, bottom: buttonView.bottomAnchor, trailing: nil, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        nameLabel.anchor(top: labelView.topAnchor, leading: labelView.leadingAnchor, bottom: nil, trailing: labelView.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        categoryLabel.anchor(top: nameLabel.bottomAnchor, leading: labelView.leadingAnchor, bottom: nil, trailing: labelView.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        subcategoryLabel.anchor(top: categoryLabel.bottomAnchor, leading: labelView.leadingAnchor, bottom: nil, trailing: labelView.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, UIView()], spacing: 0)
+        labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+        labelStackView.isLayoutMarginsRelativeArrangement = true
         
         let stackView = VerticalStackView(arrangedSubviews: [
             imageView,
-            buttonView,
-            labelView
-            ], spacing: 5)
+            UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()]),
+            labelStackView
+            ], spacing: 2)
         addSubview(stackView)
         stackView.fillSuperview(padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         

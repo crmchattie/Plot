@@ -81,13 +81,7 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
             cell.delegate = self
             if let recipe = recipe {
-                cell.nameLabel.text = recipe.title
-                if let categoryLabel = recipe.readyInMinutes, let subcategoryLabel = recipe.servings {
-                    cell.categoryLabel.text = "Preparation time: \(categoryLabel) mins"
-                    cell.subcategoryLabel.text = "Servings: \(subcategoryLabel)"
-                }
-                let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
-                    cell.imageView.sd_setImage(with: URL(string: recipeImage))
+                cell.recipe = recipe
                 return cell
             } else {
                 return cell
@@ -107,10 +101,18 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var height: CGFloat = 5
         if indexPath.item == 0 {
-            return CGSize(width: view.frame.width, height: 370)
+            let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 5))
+            dummyCell.recipe = recipe
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 5))
+            height = estimatedSize.height
+            print("height: \(height)")
+            return CGSize(width: view.frame.width, height: height)
         } else {
-            return CGSize(width: view.frame.width, height: 1000)
+            height = 1000
+            return CGSize(width: view.frame.width, height: height)
         }
     }
 }
