@@ -16,6 +16,9 @@ protocol ActivitySubTypeCellDelegate: class {
 
 class ActivitySubTypeCell: UICollectionViewCell {
     
+    var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
+    var intColor: Int = 0
+    
     var recipe: Recipe! {
         didSet {
             nameLabel.text = recipe.title
@@ -52,6 +55,19 @@ class ActivitySubTypeCell: UICollectionViewCell {
             if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
                 imageView.sd_setImage(with: URL(string: url))
             }
+        }
+    }
+    
+    var workout: Workout! {
+        didSet {
+            nameLabel.text = workout.title
+            if let category = workout.workoutDuration, let subcategory = workout.exercises?.count {
+                categoryLabel.text = "Duration: \(category) mins"
+                subcategoryLabel.text = "Number of exercises: \(subcategory)"
+            }
+            imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
+            imageView.tintColor = UIColor.white
+            imageView.backgroundColor = colors[intColor]
         }
     }
     

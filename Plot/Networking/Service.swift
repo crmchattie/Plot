@@ -63,7 +63,7 @@ class Service {
         
     }
     
-    func fetchEvents(segmentId: String, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
+    func fetchEventsSegment(segmentId: String, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: TicketMasterAPI.baseUrlString)!
@@ -80,7 +80,7 @@ class Service {
     }
     
     
-    func fetchEventsLatLong(segmentId: String, lat: Double, long: Double, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
+    func fetchEventsSegmentLatLong(segmentId: String, lat: Double, long: Double, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: TicketMasterAPI.baseUrlString)!

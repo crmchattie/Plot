@@ -16,6 +16,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     var customActivities: [ActivityType]?
     var recipes: [Recipe]?
     var events: [Event]?
+    var workouts: [Workout]?
     var numberOfRows: Int = 0
     
     var users = [User]()
@@ -51,11 +52,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
         
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("item selected")
-        if customActivities != nil {
-            if let activityType = customActivities?[indexPath.item] {
-                didSelectHandler?(activityType)
-            }
-        } else if recipes != nil {
+        if recipes != nil {
             if let recipe = recipes?[indexPath.item] {
                 didSelectHandler?(recipe)
             }
@@ -63,18 +60,23 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             if let event = events?[indexPath.item] {
                 didSelectHandler?(event)
             }
-        } else {
+        } else if workouts != nil {
+            if let workout = workouts?[indexPath.item] {
+                didSelectHandler?(workout)
+            }
+        }
+        else {
             
         }
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if customActivities != nil {
-            return customActivities!.count
-        } else if recipes != nil {
+        if recipes != nil {
             return recipes!.count
         } else if events != nil {
             return events!.count
+        } else if workouts != nil {
+            return workouts!.count
         } else {
             return 0
         }
@@ -92,6 +94,12 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             self.activityIndicatorView.stopAnimating()
             let event = events![indexPath.item]
             cell.event = event
+            return cell
+        } else if workouts != nil {
+            self.activityIndicatorView.stopAnimating()
+            let workout = workouts![indexPath.item]
+            cell.intColor = (indexPath.item % 5)
+            cell.workout = workout
             return cell
         } else {
             return cell

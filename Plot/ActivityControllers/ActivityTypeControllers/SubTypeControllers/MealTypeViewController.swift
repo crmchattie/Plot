@@ -150,6 +150,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+        cell.arrowView.isHidden = true
         cell.delegate = self
         if showGroups {
             cell.titleLabel.text = sections[indexPath.item]

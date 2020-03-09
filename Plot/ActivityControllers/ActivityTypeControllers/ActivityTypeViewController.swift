@@ -8,19 +8,22 @@
 
 import UIKit
 import MapKit
+import Firebase
+import CodableFirebase
 
 
 class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
+    fileprivate var workoutReference: DatabaseReference!
+    
     private let kActivityTypeCell = "ActivityTypeCell"
     private let headerId = "headerId"
     
-    private let musicSegmentID = "KZFzniwnSyZfZ7v7nJ"
-    private let sportsSegmentID = "KZFzniwnSyZfZ7v7nE"
-    
-    var sections: [String] = ["Recipes", "Concerts", "Sports"]
-    var types: [ActivityType] = [.basic, .trip, .meal, .workout]
+    var sections: [String] = ["Recipes", "Workouts", "Events"]
+    var types: [ActivityType] = [.basic]
     var recipes = [Recipe]()
+    
+    var workoutIDs: [String] = ["ZB9Gina","E5YrL4F","lhNZOX1","LWampEt","5jbuzns","ltrgYTF","Z37OGjs","7GdJQBG","RKrXsHn","GwxLrim","nspLcIX","nHWkOhp","0ym6yNn","6VLf2M7","n8g5auz","CM5o2rv","ufiyRQc","N7aHlCw","gIeTbVT","lGaFbQK"]
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -54,7 +57,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         collectionView.register(ActivityHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerId)
         
         locationManager.requestWhenInUseAuthorization()
-        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
                         
         fetchData()
         
@@ -67,8 +70,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     fileprivate func fetchData() {
             
         var recipes: [Recipe]?
-        var musicEvents: [Event]?
-        var sportsEvents: [Event]?
+        var workouts = [Workout]()
+        var events: [Event]?
         
         // help you sync your data fetches together
         let dispatchGroup = DispatchGroup()
@@ -87,73 +90,63 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 }
                 
                 self.collectionView.reloadData()
-        
-                if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+                
+                for workoutID in self.workoutIDs {
                     dispatchGroup.enter()
-                    Service.shared.fetchEventsLatLong(segmentId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                        musicEvents = search?.embedded?.events
-                        dispatchGroup.leave()
-                        dispatchGroup.notify(queue: .main) {
-                            if let group = musicEvents {
-                                self.groups.append(group)
-                            } else {
-                                self.sections.removeAll{ $0 == "Concerts"}
-                            }
-                            
-                            self.collectionView.reloadData()
-                            dispatchGroup.enter()
-                            Service.shared.fetchEventsLatLong(segmentId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                                sportsEvents = search?.embedded?.events
+                    self.workoutReference = Database.database().reference().child("workouts").child("0")
+                    self.workoutReference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                        if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                            if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                print("workout title \(String(describing: workout.title))")
+                                workouts.append(workout)
                                 dispatchGroup.leave()
-                                
-                                dispatchGroup.notify(queue: .main) {
-                                    self.removeSpinner()
-                                    if let group = sportsEvents {
-                                        self.groups.append(group)
-                                    } else {
-                                        self.sections.removeAll{ $0 == "Sports"}
-                                    }
-                                
-                                    self.collectionView.reloadData()
-                                }
                             }
                         }
+                      })
+                    { (error) in
+                        print(error.localizedDescription)
                     }
-                } else {
-                    dispatchGroup.enter()
-                    Service.shared.fetchEvents(segmentId: self.musicSegmentID) { (search, err) in
-                        musicEvents = search?.embedded?.events
-                        dispatchGroup.leave()
-                        dispatchGroup.notify(queue: .main) {
-                            if let group = musicEvents {
-                                self.groups.append(group)
-                            } else {
-                                self.sections.removeAll{ $0 == "Concerts"}
-                            }
-            
-                            self.collectionView.reloadData()
-                                
-                            dispatchGroup.enter()
-                            Service.shared.fetchEvents(segmentId: self.sportsSegmentID) { (search, err) in
-                                sportsEvents = search?.embedded?.events
-                                dispatchGroup.leave()
-                                
-                                dispatchGroup.notify(queue: .main) {
-                                    if let group = sportsEvents {
-                                        self.groups.append(group)
-                                    } else {
-                                        self.sections.removeAll{ $0 == "Sports"}
-                                    }
-                                
-                                    self.collectionView.reloadData()
+                }
+                
+                dispatchGroup.notify(queue: .main) {
+                    self.groups.append(workouts)
+                    self.collectionView.reloadData()
+    
+                    if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+                        dispatchGroup.enter()
+                        Service.shared.fetchEventsSegmentLatLong(segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                            events = search?.embedded?.events
+                            dispatchGroup.leave()
+                            dispatchGroup.notify(queue: .main) {
+                                if let group = events {
+                                    self.groups.append(group)
+                                } else {
+                                    self.sections.removeAll{ $0 == "Events"}
                                 }
+                                
+                                self.collectionView.reloadData()
+                            }
+                        }
+                    } else {
+                        dispatchGroup.enter()
+                        Service.shared.fetchEventsSegment(segmentId: "") { (search, err) in
+                            events = search?.embedded?.events
+                            dispatchGroup.leave()
+                            dispatchGroup.notify(queue: .main) {
+                                if let group = events {
+                                    self.groups.append(group)
+                                } else {
+                                    self.sections.removeAll{ $0 == "Events"}
+                                }
+                
+                                self.collectionView.reloadData()
+                                    
                             }
                         }
                     }
                 }
             }
         }
-        
     }
     
     // MARK: UICollectionViewDataSource
@@ -163,7 +156,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         header.activityHeaderHorizontalController.customActivities = self.types
         header.activityHeaderHorizontalController.collectionView.reloadData()
         header.activityHeaderHorizontalController.didSelectHandler = { [weak self] cellData in
-        
+            
             if let activityType = cellData as? ActivityType {
                 let activityTypeName = activityType.rawValue
                     switch activityTypeName {
@@ -203,14 +196,18 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         cell.titleLabel.text = sections[indexPath.item]
         if indexPath.item < groups.count {
             let cellData = groups[indexPath.item]
-            if let customActivities = cellData as? [ActivityType] {
-                cell.horizontalController.customActivities = customActivities
-            } else if let recipes = cellData as? [Recipe] {
+            if let recipes = cellData as? [Recipe] {
                 cell.horizontalController.recipes = recipes
                 cell.horizontalController.events = nil
+                cell.horizontalController.workouts = nil
             } else if let events = cellData as? [Event] {
                 cell.horizontalController.events = events
                 cell.horizontalController.recipes = nil
+                cell.horizontalController.workouts = nil
+            } else if let workouts = cellData as? [Workout] {
+                cell.horizontalController.workouts = workouts
+                cell.horizontalController.recipes = nil
+                cell.horizontalController.events = nil
             } else {
                 cell.horizontalController.cellData = cellData
             }
@@ -235,10 +232,18 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
                     self?.navigationController?.pushViewController(destination, animated: true)
+                } else if let workout = cellData as? Workout {
+                    print("workout \(String(describing: workout.title))")
+//                    let destination = EventDetailViewController()
+//                    destination.hidesBottomBarWhenPushed = true
+//                    destination.event = event
+//                    destination.users = self!.users
+//                    destination.filteredUsers = self!.filteredUsers
+//                    destination.conversations = self!.conversations
+//                    self?.navigationController?.pushViewController(destination, animated: true)
                 } else {
                     print("neither meals or events")
                 }
-                
             }
         }
         return cell
@@ -268,10 +273,16 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             navigationController?.pushViewController(destination, animated: true)
-        case "Concerts":
-            print("Concerts")
-        case "Sports":
-            print("Sports")
+        case "Events":
+            print("Event")
+            let destination = EventTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            navigationController?.pushViewController(destination, animated: true)
+        case "Workouts":
+            print("Workouts")
         default:
             print("Default")
         }
