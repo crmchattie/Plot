@@ -21,7 +21,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
 
     var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .type]
     var filterDictionary = [String: [String]]()
-    var sections: [String] = ["Concerts", "Sports", "Arts & Theatre"]
+    var sections: [String] = ["Concerts", "Sports", "Shows"]
     
     var locationManager = CLLocationManager()
         

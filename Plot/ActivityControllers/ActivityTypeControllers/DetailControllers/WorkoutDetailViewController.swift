@@ -1,17 +1,17 @@
 //
-//  EventDetailViewController.swift
+//  WorkoutDetailViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 3/7/20.
+//  Created by Cory McHattie on 3/9/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import UIKit
 
-class EventDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class WorkoutDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     private let kActivityDetailCell = "ActivityDetailCell"
-    private let kEventDetailCell = "EventDetailCell"
+    private let kWorkoutDetailCell = "WorkoutDetailCell"
     
     var sections = [String]()
     
@@ -19,7 +19,8 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
     var filteredUsers = [User]()
     var conversations = [Conversation]()
     
-    var event: Event?
+    var workout: Workout?
+    var intColor: Int = 0
             
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
@@ -36,7 +37,7 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        title = "Event"
+        title = "Workout"
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
@@ -46,7 +47,7 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
-        collectionView.register(EventDetailCell.self, forCellWithReuseIdentifier: kEventDetailCell)
+        collectionView.register(WorkoutDetailCell.self, forCellWithReuseIdentifier: kWorkoutDetailCell)
 
                                         
     }
@@ -64,14 +65,15 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
         if indexPath.item == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
             cell.delegate = self
-            if let event = event {
-                cell.event = event
+            if let workout = workout {
+                cell.intColor = intColor
+                cell.workout = workout
                 return cell
             } else {
                 return cell
             }
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kEventDetailCell, for: indexPath) as! EventDetailCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kWorkoutDetailCell, for: indexPath) as! WorkoutDetailCell
             cell.delegate = self
             return cell
         }
@@ -81,14 +83,15 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
         var height: CGFloat = 328
         if indexPath.item == 0 {
             let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 328))
-            dummyCell.event = event
+            dummyCell.workout = workout
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 328))
             height = estimatedSize.height
             print("height: \(height)")
             return CGSize(width: view.frame.width, height: height)
         } else {
-            height = 20
+            height = 13
+            print("height: \(height)")
             return CGSize(width: view.frame.width, height: height)
         }
         
@@ -103,7 +106,7 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
     }
 }
 
-extension EventDetailViewController: ActivityDetailCellDelegate {
+extension WorkoutDetailViewController: ActivityDetailCellDelegate {
     func plusButtonTapped() {
         print("plusButtonTapped")
     }
@@ -118,14 +121,17 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
 
 }
 
-extension EventDetailViewController: EventDetailCellDelegate {
+extension WorkoutDetailViewController: WorkoutDetailCellDelegate {
     func viewTapped() {
-        print("view tapped")
-        let destination = WebViewController()
-        destination.urlString = event?.url
-        destination.controllerTitle = "Tickets"
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
+        if let workout = workout, let indentifier = workout.identifier {
+            print("view tapped")
+            let destination = WebViewController()
+            destination.urlString = "https://workoutlabs.com/fit/wkt/\(indentifier)/?app=plot"
+            destination.controllerTitle = "Workout"
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            navigationViewController.modalPresentationStyle = .fullScreen
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
     }
 }
+

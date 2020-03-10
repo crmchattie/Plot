@@ -24,7 +24,6 @@
 		1024ABAF23C29ACF00A5875D /* VerticalStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024ABAC23C29ACF00A5875D /* VerticalStackView.swift */; };
 		102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102523EA2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift */; };
 		102523ED238B00DD00D49FAA /* ChooseChatTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102523EC238B00DD00D49FAA /* ChooseChatTableViewController.swift */; };
-		1027D09E23ECFBA10005D2A7 /* ActivityDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1027D09D23ECFBA10005D2A7 /* ActivityDetailViewController.swift */; };
 		1028A104230D8F4200619907 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1028A103230D8F4200619907 /* Activity.swift */; };
 		1028A108230DB70F00619907 /* ShareHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1028A107230DB70F00619907 /* ShareHeaderView.swift */; };
 		1028A10B230DFA8B00619907 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1028A10A230DFA8B00619907 /* GoogleService-Info.plist */; };
@@ -35,8 +34,10 @@
 		103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103E968922C2B309007D6668 /* PurchaseRow.swift */; };
 		105BD06B22FB520100ECFA34 /* PhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105BD06A22FB520100ECFA34 /* PhotosViewController.swift */; };
 		105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66E824149DC600F6EDB6 /* EventDetailCell.swift */; };
-		105F66EB2415942B00F6EDB6 /* WorkoutSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* WorkoutSearchResult.swift */; };
+		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
 		105F66F32415A83300F6EDB6 /* EventTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F22415A83300F6EDB6 /* EventTypeViewController.swift */; };
+		105F66F724171A3C00F6EDB6 /* WorkoutDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F624171A3C00F6EDB6 /* WorkoutDetailViewController.swift */; };
+		105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */; };
 		1092F2362414501D00E8CE16 /* MealDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2352414501D00E8CE16 /* MealDetailViewController.swift */; };
@@ -301,7 +302,6 @@
 		1024ABAC23C29ACF00A5875D /* VerticalStackView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalStackView.swift; sourceTree = "<group>"; };
 		102523EA2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatActivitiesTableViewCell.swift; sourceTree = "<group>"; };
 		102523EC238B00DD00D49FAA /* ChooseChatTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseChatTableViewController.swift; sourceTree = "<group>"; };
-		1027D09D23ECFBA10005D2A7 /* ActivityDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailViewController.swift; sourceTree = "<group>"; };
 		1028A100230D76CD00619907 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareExtension.entitlements; sourceTree = "<group>"; };
 		1028A103230D8F4200619907 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		1028A107230DB70F00619907 /* ShareHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareHeaderView.swift; sourceTree = "<group>"; };
@@ -315,8 +315,10 @@
 		1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.release.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.release.xcconfig"; sourceTree = "<group>"; };
 		105BD06A22FB520100ECFA34 /* PhotosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhotosViewController.swift; path = ../../../PhotosViewController.swift; sourceTree = "<group>"; };
 		105F66E824149DC600F6EDB6 /* EventDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailCell.swift; sourceTree = "<group>"; };
-		105F66EA2415942B00F6EDB6 /* WorkoutSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSearchResult.swift; sourceTree = "<group>"; };
+		105F66EA2415942B00F6EDB6 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
 		105F66F22415A83300F6EDB6 /* EventTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTypeViewController.swift; sourceTree = "<group>"; };
+		105F66F624171A3C00F6EDB6 /* WorkoutDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewController.swift; sourceTree = "<group>"; };
+		105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailCell.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCell.swift; sourceTree = "<group>"; };
 		1092F2352414501D00E8CE16 /* MealDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetailViewController.swift; sourceTree = "<group>"; };
@@ -628,9 +630,9 @@
 		1082B66523EF25D300A27046 /* DetailControllers */ = {
 			isa = PBXGroup;
 			children = (
-				1027D09D23ECFBA10005D2A7 /* ActivityDetailViewController.swift */,
 				1092F2352414501D00E8CE16 /* MealDetailViewController.swift */,
 				1092F23D2414587E00E8CE16 /* MealExpandedDetailViewController.swift */,
+				105F66F624171A3C00F6EDB6 /* WorkoutDetailViewController.swift */,
 				1092F2372414503000E8CE16 /* EventDetailViewController.swift */,
 			);
 			path = DetailControllers;
@@ -678,6 +680,7 @@
 				1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */,
 				1092F23B2414580E00E8CE16 /* MealDetailCell.swift */,
 				1092F23F241482C600E8CE16 /* MealDetailViewCell.swift */,
+				105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */,
 				105F66E824149DC600F6EDB6 /* EventDetailCell.swift */,
 				100A53E923E0DD3D004AA952 /* ActivityHeader.swift */,
 				100A53EB23E0DD9C004AA952 /* ActivityHeaderCell.swift */,
@@ -1264,7 +1267,7 @@
 				2680A0332360C0BD00C4C287 /* Invitation.swift */,
 				26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */,
 				102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */,
-				105F66EA2415942B00F6EDB6 /* WorkoutSearchResult.swift */,
+				105F66EA2415942B00F6EDB6 /* Workout.swift */,
 				100A53F223E3BDAC004AA952 /* Filter.swift */,
 			);
 			path = Model;
@@ -1838,6 +1841,7 @@
 				4BAEE48421272C4F0045AB10 /* AuthPhoneNumberController.swift in Sources */,
 				4BAEE50B21272D890045AB10 /* UserCell+ConfigureCell.swift in Sources */,
 				4BA1E77A215250F900391BCB /* StorageMediaUploader.swift in Sources */,
+				105F66F724171A3C00F6EDB6 /* WorkoutDetailViewController.swift in Sources */,
 				4BAEE48721272C4F0045AB10 /* OnboardingContainerView.swift in Sources */,
 				4BAEE5CE212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift in Sources */,
 				2680A0322360C03500C4C287 /* CreateActivityViewController+UpdateInvitees.swift in Sources */,
@@ -1922,7 +1926,6 @@
 				4BAEE51C21272D890045AB10 /* BaseMessageCell+CellDeletionHandlers.swift in Sources */,
 				4BA1E778215250BF00391BCB /* MessageSender.swift in Sources */,
 				4BAEE4F021272D890045AB10 /* AddGroupMembersController.swift in Sources */,
-				1027D09E23ECFBA10005D2A7 /* ActivityDetailViewController.swift in Sources */,
 				4BAEE51D21272D890045AB10 /* BaseMessageCell.swift in Sources */,
 				10217A7B23103661004CBA9E /* ActivityViewController.swift in Sources */,
 				4BAEE5D4212735E50045AB10 /* UIView+Extensions.swift in Sources */,
@@ -1971,7 +1974,7 @@
 				4BAEE47021272B380045AB10 /* AccountSettingsController+nameEditing.swift in Sources */,
 				4BAEE5DA212735E50045AB10 /* CameraCell.swift in Sources */,
 				4BAEE4FC21272D890045AB10 /* ChatLogController+ImageZoomHandlers.swift in Sources */,
-				105F66EB2415942B00F6EDB6 /* WorkoutSearchResult.swift in Sources */,
+				105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */,
 				4BAEE51221272D890045AB10 /* UserInfoPhoneNumberTableViewCell.swift in Sources */,
 				1092F2362414501D00E8CE16 /* MealDetailViewController.swift in Sources */,
 				265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */,
@@ -1994,6 +1997,7 @@
 				4BAEE50321272D890045AB10 /* ChatInputContainerView.swift in Sources */,
 				4BAEE5E9212735E50045AB10 /* EnterPhoneNumberContainerView.swift in Sources */,
 				4BAEE4F821272D890045AB10 /* MessagesFetcher.swift in Sources */,
+				105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */,
 				4BAEE48321272C4F0045AB10 /* UserProfileAvatarOpenerDelegate.swift in Sources */,
 				1024ABAF23C29ACF00A5875D /* VerticalStackView.swift in Sources */,
 				4BAEE46C21272B380045AB10 /* SwitchTableViewCell.swift in Sources */,

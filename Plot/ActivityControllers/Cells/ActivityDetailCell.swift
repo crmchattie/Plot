@@ -16,6 +16,9 @@ protocol ActivityDetailCellDelegate: class {
 
 class ActivityDetailCell: UICollectionViewCell {
     
+    var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
+    var intColor: Int = 0
+    
     var recipe: Recipe! {
         didSet {
             nameLabel.text = recipe.title
@@ -55,6 +58,19 @@ class ActivityDetailCell: UICollectionViewCell {
         }
     }
     
+    var workout: Workout! {
+        didSet {
+            nameLabel.text = workout.title
+            if let category = workout.workoutDuration, let subcategory = workout.exercises?.count {
+                categoryLabel.text = "Duration: \(category) mins"
+                subcategoryLabel.text = "Number of exercises: \(subcategory)"
+            }
+            imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
+            imageView.tintColor = UIColor.white
+            imageView.backgroundColor = colors[intColor]
+        }
+    }
+    
     weak var delegate: ActivityDetailCellDelegate?
     
     override init(frame: CGRect) {
@@ -65,16 +81,6 @@ class ActivityDetailCell: UICollectionViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    let borderView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.masksToBounds = true
-        view.layer.cornerRadius = 8
-        view.layer.borderWidth = 2
-        view.layer.borderColor = FalconPalette.defaultBlue.cgColor
-        return view
-    }()
     
     let heartButton: UIButton = {
         let button = UIButton(type: .system)
@@ -126,7 +132,6 @@ class ActivityDetailCell: UICollectionViewCell {
     
     let imageView = UIImageView(cornerRadius: 0)
     
-
     func setupViews() {
                         
         heartButton.constrainWidth(constant: 40)
@@ -141,17 +146,17 @@ class ActivityDetailCell: UICollectionViewCell {
         imageView.constrainHeight(constant: 231)
         
 
-        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, UIView()], spacing: 0)
+        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel], spacing: 0)
         labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
         labelStackView.isLayoutMarginsRelativeArrangement = true
         
         let stackView = VerticalStackView(arrangedSubviews: [
             imageView,
-            UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()]),
+            UIStackView(arrangedSubviews: [plusButton, UIView()]),
             labelStackView
             ], spacing: 2)
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 10, left: 0, bottom: 0, right: 0))
+        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)

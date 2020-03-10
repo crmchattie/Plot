@@ -82,16 +82,6 @@ class ActivitySubTypeCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    let borderView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.masksToBounds = true
-        view.layer.cornerRadius = 8
-        view.layer.borderWidth = 2
-        view.layer.borderColor = FalconPalette.defaultBlue.cgColor
-        return view
-    }()
-    
     let heartButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "heart"), for: .normal)
@@ -163,7 +153,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
         
         let stackView = VerticalStackView(arrangedSubviews: [
             imageView,
-            UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()]),
+            UIStackView(arrangedSubviews: [plusButton, UIView()]),
             labelStackView
             ], spacing: 2)
         addSubview(stackView)

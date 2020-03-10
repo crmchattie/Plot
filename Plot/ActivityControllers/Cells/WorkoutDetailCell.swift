@@ -1,20 +1,20 @@
 //
-//  EventDetailCell.swift
+//  WorkoutDetailCell.swift
 //  Plot
 //
-//  Created by Cory McHattie on 3/7/20.
+//  Created by Cory McHattie on 3/9/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import UIKit
 
-protocol EventDetailCellDelegate: class {
+protocol WorkoutDetailCellDelegate: class {
     func viewTapped()
 }
 
-class EventDetailCell: UICollectionViewCell {
+class WorkoutDetailCell: UICollectionViewCell {
     
-    weak var delegate: EventDetailCellDelegate?
+    weak var delegate: WorkoutDetailCellDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -32,10 +32,10 @@ class EventDetailCell: UICollectionViewCell {
         return view
     }()
    
-    let getTixLabel: UILabel = {
+    let getWorkoutLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.text = "Get Tickets"
+        label.text = "Go to Workout"
         label.font = UIFont.systemFont(ofSize: 13)
         label.numberOfLines = 1
         label.isUserInteractionEnabled = true
@@ -44,12 +44,12 @@ class EventDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-        clickView.constrainHeight(constant: 20)
+        clickView.constrainHeight(constant: 13)
         addSubview(clickView)
-        clickView.addSubview(getTixLabel)
+        clickView.addSubview(getWorkoutLabel)
 
         clickView.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        getTixLabel.anchor(top: clickView.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 0))
+        getWorkoutLabel.anchor(top: clickView.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         clickView.addGestureRecognizer(viewGesture)

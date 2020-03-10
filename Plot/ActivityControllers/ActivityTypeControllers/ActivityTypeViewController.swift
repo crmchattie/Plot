@@ -24,6 +24,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var recipes = [Recipe]()
     
     var workoutIDs: [String] = ["ZB9Gina","E5YrL4F","lhNZOX1","LWampEt","5jbuzns","ltrgYTF","Z37OGjs","7GdJQBG","RKrXsHn","GwxLrim","nspLcIX","nHWkOhp","0ym6yNn","6VLf2M7","n8g5auz","CM5o2rv","ufiyRQc","N7aHlCw","gIeTbVT","lGaFbQK"]
+    var intColor: Int = 0
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -234,13 +235,16 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     self?.navigationController?.pushViewController(destination, animated: true)
                 } else if let workout = cellData as? Workout {
                     print("workout \(String(describing: workout.title))")
-//                    let destination = EventDetailViewController()
-//                    destination.hidesBottomBarWhenPushed = true
-//                    destination.event = event
-//                    destination.users = self!.users
-//                    destination.filteredUsers = self!.filteredUsers
-//                    destination.conversations = self!.conversations
-//                    self?.navigationController?.pushViewController(destination, animated: true)
+                    let destination = WorkoutDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
+                    destination.workout = workout
+                    if let ID = workout.identifier, let index = self!.workoutIDs.firstIndex(of: ID) {
+                        destination.intColor = (index % 5)
+                    }
+                    destination.users = self!.users
+                    destination.filteredUsers = self!.filteredUsers
+                    destination.conversations = self!.conversations
+                    self?.navigationController?.pushViewController(destination, animated: true)
                 } else {
                     print("neither meals or events")
                 }
