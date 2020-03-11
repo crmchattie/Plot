@@ -61,8 +61,8 @@ class ActivityDetailCell: UICollectionViewCell {
     var workout: Workout! {
         didSet {
             nameLabel.text = workout.title
-            if let category = workout.workoutDuration, let subcategory = workout.exercises?.count {
-                categoryLabel.text = "Duration: \(category) mins"
+            if let category = workout.tagsStr, let subcategory = workout.exercises?.count {
+                categoryLabel.text = category
                 subcategoryLabel.text = "Number of exercises: \(subcategory)"
             }
             imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)

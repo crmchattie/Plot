@@ -14,6 +14,12 @@ protocol WorkoutDetailCellDelegate: class {
 
 class WorkoutDetailCell: UICollectionViewCell {
     
+    var workout: Workout! {
+        didSet {
+            notesLabel.text = workout.notes
+        }
+    }
+    
     weak var delegate: WorkoutDetailCellDelegate?
     
     override init(frame: CGRect) {
@@ -24,6 +30,14 @@ class WorkoutDetailCell: UICollectionViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    let notesLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.numberOfLines = 0
+        return label
+    }()
     
     let clickView: UIView = {
         let view = UIView()
@@ -44,12 +58,14 @@ class WorkoutDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-        clickView.constrainHeight(constant: 13)
+        clickView.constrainHeight(constant: 15)
+        addSubview(notesLabel)
         addSubview(clickView)
         clickView.addSubview(getWorkoutLabel)
-
-        clickView.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        getWorkoutLabel.anchor(top: clickView.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 0))
+        
+        notesLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 5))
+        clickView.anchor(top: notesLabel.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        getWorkoutLabel.anchor(top: clickView.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 2, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         clickView.addGestureRecognizer(viewGesture)

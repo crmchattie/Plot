@@ -107,7 +107,15 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
             print("height: \(height)")
             return CGSize(width: view.frame.width, height: height)
         } else {
-            height = 1000
+            let dummyCell = MealDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
+            if let recipe = detailedRecipe {
+                dummyCell.mealExpandedDetailViewController.recipe = recipe
+                dummyCell.mealExpandedDetailViewController.collectionView.reloadData()
+            }
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
+            height = estimatedSize.height
+            print("height: \(height)")
             return CGSize(width: view.frame.width, height: height)
         }
     }
