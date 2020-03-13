@@ -109,11 +109,7 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if segment == 2 {
             return CGSize(width: view.frame.width, height: 30)
-        } else {
-            return CGSize(width: view.frame.width, height: 30)
-        }
     }
 
 }

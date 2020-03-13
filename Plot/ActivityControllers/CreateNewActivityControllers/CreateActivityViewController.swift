@@ -1418,42 +1418,26 @@ class CreateActivityViewController: FormViewController {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             showActivityIndicator()
             groupActivityReference.updateChildValues(firebaseDictionary)
-            if Set(activity.participantsIDs!) != Set(membersIDs.0) {
-                updateParticipants(membersIDs: membersIDs)
-                groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
+            hideActivityIndicator()
+            if self.conversation == nil {
+                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+            } else {
+                self.navigationController?.backToViewController(viewController: ChatLogController.self)
             }
-            
-            activityCreatingGroup.notify(queue: DispatchQueue.main, execute: {
-                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-                    self.hideActivityIndicator()
-                    
-                    // if activity was created via conversation as opposed to activity tableview
-                    if self.conversation == nil {
-                        self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                    } else {
-                        self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                    }
-                }
-            })
+
         } else {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             firebaseDictionary["participantsIDs"] = membersIDs.1 as AnyObject
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
+            hideActivityIndicator()
+            if self.conversation == nil {
+                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+            } else {
+                self.navigationController?.backToViewController(viewController: ChatLogController.self)
+            }
 
-            connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
-
-            activityCreatingGroup.notify(queue: DispatchQueue.main, execute: {
-                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-                    self.hideActivityIndicator()
-                    if self.conversation == nil {
-                        self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                    } else {
-                        self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                    }
-                }
-            })
         }
     }
     

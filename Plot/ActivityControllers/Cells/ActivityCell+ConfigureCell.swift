@@ -114,6 +114,8 @@ extension ActivityCell {
             if invitation.status != .pending {
                 let index = invitation.status == .accepted ? 0 : 1
                 invitationSegmentedControl.selectedSegmentIndex = index
+            } else {
+                invitationSegmentedControl.selectedSegmentIndex = -1
             }
             if #available(iOS 13.0, *) {
                 invitationSegmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle

@@ -113,6 +113,14 @@ class SelectParticipantsViewController: UIViewController {
                     }
                     .sorted { $0.name ?? "" < $1.name ?? "" }
             }
+            for section in sections {
+                if section.isEmpty {
+                    if let index = sections.firstIndex(of: section) {
+                        sortedFirstLetters.remove(at: index)
+                        sections.remove(at: index)
+                    }
+                }
+            }
         }
         else {
             let firstLetters = filteredUsers.map { $0.titleFirstLetter }
@@ -329,6 +337,8 @@ class SelectParticipantsViewController: UIViewController {
         
         if selectedFalconUsers.count == 1 {
             collectionViewHeightAnchor.constant = 75
+//            collectionViewHeightAnchor.constant = 0
+
             UIView.animate(withDuration: 0.3) {
                 self.view.layoutIfNeeded()
             }

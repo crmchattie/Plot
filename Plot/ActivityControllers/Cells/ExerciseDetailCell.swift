@@ -20,7 +20,7 @@ class ExerciseDetailCell: UICollectionViewCell {
             if sets == "0" {
                 sets = "1"
             }
-            detailLabel.text = "\(sets) sets - \(exercise.reps!) \(exercise.repsType!)"
+            detailLabel.text = "\(sets) sets - \(exercise.reps!) \(exercise.repsType!) each"
         }
     }
     
@@ -48,7 +48,7 @@ class ExerciseDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.text = "Go to Workout"
         label.font = UIFont.systemFont(ofSize: 15)
-        label.numberOfLines = 1
+        label.numberOfLines = 0
         return label
     }()
     
@@ -68,7 +68,7 @@ class ExerciseDetailCell: UICollectionViewCell {
         let stackView = UIStackView(arrangedSubviews: [numberLabel, VerticalStackView(arrangedSubviews: [nameLabel, detailLabel], spacing: 2), UIView()])
         stackView.spacing = 2
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 15, left: 5, bottom: 5, right: 5))
+        stackView.fillSuperview(padding: .init(top: 15, left: 15, bottom: 15, right: 5))
        
             
     }

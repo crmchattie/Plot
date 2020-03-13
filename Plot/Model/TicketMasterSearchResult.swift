@@ -96,12 +96,7 @@ struct TicketMasterSearchResult: Codable {
 
     // MARK: - Status
     struct StatusUpdate: Codable {
-        let code: Code?
-    }
-
-    enum Code: String, Codable {
-        case offsale = "offsale"
-        case onsale = "onsale"
+        let code: String?
     }
 
     // MARK: - EventEmbedded
