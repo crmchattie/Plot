@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         tabBarController.presentOnboardingController()
         
-//        registerForPushNotifications(application: application)
+        registerForPushNotifications(application: application)
         
         return true
     }
@@ -62,15 +62,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         // 1
         if aps["content-available"] as? Int == 1 {
-            //            let podcastStore = PodcastStore.sharedStore
-            // 2
-            //            podcastStore.refreshItems { didLoadNewItems in
-            //                // 3
-            //                completionHandler(didLoadNewItems ? .newData : .noData)
-            //            }
+
         } else  {
-            // 4
-            //            NewsItem.makeNewsItem(aps)
             completionHandler(.newData)
         }
         

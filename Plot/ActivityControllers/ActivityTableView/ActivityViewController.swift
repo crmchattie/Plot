@@ -427,7 +427,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         if !isAppLoaded {
             UIView.transition(with: activityView.tableView, duration: 0.15, options: .transitionCrossDissolve, animations: { self.activityView.tableView.reloadData()
             }) { _ in
-                self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, within: 365)
+                self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!)
             }
             
             
@@ -435,7 +435,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         } else {
             configureTabBarBadge()
             activityView.tableView.reloadData()
-            scrollToFirstActivityWithDate(date: activityView.calendar.selectedDate!, within: 7)
+            scrollToFirstActivityWithDate(date: activityView.calendar.selectedDate!)
         }
         
         if allActivities.count == 0 {
@@ -476,22 +476,20 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         self.activityView.tableView.reloadData()
     }
     
-    func scrollToFirstActivityWithDate(date: Date, within days: Int) {
+    func scrollToFirstActivityWithDate(date: Date) {
         let currentDate = date.stripTime()
-        let currentDateInterval = DateInterval(start: currentDate, duration: TimeInterval(86399 * days))
         var index = 0
         var activityFound = false
         for activity in self.filteredActivities {
-            if let startInterval = activity.startDateTime?.doubleValue, let endInterval = activity.endDateTime?.doubleValue {
+            if let startInterval = activity.startDateTime?.doubleValue {
                 let startDate = Date(timeIntervalSince1970: startInterval)
-                let endDate = Date(timeIntervalSince1970: endInterval)
-                let activityDateInterval = DateInterval(start: startDate, end: endDate)
-                if currentDateInterval.intersects(activityDateInterval) {
+                if currentDate < startDate {
                     activityFound = true
                     break
                 }
                 
                 index += 1
+
             }
         }
         
@@ -559,12 +557,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        self.scrollToFirstActivityWithDate(date: date, within: 1)
+        self.scrollToFirstActivityWithDate(date: date)
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
         let days = calendar.scope == .week ? 7 : 31
-        self.scrollToFirstActivityWithDate(date: calendar.currentPage, within: days)
+        self.scrollToFirstActivityWithDate(date: calendar.currentPage)
     }
     
     func saveCalendar(scope: FSCalendarScope) {

@@ -58,6 +58,7 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     fileprivate func setupNav() {
         let downloadImage = UIImage(named: "downloadNav")
         if imageURLs.count > 0 || images.count > 0 {
+            navigationItem.rightBarButtonItem = nil
             if #available(iOS 11.0, *) {
                 let addBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(uploadImage))
                 let downloadBarButton = UIButton(type: .system)
@@ -70,6 +71,7 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
                 navigationItem.rightBarButtonItems = [addBarButton, downloadBarButton]
             }
         } else {
+            navigationItem.rightBarButtonItems = nil
             if #available(iOS 11.0, *) {
                 let addBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(uploadImage))
                 navigationItem.rightBarButtonItem = addBarButton
@@ -101,12 +103,12 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     }
     
     func checkIfThereAnyPhotos() {
+        setupNav()
         if imageURLs.count > 0 || images.count > 0 {
             viewPlaceholder.remove(from: view, priority: .medium)
         } else {
             viewPlaceholder.add(for: view, title: .emptyPhotos, subtitle: .emptyPhotos, priority: .medium, position: .top)
         }
-        setupNav()
         collectionView?.reloadData()
     }
     
@@ -159,9 +161,9 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ActivityImageCell
-        cell.photoImageView.sd_setImage(with: URL(string:imageURLs[indexPath.item]), placeholderImage: nil, options: [.continueInBackground, .scaleDownLargeImages], completed: { (image, error, cacheType, url) in
-        })
-//        cell.photoImageView.image = images[indexPath.item]
+//        cell.photoImageView.sd_setImage(with: URL(string:imageURLs[indexPath.item]), placeholderImage: nil, options: [.continueInBackground, .scaleDownLargeImages], completed: { (image, error, cacheType, url) in
+//        })
+        cell.photoImageView.image = images[indexPath.item]
         if selectedArray.contains(indexPath) {
             cell.selectedImageCheck.isHidden = false
         } else {
@@ -218,7 +220,6 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
         let photoUpdatingGroup = DispatchGroup()
         
         for image in selectedImages {
-            print("images being updated")
             photoUpdatingGroup.enter()
             if let index = self.images.firstIndex(of: image) {
                 let url = imageURLs[index]
@@ -229,10 +230,9 @@ class PhotosViewController: UICollectionViewController, UICollectionViewDelegate
             }
             photoUpdatingGroup.leave()
         }
-        print("images updated")
+        checkIfThereAnyPhotos()
         activityReference.updateChildValues(["activityPhotos": self.imageURLs as AnyObject])
         cancelDownload()
-        checkIfThereAnyPhotos()
     }
 }
 
@@ -264,7 +264,7 @@ extension PhotosViewController: AvatarOpenerDelegate {
                 return
             }
         }
-//        checkIfThereAnyPhotos()
+        checkIfThereAnyPhotos()
     }
 }
 
@@ -294,21 +294,17 @@ extension PhotosViewController { // update
     
     typealias UpdateActivityImageCompletionHandler = (_ success: Bool) -> Void
     func updateActivityImage(with image: UIImage, completion: @escaping UpdateActivityImageCompletionHandler) {
-        print("updating activity image")
         let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
         var images = [(image: UIImage, quality: CGFloat, key: String)]()
         images.append((image: image, quality: 0.5, key: "activityPhotos"))
         
         let photoUpdatingGroup = DispatchGroup()
-        for _ in images { photoUpdatingGroup.enter() }
-        
-        photoUpdatingGroup.notify(queue: DispatchQueue.main, execute: {
-            completion(true)
-        })
+        for _ in images {
+            photoUpdatingGroup.enter()
+        }
         
         for imageElement in images {
             uploadAvatarForActivityToFirebaseStorageUsingImage(imageElement.image, quality: imageElement.quality) { (url) in
-                print("url")
                 self.imageURLs.append(url)
                 self.checkIfThereAnyPhotos()
                 activityReference.updateChildValues([imageElement.key: self.imageURLs], withCompletionBlock: { (_, _) in
@@ -316,6 +312,11 @@ extension PhotosViewController { // update
                 })
             }
         }
+        
+        photoUpdatingGroup.notify(queue: DispatchQueue.main, execute: {
+            print("completion")
+            completion(true)
+        })
     }
 }
 

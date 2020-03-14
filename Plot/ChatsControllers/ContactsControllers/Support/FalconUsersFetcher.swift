@@ -68,54 +68,60 @@ class FalconUsersFetcher: NSObject {
     //create check if user exists in relationship table and return relationships
     reference.child("relationships").child(userID!).observeSingleEvent(of: .value, with: { snapshot in
         if snapshot.exists() {
-                //grab all relationships
-                guard let children = snapshot.children.allObjects as? [DataSnapshot] else { return }
-                //iterate over the children to grab users' info
-                for child in children {
-                    self.reference.child("users").child(child.key).observeSingleEvent(of: .value, with: { snapshot in
-                        if snapshot.exists() {
-                            guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                            
-                            dictionary.updateValue(child.key as AnyObject, forKey: "id")
-                            if let thumbnailURLString = User(dictionary: dictionary).thumbnailPhotoURL, let thumbnailURL = URL(string: thumbnailURLString) {
-                                SDWebImagePrefetcher.shared.prefetchURLs([thumbnailURL])
-                            }
-                            
-                            //add user to self.users unless user already was added, then update user's dictionary - will continuously add current user since current user is removed below
-                            if let index = self.users.firstIndex(where: { (user) -> Bool in
-                                return user.id == User(dictionary: dictionary).id
-                            }) {
-                                self.users[index] = User(dictionary: dictionary)
+            //grab all relationships
+            guard let children = snapshot.children.allObjects as? [DataSnapshot] else { return }
+            //iterate over the children to grab users' info
+            for child in children {
+                self.reference.child("users").child(child.key).observeSingleEvent(of: .value, with: { snapshot in
+                    if snapshot.exists() {
+                        guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
+                        
+                        dictionary.updateValue(child.key as AnyObject, forKey: "id")
+                        if let thumbnailURLString = User(dictionary: dictionary).thumbnailPhotoURL, let thumbnailURL = URL(string: thumbnailURLString) {
+                            SDWebImagePrefetcher.shared.prefetchURLs([thumbnailURL])
+                        }
+                        
+                        //add user to self.users unless user already was added, then update user's dictionary - will continuously add current user since current user is removed below
+                        if let index = self.users.firstIndex(where: { (user) -> Bool in
+                            return user.id == User(dictionary: dictionary).id
+                        }) {
+                            let user = User(dictionary: dictionary)
+                            self.users[index] = user
+                        } else {
+                            let user = User(dictionary: dictionary)
+                            if let _ = user.name {
+                                self.users.append(user)
                             } else {
-                                self.users.append(User(dictionary: dictionary))
+                            self.reference.child("relationships").child(self.userID!).child(user.id!).removeValue()
                             }
-                            
-                            self.users = self.sortUsers(users: self.users)
+                        }
+                        
+                        self.users = self.sortUsers(users: self.users)
 //                            self.users = self.rearrangeUsers(users: self.users)
-                            
-                            //remove current user from users array
-                            if let index = self.users.firstIndex(where: { (user) -> Bool in
-                                return user.id == self.userID!
-                            }) {
-                                self.users.remove(at: index)
-                            }
-                            
-                            if asynchronously {
-                                self.delegate?.falconUsers(shouldBeUpdatedTo: self.users)
+                        
+                        //remove current user from users array
+                        if let index = self.users.firstIndex(where: { (user) -> Bool in
+                            return user.id == self.userID!
+                        }) {
+                            self.users.remove(at: index)
+                        }
+                        
+                        if asynchronously {
+                            self.delegate?.falconUsers(shouldBeUpdatedTo: self.users)
 //                                print("Updated delegate")
-                            }
-                            
-                        if !asynchronously {
-                            self.group.leave()
-                            print("leaving group")
                         }
-                    } else {
-                            print("Nothing found")
-                        }
-                    }) { (error) in
-                        print(error.localizedDescription)
+                        
+                    if !asynchronously {
+                        self.group.leave()
+                        print("leaving group")
                     }
+                } else {
+                        print("Nothing found")
+                    }
+                }) { (error) in
+                    print(error.localizedDescription)
                 }
+            }
         } else {
             print("nothing found")
         }

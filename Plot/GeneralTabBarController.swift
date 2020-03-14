@@ -328,7 +328,7 @@ extension GeneralTabBarController: ManageAppearanceChat {
             self.splashContainer.showSecuredData()
         }
         grabContacts()
-        appDelegate.registerForPushNotifications(application: UIApplication.shared)
+//        appDelegate.registerForPushNotifications(application: UIApplication.shared)
 
     }
 }
@@ -348,7 +348,7 @@ extension GeneralTabBarController: ManageAppearanceActivity {
             self.splashContainer.showSecuredData()
         }
         grabContacts()
-        appDelegate.registerForPushNotifications(application: UIApplication.shared)
+//        appDelegate.registerForPushNotifications(application: UIApplication.shared)
         addSampleActivityForNewUser()
     }
 }
