@@ -20,6 +20,7 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
     var conversations = [Conversation]()
     
     var event: Event?
+    var attraction: Attraction?
             
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
@@ -67,7 +68,11 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
             if let event = event {
                 cell.event = event
                 return cell
-            } else {
+            } else if let attraction = attraction {
+                cell.attraction = attraction
+                return cell
+            }
+            else {
                 return cell
             }
         } else {
@@ -81,7 +86,11 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
         var height: CGFloat = 328
         if indexPath.item == 0 {
             let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 328))
-            dummyCell.event = event
+            if let event = event {
+                dummyCell.event = event
+            } else if let attraction = attraction {
+                dummyCell.attraction = attraction
+            }
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 328))
             height = estimatedSize.height

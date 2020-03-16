@@ -20,9 +20,10 @@ struct TicketMasterSearchResult: Codable {
         }
     }
 
-    // MARK: - WelcomeEmbedded
+    // MARK: - Embedded
     struct Embedded: Codable {
         let events: [Event]?
+        let attractions: [Attraction]?
     }
 
     // MARK: - Event
@@ -32,7 +33,7 @@ struct TicketMasterSearchResult: Codable {
         let id: String?
         let test: Bool?
         let url: String?
-        let local: Local?
+        let local: String?
         let images: [Image]?
         let distance: Double?
         let units: Units?
@@ -58,6 +59,7 @@ struct TicketMasterSearchResult: Codable {
             case local = "locale"
             case info, accessibility
         }
+        
     }
 
     // MARK: - Accessibility
@@ -85,6 +87,7 @@ struct TicketMasterSearchResult: Codable {
         let timezone: String?
         let status: StatusUpdate?
         let spanMultipleDays: Bool?
+        
     }
 
     // MARK: - Start
@@ -92,6 +95,7 @@ struct TicketMasterSearchResult: Codable {
         let localDate, localTime: String?
         let dateTime: String?
         let dateTBD, dateTBA, timeTBA, noSpecificTime: Bool?
+        
     }
 
     // MARK: - Status
@@ -112,7 +116,7 @@ struct TicketMasterSearchResult: Codable {
         let id: String?
         let test: Bool?
         let url: String?
-        let local: Local?
+        let local: String?
         let images: [Image]?
         let classifications: [Classification]?
         let upcomingEvents: UpcomingEvents?
@@ -129,18 +133,11 @@ struct TicketMasterSearchResult: Codable {
 
     // MARK: - Image
     struct Image: Codable {
-        let ratio: Ratio?
+        let ratio: String?
         let url: String?
         let width, height: Int?
         let fallback: Bool?
         let attribution: String?
-    }
-
-    enum Ratio: String, Codable {
-        case the16_9 = "16_9"
-        case the3_1 = "3_1"
-        case the3_2 = "3_2"
-        case the4_3 = "4_3"
     }
 
     // MARK: - AttractionLinks
@@ -155,10 +152,6 @@ struct TicketMasterSearchResult: Codable {
     // MARK: - First
     struct First: Codable {
         let href: String?
-    }
-
-    enum Local: String, Codable {
-        case enUs = "en-us"
     }
 
     enum AttractionType: String, Codable {
@@ -182,7 +175,7 @@ struct TicketMasterSearchResult: Codable {
         let id: String?
         let test: Bool?
         let url: String?
-        let local: Local?
+        let local: String?
         let images: [Image]?
         let distance: Double?
         let units: Units?
@@ -291,17 +284,9 @@ struct TicketMasterSearchResult: Codable {
 
     // MARK: - PriceRange
     struct PriceRange: Codable {
-        let type: PriceRangeType?
-        let currency: Currency?
+        let type: String?
+        let currency: String?
         let min, max: Double?
-    }
-
-    enum Currency: String, Codable {
-        case usd = "USD"
-    }
-
-    enum PriceRangeType: String, Codable {
-        case standard = "standard"
     }
 
     // MARK: - Product
@@ -374,4 +359,22 @@ struct TicketMasterSearchResult: Codable {
     // MARK: - Page
     struct Page: Codable {
         let size, totalElements, totalPages, number: Int?
+    }
+
+
+
+//    func sortEvents(events: [Event]) -> [Event] {
+//        return events.sorted {(
+//            ($0.dates?.start?.dateTime!.toDate())! < ($1.dates?.start?.dateTime!.toDate())!
+//        )}
+//    }
+
+    func sortEvents(events: [Event]) -> [Event] {
+        return events.sorted { (event1, event2) -> Bool in
+            if let firstDateString = event1.dates?.start?.localDate, let firstDate = firstDateString.toDate(), let secondDateString = event2.dates?.start?.localDate, let secondDate = secondDateString.toDate() {
+                return firstDate < secondDate
+            } else {
+                return false
+            }
+        }
     }

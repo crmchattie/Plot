@@ -16,6 +16,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     var customActivities: [ActivityType]?
     var recipes: [Recipe]?
     var events: [Event]?
+    var attractions: [Attraction]?
     var workouts: [Workout]?
     var numberOfRows: Int = 0
     
@@ -64,6 +65,10 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             if let workout = workouts?[indexPath.item] {
                 didSelectHandler?(workout)
             }
+        } else if attractions != nil {
+            if let attraction = attractions?[indexPath.item] {
+                didSelectHandler?(attraction)
+            }
         }
         else {
             
@@ -77,7 +82,10 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             return events!.count
         } else if workouts != nil {
             return workouts!.count
-        } else {
+        } else if attractions != nil {
+            return attractions!.count
+        }
+        else {
             return 0
         }
     }
@@ -101,7 +109,13 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.intColor = (indexPath.item % 5)
             cell.workout = workout
             return cell
-        } else {
+        } else if attractions != nil {
+            self.activityIndicatorView.stopAnimating()
+            let attraction = attractions![indexPath.item]
+            cell.attraction = attraction
+            return cell
+        }
+        else {
             return cell
         }
     }

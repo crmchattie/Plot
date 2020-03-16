@@ -58,7 +58,9 @@ extension Date {
         value += "\(formatter.string(from: self)) \(startDay)"
         
         formatter.dateFormat = "h:mm a"
-        value += " \(formatter.string(from: self))"
+        if " \(formatter.string(from: self))" != "12:00 AM" {
+            value += " \(formatter.string(from: self))"
+        }
             
         return (value)
     

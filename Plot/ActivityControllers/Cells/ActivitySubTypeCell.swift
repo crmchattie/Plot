@@ -33,12 +33,11 @@ class ActivitySubTypeCell: UICollectionViewCell {
     
     var event: Event! {
         didSet {
-            nameLabel.text = "\(String(describing: event.name!))"
-            if let startDateTime = event.dates?.start?.dateTime {
-                let dateFormatter = DateFormatter()
-                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-                let date = dateFormatter.date(from:startDateTime)!
+            nameLabel.text = "\(event.name!)"
+            if let startDateTime = event.dates?.start?.dateTime, let date = startDateTime.toDate() {
+                let newDate = date.startDateTimeString()
+                categoryLabel.text = "\(newDate) @ \(event.embedded?.venues?[0].name ?? "")"
+            } else if let startDate = event.dates?.start?.localDate, let date = startDate.toDate() {
                 let newDate = date.startDateTimeString()
                 categoryLabel.text = "\(newDate) @ \(event.embedded?.venues?[0].name ?? "")"
             }
@@ -53,6 +52,19 @@ class ActivitySubTypeCell: UICollectionViewCell {
                 subcategoryLabel.text = ""
             }
             if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
+                imageView.sd_setImage(with: URL(string: url))
+            }
+        }
+    }
+    
+    var attraction: Attraction! {
+        didSet {
+            nameLabel.text = "\(attraction.name!)"
+            if let upcomingEvents = attraction.upcomingEvents?.total {
+                categoryLabel.text = "Total events: \(upcomingEvents)"
+            }
+            subcategoryLabel.text = ""
+            if let images = attraction.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
                 imageView.sd_setImage(with: URL(string: url))
             }
         }

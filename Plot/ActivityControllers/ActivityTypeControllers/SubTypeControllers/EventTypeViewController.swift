@@ -22,6 +22,8 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .type]
     var filterDictionary = [String: [String]]()
     var sections: [String] = ["Concerts", "Sports", "Shows"]
+    var attractions = [String]()
+
     
     var locationManager = CLLocationManager()
         
@@ -121,7 +123,22 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
                         if let group = musicEvents {
-                            self.groups.append(group)
+//                            var finalEvents = [Event]()
+//                            for event in group {
+//                                print(event.name!)
+//                                if let attractions = event.embedded?.attractions, let attraction = attractions[0].id {
+//                                    if !self.attractions.contains(attraction) {
+//                                        print("attraction")
+//                                        self.attractions.append(attraction)
+//                                        finalEvents.append(event)
+//                                    }
+//                                } else {
+//                                    finalEvents.append(event)
+//                                }
+//                            }
+//                            finalEvents = sortEvents(events: finalEvents)
+                            let finalEvents = sortEvents(events: group)
+                            self.groups.append(finalEvents)
                         } else {
                             self.sections.removeAll{ $0 == "Concerts"}
                         }
@@ -135,7 +152,22 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                             dispatchGroup.notify(queue: .main) {
                                 self.removeSpinner()
                                 if let group = sportsEvents {
-                                    self.groups.append(group)
+//                                    var finalEvents = [Event]()
+//                                    for event in group {
+//                                        print(event.name!)
+//                                        if let attractions = event.embedded?.attractions, let attraction = attractions[0].id {
+//                                            if !self.attractions.contains(attraction) {
+//                                                print("attraction")
+//                                                self.attractions.append(attraction)
+//                                                finalEvents.append(event)
+//                                            }
+//                                        } else {
+//                                            finalEvents.append(event)
+//                                        }
+//                                    }
+//                                    finalEvents = sortEvents(events: finalEvents)
+                                    let finalEvents = sortEvents(events: group)
+                                    self.groups.append(finalEvents)
                                 } else {
                                     self.sections.removeAll{ $0 == "Sports"}
                                 }
@@ -148,7 +180,22 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                                     dispatchGroup.notify(queue: .main) {
                                         self.removeSpinner()
                                         if let group = arttheatreEvents {
-                                            self.groups.append(group)
+//                                            var finalEvents = [Event]()
+//                                            for event in group {
+//                                                print(event.name!)
+//                                                if let attractions = event.embedded?.attractions, let attraction = attractions[0].id {
+//                                                    if !self.attractions.contains(attraction) {
+//                                                        print("attraction")
+//                                                        self.attractions.append(attraction)
+//                                                        finalEvents.append(event)
+//                                                    }
+//                                                } else {
+//                                                    finalEvents.append(event)
+//                                                }
+//                                            }
+//                                            finalEvents = sortEvents(events: finalEvents)
+                                            let finalEvents = sortEvents(events: group)
+                                            self.groups.append(finalEvents)
                                         } else {
                                             self.sections.removeAll{ $0 == "Arts & Theatre"}
                                         }
@@ -167,7 +214,22 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
                         if let group = musicEvents {
-                            self.groups.append(group)
+//                            var finalEvents = [Event]()
+//                            for event in group {
+//                                print(event.name!)
+//                                if let attractions = event.embedded?.attractions, let attraction = attractions[0].id {
+//                                    if !self.attractions.contains(attraction) {
+//                                        print("attraction")
+//                                        self.attractions.append(attraction)
+//                                        finalEvents.append(event)
+//                                    }
+//                                } else {
+//                                    finalEvents.append(event)
+//                                }
+//                            }
+//                            finalEvents = sortEvents(events: finalEvents)
+                            let finalEvents = sortEvents(events: group)
+                            self.groups.append(finalEvents)
                         } else {
                             self.sections.removeAll{ $0 == "Concerts"}
                         }
@@ -181,7 +243,22 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                             
                             dispatchGroup.notify(queue: .main) {
                                 if let group = sportsEvents {
-                                    self.groups.append(group)
+//                                    var finalEvents = [Event]()
+//                                    for event in group {
+//                                        print(event.name!)
+//                                        if let attractions = event.embedded?.attractions, let attraction = attractions[0].id {
+//                                            if !self.attractions.contains(attraction) {
+//                                                print("attraction")
+//                                                self.attractions.append(attraction)
+//                                                finalEvents.append(event)
+//                                            }
+//                                        } else {
+//                                            finalEvents.append(event)
+//                                        }
+//                                    }
+//                                    finalEvents = sortEvents(events: finalEvents)
+                                    let finalEvents = sortEvents(events: group)
+                                    self.groups.append(finalEvents)
                                 } else {
                                     self.sections.removeAll{ $0 == "Sports"}
                                 }
@@ -194,7 +271,22 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                                     
                                     dispatchGroup.notify(queue: .main) {
                                         if let group = arttheatreEvents {
-                                            self.groups.append(group)
+//                                            var finalEvents = [Event]()
+//                                            for event in group {
+//                                                print(event.name!)
+//                                                if let attractions = event.embedded?.attractions, let attraction = attractions[0].id {
+//                                                    if !self.attractions.contains(attraction) {
+//                                                        print("attraction")
+//                                                        self.attractions.append(attraction)
+//                                                        finalEvents.append(event)
+//                                                    }
+//                                                } else {
+//                                                    finalEvents.append(event)
+//                                                }
+//                                            }
+//                                            finalEvents = sortEvents(events: finalEvents)
+                                            let finalEvents = sortEvents(events: group)
+                                            self.groups.append(finalEvents)
                                         } else {
                                             self.sections.removeAll{ $0 == "Arts & Theatre"}
                                         }

@@ -238,6 +238,21 @@ extension String {
         let myInt = Int(self)
         return myInt ?? 0
     }
+    
+    func toDate() -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        if self.contains("T") {
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        }  else {
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+        }
+        if let date = dateFormatter.date(from:self) {
+            return date
+        } else {
+            return nil
+        }
+    }
 }
 
 extension Date {

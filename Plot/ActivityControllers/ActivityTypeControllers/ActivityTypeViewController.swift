@@ -20,6 +20,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     private let headerId = "headerId"
     
     var sections: [String] = ["Recipes", "Workouts", "Events"]
+    var attractionsString = [String]()
     var types: [ActivityType] = [.basic]
     var recipes = [Recipe]()
     
@@ -73,6 +74,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         var recipes: [Recipe]?
         var workouts = [Workout]()
         var events: [Event]?
+        var attractions: [Attraction]?
         
         // help you sync your data fetches together
         let dispatchGroup = DispatchGroup()
@@ -98,7 +100,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     self.workoutReference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                         if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
                             if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
-                                print("workout title \(String(describing: workout.title))")
                                 workouts.append(workout)
                                 dispatchGroup.leave()
                             }
@@ -112,6 +113,43 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 dispatchGroup.notify(queue: .main) {
                     self.groups.append(workouts)
                     self.collectionView.reloadData()
+                    
+                    //attractions
+                    
+//                    if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+//                        dispatchGroup.enter()
+//                        Service.shared.fetchAttractionsSegmentLatLong(segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+//                            attractions = search?.embedded?.attractions
+//                            dispatchGroup.leave()
+//                            dispatchGroup.notify(queue: .main) {
+//                                if let group = attractions {
+//                                    self.groups.append(group)
+//                                } else {
+//                                    self.sections.removeAll{ $0 == "Events"}
+//                                }
+//
+//                                self.collectionView.reloadData()
+//                            }
+//                        }
+//                    } else {
+//                        dispatchGroup.enter()
+//                        Service.shared.fetchAttractionsSegment(segmentId: "") { (search, err) in
+//                            attractions = search?.embedded?.attractions
+//                            dispatchGroup.leave()
+//                            dispatchGroup.notify(queue: .main) {
+//                                if let group = attractions {
+//                                    self.groups.append(group)
+//                                } else {
+//                                    self.sections.removeAll{ $0 == "Events"}
+//                                }
+//
+//                                self.collectionView.reloadData()
+//
+//                            }
+//                        }
+//                    }
+                    
+                    //Events
     
                     if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                         dispatchGroup.enter()
@@ -120,7 +158,22 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {
                                 if let group = events {
-                                    self.groups.append(group)
+//                                    var finalEvents = [Event]()
+//                                    for event in group {
+//                                        print(event.name!)
+//                                        if let attractions = event.embedded?.attractions, let attraction = attractions[0].id {
+//                                            if !self.attractionsString.contains(attraction) {
+//                                                print("attraction")
+//                                                self.attractionsString.append(attraction)
+//                                                finalEvents.append(event)
+//                                            }
+//                                        } else {
+//                                            finalEvents.append(event)
+//                                        }
+//                                    }
+//                                    finalEvents = sortEvents(events: finalEvents)
+                                    let finalEvents = sortEvents(events: group)
+                                    self.groups.append(finalEvents)
                                 } else {
                                     self.sections.removeAll{ $0 == "Events"}
                                 }
@@ -135,7 +188,22 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {
                                 if let group = events {
-                                    self.groups.append(group)
+//                                    var finalEvents = [Event]()
+//                                    for event in group {
+//                                        print(event.name!)
+//                                        if let attractions = event.embedded?.attractions, let attraction = attractions[0].id {
+//                                            if !self.attractionsString.contains(attraction) {
+//                                                print("attraction")
+//                                                self.attractionsString.append(attraction)
+//                                                finalEvents.append(event)
+//                                            }
+//                                        } else {
+//                                            finalEvents.append(event)
+//                                        }
+//                                    }
+//                                    finalEvents = sortEvents(events: finalEvents)
+                                    let finalEvents = sortEvents(events: group)
+                                    self.groups.append(finalEvents)
                                 } else {
                                     self.sections.removeAll{ $0 == "Events"}
                                 }
@@ -199,17 +267,26 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             let cellData = groups[indexPath.item]
             if let recipes = cellData as? [Recipe] {
                 cell.horizontalController.recipes = recipes
+                cell.horizontalController.attractions = nil
                 cell.horizontalController.events = nil
                 cell.horizontalController.workouts = nil
             } else if let events = cellData as? [Event] {
                 cell.horizontalController.events = events
+                cell.horizontalController.attractions = nil
                 cell.horizontalController.recipes = nil
                 cell.horizontalController.workouts = nil
             } else if let workouts = cellData as? [Workout] {
                 cell.horizontalController.workouts = workouts
+                cell.horizontalController.attractions = nil
                 cell.horizontalController.recipes = nil
                 cell.horizontalController.events = nil
-            } else {
+            } else if let attractions = cellData as? [Attraction] {
+                cell.horizontalController.attractions = attractions
+                cell.horizontalController.workouts = nil
+                cell.horizontalController.recipes = nil
+                cell.horizontalController.events = nil
+            }
+            else {
                 cell.horizontalController.cellData = cellData
             }
             cell.horizontalController.collectionView.reloadData()
@@ -245,7 +322,17 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
                     self?.navigationController?.pushViewController(destination, animated: true)
-                } else {
+                } else if let attraction = cellData as? Attraction {
+                    print("attraction \(String(describing: attraction.name))")
+                    let destination = EventDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
+                    destination.attraction = attraction
+                    destination.users = self!.users
+                    destination.filteredUsers = self!.filteredUsers
+                    destination.conversations = self!.conversations
+                    self?.navigationController?.pushViewController(destination, animated: true)
+                }
+                else {
                     print("neither meals or events")
                 }
             }
@@ -287,6 +374,14 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             navigationController?.pushViewController(destination, animated: true)
         case "Workouts":
             print("Workouts")
+        case "Attractions":
+            print("Attractions")
+            let destination = EventTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            navigationController?.pushViewController(destination, animated: true)
         default:
             print("Default")
         }
