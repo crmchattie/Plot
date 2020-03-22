@@ -9,7 +9,12 @@
 import Foundation
 
 enum filter: String {
+    //recipes
     case cuisine, excludeCuisine, diet, intolerances, type
+    //ticketmaster
+//    case type_of_show
+//    //workouts
+//    case type_of_workout, muscle, duration, cardio, yoga
     
     var typeOfSection: String {
         switch self {

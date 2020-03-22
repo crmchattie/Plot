@@ -96,7 +96,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 
                 for workoutID in self.workoutIDs {
                     dispatchGroup.enter()
-                    self.workoutReference = Database.database().reference().child("workouts").child("0")
+                    self.workoutReference = Database.database().reference().child("workouts").child("workouts")
                     self.workoutReference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                         if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
                             if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
@@ -153,7 +153,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
                     if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        Service.shared.fetchEventsSegmentLatLong(keyword: "", segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                             events = search?.embedded?.events
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {
@@ -183,7 +183,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         }
                     } else {
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(segmentId: "") { (search, err) in
+                        Service.shared.fetchEventsSegment(keyword: "", segmentId: "") { (search, err) in
                             events = search?.embedded?.events
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {
@@ -374,6 +374,12 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             navigationController?.pushViewController(destination, animated: true)
         case "Workouts":
             print("Workouts")
+            let destination = WorkoutTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            navigationController?.pushViewController(destination, animated: true)
         case "Attractions":
             print("Attractions")
             let destination = EventTypeViewController()

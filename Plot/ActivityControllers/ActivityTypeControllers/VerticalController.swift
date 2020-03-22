@@ -15,6 +15,8 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     var customActivities: [ActivityType]?
     var recipes: [Recipe]?
     var events: [Event]?
+    var workouts: [Workout]?
+    var attractions: [Attraction]?
     var numberOfRows: Int = 0
     
     var users = [User]()
@@ -60,7 +62,16 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             if let event = events?[indexPath.item] {
                 didSelectHandler?(event)
             }
-        } else {
+        } else if workouts != nil {
+            if let workout = workouts?[indexPath.item] {
+                didSelectHandler?(workout)
+            }
+        } else if attractions != nil {
+            if let attraction = attractions?[indexPath.item] {
+                didSelectHandler?(attraction)
+            }
+        }
+        else {
             
         }
     }
@@ -72,7 +83,12 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             return recipes!.count
         } else if events != nil {
             return events!.count
-        } else {
+        } else if workouts != nil {
+            return workouts!.count
+        } else if attractions != nil {
+            return attractions!.count
+        }
+        else {
             return 0
         }
     }
@@ -88,7 +104,17 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             let event = events![indexPath.item]
             cell.event = event
             return cell
-        } else {
+        } else if workouts != nil {
+            let workout = workouts![indexPath.item]
+            cell.intColor = (indexPath.item % 5)
+            cell.workout = workout
+            return cell
+        } else if attractions != nil {
+            let attraction = attractions![indexPath.item]
+            cell.attraction = attraction
+            return cell
+        }
+        else {
             return cell
         }
     }
@@ -99,7 +125,7 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     
         
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return .init(width: view.frame.width - 48, height: 415)
+        return .init(width: view.frame.width - 48, height: 367)
     }
     
 }

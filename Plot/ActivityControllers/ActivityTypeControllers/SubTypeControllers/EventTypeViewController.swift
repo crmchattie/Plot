@@ -58,56 +58,67 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased(), cuisine: self.filterDictionary["cuisine"] ?? [""], excludeCuisine: self.filterDictionary["excludeCuisine"] ?? [""], diet: self.filterDictionary["diet"]?[0] ?? "", intolerances: self.filterDictionary["intolerances"] ?? [""], type: self.filterDictionary["type"]?[0] ?? "")
+            self.complexSearch(query: searchText.lowercased())
         })
     }
     
-    func complexSearch(query: String, cuisine: [String], excludeCuisine: [String], diet: String, intolerances: [String], type: String) {
-//        print("query \(query), cuisine \(cuisine), excludeCuisine \(excludeCuisine), diet \(diet), intolerances \(intolerances), type \(type), ")
-//
-//        self.searchEvents = [Event]()
-//        showGroups = false
-//        self.headerheight = view.frame.height
-//        self.cellheight = 0
-//        self.collectionView.reloadData()
-//
-//        if let navController = self.navigationController {
-//            self.showSpinner(onView: navController.view)
-//        } else {
-//            self.showSpinner(onView: self.view)
-//        }
-//
-//        let dispatchGroup = DispatchGroup()
-//
-//        dispatchGroup.enter()
-//        Service.shared.fetchRecipesComplex(query: query, cuisine: cuisine, excludeCuisine: excludeCuisine, diet: diet, intolerances: intolerances, type: type) { (search, err) in
-//            if let err = err {
-//                print("Failed to fetch apps:", err)
-//                return
-//            }
-//            self.removeSpinner()
-//            self.searchEvents = search!.recipes
-//
-//            dispatchGroup.leave()
-//
-//            DispatchQueue.main.async {
-//                self.collectionView.reloadData()
-//            }
-//        }
+    func complexSearch(query: String) {
+        print("query \(query)")
+
+        self.searchEvents = [Event]()
+        showGroups = false
+        self.headerheight = view.frame.height
+        self.cellheight = 0
+        self.collectionView.reloadData()
+
+        if let navController = self.navigationController {
+            self.showSpinner(onView: navController.view)
+        } else {
+            self.showSpinner(onView: self.view)
+        }
+
+        let dispatchGroup = DispatchGroup()
+
+        dispatchGroup.enter()
+        if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+            dispatchGroup.enter()
+            Service.shared.fetchEventsSegmentLatLong(keyword: query, segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                self.removeSpinner()
+                dispatchGroup.leave()
+                if let events = search?.embedded?.events {
+                    self.searchEvents = events
+                    DispatchQueue.main.async {
+                        self.collectionView.reloadData()
+                    }
+                }
+            }
+        } else {
+            dispatchGroup.enter()
+            Service.shared.fetchEventsSegment(keyword: "", segmentId: "") { (search, err) in
+                self.removeSpinner()
+                dispatchGroup.leave()
+                if let events = search?.embedded?.events {
+                    self.searchEvents = events
+                    DispatchQueue.main.async {
+                        self.collectionView.reloadData()
+                    }
+                }
+            }
+        }
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchEvents = [Event]()
         showGroups = true
         headerheight = 0
-        cellheight = 415
+        cellheight = 397
         self.collectionView.reloadData()
     }
     
     fileprivate func fetchData() {
                 
         headerheight = 0
-        cellheight = 415
+        cellheight = 397
             
         var musicEvents: [Event]?
         var sportsEvents: [Event]?
@@ -118,7 +129,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         
         if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegmentLatLong(segmentId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                Service.shared.fetchEventsSegmentLatLong(keyword: "", segmentId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                     musicEvents = search?.embedded?.events
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
@@ -145,7 +156,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                         
                         self.collectionView.reloadData()
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(segmentId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        Service.shared.fetchEventsSegmentLatLong(keyword: "", segmentId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                             sportsEvents = search?.embedded?.events
                             dispatchGroup.leave()
                     
@@ -173,7 +184,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                                 }
                                 self.collectionView.reloadData()
                                 dispatchGroup.enter()
-                                Service.shared.fetchEventsSegmentLatLong(segmentId: self.artstheatreSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                                Service.shared.fetchEventsSegmentLatLong(keyword: "", segmentId: self.artstheatreSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                                     arttheatreEvents = search?.embedded?.events
                                     dispatchGroup.leave()
                                     
@@ -209,7 +220,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 }
             } else {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegment(segmentId: self.musicSegmentID) { (search, err) in
+                Service.shared.fetchEventsSegment(keyword: "", segmentId: self.musicSegmentID) { (search, err) in
                     musicEvents = search?.embedded?.events
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
@@ -237,7 +248,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                         self.collectionView.reloadData()
                             
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(segmentId: self.sportsSegmentID) { (search, err) in
+                        Service.shared.fetchEventsSegment(keyword: "", segmentId: self.sportsSegmentID) { (search, err) in
                             sportsEvents = search?.embedded?.events
                             dispatchGroup.leave()
                             
@@ -265,7 +276,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                             
                                 self.collectionView.reloadData()
                                 dispatchGroup.enter()
-                                Service.shared.fetchEventsSegment(segmentId: self.artstheatreSegmentID) { (search, err) in
+                                Service.shared.fetchEventsSegment(keyword: "", segmentId: self.artstheatreSegmentID) { (search, err) in
                                     arttheatreEvents = search?.embedded?.events
                                     dispatchGroup.leave()
                                     
@@ -351,6 +362,18 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         let events = searchEvents
         header.verticalController.events = events
         header.verticalController.collectionView.reloadData()
+        header.verticalController.didSelectHandler = { [weak self] event in
+            if let event = event as? Event {
+                print("event \(String(describing: event.name))")
+                let destination = EventDetailViewController()
+                destination.hidesBottomBarWhenPushed = true
+                destination.event = event
+                destination.users = self!.users
+                destination.filteredUsers = self!.filteredUsers
+                destination.conversations = self!.conversations
+                self?.navigationController?.pushViewController(destination, animated: true)
+            }
+        }
         return header
     }
     
@@ -380,13 +403,13 @@ extension EventTypeViewController: UpdateFilter {
         if !filterDictionary.values.isEmpty {
             showGroups = false
             self.filterDictionary = filterDictionary
-            complexSearch(query: "", cuisine: filterDictionary["cuisine"] ?? [""], excludeCuisine: filterDictionary["excludeCuisine"] ?? [""], diet: filterDictionary["diet"]?[0] ?? "", intolerances: filterDictionary["intolerances"] ?? [""], type: filterDictionary["type"]?[0] ?? "")
+            complexSearch(query: "")
         } else {
             searchEvents = [Event]()
             self.filterDictionary = filterDictionary
             showGroups = true
             headerheight = 0
-            cellheight = 415
+            cellheight = 397
             self.collectionView.reloadData()
         }
     }

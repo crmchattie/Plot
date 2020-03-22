@@ -309,4 +309,5 @@ struct FalconPalette {
     static let defaultRed = UIColor(red: 246.0/255.0, green: 81.0/255.0, blue: 29.0/255.0, alpha: 1.0)
     static let defaultOrange = UIColor(red: 255.0/255.0, green: 180.0/255.0, blue: 0.0/255.0, alpha: 1.0)
     static let defaultDarkBlue = UIColor(red: 13.0/255.0, green: 44.0/255.0, blue: 84.0/255.0, alpha: 1.0)
+    static let ticketmaster = UIColor(red: 2.0/255.0, green: 108.0/255.0, blue: 223.0/255.0, alpha: 1.0)
 }

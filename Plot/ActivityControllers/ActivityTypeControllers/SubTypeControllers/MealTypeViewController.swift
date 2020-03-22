@@ -88,14 +88,14 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         searchRecipes = [Recipe]()
         showGroups = true
         headerheight = 0
-        cellheight = 415
+        cellheight = 397
         self.collectionView.reloadData()
     }
     
     fileprivate func fetchData() {
                 
         headerheight = 0
-        cellheight = 415
+        cellheight = 397
             
         var recipes2: [Recipe]?
         var recipes3: [Recipe]?
@@ -104,7 +104,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         let dispatchGroup = DispatchGroup()
         
         dispatchGroup.enter()
-        Service.shared.fetchRecipesComplex(query: "", cuisine: ["Italian"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+        Service.shared.fetchRecipesSimple(query: "", cuisine: "Italian") { (search, err) in
             recipes2 = search?.recipes
             dispatchGroup.leave()
             
@@ -118,7 +118,8 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 self.collectionView.reloadData()
                 
                 dispatchGroup.enter()
-                Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                Service.shared.fetchRecipesSimple(query: "vegetarian", cuisine: "") { (search, err) in
+//                Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
                     recipes3 = search?.recipes
                     dispatchGroup.leave()
                     
@@ -186,6 +187,18 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         let recipes = searchRecipes
         header.verticalController.recipes = recipes
         header.verticalController.collectionView.reloadData()
+        header.verticalController.didSelectHandler = { [weak self] recipe in
+            if let recipe = recipe as? Recipe {
+                print("meal \(recipe.title)")
+                let destination = MealDetailViewController()
+                destination.hidesBottomBarWhenPushed = true
+                destination.recipe = recipe
+                destination.users = self!.users
+                destination.filteredUsers = self!.filteredUsers
+                destination.conversations = self!.conversations
+                self?.navigationController?.pushViewController(destination, animated: true)
+            }
+        }
         return header
     }
     
@@ -221,7 +234,7 @@ extension MealTypeViewController: UpdateFilter {
             self.filterDictionary = filterDictionary
             showGroups = true
             headerheight = 0
-            cellheight = 415
+            cellheight = 397
             self.collectionView.reloadData()
         }
     }

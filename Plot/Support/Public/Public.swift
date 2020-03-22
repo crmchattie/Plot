@@ -965,7 +965,7 @@ extension UIImageView {
     
     self.addSubview(backgroundView)
     self.addSubview(activityIndicator)
-		activityIndicator.style = .white
+    activityIndicator.style = .white
     activityIndicator.center = CGPoint(x: self.frame.size.width / 2, y: self.frame.size.height / 2)
     backgroundView.translatesAutoresizingMaskIntoConstraints = false
     backgroundView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true

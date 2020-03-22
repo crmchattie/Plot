@@ -48,9 +48,9 @@ class WorkoutDetailCell: UICollectionViewCell {
    
     let getWorkoutLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.font = UIFont.systemFont(ofSize: 18)
         label.text = "Go to Workout"
-        label.font = UIFont.systemFont(ofSize: 13)
         label.numberOfLines = 1
         label.isUserInteractionEnabled = true
         return label
@@ -58,13 +58,13 @@ class WorkoutDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-        clickView.constrainHeight(constant: 15)
+        clickView.constrainHeight(constant: 18)
         addSubview(notesLabel)
         addSubview(clickView)
         clickView.addSubview(getWorkoutLabel)
         
         notesLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 5))
-        clickView.anchor(top: notesLabel.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        clickView.anchor(top: notesLabel.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 15, left: 0, bottom: 0, right: 0))
         getWorkoutLabel.anchor(top: clickView.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 2, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
