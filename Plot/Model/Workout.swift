@@ -10,8 +10,8 @@ import Foundation
 
 // MARK: - Response
 struct Workout: Codable {
-    let id, title, notes, identifier: String?
-    let workoutDuration, tagsStr: String?
+    let id, title, identifier: String
+    let notes, workoutDuration, tagsStr: String?
     let exercises: [Exercise]?
 
     enum CodingKeys: String, CodingKey {

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class MealDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
@@ -18,10 +19,11 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
+    var favAct = [String: [String]]()
     
     var recipe: Recipe?
     var detailedRecipe: Recipe?
-    
+        
         
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
@@ -81,6 +83,13 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
             cell.delegate = self
             if let recipe = recipe {
+                if let recipes = favAct["recipes"], recipes.contains("\(recipe.id)") {
+                    print("heart filled")
+                    cell.heartButtonImage = "heart-filled"
+                } else {
+                    print("heart")
+                    cell.heartButtonImage = "heart"
+                }
                 cell.recipe = recipe
                 return cell
             } else {
@@ -104,7 +113,6 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 328))
             height = estimatedSize.height
-            print("height: \(height)")
             return CGSize(width: view.frame.width, height: height)
         } else {
             let dummyCell = MealDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
@@ -115,7 +123,6 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
-            print("height: \(height)")
             return CGSize(width: view.frame.width, height: height)
         }
     }
@@ -130,8 +137,31 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
         print("shareButtonTapped")
     }
     
-    func heartButtonTapped() {
+    func heartButtonTapped(type: Any) {
         print("heartButtonTapped")
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+            if let recipe = type as? Recipe {
+                print(recipe.title)
+                databaseReference.child("recipes").observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists() {
+                        var value = snapshot.value as! [String]
+                        if value.contains("\(recipe.id)") {
+                            if let index = value.firstIndex(of: "\(recipe.id)") {
+                                value.remove(at: index)
+                            }
+                            databaseReference.updateChildValues(["recipes": value as NSArray])
+                        } else {
+                            value.append("\(recipe.id)")
+                            databaseReference.updateChildValues(["recipes": value as NSArray])
+                        }
+                    } else {
+                        databaseReference.updateChildValues(["recipes": ["\(recipe.id)"]])
+                    }
+                })
+            }
+        }
+        
     }
 
 }

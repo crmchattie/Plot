@@ -336,6 +336,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
         tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
         tableView.isUserInteractionEnabled = true
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.separatorStyle = .none
         view.addSubview(visualEffectView)
         visualEffectView.contentView.addSubview(tableView)
         visualEffectView.isUserInteractionEnabled = true

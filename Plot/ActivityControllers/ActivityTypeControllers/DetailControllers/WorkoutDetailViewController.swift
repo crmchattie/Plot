@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class WorkoutDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
@@ -19,6 +20,7 @@ class WorkoutDetailViewController: UICollectionViewController, UICollectionViewD
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
+    var favAct = [String: [String]]()
     
     var workout: Workout?
     var intColor: Int = 0
@@ -80,6 +82,11 @@ class WorkoutDetailViewController: UICollectionViewController, UICollectionViewD
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
             cell.delegate = self
             if let workout = workout {
+                if let workouts = favAct["workouts"], workouts.contains(workout.identifier) {
+                    cell.heartButtonImage = "heart-filled"
+                } else {
+                    cell.heartButtonImage = "heart"
+                }
                 cell.intColor = intColor
                 cell.workout = workout
                 return cell
@@ -148,18 +155,41 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
         print("shareButtonTapped")
     }
     
-    func heartButtonTapped() {
+    func heartButtonTapped(type: Any) {
         print("heartButtonTapped")
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+            if let workout = type as? Workout {
+                print(workout.title)
+                databaseReference.child("workouts").observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists() {
+                        var value = snapshot.value as! [String]
+                        if value.contains("\(workout.identifier)") {
+                            if let index = value.firstIndex(of: "\(workout.identifier)") {
+                                value.remove(at: index)
+                            }
+                            databaseReference.updateChildValues(["workouts": value as NSArray])
+                        } else {
+                            value.append("\(workout.identifier)")
+                            databaseReference.updateChildValues(["workouts": value as NSArray])
+                        }
+                    } else {
+                        databaseReference.updateChildValues(["workouts": ["\(workout.identifier)"]])
+                    }
+                })
+            }
+        }
+        
     }
 
 }
 
 extension WorkoutDetailViewController: WorkoutDetailCellDelegate {
     func viewTapped() {
-        if let workout = workout, let indentifier = workout.identifier {
+        if let workout = workout {
             print("view tapped")
             let destination = WebViewController()
-            destination.urlString = "https://workoutlabs.com/fit/wkt/\(indentifier)/?app=plot"
+            destination.urlString = "https://workoutlabs.com/fit/wkt/\(workout.identifier)/?app=plot"
             destination.controllerTitle = "Workout"
             let navigationViewController = UINavigationController(rootViewController: destination)
             navigationViewController.modalPresentationStyle = .fullScreen

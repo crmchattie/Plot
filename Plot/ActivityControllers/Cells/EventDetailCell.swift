@@ -34,9 +34,10 @@ class EventDetailCell: UICollectionViewCell {
    
     let getTixLabel: UILabel = {
         let label = UILabel()
-        label.textColor = FalconPalette.ticketmaster
+//        label.textColor = FalconPalette.ticketmaster
+        label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.systemFont(ofSize: 18)
-        label.text = "ticketmaster"
+        label.text = "Go to Ticketmaster"
         label.numberOfLines = 1
         label.isUserInteractionEnabled = true
         return label
@@ -44,11 +45,11 @@ class EventDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-        clickView.constrainHeight(constant: 18)
+        clickView.constrainHeight(constant: 20)
         addSubview(clickView)
         clickView.addSubview(getTixLabel)
 
-        clickView.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 15, left: 0, bottom: 0, right: 0))
+        clickView.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         getTixLabel.anchor(top: clickView.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))

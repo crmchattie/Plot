@@ -28,9 +28,9 @@ struct TicketMasterSearchResult: Codable {
 
     // MARK: - Event
     struct Event: Codable {
-        let name: String?
+        let name: String
         let type: EventType?
-        let id: String?
+        let id: String
         let test: Bool?
         let url: String?
         let local: String?
@@ -111,9 +111,9 @@ struct TicketMasterSearchResult: Codable {
 
     // MARK: - Attraction
     struct Attraction: Codable {
-        let name: String?
+        let name: String
         let type: AttractionType?
-        let id: String?
+        let id: String
         let test: Bool?
         let url: String?
         let local: String?

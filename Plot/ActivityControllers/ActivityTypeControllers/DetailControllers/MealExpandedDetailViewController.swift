@@ -14,7 +14,6 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
     
     var recipe: Recipe? {
         didSet {
-            print("didSet")
             fetchData()
         }
     }
@@ -44,11 +43,9 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
     }
     
     func fetchData() {
-        print("fetchData")
         if let recipe = recipe {
             if let extendedIngredients = recipe.extendedIngredients {
                 self.ingredients = extendedIngredients
-                print(self.ingredients)
             }
             if let analyzedInstructions = recipe.analyzedInstructions {
                 for instruction in analyzedInstructions {
@@ -61,7 +58,6 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
                     }
                 }
             }
-            print(self.equipment)
             if let recipeInstructions = recipe.instructions {
                 instructions = recipeInstructions
                 instructions = instructions.replacingOccurrences(of: "<ol>", with: "")
@@ -69,7 +65,6 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
                 instructions = instructions.replacingOccurrences(of: "<li>", with: "")
                 instructions = instructions.replacingOccurrences(of: "</li>", with: "")
                 instructions = instructions.replacingOccurrences(of: ".", with: ". ")
-                print(self.instructions)
             }
             collectionView.reloadData()
         }

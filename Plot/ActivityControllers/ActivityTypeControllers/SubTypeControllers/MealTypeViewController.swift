@@ -17,6 +17,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .type]
     var filterDictionary = [String: [String]]()
     var sections: [String] = ["American", "Italian", "Vegetarian"]
+    
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -151,6 +152,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+        cell.horizontalController.favAct = favAct
         cell.arrowView.isHidden = true
         cell.delegate = self
         if showGroups {
@@ -159,11 +161,12 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 let recipes = groups[indexPath.item]
                 cell.horizontalController.recipes = recipes
                 cell.horizontalController.collectionView.reloadData()
-                cell.horizontalController.didSelectHandler = { [weak self] recipe in
+                cell.horizontalController.didSelectHandler = { [weak self] recipe, favAct in
                     if let recipe = recipe as? Recipe {
                         print("meal \(recipe.title)")
                         let destination = MealDetailViewController()
                         destination.hidesBottomBarWhenPushed = true
+                        destination.favAct = favAct
                         destination.recipe = recipe
                         destination.users = self!.users
                         destination.filteredUsers = self!.filteredUsers
@@ -186,13 +189,15 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerId, for: indexPath) as! SearchHeader
         let recipes = searchRecipes
         header.verticalController.recipes = recipes
+        header.verticalController.favAct = favAct
         header.verticalController.collectionView.reloadData()
-        header.verticalController.didSelectHandler = { [weak self] recipe in
+        header.verticalController.didSelectHandler = { [weak self] recipe, favAct in
             if let recipe = recipe as? Recipe {
                 print("meal \(recipe.title)")
                 let destination = MealDetailViewController()
                 destination.hidesBottomBarWhenPushed = true
                 destination.recipe = recipe
+                destination.favAct = favAct
                 destination.users = self!.users
                 destination.filteredUsers = self!.filteredUsers
                 destination.conversations = self!.conversations

@@ -53,7 +53,6 @@ with open('WorkoutsModified.json') as json_file:
     		exerMG = exercise["muscle_groups"]
     		if exerMG not in muscle_groups:
     			muscle_groups.append(exerMG)
-
     		exerSMG = exercise["muscle_groups_secondary"]
     		if exerSMG not in secondary_muscle_groups:
     			secondary_muscle_groups.append(exerSMG)
@@ -69,28 +68,36 @@ with open('WorkoutsModified.json') as json_file:
     		finalYoga.append(workoutID)
     	else:
     		yoga = False
-
-		for muscle in muscle_groups:
-			if "," in muscle:
-				muscleSplit = muscle.split(", ")
-				for subMuscle in muscleSplit:
-					subMuscle = subMuscle.replace(" ", "_")
-					subMuscle = subMuscle.replace("/", "&")
-					subMuscle = subMuscle.lower()
-					if subMuscle not in MG and subMuscle != '':
-						MG.append(subMuscle)
-						finalMuscle_groups[subMuscle].append(workoutID)
-
-			else:
+    	print("moving on")
+    	print(muscle_groups)
+    	for muscle in muscle_groups:
+    		print(muscle)
+    		if "," in muscle:
+    			print("found comma")
+    			muscleSplit = muscle.split(", ")
+    			for subMuscle in muscleSplit:
+    				subMuscle = subMuscle.replace(" ", "_")
+    				subMuscle = subMuscle.replace("/", "&")
+    				subMuscle = subMuscle.lower()
+    				print(subMuscle)
+    				if subMuscle not in MG and subMuscle != '':
+    					MG.append(subMuscle)
+    					finalMuscle_groups[subMuscle].append(workoutID)
+    					print(finalMuscle_groups)
+    		else:
+				print("did not find comma")
 				muscle = muscle.replace(" ", "_")
 				muscle = muscle.replace("/", "&")
 				muscle = muscle.lower()
+				print(muscle)
 				if muscle not in MG and muscle != '':
+					print(muscle)
 					MG.append(muscle)
 					finalMuscle_groups[muscle].append(workoutID)
-
-		for muscle in secondary_muscle_groups:
+					print(finalMuscle_groups)
+    	for muscle in secondary_muscle_groups:
 			if "," in muscle:
+				print("found comma")
 				muscleSplit = muscle.split(", ")
 				for subMuscle in muscleSplit:
 					subMuscle = subMuscle.replace(" ", "_")
@@ -100,13 +107,15 @@ with open('WorkoutsModified.json') as json_file:
 						SMG.append(subMuscle)
 						finalSecondary_muscle_groups[subMuscle].append(workoutID)
 			else:
+				print("did not find comma")
 				muscle = muscle.replace(" ", "_")
 				muscle = muscle.replace("/", "&")
 				muscle = muscle.lower()
 				if muscle not in SMG and muscle not in MG and muscle != '':
 					SMG.append(muscle)
 					finalSecondary_muscle_groups[muscle].append(workoutID)
-		for tpe in types:
+    	for tpe in types:
+			print(tpe)
 			if "," in tpe:
 				typeSplit = tpe.split(", ")
 				for subType in typeSplit:
@@ -133,11 +142,11 @@ with open('WorkoutsModified.json') as json_file:
 		# print("secondary_muscle_groups ",SMG)
 		# print("types ",workout_types)
 
-		workout["cardio"] = cardio
-		workout["yoga"] = yoga
-		workout["muscle_groups"] = MG
-		workout["secondary_muscle_groups"] = SMG
-		workout["types"] = workout_types
+    	workout["cardio"] = cardio
+    	workout["yoga"] = yoga
+    	workout["muscle_groups"] = MG
+    	workout["secondary_muscle_groups"] = SMG
+    	workout["types"] = workout_types
 
 data["exercises"] = exercises
 

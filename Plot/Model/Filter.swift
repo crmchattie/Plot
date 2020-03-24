@@ -12,9 +12,9 @@ enum filter: String {
     //recipes
     case cuisine, excludeCuisine, diet, intolerances, type
     //ticketmaster
-//    case type_of_show
+//    case type
 //    //workouts
-//    case type_of_workout, muscle, duration, cardio, yoga
+//    case type, muscle(s), duration
     
     var typeOfSection: String {
         switch self {

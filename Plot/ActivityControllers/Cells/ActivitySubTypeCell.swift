@@ -11,7 +11,7 @@ import UIKit
 protocol ActivitySubTypeCellDelegate: class {
     func plusButtonTapped()
     func shareButtonTapped()
-    func heartButtonTapped()
+    func heartButtonTapped(type: Any)
 }
 
 class ActivitySubTypeCell: UICollectionViewCell {
@@ -19,67 +19,78 @@ class ActivitySubTypeCell: UICollectionViewCell {
     var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
     var intColor: Int = 0
     
+    var favAct = [String: [String]]()
+    
     var recipe: Recipe! {
         didSet {
-            nameLabel.text = recipe.title
-            if let category = recipe.readyInMinutes, let subcategory = recipe.servings {
-                categoryLabel.text = "Preparation time: \(category) mins"
-                subcategoryLabel.text = "Servings: \(subcategory)"
+            if let recipe = recipe {
+                nameLabel.text = recipe.title
+                if let category = recipe.readyInMinutes, let subcategory = recipe.servings {
+                    categoryLabel.text = "Preparation time: \(category) mins"
+                    subcategoryLabel.text = "Servings: \(subcategory)"
+                }
+                let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
+                    imageView.sd_setImage(with: URL(string: recipeImage))
+                setupViews()
             }
-            let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
-                imageView.sd_setImage(with: URL(string: recipeImage))
         }
     }
     
     var event: Event! {
         didSet {
-            nameLabel.text = "\(event.name!)"
-            if let startDateTime = event.dates?.start?.dateTime, let date = startDateTime.toDate() {
-                let newDate = date.startDateTimeString()
-                categoryLabel.text = "\(newDate) @ \(event.embedded?.venues?[0].name ?? "")"
-            } else if let startDate = event.dates?.start?.localDate, let date = startDate.toDate() {
-                let newDate = date.startDateTimeString()
-                categoryLabel.text = "\(newDate) @ \(event.embedded?.venues?[0].name ?? "")"
-            }
-            if let minPrice = event.priceRanges?[0].min, let maxPrice = event.priceRanges?[0].max {
-                let formatter = CurrencyFormatter()
-                formatter.locale = .current
-                formatter.numberStyle = .currency
-                let minPriceString = formatter.string(for: minPrice)!
-                let maxPriceString = formatter.string(for: maxPrice)!
-                subcategoryLabel.text = "Price range: \(minPriceString) to \(maxPriceString)"
-            } else {
-                subcategoryLabel.text = ""
-            }
-            if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
-                imageView.sd_setImage(with: URL(string: url))
+            if let event = event {
+                nameLabel.text = "\(event.name)"
+                if let startDateTime = event.dates?.start?.dateTime, let date = startDateTime.toDate() {
+                    let newDate = date.startDateTimeString()
+                    categoryLabel.text = "\(newDate) @ \(event.embedded?.venues?[0].name ?? "")"
+                }
+                if let minPrice = event.priceRanges?[0].min, let maxPrice = event.priceRanges?[0].max {
+                    let formatter = CurrencyFormatter()
+                    formatter.locale = .current
+                    formatter.numberStyle = .currency
+                    let minPriceString = formatter.string(for: minPrice)!
+                    let maxPriceString = formatter.string(for: maxPrice)!
+                    subcategoryLabel.text = "Price range: \(minPriceString) to \(maxPriceString)"
+                } else {
+                    subcategoryLabel.text = ""
+                }
+                if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
+                    imageView.sd_setImage(with: URL(string: url))
+                }
+                setupViews()
             }
         }
     }
     
     var attraction: Attraction! {
         didSet {
-            nameLabel.text = "\(attraction.name!)"
-            if let upcomingEvents = attraction.upcomingEvents?.total {
-                categoryLabel.text = "Total events: \(upcomingEvents)"
-            }
-            subcategoryLabel.text = ""
-            if let images = attraction.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
-                imageView.sd_setImage(with: URL(string: url))
+            if let attraction = attraction {
+                nameLabel.text = "\(attraction.name)"
+                if let upcomingEvents = attraction.upcomingEvents?.total {
+                    categoryLabel.text = "Total events: \(upcomingEvents)"
+                }
+                subcategoryLabel.text = ""
+                if let images = attraction.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
+                    imageView.sd_setImage(with: URL(string: url))
+                }
+                setupViews()
             }
         }
     }
     
     var workout: Workout! {
         didSet {
-            nameLabel.text = workout.title
-            if let category = workout.tagsStr, let subcategory = workout.exercises?.count {
-                categoryLabel.text = category
-                subcategoryLabel.text = "Number of exercises: \(subcategory)"
+            if let workout = workout {
+                nameLabel.text = workout.title
+                if let category = workout.tagsStr, let subcategory = workout.exercises?.count {
+                    categoryLabel.text = category
+                    subcategoryLabel.text = "Number of exercises: \(subcategory)"
+                }
+                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
+                imageView.tintColor = UIColor.white
+                imageView.backgroundColor = colors[intColor]
             }
-            imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
-            imageView.tintColor = UIColor.white
-            imageView.backgroundColor = colors[intColor]
+            setupViews()
         }
     }
     
@@ -87,16 +98,19 @@ class ActivitySubTypeCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupViews()
+//        FavActDelegate.delegate = self
+//        falconUsersFetcher.delegate = self
+//        setupViews()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+        
+    var heartButtonImage: String?
     
     let heartButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "heart"), for: .normal)
         button.tintColor = ThemeManager.currentTheme().generalTitleColor
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -146,7 +160,14 @@ class ActivitySubTypeCell: UICollectionViewCell {
     
 
     func setupViews() {
-                        
+        
+        if let heartImage = heartButtonImage {
+            heartButton.setImage(UIImage(named: heartImage), for: .normal)
+            heartButton.isHidden = false
+        } else {
+            heartButton.isHidden = true
+        }
+        
         heartButton.constrainWidth(constant: 40)
         heartButton.constrainHeight(constant: 40)
         
@@ -165,7 +186,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
         
         let stackView = VerticalStackView(arrangedSubviews: [
             imageView,
-            UIStackView(arrangedSubviews: [plusButton, UIView()]),
+            UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()]),
             labelStackView
             ], spacing: 2)
         addSubview(stackView)
@@ -187,7 +208,19 @@ class ActivitySubTypeCell: UICollectionViewCell {
     }
 
     @objc func heartButtonTapped() {
-        self.delegate?.heartButtonTapped()
+        heartButtonImage = (heartButtonImage == "heart") ? "heart-filled" : "heart"
+        heartButton.setImage(UIImage(named: heartButtonImage!), for: .normal)
+        if let recipe = recipe {
+            self.delegate?.heartButtonTapped(type: recipe)
+        } else if let workout = workout {
+            self.delegate?.heartButtonTapped(type: workout)
+        } else if let event = event {
+            self.delegate?.heartButtonTapped(type: event)
+        } else if let attraction = attraction {
+            self.delegate?.heartButtonTapped(type: attraction)
+        }
+        
     }
+
 }
 

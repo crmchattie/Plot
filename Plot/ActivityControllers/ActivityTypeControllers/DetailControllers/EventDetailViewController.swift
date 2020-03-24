@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class EventDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
@@ -18,6 +19,7 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
+    var favAct = [String: [String]]()
     
     var event: Event?
     var attraction: Attraction?
@@ -66,6 +68,11 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
             cell.delegate = self
             if let event = event {
+                if let events = favAct["events"], events.contains(event.id) {
+                    cell.heartButtonImage = "heart-filled"
+                } else {
+                    cell.heartButtonImage = "heart"
+                }
                 cell.event = event
                 return cell
             } else if let attraction = attraction {
@@ -121,8 +128,49 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
         print("shareButtonTapped")
     }
     
-    func heartButtonTapped() {
+    func heartButtonTapped(type: Any) {
         print("heartButtonTapped")
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+            if let event = type as? Event {
+                print(event.name)
+                databaseReference.child("events").observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists() {
+                        var value = snapshot.value as! [String]
+                        if value.contains("\(event.id)") {
+                            if let index = value.firstIndex(of: "\(event.id)") {
+                                value.remove(at: index)
+                            }
+                            databaseReference.updateChildValues(["events": value as NSArray])
+                        } else {
+                            value.append("\(event.id)")
+                            databaseReference.updateChildValues(["events": value as NSArray])
+                        }
+                    } else {
+                        databaseReference.updateChildValues(["events": ["\(event.id)"]])
+                    }
+                })
+            } else if let attraction = type as? Attraction {
+                print(attraction.name)
+                databaseReference.child("attractions").observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists() {
+                        var value = snapshot.value as! [String]
+                        if value.contains("\(attraction.id)") {
+                            if let index = value.firstIndex(of: "\(attraction.id)") {
+                                value.remove(at: index)
+                            }
+                            databaseReference.updateChildValues(["attractions": value as NSArray])
+                        } else {
+                            value.append("\(attraction.id)")
+                            databaseReference.updateChildValues(["attractions": value as NSArray])
+                        }
+                    } else {
+                        databaseReference.updateChildValues(["attractions": ["\(attraction.id)"]])
+                    }
+                })
+            }
+        }
+        
     }
 
 }

@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import Firebase
 
 class ActivitySubTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+    
     
     let kActivityTypeCell = "ActivityTypeCell"
     let headerId = "headerId"
@@ -17,6 +19,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
+    var favAct = [String: [String]]()
         
     var timer: Timer?
     var headerheight: CGFloat = 0
@@ -24,6 +27,8 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     
     var showGroups = true
     
+    fileprivate var reference: DatabaseReference!
+    let favActivities = ActivityTypeViewController()
     
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
@@ -35,7 +40,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+                
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
@@ -55,8 +60,43 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("view appearing")
+        fetchFavAct()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        print("view disappearing")
+        reference.removeAllObservers()
+    }
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
     }
+    
+    func fetchFavAct() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        
+        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
+                print("favAct")
+                self.favAct = favoriteActivitiesSnapshot
+                self.collectionView.reloadData()
+            } else {
+                self.favAct = [String: [String]]()
+                self.collectionView.reloadData()
+               print("snapshot does not exist")
+           }
+          })
+        { (error) in
+            print(error.localizedDescription)
+        }
+        
+    }
+    
+    
 }
 

@@ -14,8 +14,8 @@ import CodableFirebase
 
 class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
-    fileprivate var workoutReference: DatabaseReference!
-    
+    fileprivate var reference: DatabaseReference!
+        
     private let kActivityTypeCell = "ActivityTypeCell"
     private let headerId = "headerId"
     
@@ -23,6 +23,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var attractionsString = [String]()
     var types: [ActivityType] = [.basic]
     var recipes = [Recipe]()
+    var favAct = [String: [String]]()
     
     var workoutIDs: [String] = ["ZB9Gina","E5YrL4F","lhNZOX1","LWampEt","5jbuzns","ltrgYTF","Z37OGjs","7GdJQBG","RKrXsHn","GwxLrim","nspLcIX","nHWkOhp","0ym6yNn","6VLf2M7","n8g5auz","CM5o2rv","ufiyRQc","N7aHlCw","gIeTbVT","lGaFbQK"]
     var intColor: Int = 0
@@ -65,16 +66,54 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("view appearing")
+        fetchFavAct()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        print("view disappearing")
+        reference.removeAllObservers()
+    }
+    
+    func fetchFavAct() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        
+        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
+                 print("favAct")
+                 self.favAct = favoriteActivitiesSnapshot
+                 self.collectionView.reloadData()
+             } else {
+                 self.favAct = [String: [String]]()
+                 self.collectionView.reloadData()
+                print("snapshot does not exist")
+            }
+          })
+        { (error) in
+            print(error.localizedDescription)
+        }
+        
+    }
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
     }
     
     fileprivate func fetchData() {
+        
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
             
         var recipes: [Recipe]?
         var workouts = [Workout]()
         var events: [Event]?
-        var attractions: [Attraction]?
+//        var attractions: [Attraction]?
         
         // help you sync your data fetches together
         let dispatchGroup = DispatchGroup()
@@ -96,8 +135,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 
                 for workoutID in self.workoutIDs {
                     dispatchGroup.enter()
-                    self.workoutReference = Database.database().reference().child("workouts").child("workouts")
-                    self.workoutReference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                    self.reference = Database.database().reference().child("workouts").child("workouts")
+                    self.reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                         if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
                             if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
                                 workouts.append(workout)
@@ -261,6 +300,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+        cell.horizontalController.favAct = favAct
         cell.delegate = self
         cell.titleLabel.text = sections[indexPath.item]
         if indexPath.item < groups.count {
@@ -290,12 +330,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 cell.horizontalController.cellData = cellData
             }
             cell.horizontalController.collectionView.reloadData()
-            cell.horizontalController.didSelectHandler = { [weak self] cellData in
+            cell.horizontalController.didSelectHandler = { [weak self] cellData, favAct in
                 
                 if let recipe = cellData as? Recipe {
                     print("meal \(recipe.title)")
                     let destination = MealDetailViewController()
                     destination.hidesBottomBarWhenPushed = true
+                    destination.favAct = favAct
                     destination.recipe = recipe
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
@@ -305,6 +346,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     print("event \(String(describing: event.name))")
                     let destination = EventDetailViewController()
                     destination.hidesBottomBarWhenPushed = true
+                    destination.favAct = favAct
                     destination.event = event
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
@@ -314,8 +356,9 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     print("workout \(String(describing: workout.title))")
                     let destination = WorkoutDetailViewController()
                     destination.hidesBottomBarWhenPushed = true
+                    destination.favAct = favAct
                     destination.workout = workout
-                    if let ID = workout.identifier, let index = self!.workoutIDs.firstIndex(of: ID) {
+                    if let index = self!.workoutIDs.firstIndex(of: workout.identifier) {
                         destination.intColor = (index % 5)
                     }
                     destination.users = self!.users
@@ -326,6 +369,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     print("attraction \(String(describing: attraction.name))")
                     let destination = EventDetailViewController()
                     destination.hidesBottomBarWhenPushed = true
+                    destination.favAct = favAct
                     destination.attraction = attraction
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
@@ -360,6 +404,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             if !recipes.isEmpty {
                 destination.groups.append(recipes)
             }
+            destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -368,6 +413,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             print("Event")
             let destination = EventTypeViewController()
             destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -376,6 +422,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             print("Workouts")
             let destination = WorkoutTypeViewController()
             destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -384,6 +431,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             print("Attractions")
             let destination = EventTypeViewController()
             destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations

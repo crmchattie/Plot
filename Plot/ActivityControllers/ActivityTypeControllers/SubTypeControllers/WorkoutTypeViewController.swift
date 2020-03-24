@@ -247,6 +247,7 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+        cell.horizontalController.favAct = favAct
         cell.arrowView.isHidden = true
         cell.delegate = self
         if showGroups {
@@ -255,13 +256,14 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
                 let workouts = groups[indexPath.item]
                 cell.horizontalController.workouts = workouts
                 cell.horizontalController.collectionView.reloadData()
-                cell.horizontalController.didSelectHandler = { [weak self] workout in
+                cell.horizontalController.didSelectHandler = { [weak self] workout, favAct in
                     if let workout = workout as? Workout {
                         print("workout \(String(describing: workout.title))")
                         let destination = WorkoutDetailViewController()
                         destination.hidesBottomBarWhenPushed = true
+                        destination.favAct = favAct
                         destination.workout = workout
-                        if let ID = workout.identifier, let index = workouts.firstIndex(where: {$0.identifier == ID} ) {
+                        if let index = workouts.firstIndex(where: {$0.identifier == workout.identifier} ) {
                             destination.intColor = (index % 5)
                         }
                         destination.users = self!.users
@@ -284,15 +286,17 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerId, for: indexPath) as! SearchHeader
         let workouts = searchWorkouts
+        header.verticalController.favAct = favAct
         header.verticalController.workouts = workouts
         header.verticalController.collectionView.reloadData()
-        header.verticalController.didSelectHandler = { [weak self] workout in
+        header.verticalController.didSelectHandler = { [weak self] workout, favAct in
             if let workout = workout as? Workout {
                 print("workout \(String(describing: workout.title))")
                 let destination = WorkoutDetailViewController()
                 destination.hidesBottomBarWhenPushed = true
+                destination.favAct = favAct
                 destination.workout = workout
-                if let ID = workout.identifier, let index = workouts.firstIndex(where: {$0.identifier == ID} ) {
+                if let index = workouts.firstIndex(where: {$0.identifier == workout.identifier} ) {
                     destination.intColor = (index % 5)
                 }
                 destination.users = self!.users

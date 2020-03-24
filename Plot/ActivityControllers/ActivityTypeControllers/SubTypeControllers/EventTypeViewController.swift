@@ -326,6 +326,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+        cell.horizontalController.favAct = favAct
         cell.arrowView.isHidden = true
         cell.delegate = self
         if showGroups {
@@ -334,11 +335,12 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 let events = groups[indexPath.item]
                 cell.horizontalController.events = events
                 cell.horizontalController.collectionView.reloadData()
-                cell.horizontalController.didSelectHandler = { [weak self] event in
+                cell.horizontalController.didSelectHandler = { [weak self] event, favAct in
                     if let event = event as? Event {
                         print("event \(String(describing: event.name))")
                         let destination = EventDetailViewController()
                         destination.hidesBottomBarWhenPushed = true
+                        destination.favAct = favAct
                         destination.event = event
                         destination.users = self!.users
                         destination.filteredUsers = self!.filteredUsers
@@ -360,13 +362,15 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerId, for: indexPath) as! SearchHeader
         let events = searchEvents
+        header.verticalController.favAct = favAct
         header.verticalController.events = events
         header.verticalController.collectionView.reloadData()
-        header.verticalController.didSelectHandler = { [weak self] event in
+        header.verticalController.didSelectHandler = { [weak self] event, favAct in
             if let event = event as? Event {
                 print("event \(String(describing: event.name))")
                 let destination = EventDetailViewController()
                 destination.hidesBottomBarWhenPushed = true
+                destination.favAct = favAct
                 destination.event = event
                 destination.users = self!.users
                 destination.filteredUsers = self!.filteredUsers
