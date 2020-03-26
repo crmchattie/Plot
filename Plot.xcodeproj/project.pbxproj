@@ -32,6 +32,7 @@
 		10314113230D712E00DB471B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 10314109230D712E00DB471B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
 		103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103E968922C2B309007D6668 /* PurchaseRow.swift */; };
+		1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1040E582242AA05D00304D05 /* MessageViewController.swift */; };
 		105BD06B22FB520100ECFA34 /* PhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105BD06A22FB520100ECFA34 /* PhotosViewController.swift */; };
 		105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66E824149DC600F6EDB6 /* EventDetailCell.swift */; };
 		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
@@ -314,6 +315,7 @@
 		10314110230D712E00DB471B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		10367D42230B126800D25885 /* ActivityImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityImageCell.swift; sourceTree = "<group>"; };
 		103E968922C2B309007D6668 /* PurchaseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseRow.swift; sourceTree = "<group>"; };
+		1040E582242AA05D00304D05 /* MessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
 		1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.release.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.release.xcconfig"; sourceTree = "<group>"; };
 		105BD06A22FB520100ECFA34 /* PhotosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhotosViewController.swift; path = ../../../PhotosViewController.swift; sourceTree = "<group>"; };
 		105F66E824149DC600F6EDB6 /* EventDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailCell.swift; sourceTree = "<group>"; };
@@ -594,6 +596,7 @@
 				109F849823D6860D002C0044 /* FilterViewController.swift */,
 				100A53ED23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift */,
 				1092F2392414507200E8CE16 /* WebViewController.swift */,
+				1040E582242AA05D00304D05 /* MessageViewController.swift */,
 				100A53EF23E0E839004AA952 /* HorizontalSnappingController.swift */,
 			);
 			path = ActivityTypeControllers;
@@ -1886,6 +1889,7 @@
 				4BAEE50C21272D890045AB10 /* UserInfoTableViewController+handlers.swift in Sources */,
 				4BAEE50921272D890045AB10 /* SelectedMediaCollectionCell+timerHandlers.swift in Sources */,
 				1092F23E2414587E00E8CE16 /* MealExpandedDetailViewController.swift in Sources */,
+				1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */,
 				4BAEE5DF212735E50045AB10 /* UIEdgeInsetsExtensions.swift in Sources */,
 				4BAEE5E8212735E50045AB10 /* EnterPhoneNumberController.swift in Sources */,
 				10EED1552295779A00D13D08 /* ScheduleViewController.swift in Sources */,

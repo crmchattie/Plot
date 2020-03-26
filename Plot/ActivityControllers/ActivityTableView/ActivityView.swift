@@ -47,7 +47,7 @@ class ActivityView: UIView {
             calendar.rightAnchor.constraint(equalTo: rightAnchor),
 //            calendar.bottomAnchor.constraint(equalTo: arrowButton.topAnchor, constant: 10),
             
-            arrowButton.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: -10),
+            arrowButton.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: -7),
             arrowButton.widthAnchor.constraint(equalToConstant: 15),
             arrowButton.heightAnchor.constraint(equalToConstant: 15),
             arrowButton.centerXAnchor.constraint(equalTo: calendar.centerXAnchor),

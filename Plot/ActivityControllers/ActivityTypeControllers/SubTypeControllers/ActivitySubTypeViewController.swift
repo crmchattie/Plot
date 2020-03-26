@@ -66,12 +66,6 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         fetchFavAct()
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        print("view disappearing")
-        reference.removeAllObservers()
-    }
-    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
     }

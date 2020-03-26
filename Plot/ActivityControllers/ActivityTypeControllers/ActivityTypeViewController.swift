@@ -72,12 +72,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         fetchFavAct()
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        print("view disappearing")
-        reference.removeAllObservers()
-    }
-    
     func fetchFavAct() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         

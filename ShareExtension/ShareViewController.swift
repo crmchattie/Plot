@@ -73,34 +73,11 @@ class ShareViewController: UIViewController {
         
         navigationItem.title = "Select Activity"
         navigationItem.leftBarButtonItem = leftButton
-        
-//        if #available(iOS 11.0, *) {
-//            searchExtensionController = UISearchController(searchResultsController: nil)
-//            searchExtensionController?.searchResultsUpdater = self
-//            searchExtensionController?.obscuresBackgroundDuringPresentation = false
-//            searchExtensionController?.searchBar.delegate = self
-//            searchExtensionController?.definesPresentationContext = true
-//            searchExtensionController?.searchBar.sizeToFit()
-//            searchExtensionController?.searchBar.barTintColor = UIColor(red: 245.0/255.0, green: 245.0/255.0, blue: 245.0/255.0, alpha: 1.0)
-//            shareHeaderView.tableView.tableHeaderView = searchExtensionController?.searchBar
-//        } else {
-//            searchBar = UISearchBar()
-//            searchBar?.delegate = self
-//            searchBar?.placeholder = "Search"
-//            searchBar?.searchBarStyle = .minimal
-//            searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
-//            searchBar?.barTintColor = UIColor(red: 245.0/255.0, green: 245.0/255.0, blue: 245.0/255.0, alpha: 1.0)
-//            shareHeaderView.tableView.tableHeaderView = searchBar
-//        }
-//        navigationItem.hidesSearchBarWhenScrolling = false
-
-        
-//         Assign the navigation item to the navigation bar
         shareHeaderView.navBar.items = [navigationItem]
     }
 
     
-    /// This method fetches the data to be displayed in widget from shared container.
+    // This method fetches the data to be displayed in widget from shared container.
     fileprivate func fetchDataFromSharedContainer() {
         if let sharedContainer = sharedContainer, let activities = sharedContainer.array(forKey: "ActivitiesArray") {
             for activity in activities {

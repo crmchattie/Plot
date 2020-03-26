@@ -46,7 +46,7 @@ protocol ActivityViewControllerDataStore: class {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->())
 }
 
-class ActivityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, UIGestureRecognizerDelegate {
+class ActivityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance, UIGestureRecognizerDelegate {
     fileprivate var isAppLoaded = false
     fileprivate let plotAppGroup = "group.immaturecreations.plot"
     fileprivate var sharedContainer : UserDefaults?
@@ -166,6 +166,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.calendar.appearance.todayColor = FalconPalette.defaultBlue
         activityView.calendar.appearance.todaySelectionColor = FalconPalette.defaultBlue
         activityView.arrowButton.tintColor = theme.generalTitleColor
+        activityView.calendar.appearance.eventSelectionColor = ThemeManager.currentTheme().generalTitleColor
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -230,6 +231,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.calendar.register(FSCalendarCell.self, forCellReuseIdentifier: "cell")
         activityView.calendar.scope = getCalendarScope()
         activityView.calendar.swipeToChooseGesture.isEnabled = true // Swipe-To-Choose
+        activityView.calendar.appearance.headerMinimumDissolvedAlpha = 0.0
         
         let scopeGesture = UIPanGestureRecognizer(target: activityView.calendar, action: #selector(activityView.calendar.handleScopeGesture(_:)));
         activityView.calendar.addGestureRecognizer(scopeGesture)
@@ -425,17 +427,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         saveDataToSharedContainer(activities: allActivities)
         
         if !isAppLoaded {
-            UIView.transition(with: activityView.tableView, duration: 0.15, options: .transitionCrossDissolve, animations: { self.activityView.tableView.reloadData()
-            }) { _ in
-                self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!)
-            }
-            
-            
+            activityView.tableView.reloadData()
             configureTabBarBadge()
         } else {
             configureTabBarBadge()
             activityView.tableView.reloadData()
-            scrollToFirstActivityWithDate(date: activityView.calendar.selectedDate!)
         }
         
         if allActivities.count == 0 {
@@ -447,6 +443,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         guard !isAppLoaded else { return }
         delegate?.manageAppearanceActivity(self, didFinishLoadingWith: true)
         isAppLoaded = true
+        
+        UIView.transition(with: activityView.tableView, duration: 0.15, options: .transitionCrossDissolve, animations: { self.activityView.tableView.reloadData()
+        }) { _ in
+            self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!)
+        }
+        activityView.calendar.reloadData()
     }
     
     func handleReloadActivities() {
@@ -561,7 +563,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        let days = calendar.scope == .week ? 7 : 31
+//        let days = calendar.scope == .week ? 7 : 31
         self.scrollToFirstActivityWithDate(date: calendar.currentPage)
     }
     
@@ -576,6 +578,22 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             // default
             return .week
         }
+    }
+    
+    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+
+        for activity in activities {
+            if let startDate = activity.startDateTime as? TimeInterval {
+                let startDate = Date(timeIntervalSince1970: startDate)
+                if dateFormatter.string(from: date) == dateFormatter.string(from: startDate) {
+                    return 1
+                }
+            }
+        }
+        return 0
     }
     
     // MARK: - Table view data source

@@ -168,7 +168,34 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
     }
     
     func shareButtonTapped() {
+        sendMessage()
         print("shareButtonTapped")
+    }
+    
+    func sendMessage() {
+        print("send message")
+        let shareText = "Plot"
+//        guard let url = URL(string: "http://swiftdevcenter.com/"),
+//            let image = UIImage(named: "myImage.png")
+//            else { return }
+        let shareContent: [Any] = [shareText]
+        let activityController = UIActivityViewController(activityItems: shareContent,
+                                                          applicationActivities: nil)
+        self.present(activityController, animated: true, completion: nil)
+
+        //Completion handler
+        activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+        Bool, arrayReturnedItems: [Any]?, error: Error?) in
+            if completed {
+                print("share completed")
+                return
+            } else {
+                print("cancel")
+            }
+            if let shareError = error {
+                print("error while sharing: \(shareError.localizedDescription)")
+            }
+        }
     }
     
     func heartButtonTapped(type: Any) {
