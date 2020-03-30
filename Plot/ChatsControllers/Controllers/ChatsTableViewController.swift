@@ -590,7 +590,7 @@ extension ChatsTableViewController: ChatCellDelegate {
     
     func openActivity(forConversation conversation: Conversation) {
         if conversation.activities == nil {
-            let destination = CreateActivityViewController()
+            let destination = ActivityTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.users = users
             destination.filteredUsers = filteredUsers

@@ -139,6 +139,7 @@ extension MediaPickerControllerNew: ImagePickerTrayControllerDelegate {
         
         self.inputContainerView?.selectedMedia.append(MediaObject(dictionary: mediaObject))
         
+        
         if self.inputContainerView!.selectedMedia.count - 1 >= 0 {
           self.insertItemsToCollectionViewAnimated(at: [IndexPath(item: self.inputContainerView!.selectedMedia.count - 1 , section: 0)], mediaObject: mediaObject)
           

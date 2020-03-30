@@ -15,9 +15,10 @@ class IncomingTextMessageCell: BaseMessageCell {
     let textView = FalconTextView()
 //    textView.font = UIFont.systemFont(ofSize: 13)
     textView.font = UIFont.preferredFont(forTextStyle: .callout)
-//    textView.adjustsFontForContentSizeCategory = true
-		textView.textColor = .darkText
-        textView.textContainerInset = UIEdgeInsets(top: incomingTextViewTopInset, left: incomingTextViewLeftInset, bottom: incomingTextViewBottomInset, right: incomingTextViewRightInset)
+    textView.textColor = .darkText
+    textView.textContainerInset = UIEdgeInsets(top: incomingTextViewTopInset, left: incomingTextViewLeftInset, bottom: incomingTextViewBottomInset, right: incomingTextViewRightInset)
+    textView.linkTextAttributes = [
+        NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue]
     return textView
   }()
 

@@ -22,8 +22,12 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var sections: [String] = ["Recipes", "Workouts", "Events"]
     var attractionsString = [String]()
     var types: [ActivityType] = [.basic]
-    var recipes = [Recipe]()
     var favAct = [String: [String]]()
+    
+    var recipes: [Recipe]?
+    var workouts = [Workout]()
+    var events: [Event]?
+//    var attractions: [Attraction]?
     
     var workoutIDs: [String] = ["ZB9Gina","E5YrL4F","lhNZOX1","LWampEt","5jbuzns","ltrgYTF","Z37OGjs","7GdJQBG","RKrXsHn","GwxLrim","nspLcIX","nHWkOhp","0ym6yNn","6VLf2M7","n8g5auz","CM5o2rv","ufiyRQc","N7aHlCw","gIeTbVT","lGaFbQK"]
     var intColor: Int = 0
@@ -31,6 +35,9 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
+    var selectedFalconUsers = [User]()
+    var conversation : Conversation?
+    
     var groups = [Any]()
     
     var locationManager = CLLocationManager()
@@ -63,6 +70,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
                         
         fetchData()
+
         
     }
     
@@ -70,27 +78,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         super.viewWillAppear(animated)
         print("view appearing")
         fetchFavAct()
-    }
-    
-    func fetchFavAct() {
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        
-        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
-        self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
-                 print("favAct")
-                 self.favAct = favoriteActivitiesSnapshot
-                 self.collectionView.reloadData()
-             } else {
-                 self.favAct = [String: [String]]()
-                 self.collectionView.reloadData()
-                print("snapshot does not exist")
-            }
-          })
-        { (error) in
-            print(error.localizedDescription)
-        }
-        
+
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -103,22 +91,17 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-            
-        var recipes: [Recipe]?
-        var workouts = [Workout]()
-        var events: [Event]?
-//        var attractions: [Attraction]?
         
         // help you sync your data fetches together
         let dispatchGroup = DispatchGroup()
         
         dispatchGroup.enter()
         Service.shared.fetchRecipesSimple(query: "healthy", cuisine: "American") { (search, err) in
-            recipes = search?.recipes
+            self.recipes = search?.recipes
             dispatchGroup.leave()
             
             dispatchGroup.notify(queue: .main) {
-                if let group = recipes {
+                if let group = self.recipes {
                     self.groups.append(group)
                     self.recipes = group
                 } else {
@@ -133,7 +116,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     self.reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                         if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
                             if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
-                                workouts.append(workout)
+                                self.workouts.append(workout)
                                 dispatchGroup.leave()
                             }
                         }
@@ -144,7 +127,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 }
                 
                 dispatchGroup.notify(queue: .main) {
-                    self.groups.append(workouts)
+                    self.groups.append(self.workouts)
                     self.collectionView.reloadData()
                     
                     //attractions
@@ -187,10 +170,10 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                         dispatchGroup.enter()
                         Service.shared.fetchEventsSegmentLatLong(keyword: "", segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                            events = search?.embedded?.events
+                            self.events = search?.embedded?.events
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {
-                                if let group = events {
+                                if let group = self.events {
 //                                    var finalEvents = [Event]()
 //                                    for event in group {
 //                                        print(event.name!)
@@ -217,10 +200,10 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     } else {
                         dispatchGroup.enter()
                         Service.shared.fetchEventsSegment(keyword: "", segmentId: "") { (search, err) in
-                            events = search?.embedded?.events
+                            self.events = search?.embedded?.events
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {
-                                if let group = events {
+                                if let group = self.events {
 //                                    var finalEvents = [Event]()
 //                                    for event in group {
 //                                        print(event.name!)
@@ -294,9 +277,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+        cell.horizontalController.conversations = conversations
+        cell.horizontalController.users = users
+        cell.horizontalController.filteredUsers = filteredUsers
         cell.horizontalController.favAct = favAct
         cell.delegate = self
         cell.titleLabel.text = sections[indexPath.item]
+
         if indexPath.item < groups.count {
             let cellData = groups[indexPath.item]
             if let recipes = cellData as? [Recipe] {
@@ -325,7 +312,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             }
             cell.horizontalController.collectionView.reloadData()
             cell.horizontalController.didSelectHandler = { [weak self] cellData, favAct in
-                
+                                
                 if let recipe = cellData as? Recipe {
                     print("meal \(recipe.title)")
                     let destination = MealDetailViewController()
@@ -386,6 +373,94 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: view.frame.width, height: 397)
     }
+    
+    func fetchFavAct() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        
+        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
+                print("snapshot exists")
+                print(self.favAct)
+                print(favoriteActivitiesSnapshot)
+                if !NSDictionary(dictionary: self.favAct).isEqual(to: favoriteActivitiesSnapshot) {
+                    let updateFavoriteActivitiesSnapshot = favoriteActivitiesSnapshot.minus(dict: self.favAct)
+                    let updateFavAct = self.favAct.minus(dict: favoriteActivitiesSnapshot)
+                    print(updateFavAct)
+                    print(updateFavoriteActivitiesSnapshot)
+                    self.favAct = favoriteActivitiesSnapshot
+                    for (_, values) in updateFavoriteActivitiesSnapshot {
+                        for value in values {
+                            print(value)
+                            if let _ = self.recipes?.firstIndex(where: {"\($0.id)" == value}) {
+                                let indexPath = IndexPath(row: 0, section: 0)
+                                print(indexPath)
+                                self.collectionView.reloadItems(at: [indexPath])
+                            } else if let _ = self.workouts.firstIndex(where: {"\($0.identifier)" == value}) {
+                                let indexPath = IndexPath(row: 1, section: 0)
+                                print(indexPath)
+                                self.collectionView.reloadItems(at: [indexPath])
+                            } else if let _ = self.events?.firstIndex(where: {"\($0.id)" == value}) {
+                                let indexPath = IndexPath(row: 2, section: 0)
+                                print(indexPath)
+                                self.collectionView.reloadItems(at: [indexPath])
+                            }
+                        }
+                    }
+                    for (_, values) in updateFavAct {
+                        for value in values {
+                            print(value)
+                            if let _ = self.recipes?.firstIndex(where: {"\($0.id)" == value}) {
+                                let indexPath = IndexPath(row: 0, section: 0)
+                                print(indexPath)
+                                self.collectionView.reloadItems(at: [indexPath])
+                            } else if let _ = self.workouts.firstIndex(where: {"\($0.identifier)" == value}) {
+                                let indexPath = IndexPath(row: 1, section: 0)
+                                print(indexPath)
+                                self.collectionView.reloadItems(at: [indexPath])
+                            } else if let _ = self.events?.firstIndex(where: {"\($0.id)" == value}) {
+                                let indexPath = IndexPath(row: 2, section: 0)
+                                print(indexPath)
+                                self.collectionView.reloadItems(at: [indexPath])
+                            }
+                        }
+                    }
+                }
+//                self.collectionView.reloadData()
+             } else {
+                print("snapshot does not exist")
+                print(self.favAct)
+                if !self.favAct.isEmpty {
+                    let updateFavAct = self.favAct
+                    print(updateFavAct)
+                    self.favAct = [String: [String]]()
+                    for (_, values) in updateFavAct {
+                        for value in values {
+                            print(value)
+                            if let _ = self.recipes?.firstIndex(where: {"\($0.id)" == value}) {
+                                let indexPath = IndexPath(row: 0, section: 0)
+                                print(indexPath)
+                                self.collectionView.reloadItems(at: [indexPath])
+                            } else if let _ = self.workouts.firstIndex(where: {"\($0.identifier)" == value}) {
+                                let indexPath = IndexPath(row: 1, section: 0)
+                                print(indexPath)
+                                self.collectionView.reloadItems(at: [indexPath])
+                            } else if let _ = self.events?.firstIndex(where: {"\($0.id)" == value}) {
+                                let indexPath = IndexPath(row: 2, section: 0)
+                                print(indexPath)
+                                self.collectionView.reloadItems(at: [indexPath])
+                            }
+                        }
+                    }
+                }
+//                self.collectionView.reloadData()
+            }
+          })
+        { (error) in
+            print(error.localizedDescription)
+        }
+        
+    }
   
 }
 
@@ -395,7 +470,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
         case "Recipes":
             let destination = MealTypeViewController()
             destination.hidesBottomBarWhenPushed = true
-            if !recipes.isEmpty {
+            if let recipes = self.recipes, !recipes.isEmpty {
                 destination.groups.append(recipes)
             }
             destination.favAct = favAct

@@ -76,13 +76,17 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
         self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
-                print("favAct")
-                self.favAct = favoriteActivitiesSnapshot
-                self.collectionView.reloadData()
+                if !NSDictionary(dictionary: self.favAct).isEqual(to: favoriteActivitiesSnapshot) {
+                    print("favAct")
+                    self.favAct = favoriteActivitiesSnapshot
+                    self.collectionView.reloadData()
+                }
             } else {
-                self.favAct = [String: [String]]()
-                self.collectionView.reloadData()
-               print("snapshot does not exist")
+                if !self.favAct.isEmpty {
+                    self.favAct = [String: [String]]()
+                    self.collectionView.reloadData()
+                    print("snapshot does not exist")
+                }
            }
           })
         { (error) in

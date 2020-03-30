@@ -126,4 +126,5 @@ class BaseMessageCell: RevealableCollectionViewCell {
     prepareViewsForReuse()
     deliveryStatus.text = ""
   }
+        
 }

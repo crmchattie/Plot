@@ -43,6 +43,7 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
     }
     
     func fetchData() {
+        
         if let recipe = recipe {
             if let extendedIngredients = recipe.extendedIngredients {
                 self.ingredients = extendedIngredients

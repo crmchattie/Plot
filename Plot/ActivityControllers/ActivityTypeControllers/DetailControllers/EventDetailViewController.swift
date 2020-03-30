@@ -23,6 +23,8 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
     
     var event: Event?
     var attraction: Attraction?
+    
+    fileprivate var reference: DatabaseReference!
             
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
@@ -50,12 +52,34 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
         
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(EventDetailCell.self, forCellWithReuseIdentifier: kEventDetailCell)
+        
+        if favAct.isEmpty {
+            fetchFavAct()
+        }
 
                                         
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
+    }
+    
+    fileprivate func fetchFavAct() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        
+        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
+                print("snapshot exists")
+                self.favAct = favoriteActivitiesSnapshot
+                self.collectionView.reloadData()
+            }
+        })
     }
 
     
@@ -120,11 +144,11 @@ class EventDetailViewController: UICollectionViewController, UICollectionViewDel
 }
 
 extension EventDetailViewController: ActivityDetailCellDelegate {
-    func plusButtonTapped() {
+    func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
     }
     
-    func shareButtonTapped() {
+    func shareButtonTapped(id: String) {
         print("shareButtonTapped")
     }
     
@@ -146,7 +170,9 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                             value.append("\(event.id)")
                             databaseReference.updateChildValues(["events": value as NSArray])
                         }
+                        self.favAct["events"] = value
                     } else {
+                        self.favAct["events"] = ["\(event.id)"]
                         databaseReference.updateChildValues(["events": ["\(event.id)"]])
                     }
                 })
@@ -164,7 +190,9 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                             value.append("\(attraction.id)")
                             databaseReference.updateChildValues(["attractions": value as NSArray])
                         }
+                        self.favAct["attractions"] = value
                     } else {
+                        self.favAct["attractions"] = ["\(attraction.id)"]
                         databaseReference.updateChildValues(["attractions": ["\(attraction.id)"]])
                     }
                 })
@@ -177,6 +205,11 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
 
 extension EventDetailViewController: EventDetailCellDelegate {
     func viewTapped() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
         print("view tapped")
         let destination = WebViewController()
         destination.urlString = event?.url

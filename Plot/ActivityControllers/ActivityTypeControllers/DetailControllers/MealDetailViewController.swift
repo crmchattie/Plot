@@ -23,6 +23,8 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
     
     var recipe: Recipe?
     var detailedRecipe: Recipe?
+    
+    fileprivate var reference: DatabaseReference!
         
         
     init() {
@@ -51,9 +53,14 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
         
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(MealDetailCell.self, forCellWithReuseIdentifier: kMealDetailCell)
-                                
-        fetchData()
         
+        if detailedRecipe == nil {
+            fetchData()
+        }
+        
+        if favAct.isEmpty {
+            fetchFavAct()
+        }
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -61,6 +68,12 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
     }
     
     fileprivate func fetchData() {
+        
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
         if let recipe = recipe {
@@ -72,6 +85,24 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
                 }
             }
         }
+    }
+    
+    fileprivate func fetchFavAct() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        
+        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
+                print("snapshot exists")
+                self.favAct = favoriteActivitiesSnapshot
+                self.collectionView.reloadData()
+            }
+        })
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -129,11 +160,11 @@ class MealDetailViewController: UICollectionViewController, UICollectionViewDele
 }
 
 extension MealDetailViewController: ActivityDetailCellDelegate {
-    func plusButtonTapped() {
+    func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
     }
     
-    func shareButtonTapped() {
+    func shareButtonTapped(id: String) {
         print("shareButtonTapped")
     }
     
@@ -155,7 +186,9 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
                             value.append("\(recipe.id)")
                             databaseReference.updateChildValues(["recipes": value as NSArray])
                         }
+                        self.favAct["recipes"] = value
                     } else {
+                        self.favAct["recipes"] = ["\(recipe.id)"]
                         databaseReference.updateChildValues(["recipes": ["\(recipe.id)"]])
                     }
                 })

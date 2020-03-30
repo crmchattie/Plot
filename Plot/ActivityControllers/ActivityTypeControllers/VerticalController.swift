@@ -24,6 +24,8 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     var conversations = [Conversation]()
     var favAct = [String: [String]]()
     
+    var activityObject: ActivityObject?
+    
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
@@ -160,11 +162,62 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
 }
 
 extension VerticalController: ActivitySubTypeCellDelegate {
-    func plusButtonTapped() {
+    func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
     }
     
-    func shareButtonTapped() {
+    func shareButtonTapped(activityObject: ActivityObject) {
+        self.activityObject = activityObject
+        
+        let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
+
+        alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+            print("User click Approve button")
+            let destination = ChooseChatTableViewController()
+            let navController = UINavigationController(rootViewController: destination)
+            destination.delegate = self
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.filteredConversations = self.conversations
+            destination.filteredPinnedConversations = self.conversations
+            self.present(navController, animated: true, completion: nil)
+            
+        }))
+
+        alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+            print("User click Edit button")
+                // Fallback on earlier versions
+            let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+            guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+                else { return }
+            let shareContent: [Any] = [shareText, url]
+            let activityController = UIActivityViewController(activityItems: shareContent,
+                                                              applicationActivities: nil)
+            self.present(activityController, animated: true, completion: nil)
+            activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+            Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                if completed {
+                    print("share completed")
+                    return
+                } else {
+                    print("cancel")
+                }
+                if let shareError = error {
+                    print("error while sharing: \(shareError.localizedDescription)")
+                }
+            }
+            
+        }))
+        
+
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
         print("shareButtonTapped")
     }
     
@@ -257,4 +310,15 @@ extension VerticalController: ActivitySubTypeCellDelegate {
         
     }
     
+}
+
+extension VerticalController: UpdateChatDelegate {
+    
+    func updateChat(chatID: String, activityID: String?) {
+        if let conversation = self.conversations.first(where: { $0.chatID! == chatID}), let activityObject = activityObject {
+            let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
+            messageSender.sendMessage()
+
+        }
+    }
 }

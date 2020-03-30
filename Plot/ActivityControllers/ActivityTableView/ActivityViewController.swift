@@ -483,9 +483,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         var index = 0
         var activityFound = false
         for activity in self.filteredActivities {
-            if let startInterval = activity.startDateTime?.doubleValue {
+            if let startInterval = activity.startDateTime?.doubleValue, let endInterval = activity.endDateTime?.doubleValue {
                 let startDate = Date(timeIntervalSince1970: startInterval)
-                if currentDate < startDate {
+                let endDate = Date(timeIntervalSince1970: endInterval)
+                if currentDate < startDate || currentDate < endDate {
                     activityFound = true
                     break
                 }
@@ -586,10 +587,14 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         dateFormatter.timeZone = TimeZone(identifier: "UTC")
 
         for activity in activities {
-            if let startDate = activity.startDateTime as? TimeInterval {
+            if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval {
                 let startDate = Date(timeIntervalSince1970: startDate)
-                if dateFormatter.string(from: date) == dateFormatter.string(from: startDate) {
-                    return 1
+                let endDate = Date(timeIntervalSince1970: endDate + 86400)
+                let dayDurationInSeconds: TimeInterval = 60*60*24
+                for activityDate in stride(from: startDate, to: endDate, by: dayDurationInSeconds) {
+                    if dateFormatter.string(from: date) == dateFormatter.string(from: activityDate) {
+                        return 1
+                    }
                 }
             }
         }
@@ -994,6 +999,7 @@ extension ActivityViewController: MessagesDelegate {
         
         self.chatLogController?.startCollectionViewAtBottom()
         
+        
         // If we're presenting a modal sheet
         if let presentedViewController = presentedViewController as? UINavigationController {
             presentedViewController.pushViewController(destination, animated: true)
@@ -1008,11 +1014,12 @@ extension ActivityViewController: MessagesDelegate {
 }
 
 extension ActivityViewController: UpdateChatDelegate {
-    func updateChat(chatID: String, activityID: String) {
+    func updateChat(chatID: String, activityID: String?) {
+        
         if let conversation = conversations.first(where: {$0.chatID == chatID}) {
             if conversation.activities != nil {
                    var activities = conversation.activities!
-                   activities.append(activityID)
+                   activities.append(activityID!)
                    let updatedActivities = ["activities": activities as AnyObject]
                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                } else {
@@ -1021,6 +1028,6 @@ extension ActivityViewController: UpdateChatDelegate {
                }
            }
         let updatedConversationID = ["conversationID": chatID as AnyObject]
-        Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+        Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
     }
 }

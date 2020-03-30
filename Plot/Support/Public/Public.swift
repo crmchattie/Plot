@@ -261,6 +261,7 @@ extension Date {
         let duration =  Calendar.current.dateComponents([.second], from: date, to: self).second ?? 0
         return Double(abs(duration))
     }
+
 }
 
 extension Date {
@@ -538,6 +539,35 @@ func timeAgoSinceDate(_ date:Date, numericDates:Bool = false) -> String {
   } else {
     return "just now"
   }
+}
+
+extension Date: Strideable {
+    public func distance(to other: Date) -> TimeInterval {
+        return other.timeIntervalSinceReferenceDate - self.timeIntervalSinceReferenceDate
+    }
+
+    public func advanced(by n: TimeInterval) -> Date {
+        return self + n
+    }
+}
+
+extension Dictionary where Key: Comparable, Value: Equatable {
+    func minus(dict: [Key:Value]) -> [Key:Value] {
+        let entriesInSelfAndNotInDict = filter { dict[$0.0] != self[$0.0] }
+        return entriesInSelfAndNotInDict.reduce([Key:Value]()) { (res, entry) -> [Key:Value] in
+            var res = res
+            res[entry.0] = entry.1
+            return res
+        }
+    }
+}
+
+extension Dictionary {
+    mutating func merge(dict: [Key: Value]){
+        for (k, v) in dict {
+            updateValue(v, forKey: k)
+        }
+    }
 }
 
 extension UITableViewCell {
@@ -1039,6 +1069,15 @@ extension NSObject: Utilities {
 }
 
 var vSpinner : UIView?
+
+extension UIView {
+   func roundCorners(corners: UIRectCorner, radius: CGFloat) {
+        let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        let mask = CAShapeLayer()
+        mask.path = path.cgPath
+        layer.mask = mask
+    }
+}
 
 extension UIViewController {
     func showSpinner(onView : UIView) {

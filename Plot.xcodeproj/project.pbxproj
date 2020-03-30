@@ -40,6 +40,10 @@
 		105F66F724171A3C00F6EDB6 /* WorkoutDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F624171A3C00F6EDB6 /* WorkoutDetailViewController.swift */; };
 		105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */; };
 		105F66FB24185B4000F6EDB6 /* ExerciseDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */; };
+		1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */; };
+		1069B2D02430EC880048244C /* IncomingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */; };
+		1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */; };
+		1069B2D4243115950048244C /* ActivityObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2D3243115950048244C /* ActivityObject.swift */; };
 		106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */; };
@@ -324,6 +328,10 @@
 		105F66F624171A3C00F6EDB6 /* WorkoutDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewController.swift; sourceTree = "<group>"; };
 		105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailCell.swift; sourceTree = "<group>"; };
 		105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailCell.swift; sourceTree = "<group>"; };
+		1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseActivityMessageCell.swift; sourceTree = "<group>"; };
+		1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingActivityMessageCell.swift; sourceTree = "<group>"; };
+		1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingActivityMessageCell.swift; sourceTree = "<group>"; };
+		1069B2D3243115950048244C /* ActivityObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityObject.swift; sourceTree = "<group>"; };
 		106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTypeViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCell.swift; sourceTree = "<group>"; };
@@ -1148,6 +1156,7 @@
 				4BAEE4A721272D880045AB10 /* OutgoingTextMessageCell.swift */,
 				4BAEE4BE21272D880045AB10 /* OutgoingVoiceMessageCell.swift */,
 				4BAEE4C121272D880045AB10 /* OutgoingPhotoMessageCell.swift */,
+				1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */,
 			);
 			path = Outgoing;
 			sourceTree = "<group>";
@@ -1158,6 +1167,7 @@
 				4BAEE4DA21272D880045AB10 /* IncomingTextMessageCell.swift */,
 				4BAEE4B921272D880045AB10 /* IncomingVoiceMessageCell.swift */,
 				4BAEE4AE21272D880045AB10 /* IncomingPhotoMessageCell.swift */,
+				1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */,
 			);
 			path = Incoming;
 			sourceTree = "<group>";
@@ -1169,6 +1179,7 @@
 				4BAEE4DE21272D880045AB10 /* BaseMessageCell+CellDeletionHandlers.swift */,
 				4BAEE4BD21272D880045AB10 /* BaseVoiceMessageCell.swift */,
 				4BAEE4D121272D880045AB10 /* BaseMediaMessageCell.swift */,
+				1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */,
 				4BAEE4CF21272D880045AB10 /* PlayerCellView.swift */,
 			);
 			path = Base;
@@ -1270,6 +1281,7 @@
 				4BAEE54A212735880045AB10 /* Message.swift */,
 				4BAEE54B212735880045AB10 /* User.swift */,
 				4BAEE54C212735880045AB10 /* MediaObject.swift */,
+				1069B2D3243115950048244C /* ActivityObject.swift */,
 				10C50FA32274EF9000111033 /* Activity.swift */,
 				109FEB3C22A7003000621D2F /* Schedule.swift */,
 				109FEB4122A9C3DD00621D2F /* Purchase.swift */,
@@ -1954,6 +1966,7 @@
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,
 				4BAEE50D21272D890045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift in Sources */,
 				109F849723D67A85002C0044 /* SearchHeader.swift in Sources */,
+				1069B2D4243115950048244C /* ActivityObject.swift in Sources */,
 				1024ABA423C1225D00A5875D /* UIView+Layout.swift in Sources */,
 				4BAEE54F212735880045AB10 /* User.swift in Sources */,
 				4BAEE5E0212735E50045AB10 /* UIImageExtensions.swift in Sources */,
@@ -1975,10 +1988,12 @@
 				4BAEE4EF21272D890045AB10 /* IncomingPhotoMessageCell.swift in Sources */,
 				4BAEE5F7212735E50045AB10 /* AvatarOpenerOverlay.swift in Sources */,
 				105F66FB24185B4000F6EDB6 /* ExerciseDetailCell.swift in Sources */,
+				1069B2D02430EC880048244C /* IncomingActivityMessageCell.swift in Sources */,
 				109F848E23D60113002C0044 /* ActivitySubTypeViewController.swift in Sources */,
 				109FEB3D22A7003000621D2F /* Schedule.swift in Sources */,
 				4BAEE4EC21272D890045AB10 /* UserInfoCreateContactTableViewController.swift in Sources */,
 				10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */,
+				1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */,
 				4BAEE46621272B380045AB10 /* PrivacyTableViewController.swift in Sources */,
 				4BAEE51521272D890045AB10 /* ChatLogController.swift in Sources */,
 				4BAEE4EE21272D890045AB10 /* ChatInputContainer+AttachedImagesCollectionConfig.swift in Sources */,
@@ -1998,6 +2013,7 @@
 				1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */,
 				4BAEE47F21272C4F0045AB10 /* UserProfileContainerView.swift in Sources */,
 				10FDB73122D924530084D842 /* PlacesAnnotation.swift in Sources */,
+				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,
 				4BAEE5DC212735E50045AB10 /* AnimationController.swift in Sources */,
 				4BAEE4FD21272D890045AB10 /* BaseVoiceMessageCell.swift in Sources */,
 				4BAEE5DB212735E50045AB10 /* ImageCell.swift in Sources */,

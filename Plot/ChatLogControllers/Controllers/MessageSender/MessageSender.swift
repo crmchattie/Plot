@@ -19,34 +19,43 @@ class MessageSender: NSObject {
   
   fileprivate let storageUploader = StorageMediaUploader()
   fileprivate var conversation: Conversation?
-  fileprivate var attachedMedia = [MediaObject]()
+  fileprivate var attachedMedia: [MediaObject]?
+  fileprivate var attachedActivity: ActivityObject?
   fileprivate var text: String?
   fileprivate let reference = Database.database().reference()
   
   weak var delegate: MessageSenderDelegate?
   
-  init(_ conversation: Conversation?, text: String?, media: [MediaObject]) {
-    self.conversation = conversation
-    self.text = text
-    self.attachedMedia = media
+    init(_ conversation: Conversation?, text: String?, media: [MediaObject]?, activity: ActivityObject?) {
+        self.conversation = conversation
+        self.text = text
+        self.attachedMedia = media
+        self.attachedActivity = activity
   }
   
   public func sendMessage() {
     syncronizeMediaSending()
-    sendTextMessage()
-    attachedMedia.forEach { (mediaObject) in
-      let isVoiceMessage = mediaObject.audioObject != nil
-      let isPhotoMessage = (mediaObject.phAsset?.mediaType == PHAssetMediaType.image || mediaObject.phAsset == nil) && mediaObject.audioObject == nil
-      let isVideoMessage = mediaObject.phAsset?.mediaType == PHAssetMediaType.video
-      
-      if isVoiceMessage {
-        sendVoiceMessage(object: mediaObject)
-      } else if isPhotoMessage {
-        sendPhotoMessage(object: mediaObject)
-      } else if isVideoMessage {
-        sendVideoMessage(object: mediaObject)
-      }
+    if let activityObject = attachedActivity {
+        sendActivityMessage(activityObject: activityObject)
+    } else {
+        sendTextMessage()
+        if let attachedMedia = attachedMedia {
+            attachedMedia.forEach { (mediaObject) in
+              let isVoiceMessage = mediaObject.audioObject != nil
+              let isPhotoMessage = (mediaObject.phAsset?.mediaType == PHAssetMediaType.image || mediaObject.phAsset == nil) && mediaObject.audioObject == nil
+              let isVideoMessage = mediaObject.phAsset?.mediaType == PHAssetMediaType.video
+              
+              if isVoiceMessage {
+                sendVoiceMessage(object: mediaObject)
+              } else if isPhotoMessage {
+                sendPhotoMessage(object: mediaObject)
+              } else if isVideoMessage {
+                sendVideoMessage(object: mediaObject)
+              }
+            }
+        }
     }
+    
   }
     
   fileprivate var chatCreatingGroup = DispatchGroup()
@@ -64,10 +73,11 @@ class MessageSender: NSObject {
     
     mediaUploadGroup.enter() // for text message
     mediaCount += 1 // for text message
-    
-    attachedMedia.forEach { (object) in
-      mediaUploadGroup.enter()
-      mediaCount += 1
+    if let attachedMedia = attachedMedia {
+        attachedMedia.forEach { (object) in
+          mediaUploadGroup.enter()
+          mediaCount += 1
+        }
     }
     
     mediaUploadGroup.notify(queue: .global(qos: .default), execute: {
@@ -245,6 +255,64 @@ class MessageSender: NSObject {
     progress.setProgress(1.0, id: messageUID)
     updateProgress(progress, mediaCount: mediaCount)
   }
+    
+    //MARK: ACTIVITY MESSAGE
+    fileprivate func sendActivityMessage(activityObject: ActivityObject) {
+      guard let toID = conversation?.chatID, let fromID = Auth.auth().currentUser?.uid, let text = self.text else {
+        self.mediaCount -= 1
+        self.mediaUploadGroup.leave()
+        return
+      }
+        
+        guard text != "" else {
+          self.mediaCount -= 1
+          self.mediaUploadGroup.leave()
+          return
+        }
+        
+      
+      let reference = Database.database().reference().child("messages").childByAutoId()
+      
+      guard let messageUID = reference.key else { return }
+      let messageStatus = messageStatusDelivered
+      let timestamp = NSNumber(value: Int(Date().timeIntervalSince1970))
+      
+      let defaultData: [String: AnyObject] = ["messageUID": messageUID as AnyObject,
+                                              "toId": toID as AnyObject,
+                                              "status": messageStatus as AnyObject,
+                                              "seen": false as AnyObject,
+                                              "fromId": fromID as AnyObject,
+                                              "timestamp": timestamp,
+                                              "text": text as AnyObject,
+                                              "activityID": activityObject.activityID as AnyObject,
+                                              "activityType": activityObject.activityType as AnyObject,
+                                              "activityImageURL": activityObject.activityImageURL as AnyObject,
+                                              "imageWidth": activityObject.object!.asUIImage!.size.width as AnyObject,
+                                              "imageHeight": activityObject.object!.asUIImage!.size.height as AnyObject]
+      
+      var localData: [String: AnyObject] = ["localImage": activityObject.object!.asUIImage!]  //"localVideoUrl": path as AnyObject]
+      defaultData.forEach({ localData[$0] = $1 })
+      
+      delegate?.update(with: localData)
+      
+      storageUploader.upload(activityObject.object!.asUIImage!, progress: { (snapshot) in
+        
+        if let progressCount = snapshot?.progress?.fractionCompleted {
+          
+          self.progress.setProgress(progressCount * 0.98, id: messageUID) //= self.setProgress(progressCount * 0.98, id: messageUID, array: self.progress)
+          self.updateProgress(self.progress, mediaCount: self.mediaCount)
+        }
+        
+      }) { (imageURL) in
+        self.progress.setProgress(1.0, id: messageUID)
+        self.updateProgress(self.progress, mediaCount: self.mediaCount)
+        var remoteData: [String: AnyObject] = ["imageUrl": imageURL as AnyObject]
+        defaultData.forEach({ remoteData[$0] = $1 })
+        
+        self.mediaToSend.append((values: remoteData, reference: reference))
+        self.mediaUploadGroup.leave()
+      }
+    }
   
   fileprivate func updateProgress(_ array: [UploadProgress], mediaCount: CGFloat) {
     let totalProgressArray = array.map({$0.progress})

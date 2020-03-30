@@ -49,6 +49,10 @@ class Message: NSObject  {
     var imageCellHeight: NSNumber?
   
     var senderName: String? //local only, group messages only
+    
+    var activityType: String?
+    var activityID: String?
+    var activityImageURL: String?
       
     func chatPartnerId() -> String? {
         return fromId == Auth.auth().currentUser?.uid ? toId : fromId
@@ -87,5 +91,9 @@ class Message: NSObject  {
         imageCellHeight = dictionary["imageCellHeight"] as? NSNumber
       
         senderName = dictionary["senderName"] as? String
+        
+        activityType = dictionary["activityType"] as? String
+        activityID = dictionary["activityID"] as? String
+        activityImageURL = dictionary["activityImageURL"] as? String
     }
 }

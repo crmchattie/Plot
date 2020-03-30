@@ -9,8 +9,8 @@
 import UIKit
 
 protocol ActivityDetailCellDelegate: class {
-    func plusButtonTapped()
-    func shareButtonTapped()
+    func plusButtonTapped(type: Any)
+    func shareButtonTapped(id: String)
     func heartButtonTapped(type: Any)
 }
 
@@ -197,11 +197,27 @@ class ActivityDetailCell: UICollectionViewCell {
     }
     
     @objc func plusButtonTapped() {
-        self.delegate?.plusButtonTapped()
+        if let recipe = recipe {
+            self.delegate?.plusButtonTapped(type: recipe)
+        } else if let workout = workout {
+            self.delegate?.plusButtonTapped(type: workout)
+        } else if let event = event {
+            self.delegate?.plusButtonTapped(type: event)
+        } else if let attraction = attraction {
+            self.delegate?.plusButtonTapped(type: attraction)
+        }
     }
     
     @objc func shareButtonTapped() {
-        self.delegate?.shareButtonTapped()
+        if let recipe = recipe {
+            self.delegate?.shareButtonTapped(id: "\(recipe.id)")
+        } else if let workout = workout {
+            self.delegate?.shareButtonTapped(id: workout.identifier)
+        } else if let event = event {
+            self.delegate?.shareButtonTapped(id: event.id)
+        } else if let attraction = attraction {
+            self.delegate?.shareButtonTapped(id: attraction.id)
+        }
     }
 
     @objc func heartButtonTapped() {

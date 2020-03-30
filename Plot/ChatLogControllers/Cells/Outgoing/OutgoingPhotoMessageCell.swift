@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PhotoMessageCell: BaseMediaMessageCell {
+class OutgoingPhotoMessageCell: BaseMediaMessageCell {
 
   override func setupViews() {
 
@@ -20,10 +20,10 @@ class PhotoMessageCell: BaseMediaMessageCell {
     progressView.strokeColor = .white
 
     contentView.addSubview(deliveryStatus)
-    messageImageView.topAnchor.constraint(equalTo: bubbleView.topAnchor, constant: 4).isActive = true
-    messageImageView.bottomAnchor.constraint(equalTo: bubbleView.bottomAnchor, constant: -4).isActive = true
-    messageImageView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 4).isActive = true
-    messageImageView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor, constant: -9).isActive = true
+    messageImageView.topAnchor.constraint(equalTo: bubbleView.topAnchor, constant: 0).isActive = true
+    messageImageView.bottomAnchor.constraint(equalTo: bubbleView.bottomAnchor, constant: 0).isActive = true
+    messageImageView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 0).isActive = true
+    messageImageView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor, constant: -4).isActive = true
 
     bubbleView.addSubview(playButton)
     playButton.centerXAnchor.constraint(equalTo: bubbleView.centerXAnchor).isActive = true

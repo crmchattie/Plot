@@ -32,7 +32,7 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 protocol UpdateChatDelegate: class {
-    func updateChat(chatID: String, activityID: String)
+    func updateChat(chatID: String, activityID: String?)
 }
 
 
@@ -50,7 +50,7 @@ class ChooseChatTableViewController: UITableViewController {
     var pinnedConversations = [Conversation]()
     var filteredPinnedConversations = [Conversation]()
     
-    var activity: Activity!
+    var activity: Activity?
     var users = [User]()
     var filteredUsers = [User]()
 
@@ -108,15 +108,27 @@ class ChooseChatTableViewController: UITableViewController {
     
     @objc fileprivate func newChat() {
         if let currentUserID = Auth.auth().currentUser?.uid {
-            let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
-            let membersIDs = fetchMembersIDs(activity: activity)
-            createChat(chatID: chatID, membersIDs: membersIDs, activity: activity)
-            delegate?.updateChat(chatID: chatID, activityID: activity.activityID!)
+            if let activity = activity {
+                let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
+                let membersIDs = fetchMembersIDs(activity: activity)
+                createChatwActivity(chatID: chatID, membersIDs: membersIDs, activity: activity)
+                delegate?.updateChat(chatID: chatID, activityID: activity.activityID!)
+            } else {
+                let destination = ContactsController()
+                destination.hidesBottomBarWhenPushed = true
+                let isContactsAccessGranted = destination.checkContactsAuthorizationStatus()
+                if isContactsAccessGranted {
+                    destination.users = users
+                    destination.filteredUsers = filteredUsers
+                    destination.conversations = conversations
+                }
+                navigationController?.pushViewController(destination, animated: true)
+            }
             
         }
     }
     
-    func createChat(chatID: String, membersIDs: ([String], [String:AnyObject]), activity: Activity) {
+    func createChatwActivity(chatID: String, membersIDs: ([String], [String:AnyObject]), activity: Activity) {
         if let currentUserID = Auth.auth().currentUser?.uid {
             let activities: [String] = [activity.activityID!]
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
@@ -306,13 +318,15 @@ class ChooseChatTableViewController: UITableViewController {
     var conversation: Conversation!
     let unpinnedConversation = filteredConversations[indexPath.row]
     conversation = unpinnedConversation
-    if let chatID = conversation.chatID {
-        let newActivityName = activity.name?.trimmingCharacters(in: .whitespaces) ?? ""
+    if let chatID = conversation.chatID, let activity = activity, let activityName = activity.name?.trimmingCharacters(in: .whitespaces) {
+        let newActivityName = activityName
         let text = "The \(newActivityName ) activity was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: activity.participantsIDs!, text: text)
         delegate?.updateChat(chatID: chatID, activityID: activity.activityID!)
-        dismiss(animated: true, completion: nil)
+    } else if let chatID = conversation.chatID {
+        delegate?.updateChat(chatID: chatID, activityID: nil)
     }
+    dismiss(animated: true, completion: nil)
   }
 }
 

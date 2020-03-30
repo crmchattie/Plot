@@ -14,14 +14,17 @@ class OutgoingTextMessageCell: BaseMessageCell {
     let textView = FalconTextView()
 //    textView.font = UIFont.systemFont(ofSize: 13)
     textView.font = UIFont.preferredFont(forTextStyle: .callout)
-//    textView.adjustsFontForContentSizeCategory = true
     textView.backgroundColor = .clear
     textView.isEditable = false
     textView.isScrollEnabled = false
     textView.textContainerInset = UIEdgeInsets(top: outgoingTextViewTopInset, left: outgoingTextViewLeftInset, bottom: outgoingTextViewBottomInset, right: outgoingTextViewRightInset)
+    textView.linkTextAttributes = [
+        NSAttributedString.Key.foregroundColor: UIColor.white,
+        NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue
+    ]
+    
     textView.dataDetectorTypes = .all
     textView.textColor = .white
-		textView.linkTextAttributes = [NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single]
 
     return textView
   }()

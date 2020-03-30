@@ -53,12 +53,14 @@ class ChatLogController: UICollectionViewController {
   let incomingTextMessageCellID = "incomingTextMessageCellID"
   let outgoingTextMessageCellID = "outgoingTextMessageCellID"
   let typingIndicatorCellID = "typingIndicatorCellID"
-  let photoMessageCellID = "photoMessageCellID"
+  let outgoingPhotoMessageCellID = "outgoingPhotoMessageCellID"
   let outgoingVoiceMessageCellID = "outgoingVoiceMessageCellID"
+  let outgoingActivityMessageCellID = "outgoingActivityMessageCellID"
   let incomingVoiceMessageCellID = "incomingVoiceMessageCellID"
   let typingIndicatorDatabaseID = "typingIndicator"
   let typingIndicatorStateDatabaseKeyID = "Is typing"
   let incomingPhotoMessageCellID = "incomingPhotoMessageCellID"
+  let incomingActivityMessageCellID = "incomingActivityMessageCellID"
   let informationMessageCellID = "informationMessageCellID"
 
   lazy var inputContainerView: ChatInputContainerView = {
@@ -330,7 +332,10 @@ class ChatLogController: UICollectionViewController {
       self.navigationController?.visibleViewController is  GroupAdminControlsTableViewController ||
       topViewController(rootViewController: self) is CropViewController ||
         self.navigationController?.visibleViewController is  CreateActivityViewController ||
-        self.navigationController?.visibleViewController is  SelectActivityTableViewController {
+        self.navigationController?.visibleViewController is  SelectActivityTableViewController ||
+        self.navigationController?.visibleViewController is  MealDetailViewController ||
+        self.navigationController?.visibleViewController is  EventTypeViewController ||
+        self.navigationController?.visibleViewController is  WorkoutTypeViewController {
       return
     }
 
@@ -479,9 +484,11 @@ class ChatLogController: UICollectionViewController {
     collectionView?.register(IncomingTextMessageCell.self, forCellWithReuseIdentifier: incomingTextMessageCellID)
     collectionView?.register(OutgoingTextMessageCell.self, forCellWithReuseIdentifier: outgoingTextMessageCellID)
     collectionView?.register(TypingIndicatorCell.self, forCellWithReuseIdentifier: typingIndicatorCellID)
-    collectionView?.register(PhotoMessageCell.self, forCellWithReuseIdentifier: photoMessageCellID)
+    collectionView?.register(OutgoingPhotoMessageCell.self, forCellWithReuseIdentifier: outgoingPhotoMessageCellID)
     collectionView?.register(IncomingPhotoMessageCell.self, forCellWithReuseIdentifier: incomingPhotoMessageCellID)
     collectionView?.register(OutgoingVoiceMessageCell.self, forCellWithReuseIdentifier: outgoingVoiceMessageCellID)
+    collectionView?.register(OutgoingActivityMessageCell.self, forCellWithReuseIdentifier: outgoingActivityMessageCellID)
+    collectionView?.register(IncomingActivityMessageCell.self, forCellWithReuseIdentifier: incomingActivityMessageCellID)
     collectionView?.register(IncomingVoiceMessageCell.self, forCellWithReuseIdentifier: incomingVoiceMessageCellID)
     collectionView?.register(InformationMessageCell.self, forCellWithReuseIdentifier: informationMessageCellID)
     collectionView?.registerNib(UINib(nibName: "TimestampView", bundle: nil), forRevealableViewReuseIdentifier: "timestamp")
@@ -608,10 +615,8 @@ class ChatLogController: UICollectionViewController {
   func setRightBarButtonItem () {
     if let isGroupChat = conversation?.isGroupChat, isGroupChat && activityID == "" && chatExists {
         let infoButton = UIButton(type: .infoLight)
-//        let activityImage = UIImage(named: "activity")
         infoButton.addTarget(self, action: #selector(getInfoAction), for: .touchUpInside)
         let infoBarButtonItem = UIBarButtonItem(customView: infoButton)
-//        let activityBarButtonItem = UIBarButtonItem(image: activityImage, style: .plain, target: self, action: #selector(goToActivity))
         
         guard let uid = Auth.auth().currentUser?.uid, let conversationID = conversation?.chatID, uid != conversationID else { return }
         navigationItem.rightBarButtonItems = [infoBarButtonItem]
@@ -621,19 +626,6 @@ class ChatLogController: UICollectionViewController {
             navigationItem.rightBarButtonItem?.isEnabled = false
         }
     }
-//    else {
-//        let infoButton = UIButton(type: .infoLight)
-//        infoButton.addTarget(self, action: #selector(getInfoAction), for: .touchUpInside)
-//        let infoBarButtonItem = UIBarButtonItem(customView: infoButton)
-//
-//        guard let uid = Auth.auth().currentUser?.uid, let conversationID = conversation?.chatID, uid != conversationID else { return }
-//        navigationItem.rightBarButtonItem = infoBarButtonItem
-//        if isCurrentUserMemberOfCurrentGroup() {
-//            navigationItem.rightBarButtonItem?.isEnabled = true
-//        } else {
-//            navigationItem.rightBarButtonItem?.isEnabled = false
-//        }
-//    }
 
   }
 
@@ -657,57 +649,61 @@ class ChatLogController: UICollectionViewController {
     }
   }
     
-    @objc func goToActivity() {
-        if conversation?.activities == nil {
-            let destination = CreateActivityViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.users = users
-            destination.filteredUsers = filteredUsers
-            var selectedFalconUsers = [User]()
-            for ID in conversation!.chatParticipantsIDs! {
-                guard let currentUserID = Auth.auth().currentUser?.uid, currentUserID != ID else { continue }
-                let newMemberReference = Database.database().reference().child("users").child(ID)
-                
-                newMemberReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    
-                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    
-                    let user = User(dictionary: dictionary)
-                    
-                    selectedFalconUsers.append(user)
-                    destination.selectedFalconUsers = selectedFalconUsers
-                })
+    @objc func goToActivity(message: Message) {
+        print("going to activity")
+        if message.activityType == "recipe", let recipeString = message.activityID, let recipeID = Int(recipeString) {
+            print("meal \(String(describing: message.text))")
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
+                let detailedRecipe = search
+                dispatchGroup.leave()
+                dispatchGroup.notify(queue: .main) {
+                let destination = MealDetailViewController()
+                destination.hidesBottomBarWhenPushed = true
+                destination.recipe = detailedRecipe
+                destination.detailedRecipe = detailedRecipe
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.conversations = self.conversations
+                self.navigationController?.pushViewController(destination, animated: true)
+                }
             }
-            destination.conversation = conversation
-            navigationController?.pushViewController(destination, animated: true)
+        } else if message.activityType == "event" {
+            print("event \(String(describing: message.text))")
+            let destination = EventDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+//            destination.event = event
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if message.activityType == "workout" {
+            print("workout \(String(describing: message.text))")
+            let destination = WorkoutDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+//            destination.workout = workout
+//            if let index = self!.workoutIDs.firstIndex(of: workout.identifier) {
+//                destination.intColor = (index % 5)
+//            }
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if message.activityType == "attraction" {
+            print("attraction \(String(describing: message.text))")
+            let destination = EventDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+//            destination.attraction = attraction
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            self.navigationController?.pushViewController(destination, animated: true)
         }
         else {
-            let destination = SelectActivityTableViewController()
-            destination.hidesBottomBarWhenPushed = false
-            destination.conversation = conversation
-            destination.users = users
-            destination.filteredUsers = filteredUsers
-            destination.activities = activities
-            var selectedFalconUsers = [User]()
-            for ID in conversation!.chatParticipantsIDs! {
-                guard let currentUserID = Auth.auth().currentUser?.uid, currentUserID != ID else { continue }
-                let newMemberReference = Database.database().reference().child("users").child(ID)
-                
-                newMemberReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    
-                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    
-                    let user = User(dictionary: dictionary)
-                                        
-                    selectedFalconUsers.append(user)
-                    destination.selectedFalconUsers = selectedFalconUsers
-                })
-            }
-
-            navigationController?.pushViewController(destination, animated: true)
+            print("neither meals or events")
         }
+        
     }
   
   var canRefresh = true
@@ -780,7 +776,7 @@ class ChatLogController: UICollectionViewController {
       mediaPickerController.collectionView.deselectAllItems()
     }
     inputContainerView.prepareForSend()
-    let messageSender = MessageSender(conversation, text: text, media: media)
+    let messageSender = MessageSender(conversation, text: text, media: media, activity: nil)
     messageSender.delegate = self
     messageSender.sendMessage()
   }

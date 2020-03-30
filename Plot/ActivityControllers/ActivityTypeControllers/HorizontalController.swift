@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import LinkPresentation
 
 class HorizontalController: HorizontalSnappingController, UICollectionViewDelegateFlowLayout {
     
@@ -27,6 +28,8 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     var conversations = [Conversation]()
     var favAct = [String: [String]]()
     
+    var activityObject: ActivityObject?
+        
     let activityIndicatorView: UIActivityIndicatorView = {
         let aiv = UIActivityIndicatorView(style: .whiteLarge)
         aiv.color = .darkGray
@@ -34,7 +37,6 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
         aiv.hidesWhenStopped = true
         return aiv
     }()
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,6 +47,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
         
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
+    
 
     }
     
@@ -163,39 +166,64 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
 }
 
 extension HorizontalController: ActivitySubTypeCellDelegate {
-    func plusButtonTapped() {
+    
+    func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
     }
     
-    func shareButtonTapped() {
-        sendMessage()
-        print("shareButtonTapped")
-    }
-    
-    func sendMessage() {
-        print("send message")
-        let shareText = "Plot"
-//        guard let url = URL(string: "http://swiftdevcenter.com/"),
-//            let image = UIImage(named: "myImage.png")
-//            else { return }
-        let shareContent: [Any] = [shareText]
-        let activityController = UIActivityViewController(activityItems: shareContent,
-                                                          applicationActivities: nil)
-        self.present(activityController, animated: true, completion: nil)
+    func shareButtonTapped(activityObject: ActivityObject) {
+        self.activityObject = activityObject
+        
+        let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
 
-        //Completion handler
-        activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-        Bool, arrayReturnedItems: [Any]?, error: Error?) in
-            if completed {
-                print("share completed")
-                return
-            } else {
-                print("cancel")
+        alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+            print("User click Approve button")
+            let destination = ChooseChatTableViewController()
+            let navController = UINavigationController(rootViewController: destination)
+            destination.delegate = self
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.filteredConversations = self.conversations
+            destination.filteredPinnedConversations = self.conversations
+            self.present(navController, animated: true, completion: nil)
+            
+        }))
+
+        alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+            print("User click Edit button")
+                // Fallback on earlier versions
+            let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+            guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+                else { return }
+            let shareContent: [Any] = [shareText, url]
+            let activityController = UIActivityViewController(activityItems: shareContent,
+                                                              applicationActivities: nil)
+            self.present(activityController, animated: true, completion: nil)
+            activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+            Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                if completed {
+                    print("share completed")
+                    return
+                } else {
+                    print("cancel")
+                }
+                if let shareError = error {
+                    print("error while sharing: \(shareError.localizedDescription)")
+                }
             }
-            if let shareError = error {
-                print("error while sharing: \(shareError.localizedDescription)")
-            }
-        }
+            
+        }))
+        
+
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        print("shareButtonTapped")
     }
     
     func heartButtonTapped(type: Any) {
@@ -285,5 +313,16 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
             }
         }
         
+    }
+}
+
+extension HorizontalController: UpdateChatDelegate {
+    
+    func updateChat(chatID: String, activityID: String?) {
+        if let conversation = self.conversations.first(where: { $0.chatID! == chatID}), let activityObject = activityObject {
+            let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
+            messageSender.sendMessage()
+
+        }
     }
 }

@@ -24,6 +24,8 @@ class WorkoutDetailViewController: UICollectionViewController, UICollectionViewD
     
     var workout: Workout?
     var intColor: Int = 0
+    
+    fileprivate var reference: DatabaseReference!
             
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
@@ -52,8 +54,30 @@ class WorkoutDetailViewController: UICollectionViewController, UICollectionViewD
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(WorkoutDetailCell.self, forCellWithReuseIdentifier: kWorkoutDetailCell)
         collectionView.register(ExerciseDetailCell.self, forCellWithReuseIdentifier: kExerciseDetailCell)
+        
+        if favAct.isEmpty {
+            fetchFavAct()
+        }
 
                                         
+    }
+    
+    fileprivate func fetchFavAct() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        
+        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
+                print("snapshot exists")
+                self.favAct = favoriteActivitiesSnapshot
+                self.collectionView.reloadData()
+            }
+        })
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -147,11 +171,11 @@ class WorkoutDetailViewController: UICollectionViewController, UICollectionViewD
 }
 
 extension WorkoutDetailViewController: ActivityDetailCellDelegate {
-    func plusButtonTapped() {
+    func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
     }
     
-    func shareButtonTapped() {
+    func shareButtonTapped(id: String) {
         print("shareButtonTapped")
     }
     
@@ -173,7 +197,9 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                             value.append("\(workout.identifier)")
                             databaseReference.updateChildValues(["workouts": value as NSArray])
                         }
+                        self.favAct["workouts"] = value
                     } else {
+                        self.favAct["workouts"] = ["\(workout.identifier)"]
                         databaseReference.updateChildValues(["workouts": ["\(workout.identifier)"]])
                     }
                 })
@@ -186,6 +212,12 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
 
 extension WorkoutDetailViewController: WorkoutDetailCellDelegate {
     func viewTapped() {
+        
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
         if let workout = workout {
             print("view tapped")
             let destination = WebViewController()

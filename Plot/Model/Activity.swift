@@ -37,6 +37,10 @@ class Activity: NSObject, Codable {
     var muted: Bool?
     var conversationID: String?
     var calendarExport: Bool?
+    var recipe: Recipe?
+    var workout: Workout?
+    var event: Event?
+    
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -53,6 +57,10 @@ class Activity: NSObject, Codable {
         case schedule
         case purchases
         case checklist
+        case calendarExport
+        case recipe
+        case workout
+        case event
     }
     
     init(dictionary: [String: AnyObject]?){
@@ -92,6 +100,9 @@ class Activity: NSObject, Codable {
         muted = dictionary?["muted"] as? Bool
         conversationID = dictionary?["conversationID"] as? String
         calendarExport = dictionary?["calendarExport"] as? Bool
+        recipe = dictionary?["recipe"] as? Recipe
+        workout = dictionary?["workout"] as? Workout
+        event = dictionary?["purchases"] as? Event
     }
     
     func toAnyObject() -> [String: AnyObject] {

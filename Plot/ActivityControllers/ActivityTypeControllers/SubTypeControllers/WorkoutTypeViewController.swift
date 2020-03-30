@@ -48,6 +48,11 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
         
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
@@ -98,6 +103,11 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
     }
     
     fileprivate func fetchData() {
+        
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
                 
         headerheight = 0
         cellheight = 397

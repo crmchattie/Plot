@@ -12,13 +12,10 @@ class FalconTextView: UITextView {
 
 	convenience init() {
 		self.init(frame: .zero)
-
 		backgroundColor = .clear
 		isEditable = false
 		isScrollEnabled = false
-
 		dataDetectorTypes = .all
-		linkTextAttributes = [NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue]
 	}
 
 	override init(frame: CGRect, textContainer: NSTextContainer?) {

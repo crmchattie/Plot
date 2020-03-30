@@ -1853,20 +1853,20 @@ extension CreateActivityViewController: UpdateActivityPhotosDelegate {
 }
 
 extension CreateActivityViewController: UpdateChatDelegate {
-    func updateChat(chatID: String, activityID: String) {
+    func updateChat(chatID: String, activityID: String?) {
         if let conversation = conversations.first(where: {$0.chatID == chatID}) {
             if conversation.activities != nil {
                    var activities = conversation.activities!
-                   activities.append(activityID)
+                   activities.append(activityID!)
                    let updatedActivities = ["activities": activities as AnyObject]
                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                } else {
-                   let updatedActivities = ["activities": [activityID] as AnyObject]
+                   let updatedActivities = ["activities": [activityID!] as AnyObject]
                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                }
            }
         let updatedConversationID = ["conversationID": chatID as AnyObject]
-        Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+        Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
     }
 }
 

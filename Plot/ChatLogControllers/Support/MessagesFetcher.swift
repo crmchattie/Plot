@@ -178,6 +178,14 @@ class MessagesFetcher: NSObject {
     var dictionary = dictionary
     if let messageText = Message(dictionary: dictionary).text { /* pre-calculateCellSizes */
       dictionary.updateValue(estimateFrameForText(messageText) as AnyObject, forKey: "estimatedFrameForText" )
+        print("estimatedFrameForText \(estimateFrameForText(messageText).height)")
+        if let imageWidth = Message(dictionary: dictionary).imageWidth?.floatValue,
+          let imageHeight = Message(dictionary: dictionary).imageHeight?.floatValue {
+          let cellHeight = CGFloat(imageHeight / imageWidth * 200).rounded()
+          dictionary.updateValue(cellHeight as AnyObject, forKey: "imageCellHeight")
+            print("cell height \(cellHeight)")
+
+        }
     } else if let imageWidth = Message(dictionary: dictionary).imageWidth?.floatValue,
       let imageHeight = Message(dictionary: dictionary).imageHeight?.floatValue {
       let cellHeight = CGFloat(imageHeight / imageWidth * 200).rounded()
