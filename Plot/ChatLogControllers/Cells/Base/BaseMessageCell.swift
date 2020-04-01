@@ -50,7 +50,6 @@ class BaseMessageCell: RevealableCollectionViewCell {
     deliveryStatus.textColor =  ThemeManager.currentTheme().generalSubtitleColor
     deliveryStatus.isHidden = true
     deliveryStatus.textAlignment = .right
-    
     return deliveryStatus
   }()
     

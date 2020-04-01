@@ -184,6 +184,8 @@ class MessagesFetcher: NSObject {
         if let subcategoryText = Message(dictionary: dictionary).activitySubcategory {
             varMessageTaxt += subcategoryText
         }
+        print("varMessageTaxt \(varMessageTaxt)")
+        print("estimatedFrameForText \(estimateFrameForActivity(varMessageTaxt))")
       dictionary.updateValue(estimateFrameForActivity(varMessageTaxt) as AnyObject, forKey: "estimatedFrameForText" )
     } else if let messageText = Message(dictionary: dictionary).text { /* pre-calculateCellSizes */
       dictionary.updateValue(estimateFrameForText(messageText) as AnyObject, forKey: "estimatedFrameForText" )        

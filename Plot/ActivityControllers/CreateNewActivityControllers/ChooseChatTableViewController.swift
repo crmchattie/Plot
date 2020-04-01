@@ -65,6 +65,8 @@ class ChooseChatTableViewController: UITableViewController {
     // [chatID: Participants]
     var chatParticipants: [String: [User]] = [:]
     
+    var activityObject: ActivityObject?
+    
   override func viewDidLoad() {
     super.viewDidLoad()
    
@@ -113,8 +115,9 @@ class ChooseChatTableViewController: UITableViewController {
                 let membersIDs = fetchMembersIDs(activity: activity)
                 createChatwActivity(chatID: chatID, membersIDs: membersIDs, activity: activity)
                 delegate?.updateChat(chatID: chatID, activityID: activity.activityID!)
-            } else {
+            } else if let activityObject = activityObject {
                 let destination = ContactsController()
+                destination.activityObject = activityObject
                 destination.hidesBottomBarWhenPushed = true
                 let isContactsAccessGranted = destination.checkContactsAuthorizationStatus()
                 if isContactsAccessGranted {
@@ -323,10 +326,16 @@ class ChooseChatTableViewController: UITableViewController {
         let text = "The \(newActivityName ) activity was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: activity.participantsIDs!, text: text)
         delegate?.updateChat(chatID: chatID, activityID: activity.activityID!)
-    } else if let chatID = conversation.chatID {
-        delegate?.updateChat(chatID: chatID, activityID: nil)
+        dismiss(animated: true, completion: nil)
+    } else if let activityObject = activityObject {
+        let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
+        messageSender.sendMessage()
+        self.messageSentAlert()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+            self.removeAlert()
+            self.dismiss(animated: true, completion: nil)
+        })
     }
-    dismiss(animated: true, completion: nil)
   }
 }
 

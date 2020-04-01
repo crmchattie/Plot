@@ -10,7 +10,7 @@ import UIKit
 
 protocol ActivityDetailCellDelegate: class {
     func plusButtonTapped(type: Any)
-    func shareButtonTapped(id: String)
+    func shareButtonTapped(activityObject: ActivityObject)
     func heartButtonTapped(type: Any)
 }
 
@@ -30,7 +30,8 @@ class ActivityDetailCell: UICollectionViewCell {
                     subcategoryLabel.text = "Servings: \(subcategory)"
                 }
                 let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
-                    imageView.sd_setImage(with: URL(string: recipeImage))
+                imageView.sd_setImage(with: URL(string: recipeImage))
+                imageURL = recipeImage
                 setupViews()
             }
         }
@@ -56,6 +57,7 @@ class ActivityDetailCell: UICollectionViewCell {
                 }
                 if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
                     imageView.sd_setImage(with: URL(string: url))
+                    imageURL = url
                 }
                 setupViews()
             }
@@ -72,6 +74,7 @@ class ActivityDetailCell: UICollectionViewCell {
                 subcategoryLabel.text = ""
                 if let images = attraction.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
                     imageView.sd_setImage(with: URL(string: url))
+                    imageURL = url
                 }
                 setupViews()
             }
@@ -89,6 +92,7 @@ class ActivityDetailCell: UICollectionViewCell {
                 imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
                 imageView.tintColor = UIColor.white
                 imageView.backgroundColor = colors[intColor]
+                imageURL = "workout"
             }
             setupViews()
         }
@@ -105,6 +109,7 @@ class ActivityDetailCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var imageURL: String?
     var heartButtonImage: String?
 
     let heartButton: UIButton = {
@@ -210,13 +215,94 @@ class ActivityDetailCell: UICollectionViewCell {
     
     @objc func shareButtonTapped() {
         if let recipe = recipe {
-            self.delegate?.shareButtonTapped(id: "\(recipe.id)")
+            var activity = [String: AnyObject]()
+            var activityObject: ActivityObject
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
+                print("categoryObject \(category)")
+                let data = compressImage(image: image)
+                activity = ["activityType": "recipe",
+                            "activityName": "\(recipe.title)",
+                            "activityID": "\(recipe.id)",
+                            "activityImageURL": imageURL,
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                activity = ["activityType": "recipe",
+                            "activityName": "\(recipe.title)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
+                            "activityID": "\(recipe.id)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            }
+            self.delegate?.shareButtonTapped(activityObject: activityObject)
         } else if let workout = workout {
-            self.delegate?.shareButtonTapped(id: workout.identifier)
+            var activity = [String: AnyObject]()
+            var activityObject: ActivityObject
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
+                let data = compressImage(image: image)
+                activity = ["activityType": "workout",
+                            "activityName": "\(workout.title)",
+                            "activityID": "\(workout.identifier)",
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
+                            "activityImageURL": imageURL,
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                activity = ["activityType": "workout",
+                            "activityName": "\(workout.title)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
+                            "activityID": "\(workout.identifier)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            }
+            self.delegate?.shareButtonTapped(activityObject: activityObject)
         } else if let event = event {
-            self.delegate?.shareButtonTapped(id: event.id)
+            var activity = [String: AnyObject]()
+            var activityObject: ActivityObject
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
+                let data = compressImage(image: image)
+                activity = ["activityType": "event",
+                            "activityName": "\(event.name)",
+                            "activityID": "\(event.id)",
+                            "activityImageURL": imageURL,
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                activity = ["activityType": "event",
+                            "activityName": "\(event.name)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
+                            "activityID": "\(event.id)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            }
+            self.delegate?.shareButtonTapped(activityObject: activityObject)
         } else if let attraction = attraction {
-            self.delegate?.shareButtonTapped(id: attraction.id)
+            var activity = [String: AnyObject]()
+            var activityObject: ActivityObject
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
+                let data = compressImage(image: image)
+                activity = ["activityType": "attraction",
+                            "activityName": "\(attraction.name)",
+                            "activityID": "\(attraction.id)",
+                            "activityImageURL": imageURL,
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                activity = ["activityType": "attraction",
+                            "activityName": "\(attraction.name)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
+                            "activityID": "\(attraction.id)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            }
+            self.delegate?.shareButtonTapped(activityObject: activityObject)
         }
     }
 

@@ -598,7 +598,7 @@ func basicErrorAlertWith (title: String, message: String, controller: UIViewCont
   
 	let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
 	alert.addAction(UIAlertAction(title: "Close", style: UIAlertAction.Style.cancel, handler: nil))
-  controller.present(alert, animated: true, completion: nil)
+    controller.present(alert, animated: true, completion: nil)
 }
 
 func libraryAccessChecking() -> Bool {
@@ -1076,6 +1076,17 @@ extension UIView {
         let mask = CAShapeLayer()
         mask.path = path.cgPath
         layer.mask = mask
+    }
+}
+let alert = UIAlertController(title: "Activity Sent!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+extension UIViewController {
+    func messageSentAlert() {
+        // create the alert
+        self.present(alert, animated: true, completion: nil)
+    }
+    func removeAlert() {
+        alert.dismiss(animated: true, completion: nil)
     }
 }
 

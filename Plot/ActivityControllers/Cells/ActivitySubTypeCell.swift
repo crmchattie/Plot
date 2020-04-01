@@ -19,6 +19,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
     var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
     var intColor: Int = 0
     
+    
     var favAct = [String: [String]]()
     
     var recipe: Recipe! {
@@ -229,7 +230,6 @@ class ActivitySubTypeCell: UICollectionViewCell {
                             "activityCategory": category,
                             "activitySubcategory": subcategory,
                             "object": data] as [String: AnyObject]
-                print("activityObject \(activity)")
                 activityObject = ActivityObject(dictionary: activity)
             } else {
                 activity = ["activityType": "recipe",

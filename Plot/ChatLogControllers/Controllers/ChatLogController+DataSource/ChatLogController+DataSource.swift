@@ -262,7 +262,10 @@ extension ChatLogController: UICollectionViewDelegateFlowLayout {
           cellHeight = 175 + message.estimatedFrameForText!.height + 15 + 35
         } else {
           cellHeight = 175 + message.estimatedFrameForText!.height + 15
-      }
+        }
+        if cellHeight < 250 {
+            cellHeight = 250
+        }
     } else if isTextMessage {
       if let isInfoMessage = message.isInformationMessage, isInfoMessage {
         return CGSize(width: self.collectionView!.frame.width, height: 25)

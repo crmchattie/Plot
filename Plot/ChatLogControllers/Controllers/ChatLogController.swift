@@ -447,8 +447,7 @@ class ChatLogController: UICollectionViewController {
   }
 
   fileprivate func setupCollectionView () {
-    inputTextViewTapGestureRecognizer = UITapGestureRecognizer(target: inputContainerView.chatLogController,
-                                                               action: #selector(ChatLogController.toggleTextView))
+    inputTextViewTapGestureRecognizer = UITapGestureRecognizer(target: inputContainerView.chatLogController, action: #selector(ChatLogController.toggleTextView))
     inputTextViewTapGestureRecognizer.delegate = inputContainerView
 
     chatLogHistoryFetcher.delegate = self

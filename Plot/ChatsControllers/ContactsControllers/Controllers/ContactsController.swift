@@ -33,6 +33,8 @@ class ContactsController: UITableViewController {
   var searchContactsController: UISearchController?
   
   let viewPlaceholder = ViewPlaceholder()
+    
+  var activityObject: ActivityObject?
 
 
     //called only once when the controller loads the view - use for things you only need to load once, results in short freeze when first called in app (use progress bar?)
@@ -216,9 +218,9 @@ class ContactsController: UITableViewController {
     var messagesFetcher: MessagesFetcher? = nil
   
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      
         if indexPath.section == 0 {
             let destination = SelectGroupMembersController()
+            destination.activityObject = activityObject
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -232,6 +234,16 @@ class ContactsController: UITableViewController {
                     let conversationSet = Set(conversation.chatParticipantsIDs!)
                     let membersSet = Set(membersIDs)
                     if membersSet == conversationSet {
+                        if let activityObject = activityObject {
+                            let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
+                            messageSender.sendMessage()
+                            self.messageSentAlert()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                                self.removeAlert()
+                                self.dismiss(animated: true, completion: nil)
+                            })
+                            return
+                        }
                         self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
                         self.messagesFetcher = MessagesFetcher()
                         self.messagesFetcher?.delegate = self
@@ -250,6 +262,16 @@ class ContactsController: UITableViewController {
                                                            "chatParticipantsIDs": [filteredUsers[indexPath.row].id, currentUserID] as AnyObject]
         
         let conversation = Conversation(dictionary: conversationDictionary)
+        if let activityObject = activityObject {
+            let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
+            messageSender.sendMessage()
+            self.messageSentAlert()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                self.removeAlert()
+                self.dismiss(animated: true, completion: nil)
+            })
+            return
+        }
         chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
         chatLogController?.chatExists = false
         messagesFetcher = MessagesFetcher()

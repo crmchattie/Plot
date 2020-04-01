@@ -21,6 +21,8 @@ class GroupProfileTableViewController: UITableViewController {
   let chatCreatingGroup = DispatchGroup()
   let informationMessageSender = InformationMessageSender()
   var conversationAdminNeeded = false
+    
+  var activityObject: ActivityObject?
 
   
   override func viewDidLoad() {
@@ -213,9 +215,20 @@ extension GroupProfileTableViewController {
     connectMembersToGroup(memberIDs: membersIDs.0, chatID: chatID)
     
     chatCreatingGroup.notify(queue: DispatchQueue.main, execute: {
-      self.hideActivityIndicator()
-      print("Chat creating finished...")
-      self.informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: membersIDs.0, text: "New group has been created")
+        self.hideActivityIndicator()
+        print("Chat creating finished...")
+        self.informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: membersIDs.0, text: "New group has been created")
+        if let activityObject = self.activityObject {
+            let conversation = Conversation(dictionary: childValues)
+            let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
+            messageSender.sendMessage()
+            self.messageSentAlert()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                self.removeAlert()
+                self.dismiss(animated: true, completion: nil)
+            })
+            return
+      }
       self.navigationController?.backToViewController(viewController: ChatsTableViewController.self)
     })
   }

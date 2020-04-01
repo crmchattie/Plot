@@ -10,6 +10,7 @@ import UIKit
 import SDWebImage
 
 class BaseActivityMessageCell: BaseMessageCell {
+    
           
     lazy var messageImageView: UIImageView = {
         let messageImageView = UIImageView()

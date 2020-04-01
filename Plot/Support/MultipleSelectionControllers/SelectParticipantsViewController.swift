@@ -45,6 +45,8 @@ class SelectParticipantsViewController: UIViewController {
     let tableView = UITableView()
     var movingBackwards: Bool = true
     
+    var activityObject: ActivityObject?
+    
     var selectedParticipantsCollectionView: UICollectionView = {
         var selectedParticipantsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         return selectedParticipantsCollectionView
@@ -169,6 +171,15 @@ class SelectParticipantsViewController: UIViewController {
                 let conversationSet = Set(conversation.chatParticipantsIDs!)
                 let membersSet = Set(membersIDs)
                 if membersSet == conversationSet {
+                    if let activityObject = activityObject {
+                        let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
+                        messageSender.sendMessage()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.removeAlert()
+                            self.dismiss(animated: true, completion: nil)
+                        })
+                        return
+                    }
                     self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
                     self.messagesFetcher = MessagesFetcher()
                     self.messagesFetcher?.delegate = self
@@ -178,6 +189,7 @@ class SelectParticipantsViewController: UIViewController {
             }
         }
         let destination = GroupProfileTableViewController()
+        destination.activityObject = activityObject
         destination.selectedFlaconUsers = selectedFalconUsers
         navigationController?.pushViewController(destination, animated: true)
     }

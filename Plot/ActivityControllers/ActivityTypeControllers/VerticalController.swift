@@ -23,9 +23,7 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     var filteredUsers = [User]()
     var conversations = [Conversation]()
     var favAct = [String: [String]]()
-    
-    var activityObject: ActivityObject?
-    
+        
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
@@ -167,7 +165,6 @@ extension VerticalController: ActivitySubTypeCellDelegate {
     }
     
     func shareButtonTapped(activityObject: ActivityObject) {
-        self.activityObject = activityObject
         
         let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
 
@@ -175,7 +172,7 @@ extension VerticalController: ActivitySubTypeCellDelegate {
             print("User click Approve button")
             let destination = ChooseChatTableViewController()
             let navController = UINavigationController(rootViewController: destination)
-            destination.delegate = self
+            destination.activityObject = activityObject
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
@@ -310,15 +307,4 @@ extension VerticalController: ActivitySubTypeCellDelegate {
         
     }
     
-}
-
-extension VerticalController: UpdateChatDelegate {
-    
-    func updateChat(chatID: String, activityID: String?) {
-        if let conversation = self.conversations.first(where: { $0.chatID! == chatID}), let activityObject = activityObject {
-            let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
-            messageSender.sendMessage()
-
-        }
-    }
 }

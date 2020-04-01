@@ -118,18 +118,10 @@ class FilterViewController: FormViewController {
     func initializeForm() {
         
         for filter in filters {
-            var title = String()
-            if filter.rawValue == "excludeCuisine" {
-                title = "Exclude Cusisines"
-            } else if filter.rawValue == "cuisine" {
-                title = "Cusisines"
-            } else {
-                title = filter.rawValue.capitalized
-            }
             if filter.typeOfSection == "single" {
                 form +++ SelectableSection<ListCheckRow<String>>(filter.descriptionText, selectionType: .singleSelection(enableDeselection: true))
                     <<< CheckRow(filter.rawValue) {
-                    $0.title = title
+                    $0.title = filter.titleText
                     $0.value = false
                     $0.cell.accessoryView = UIImageView(image: UIImage(named: "chevronDownBlack")!.withRenderingMode(.alwaysTemplate))
                     $0.cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
@@ -179,7 +171,7 @@ class FilterViewController: FormViewController {
         } else {
             form +++ SelectableSection<ListCheckRow<String>>(filter.descriptionText, selectionType: .multipleSelection)
                 <<< CheckRow(filter.rawValue) {
-                        $0.title = title
+                        $0.title = filter.titleText
                         $0.value = false
                         $0.cell.accessoryView = UIImageView(image: UIImage(named: "chevronDownBlack")!.withRenderingMode(.alwaysTemplate))
                         $0.cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
