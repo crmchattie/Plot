@@ -269,8 +269,7 @@ class MessageSender: NSObject {
           self.mediaUploadGroup.leave()
           return
         }
-        
-      
+            
       let reference = Database.database().reference().child("messages").childByAutoId()
       
       guard let messageUID = reference.key else { return }
@@ -287,6 +286,8 @@ class MessageSender: NSObject {
                                               "activityID": activityObject.activityID as AnyObject,
                                               "activityType": activityObject.activityType as AnyObject,
                                               "activityImageURL": activityObject.activityImageURL as AnyObject,
+                                              "activityCategory": activityObject.activityCategory as AnyObject,
+                                              "activitySubcategory": activityObject.activitySubcategory as AnyObject,
                                               "imageWidth": activityObject.object!.asUIImage!.size.width as AnyObject,
                                               "imageHeight": activityObject.object!.asUIImage!.size.height as AnyObject]
       

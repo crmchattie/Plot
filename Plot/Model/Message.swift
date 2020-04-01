@@ -53,6 +53,8 @@ class Message: NSObject  {
     var activityType: String?
     var activityID: String?
     var activityImageURL: String?
+    var activityCategory: String?
+    var activitySubcategory: String?
       
     func chatPartnerId() -> String? {
         return fromId == Auth.auth().currentUser?.uid ? toId : fromId
@@ -95,5 +97,7 @@ class Message: NSObject  {
         activityType = dictionary["activityType"] as? String
         activityID = dictionary["activityID"] as? String
         activityImageURL = dictionary["activityImageURL"] as? String
+        activityCategory = dictionary["activityCategory"] as? String
+        activitySubcategory = dictionary["activitySubcategory"] as? String
     }
 }

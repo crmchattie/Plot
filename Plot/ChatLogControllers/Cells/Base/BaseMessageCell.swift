@@ -39,7 +39,6 @@ class BaseMessageCell: RevealableCollectionViewCell {
     let bubbleView = UIImageView()
     bubbleView.backgroundColor = ThemeManager.currentTheme().chatBackgroundColor
     bubbleView.isUserInteractionEnabled = true
-    
     return bubbleView
   }()
   
@@ -47,11 +46,7 @@ class BaseMessageCell: RevealableCollectionViewCell {
   var deliveryStatus: UILabel = {
     var deliveryStatus = UILabel()
     deliveryStatus.text = "status"
-//    deliveryStatus.font = UIFont.boldSystemFont(ofSize: 10)
     deliveryStatus.font = UIFont.preferredFont(forTextStyle: .caption2)
-    deliveryStatus.adjustsFontForContentSizeCategory = true
-    deliveryStatus.minimumScaleFactor = 0.1
-    deliveryStatus.adjustsFontSizeToFitWidth = true
     deliveryStatus.textColor =  ThemeManager.currentTheme().generalSubtitleColor
     deliveryStatus.isHidden = true
     deliveryStatus.textAlignment = .right
@@ -62,11 +57,7 @@ class BaseMessageCell: RevealableCollectionViewCell {
   //user name label interface
   let nameLabel: UILabel = {
     let nameLabel = UILabel()
-//    nameLabel.font = UIFont.systemFont(ofSize: 13)
     nameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-    nameLabel.adjustsFontForContentSizeCategory = true
-    nameLabel.minimumScaleFactor = 0.1
-    nameLabel.adjustsFontSizeToFitWidth = true
     nameLabel.numberOfLines = 1
     nameLabel.backgroundColor = .clear
     nameLabel.textColor = FalconPalette.defaultBlue

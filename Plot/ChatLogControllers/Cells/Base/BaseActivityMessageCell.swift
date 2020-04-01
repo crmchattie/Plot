@@ -10,16 +10,14 @@ import UIKit
 import SDWebImage
 
 class BaseActivityMessageCell: BaseMessageCell {
-  
+          
     lazy var messageImageView: UIImageView = {
         let messageImageView = UIImageView()
         messageImageView.translatesAutoresizingMaskIntoConstraints = false
         messageImageView.layer.masksToBounds = true
-//        messageImageView.layer.cornerRadius = 15
-//        roundCorners(corners: [.topLeft, .topRight], radius: 15)
+        messageImageView.isUserInteractionEnabled = false
         messageImageView.layer.cornerRadius = 15
         messageImageView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        messageImageView.isUserInteractionEnabled = false
         return messageImageView
     }()
   

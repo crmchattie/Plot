@@ -16,7 +16,7 @@ class OutgoingPhotoMessageCell: BaseMediaMessageCell {
     contentView.addSubview(bubbleView)
     bubbleView.addSubview(messageImageView)
     bubbleView.frame.size.width = 200
-    bubbleView.image = blueBubbleImage
+//    bubbleView.image = blueBubbleImage
     progressView.strokeColor = .white
 
     contentView.addSubview(deliveryStatus)
@@ -48,7 +48,7 @@ class OutgoingPhotoMessageCell: BaseMediaMessageCell {
 
   override func prepareViewsForReuse() {
      super.prepareViewsForReuse()
-    bubbleView.image = blueBubbleImage
+//    bubbleView.image = blueBubbleImage
     playButton.isHidden = true
     messageImageView.sd_cancelCurrentImageLoad()
     messageImageView.image = nil

@@ -29,7 +29,7 @@ class IncomingPhotoMessageCell: BaseMediaMessageCell {
     
     progressView.strokeColor = .black
    
-    bubbleView.image = grayBubbleImage
+//    bubbleView.image = grayBubbleImage
 
     messageImageViewTopAnchor = messageImageView.topAnchor.constraint(equalTo: bubbleView.topAnchor, constant: 0)
     messageImageViewTopAnchor.isActive = true
@@ -71,7 +71,7 @@ class IncomingPhotoMessageCell: BaseMediaMessageCell {
 
   override func prepareViewsForReuse() {
      super.prepareViewsForReuse()
-    bubbleView.image = grayBubbleImage
+//    bubbleView.image = grayBubbleImage
     playButton.isHidden = true
     messageImageView.sd_cancelCurrentImageLoad()
     messageImageView.image = nil

@@ -258,20 +258,11 @@ extension ChatLogController: UICollectionViewDelegateFlowLayout {
     }
     
     if isActivityMessage {
-      if CGFloat(truncating: message.imageCellHeight!) < 66 {
         if isGroupChat, !isOutgoingMessage {
-          cellHeight = 86 + message.estimatedFrameForText!.height + 35
+          cellHeight = 175 + message.estimatedFrameForText!.height + 15 + 35
         } else {
-          cellHeight = 66 + message.estimatedFrameForText!.height + 20
-        }
-      } else {
-        if isGroupChat, !isOutgoingMessage {
-          cellHeight = CGFloat(truncating: message.imageCellHeight!) + 20 + message.estimatedFrameForText!.height + 35
-        } else {
-          cellHeight = CGFloat(truncating: message.imageCellHeight!) + message.estimatedFrameForText!.height + 20
-        }
+          cellHeight = 175 + message.estimatedFrameForText!.height + 15
       }
-        print("cell height \(cellHeight)")
     } else if isTextMessage {
       if let isInfoMessage = message.isInformationMessage, isInfoMessage {
         return CGSize(width: self.collectionView!.frame.width, height: 25)

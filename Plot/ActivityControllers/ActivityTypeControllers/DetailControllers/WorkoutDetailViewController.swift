@@ -113,20 +113,22 @@ class WorkoutDetailViewController: UICollectionViewController, UICollectionViewD
                 }
                 cell.intColor = intColor
                 cell.workout = workout
-                return cell
-            } else {
-                return cell
             }
+            return cell
         } else if indexPath.section == 1 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kWorkoutDetailCell, for: indexPath) as! WorkoutDetailCell
-            cell.workout = workout
-            cell.delegate = self
+            if let workout = workout {
+                cell.workout = workout
+                cell.delegate = self
+            }
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kExerciseDetailCell, for: indexPath) as! ExerciseDetailCell
-            cell.count = indexPath.item + 1
-            cell.exercise = workout?.exercises![indexPath.item]
-            cell.delegate = self
+            if let workout = workout {
+                cell.count = indexPath.item + 1
+                cell.exercise = workout.exercises![indexPath.item]
+                cell.delegate = self
+            }
             return cell
         }
     }

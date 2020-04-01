@@ -18,13 +18,12 @@ class OutgoingTextMessageCell: BaseMessageCell {
     textView.isEditable = false
     textView.isScrollEnabled = false
     textView.textContainerInset = UIEdgeInsets(top: outgoingTextViewTopInset, left: outgoingTextViewLeftInset, bottom: outgoingTextViewBottomInset, right: outgoingTextViewRightInset)
+    textView.dataDetectorTypes = .all
+    textView.textColor = .white
     textView.linkTextAttributes = [
         NSAttributedString.Key.foregroundColor: UIColor.white,
         NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue
     ]
-    
-    textView.dataDetectorTypes = .all
-    textView.textColor = .white
 
     return textView
   }()

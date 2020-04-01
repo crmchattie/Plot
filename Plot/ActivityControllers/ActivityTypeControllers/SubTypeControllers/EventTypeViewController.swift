@@ -87,7 +87,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         dispatchGroup.enter()
         if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
             dispatchGroup.enter()
-            Service.shared.fetchEventsSegmentLatLong(keyword: query, segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+            Service.shared.fetchEventsSegmentLatLong(id: "", keyword: query, segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                 self.removeSpinner()
                 dispatchGroup.leave()
                 if let events = search?.embedded?.events {
@@ -99,7 +99,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
             }
         } else {
             dispatchGroup.enter()
-            Service.shared.fetchEventsSegment(keyword: "", segmentId: "") { (search, err) in
+            Service.shared.fetchEventsSegment(id: "", keyword: query, segmentId: "") { (search, err) in
                 self.removeSpinner()
                 dispatchGroup.leave()
                 if let events = search?.embedded?.events {
@@ -139,7 +139,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         
         if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegmentLatLong(keyword: "", segmentId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", segmentId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                     musicEvents = search?.embedded?.events
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
@@ -166,7 +166,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                         
                         self.collectionView.reloadData()
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(keyword: "", segmentId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", segmentId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                             sportsEvents = search?.embedded?.events
                             dispatchGroup.leave()
                     
@@ -194,7 +194,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                                 }
                                 self.collectionView.reloadData()
                                 dispatchGroup.enter()
-                                Service.shared.fetchEventsSegmentLatLong(keyword: "", segmentId: self.artstheatreSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                                Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", segmentId: self.artstheatreSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                                     arttheatreEvents = search?.embedded?.events
                                     dispatchGroup.leave()
                                     
@@ -230,7 +230,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 }
             } else {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegment(keyword: "", segmentId: self.musicSegmentID) { (search, err) in
+                Service.shared.fetchEventsSegment(id: "", keyword: "", segmentId: self.musicSegmentID) { (search, err) in
                     musicEvents = search?.embedded?.events
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
@@ -258,7 +258,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                         self.collectionView.reloadData()
                             
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(keyword: "", segmentId: self.sportsSegmentID) { (search, err) in
+                        Service.shared.fetchEventsSegment(id: "", keyword: "", segmentId: self.sportsSegmentID) { (search, err) in
                             sportsEvents = search?.embedded?.events
                             dispatchGroup.leave()
                             
@@ -286,7 +286,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                             
                                 self.collectionView.reloadData()
                                 dispatchGroup.enter()
-                                Service.shared.fetchEventsSegment(keyword: "", segmentId: self.artstheatreSegmentID) { (search, err) in
+                                Service.shared.fetchEventsSegment(id: "", keyword: "", segmentId: self.artstheatreSegmentID) { (search, err) in
                                     arttheatreEvents = search?.embedded?.events
                                     dispatchGroup.leave()
                                     

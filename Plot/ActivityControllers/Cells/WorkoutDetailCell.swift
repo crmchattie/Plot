@@ -16,7 +16,9 @@ class WorkoutDetailCell: UICollectionViewCell {
     
     var workout: Workout! {
         didSet {
-            notesLabel.text = workout.notes
+            if let notes = workout.notes {
+                notesLabel.text = notes
+            }
         }
     }
     

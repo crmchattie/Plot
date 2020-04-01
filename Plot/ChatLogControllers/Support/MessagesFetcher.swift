@@ -176,16 +176,17 @@ class MessagesFetcher: NSObject {
 
   func preloadCellData(to dictionary: [String: AnyObject], isGroupChat: Bool) -> [String: AnyObject] {
     var dictionary = dictionary
-    if let messageText = Message(dictionary: dictionary).text { /* pre-calculateCellSizes */
-      dictionary.updateValue(estimateFrameForText(messageText) as AnyObject, forKey: "estimatedFrameForText" )
-        print("estimatedFrameForText \(estimateFrameForText(messageText).height)")
-        if let imageWidth = Message(dictionary: dictionary).imageWidth?.floatValue,
-          let imageHeight = Message(dictionary: dictionary).imageHeight?.floatValue {
-          let cellHeight = CGFloat(imageHeight / imageWidth * 200).rounded()
-          dictionary.updateValue(cellHeight as AnyObject, forKey: "imageCellHeight")
-            print("cell height \(cellHeight)")
-
+    if Message(dictionary: dictionary).activityType != nil, let messageText = Message(dictionary: dictionary).text { /* pre-calculateCellSizes */
+        var varMessageTaxt = messageText
+        if let categoryText = Message(dictionary: dictionary).activityCategory {
+            varMessageTaxt += categoryText
         }
+        if let subcategoryText = Message(dictionary: dictionary).activitySubcategory {
+            varMessageTaxt += subcategoryText
+        }
+      dictionary.updateValue(estimateFrameForActivity(varMessageTaxt) as AnyObject, forKey: "estimatedFrameForText" )
+    } else if let messageText = Message(dictionary: dictionary).text { /* pre-calculateCellSizes */
+      dictionary.updateValue(estimateFrameForText(messageText) as AnyObject, forKey: "estimatedFrameForText" )        
     } else if let imageWidth = Message(dictionary: dictionary).imageWidth?.floatValue,
       let imageHeight = Message(dictionary: dictionary).imageHeight?.floatValue {
       let cellHeight = CGFloat(imageHeight / imageWidth * 200).rounded()
@@ -217,6 +218,13 @@ class MessagesFetcher: NSObject {
     let attributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .callout)]
     return text.boundingRect(with: size, options: options, attributes: attributes, context: nil).integral
   }
+    
+    func estimateFrameForActivity(_ text: String) -> CGRect {
+      let size = CGSize(width: 225, height: 10000)
+      let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+      let attributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .callout)]
+      return text.boundingRect(with: size, options: options, attributes: attributes, context: nil).integral
+    }
 
   func estimateFrameForText(width: CGFloat, text: String, font: UIFont) -> CGRect {
     let size = CGSize(width: width, height: 10000)

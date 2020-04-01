@@ -215,22 +215,27 @@ class ActivitySubTypeCell: UICollectionViewCell {
             self.delegate?.plusButtonTapped(type: attraction)
         }
     }
-    
     @objc func shareButtonTapped() {
         if let recipe = recipe {
             var activity = [String: AnyObject]()
             var activityObject: ActivityObject
-            if let image = imageView.image, let imageURL = imageURL {
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
+                print("categoryObject \(category)")
                 let data = compressImage(image: image)
                 activity = ["activityType": "recipe",
                             "activityName": "\(recipe.title)",
                             "activityID": "\(recipe.id)",
                             "activityImageURL": imageURL,
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
                             "object": data] as [String: AnyObject]
+                print("activityObject \(activity)")
                 activityObject = ActivityObject(dictionary: activity)
             } else {
                 activity = ["activityType": "recipe",
                             "activityName": "\(recipe.title)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
                             "activityID": "\(recipe.id)"] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             }
@@ -238,17 +243,21 @@ class ActivitySubTypeCell: UICollectionViewCell {
         } else if let workout = workout {
             var activity = [String: AnyObject]()
             var activityObject: ActivityObject
-            if let image = imageView.image, let imageURL = imageURL {
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
                 let data = compressImage(image: image)
                 activity = ["activityType": "workout",
                             "activityName": "\(workout.title)",
                             "activityID": "\(workout.identifier)",
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
                             "activityImageURL": imageURL,
                             "object": data] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             } else {
                 activity = ["activityType": "workout",
                             "activityName": "\(workout.title)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
                             "activityID": "\(workout.identifier)"] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             }
@@ -256,17 +265,21 @@ class ActivitySubTypeCell: UICollectionViewCell {
         } else if let event = event {
             var activity = [String: AnyObject]()
             var activityObject: ActivityObject
-            if let image = imageView.image, let imageURL = imageURL {
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
                 let data = compressImage(image: image)
                 activity = ["activityType": "event",
                             "activityName": "\(event.name)",
                             "activityID": "\(event.id)",
                             "activityImageURL": imageURL,
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
                             "object": data] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             } else {
                 activity = ["activityType": "event",
                             "activityName": "\(event.name)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
                             "activityID": "\(event.id)"] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             }
@@ -274,17 +287,21 @@ class ActivitySubTypeCell: UICollectionViewCell {
         } else if let attraction = attraction {
             var activity = [String: AnyObject]()
             var activityObject: ActivityObject
-            if let image = imageView.image, let imageURL = imageURL {
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
                 let data = compressImage(image: image)
                 activity = ["activityType": "attraction",
                             "activityName": "\(attraction.name)",
                             "activityID": "\(attraction.id)",
                             "activityImageURL": imageURL,
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
                             "object": data] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             } else {
                 activity = ["activityType": "attraction",
                             "activityName": "\(attraction.name)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
                             "activityID": "\(attraction.id)"] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             }

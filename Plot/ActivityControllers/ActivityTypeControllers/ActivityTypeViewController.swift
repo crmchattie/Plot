@@ -134,7 +134,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     
 //                    if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
 //                        dispatchGroup.enter()
-//                        Service.shared.fetchAttractionsSegmentLatLong(segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+//                        Service.shared.fetchAttractionsSegmentLatLong(id: "", keyword: "", segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
 //                            attractions = search?.embedded?.attractions
 //                            dispatchGroup.leave()
 //                            dispatchGroup.notify(queue: .main) {
@@ -149,7 +149,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
 //                        }
 //                    } else {
 //                        dispatchGroup.enter()
-//                        Service.shared.fetchAttractionsSegment(segmentId: "") { (search, err) in
+//                        Service.shared.fetchAttractionsSegment(id: "", keyword: "", segmentId: "") { (search, err) in
 //                            attractions = search?.embedded?.attractions
 //                            dispatchGroup.leave()
 //                            dispatchGroup.notify(queue: .main) {
@@ -169,7 +169,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
                     if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(keyword: "", segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                             self.events = search?.embedded?.events
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {
@@ -199,7 +199,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         }
                     } else {
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(keyword: "", segmentId: "") { (search, err) in
+                        Service.shared.fetchEventsSegment(id: "", keyword: "", segmentId: "") { (search, err) in
                             self.events = search?.embedded?.events
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {

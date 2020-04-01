@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import CodableFirebase
 import Photos
 import AudioToolbox
 import FTPopOverMenu_Swift
@@ -25,7 +26,7 @@ class ChatLogController: UICollectionViewController {
   let chatLogHistoryFetcher = ChatLogHistoryFetcher()
   let groupMembersManager = GroupMembersManager()
   
-  let reference = Database.database().reference()
+    var reference = Database.database().reference()
   var membersReference: DatabaseReference!
   var typingIndicatorReference: DatabaseReference!
   var userStatusReference: DatabaseReference!
@@ -334,8 +335,8 @@ class ChatLogController: UICollectionViewController {
         self.navigationController?.visibleViewController is  CreateActivityViewController ||
         self.navigationController?.visibleViewController is  SelectActivityTableViewController ||
         self.navigationController?.visibleViewController is  MealDetailViewController ||
-        self.navigationController?.visibleViewController is  EventTypeViewController ||
-        self.navigationController?.visibleViewController is  WorkoutTypeViewController {
+        self.navigationController?.visibleViewController is  EventDetailViewController ||
+        self.navigationController?.visibleViewController is  WorkoutDetailViewController {
       return
     }
 
@@ -650,55 +651,81 @@ class ChatLogController: UICollectionViewController {
   }
     
     @objc func goToActivity(message: Message) {
+        let dispatchGroup = DispatchGroup()
         print("going to activity")
         if message.activityType == "recipe", let recipeString = message.activityID, let recipeID = Int(recipeString) {
             print("meal \(String(describing: message.text))")
-            let dispatchGroup = DispatchGroup()
             dispatchGroup.enter()
             Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
                 let detailedRecipe = search
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
-                let destination = MealDetailViewController()
-                destination.hidesBottomBarWhenPushed = true
-                destination.recipe = detailedRecipe
-                destination.detailedRecipe = detailedRecipe
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
-                self.navigationController?.pushViewController(destination, animated: true)
+                    let destination = MealDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
+                    destination.recipe = detailedRecipe
+                    destination.detailedRecipe = detailedRecipe
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    destination.conversations = self.conversations
+                    self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
-        } else if message.activityType == "event" {
+        } else if message.activityType == "event", let eventID = message.activityID {
             print("event \(String(describing: message.text))")
-            let destination = EventDetailViewController()
-            destination.hidesBottomBarWhenPushed = true
-//            destination.event = event
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            self.navigationController?.pushViewController(destination, animated: true)
-        } else if message.activityType == "workout" {
+            print("id \(String(describing: eventID))")
+            dispatchGroup.enter()
+            Service.shared.fetchEventsSegment(id: eventID, keyword: "", segmentId: "") { (search, err) in
+                if let events = search?.embedded?.events {
+                    let event = events[0]
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = EventDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.event = event
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.conversations = self.conversations
+                        self.navigationController?.pushViewController(destination, animated: true)
+                    }
+                }
+            }
+        } else if message.activityType == "workout", let workoutID = message.activityID {
             print("workout \(String(describing: message.text))")
             let destination = WorkoutDetailViewController()
             destination.hidesBottomBarWhenPushed = true
-//            destination.workout = workout
-//            if let index = self!.workoutIDs.firstIndex(of: workout.identifier) {
-//                destination.intColor = (index % 5)
-//            }
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            self.navigationController?.pushViewController(destination, animated: true)
-        } else if message.activityType == "attraction" {
-            print("attraction \(String(describing: message.text))")
-            let destination = EventDetailViewController()
-            destination.hidesBottomBarWhenPushed = true
-//            destination.attraction = attraction
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            self.navigationController?.pushViewController(destination, animated: true)
+            dispatchGroup.enter()
+            self.reference = Database.database().reference().child("workouts").child("workouts")
+            self.reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                    if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                        dispatchGroup.leave()
+                        destination.workout = workout
+                        destination.intColor = 0
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.conversations = self.conversations
+                        self.navigationController?.pushViewController(destination, animated: true)
+                    }
+                }
+              })
+            { (error) in
+                print(error.localizedDescription)
+            }
+        } else if message.activityType == "attraction", let attractionID = message.activityID {
+            dispatchGroup.enter()
+            Service.shared.fetchAttractionsSegment(id: attractionID, keyword: "", segmentId: "") { (search, err) in
+                let attraction = search?.embedded?.attractions![0]
+                dispatchGroup.leave()
+                dispatchGroup.notify(queue: .main) {
+                    let destination = EventDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
+                    destination.attraction = attraction
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    destination.conversations = self.conversations
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
+            }
         }
         else {
             print("neither meals or events")
