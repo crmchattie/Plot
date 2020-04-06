@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 
 protocol UpdateLocationDelegate: class {
-    func updateLocation(locationName: String, locationAddress: [String : [Double]])
+    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String)
 }
 
 class LocationFinderTableViewController: UIViewController {
@@ -31,6 +31,15 @@ class LocationFinderTableViewController: UIViewController {
         setupMainView()
         setupTableView()
         searchCompleter.delegate = self
+        
+        if #available(iOS 11.0, *) {
+            let cancelBarButton =  UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            
+            navigationItem.rightBarButtonItem = cancelBarButton
+        } else {
+            let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancel))
+            navigationItem.rightBarButtonItem = cancelBarButton
+        }
     }
     
     fileprivate func setupSearchController() {
@@ -76,6 +85,12 @@ class LocationFinderTableViewController: UIViewController {
         searchResultsTableView.separatorStyle = .none
 
     }
+    
+    @objc func cancel() {
+        //            self.dismiss(animated: true, completion: nil)
+        navigationController?.popViewController(animated: true)
+    }
+
     
     deinit {
         print("select location deinit")
@@ -146,8 +161,15 @@ extension LocationFinderTableViewController: UITableViewDelegate {
             latitude = coordinates!.latitude
             longitude = coordinates!.longitude
             
+            print("response \(response!.mapItems[0].placemark)")
+            let zipcode = response?.mapItems[0].placemark.postalCode ?? ""
+            let city = response?.mapItems[0].placemark.locality ?? ""
+            let state = response?.mapItems[0].placemark.administrativeArea ?? ""
+            let countryCode = response?.mapItems[0].placemark.countryCode ?? ""
+            
             self.locationAddress = [self.locationName: [latitude, longitude]]
-            self.delegate?.updateLocation(locationName: self.locationName, locationAddress: self.locationAddress)
+            self.delegate?.updateLocation(locationName: self.locationName, locationAddress: self.locationAddress, zipcode: zipcode, city: city, state: state, country: countryCode)
+//            self.dismiss(animated: true, completion: nil)
             self.navigationController?.popViewController(animated: true)
         }
 
@@ -159,6 +181,9 @@ extension LocationFinderTableViewController {
     func updateSearchResults(for searchController: UISearchController) {}
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        if searchBar.text == nil {
+            cancel()
+        }
         searchBar.text = nil
         //    guard users.count > 0 else { return }
         searchBar.setShowsCancelButton(false, animated: true)
@@ -172,4 +197,5 @@ extension LocationFinderTableViewController {
         
         return true
     }
+    
 }

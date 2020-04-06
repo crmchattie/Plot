@@ -63,14 +63,31 @@ class Service {
         
     }
     
-    func fetchEventsSegment(id: String, keyword: String, segmentId: String, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
+    func fetchEventsSegment(id: String, keyword: String, attractionId: String, venueId: String, postalCode: String, radius: String, unit: String, startDateTime: String, endDateTime: String, city: String, stateCode: String, countryCode: String, classificationName: String, classificationId: String, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: TicketMasterAPI.eventsUrlString)!
         }()
         
-        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "size":"100"]
-        let parameters = ["id": "\(id)", "keyword": "\(keyword)", "segmentId": "\(segmentId)"].merging(defaultParameters, uniquingKeysWith: +)
+        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "size":"50"]
+        
+        var parameters = ["id": "\(id)", "keyword": "\(keyword)", "attractionId": "\(attractionId)", "venueId": "\(venueId)", "postalCode": "\(postalCode)", "radius": "\(radius)", "unit": "\(unit)", "startDateTime": "\(startDateTime)", "endDateTime": "\(endDateTime)", "city": "\(city)", "stateCode": "\(stateCode)", "countryCode": "\(countryCode)", "classificationName": "\(classificationName)", "classificationId": "\(classificationId)"]
+        if attractionId == "" {
+            parameters["attractionId"] = nil
+        }
+        if venueId == "" {
+            parameters["venueId"] = nil
+        }
+//        if city.isEmpty {
+//            parameters["city"] = nil
+//        }
+//        if classificationName.isEmpty {
+//            parameters["classificationName"] = nil
+//        }
+//        if classificationId.isEmpty {
+//            parameters["classificationId"] = nil
+//        }
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
@@ -80,14 +97,31 @@ class Service {
     }
     
     
-    func fetchEventsSegmentLatLong(id: String, keyword: String, segmentId: String, lat: Double, long: Double, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
+    func fetchEventsSegmentLatLong(id: String, keyword: String, attractionId: String, venueId: String, postalCode: String, radius: String, unit: String, startDateTime: String, endDateTime: String, city: String, stateCode: String, countryCode: String, classificationName: String, classificationId: String, lat: Double, long: Double, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: TicketMasterAPI.eventsUrlString)!
         }()
         
-        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "size":"100"]
-        let parameters = ["id": "\(id)", "keyword": "\(keyword)", "segmentId": "\(segmentId)", "latlong": "\(lat),\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "size":"50"]
+        
+        var parameters = ["id": "\(id)", "keyword": "\(keyword)", "attractionId": "\(attractionId)", "venueId": "\(venueId)", "postalCode": "\(postalCode)", "radius": "\(radius)", "unit": "\(unit)", "startDateTime": "\(startDateTime)", "endDateTime": "\(endDateTime)", "city": "\(city)", "stateCode": "\(stateCode)", "countryCode": "\(countryCode)", "classificationName": "\(classificationName)", "classificationId": "\(classificationId)", "latlong": "\(lat),\(long)"]
+        if attractionId == "" {
+            parameters["attractionId"] = nil
+        }
+        if venueId == "" {
+            parameters["venueId"] = nil
+        }
+//        if city.isEmpty {
+//            parameters["city"] = nil
+//        }
+//        if classificationName.isEmpty {
+//            parameters["classificationName"] = nil
+//        }
+//        if classificationId.isEmpty {
+//            parameters["classificationId"] = nil
+//        }
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
@@ -96,14 +130,14 @@ class Service {
         
     }
     
-    func fetchSuggestSegment(id: String, keyword: String, segmentId: String, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
+    func fetchSuggestSegment(keyword: String,radius: String, unit: String, startDateTime: String, endDateTime: String, segmentId: String, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: TicketMasterAPI.eventsUrlString)!
+            return URL(string: TicketMasterAPI.suggestUrlString)!
         }()
         
-        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "resource":"events"]
-        let parameters = ["id": "\(id)", "segmentId": "\(segmentId)"].merging(defaultParameters, uniquingKeysWith: +)
+        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "resource":"events", "size":"50"]
+        let parameters = ["keyword": "\(keyword)", "radius": "\(radius)", "unit": "\(unit)", "segmentId": "\(segmentId)"].merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
@@ -113,14 +147,14 @@ class Service {
     }
     
     
-    func fetchSuggestSegmentLatLong(id: String, keyword: String, segmentId: String, lat: Double, long: Double, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
+    func fetchSuggestSegmentLatLong(keyword: String,radius: String, unit: String, startDateTime: String, endDateTime: String, segmentId: String, lat: Double, long: Double, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: TicketMasterAPI.eventsUrlString)!
+            return URL(string: TicketMasterAPI.suggestUrlString)!
         }()
         
-        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "resource":"events"]
-        let parameters = ["id": "\(id)", "segmentId": "\(segmentId)", "latlong": "\(lat),\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "resource":"events", "size":"50"]
+        let parameters = ["keyword": "\(keyword)", "radius": "\(radius)", "unit": "\(unit)", "segmentId": "\(segmentId)", "latlong": "\(lat),\(long)"].merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
@@ -129,14 +163,21 @@ class Service {
         
     }
     
-    func fetchAttractionsSegment(id: String, keyword: String, segmentId: String, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
+    func fetchAttractionsSegment(id: String, keyword: String, classificationName: String, classificationId: String, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: TicketMasterAPI.attractionsUrlString)!
         }()
         
-        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "size":"100"]
-        let parameters = ["id": "\(id)", "segmentId": "\(segmentId)"].merging(defaultParameters, uniquingKeysWith: +)
+        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "size":"50"]
+        var parameters = ["id": "\(id)", "keyword": "\(keyword)", "classificationName": "\(classificationName)", "classificationId": "\(classificationId)"].merging(defaultParameters, uniquingKeysWith: +)
+//        if classificationName.isEmpty {
+//            parameters["classificationName"] = nil
+//        }
+//        if classificationId.isEmpty {
+//            parameters["classificationId"] = nil
+//        }
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
@@ -145,14 +186,21 @@ class Service {
         
     }
     
-    func fetchAttractionsSegmentLatLong(id: String, keyword: String, segmentId: String, lat: Double, long: Double, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
+    func fetchAttractionsSegmentLatLong(id: String, keyword: String, classificationName: [String], classificationId: [String], lat: Double, long: Double, completion: @escaping ((TicketMasterSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: TicketMasterAPI.attractionsUrlString)!
         }()
         
-        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "size":"100"]
-        let parameters = ["id": "\(id)", "segmentId": "\(segmentId)", "latlong": "\(lat),\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+        let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*", "size":"50"]
+        var parameters = ["id": "\(id)", "keyword": "\(keyword)", "classificationName": "\(classificationName)", "classificationId": "\(classificationId)", "latlong": "\(lat),\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+        if classificationName.isEmpty {
+            parameters["classificationName"] = nil
+        }
+        if classificationId.isEmpty {
+            parameters["classificationId"] = nil
+        }
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
@@ -174,6 +222,7 @@ class Service {
                 let objects = try JSONDecoder().decode(T.self, from: data!)
                 // success
                 print("completion")
+                print(objects)
                 completion(objects, nil)
             } catch {
                 print("error \(error)")
@@ -189,11 +238,6 @@ struct SpoonacularAPI {
     static let complexUrlString = "https://api.spoonacular.com/recipes/complexSearch"
     static let infoUrlString = "https://api.spoonacular.com/recipes/"
     static let apiKey = "7c1e8c9cd7fc48718c4d903c53aa99d9"
-}
-
-struct WorkoutAPI {
-//    static let baseUrlString = "https://api.spoonacular.com/"
-//    static let apiKey = "7c1e8c9cd7fc48718c4d903c53aa99d9"
 }
 
 struct TicketMasterAPI {

@@ -19,9 +19,9 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     private let sportsSegmentID = "KZFzniwnSyZfZ7v7nE"
     private let artstheatreSegmentID = "KZFzniwnSyZfZ7v7na"
 
-    var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .type]
+    var filters: [filter] = [.eventType, .eventStartDate, .location]
     var filterDictionary = [String: [String]]()
-    var sections: [String] = ["Concerts", "Sports", "Shows"]
+    var sections: [String] = ["Music", "Sports", "Shows"]
     var attractions = [String]()
 
     
@@ -63,12 +63,12 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased())
+            self.complexSearch(query: searchText.lowercased(), eventType: self.filterDictionary["eventType"]?[0] ?? "", eventStartDate: self.filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: self.filterDictionary["eventEndDate"]?[0] ?? "", zipcode: self.filterDictionary["zipcode"]?[0] ?? "", city: self.filterDictionary["city"]?[0] ?? "", state: self.filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "")
         })
     }
     
-    func complexSearch(query: String) {
-        print("query \(query)")
+    func complexSearch(query: String, eventType: String, eventStartDate: String, eventEndDate: String, zipcode: String, city: String, state: String, country: String) {
+        print("query \(query), eventType \(eventType), eventStartDate \(eventStartDate), eventEndDate \(eventEndDate), zipcode \(zipcode), city \(city), state \(state)")
 
         self.searchEvents = [Event]()
         showGroups = false
@@ -87,7 +87,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         dispatchGroup.enter()
         if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
             dispatchGroup.enter()
-            Service.shared.fetchEventsSegmentLatLong(id: "", keyword: query, segmentId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+            Service.shared.fetchEventsSegmentLatLong(id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                 self.removeSpinner()
                 dispatchGroup.leave()
                 if let events = search?.embedded?.events {
@@ -99,7 +99,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
             }
         } else {
             dispatchGroup.enter()
-            Service.shared.fetchEventsSegment(id: "", keyword: query, segmentId: "") { (search, err) in
+            Service.shared.fetchEventsSegment(id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
                 self.removeSpinner()
                 dispatchGroup.leave()
                 if let events = search?.embedded?.events {
@@ -139,7 +139,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         
         if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", segmentId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                     musicEvents = search?.embedded?.events
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
@@ -161,12 +161,12 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                             let finalEvents = sortEvents(events: group)
                             self.groups.append(finalEvents)
                         } else {
-                            self.sections.removeAll{ $0 == "Concerts"}
+                            self.sections.removeAll{ $0 == "Music"}
                         }
                         
                         self.collectionView.reloadData()
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", segmentId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                             sportsEvents = search?.embedded?.events
                             dispatchGroup.leave()
                     
@@ -194,7 +194,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                                 }
                                 self.collectionView.reloadData()
                                 dispatchGroup.enter()
-                                Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", segmentId: self.artstheatreSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                                Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.artstheatreSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                                     arttheatreEvents = search?.embedded?.events
                                     dispatchGroup.leave()
                                     
@@ -230,7 +230,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 }
             } else {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegment(id: "", keyword: "", segmentId: self.musicSegmentID) { (search, err) in
+                Service.shared.fetchEventsSegment(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.musicSegmentID) { (search, err) in
                     musicEvents = search?.embedded?.events
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
@@ -252,13 +252,13 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                             let finalEvents = sortEvents(events: group)
                             self.groups.append(finalEvents)
                         } else {
-                            self.sections.removeAll{ $0 == "Concerts"}
+                            self.sections.removeAll{ $0 == "Music"}
                         }
         
                         self.collectionView.reloadData()
                             
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(id: "", keyword: "", segmentId: self.sportsSegmentID) { (search, err) in
+                        Service.shared.fetchEventsSegment(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.sportsSegmentID) { (search, err) in
                             sportsEvents = search?.embedded?.events
                             dispatchGroup.leave()
                             
@@ -286,7 +286,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                             
                                 self.collectionView.reloadData()
                                 dispatchGroup.enter()
-                                Service.shared.fetchEventsSegment(id: "", keyword: "", segmentId: self.artstheatreSegmentID) { (search, err) in
+                                Service.shared.fetchEventsSegment(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.artstheatreSegmentID) { (search, err) in
                                     arttheatreEvents = search?.embedded?.events
                                     dispatchGroup.leave()
                                     
@@ -414,10 +414,11 @@ extension EventTypeViewController: ActivityTypeCellDelegate {
 
 extension EventTypeViewController: UpdateFilter {
     func updateFilter(filterDictionary : [String: [String]]) {
+        print("filterDictionary \(filterDictionary)")
         if !filterDictionary.values.isEmpty {
             showGroups = false
             self.filterDictionary = filterDictionary
-            complexSearch(query: "")
+            complexSearch(query: "", eventType: filterDictionary["eventType"]?[0] ?? "", eventStartDate: filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: filterDictionary["eventEndDate"]?[0] ?? "", zipcode: filterDictionary["zipcode"]?[0] ?? "", city: filterDictionary["city"]?[0] ?? "", state: filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "")
         } else {
             searchEvents = [Event]()
             self.filterDictionary = filterDictionary

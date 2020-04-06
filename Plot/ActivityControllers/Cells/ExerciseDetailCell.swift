@@ -17,6 +17,7 @@ class ExerciseDetailCell: UICollectionViewCell {
             var sets: String = exercise.sets!
             numberLabel.text = "\(count)"
             nameLabel.text = exercise.name
+            //update reps as well as sets i.e. cardio now says 0 reps each
             if sets == "0" {
                 sets = "1"
             }

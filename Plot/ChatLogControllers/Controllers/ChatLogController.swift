@@ -673,7 +673,7 @@ class ChatLogController: UICollectionViewController {
             print("event \(String(describing: message.text))")
             print("id \(String(describing: eventID))")
             dispatchGroup.enter()
-            Service.shared.fetchEventsSegment(id: eventID, keyword: "", segmentId: "") { (search, err) in
+            Service.shared.fetchEventsSegment(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
                 if let events = search?.embedded?.events {
                     let event = events[0]
                     dispatchGroup.leave()
@@ -712,7 +712,7 @@ class ChatLogController: UICollectionViewController {
             }
         } else if message.activityType == "attraction", let attractionID = message.activityID {
             dispatchGroup.enter()
-            Service.shared.fetchAttractionsSegment(id: attractionID, keyword: "", segmentId: "") { (search, err) in
+            Service.shared.fetchAttractionsSegment(id: "", keyword: "", classificationName: "", classificationId: "") { (search, err) in
                 let attraction = search?.embedded?.attractions![0]
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {

@@ -14,7 +14,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     var groups = [[Recipe]]()
     var searchRecipes = [Recipe]()
 
-    var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .type]
+    var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .recipeType]
     var filterDictionary = [String: [String]]()
     var sections: [String] = ["American", "Italian", "Vegetarian"]
     
@@ -52,7 +52,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased(), cuisine: self.filterDictionary["cuisine"] ?? [""], excludeCuisine: self.filterDictionary["excludeCuisine"] ?? [""], diet: self.filterDictionary["diet"]?[0] ?? "", intolerances: self.filterDictionary["intolerances"] ?? [""], type: self.filterDictionary["type"]?[0] ?? "")
+            self.complexSearch(query: searchText.lowercased(), cuisine: self.filterDictionary["cuisine"] ?? [""], excludeCuisine: self.filterDictionary["excludeCuisine"] ?? [""], diet: self.filterDictionary["diet"]?[0] ?? "", intolerances: self.filterDictionary["intolerances"] ?? [""], type: self.filterDictionary["recipeType"]?[0] ?? "")
         })
     }
     
@@ -243,7 +243,7 @@ extension MealTypeViewController: UpdateFilter {
         if !filterDictionary.values.isEmpty {
             showGroups = false
             self.filterDictionary = filterDictionary
-            complexSearch(query: "", cuisine: filterDictionary["cuisine"] ?? [""], excludeCuisine: filterDictionary["excludeCuisine"] ?? [""], diet: filterDictionary["diet"]?[0] ?? "", intolerances: filterDictionary["intolerances"] ?? [""], type: filterDictionary["type"]?[0] ?? "")
+            complexSearch(query: "", cuisine: filterDictionary["cuisine"] ?? [""], excludeCuisine: filterDictionary["excludeCuisine"] ?? [""], diet: filterDictionary["diet"]?[0] ?? "", intolerances: filterDictionary["intolerances"] ?? [""], type: filterDictionary["recipeType"]?[0] ?? "")
         } else {
             searchRecipes = [Recipe]()
             self.filterDictionary = filterDictionary

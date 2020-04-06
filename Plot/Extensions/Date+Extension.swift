@@ -42,7 +42,6 @@ extension Date {
         var value = ""
         let formatter = DateFormatter()
         formatter.dateFormat = "d"
-//        formatter.timeZone = TimeZone(identifier: "UTC")
     
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .ordinal
@@ -64,6 +63,12 @@ extension Date {
             
         return (value)
     
+    }
+    
+    func toString(dateFormat format: String ) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        return dateFormatter.string(from: self)
     }
 
 }

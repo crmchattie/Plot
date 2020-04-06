@@ -64,15 +64,6 @@ class FilterViewController: FormViewController {
         
     }
 
-  
-//    @objc fileprivate func changeTheme() {
-//        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-//        tableView.sectionIndexBackgroundColor = view.backgroundColor
-//        tableView.backgroundColor = view.backgroundColor
-//        tableView.reloadData()
-//    }
-
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
@@ -116,6 +107,19 @@ class FilterViewController: FormViewController {
     }
     
     func initializeForm() {
+        
+        form +++ Section()
+            <<< ButtonRow("Restore Default Filters") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textAlignment = .center
+                row.cell.textLabel?.textColor = FalconPalette.defaultBlue
+                row.cell.accessoryType = .none
+                row.title = row.tag
+                }.onCellSelection({ _,_ in
+                    self.filterDictionary = [String: [String]]()
+                    self.form.removeAll()
+                    self.initializeForm()
+                })
         
         for filter in filters {
             if filter.typeOfSection == "single" {
@@ -168,9 +172,9 @@ class FilterViewController: FormViewController {
                             print(self.filterDictionary)
                         })
                 }
-        } else {
-            form +++ SelectableSection<ListCheckRow<String>>(filter.descriptionText, selectionType: .multipleSelection)
-                <<< CheckRow(filter.rawValue) {
+            } else if filter.typeOfSection == "multiple" {
+                form +++ SelectableSection<ListCheckRow<String>>(filter.descriptionText, selectionType: .multipleSelection)
+                    <<< CheckRow(filter.rawValue) {
                         $0.title = filter.titleText
                         $0.value = false
                         $0.cell.accessoryView = UIImageView(image: UIImage(named: "chevronDownBlack")!.withRenderingMode(.alwaysTemplate))
@@ -233,8 +237,121 @@ class FilterViewController: FormViewController {
                             print(self.filterDictionary)
                         })
                     }
+            } else if filter.typeOfSection == "input" {
+                form +++ Section(filter.descriptionText)
+                <<< ButtonRow("\(filter.rawValue)") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = filter.titleText
+                if row.tag == "location", let location = filterDictionary["location"] {
+                    row.cell.accessoryType = .detailDisclosureButton
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.title = location[0]
+                }
+                }.onCellSelection({ _,row in
+                    if row.tag == "location" {
+                        self.openLocationFinder()
+                    }
+                }).cellUpdate { cell, row in
+                    if row.tag == "location" {
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textAlignment = .left
+                        if row.title == "Location" {
+                            cell.accessoryType = .disclosureIndicator
+                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        } else if let value = row.title, !value.isEmpty {
+                            cell.accessoryType = .detailDisclosureButton
+                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        } else {
+                            cell.accessoryType = .disclosureIndicator
+                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                            cell.textLabel?.text = "Location"
+                        }
+                    }
+                }
+            } else if filter.typeOfSection == "date" {
+                form +++ Section(filter.descriptionText)
+                <<< DateInlineRow("\(filter.rawValue)") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.title = filter.titleText
+                    $0.dateFormatter?.dateStyle = .full
+                    if $0.tag == "eventStartDate", filterDictionary["eventStartDate"] != nil, let value = filterDictionary["eventStartDate"], let date = value[0].toDate() {
+                        $0.value = date
+                        $0.updateCell()
+                    }
+                }
+                .onChange { [weak self] row in
+                    if row.tag == "eventStartDate", let dateString = row.value?.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'") {
+                        self?.filterDictionary["eventStartDate"] = [dateString]
+                    }
                 }
             }
         }
+    }
+    
+    @objc fileprivate func openLocationFinder() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = LocationFinderTableViewController()
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
+//        let navigationViewController = UINavigationController(rootViewController: destination)
+//        self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+            
+        let alertController = UIAlertController(title: filterDictionary["location"]![0], message: nil, preferredStyle: .alert)
+        let removeAddress = UIAlertAction(title: "Remove Address", style: .default) { (action:UIAlertAction) in
+            if let locationRow: ButtonRow = self.form.rowBy(tag: "location") {
+                self.filterDictionary["zipcode"] = nil
+                self.filterDictionary["city"] = nil
+                self.filterDictionary["state"] = nil
+                self.filterDictionary["country"] = nil
+                self.filterDictionary["location"] = nil
+                locationRow.title = "Location"
+                locationRow.updateCell()
+            }
+        }
+        let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
+            print("You've pressed cancel")
+            
+        }
+        alertController.addAction(removeAddress)
+        alertController.addAction(cancelAlert)
+        self.present(alertController, animated: true, completion: nil)
+    }
+        
+}
+
+
+extension FilterViewController: UpdateLocationDelegate {
+    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
+        if let locationRow: ButtonRow = form.rowBy(tag: "location") {
+            if locationName != "" {
+                filterDictionary["zipcode"] = [zipcode]
+                filterDictionary["city"] = [city]
+                filterDictionary["state"] = [state]
+                filterDictionary["country"] = [country]
+                filterDictionary["location"] = [locationName]
+                locationRow.title = locationName
+            } else {
+                filterDictionary["zipcode"] = nil
+                filterDictionary["city"] = nil
+                filterDictionary["state"] = nil
+                filterDictionary["country"] = nil
+                filterDictionary["location"] = nil
+                locationRow.title = "Location"
+            }
+            locationRow.updateCell()
+        }
+        print("filterDictionary \(filterDictionary)")
+    }
 }
 

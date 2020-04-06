@@ -14,7 +14,7 @@ import SplitRow
 import ViewRow
 import EventKit
 import UserNotifications
-import Contacts
+//import Contacts
 
 
 class CreateActivityViewController: FormViewController {
@@ -384,27 +384,27 @@ class CreateActivityViewController: FormViewController {
                     }
                 }
             
-            <<< ActionSheetRow<String>("Transportation") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.selectorTitle = "How are you getting there?"
-                $0.options = ["None", "Car", "Flight", "Train", "Bus", "Subway", "Bike/Scooter", "Walk"]
-                if self.active && self.activity.transportation != "nothing" && self.activity.transportation != nil {
-                    $0.value = self.activity.transportation
-                }
-                }
-                .onPresent { from, to in
-                    to.popoverPresentationController?.permittedArrowDirections = .up
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-
-                }.onChange() { [unowned self] row in
-                    self.activity.transportation = row.value
-                }
+//            <<< ActionSheetRow<String>("Transportation") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.title = $0.tag
+//                $0.selectorTitle = "How are you getting there?"
+//                $0.options = ["None", "Car", "Flight", "Train", "Bus", "Subway", "Bike/Scooter", "Walk"]
+//                if self.active && self.activity.transportation != "nothing" && self.activity.transportation != nil {
+//                    $0.value = self.activity.transportation
+//                }
+//                }
+//                .onPresent { from, to in
+//                    to.popoverPresentationController?.permittedArrowDirections = .up
+//                }.cellUpdate { cell, row in
+//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//
+//                }.onChange() { [unowned self] row in
+//                    self.activity.transportation = row.value
+//                }
             
             <<< SwitchRow("All-day") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -423,15 +423,15 @@ class CreateActivityViewController: FormViewController {
                     let endDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
                     
                     if row.value ?? false {
-                        startDate.dateFormatter?.dateStyle = .medium
+                        startDate.dateFormatter?.dateStyle = .full
                         startDate.dateFormatter?.timeStyle = .none
-                        endDate.dateFormatter?.dateStyle = .medium
+                        endDate.dateFormatter?.dateStyle = .full
                         endDate.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        startDate.dateFormatter?.dateStyle = .short
+                        startDate.dateFormatter?.dateStyle = .full
                         startDate.dateFormatter?.timeStyle = .short
-                        endDate.dateFormatter?.dateStyle = .short
+                        endDate.dateFormatter?.dateStyle = .full
                         endDate.dateFormatter?.timeStyle = .short
                     }
                     startDate.updateCell()
@@ -443,21 +443,25 @@ class CreateActivityViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
             
+            
+            //add Soon option to replace time; will require update to end time as well
             <<< DateTimeInlineRow("Starts") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
                     
                     if self.activity.allDay == true {
-                        $0.dateFormatter?.dateStyle = .medium
+                        $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .short
+                        $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .short
                     }
                     
@@ -511,15 +515,17 @@ class CreateActivityViewController: FormViewController {
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
                     
                     if self.activity.allDay == true {
-                        $0.dateFormatter?.dateStyle = .medium
+                        $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .short
+                        $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .short
                     }
                     
@@ -964,6 +970,9 @@ class CreateActivityViewController: FormViewController {
             }
             
             let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
+            let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
+                self.goToMap()
+            }
             let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
                 let pasteboard = UIPasteboard.general
                 pasteboard.string = addressString
@@ -987,7 +996,7 @@ class CreateActivityViewController: FormViewController {
                 print("You've pressed cancel")
                 
             }
-            
+            alertController.addAction(mapAddress)
             alertController.addAction(copyAddress)
             alertController.addAction(changeAddress)
             alertController.addAction(removeAddress)
@@ -1280,8 +1289,8 @@ class CreateActivityViewController: FormViewController {
         }
 
         self.navigationController?.pushViewController(destination, animated: true)
-        
-        //        present(destination, animated: true, completion: nil)
+//        let navigationViewController = UINavigationController(rootViewController: destination)
+//        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     @objc fileprivate func openLocationFinder() {
@@ -1292,8 +1301,8 @@ class CreateActivityViewController: FormViewController {
         let destination = LocationFinderTableViewController()
         destination.delegate = self
         self.navigationController?.pushViewController(destination, animated: true)
-        
-        //        present(destination, animated: true, completion: nil)
+//        let navigationViewController = UINavigationController(rootViewController: destination)
+//        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     //update so existing invitees are shown as selected
@@ -1744,7 +1753,7 @@ extension CreateActivityViewController: UITextViewDelegate {
 }
 
 extension CreateActivityViewController: UpdateLocationDelegate {
-    func updateLocation(locationName: String, locationAddress: [String : [Double]]) {
+    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
         if let locationRow: ButtonRow = form.rowBy(tag: "Location") {
             self.locationAddress[self.locationName] = nil
             if self.activity.locationAddress != nil {

@@ -652,7 +652,7 @@ class ScheduleViewController: FormViewController {
 }
 
 extension ScheduleViewController: UpdateLocationDelegate {
-    func updateLocation(locationName: String, locationAddress: [String : [Double]]) {
+    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
         if let locationRow: ButtonRow = form.rowBy(tag: "Location") {
             self.locationAddress[self.locationName] = nil
             if self.schedule.locationAddress != nil {
