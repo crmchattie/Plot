@@ -25,6 +25,9 @@ enum ViewPlaceholderTitle: String {
   case emptyChat = "You don't have any active conversations yet."
   case emptyActivities = "You don't have any activities yet."
   case emptyPhotos = "You don't have any photos yet."
+  case emptyRecipes = "Could not find any recipes that match the filter(s) and/or keyword search"
+  case emptyEvents = "Could not find any events that match the filter(s) and/or keyword search"
+  case emptyWorkouts = "Could not find any workouts that match the filter(s)"
 }
 
 enum ViewPlaceholderSubtitle: String {
@@ -33,6 +36,8 @@ enum ViewPlaceholderSubtitle: String {
   case emptyChat = "You can create your first message with the notepad button in the upper right corner."
   case emptyActivities = "You can add an activity with the plus button in the upper right corner."
   case emptyPhotos = "You can add photos with the plus button in the upper right corner."
+  case emptyRecipesEvents = "You can update the search via the search bar and/or by adjusting filters in the upper right corner"
+  case emptyWorkouts = "You can update the search by adjusting filters in the upper right corner"
 }
 
 class ViewPlaceholder: UIView {

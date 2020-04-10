@@ -144,6 +144,9 @@ class ActivitiesFetcher: NSObject {
             activity.activityID = metaInfo.activityID
             activity.conversationID = metaInfo.conversationID
             activity.admin = metaInfo.admin
+            activity.recipeID = metaInfo.recipeID
+            activity.workoutID = metaInfo.workoutID
+            activity.eventID = metaInfo.eventID
             
             if let scheduleFirebaseList = dictionary["schedule"] as? [AnyObject] {
                 var scheduleList = [Schedule]()
@@ -255,7 +258,10 @@ class ActivitiesFetcher: NSObject {
                                        scheduleKey: "schedule",
                                        purchasesKey: "purchases",
                                        checklistKey: "checklist",
-                                       conversationKey: "conversationID")
+                                       conversationKey: "conversationID",
+                                       recipeKey: "recipeID",
+                                       workoutKey: "workoutID",
+                                       eventKey: "eventID")
         })
     }
     
@@ -289,7 +295,10 @@ class ActivitiesFetcher: NSObject {
                                        scheduleKey: "schedule",
                                        purchasesKey: "purchases",
                                        checklistKey: "checklist",
-                                       conversationKey: "conversationID")
+                                       conversationKey: "conversationID",
+                                       recipeKey: "recipeID",
+                                       workoutKey: "workoutID",
+                                       eventKey: "eventID")
         })
     }
     
@@ -323,7 +332,10 @@ class ActivitiesFetcher: NSObject {
                                        scheduleKey: "schedule",
                                        purchasesKey: "purchases",
                                        checklistKey: "checklist",
-                                       conversationKey: "conversationID")
+                                       conversationKey: "conversationID",
+                                       recipeKey: "recipeID",
+                                       workoutKey: "workoutID",
+                                       eventKey: "eventID")
         })
     }
     
@@ -347,7 +359,10 @@ class ActivitiesFetcher: NSObject {
                                            scheduleKey: String,
                                            purchasesKey: String,
                                            checklistKey: String,
-                                           conversationKey: String) {
+                                           conversationKey: String,
+                                           recipeKey: String,
+                                           workoutKey: String,
+                                           eventKey: String) {
         
         guard let index = activities.firstIndex(where: { (activity) -> Bool in
             return activity.activityID == activityID
@@ -458,6 +473,21 @@ class ActivitiesFetcher: NSObject {
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
+        if snapshot.key == recipeKey {
+            activities[index].recipeID = snapshot.value as? String
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == workoutKey {
+            activities[index].workoutID = snapshot.value as? String
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == eventKey {
+            activities[index].eventID = snapshot.value as? String
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
     }
     
     fileprivate func handleActivityRemovals(from snapshot: DataSnapshot,
@@ -480,7 +510,10 @@ class ActivitiesFetcher: NSObject {
                                            scheduleKey: String,
                                            purchasesKey: String,
                                            checklistKey: String,
-                                           conversationKey: String) {
+                                           conversationKey: String,
+                                           recipeKey: String,
+                                           workoutKey: String,
+                                           eventKey: String) {
         
         guard let index = activities.firstIndex(where: { (activity) -> Bool in
             return activity.activityID == activityID
@@ -553,6 +586,21 @@ class ActivitiesFetcher: NSObject {
         
         if snapshot.key == conversationKey {
             activities[index].conversationID = nil
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == recipeKey {
+            activities[index].recipeID = snapshot.value as? String
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == workoutKey {
+            activities[index].workoutID = snapshot.value as? String
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == eventKey {
+            activities[index].eventID = snapshot.value as? String
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
     }

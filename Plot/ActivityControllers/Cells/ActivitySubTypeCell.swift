@@ -141,7 +141,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = UIFont.systemFont(ofSize: 18)
+        label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         return label
     }()
@@ -149,7 +149,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
     let categoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.font = UIFont.systemFont(ofSize: 13)
+        label.font = UIFont.preferredFont(forTextStyle: .footnote)
         label.numberOfLines = 0
         return label
     }()
@@ -157,7 +157,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
     let subcategoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.font = UIFont.systemFont(ofSize: 13)
+        label.font = UIFont.preferredFont(forTextStyle: .footnote)
         label.numberOfLines = 0
         return label
     }()
@@ -216,6 +216,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
             self.delegate?.plusButtonTapped(type: attraction)
         }
     }
+    
     @objc func shareButtonTapped() {
         if let recipe = recipe {
             var activity = [String: AnyObject]()

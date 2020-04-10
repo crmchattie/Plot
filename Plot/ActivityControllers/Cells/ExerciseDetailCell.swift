@@ -15,18 +15,28 @@ class ExerciseDetailCell: UICollectionViewCell {
     var exercise: Exercise! {
         didSet {
             var sets: String = exercise.sets!
+            var reps: String = exercise.reps!
             numberLabel.text = "\(count)"
             nameLabel.text = exercise.name
-            //update reps as well as sets i.e. cardio now says 0 reps each
             if sets == "0" {
-                sets = "1"
+                sets = "1 set"
+                if reps == "0" {
+                    reps = "- go to workout for more detail"
+                } else {
+                    reps = "- \(reps) \(exercise.repsType!)"
+                }
+            } else {
+                sets = "\(sets) sets"
+                if reps == "0" {
+                    reps = "- go to workout for more detail"
+                } else {
+                    reps = "- \(reps) \(exercise.repsType!) each"
+                }
             }
-            detailLabel.text = "\(sets) sets - \(exercise.reps!) \(exercise.repsType!) each"
+            detailLabel.text = "\(sets) \(reps)"
         }
     }
-    
-    weak var delegate: WorkoutDetailCellDelegate?
-    
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -38,17 +48,16 @@ class ExerciseDetailCell: UICollectionViewCell {
     
     let numberLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.font = UIFont.systemFont(ofSize: 18)
+        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         return label
     }()
    
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.text = "Go to Workout"
-        label.font = UIFont.systemFont(ofSize: 15)
+        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         return label
     }()
@@ -56,8 +65,7 @@ class ExerciseDetailCell: UICollectionViewCell {
     let detailLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.text = "Go to Workout"
-        label.font = UIFont.systemFont(ofSize: 15)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 1
         return label
     }()
@@ -67,12 +75,13 @@ class ExerciseDetailCell: UICollectionViewCell {
         numberLabel.constrainWidth(constant: 25)
         
         let nameDetailStackView = VerticalStackView(arrangedSubviews: [nameLabel, detailLabel, UIView()], spacing: 2)
-        nameDetailStackView.layoutMargins = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+        nameDetailStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        nameDetailStackView.isLayoutMarginsRelativeArrangement = true
         
         let stackView = UIStackView(arrangedSubviews: [numberLabel, nameDetailStackView])
         stackView.spacing = 2
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 15, left: 15, bottom: 15, right: 5))
+        stackView.fillSuperview(padding: .init(top: 0, left: 25, bottom: 15, right: 15))
        
             
     }

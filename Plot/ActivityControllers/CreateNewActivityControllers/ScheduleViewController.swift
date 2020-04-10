@@ -35,6 +35,8 @@ class ScheduleViewController: FormViewController {
     var userNames : [String] = []
     var userNamesString: String = ""
     
+    var scheduleID = String()
+    
     fileprivate var active: Bool = false
     
     fileprivate var movingBackwards: Bool = true
@@ -45,6 +47,11 @@ class ScheduleViewController: FormViewController {
         
         if schedule != nil {
             active = true
+            if schedule.scheduleID != nil {
+                scheduleID = schedule.scheduleID!
+            } else {
+                schedule.scheduleID = UUID().uuidString
+            }
             for ID in schedule!.participantsIDs!{
                 // users equals ACTIVITY selected falcon users
                 if let user = users.first(where: {$0.id == ID}) {
@@ -85,6 +92,7 @@ class ScheduleViewController: FormViewController {
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
+        tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
 //        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: nil, action: nil)
         
         let mapsImage = UIImage(named: "map")
@@ -212,25 +220,25 @@ class ScheduleViewController: FormViewController {
                     }
             }
             
-            <<< ActionSheetRow<String>("Transportation") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.selectorTitle = "How are you getting there?"
-                $0.options = ["Car", "Flight", "Train", "Bus", "Subway", "Bike/Scooter", "Walk"]
-                if self.active && self.schedule.transportation != nil && self.schedule.transportation != "nothing" {
-                    $0.value = self.schedule.transportation
-                }
-                }
-                .onPresent { from, to in
-                    to.popoverPresentationController?.permittedArrowDirections = .up
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    
-            }
+//            <<< ActionSheetRow<String>("Transportation") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.title = $0.tag
+//                $0.selectorTitle = "How are you getting there?"
+//                $0.options = ["Car", "Flight", "Train", "Bus", "Subway", "Bike/Scooter", "Walk"]
+//                if self.active && self.schedule.transportation != nil && self.schedule.transportation != "nothing" {
+//                    $0.value = self.schedule.transportation
+//                }
+//                }
+//                .onPresent { from, to in
+//                    to.popoverPresentationController?.permittedArrowDirections = .up
+//                }.cellUpdate { cell, row in
+//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//
+//            }
             
             <<< SwitchRow("All-day") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -272,16 +280,19 @@ class ScheduleViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
+                $0.minuteInterval = 5
                 $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.value = Date(timeIntervalSince1970: self.schedule!.startDateTime as! TimeInterval)
                     
                     if self.schedule.allDay == true {
-                        $0.dateFormatter?.dateStyle = .medium
+                        $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .short
+                        $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .short
                     }
                     
@@ -330,16 +341,19 @@ class ScheduleViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
+                $0.minuteInterval = 5
                 $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.value = Date(timeIntervalSince1970: self.schedule!.endDateTime as! TimeInterval)
                     
                     if self.schedule.allDay == true {
-                        $0.dateFormatter?.dateStyle = .medium
+                        $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .short
+                        $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .short
                     }
                     
@@ -384,6 +398,35 @@ class ScheduleViewController: FormViewController {
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
             }
+        
+            <<< AlertRow<EventAlert>("Reminder") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.title = $0.tag
+                $0.selectorTitle = $0.tag
+                if self.active && self.schedule.reminder != nil {
+                    if let value = self.schedule.reminder {
+                        $0.value = EventAlert(rawValue: value)
+                    }
+                } else {
+                    $0.value = .None
+                    if let reminder = $0.value?.description {
+                        self.schedule.reminder = reminder
+                    }
+                }
+                $0.options = EventAlert.allValues
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    
+                }.onChange() { [unowned self] row in
+                    if let reminder = row.value?.description {
+                        self.schedule.reminder = reminder
+                        self.scheduleReminder()
+                    }
+                }
 
         
         form +++
@@ -497,6 +540,8 @@ class ScheduleViewController: FormViewController {
         }
         
         let valuesDictionary = form.values()
+        
+        schedule.scheduleID = scheduleID
 
         schedule.name = valuesDictionary["Mini Activity Name"] as? String
 
@@ -525,12 +570,48 @@ class ScheduleViewController: FormViewController {
         schedule.startDateTime = NSNumber(value: Int((valuesDictionary["Starts"] as! Date).timeIntervalSince1970))
         schedule.endDateTime = NSNumber(value: Int((valuesDictionary["Ends"] as! Date).timeIntervalSince1970))
         
+        if let value = valuesDictionary["Reminder"] as? String {
+            schedule.reminder = value
+        }
+        
         let membersIDs = fetchMembersIDs()
 
         schedule.participantsIDs = membersIDs.0
 
         delegate?.updateSchedule(schedule: schedule)
         self.navigationController?.popViewController(animated: true)
+    }
+    
+    func scheduleReminder() {
+        let center = UNUserNotificationCenter.current()
+        guard schedule.reminder! != "None" else {
+            center.removePendingNotificationRequests(withIdentifiers: ["\(scheduleID)_Reminder"])
+            return
+        }
+        let content = UNMutableNotificationContent()
+        content.title = "\(String(describing: schedule.name!)) Reminder"
+        content.sound = UNNotificationSound.default
+        var formattedDate: (String, String) = ("", "")
+        if let startDate = startDateTime, let endDate = endDateTime, let allDay = schedule.allDay {
+            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay)
+            content.subtitle = formattedDate.0
+        }
+        let reminder = EventAlert(rawValue: schedule.reminder!)
+        var reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
+        let timezone = TimeZone.current
+        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+        reminderDate = reminderDate.addingTimeInterval(-seconds)
+        let triggerDate = Calendar.current.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
+                                                    repeats: false)
+        let identifier = "\(scheduleID)_Reminder"
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        
+        center.add(request, withCompletionHandler: { (error) in
+            if let error = error {
+                print(error)
+            }
+        })
     }
     
     @objc fileprivate func openLocationFinder() {

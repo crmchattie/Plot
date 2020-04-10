@@ -167,9 +167,30 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
     
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
+        let alert = UIAlertController(title: "Add Activity", message: nil, preferredStyle: .actionSheet)
+
+        alert.addAction(UIAlertAction(title: "Create New Activiy", style: .default, handler: { (_) in
+            print("User click Approve button")
+            
+        }))
+
+        alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
+            print("User click Edit button")
+                // Fallback on earlier versions
+                    
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     func shareButtonTapped(activityObject: ActivityObject) {
+        print("shareButtonTapped")
         
         let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
 
@@ -220,7 +241,6 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
-        print("shareButtonTapped")
     }
     
     func heartButtonTapped(type: Any) {

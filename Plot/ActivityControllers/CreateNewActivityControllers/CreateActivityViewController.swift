@@ -51,7 +51,8 @@ class CreateActivityViewController: FormViewController {
     
     fileprivate var reminderDate: Date?
     
-    fileprivate var active: Bool = false
+    var active: Bool = false
+    var includeSubSections: Bool = true
     
     typealias CompletionHandler = (_ success: Bool) -> Void
     
@@ -450,6 +451,7 @@ class CreateActivityViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
+                $0.minuteInterval = 5
                 $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                 $0.dateFormatter?.dateStyle = .full
                 $0.dateFormatter?.timeStyle = .short
@@ -478,15 +480,18 @@ class CreateActivityViewController: FormViewController {
                     let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
                     if row.value?.compare(endRow.value!) == .orderedDescending {
                         endRow.value = Date(timeInterval: 0, since: row.value!)
-                        endRow.cell!.backgroundColor = .white
                         endRow.updateCell()
                     }
                     self!.activity.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.startDateTime = row.value
-                    self!.scheduleReminder()
+                    if self!.active {
+                        self!.scheduleReminder()
+                    }
                 }
                 .onExpandInlineRow { [weak self] cell, row, inlineRow in
                     inlineRow.cellUpdate() { cell, row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                         let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                         if allRow.value ?? false {
                             cell.datePicker.datePickerMode = .date
@@ -514,6 +519,7 @@ class CreateActivityViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
+                $0.minuteInterval = 5
                 $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                 $0.dateFormatter?.dateStyle = .full
                 $0.dateFormatter?.timeStyle = .short
@@ -542,17 +548,16 @@ class CreateActivityViewController: FormViewController {
                 .onChange { [weak self] row in
                     let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
                     if row.value?.compare(startRow.value!) == .orderedAscending {
-                        row.cell!.backgroundColor = .red
+                        startRow.value = Date(timeInterval: 0, since: row.value!)
+                        startRow.updateCell()
                     }
-                    else{
-                        row.cell!.backgroundColor = .white
-                    }
-                    row.updateCell()
                     self!.activity.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.endDateTime = row.value
                 }
                 .onExpandInlineRow { [weak self] cell, row, inlineRow in
                     inlineRow.cellUpdate { cell, dateRow in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                         let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                         if allRow.value ?? false {
                             cell.datePicker.datePickerMode = .date
@@ -600,7 +605,9 @@ class CreateActivityViewController: FormViewController {
                 }.onChange() { [unowned self] row in
                     if let reminder = row.value?.description {
                         self.activity.reminder = reminder
-                        self.scheduleReminder()
+                        if self.active {
+                            self.scheduleReminder()
+                        }
                     }
                 }
 
@@ -622,242 +629,246 @@ class CreateActivityViewController: FormViewController {
                     self.activity.notes = row.value
                 }
             
-            <<< ActionSheetRow<String>("Export") {
-                $0.cell.textLabel?.textAlignment = .center
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textLabel?.textColor = FalconPalette.defaultBlue
-                $0.cell.detailTextLabel?.textColor = FalconPalette.defaultBlue
-                $0.title = "Export Activity to Calendar"
-                $0.selectorTitle = "Which Calendar?"
-                $0.options = ["iCal"]
-//                $0.options = ["iCal", "Google Calendar", "Outlook"]
-                if self.active && self.activity.calendarExport == true {
-                    $0.value = "Exported"
-                }
-                }
-                .onPresent { from, to in
-                    to.popoverPresentationController?.permittedArrowDirections = .up
-                }.cellUpdate { cell, row in
-                    cell.textLabel?.textAlignment = .center
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = FalconPalette.defaultBlue
-                    cell.detailTextLabel?.textColor = FalconPalette.defaultBlue
-                }.onChange({ row in
-                    if row.value == "iCal" {
-                        self.addEventToiCal()
-                        row.value = "Exported"
-                    } else if row.value == "Google Calendar" {
-                        row.value = "Exported"
-                    } else {
-                        row.value = "Exported"
-                    }
-                })
-            
+//            <<< ActionSheetRow<String>("Export") {
+//                $0.cell.textLabel?.textAlignment = .center
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                $0.cell.textLabel?.textColor = FalconPalette.defaultBlue
+//                $0.cell.detailTextLabel?.textColor = FalconPalette.defaultBlue
+//                $0.title = "Export Activity to Calendar"
+//                $0.selectorTitle = "Which Calendar?"
+//                $0.options = ["iCal"]
+////                $0.options = ["iCal", "Google Calendar", "Outlook"]
+//                if self.active && self.activity.calendarExport == true {
+//                    $0.value = "Exported"
+//                }
+//                }
+//                .onPresent { from, to in
+//                    to.popoverPresentationController?.permittedArrowDirections = .up
+//                }.cellUpdate { cell, row in
+//                    cell.textLabel?.textAlignment = .center
+//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.textLabel?.textColor = FalconPalette.defaultBlue
+//                    cell.detailTextLabel?.textColor = FalconPalette.defaultBlue
+//                }.onChange({ row in
+//                    if row.value == "iCal" {
+//                        self.addEventToiCal()
+//                        row.value = "Exported"
+//                    } else if row.value == "Google Calendar" {
+//                        row.value = "Exported"
+//                    } else {
+//                        row.value = "Exported"
+//                    }
+//                })
             
             <<< SegmentedRow<String>("sections"){
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                if #available(iOS 13.0, *) {
-                    $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-                } else {
-                    // Fallback on earlier versions
-                }
-                $0.options = ["Schedule", "Checklist", "Purchases"]
-                $0.value = "Schedule"
-                }
-                .onCellSelection({_,_  in
-                    if let indexPath = self.form.allRows.last?.indexPath {
-                        self.tableView?.scrollToRow(at: indexPath, at: .none, animated: true)
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.hidden = Condition.init(booleanLiteral: !includeSubSections)
+                    if #available(iOS 13.0, *) {
+                        $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+                    } else {
+                        // Fallback on earlier versions
                     }
-                })
-        addSubSections()
+                    $0.options = ["Schedule", "Checklist", "Purchases"]
+                    if includeSubSections {
+                        $0.value = "Schedule"
+                    } else {
+                        $0.value = "Hidden"
+                    }
+                    }
+                    .onCellSelection({_,_  in
+                        if let indexPath = self.form.allRows.last?.indexPath {
+                            self.tableView?.scrollToRow(at: indexPath, at: .none, animated: true)
+                        }
+                    })
+            addSubSections()
     }
     
     func addSubSections() {
         //            add in schedule that will be a MultivaluedSection that will lead to another VC with a form that includes item name, start/end time, location, transportation and notes sections - sorted by date/time
         //            or add in a custom row that shows/hides point options (name, start/end time, location and notes sections)
-                    form +++
-                        MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                           header: "Schedule",
-                                           footer: "Add a new point in the schedule") {
-                                            $0.tag = "schedulefields"
-                                            $0.hidden = "$sections != 'Schedule'"
-                                            $0.addButtonProvider = { section in
-                                                return ButtonRow(){
-                                                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                    $0.title = "Add New Point"
-                                                    }.cellUpdate { cell, row in
-                                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                        cell.textLabel?.textAlignment = .left
-                                                        cell.height = { 60 }
-                                                    }
-                                            }
-                                            $0.multivaluedRowToInsertAt = { index in
-                                                self.scheduleIndex = index
-                                                self.openSchedule()
-                                                return ScheduleRow()
-                                                    .onCellSelection() { cell, row in
-                                                    self.scheduleIndex = index
-                                                    self.openSchedule()
-                                                    cell.cellResignFirstResponder()
-        //                                            self.tableView.endEditing(true)
-                                                }
-                                            }
-                                            
-                        }
-                                            for schedule in scheduleList {
-                                                var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
-                                                mvs.insert(ScheduleRow() {
-                                                    $0.value = schedule
-                                                    }.onCellSelection() { cell, row in
-                                                        self.scheduleIndex = row.indexPath!.row
-                                                        self.openSchedule()
-                                                        cell.cellResignFirstResponder()
-        //                                                self.tableView.endEditing(true)
-                                                }, at: mvs.count - 1)
-                                                
-                                            }
-                
-                form +++
-                    MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
-                                       header: "Checklist",
-                                       footer: "Add a checklist item") {
-                                        $0.tag = "checklistfields"
-                                        $0.hidden = "$sections != 'Checklist'"
-                                        $0.addButtonProvider = { section in
-                                            return ButtonRow(){
-                                                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                $0.title = "Add New Item"
-                                                }.cellUpdate { cell, row in
-                                                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                    cell.textLabel?.textAlignment = .left
-                                                    
-                                            }
+        form +++
+            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                               header: "Schedule",
+                               footer: "Add a new point in the schedule") {
+                                $0.tag = "schedulefields"
+                                $0.hidden = "$sections != 'Schedule'"
+                                $0.addButtonProvider = { section in
+                                    return ButtonRow(){
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.title = "Add New Point"
+                                        }.cellUpdate { cell, row in
+                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.textLabel?.textAlignment = .left
+                                            cell.height = { 60 }
                                         }
-                                        $0.multivaluedRowToInsertAt = { index in
-                                            return SplitRow<TextRow, CheckRow>(){
-                                                $0.rowLeftPercentage = 0.75
-                                                $0.rowLeft = TextRow(){
-                                                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                                    $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                                    $0.placeholder = "Item"
-                                                    }.cellUpdate { cell, row in
-                                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                        cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                                        row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                                }
-                                                
-                                                $0.rowRight = CheckRow() {
-                                                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                    $0.cell.tintColor = FalconPalette.defaultBlue
-                                                    $0.value = false
-                                                    $0.cell.accessoryType = .checkmark
-                                                    $0.cell.tintAdjustmentMode = .dimmed
-                                                    }.cellUpdate { cell, row in
-                                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                        cell.tintColor = FalconPalette.defaultBlue
-                                                        if row.value == false {
-                                                            cell.accessoryType = .checkmark
-                                                            cell.tintAdjustmentMode = .dimmed
-                                                        } else {
-                                                            cell.tintAdjustmentMode = .automatic
-                                                        }
-                                                }
-                                                }.cellUpdate { cell, row in
-                                                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                }.onChange() { _ in
-                                                    self.updateLists(type: "checklist")
-                                            }
-                                            
-                                        }
+                                }
+                                $0.multivaluedRowToInsertAt = { index in
+                                    self.scheduleIndex = index
+                                    self.openSchedule()
+                                    return ScheduleRow()
+                                        .onCellSelection() { cell, row in
+                                        self.scheduleIndex = index
+                                        self.openSchedule()
+                                        cell.cellResignFirstResponder()
+    //                                            self.tableView.endEditing(true)
+                                    }
+                                }
+                                
+            }
+                                for schedule in scheduleList {
+                                    var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+                                    mvs.insert(ScheduleRow() {
+                                        $0.value = schedule
+                                        }.onCellSelection() { cell, row in
+                                            self.scheduleIndex = row.indexPath!.row
+                                            self.openSchedule()
+                                            cell.cellResignFirstResponder()
+    //                                                self.tableView.endEditing(true)
+                                    }, at: mvs.count - 1)
+                                    
+                                }
+
+    form +++
+        MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
+                           header: "Checklist",
+                           footer: "Add a checklist item") {
+                            $0.tag = "checklistfields"
+                            $0.hidden = "$sections != 'Checklist'"
+                            $0.addButtonProvider = { section in
+                                return ButtonRow(){
+                                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                    $0.title = "Add New Item"
+                                    }.cellUpdate { cell, row in
+                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        cell.textLabel?.textAlignment = .left
                                         
-                }
-                                            for (_, value) in checklistDict {
-                                                var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
-                                                mvs.insert(SplitRow<TextRow, CheckRow>() {
-                                                    $0.rowLeftPercentage = 0.75
-                                                    $0.rowLeft = TextRow(){
-                                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                                        $0.value = value.keys.first
-                                                        }.cellUpdate { cell, row in
-                                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                                            row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                                    }
-                                                    $0.rowRight = CheckRow() {
-                                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                        $0.cell.tintColor = FalconPalette.defaultBlue
-                                                        $0.value = value.values.first
-                                                        $0.cell.accessoryType = .checkmark
-                                                        $0.cell.tintAdjustmentMode = .dimmed
-                                                        }.cellUpdate { cell, row in
-                                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                            cell.tintColor = FalconPalette.defaultBlue
-                                                            if row.value == false {
-                                                                cell.accessoryType = .checkmark
-                                                                cell.tintAdjustmentMode = .dimmed
-                                                            } else {
-                                                                cell.tintAdjustmentMode = .automatic
-                                                            }
-                                                    }
-                                                    }.cellUpdate { cell, row in
-                                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                    }.onChange() { _ in
-                                                        self.updateLists(type: "checklist")
-                                                } , at: mvs.count - 1)
-                                                
+                                }
+                            }
+                            $0.multivaluedRowToInsertAt = { index in
+                                return SplitRow<TextRow, CheckRow>(){
+                                    $0.rowLeftPercentage = 0.75
+                                    $0.rowLeft = TextRow(){
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                        $0.placeholder = "Item"
+                                        }.cellUpdate { cell, row in
+                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                            row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                    }
+                                    
+                                    $0.rowRight = CheckRow() {
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.cell.tintColor = FalconPalette.defaultBlue
+                                        $0.value = false
+                                        $0.cell.accessoryType = .checkmark
+                                        $0.cell.tintAdjustmentMode = .dimmed
+                                        }.cellUpdate { cell, row in
+                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.tintColor = FalconPalette.defaultBlue
+                                            if row.value == false {
+                                                cell.accessoryType = .checkmark
+                                                cell.tintAdjustmentMode = .dimmed
+                                            } else {
+                                                cell.tintAdjustmentMode = .automatic
                                             }
-                
-                    form +++
-                        MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                           header: "Purchases",
-                                           footer: "Add a purchase that can be split among participants") {
-                                            $0.tag = "purchasefields"
-                                            $0.hidden = "$sections != 'Purchases'"
-                                            $0.addButtonProvider = { section in
-                                                return ButtonRow(){
-                                                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                    $0.title = "Add New Purchase"
-                                                    }.cellUpdate { cell, row in
-                                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                        cell.textLabel?.textAlignment = .left
-                                                        cell.height = { 60 }
+                                    }
+                                    }.cellUpdate { cell, row in
+                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                    }.onChange() { _ in
+                                        self.updateLists(type: "checklist")
+                                }
+                                
+                            }
+                            
+    }
+                                for (_, value) in checklistDict {
+                                    var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
+                                    mvs.insert(SplitRow<TextRow, CheckRow>() {
+                                        $0.rowLeftPercentage = 0.75
+                                        $0.rowLeft = TextRow(){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                            $0.value = value.keys.first
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                        }
+                                        $0.rowRight = CheckRow() {
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            $0.cell.tintColor = FalconPalette.defaultBlue
+                                            $0.value = value.values.first
+                                            $0.cell.accessoryType = .checkmark
+                                            $0.cell.tintAdjustmentMode = .dimmed
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                                cell.tintColor = FalconPalette.defaultBlue
+                                                if row.value == false {
+                                                    cell.accessoryType = .checkmark
+                                                    cell.tintAdjustmentMode = .dimmed
+                                                } else {
+                                                    cell.tintAdjustmentMode = .automatic
                                                 }
-                                            }
-                                            $0.multivaluedRowToInsertAt = { index in
-                                                self.purchaseIndex = index
-                                                self.openPurchases()
-                                                return PurchaseRow()
-                                                    .onCellSelection() { cell, row in
-                                                        self.purchaseIndex = index
-                                                        self.openPurchases()
-                                                        cell.cellResignFirstResponder()
-        //                                                self.tableView.endEditing(true)
-                                                }
-                                                
-                                            }
-                        }
-                                            for purchase in purchaseList {
-                                                var mvs = (form.sectionBy(tag: "purchasefields") as! MultivaluedSection)
-                                                mvs.insert(PurchaseRow() {
-                                                    $0.value = purchase
-                                                    }.onCellSelection() { cell, row in
-                                                        self.purchaseIndex = row.indexPath!.row
-                                                        self.openPurchases()
-                                                        cell.cellResignFirstResponder()
-        //                                                self.tableView.endEditing(true)
-                                                }, at: mvs.count - 1)
-                                                
-                                            }
-                
-                                            form +++
-                                                Section(header: "Balances",
-                                                        footer: "Positive Balance = Receipt; Negative Balance = Payment") {
-                                                            $0.tag = "Balances"
-                                                            $0.hidden = "$sections != 'Purchases'"
-                                            }
+                                        }
+                                        }.cellUpdate { cell, row in
+                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        }.onChange() { _ in
+                                            self.updateLists(type: "checklist")
+                                    } , at: mvs.count - 1)
+                                    
+                                }
+
+        form +++
+            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                               header: "Purchases",
+                               footer: "Add a purchase that can be split among participants") {
+                                $0.tag = "purchasefields"
+                                $0.hidden = "$sections != 'Purchases'"
+                                $0.addButtonProvider = { section in
+                                    return ButtonRow(){
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.title = "Add New Purchase"
+                                        }.cellUpdate { cell, row in
+                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.textLabel?.textAlignment = .left
+                                            cell.height = { 60 }
+                                    }
+                                }
+                                $0.multivaluedRowToInsertAt = { index in
+                                    self.purchaseIndex = index
+                                    self.openPurchases()
+                                    return PurchaseRow()
+                                        .onCellSelection() { cell, row in
+                                            self.purchaseIndex = index
+                                            self.openPurchases()
+                                            cell.cellResignFirstResponder()
+    //                                                self.tableView.endEditing(true)
+                                    }
+                                    
+                                }
+            }
+                                for purchase in purchaseList {
+                                    var mvs = (form.sectionBy(tag: "purchasefields") as! MultivaluedSection)
+                                    mvs.insert(PurchaseRow() {
+                                        $0.value = purchase
+                                        }.onCellSelection() { cell, row in
+                                            self.purchaseIndex = row.indexPath!.row
+                                            self.openPurchases()
+                                            cell.cellResignFirstResponder()
+    //                                                self.tableView.endEditing(true)
+                                    }, at: mvs.count - 1)
+                                    
+                                }
+
+                                form +++
+                                    Section(header: "Balances",
+                                            footer: "Positive Balance = Receipt; Negative Balance = Payment") {
+                                                $0.tag = "Balances"
+                                                $0.hidden = "$sections != 'Purchases'"
+                                }
     }
     
     func decimalRowFunc() {
@@ -1002,82 +1013,6 @@ class CreateActivityViewController: FormViewController {
             alertController.addAction(removeAddress)
             alertController.addAction(cancelAlert)
             self.present(alertController, animated: true, completion: nil)
-        }
-        
-    }
-    
-    // MARK: - Repeat Frequency
-//    enum RepeatInterval : String, CustomStringConvertible {
-//        case Never = "Never"
-//        case Every_Day = "Every Day"
-//        case Every_Week = "Every Week"
-//        case Every_2_Weeks = "Every 2 Weeks"
-//        case Every_Month = "Every Month"
-//        case Every_Year = "Every Year"
-//
-//        var description : String { return rawValue }
-//
-//        static let allValues = [Never, Every_Day, Every_Week, Every_2_Weeks, Every_Month, Every_Year]
-//    }
-//
-    // MARK: - Reminder Frequency
-    enum EventAlert : String, CustomStringConvertible {
-        case None = "None"
-        case At_time_of_event = "At time of event"
-        case Five_Minutes = "5 minutes before"
-        case Fifteen_Minutes = "15 minutes before"
-        case Half_Hour = "30 minutes before"
-        case One_Hour = "1 hour before"
-        case One_Day = "1 day before"
-        case One_Week = "1 week before"
-        case One_Month = "1 month before"
-        
-        var description : String { return rawValue }
-        
-        static let allValues = [None, At_time_of_event, Fifteen_Minutes, Half_Hour, One_Hour, One_Day, One_Week, One_Month]
-        
-        var timeInterval: Double {
-            switch self {
-            case .None:
-                return 0
-            case .At_time_of_event:
-                return 0
-            case .Fifteen_Minutes:
-                return -900
-            case .Half_Hour:
-                return -1800
-            case .One_Hour:
-                return -3600
-            case .One_Day:
-                return -86400
-            case .One_Week:
-                return -604800
-            case .One_Month:
-                return -2419200
-            default:
-                return 0
-            }
-        }
-        
-        static func fromInterval(_ interval: TimeInterval) -> EventAlert {
-            switch interval {
-            case 0:
-                return .At_time_of_event
-            case 900:
-                return .Fifteen_Minutes
-            case 1800:
-                return .Half_Hour
-            case 3600:
-                return .One_Hour
-            case 86400:
-                return .One_Day
-            case 604800:
-                return .One_Week
-            case 2419200:
-                return .One_Month
-            default:
-                return .None
-            }
         }
         
     }
@@ -1405,7 +1340,7 @@ class CreateActivityViewController: FormViewController {
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
-    @objc func createNewActivity () {
+    @objc func createNewActivity() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
@@ -1433,10 +1368,15 @@ class CreateActivityViewController: FormViewController {
             } else {
                 self.navigationController?.backToViewController(viewController: ChatLogController.self)
             }
-
         } else {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             firebaseDictionary["participantsIDs"] = membersIDs.1 as AnyObject
+            
+            activityCreatingGroup.notify(queue: DispatchQueue.main, execute: {
+                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
+//                    self.hideActivityIndicator()
+                }
+            })
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
@@ -1446,7 +1386,6 @@ class CreateActivityViewController: FormViewController {
             } else {
                 self.navigationController?.backToViewController(viewController: ChatLogController.self)
             }
-
         }
     }
     
@@ -1592,6 +1531,7 @@ class CreateActivityViewController: FormViewController {
     
     var activityAvatarURL = String() {
         didSet {
+            print("activity avatar \(activityAvatarURL)")
             let viewRow: ViewRow<UIImageView> = form.rowBy(tag: "Activity Image")!
             viewRow.cell.view!.showActivityIndicator()
             viewRow.cell.view!.sd_setImage(with: URL(string:activityAvatarURL), placeholderImage: nil, options: [.continueInBackground, .scaleDownLargeImages], completed: { (image, error, cacheType, url) in

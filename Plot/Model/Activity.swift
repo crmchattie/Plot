@@ -37,9 +37,9 @@ class Activity: NSObject, Codable {
     var muted: Bool?
     var conversationID: String?
     var calendarExport: Bool?
-    var recipe: Recipe?
-    var workout: Workout?
-    var event: Event?
+    var recipeID: String?
+    var workoutID: String?
+    var eventID: String?
     
     
     enum CodingKeys: String, CodingKey {
@@ -58,9 +58,9 @@ class Activity: NSObject, Codable {
         case purchases
         case checklist
         case calendarExport
-        case recipe
-        case workout
-        case event
+        case recipeID
+        case workoutID
+        case eventID
     }
     
     init(dictionary: [String: AnyObject]?){
@@ -100,19 +100,25 @@ class Activity: NSObject, Codable {
         muted = dictionary?["muted"] as? Bool
         conversationID = dictionary?["conversationID"] as? String
         calendarExport = dictionary?["calendarExport"] as? Bool
-        recipe = dictionary?["recipe"] as? Recipe
-        workout = dictionary?["workout"] as? Workout
-        event = dictionary?["purchases"] as? Event
+        recipeID = dictionary?["recipeID"] as? String
+        workoutID = dictionary?["workoutID"] as? String
+        eventID = dictionary?["purchasesID"] as? String
     }
     
     func toAnyObject() -> [String: AnyObject] {
         var activityDict = [String: AnyObject]()
         
-        activityDict["activityID"] = self.activityID as AnyObject
+        if let value = self.activityID as AnyObject? {
+            activityDict["activityID"] = value
+        }
         
-        activityDict["name"] = self.name as AnyObject
+        if let value = self.name as AnyObject? {
+            activityDict["name"] = value
+        }
         
-        activityDict["admin"] = self.admin as AnyObject
+        if let value = self.admin as AnyObject? {
+            activityDict["admin"] = value
+        }
         
         if let value = self.activityType as AnyObject? {
             activityDict["activityType"] = value
@@ -133,8 +139,10 @@ class Activity: NSObject, Codable {
         if let value = self.locationAddress as AnyObject? {
             activityDict["locationAddress"] = value
         }
-        
-        activityDict["participantsIDs"] = self.participantsIDs as AnyObject
+                
+        if let value = self.participantsIDs as AnyObject? {
+            activityDict["participantsIDs"] = value
+        }
         
         if let value = self.transportation as AnyObject? {
             activityDict["transportation"] = value
@@ -154,10 +162,18 @@ class Activity: NSObject, Codable {
             activityDict["activityPhotos"] = value
         }
         
-        activityDict["allDay"] = self.allDay as AnyObject
-        activityDict["startDateTime"] = self.startDateTime as AnyObject
-        activityDict["endDateTime"] = self.endDateTime as AnyObject
-
+        if let value = self.allDay as AnyObject? {
+            activityDict["allDay"] = value
+        }
+        
+        if let value = self.startDateTime as AnyObject? {
+            activityDict["startDateTime"] = value
+        }
+        
+        if let value = self.endDateTime as AnyObject? {
+            activityDict["endDateTime"] = value
+        }
+        
         if let value = self.notes as AnyObject? {
             activityDict["notes"] = value
         } else {
@@ -188,6 +204,18 @@ class Activity: NSObject, Codable {
         
         if let value = self.checklist as AnyObject? {
             activityDict["checklist"] = value
+        }
+        
+        if let value = self.recipeID as AnyObject? {
+            activityDict["recipeID"] = value
+        }
+        
+        if let value = self.workoutID as AnyObject? {
+            activityDict["workoutID"] = value
+        }
+        
+        if let value = self.eventID as AnyObject? {
+            activityDict["eventID"] = value
         }
         
         return activityDict

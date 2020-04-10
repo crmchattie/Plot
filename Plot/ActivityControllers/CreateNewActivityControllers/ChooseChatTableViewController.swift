@@ -127,7 +127,6 @@ class ChooseChatTableViewController: UITableViewController {
                 }
                 navigationController?.pushViewController(destination, animated: true)
             }
-            
         }
     }
     

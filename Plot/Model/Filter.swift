@@ -16,6 +16,24 @@ enum filter: String {
     //workouts
     case workoutType, muscles, duration
     
+    var activity: String {
+            switch self {
+                case .cuisine: return "Recipes"
+                case .excludeCuisine: return "Recipes"
+                case .diet: return "Recipes"
+                case .intolerances: return "Recipes"
+                case .recipeType: return "Recipes"
+                case .eventType: return "Events"
+                case .eventStartDate: return "Events"
+                case .location: return "Events"
+                case .workoutType: return "Workouts"
+                case .muscles: return "Workouts"
+                case .duration: return "Workouts"
+    //            case .exercise: return "multiple"
+
+            }
+        }
+    
     var typeOfSection: String {
         switch self {
             case .cuisine: return "multiple"

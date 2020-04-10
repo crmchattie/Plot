@@ -20,6 +20,8 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     var filteredUsers = [User]()
     var conversations = [Conversation]()
     var favAct = [String: [String]]()
+    
+    let viewPlaceholder = ViewPlaceholder()
         
     var timer: Timer?
     var headerheight: CGFloat = 0

@@ -41,10 +41,7 @@ class ActivityDetailCell: UICollectionViewCell {
         didSet {
             if let event = event {
                 nameLabel.text = "\(event.name)"
-                if let startDateTime = event.dates?.start?.dateTime, let date = startDateTime.toDate() {
-                    let newDate = date.startDateTimeString()
-                    categoryLabel.text = "\(newDate) @ \(event.embedded?.venues?[0].name ?? "")"
-                }
+                categoryLabel.text = "\(event.embedded?.venues?[0].name?.capitalized ?? "")"
                 if let minPrice = event.priceRanges?[0].min, let maxPrice = event.priceRanges?[0].max {
                     let formatter = CurrencyFormatter()
                     formatter.locale = .current
@@ -59,6 +56,7 @@ class ActivityDetailCell: UICollectionViewCell {
                     imageView.sd_setImage(with: URL(string: url))
                     imageURL = url
                 }
+                
                 setupViews()
             }
         }
@@ -93,8 +91,9 @@ class ActivityDetailCell: UICollectionViewCell {
                 imageView.tintColor = UIColor.white
                 imageView.backgroundColor = colors[intColor]
                 imageURL = "workout"
+                
+                setupViews()
             }
-            setupViews()
         }
     }
     
@@ -138,7 +137,7 @@ class ActivityDetailCell: UICollectionViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = UIFont.systemFont(ofSize: 18)
+        label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         return label
     }()
@@ -146,7 +145,7 @@ class ActivityDetailCell: UICollectionViewCell {
     let categoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.font = UIFont.systemFont(ofSize: 13)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         return label
     }()
@@ -154,7 +153,7 @@ class ActivityDetailCell: UICollectionViewCell {
     let subcategoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.font = UIFont.systemFont(ofSize: 13)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         return label
     }()
@@ -181,23 +180,25 @@ class ActivityDetailCell: UICollectionViewCell {
 
         imageView.constrainHeight(constant: 231)
         
-
-        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel], spacing: 0)
-        labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+        let buttonStack = UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()])
+        buttonStack.isLayoutMarginsRelativeArrangement = true
+        buttonStack.layoutMargins = UIEdgeInsets(top: 0, left: 10, bottom: 5, right: 15)
+        
+        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel], spacing: 2)
         labelStackView.isLayoutMarginsRelativeArrangement = true
+        labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
         
         let stackView = VerticalStackView(arrangedSubviews: [
             imageView,
-            UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()]),
+            buttonStack,
             labelStackView
-            ], spacing: 2)
+            ], spacing: 0)
         addSubview(stackView)
         stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
         heartButton.addTarget(self, action: #selector(heartButtonTapped), for: .touchUpInside)
-        
 
     }
     

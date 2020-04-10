@@ -17,8 +17,10 @@ class WorkoutDetailCell: UICollectionViewCell {
     var workout: Workout! {
         didSet {
             if let notes = workout.notes {
+                print("set notes")
                 notesLabel.text = notes
             }
+            setupViews()
         }
     }
     
@@ -36,7 +38,7 @@ class WorkoutDetailCell: UICollectionViewCell {
     let notesLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.font = UIFont.systemFont(ofSize: 13)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         return label
     }()
@@ -44,30 +46,35 @@ class WorkoutDetailCell: UICollectionViewCell {
     let clickView: UIView = {
         let view = UIView()
         view.isUserInteractionEnabled = true
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
    
     let getWorkoutLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = UIFont.systemFont(ofSize: 18)
+        label.font = UIFont.preferredFont(forTextStyle: .body)
         label.text = "Go to Workout"
         label.numberOfLines = 1
-        label.isUserInteractionEnabled = true
         return label
     }()
    
     func setupViews() {
         
-        clickView.constrainHeight(constant: 18)
-        addSubview(notesLabel)
-        addSubview(clickView)
-        clickView.addSubview(getWorkoutLabel)
+        clickView.constrainHeight(constant: 17)
         
-        notesLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 5))
-        clickView.anchor(top: notesLabel.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 15, left: 0, bottom: 0, right: 0))
-        getWorkoutLabel.anchor(top: clickView.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 2, right: 0))
+        let labelStackView = UIStackView(arrangedSubviews: [notesLabel])
+        labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+        labelStackView.isLayoutMarginsRelativeArrangement = true
+        
+        clickView.addSubview(getWorkoutLabel)
+        getWorkoutLabel.anchor(top: clickView.topAnchor, leading: clickView.leadingAnchor, bottom: nil, trailing: clickView.trailingAnchor, padding: .init(top: 0, left: 15, bottom: 0, right: 15))
+        
+        let stackView = VerticalStackView(arrangedSubviews:
+            [labelStackView,
+            clickView
+            ], spacing: 2)
+        addSubview(stackView)
+        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 10, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         clickView.addGestureRecognizer(viewGesture)

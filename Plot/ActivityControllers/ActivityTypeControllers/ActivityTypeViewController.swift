@@ -66,7 +66,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         collectionView.register(ActivityTypeCell.self, forCellWithReuseIdentifier: kActivityTypeCell)
         collectionView.register(ActivityHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerId)
         
-        locationManager.requestWhenInUseAuthorization()
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
                         
         fetchData()
@@ -169,7 +168,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
                     if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        Service.shared.fetchEventsSegmentLatLong(size: "50", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                             self.events = search?.embedded?.events
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {
@@ -199,7 +198,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         }
                     } else {
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
+                        Service.shared.fetchEventsSegment(size: "50", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
                             self.events = search?.embedded?.events
                             dispatchGroup.leave()
                             dispatchGroup.notify(queue: .main) {

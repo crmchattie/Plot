@@ -54,7 +54,6 @@ class MealDetailCell: UICollectionViewCell {
         segmentedControl.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 10, left: 5, bottom: 0, right: 5))
         mealExpandedDetailViewController.view.anchor(top: segmentedControl.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         
-        
     }
     
     @IBAction func action(_ sender: UISegmentedControl) {

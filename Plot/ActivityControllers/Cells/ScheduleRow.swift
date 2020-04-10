@@ -19,8 +19,6 @@ final class ScheduleCell: Cell<Schedule>, CellType {
         //        label.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
-        label.minimumScaleFactor = 0.1
-        label.adjustsFontSizeToFitWidth = true
         label.translatesAutoresizingMaskIntoConstraints = false
         label.sizeToFit()
         
@@ -33,8 +31,6 @@ final class ScheduleCell: Cell<Schedule>, CellType {
         //        label.font = UIFont.systemFont(ofSize: 13)
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.minimumScaleFactor = 0.1
-        label.adjustsFontSizeToFitWidth = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false

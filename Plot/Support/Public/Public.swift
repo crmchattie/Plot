@@ -1090,6 +1090,75 @@ extension UIViewController {
     }
 }
 
+// MARK: - Reminder Frequency
+enum EventAlert : String, CustomStringConvertible {
+    case None = "None"
+    case At_time_of_event = "At time of activity"
+    case Five_Minutes = "5 minutes before"
+    case Fifteen_Minutes = "15 minutes before"
+    case Half_Hour = "30 minutes before"
+    case One_Hour = "1 hour before"
+    case One_Day = "1 day before"
+    case One_Week = "1 week before"
+    case One_Month = "1 month before"
+    
+    var description : String { return rawValue }
+    
+    static let allValues = [None, At_time_of_event, Fifteen_Minutes, Half_Hour, One_Hour, One_Day, One_Week, One_Month]
+    
+    var timeInterval: Double {
+        switch self {
+        case .None:
+            return 0
+        case .At_time_of_event:
+            return 0
+        case .Fifteen_Minutes:
+            return -900
+        case .Half_Hour:
+            return -1800
+        case .One_Hour:
+            return -3600
+        case .One_Day:
+            return -86400
+        case .One_Week:
+            return -604800
+        case .One_Month:
+            return -2419200
+        default:
+            return 0
+        }
+    }
+    
+    static func fromInterval(_ interval: TimeInterval) -> EventAlert {
+        switch interval {
+        case 0:
+            return .At_time_of_event
+        case 900:
+            return .Fifteen_Minutes
+        case 1800:
+            return .Half_Hour
+        case 3600:
+            return .One_Hour
+        case 86400:
+            return .One_Day
+        case 604800:
+            return .One_Week
+        case 2419200:
+            return .One_Month
+        default:
+            return .None
+        }
+    }
+    
+}
+
+extension Array where Element: Comparable {
+    func containsSameElements(_ other: [Element]) -> Bool {
+        return self.count == other.count && self.sorted() == other.sorted()
+    }
+}
+
+
 extension UIViewController {
     func showSpinner(onView : UIView) {
         let spinnerView = UIView.init(frame: onView.bounds)

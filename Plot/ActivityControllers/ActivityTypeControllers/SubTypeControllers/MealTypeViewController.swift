@@ -12,7 +12,7 @@ import Eureka
 class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
     
     var groups = [[Recipe]]()
-    var searchRecipes = [Recipe]()
+    var searchActivities = [Recipe]()
 
     var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .recipeType]
     var filterDictionary = [String: [String]]()
@@ -52,14 +52,19 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased(), cuisine: self.filterDictionary["cuisine"] ?? [""], excludeCuisine: self.filterDictionary["excludeCuisine"] ?? [""], diet: self.filterDictionary["diet"]?[0] ?? "", intolerances: self.filterDictionary["intolerances"] ?? [""], type: self.filterDictionary["recipeType"]?[0] ?? "")
+            self.complexSearch(query: searchText.lowercased(), cuisine: self.filterDictionary["cuisine"] ?? [], excludeCuisine: self.filterDictionary["excludeCuisine"] ?? [], diet: self.filterDictionary["diet"]?[0] ?? "", intolerances: self.filterDictionary["intolerances"] ?? [""], type: self.filterDictionary["recipeType"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         })
     }
     
-    func complexSearch(query: String, cuisine: [String], excludeCuisine: [String], diet: String, intolerances: [String], type: String) {
-        print("query \(query), cuisine \(cuisine), excludeCuisine \(excludeCuisine), diet \(diet), intolerances \(intolerances), type \(type), ")
+    func complexSearch(query: String, cuisine: [String], excludeCuisine: [String], diet: String, intolerances: [String], type: String, favorites: String) {
+        print("query \(query), cuisine \(cuisine), excludeCuisine \(excludeCuisine), diet \(diet), intolerances \(intolerances), type \(type), favorites \(favorites)")
         
-        self.searchRecipes = [Recipe]()
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        self.searchActivities = [Recipe]()
         showGroups = false
         self.headerheight = view.frame.height
         self.cellheight = 0
@@ -72,30 +77,95 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         }
         
         let dispatchGroup = DispatchGroup()
-
-        dispatchGroup.enter()
-        Service.shared.fetchRecipesComplex(query: query, cuisine: cuisine, excludeCuisine: excludeCuisine, diet: diet, intolerances: intolerances, type: type) { (search, err) in
-            if let err = err {
-                print("Failed to fetch apps:", err)
-                return
+        
+        if favorites == "true" {
+            print("in favorites")
+            if let recipes = self.favAct["recipes"] {
+                for recipeID in recipes {
+                    var recipe: Recipe!
+                    var include = true
+                    dispatchGroup.enter()
+                    Service.shared.fetchRecipesInfo(id: Int(recipeID)!) { (search, err) in
+                        recipe = search
+                        for type in cuisine {
+                            if let cuisines = recipe.cuisines, cuisines.contains(type) {
+                                include = true
+                                break
+                            } else {
+                                include = false
+                            }
+                        }
+                        if include == true {
+                            for type in excludeCuisine {
+                                if let cuisines = recipe.cuisines, cuisines.contains(type) {
+                                    include = false
+                                    break
+                                } else {
+                                    include = true
+                                }
+                            }
+                        }
+                        if diet != "" && include == true {
+                            if let diets = recipe.diets, diets.contains(diet) {
+                                include = true
+                            } else {
+                                include = false
+                            }
+                        }
+                        if type != "" && include == true {
+                            if let types = recipe.dishTypes, types.contains(type) {
+                                include = true
+                            } else {
+                                include = false
+                            }
+                        }
+                        if include {
+                            self.searchActivities.append(recipe)
+                        }
+                        dispatchGroup.leave()
+                    }
+                }
             }
             self.removeSpinner()
-            self.searchRecipes = search!.recipes
-            
-            dispatchGroup.leave()
-            
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
+        } else {
+            dispatchGroup.enter()
+            Service.shared.fetchRecipesComplex(query: query, cuisine: cuisine, excludeCuisine: excludeCuisine, diet: diet, intolerances: intolerances, type: type) { (search, err) in
+                if let err = err {
+                    print("Failed to fetch apps:", err)
+                    return
+                }
+                
+                self.searchActivities = search!.recipes
+                self.removeSpinner()
+                
+                dispatchGroup.leave()
             }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.collectionView.reloadData()
+            self.checkIfThereAnyActivities()
         }
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchRecipes = [Recipe]()
-        showGroups = true
-        headerheight = 0
-        cellheight = 397
-        self.collectionView.reloadData()
+        if !filterDictionary.values.isEmpty && searchActivities.isEmpty {
+            showGroups = false
+            complexSearch(query: "", cuisine: filterDictionary["cuisine"] ?? [], excludeCuisine: filterDictionary["excludeCuisine"] ?? [], diet: filterDictionary["diet"]?[0] ?? "", intolerances: filterDictionary["intolerances"] ?? [], type: filterDictionary["recipeType"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+        } else if !filterDictionary.values.isEmpty && !searchActivities.isEmpty {
+            self.checkIfThereAnyActivities()
+            showGroups = false
+            self.headerheight = view.frame.height
+            self.cellheight = 0
+            self.collectionView.reloadData()
+        } else {
+            viewPlaceholder.remove(from: view, priority: .medium)
+            searchActivities = [Recipe]()
+            showGroups = true
+            headerheight = 0
+            cellheight = 397
+            checkIfThereAnyActivities()
+        }
     }
     
     fileprivate func fetchData() {
@@ -197,7 +267,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerId, for: indexPath) as! SearchHeader
-        let recipes = searchRecipes
+        let recipes = searchActivities
         header.verticalController.recipes = recipes
         header.verticalController.favAct = favAct
         header.verticalController.collectionView.reloadData()
@@ -219,6 +289,15 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return .init(width: view.frame.width, height: headerheight)
+    }
+    
+    func checkIfThereAnyActivities() {
+        if searchActivities.count > 0 {
+            viewPlaceholder.remove(from: view, priority: .medium)
+        } else {
+            viewPlaceholder.add(for: view, title: .emptyRecipes, subtitle: .emptyRecipesEvents, priority: .medium, position: .top)
+        }
+        collectionView?.reloadData()
     }
     
     @objc func filter() {
@@ -243,9 +322,10 @@ extension MealTypeViewController: UpdateFilter {
         if !filterDictionary.values.isEmpty {
             showGroups = false
             self.filterDictionary = filterDictionary
-            complexSearch(query: "", cuisine: filterDictionary["cuisine"] ?? [""], excludeCuisine: filterDictionary["excludeCuisine"] ?? [""], diet: filterDictionary["diet"]?[0] ?? "", intolerances: filterDictionary["intolerances"] ?? [""], type: filterDictionary["recipeType"]?[0] ?? "")
+            complexSearch(query: "", cuisine: filterDictionary["cuisine"] ?? [], excludeCuisine: filterDictionary["excludeCuisine"] ?? [], diet: filterDictionary["diet"]?[0] ?? "", intolerances: filterDictionary["intolerances"] ?? [], type: filterDictionary["recipeType"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         } else {
-            searchRecipes = [Recipe]()
+            viewPlaceholder.remove(from: view, priority: .medium)
+            searchActivities = [Recipe]()
             self.filterDictionary = filterDictionary
             showGroups = true
             headerheight = 0

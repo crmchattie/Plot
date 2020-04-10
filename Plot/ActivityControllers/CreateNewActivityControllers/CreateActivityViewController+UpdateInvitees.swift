@@ -43,28 +43,22 @@ extension CreateActivityViewController: UpdateInvitees {
                 inviteesRow.updateCell()
             }
             
-            let membersIDs = fetchMembersIDs()
-            if Set(activity.participantsIDs!) != Set(membersIDs.0) {
-                let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-                updateParticipants(membersIDs: membersIDs)
-                groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
-            }
-            
-            activityCreatingGroup.notify(queue: DispatchQueue.main, execute: {
-                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-//                    self.hideActivityIndicator()
+            if active {
+                let membersIDs = fetchMembersIDs()
+                if Set(activity.participantsIDs!) != Set(membersIDs.0) {
+                    let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+                    updateParticipants(membersIDs: membersIDs)
+                    groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
                 }
-            })
+                
+                activityCreatingGroup.notify(queue: DispatchQueue.main, execute: {
+                    InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
+    //                    self.hideActivityIndicator()
+                    }
+                })
+            }
             
             decimalRowFunc()
         }
-    }
-    
-    
-}
-
-extension Array where Element: Comparable {
-    func containsSameElements(_ other: [Element]) -> Bool {
-        return self.count == other.count && self.sorted() == other.sorted()
     }
 }

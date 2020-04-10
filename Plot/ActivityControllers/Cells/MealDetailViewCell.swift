@@ -15,8 +15,7 @@ class MealDetailViewCell: UICollectionViewCell {
         label.text = "Activity Type"
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 18)
-        label.isUserInteractionEnabled = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
         return label
     }()
 
@@ -25,8 +24,7 @@ class MealDetailViewCell: UICollectionViewCell {
         label.text = "Activity Type"
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 16)
-        label.isUserInteractionEnabled = true
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         return label
     }()
 
@@ -46,7 +44,6 @@ class MealDetailViewCell: UICollectionViewCell {
         
         titleLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 2, left: 15, bottom: 0, right: 15))
         instructionsLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 2, left: 15, bottom: 0, right: 15))
-     
      
     }
  

@@ -13,7 +13,7 @@ import Eureka
 class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
     
     var groups = [[Event]]()
-    var searchEvents = [Event]()
+    var searchActivities = [Event]()
     
     private let musicSegmentID = "KZFzniwnSyZfZ7v7nJ"
     private let sportsSegmentID = "KZFzniwnSyZfZ7v7nE"
@@ -23,7 +23,6 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     var filterDictionary = [String: [String]]()
     var sections: [String] = ["Music", "Sports", "Shows"]
     var attractions = [String]()
-
     
     var locationManager = CLLocationManager()
         
@@ -39,7 +38,6 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         
         fetchData()
         
-        locationManager.requestWhenInUseAuthorization()
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         
     }
@@ -63,14 +61,19 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased(), eventType: self.filterDictionary["eventType"]?[0] ?? "", eventStartDate: self.filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: self.filterDictionary["eventEndDate"]?[0] ?? "", zipcode: self.filterDictionary["zipcode"]?[0] ?? "", city: self.filterDictionary["city"]?[0] ?? "", state: self.filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "")
+            self.complexSearch(query: searchText.lowercased(), eventType: self.filterDictionary["eventType"]?[0] ?? "", eventStartDate: self.filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: self.filterDictionary["eventEndDate"]?[0] ?? "", zipcode: self.filterDictionary["zipcode"]?[0] ?? "", city: self.filterDictionary["city"]?[0] ?? "", state: self.filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         })
     }
     
-    func complexSearch(query: String, eventType: String, eventStartDate: String, eventEndDate: String, zipcode: String, city: String, state: String, country: String) {
-        print("query \(query), eventType \(eventType), eventStartDate \(eventStartDate), eventEndDate \(eventEndDate), zipcode \(zipcode), city \(city), state \(state)")
+    func complexSearch(query: String, eventType: String, eventStartDate: String, eventEndDate: String, zipcode: String, city: String, state: String, country: String, favorites: String) {
+        print("query \(query), eventType \(eventType), eventStartDate \(eventStartDate), eventEndDate \(eventEndDate), zipcode \(zipcode), city \(city), state \(state), country \(country), favorites \(favorites)")
+        
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
 
-        self.searchEvents = [Event]()
+        self.searchActivities = [Event]()
         showGroups = false
         self.headerheight = view.frame.height
         self.cellheight = 0
@@ -83,41 +86,87 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         }
 
         let dispatchGroup = DispatchGroup()
-
-        dispatchGroup.enter()
-        if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
-            dispatchGroup.enter()
-            Service.shared.fetchEventsSegmentLatLong(id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                self.removeSpinner()
-                dispatchGroup.leave()
-                if let events = search?.embedded?.events {
-                    self.searchEvents = events
-                    DispatchQueue.main.async {
-                        self.collectionView.reloadData()
+        
+        if favorites == "true" {
+            if let events = self.favAct["events"] {
+                for event in events {
+                    dispatchGroup.enter()
+                    if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+                        dispatchGroup.enter()
+                        Service.shared.fetchEventsSegmentLatLong(size: "50", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                            self.removeSpinner()
+                            dispatchGroup.leave()
+                            if let events = search?.embedded?.events {
+                                self.searchActivities = events
+                                dispatchGroup.notify(queue: .main) {
+                                    self.collectionView.reloadData()
+                                }
+                            }
+                        }
+                    } else {
+                        dispatchGroup.enter()
+                        Service.shared.fetchEventsSegment(size: "50", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
+                            self.removeSpinner()
+                            dispatchGroup.leave()
+                            if let events = search?.embedded?.events {
+                                self.searchActivities = events
+                                dispatchGroup.notify(queue: .main) {
+                                    self.collectionView.reloadData()
+                                }
+                            }
+                        }
                     }
                 }
             }
         } else {
             dispatchGroup.enter()
-            Service.shared.fetchEventsSegment(id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
-                self.removeSpinner()
-                dispatchGroup.leave()
-                if let events = search?.embedded?.events {
-                    self.searchEvents = events
-                    DispatchQueue.main.async {
-                        self.collectionView.reloadData()
+            if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+                dispatchGroup.enter()
+                Service.shared.fetchEventsSegmentLatLong(size: "50", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                    self.removeSpinner()
+                    dispatchGroup.leave()
+                    if let events = search?.embedded?.events {
+                        self.searchActivities = events
+                        dispatchGroup.notify(queue: .main) {
+                            self.collectionView.reloadData()
+                        }
+                    }
+                }
+            } else {
+                dispatchGroup.enter()
+                Service.shared.fetchEventsSegment(size: "50", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
+                    self.removeSpinner()
+                    dispatchGroup.leave()
+                    if let events = search?.embedded?.events {
+                        self.searchActivities = events
+                        dispatchGroup.notify(queue: .main) {
+                            self.collectionView.reloadData()
+                        }
                     }
                 }
             }
         }
+        checkIfThereAnyActivities()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchEvents = [Event]()
-        showGroups = true
-        headerheight = 0
-        cellheight = 397
-        self.collectionView.reloadData()
+        if !filterDictionary.values.isEmpty && searchActivities.isEmpty {
+            showGroups = false
+            complexSearch(query: "", eventType: filterDictionary["eventType"]?[0] ?? "", eventStartDate: filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: filterDictionary["eventEndDate"]?[0] ?? "", zipcode: filterDictionary["zipcode"]?[0] ?? "", city: filterDictionary["city"]?[0] ?? "", state: filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+        } else if !filterDictionary.values.isEmpty && !searchActivities.isEmpty {
+            self.checkIfThereAnyActivities()
+            showGroups = false
+            self.headerheight = view.frame.height
+            self.cellheight = 0
+            self.collectionView.reloadData()
+        } else {
+            viewPlaceholder.remove(from: view, priority: .medium)
+            searchActivities = [Event]()
+            showGroups = true
+            headerheight = 0
+            cellheight = 397
+            checkIfThereAnyActivities()
+        }
     }
     
     fileprivate func fetchData() {
@@ -139,7 +188,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         
         if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                Service.shared.fetchEventsSegmentLatLong(size: "50", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.musicSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                     musicEvents = search?.embedded?.events
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
@@ -166,7 +215,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                         
                         self.collectionView.reloadData()
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        Service.shared.fetchEventsSegmentLatLong(size: "50", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.sportsSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                             sportsEvents = search?.embedded?.events
                             dispatchGroup.leave()
                     
@@ -194,7 +243,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                                 }
                                 self.collectionView.reloadData()
                                 dispatchGroup.enter()
-                                Service.shared.fetchEventsSegmentLatLong(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.artstheatreSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                                Service.shared.fetchEventsSegmentLatLong(size: "50", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.artstheatreSegmentID, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                                     arttheatreEvents = search?.embedded?.events
                                     dispatchGroup.leave()
                                     
@@ -230,7 +279,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 }
             } else {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegment(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.musicSegmentID) { (search, err) in
+                Service.shared.fetchEventsSegment(size: "50", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.musicSegmentID) { (search, err) in
                     musicEvents = search?.embedded?.events
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
@@ -258,7 +307,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                         self.collectionView.reloadData()
                             
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.sportsSegmentID) { (search, err) in
+                        Service.shared.fetchEventsSegment(size: "50", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.sportsSegmentID) { (search, err) in
                             sportsEvents = search?.embedded?.events
                             dispatchGroup.leave()
                             
@@ -286,7 +335,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                             
                                 self.collectionView.reloadData()
                                 dispatchGroup.enter()
-                                Service.shared.fetchEventsSegment(id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.artstheatreSegmentID) { (search, err) in
+                                Service.shared.fetchEventsSegment(size: "50", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: self.artstheatreSegmentID) { (search, err) in
                                     arttheatreEvents = search?.embedded?.events
                                     dispatchGroup.leave()
                                     
@@ -371,7 +420,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerId, for: indexPath) as! SearchHeader
-        let events = searchEvents
+        let events = searchActivities
         header.verticalController.favAct = favAct
         header.verticalController.events = events
         header.verticalController.collectionView.reloadData()
@@ -393,6 +442,15 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return .init(width: view.frame.width, height: headerheight)
+    }
+    
+    func checkIfThereAnyActivities() {
+        if searchActivities.count > 0 {
+            viewPlaceholder.remove(from: view, priority: .medium)
+        } else {
+            viewPlaceholder.add(for: view, title: .emptyEvents, subtitle: .emptyRecipesEvents, priority: .medium, position: .top)
+        }
+        collectionView?.reloadData()
     }
     
     @objc func filter() {
@@ -418,9 +476,10 @@ extension EventTypeViewController: UpdateFilter {
         if !filterDictionary.values.isEmpty {
             showGroups = false
             self.filterDictionary = filterDictionary
-            complexSearch(query: "", eventType: filterDictionary["eventType"]?[0] ?? "", eventStartDate: filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: filterDictionary["eventEndDate"]?[0] ?? "", zipcode: filterDictionary["zipcode"]?[0] ?? "", city: filterDictionary["city"]?[0] ?? "", state: filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "")
+            complexSearch(query: "", eventType: filterDictionary["eventType"]?[0] ?? "", eventStartDate: filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: filterDictionary["eventEndDate"]?[0] ?? "", zipcode: filterDictionary["zipcode"]?[0] ?? "", city: filterDictionary["city"]?[0] ?? "", state: filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         } else {
-            searchEvents = [Event]()
+            viewPlaceholder.remove(from: view, priority: .medium)
+            searchActivities = [Event]()
             self.filterDictionary = filterDictionary
             showGroups = true
             headerheight = 0

@@ -3,8 +3,6 @@
         "name": "Example Trip",
         "activityType": "Vacation",
         "activityDescription" : "Example Trip to Edinburgh and St Andrews with Schedule and Checklist.",
-        "activityOriginalPhotoURL" : "https://firebasestorage.googleapis.com/v0/b/messenging-app-94621.appspot.com/o/userProfilePictures%2F757D55C7-CA5D-4855-8E24-19BFDCB8110D?alt=media&token=12556a57-6756-4f9e-93db-6be4f19a29f9",
-        "activityThumbnailPhotoURL" : "https://firebasestorage.googleapis.com/v0/b/messenging-app-94621.appspot.com/o/userProfilePictures%2F1382053A-7F70-45C9-8177-58A88D070E92?alt=media&token=e2a6f527-54c6-4a04-b453-0e9c6b54a303",
         "locationAddress" : {
           "1 Dublin Street Lane North" : [ 55.9580803, -3.193311 ],
           "Aizle" : [ 55.9418449, -3.1790042 ],

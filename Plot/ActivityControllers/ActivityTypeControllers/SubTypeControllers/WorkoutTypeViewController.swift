@@ -16,11 +16,12 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
     fileprivate var workoutReference: DatabaseReference!
     
     var groups = [[Workout]]()
-    var searchWorkouts = [Workout]()
+    var searchActivities = [Workout]()
 
     var filters: [filter] = [.workoutType, .muscles, .duration]
     var filterDictionary = [String: [String]]()
     var sections: [String] = ["Quick", "HIIT", "Cardio"]
+
 
             
     override func viewDidLoad() {
@@ -56,14 +57,19 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased(), workoutType: self.filterDictionary["workoutType"] ?? [], muscles: self.filterDictionary["muscles"] ?? [], duration: self.filterDictionary["duration"] ?? [])
+            self.complexSearch(query: searchText.lowercased(), workoutType: self.filterDictionary["workoutType"]?[0] ?? "", muscles: self.filterDictionary["muscles"] ?? [], duration: self.filterDictionary["duration"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         })
     }
     
-    func complexSearch(query: String, workoutType: [String], muscles: [String], duration: [String]) {
-        print("query \(query), workoutType \(workoutType), muscles \(muscles), duration \(duration)")
+    func complexSearch(query: String, workoutType: String, muscles: [String], duration: String, favorites: String) {
+        print("query \(query), workoutType \(workoutType), muscles \(muscles), duration \(duration), favorites \(favorites)")
+        
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
 
-        self.searchWorkouts = [Workout]()
+        self.searchActivities = [Workout]()
         var workoutIDs = [String]()
         self.workoutTypeReference = Database.database().reference().child("workouts").child("types_of_workouts")
 
@@ -80,68 +86,128 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
 
         let dispatchGroup = DispatchGroup()
         
-        for type in workoutType {
-            dispatchGroup.enter()
-            var newValue = String()
-            if type == "Strength" {
-                newValue = "workout"
-            } else {
-                newValue = type.replacingOccurrences(of: " ", with: "_")
+        if favorites == "true" {
+            if let workouts = self.favAct["workouts"] {
+                workoutIDs = workouts
+                for workoutID in workouts {
+                    var include = true
+                    if workoutType != "" {
+                        dispatchGroup.enter()
+                        var newValue = String()
+                        if workoutType == "Strength" {
+                            newValue = "workout"
+                        } else {
+                            newValue = workoutType.replacingOccurrences(of: " ", with: "_")
+                            newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                            newValue = newValue.lowercased()
+                        }
+                    self.workoutTypeReference.child("type_of_workouts").child(newValue).child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if !snapshot.exists() {
+                                include = false
+                                if let index = workoutIDs.firstIndex(of: workoutID) {
+                                    workoutIDs.remove(at: index)
+                                }
+                            }
+                            dispatchGroup.leave()
+                        })
+                    }
+                    guard include == true else { continue }
+                    for muscle in muscles {
+                        dispatchGroup.enter()
+                        var newValue = muscle.replacingOccurrences(of: " ", with: "_")
+                        newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                        newValue = newValue.lowercased()
+                    self.workoutTypeReference.child("muscle_groups").child(newValue).child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                        if !snapshot.exists() {
+                            include = false
+                            if let index = workoutIDs.firstIndex(of: workoutID) {
+                                workoutIDs.remove(at: index)
+                            }
+                        }
+                            dispatchGroup.leave()
+                        })
+                    }
+                    guard include == true else { continue }
+                    if duration != "" {
+                        dispatchGroup.enter()
+                        var newValue = duration.replacingOccurrences(of: " ", with: "_")
+                        newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                        newValue = newValue.lowercased()
+                    self.workoutTypeReference.child("workout_durations").child(newValue).child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                        if !snapshot.exists() {
+                            include = false
+                            if let index = workoutIDs.firstIndex(of: workoutID) {
+                                workoutIDs.remove(at: index)
+                            }
+                        }
+                        dispatchGroup.leave()
+                        })
+                    }
+                }
+            }
+        } else {
+            if workoutType != "" {
+                dispatchGroup.enter()
+                var newValue = String()
+                if workoutType == "Strength" {
+                    newValue = "workout"
+                } else {
+                    newValue = workoutType.replacingOccurrences(of: " ", with: "_")
+                    newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                    newValue = newValue.lowercased()
+                }
+                print("newValue \(newValue)")
+                self.workoutTypeReference.child("type_of_workouts").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                    print("snapshot \(snapshot)")
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                        print("workoutsSnapshotValue \(workoutsSnapshotValue)")
+                        workoutIDs += workoutsSnapshotValue
+                        print("workoutIDs \(workoutIDs)")
+                    }
+                    dispatchGroup.leave()
+                })
+            }
+            
+            for muscle in muscles {
+                dispatchGroup.enter()
+                var newValue = muscle.replacingOccurrences(of: " ", with: "_")
                 newValue = newValue.replacingOccurrences(of: "/", with: "&")
                 newValue = newValue.lowercased()
+                print("newValue \(newValue)")
+                self.workoutTypeReference.child("muscle_groups").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                        print("workoutsSnapshotValue \(workoutsSnapshotValue)")
+                        let existingWorkoutIDsSet = Set(workoutIDs)
+                        let newWorkoutIDsSet = Set(workoutsSnapshotValue)
+                        let bothWorkoutIDsSet = existingWorkoutIDsSet.intersection(newWorkoutIDsSet)
+                        workoutIDs = Array(bothWorkoutIDsSet)
+                        print("workoutIDs \(workoutIDs)")
+                    }
+                    dispatchGroup.leave()
+                })
             }
-            print("newValue \(newValue)")
-            self.workoutTypeReference.child("type_of_workouts").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
-                print("snapshot \(snapshot)")
-                if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
-                    print("workoutsSnapshotValue \(workoutsSnapshotValue)")
-                    workoutIDs += workoutsSnapshotValue
-                    print("workoutIDs \(workoutIDs)")
-                }
-                dispatchGroup.leave()
-            })
-        }
-        
-        for muscle in muscles {
-            dispatchGroup.enter()
-            var newValue = muscle.replacingOccurrences(of: " ", with: "_")
-            newValue = newValue.replacingOccurrences(of: "/", with: "&")
-            newValue = newValue.lowercased()
-            print("newValue \(newValue)")
-            self.workoutTypeReference.child("muscle_groups").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
-                    print("workoutsSnapshotValue \(workoutsSnapshotValue)")
-                    let existingWorkoutIDsSet = Set(workoutIDs)
-                    let newWorkoutIDsSet = Set(workoutsSnapshotValue)
-                    let bothWorkoutIDsSet = existingWorkoutIDsSet.intersection(newWorkoutIDsSet)
-                    workoutIDs = Array(bothWorkoutIDsSet)
-                    print("workoutIDs \(workoutIDs)")
-                }
-                dispatchGroup.leave()
-            })
-        }
-        
-        for time in duration {
-            dispatchGroup.enter()
-            var newValue = time.replacingOccurrences(of: " ", with: "_")
-            newValue = newValue.replacingOccurrences(of: "/", with: "&")
-            newValue = newValue.lowercased()
-            print("newValue \(newValue)")
-            self.workoutTypeReference.child("workout_durations").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
-                    print("workoutsSnapshotValue \(workoutsSnapshotValue)")
-                    let existingWorkoutIDsSet = Set(workoutIDs)
-                    let newWorkoutIDsSet = Set(workoutsSnapshotValue)
-                    let bothWorkoutIDsSet = existingWorkoutIDsSet.intersection(newWorkoutIDsSet)
-                    workoutIDs = Array(bothWorkoutIDsSet)
-                    print("workoutIDs \(workoutIDs)")
-                }
-                dispatchGroup.leave()
-            })
+            
+            if duration != "" {
+                dispatchGroup.enter()
+                var newValue = duration.replacingOccurrences(of: " ", with: "_")
+                newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                newValue = newValue.lowercased()
+                print("newValue \(newValue)")
+                self.workoutTypeReference.child("workout_durations").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                        print("workoutsSnapshotValue \(workoutsSnapshotValue)")
+                        let existingWorkoutIDsSet = Set(workoutIDs)
+                        let newWorkoutIDsSet = Set(workoutsSnapshotValue)
+                        let bothWorkoutIDsSet = existingWorkoutIDsSet.intersection(newWorkoutIDsSet)
+                        workoutIDs = Array(bothWorkoutIDsSet)
+                        print("workoutIDs \(workoutIDs)")
+                    }
+                    dispatchGroup.leave()
+                })
+            }
         }
         
         print("workoutIDs \(workoutIDs)")
-        
         dispatchGroup.notify(queue: .main) {
             print("looking up workouts")
             if query == "" {
@@ -153,14 +219,13 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
                         if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
                             if let workout = try? FirebaseDecoder().decode(Workout.self, from:      workoutSnapshotValue) {
                                 print("workoutSnapshotValue \(workoutSnapshotValue)")
-                                print("added workout to searchWorkouts")
+                                print("added workout to searchActivities")
                                 print(workout.identifier)
-                                self.removeSpinner()
-                                self.searchWorkouts.append(workout)
+                                self.searchActivities.append(workout)
                                 self.collectionView.reloadData()
-                                dispatchGroup.leave()
                             }
                         }
+                        dispatchGroup.leave()
                       })
                 }
             } else {
@@ -176,28 +241,40 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
                                 let tags = workout.tagsStr ?? ""
                                 let title = workout.title
                                 if notes.contains(query) || tags.contains(query) || title.contains(query) {
-                                    print("added workout to searchWorkouts")
+                                    print("added workout to searchActivities")
                                     print(workout.identifier)
-                                    self.removeSpinner()
-                                    self.searchWorkouts.append(workout)
+                                    self.searchActivities.append(workout)
                                     self.collectionView.reloadData()
                                 }
-                                dispatchGroup.leave()
                             }
                         }
+                        dispatchGroup.leave()
                       })
                 }
             }
         }
         self.removeSpinner()
+        checkIfThereAnyActivities()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchWorkouts = [Workout]()
-        showGroups = true
-        headerheight = 0
-        cellheight = 397
-        self.collectionView.reloadData()
+        if !filterDictionary.values.isEmpty && searchActivities.isEmpty {
+            showGroups = false
+            complexSearch(query: "", workoutType: self.filterDictionary["workoutType"]?[0] ?? "", muscles: self.filterDictionary["muscles"] ?? [], duration: self.filterDictionary["duration"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+        } else if !filterDictionary.values.isEmpty && !searchActivities.isEmpty {
+            self.checkIfThereAnyActivities()
+            showGroups = false
+            self.headerheight = view.frame.height
+            self.cellheight = 0
+            self.collectionView.reloadData()
+        } else {
+            viewPlaceholder.remove(from: view, priority: .medium)
+            searchActivities = [Workout]()
+            showGroups = true
+            headerheight = 0
+            cellheight = 397
+            checkIfThereAnyActivities()
+        }
     }
     
     fileprivate func fetchData() {
@@ -385,15 +462,13 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
         return cell
     }
     
-    
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: view.frame.width, height: cellheight)
     }
     
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerId, for: indexPath) as! SearchHeader
-        let workouts = searchWorkouts
+        let workouts = searchActivities
         header.verticalController.favAct = favAct
         header.verticalController.workouts = workouts
         header.verticalController.collectionView.reloadData()
@@ -420,6 +495,16 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
         return .init(width: view.frame.width, height: headerheight)
     }
     
+    
+    func checkIfThereAnyActivities() {
+        if searchActivities.count > 0 {
+            viewPlaceholder.remove(from: view, priority: .medium)
+        } else {
+            viewPlaceholder.add(for: view, title: .emptyWorkouts, subtitle: .emptyWorkouts, priority: .medium, position: .top)
+        }
+        collectionView?.reloadData()
+    }
+    
     @objc func filter() {
         let destination = FilterViewController()
         let navigationViewController = UINavigationController(rootViewController: destination)
@@ -443,9 +528,10 @@ extension WorkoutTypeViewController: UpdateFilter {
         if !filterDictionary.values.isEmpty {
             showGroups = false
             self.filterDictionary = filterDictionary
-            complexSearch(query: "", workoutType: filterDictionary["workoutType"] ?? [], muscles: filterDictionary["muscles"] ?? [], duration: filterDictionary["duration"] ?? [])
+            complexSearch(query: "", workoutType: self.filterDictionary["workoutType"]?[0] ?? "", muscles: self.filterDictionary["muscles"] ?? [], duration: self.filterDictionary["duration"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         } else {
-            searchWorkouts = [Workout]()
+            viewPlaceholder.remove(from: view, priority: .medium)
+            searchActivities = [Workout]()
             self.filterDictionary = filterDictionary
             showGroups = true
             headerheight = 0

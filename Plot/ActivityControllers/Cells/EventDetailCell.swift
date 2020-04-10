@@ -28,7 +28,6 @@ class EventDetailCell: UICollectionViewCell {
     let clickView: UIView = {
         let view = UIView()
         view.isUserInteractionEnabled = true
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
    
@@ -36,21 +35,24 @@ class EventDetailCell: UICollectionViewCell {
         let label = UILabel()
 //        label.textColor = FalconPalette.ticketmaster
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = UIFont.systemFont(ofSize: 18)
+        label.font = UIFont.preferredFont(forTextStyle: .body)
         label.text = "Go to Ticketmaster"
         label.numberOfLines = 1
-        label.isUserInteractionEnabled = true
         return label
     }()
    
     func setupViews() {
         
-        clickView.constrainHeight(constant: 20)
-        addSubview(clickView)
+        clickView.constrainHeight(constant: 17)
+        
         clickView.addSubview(getTixLabel)
-
-        clickView.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        getTixLabel.anchor(top: clickView.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 0))
+        getTixLabel.anchor(top: clickView.topAnchor, leading: clickView.leadingAnchor, bottom: nil, trailing: clickView.trailingAnchor, padding: .init(top: 2, left: 15, bottom: 0, right: 15))
+        
+        let stackView = VerticalStackView(arrangedSubviews:
+            [clickView
+            ], spacing: 0)
+        addSubview(stackView)
+        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 10, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         clickView.addGestureRecognizer(viewGesture)

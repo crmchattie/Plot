@@ -44,7 +44,7 @@ struct Recipe: Codable {
     let nutrition: Nutrition?
     let summary: String?
     let cuisines, dishTypes: [String]?
-    let diets, occasions: [JSONAny]?
+    let diets, occasions: [String]?
     let winePairing: WinePairing?
     let instructions: String?
     let analyzedInstructions: [AnalyzedInstruction]?
