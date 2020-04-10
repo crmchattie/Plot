@@ -174,8 +174,11 @@ class EventDetailViewController: ActivityDetailViewController {
                         startDateTime = date
                         endDateTime = date
                     } else {
-                        startDateTime = Date()
-                        endDateTime = Date()
+                        let original = Date()
+                        let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        startDateTime = rounded
+                        endDateTime = rounded
                     }
                     cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
                     cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
@@ -183,6 +186,8 @@ class EventDetailViewController: ActivityDetailViewController {
                     cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
                     cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
                 }
+                cell.startDatePicker.date = startDateTime!
+                cell.endDatePicker.date = endDateTime!
                 cell.locationLabel.text = locationName
                 cell.participantsLabel.text = userNamesString
                 activity.eventID = "\(event.id)"

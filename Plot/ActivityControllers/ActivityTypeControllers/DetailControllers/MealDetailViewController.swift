@@ -151,14 +151,19 @@ class MealDetailViewController: ActivityDetailViewController {
             if let recipe = recipe {
                 cell.recipe = recipe
                 if startDateTime == nil && endDateTime == nil {
-                    startDateTime = Date()
-                    endDateTime = Date().addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    startDateTime = rounded
+                    endDateTime = rounded.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
                     cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
                     cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
                 } else {
                     cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
                     cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
                 }
+                cell.startDatePicker.date = startDateTime!
+                cell.endDatePicker.date = endDateTime!
                 cell.locationLabel.text = locationName
                 cell.participantsLabel.text = userNamesString
                 activity.recipeID = "\(recipe.id)"

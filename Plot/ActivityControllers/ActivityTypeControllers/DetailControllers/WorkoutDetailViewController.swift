@@ -78,11 +78,14 @@ class WorkoutDetailViewController: ActivityDetailViewController {
             if let workout = workout {
                 cell.workout = workout
                 if startDateTime == nil && endDateTime == nil {
-                    startDateTime = Date()
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    startDateTime = rounded
                     if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
                         endDateTime = Date().addingTimeInterval(duration * 60)
                     } else {
-                        endDateTime = Date()
+                        endDateTime = rounded
                     }
                     cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
                     cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
@@ -90,6 +93,8 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                     cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
                     cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
                 }
+                cell.startDatePicker.date = startDateTime!
+                cell.endDatePicker.date = endDateTime!
                 cell.locationLabel.text = locationName
                 cell.participantsLabel.text = userNamesString
                 activity.workoutID = "\(workout.identifier)"

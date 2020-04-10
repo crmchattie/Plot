@@ -243,7 +243,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
     }()
    
     func setupViews() {
-        
+            
         if locationLabel.text == "Location" {
             locationInfoView.isHidden = true
         } else {

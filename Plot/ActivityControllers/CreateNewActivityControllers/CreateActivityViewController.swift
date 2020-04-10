@@ -469,9 +469,12 @@ class CreateActivityViewController: FormViewController {
                     
                     $0.updateCell()
                 } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    $0.value = Date().addingTimeInterval(seconds)
+                    $0.value = rounded.addingTimeInterval(seconds)
                     self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.startDateTime = $0.value
@@ -538,9 +541,12 @@ class CreateActivityViewController: FormViewController {
                     $0.updateCell()
                     
                 } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    $0.value = Date().addingTimeInterval(seconds)
+                    $0.value = rounded.addingTimeInterval(seconds)
                     self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.endDateTime = $0.value
