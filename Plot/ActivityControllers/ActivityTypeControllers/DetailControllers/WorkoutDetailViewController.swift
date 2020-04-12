@@ -31,8 +31,58 @@ class WorkoutDetailViewController: ActivityDetailViewController {
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
         collectionView.register(WorkoutDetailCell.self, forCellWithReuseIdentifier: kWorkoutDetailCell)
         collectionView.register(ExerciseDetailCell.self, forCellWithReuseIdentifier: kExerciseDetailCell)
+        
+        if activity == nil {
+            setMoreActivity()
+        }
 
                                         
+    }
+    
+    fileprivate func setMoreActivity() {
+        if let workout = workout {
+            activity.workoutID = "\(workout.identifier)"
+            if schedule, let umbrellaActivity = umbrellaActivity {
+                if let startDate = umbrellaActivity.startDateTime {
+                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                    if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
+                        endDateTime = startDateTime!.addingTimeInterval(duration * 60)
+                    } else {
+                        endDateTime = startDateTime
+                    }
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    startDateTime = rounded
+                    if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
+                        endDateTime = Date().addingTimeInterval(duration * 60)
+                    } else {
+                        endDateTime = rounded
+                    }
+                }
+                activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
+                activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
+                if let localName = umbrellaActivity.locationName, localName != "locationName", let localAddress = umbrellaActivity.locationAddress {
+                    locationName = localName
+                    locationAddress = localAddress
+                    activity.locationName = locationName
+                    activity.locationAddress = localAddress
+                }
+            } else if !schedule {
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                startDateTime = rounded
+                if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
+                    endDateTime = Date().addingTimeInterval(duration * 60)
+                } else {
+                    endDateTime = rounded
+                }
+            }
+            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
+        }
     }
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -76,28 +126,14 @@ class WorkoutDetailViewController: ActivityDetailViewController {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
             cell.delegate = self
             if let workout = workout {
-                cell.workout = workout
-                if startDateTime == nil && endDateTime == nil {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    startDateTime = rounded
-                    if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
-                        endDateTime = Date().addingTimeInterval(duration * 60)
-                    } else {
-                        endDateTime = rounded
-                    }
-                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
-                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
-                } else {
-                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
-                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
-                }
-                cell.startDatePicker.date = startDateTime!
-                cell.endDatePicker.date = endDateTime!
                 cell.locationLabel.text = locationName
                 cell.participantsLabel.text = userNamesString
-                activity.workoutID = "\(workout.identifier)"
+                cell.rightReminderLabel.text = reminder
+                cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
+                cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
+                cell.startDatePicker.date = startDateTime!
+                cell.endDatePicker.date = endDateTime!
+                cell.workout = workout
                 return cell
             } else {
                 return cell
@@ -311,6 +347,7 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
                 }
                 self.activity.locationName = "Location"
                 self.locationName = "Location"
+                self.collectionView.reloadData()
             }
             let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
                 print("You've pressed cancel")
@@ -358,6 +395,8 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
         
         let noneAddress = UIAlertAction(title: EventAlert.None.rawValue, style: .default) { (action:UIAlertAction) in
             print("none")
+            self.reminder = EventAlert.None.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.None.description
             if self.active {
                 self.scheduleReminder()
@@ -365,6 +404,8 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let atTimeAddress = UIAlertAction(title: EventAlert.At_time_of_event.rawValue, style: .default) { (action:UIAlertAction) in
             print("atTimeAddress")
+            self.reminder = EventAlert.At_time_of_event.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.At_time_of_event.description
             if self.active {
                 self.scheduleReminder()
@@ -373,6 +414,8 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let fifteenAddress = UIAlertAction(title: EventAlert.Fifteen_Minutes.rawValue, style: .default) { (action:UIAlertAction) in
             print("fifteenAddress")
+            self.reminder = EventAlert.Fifteen_Minutes.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.Fifteen_Minutes.description
             if self.active {
                 self.scheduleReminder()
@@ -380,6 +423,8 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let halfHourAddress = UIAlertAction(title: EventAlert.Half_Hour.rawValue, style: .default) { (action:UIAlertAction) in
             print("halfHourAddress")
+            self.reminder = EventAlert.Half_Hour.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.Half_Hour.description
             if self.active {
                 self.scheduleReminder()
@@ -387,6 +432,8 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let oneHourAddress = UIAlertAction(title: EventAlert.One_Hour.rawValue, style: .default) { (action:UIAlertAction) in
             print("oneHourAddress")
+            self.reminder = EventAlert.One_Hour.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Hour.description
             if self.active {
                 self.scheduleReminder()
@@ -394,6 +441,8 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let oneDayAddress = UIAlertAction(title: EventAlert.One_Day.rawValue, style: .default) { (action:UIAlertAction) in
             print("oneDayAddress")
+            self.reminder = EventAlert.One_Day.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Day.description
             if self.active {
                 self.scheduleReminder()
@@ -401,6 +450,8 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let oneWeekAddress = UIAlertAction(title: EventAlert.One_Week.rawValue, style: .default) { (action:UIAlertAction) in
             print("oneWeekAddress")
+            self.reminder = EventAlert.One_Week.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Week.description
             if self.active {
                 self.scheduleReminder()
@@ -408,6 +459,8 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let oneMonthAddress = UIAlertAction(title: EventAlert.One_Month.rawValue, style: .default) { (action:UIAlertAction) in
             print("oneMonthAddress")
+            self.reminder = EventAlert.One_Month.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Month.description
             if self.active {
                 self.scheduleReminder()
@@ -430,117 +483,6 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
         
     }
     
-}
-
-extension WorkoutDetailViewController: ActivityDetailCellDelegate {
-    func plusButtonTapped(type: Any) {
-        print("plusButtonTapped")
-        let alert = UIAlertController(title: "Add Activity", message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Create New Activiy", style: .default, handler: { (_) in
-            print("User click Approve button")
-            self.createNewActivity()
-            
-        }))
-
-        alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
-            print("User click Edit button")
-                // Fallback on earlier versions
-                    
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-    }
-    
-    func shareButtonTapped(activityObject: ActivityObject) {
-        
-        let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
-            print("User click Approve button")
-            let destination = ChooseChatTableViewController()
-            let navController = UINavigationController(rootViewController: destination)
-            destination.activityObject = activityObject
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.filteredConversations = self.conversations
-            destination.filteredPinnedConversations = self.conversations
-            self.present(navController, animated: true, completion: nil)
-            
-        }))
-
-        alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
-            print("User click Edit button")
-                // Fallback on earlier versions
-            let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
-            guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
-                else { return }
-            let shareContent: [Any] = [shareText, url]
-            let activityController = UIActivityViewController(activityItems: shareContent,
-                                                              applicationActivities: nil)
-            self.present(activityController, animated: true, completion: nil)
-            activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-            Bool, arrayReturnedItems: [Any]?, error: Error?) in
-                if completed {
-                    print("share completed")
-                    return
-                } else {
-                    print("cancel")
-                }
-                if let shareError = error {
-                    print("error while sharing: \(shareError.localizedDescription)")
-                }
-            }
-            
-        }))
-        
-
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-        print("shareButtonTapped")
-    }
-    
-    func heartButtonTapped(type: Any) {
-        print("heartButtonTapped")
-        if let currentUserID = Auth.auth().currentUser?.uid {
-            let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
-            if let workout = type as? Workout {
-                print(workout.title)
-                databaseReference.child("workouts").observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists() {
-                        var value = snapshot.value as! [String]
-                        if value.contains("\(workout.identifier)") {
-                            if let index = value.firstIndex(of: "\(workout.identifier)") {
-                                value.remove(at: index)
-                            }
-                            databaseReference.updateChildValues(["workouts": value as NSArray])
-                        } else {
-                            value.append("\(workout.identifier)")
-                            databaseReference.updateChildValues(["workouts": value as NSArray])
-                        }
-                        self.favAct["workouts"] = value
-                    } else {
-                        self.favAct["workouts"] = ["\(workout.identifier)"]
-                        databaseReference.updateChildValues(["workouts": ["\(workout.identifier)"]])
-                    }
-                })
-            }
-        }
-        
-    }
-
 }
 
 extension WorkoutDetailViewController: WorkoutDetailCellDelegate {
@@ -643,5 +585,137 @@ extension WorkoutDetailViewController: UpdateLocationDelegate {
             }
         }
     }
+}
+
+extension WorkoutDetailViewController: ActivityDetailCellDelegate {
+    func plusButtonTapped(type: Any) {
+        print("plusButtonTapped")
+        let alert = UIAlertController(title: "Add Activity", message: nil, preferredStyle: .actionSheet)
+        
+        if let _ = activity {
+            alert.addAction(UIAlertAction(title: "Duplicate Activity", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new activity with updated time
+//                self.createNewActivity()
+            }))
+
+            alert.addAction(UIAlertAction(title: "Merge with Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                // ChooseActivityTableViewController
+                        
+            }))
+        
+        } else if schedule, let _ = umbrellaActivity {
+            alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
+                print("User click Approve button")
+                //add to schedule
+                
+            }))
+            
+        } else if !schedule {
+            alert.addAction(UIAlertAction(title: "Create New Activity", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new activity
+//                self.createNewActivity()
+            }))
+
+            alert.addAction(UIAlertAction(title: "Merge with Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                // ChooseActivityTableViewController
+            }))
+        }
+        
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+    }
+    
+    func shareButtonTapped(activityObject: ActivityObject) {
+        
+        let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
+
+        alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+            print("User click Approve button")
+            let destination = ChooseChatTableViewController()
+            let navController = UINavigationController(rootViewController: destination)
+            destination.activityObject = activityObject
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.filteredConversations = self.conversations
+            destination.filteredPinnedConversations = self.conversations
+            self.present(navController, animated: true, completion: nil)
+            
+        }))
+
+        alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+            print("User click Edit button")
+                // Fallback on earlier versions
+            let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+            guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+                else { return }
+            let shareContent: [Any] = [shareText, url]
+            let activityController = UIActivityViewController(activityItems: shareContent,
+                                                              applicationActivities: nil)
+            self.present(activityController, animated: true, completion: nil)
+            activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+            Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                if completed {
+                    print("share completed")
+                    return
+                } else {
+                    print("cancel")
+                }
+                if let shareError = error {
+                    print("error while sharing: \(shareError.localizedDescription)")
+                }
+            }
+            
+        }))
+        
+
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        print("shareButtonTapped")
+    }
+    
+    func heartButtonTapped(type: Any) {
+        print("heartButtonTapped")
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+            if let workout = type as? Workout {
+                print(workout.title)
+                databaseReference.child("workouts").observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists() {
+                        var value = snapshot.value as! [String]
+                        if value.contains("\(workout.identifier)") {
+                            if let index = value.firstIndex(of: "\(workout.identifier)") {
+                                value.remove(at: index)
+                            }
+                            databaseReference.updateChildValues(["workouts": value as NSArray])
+                        } else {
+                            value.append("\(workout.identifier)")
+                            databaseReference.updateChildValues(["workouts": value as NSArray])
+                        }
+                        self.favAct["workouts"] = value
+                    } else {
+                        self.favAct["workouts"] = ["\(workout.identifier)"]
+                        databaseReference.updateChildValues(["workouts": ["\(workout.identifier)"]])
+                    }
+                })
+            }
+        }
+        
+    }
+
 }
 

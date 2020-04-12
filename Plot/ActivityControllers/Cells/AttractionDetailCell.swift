@@ -83,7 +83,7 @@ class AttractionDetailCell: UICollectionViewCell {
         nameDetailStackView.fillSuperview(padding: .init(top: 0, left: 25, bottom: 15, right: 15))
         
         let eventGesture = UITapGestureRecognizer(target: self, action: #selector(labelTapped(_:)))
-        nameLabel.addGestureRecognizer(eventGesture)
+        nameDetailStackView.addGestureRecognizer(eventGesture)
        
             
     }

@@ -8,7 +8,7 @@
 
 import Eureka
 
-final class ScheduleCell: Cell<Schedule>, CellType {
+final class ScheduleCell: Cell<Activity>, CellType {
     
     var formattedDate: (String, String) = ("", "")
     var allDay: Bool = false
@@ -122,7 +122,6 @@ final class ScheduleCell: Cell<Schedule>, CellType {
 
         guard let schedule = row.value else { return }
 
-        
         if let startDate = schedule.startDateTime as? TimeInterval, let endDate = schedule.endDateTime as? TimeInterval, let allDay = schedule.allDay {
             let startDate = Date(timeIntervalSince1970: startDate)
             let endDate = Date(timeIntervalSince1970: endDate)

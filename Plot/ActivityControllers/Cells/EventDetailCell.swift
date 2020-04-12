@@ -40,19 +40,34 @@ class EventDetailCell: UICollectionViewCell {
         label.numberOfLines = 1
         return label
     }()
+    
+    let clickArrowView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "chevronRightBlack")!.withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        return imageView
+    }()
    
     func setupViews() {
         
         clickView.constrainHeight(constant: 17)
+        clickArrowView.constrainWidth(constant: 16)
+        clickArrowView.constrainHeight(constant: 16)
         
         clickView.addSubview(getTixLabel)
+        clickView.addSubview(clickArrowView)
         getTixLabel.anchor(top: clickView.topAnchor, leading: clickView.leadingAnchor, bottom: nil, trailing: clickView.trailingAnchor, padding: .init(top: 2, left: 15, bottom: 0, right: 15))
+        clickArrowView.anchor(top: nil, leading: nil, bottom: nil, trailing: clickView.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 15))
+        clickArrowView.centerYAnchor.constraint(equalTo: getTixLabel.centerYAnchor).isActive = true
         
         let stackView = VerticalStackView(arrangedSubviews:
             [clickView
             ], spacing: 0)
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 10, right: 0))
+        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 15, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         clickView.addGestureRecognizer(viewGesture)

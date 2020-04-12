@@ -15,14 +15,14 @@ import EventKit
 
 
 protocol UpdateScheduleDelegate: class {
-    func updateSchedule(schedule: Schedule)
+    func updateSchedule(schedule: Activity)
 }
 
 class ScheduleViewController: FormViewController {
     
     weak var delegate : UpdateScheduleDelegate?
     
-    var schedule: Schedule!
+    var schedule: Activity!
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -47,10 +47,10 @@ class ScheduleViewController: FormViewController {
         
         if schedule != nil {
             active = true
-            if schedule.scheduleID != nil {
-                scheduleID = schedule.scheduleID!
+            if schedule.activityID != nil {
+                scheduleID = schedule.activityID!
             } else {
-                schedule.scheduleID = UUID().uuidString
+                schedule.activityID = UUID().uuidString
             }
             for ID in schedule!.participantsIDs!{
                 // users equals ACTIVITY selected falcon users
@@ -67,7 +67,8 @@ class ScheduleViewController: FormViewController {
                 checklistDict = schedule.checklist!
             }
         } else {
-            schedule = Schedule(dictionary: ["name" : "Mini Activity Name" as AnyObject])
+            scheduleID = UUID().uuidString
+            schedule = Activity(dictionary: ["activityID": scheduleID as AnyObject])
         }
             
         initializeForm()
@@ -147,8 +148,8 @@ class ScheduleViewController: FormViewController {
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
-                if self.active && self.schedule.scheduleType != nil && self.schedule.scheduleType != "nothing" {
-                    $0.value = self.schedule.scheduleType
+                if self.active && self.schedule.activityType != nil && self.schedule.activityType != "nothing" {
+                    $0.value = self.schedule.activityType
                 }
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -162,8 +163,8 @@ class ScheduleViewController: FormViewController {
                 $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
-                if self.active && self.schedule.scheduleDescription != nil && self.schedule.scheduleDescription != "nothing" {
-                    $0.value = self.schedule.scheduleDescription
+                if self.active && self.schedule.activityDescription != nil && self.schedule.activityDescription != "nothing" {
+                    $0.value = self.schedule.activityDescription
                 }
                 }.cellUpdate({ (cell, row) in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -541,20 +542,16 @@ class ScheduleViewController: FormViewController {
         
         let valuesDictionary = form.values()
         
-        schedule.scheduleID = scheduleID
+        schedule.activityID = scheduleID
 
         schedule.name = valuesDictionary["Mini Activity Name"] as? String
 
         if let value = valuesDictionary["Mini Activity Type"] as? String {
-            schedule.scheduleType = value
-        } else {
-            schedule.scheduleType = "nothing"
+            schedule.activityType = value
         }
         
         if let value = valuesDictionary["Description"] as? String {
-            schedule.scheduleDescription = value
-        } else {
-            schedule.scheduleDescription = "nothing"
+            schedule.activityDescription = value
         }
 
         schedule.locationName = self.locationName
@@ -562,8 +559,6 @@ class ScheduleViewController: FormViewController {
 
         if let value = valuesDictionary["Transportation"] as? String {
             schedule.transportation = value
-        } else {
-            schedule.transportation = "nothing"
         }
         
         schedule.allDay = valuesDictionary["All-day"] as? Bool

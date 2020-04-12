@@ -14,7 +14,7 @@ import SplitRow
 import ViewRow
 import EventKit
 import UserNotifications
-//import Contacts
+import CodableFirebase
 
 
 class CreateActivityViewController: FormViewController {
@@ -32,7 +32,7 @@ class CreateActivityViewController: FormViewController {
     let avatarOpener = AvatarOpener()
     var locationName : String = "locationName"
     var locationAddress = [String : [Double]]()
-    var scheduleList = [Schedule]()
+    var scheduleList = [Activity]()
     var purchaseList = [Purchase]()
     var purchaseDict = [User: Double]()
     var checklistDict = [String: [String : Bool]]()
@@ -528,7 +528,6 @@ class CreateActivityViewController: FormViewController {
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
-                    
                     if self.activity.allDay == true {
                         $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .none
@@ -537,7 +536,6 @@ class CreateActivityViewController: FormViewController {
                         $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .short
                     }
-                    
                     $0.updateCell()
                     
                 } else {
@@ -1086,7 +1084,7 @@ class CreateActivityViewController: FormViewController {
         if type == "schedule" {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             if scheduleList.isEmpty {
-                activity.schedule = [Schedule]()
+                activity.schedule = [Activity]()
                 groupActivityReference.child("schedule").removeValue()
             } else {
                 print("schedule list is not empty")
@@ -1174,15 +1172,6 @@ class CreateActivityViewController: FormViewController {
                 completion?(false, error as NSError?)
             }
         })
-    }
-    
-    func storeReminder() {
-        if let currentUserID = Auth.auth().currentUser?.uid {
-            let userReference = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : AnyObject] = ["reminder": activity!.reminder as AnyObject]
-            userReference.updateChildValues(values)
-            scheduleReminder()
-        }
     }
     
     func scheduleReminder() {
@@ -1314,22 +1303,103 @@ class CreateActivityViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        let destination = ScheduleViewController()
-        destination.users = acceptedParticipant
-        destination.filteredUsers = acceptedParticipant
-        destination.startDateTime = startDateTime
-        destination.endDateTime = endDateTime
         if scheduleList.indices.contains(scheduleIndex) {
-            destination.schedule = scheduleList[scheduleIndex]
-            if let scheduleLocationAddress = scheduleList[scheduleIndex].locationAddress {
-                for (key, _) in scheduleLocationAddress {
-                    locationAddress[key] = nil
+            let dispatchGroup = DispatchGroup()
+            let scheduleItem = scheduleList[scheduleIndex]
+            if let recipeString = scheduleItem.recipeID, let recipeID = Int(recipeString) {
+                dispatchGroup.enter()
+                Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
+                    let detailedRecipe = search
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = MealDetailViewController()
+                        destination.activity = scheduleItem
+                        destination.recipe = detailedRecipe
+                        destination.detailedRecipe = detailedRecipe
+                        destination.users = self.acceptedParticipant
+                        destination.filteredUsers = self.acceptedParticipant
+                        self.navigationController?.pushViewController(destination, animated: true)
+                    }
                 }
+            } else if let eventID = scheduleItem.eventID {
+                dispatchGroup.enter()
+                Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
+                    if let events = search?.embedded?.events {
+                        let event = events[0]
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            let destination = EventDetailViewController()
+                            destination.activity = scheduleItem
+                            destination.event = event
+                            destination.users = self.acceptedParticipant
+                            destination.filteredUsers = self.acceptedParticipant
+                            self.navigationController?.pushViewController(destination, animated: true)
+                        }
+                    }
+                }
+            } else if let workoutID = scheduleItem.workoutID {
+                var reference = Database.database().reference()
+                let destination = WorkoutDetailViewController()
+                dispatchGroup.enter()
+                reference = Database.database().reference().child("workouts").child("workouts")
+                reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                        if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                            dispatchGroup.leave()
+                            destination.activity = scheduleItem
+                            destination.workout = workout
+                            destination.intColor = 0
+                            destination.users = self.acceptedParticipant
+                            destination.filteredUsers = self.acceptedParticipant
+                            self.navigationController?.pushViewController(destination, animated: true)
+                        }
+                    }
+                  })
+                { (error) in
+                    print(error.localizedDescription)
+                }
+            } else if let attractionID = scheduleItem.attractionID {
+                dispatchGroup.enter()
+                Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
+                    let attraction = search?.embedded?.attractions![0]
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = EventDetailViewController()
+                        destination.activity = scheduleItem
+                        destination.attraction = attraction
+                        destination.users = self.acceptedParticipant
+                        destination.filteredUsers = self.acceptedParticipant
+                        destination.conversations = self.conversations
+                        self.navigationController?.pushViewController(destination, animated: true)
+                    }
+                }
+            } else {
+                let destination = ScheduleViewController()
+                destination.schedule = scheduleItem
+                destination.users = acceptedParticipant
+                destination.filteredUsers = acceptedParticipant
+                destination.startDateTime = startDateTime
+                destination.endDateTime = endDateTime
+                if let scheduleLocationAddress = scheduleList[scheduleIndex].locationAddress {
+                    for (key, _) in scheduleLocationAddress {
+                        locationAddress[key] = nil
+                    }
+                }
+                destination.delegate = self
+                self.navigationController?.pushViewController(destination, animated: true)
             }
+        } else {
+            let destination = ActivityTypeViewController()
+            destination.users = acceptedParticipant
+            destination.filteredUsers = acceptedParticipant
+            destination.selectedFalconUsers = acceptedParticipant
+            destination.umbrellaActivity = activity
+            destination.schedule = true
+//        destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+
         }
-        destination.delegate = self
-        self.navigationController?.pushViewController(destination, animated: true)
-        }
+    }
     
     @objc fileprivate func openPurchases() {
         guard currentReachabilityStatus != .notReachable else {
@@ -1351,42 +1421,19 @@ class CreateActivityViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-    
-        if !active {
-            activity.admin = Auth.auth().currentUser?.uid
-        }
         
-        storeReminder()
-    
-        var firebaseDictionary = activity.toAnyObject()
-        
-        let membersIDs = fetchMembersIDs()
-        
-        incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
+        showActivityIndicator()
+        let createActivity = CreateActivity(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+        createActivity.createNewActivity()
+        hideActivityIndicator()
         
         if active {
-            let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-            showActivityIndicator()
-            groupActivityReference.updateChildValues(firebaseDictionary)
-            hideActivityIndicator()
             if self.conversation == nil {
                 self.navigationController?.backToViewController(viewController: ActivityViewController.self)
             } else {
                 self.navigationController?.backToViewController(viewController: ChatLogController.self)
             }
         } else {
-            let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-            firebaseDictionary["participantsIDs"] = membersIDs.1 as AnyObject
-            
-            activityCreatingGroup.notify(queue: DispatchQueue.main, execute: {
-                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-//                    self.hideActivityIndicator()
-                }
-            })
-            activityCreatingGroup.enter()
-            activityCreatingGroup.enter()
-            createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
-            hideActivityIndicator()
             if self.conversation == nil {
                 self.navigationController?.backToViewController(viewController: ActivityViewController.self)
             } else {
@@ -1608,12 +1655,12 @@ class CreateActivityViewController: FormViewController {
     }
     
     func incrementBadgeForReciever(activityID: String?, participantsIDs: [String]) {
-            guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activityID else { return }
-            for participantID in participantsIDs where participantID != currentUserID {
-                runActivityBadgeUpdate(firstChild: participantID, secondChild: activityID)
-                runUserBadgeUpdate(firstChild: participantID)
-            }
+        guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activityID else { return }
+        for participantID in participantsIDs where participantID != currentUserID {
+            runActivityBadgeUpdate(firstChild: participantID, secondChild: activityID)
+            runUserBadgeUpdate(firstChild: participantID)
         }
+    }
 
     func runActivityBadgeUpdate(firstChild: String, secondChild: String) {
         var ref = Database.database().reference().child("user-activities").child(firstChild).child(secondChild)
@@ -1633,25 +1680,6 @@ class CreateActivityViewController: FormViewController {
             })
         })
     }
-}
-
-public func runUserBadgeUpdate(firstChild: String) {
-    var ref = Database.database().reference().child("users").child(firstChild)
-    ref.observeSingleEvent(of: .value, with: { (snapshot) in
-        
-        guard snapshot.hasChild("badge") else {
-            ref.updateChildValues(["badge": 1])
-            return
-        }
-        
-        ref = ref.child("badge")
-        ref.runTransactionBlock({ (mutableData) -> TransactionResult in
-            var value = mutableData.value as? Int
-            if value == nil { value = 0 }
-            mutableData.value = value! + 1
-            return TransactionResult.success(withValue: mutableData)
-        })
-    })
 }
 
 extension CreateActivityViewController: UITextFieldDelegate {
@@ -1742,10 +1770,10 @@ extension CreateActivityViewController: UpdateLocationDelegate {
 }
 
 extension CreateActivityViewController: UpdateScheduleDelegate {
-    func updateSchedule(schedule: Schedule) {
+    func updateSchedule(schedule: Activity) {
         if let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
             let scheduleRow = mvs.allRows[scheduleIndex]
-            if schedule.name != "Mini Activity Name" {
+            if let _ = schedule.name {
                 scheduleRow.baseValue = schedule
                 scheduleRow.updateCell()
                 if scheduleList.indices.contains(scheduleIndex) {

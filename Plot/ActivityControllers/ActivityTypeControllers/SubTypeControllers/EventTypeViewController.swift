@@ -385,7 +385,14 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+        cell.horizontalController.conversations = conversations
+        cell.horizontalController.users = users
+        cell.horizontalController.filteredUsers = filteredUsers
         cell.horizontalController.favAct = favAct
+        cell.horizontalController.conversation = conversation
+        cell.horizontalController.schedule = schedule
+        cell.horizontalController.umbrellaActivity = umbrellaActivity
+        cell.horizontalController.selectedFalconUsers = selectedFalconUsers
         cell.arrowView.isHidden = true
         cell.delegate = self
         if showGroups {
@@ -398,12 +405,21 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                     if let event = event as? Event {
                         print("event \(String(describing: event.name))")
                         let destination = EventDetailViewController()
-                        destination.hidesBottomBarWhenPushed = true
+                        if let umbrellaActivity = self!.umbrellaActivity {
+                            destination.schedule = true
+                            destination.umbrellaActivity = umbrellaActivity
+                        } else {
+                            destination.schedule = false
+                        }
                         destination.favAct = favAct
                         destination.event = event
                         destination.users = self!.users
                         destination.filteredUsers = self!.filteredUsers
                         destination.conversations = self!.conversations
+                        destination.conversation = self!.conversation
+                        destination.schedule = self!.schedule
+                        destination.umbrellaActivity = self!.umbrellaActivity
+                        destination.selectedFalconUsers = self!.selectedFalconUsers
                         self?.navigationController?.pushViewController(destination, animated: true)
                     }
                 }
@@ -423,17 +439,28 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         let events = searchActivities
         header.verticalController.favAct = favAct
         header.verticalController.events = events
+        header.verticalController.conversations = conversations
+        header.verticalController.users = users
+        header.verticalController.filteredUsers = filteredUsers
+        header.verticalController.favAct = favAct
+        header.verticalController.conversation = conversation
+        header.verticalController.schedule = schedule
+        header.verticalController.umbrellaActivity = umbrellaActivity
+        header.verticalController.selectedFalconUsers = selectedFalconUsers
         header.verticalController.collectionView.reloadData()
         header.verticalController.didSelectHandler = { [weak self] event, favAct in
             if let event = event as? Event {
                 print("event \(String(describing: event.name))")
                 let destination = EventDetailViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.favAct = favAct
                 destination.event = event
                 destination.users = self!.users
                 destination.filteredUsers = self!.filteredUsers
                 destination.conversations = self!.conversations
+                destination.conversation = self!.conversation
+                destination.schedule = self!.schedule
+                destination.umbrellaActivity = self!.umbrellaActivity
+                destination.selectedFalconUsers = self!.selectedFalconUsers
                 self?.navigationController?.pushViewController(destination, animated: true)
             }
         }

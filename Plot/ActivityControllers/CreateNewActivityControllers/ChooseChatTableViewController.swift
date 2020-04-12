@@ -211,24 +211,6 @@ class ChooseChatTableViewController: UITableViewController {
     }
   }
   
-  fileprivate func managePresense() {
-    if currentReachabilityStatus == .notReachable {
-      navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .connecting,
-                                                            activityPriority: .high,
-                                                            color: ThemeManager.currentTheme().generalTitleColor)
-    }
-    
-    let connectedReference = Database.database().reference(withPath: ".info/connected")
-    connectedReference.observe(.value, with: { (snapshot) in
-      
-      if self.currentReachabilityStatus != .notReachable {
-        self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
-      } else {
-        self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: ThemeManager.currentTheme().generalTitleColor)
-      }
-    })
-  }
-  
   func checkIfThereAnyActiveChats(isEmpty: Bool) {
     guard isEmpty else {
       viewPlaceholder.remove(from: view, priority: .medium)
@@ -265,28 +247,7 @@ class ChooseChatTableViewController: UITableViewController {
     }
   }
 
-    // MARK: - Table view data source
-  override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    return true
-  }
-  
-  override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-
-      return ""
-  }
-  
-  override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-      return 0
-  }
-    
-    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-      view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-      
-      if let headerTitle = view as? UITableViewHeaderFooterView {
-        headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-      }
-    }
-  
+    // MARK: - Table view data source  
   override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     return UITableView.automaticDimension
   }

@@ -192,7 +192,7 @@ class ActivityDetailCell: UICollectionViewCell {
             imageView,
             buttonStack,
             labelStackView
-            ], spacing: 0)
+            ], spacing: 5)
         addSubview(stackView)
         stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         

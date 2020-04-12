@@ -25,8 +25,13 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     
     var users = [User]()
     var filteredUsers = [User]()
+    var selectedFalconUsers = [User]()
     var conversations = [Conversation]()
+    var conversation : Conversation?
     var favAct = [String: [String]]()
+        
+    var umbrellaActivity: Activity!
+    var schedule: Bool = false
             
     let activityIndicatorView: UIActivityIndicatorView = {
         let aiv = UIActivityIndicatorView(style: .whiteLarge)
@@ -159,6 +164,46 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return .init(width: view.frame.width - 48, height: view.frame.height)
     }
+    
+//    func createNewActivity() {
+//        guard currentReachabilityStatus != .notReachable else {
+//            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+//            return
+//        }
+//        
+//        showActivityIndicator()
+//        let createActivity = CreateActivity(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+//        createActivity.createNewActivity()
+//        hideActivityIndicator()
+//        
+//        if active {
+//            if self.conversation == nil {
+//                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+//            } else {
+//                self.navigationController?.backToViewController(viewController: ChatLogController.self)
+//            }
+//        } else {
+//            if self.conversation == nil {
+//                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+//            } else {
+//                self.navigationController?.backToViewController(viewController: ChatLogController.self)
+//            }
+//        }
+//    }
+    
+    func showActivityIndicator() {
+        if let navController = self.navigationController {
+            self.showSpinner(onView: navController.view)
+        } else {
+            self.showSpinner(onView: self.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
 
     
 }
@@ -168,17 +213,24 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
         let alert = UIAlertController(title: "Add Activity", message: nil, preferredStyle: .actionSheet)
+        if let _ = umbrellaActivity {
+            alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
+                print("User click Approve button")
+                //add to schedule
+                
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "Create New Activity", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new activity
+//                self.createNewActivity()
+            }))
 
-        alert.addAction(UIAlertAction(title: "Create New Activiy", style: .default, handler: { (_) in
-            print("User click Approve button")
-            
-        }))
-
-        alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
-            print("User click Edit button")
-                // Fallback on earlier versions
-                    
-        }))
+            alert.addAction(UIAlertAction(title: "Merge with Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                // ChooseActivityTableViewController
+            }))
+        }
         
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")

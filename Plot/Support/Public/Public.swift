@@ -1152,6 +1152,25 @@ enum EventAlert : String, CustomStringConvertible {
     
 }
 
+public func runUserBadgeUpdate(firstChild: String) {
+    var ref = Database.database().reference().child("users").child(firstChild)
+    ref.observeSingleEvent(of: .value, with: { (snapshot) in
+        
+        guard snapshot.hasChild("badge") else {
+            ref.updateChildValues(["badge": 1])
+            return
+        }
+        
+        ref = ref.child("badge")
+        ref.runTransactionBlock({ (mutableData) -> TransactionResult in
+            var value = mutableData.value as? Int
+            if value == nil { value = 0 }
+            mutableData.value = value! + 1
+            return TransactionResult.success(withValue: mutableData)
+        })
+    })
+}
+
 extension Array where Element: Comparable {
     func containsSameElements(_ other: [Element]) -> Bool {
         return self.count == other.count && self.sorted() == other.sorted()

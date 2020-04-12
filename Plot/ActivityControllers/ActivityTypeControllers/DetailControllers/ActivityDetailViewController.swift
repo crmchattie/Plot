@@ -12,6 +12,7 @@ import MapKit
 
 
 class ActivityDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+    var umbrellaActivity: Activity!
     var activity: Activity!
     
     var sections = [String]()
@@ -27,19 +28,22 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     var userNames : [String] = []
     var userNamesString: String = ""
     
-    var locationName : String = "Location"
+    var locationName: String = "Location"
     var locationAddress = [String : [Double]]()
     
     var startDateTime: Date?
     var endDateTime: Date?
     
+    var reminder: String = "None"
+    
+    var schedule: Bool = false
     var active: Bool = false
     var activityID = String()
     
     let dispatchGroup = DispatchGroup()
     
+    var invitation: Invitation?
     var userInvitationStatus: [String: Status] = [:]
-    
     let invitationsEntity = "invitations"
     let userInvitationsEntity = "user-invitations"
             
@@ -94,11 +98,9 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     func setActivity() {
         if let activity = activity {
             active = true
-            
             if let activityID = activity.activityID {
                 self.activityID = activityID
             }
-            
             if let localName = activity.locationName, localName != "Location", let localAddress = activity.locationAddress {
                 locationName = localName
                 locationAddress = localAddress
@@ -107,17 +109,24 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
                 startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
                 endDateTime = Date(timeIntervalSince1970: endDate as! TimeInterval)
             }
-            
-        } else {
-            if let currentUserID = Auth.auth().currentUser?.uid {
-            //create new activityID for auto updating items (schedule, purchases, checklist)
-            activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+            if let reminder = activity.reminder {
+                self.reminder = reminder
+            }
+            if umbrellaActivity == nil {
+                resetBadgeForSelf()
+            }
+        } else if schedule {
+            activityID = UUID().uuidString
             activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-    //      activity.activityType = newActivityType.rawValue.capitalized
+        } else if !schedule {
+            if let currentUserID = Auth.auth().currentUser?.uid {
+                activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+                activity = Activity(dictionary: ["activityID": activityID as AnyObject])
             }
         }
         
         var participantCount = self.acceptedParticipant.count
+        
         // If user is creating this activity (admin)
         if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
             participantCount += 1
@@ -128,7 +137,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         } else {
             self.userNamesString = "1 participant"
         }
-        
     }
     
     func fetchFavAct() {
@@ -150,53 +158,30 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     }
     
     @objc func createNewActivity() {
-            guard currentReachabilityStatus != .notReachable else {
-                basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-                return
-            }
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
         
-            if !active {
-                activity.admin = Auth.auth().currentUser?.uid
-            }
-            
-            storeReminder()
+        showActivityIndicator()
+        let createActivity = CreateActivity(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+        createActivity.createNewActivity()
+        hideActivityIndicator()
         
-            var firebaseDictionary = activity.toAnyObject()
-            
-            let membersIDs = fetchMembersIDs()
-            
-            incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
-            
-            if active {
-                let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-                showActivityIndicator()
-                groupActivityReference.updateChildValues(firebaseDictionary)
-                hideActivityIndicator()
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                }
+        if !schedule {
+            if self.conversation == nil {
+                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
             } else {
-                let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-                firebaseDictionary["participantsIDs"] = membersIDs.1 as AnyObject
-                
-                dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-                    InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-    //                    self.hideActivityIndicator()
-                    }
-                })
-                dispatchGroup.enter()
-                dispatchGroup.enter()
-                createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
-                hideActivityIndicator()
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                }
+                self.navigationController?.backToViewController(viewController: ChatLogController.self)
+            }
+        } else {
+            if self.conversation == nil {
+                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+            } else {
+                self.navigationController?.backToViewController(viewController: ChatLogController.self)
             }
         }
+    }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
@@ -256,18 +241,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
             })
         }
     }
-
-    func createGroupActivityNode(reference: DatabaseReference, childValues: [String: Any]) {
-        showActivityIndicator()
-        let nodeCreationGroup = DispatchGroup()
-        nodeCreationGroup.enter()
-        nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
-            self.dispatchGroup.leave()
-        })
-        reference.updateChildValues(childValues) { (error, reference) in
-            nodeCreationGroup.leave()
-        }
-    }
     
     func connectMembersToGroupChat(memberIDs: [String], chatID: String) {
         let connectingMembersGroup = DispatchGroup()
@@ -286,19 +259,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         }
     }
     
-    func createGroupChatNode(reference: DatabaseReference, childValues: [String: Any], noImagesToUpload: Bool) {
-        showActivityIndicator()
-        let nodeCreationGroup = DispatchGroup()
-        nodeCreationGroup.enter()
-        nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
-            self.dispatchGroup.leave()
-        })
-        reference.updateChildValues(childValues) { (error, reference) in
-            nodeCreationGroup.leave()
-        }
-        hideActivityIndicator()
-    }
-    
     @objc func goToMap() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
@@ -307,15 +267,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         let destination = MapViewController()
         destination.locationAddress = locationAddress
         navigationController?.pushViewController(destination, animated: true)
-    }
-    
-    func storeReminder() {
-        if let currentUserID = Auth.auth().currentUser?.uid {
-            let userReference = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : AnyObject] = ["reminder": activity!.reminder as AnyObject]
-            userReference.updateChildValues(values)
-            scheduleReminder()
-        }
     }
     
     func scheduleReminder() {
@@ -358,33 +309,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
             value = 0
             mutableData.value = value!
             return TransactionResult.success(withValue: mutableData)
-        })
-    }
-    
-    func incrementBadgeForReciever(activityID: String?, participantsIDs: [String]) {
-            guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activityID else { return }
-            for participantID in participantsIDs where participantID != currentUserID {
-                runActivityBadgeUpdate(firstChild: participantID, secondChild: activityID)
-                runUserBadgeUpdate(firstChild: participantID)
-            }
-        }
-
-    func runActivityBadgeUpdate(firstChild: String, secondChild: String) {
-        var ref = Database.database().reference().child("user-activities").child(firstChild).child(secondChild)
-        ref.observeSingleEvent(of: .value, with: { (snapshot) in
-            
-            guard snapshot.hasChild(messageMetaDataFirebaseFolder) else {
-                ref = ref.child(messageMetaDataFirebaseFolder)
-                ref.updateChildValues(["badge": 1])
-                return
-            }
-            ref = ref.child(messageMetaDataFirebaseFolder).child("badge")
-            ref.runTransactionBlock({ (mutableData) -> TransactionResult in
-                var value = mutableData.value as? Int
-                if value == nil { value = 0 }
-                mutableData.value = value! + 1
-                return TransactionResult.success(withValue: mutableData)
-            })
         })
     }
     

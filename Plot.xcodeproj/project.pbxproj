@@ -55,6 +55,7 @@
 		1069B2D02430EC880048244C /* IncomingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */; };
 		1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */; };
 		1069B2D4243115950048244C /* ActivityObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2D3243115950048244C /* ActivityObject.swift */; };
+		106D758B2442447C0039B534 /* CreateActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106D758A2442447C0039B534 /* CreateActivity.swift */; };
 		106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		10796C8524411EEA004E8BF7 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10796C8424411EEA004E8BF7 /* PurchasesViewController.swift */; };
@@ -348,6 +349,7 @@
 		1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2D3243115950048244C /* ActivityObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityObject.swift; sourceTree = "<group>"; };
+		106D758A2442447C0039B534 /* CreateActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateActivity.swift; sourceTree = "<group>"; };
 		106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTypeViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		10796C8424411EEA004E8BF7 /* PurchasesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PurchasesViewController.swift; path = ../../../../../.Trash/PurchasesViewController.swift; sourceTree = "<group>"; };
@@ -736,6 +738,7 @@
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
 				10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */,
 				10196EF924411B5600B6AFDF /* ChooseChatTableViewController.swift */,
+				106D758A2442447C0039B534 /* CreateActivity.swift */,
 			);
 			path = CreateNewActivityControllers;
 			sourceTree = "<group>";
@@ -1980,6 +1983,7 @@
 				4BAEE51621272D890045AB10 /* GroupAdminControlsTableViewCell.swift in Sources */,
 				10196F0324411B5600B6AFDF /* ScheduleViewController.swift in Sources */,
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,
+				106D758B2442447C0039B534 /* CreateActivity.swift in Sources */,
 				4BAEE50D21272D890045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift in Sources */,
 				109F849723D67A85002C0044 /* SearchHeader.swift in Sources */,
 				1069B2D4243115950048244C /* ActivityObject.swift in Sources */,

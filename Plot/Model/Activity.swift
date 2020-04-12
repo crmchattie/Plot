@@ -27,7 +27,7 @@ class Activity: NSObject, Codable {
     var endDateTime: NSNumber?
     var reminder: String?
     var notes: String?
-    var schedule: [Schedule]?
+    var schedule: [Activity]?
     var purchases: [Purchase]?
     var checklist: [String : [String : Bool]]?
     var isGroupActivity: Bool?
@@ -40,6 +40,7 @@ class Activity: NSObject, Codable {
     var recipeID: String?
     var workoutID: String?
     var eventID: String?
+    var attractionID: String?
     
     
     enum CodingKeys: String, CodingKey {
@@ -61,6 +62,7 @@ class Activity: NSObject, Codable {
         case recipeID
         case workoutID
         case eventID
+        case attractionID
     }
     
     init(dictionary: [String: AnyObject]?){
@@ -90,7 +92,7 @@ class Activity: NSObject, Codable {
         endDateTime = dictionary?["endDateTime"] as? NSNumber
         reminder = dictionary?["reminder"] as? String
         notes = dictionary?["notes"] as? String
-        schedule = dictionary?["schedule"] as? [Schedule]
+        schedule = dictionary?["schedule"] as? [Activity]
         purchases = dictionary?["purchases"] as? [Purchase]
         checklist = dictionary?["checklist"] as? [String: [String : Bool]]
         isGroupActivity = dictionary?["isGroupActivity"] as? Bool
@@ -103,6 +105,7 @@ class Activity: NSObject, Codable {
         recipeID = dictionary?["recipeID"] as? String
         workoutID = dictionary?["workoutID"] as? String
         eventID = dictionary?["purchasesID"] as? String
+        attractionID = dictionary?["attractionID"] as? String
     }
     
     func toAnyObject() -> [String: AnyObject] {
@@ -122,14 +125,10 @@ class Activity: NSObject, Codable {
         
         if let value = self.activityType as AnyObject? {
             activityDict["activityType"] = value
-        } else {
-            activityDict["activityType"] = "nothing" as AnyObject
         }
         
         if let value = self.activityDescription as AnyObject? {
             activityDict["activityDescription"] = value
-        } else {
-            activityDict["activityDescription"] = "nothing" as AnyObject
         }
         
         if let value = self.locationName as AnyObject? {
@@ -146,8 +145,6 @@ class Activity: NSObject, Codable {
         
         if let value = self.transportation as AnyObject? {
             activityDict["transportation"] = value
-        } else {
-            activityDict["transportation"] = "nothing" as AnyObject
         }
         
         if let value = self.activityOriginalPhotoURL as AnyObject? {
@@ -176,8 +173,6 @@ class Activity: NSObject, Codable {
         
         if let value = self.notes as AnyObject? {
             activityDict["notes"] = value
-        } else {
-            activityDict["notes"] = "nothing" as AnyObject
         }
 
         if let value = self.conversationID as AnyObject? {
@@ -216,6 +211,10 @@ class Activity: NSObject, Codable {
         
         if let value = self.eventID as AnyObject? {
             activityDict["eventID"] = value
+        }
+        
+        if let value = self.attractionID as AnyObject? {
+            activityDict["attractionID"] = value
         }
         
         return activityDict

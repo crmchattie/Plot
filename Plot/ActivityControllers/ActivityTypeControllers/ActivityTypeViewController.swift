@@ -32,12 +32,15 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var workoutIDs: [String] = ["ZB9Gina","E5YrL4F","lhNZOX1","LWampEt","5jbuzns","ltrgYTF","Z37OGjs","7GdJQBG","RKrXsHn","GwxLrim","nspLcIX","nHWkOhp","0ym6yNn","6VLf2M7","n8g5auz","CM5o2rv","ufiyRQc","N7aHlCw","gIeTbVT","lGaFbQK"]
     var intColor: Int = 0
     
+    var umbrellaActivity: Activity!
+    var schedule: Bool = false
+    
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
     var selectedFalconUsers = [User]()
     var conversation : Conversation?
-    
+        
     var groups = [Any]()
     
     var locationManager = CLLocationManager()
@@ -69,7 +72,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
                         
         fetchData()
-
         
     }
     
@@ -246,12 +248,20 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     switch activityTypeName {
                     case "basic":
                         print("basic")
-                        let destination = CreateActivityViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.users = self!.users
-                        destination.filteredUsers = self!.filteredUsers
-                        destination.conversations = self!.conversations
-                        self?.navigationController?.pushViewController(destination, animated: true)
+                        if let activity = self!.umbrellaActivity {
+                            let destination = ScheduleViewController()
+                            destination.users = self!.users
+                            destination.filteredUsers = self!.filteredUsers
+                            destination.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
+                            destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
+                            self?.navigationController?.pushViewController(destination, animated: true)
+                        } else {
+                            let destination = CreateActivityViewController()
+                            destination.users = self!.users
+                            destination.filteredUsers = self!.filteredUsers
+                            destination.conversations = self!.conversations
+                            self?.navigationController?.pushViewController(destination, animated: true)
+                        }
                     case "meal":
                         print("meal")
                     case "workout":
@@ -280,6 +290,10 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         cell.horizontalController.users = users
         cell.horizontalController.filteredUsers = filteredUsers
         cell.horizontalController.favAct = favAct
+        cell.horizontalController.conversation = conversation
+        cell.horizontalController.schedule = schedule
+        cell.horizontalController.umbrellaActivity = umbrellaActivity
+        cell.horizontalController.selectedFalconUsers = selectedFalconUsers
         cell.delegate = self
         cell.titleLabel.text = sections[indexPath.item]
 
@@ -315,27 +329,43 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 if let recipe = cellData as? Recipe {
                     print("meal \(recipe.title)")
                     let destination = MealDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
+                    if let _ = self!.umbrellaActivity {
+                        destination.schedule = true
+                    } else {
+                        destination.schedule = false
+                    }
                     destination.favAct = favAct
                     destination.recipe = recipe
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
+                    destination.conversation = self!.conversation
+                    destination.schedule = self!.schedule
+                    destination.umbrellaActivity = self!.umbrellaActivity
+                    destination.selectedFalconUsers = self!.selectedFalconUsers
                     self?.navigationController?.pushViewController(destination, animated: true)
                 } else if let event = cellData as? Event {
                     print("event \(String(describing: event.name))")
                     let destination = EventDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
                     destination.favAct = favAct
                     destination.event = event
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
+                    destination.conversation = self!.conversation
+                    destination.schedule = self!.schedule
+                    destination.umbrellaActivity = self!.umbrellaActivity
+                    destination.selectedFalconUsers = self!.selectedFalconUsers
                     self?.navigationController?.pushViewController(destination, animated: true)
                 } else if let workout = cellData as? Workout {
                     print("workout \(String(describing: workout.title))")
                     let destination = WorkoutDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
+                    if let umbrellaActivity = self!.umbrellaActivity {
+                        destination.schedule = true
+                        destination.umbrellaActivity = umbrellaActivity
+                    } else {
+                        destination.schedule = false
+                    }
                     destination.favAct = favAct
                     destination.workout = workout
                     if let index = self!.workoutIDs.firstIndex(of: workout.identifier) {
@@ -344,16 +374,29 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
+                    destination.conversation = self!.conversation
+                    destination.schedule = self!.schedule
+                    destination.umbrellaActivity = self!.umbrellaActivity
+                    destination.selectedFalconUsers = self!.selectedFalconUsers
                     self?.navigationController?.pushViewController(destination, animated: true)
                 } else if let attraction = cellData as? Attraction {
                     print("attraction \(String(describing: attraction.name))")
                     let destination = EventDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
+                    if let umbrellaActivity = self!.umbrellaActivity {
+                        destination.schedule = true
+                        destination.umbrellaActivity = umbrellaActivity
+                    } else {
+                        destination.schedule = false
+                    }
                     destination.favAct = favAct
                     destination.attraction = attraction
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
+                    destination.conversation = self!.conversation
+                    destination.schedule = self!.schedule
+                    destination.umbrellaActivity = self!.umbrellaActivity
+                    destination.selectedFalconUsers = self!.selectedFalconUsers
                     self?.navigationController?.pushViewController(destination, animated: true)
                 }
                 else {
@@ -425,7 +468,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         }
                     }
                 }
-//                self.collectionView.reloadData()
              } else {
                 print("snapshot does not exist")
                 print(self.favAct)
@@ -452,7 +494,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         }
                     }
                 }
-//                self.collectionView.reloadData()
             }
           })
         { (error) in
@@ -468,7 +509,6 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
         switch labelText {
         case "Recipes":
             let destination = MealTypeViewController()
-            destination.hidesBottomBarWhenPushed = true
             if let recipes = self.recipes, !recipes.isEmpty {
                 destination.groups.append(recipes)
             }
@@ -476,33 +516,46 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.selectedFalconUsers = selectedFalconUsers
             navigationController?.pushViewController(destination, animated: true)
         case "Events":
             print("Event")
             let destination = EventTypeViewController()
-            destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.selectedFalconUsers = selectedFalconUsers
             navigationController?.pushViewController(destination, animated: true)
         case "Workouts":
             print("Workouts")
             let destination = WorkoutTypeViewController()
-            destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.selectedFalconUsers = selectedFalconUsers
             navigationController?.pushViewController(destination, animated: true)
         case "Attractions":
             print("Attractions")
             let destination = EventTypeViewController()
-            destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.selectedFalconUsers = selectedFalconUsers
             navigationController?.pushViewController(destination, animated: true)
         default:
             print("Default")

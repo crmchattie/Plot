@@ -45,14 +45,46 @@ class MealDetailViewController: ActivityDetailViewController {
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
         collectionView.register(MealDetailCell.self, forCellWithReuseIdentifier: kMealDetailCell)
         
+        if activity == nil {
+            setMoreActivity()
+        }
+        
         if detailedRecipe == nil {
             fetchData()
         }
-                
+        
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+    fileprivate func setMoreActivity() {
+        if let recipe = recipe {
+            activity.recipeID = "\(recipe.id)"
+            if schedule, let umbrellaActivity = umbrellaActivity {
+                if let startDate = umbrellaActivity.startDateTime {
+                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                    endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    startDateTime = rounded
+                    endDateTime = rounded.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+                }
+                if let localName = umbrellaActivity.locationName, localName != "locationName", let localAddress = umbrellaActivity.locationAddress {
+                    locationName = localName
+                    locationAddress = localAddress
+                    activity.locationName = locationName
+                    activity.locationAddress = localAddress
+                }
+            } else if !schedule {
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                startDateTime = rounded
+                endDateTime = rounded.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+            }
+            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
+        }
     }
     
     fileprivate func fetchData() {
@@ -149,24 +181,14 @@ class MealDetailViewController: ActivityDetailViewController {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
             cell.delegate = self
             if let recipe = recipe {
-                cell.recipe = recipe
-                if startDateTime == nil && endDateTime == nil {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    startDateTime = rounded
-                    endDateTime = rounded.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
-                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
-                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
-                } else {
-                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
-                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
-                }
-                cell.startDatePicker.date = startDateTime!
-                cell.endDatePicker.date = endDateTime!
                 cell.locationLabel.text = locationName
                 cell.participantsLabel.text = userNamesString
-                activity.recipeID = "\(recipe.id)"
+                cell.rightReminderLabel.text = reminder
+                cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
+                cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
+                cell.startDatePicker.date = startDateTime!
+                cell.endDatePicker.date = endDateTime!
+                cell.recipe = recipe
                 return cell
             } else {
                 return cell
@@ -382,6 +404,7 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
                 }
                 self.activity.locationName = "Location"
                 self.locationName = "Location"
+                self.collectionView.reloadData()
             }
             let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
                 print("You've pressed cancel")
@@ -429,6 +452,8 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
         
         let noneAddress = UIAlertAction(title: EventAlert.None.rawValue, style: .default) { (action:UIAlertAction) in
             print("none")
+            self.reminder = EventAlert.None.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.None.description
             if self.active {
                 self.scheduleReminder()
@@ -436,6 +461,8 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let atTimeAddress = UIAlertAction(title: EventAlert.At_time_of_event.rawValue, style: .default) { (action:UIAlertAction) in
             print("atTimeAddress")
+            self.reminder = EventAlert.At_time_of_event.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.At_time_of_event.description
             if self.active {
                 self.scheduleReminder()
@@ -444,6 +471,8 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let fifteenAddress = UIAlertAction(title: EventAlert.Fifteen_Minutes.rawValue, style: .default) { (action:UIAlertAction) in
             print("fifteenAddress")
+            self.reminder = EventAlert.Fifteen_Minutes.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.Fifteen_Minutes.description
             if self.active {
                 self.scheduleReminder()
@@ -451,6 +480,8 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let halfHourAddress = UIAlertAction(title: EventAlert.Half_Hour.rawValue, style: .default) { (action:UIAlertAction) in
             print("halfHourAddress")
+            self.reminder = EventAlert.Half_Hour.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.Half_Hour.description
             if self.active {
                 self.scheduleReminder()
@@ -458,6 +489,8 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let oneHourAddress = UIAlertAction(title: EventAlert.One_Hour.rawValue, style: .default) { (action:UIAlertAction) in
             print("oneHourAddress")
+            self.reminder = EventAlert.One_Hour.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Hour.description
             if self.active {
                 self.scheduleReminder()
@@ -465,6 +498,8 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let oneDayAddress = UIAlertAction(title: EventAlert.One_Day.rawValue, style: .default) { (action:UIAlertAction) in
             print("oneDayAddress")
+            self.reminder = EventAlert.One_Day.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Day.description
             if self.active {
                 self.scheduleReminder()
@@ -472,6 +507,8 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let oneWeekAddress = UIAlertAction(title: EventAlert.One_Week.rawValue, style: .default) { (action:UIAlertAction) in
             print("oneWeekAddress")
+            self.reminder = EventAlert.One_Week.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Week.description
             if self.active {
                 self.scheduleReminder()
@@ -479,6 +516,8 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
         }
         let oneMonthAddress = UIAlertAction(title: EventAlert.One_Month.rawValue, style: .default) { (action:UIAlertAction) in
             print("oneMonthAddress")
+            self.reminder = EventAlert.One_Month.description
+            self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Month.description
             if self.active {
                 self.scheduleReminder()
@@ -503,21 +542,125 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
     
 }
 
+extension MealDetailViewController: UpdateInvitees {
+    func updateInvitees(selectedFalconUsers: [User]) {
+        if !selectedFalconUsers.isEmpty {
+            self.selectedFalconUsers = selectedFalconUsers
+            self.acceptedParticipant = acceptedParticipant.filter { selectedFalconUsers.contains($0) }
+            
+            var participantCount = self.acceptedParticipant.count
+            // If user is creating this activity (admin)
+            if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
+                participantCount += 1
+            }
+            
+            if participantCount > 1 {
+                self.userNamesString = "\(participantCount) participants"
+            } else {
+                self.userNamesString = "1 participant"
+            }
+            collectionView.reloadData()
+        } else {
+            self.selectedFalconUsers = selectedFalconUsers
+            self.acceptedParticipant = selectedFalconUsers
+            self.userNamesString = "1 participant"
+            collectionView.reloadData()
+        }
+        
+        if active {
+            let membersIDs = fetchMembersIDs()
+            if Set(activity.participantsIDs!) != Set(membersIDs.0) {
+                let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+                updateParticipants(membersIDs: membersIDs)
+                groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
+            }
+            
+            dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
+                }
+            })
+        }
+    }
+}
+
+extension MealDetailViewController: UpdateLocationDelegate {
+    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
+        self.locationAddress[self.locationName] = nil
+        if self.activity.locationAddress != nil {
+            self.activity.locationAddress![self.locationName] = nil
+        }
+        for (key, value) in locationAddress {
+            var newKey = String()
+            switch key {
+            case let oldKey where key.contains("/"):
+                newKey = oldKey.replacingOccurrences(of: "/", with: "")
+            case let oldKey where key.contains("."):
+                newKey = oldKey.replacingOccurrences(of: ".", with: "")
+            case let oldKey where key.contains("#"):
+                newKey = oldKey.replacingOccurrences(of: "#", with: "")
+            case let oldKey where key.contains("$"):
+                newKey = oldKey.replacingOccurrences(of: "$", with: "")
+            case let oldKey where key.contains("["):
+                newKey = oldKey.replacingOccurrences(of: "[", with: "")
+                if newKey.contains("]") {
+                    newKey = newKey.replacingOccurrences(of: "]", with: "")
+                }
+            case let oldKey where key.contains("]"):
+                newKey = oldKey.replacingOccurrences(of: "]", with: "")
+            default:
+                newKey = key
+            }
+            self.locationName = newKey
+            self.locationAddress[newKey] = value
+            collectionView.reloadData()
+            
+            self.activity.locationName = newKey
+            if activity.locationAddress == nil {
+                self.activity.locationAddress = self.locationAddress
+            } else {
+                self.activity.locationAddress![newKey] = value
+            }
+        }
+    }
+}
+
 extension MealDetailViewController: ActivityDetailCellDelegate {
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
         let alert = UIAlertController(title: "Add Activity", message: nil, preferredStyle: .actionSheet)
+        
+        if let _ = activity {
+            alert.addAction(UIAlertAction(title: "Duplicate Activity", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new activity with updated time
+//                self.createNewActivity()
+            }))
 
-        alert.addAction(UIAlertAction(title: "Create New Activiy", style: .default, handler: { (_) in
-            print("User click Approve button")
-//            self.createNewActivity()
-        }))
+            alert.addAction(UIAlertAction(title: "Merge with Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                // ChooseActivityTableViewController
+                        
+            }))
+        
+        } else if schedule, let _ = umbrellaActivity {
+            alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
+                print("User click Approve button")
+                //add to schedule
+                
+            }))
+            
+        } else if !schedule {
+            alert.addAction(UIAlertAction(title: "Create New Activity", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new activity
+//                self.createNewActivity()
+            }))
 
-        alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
-            print("User click Edit button")
-                // Fallback on earlier versions
-                    
-        }))
+            alert.addAction(UIAlertAction(title: "Merge with Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                // ChooseActivityTableViewController
+            }))
+        }
         
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -611,86 +754,4 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
         
     }
 
-}
-
-extension MealDetailViewController: UpdateInvitees {
-    func updateInvitees(selectedFalconUsers: [User]) {
-        if !selectedFalconUsers.isEmpty {
-            self.selectedFalconUsers = selectedFalconUsers
-            self.acceptedParticipant = acceptedParticipant.filter { selectedFalconUsers.contains($0) }
-            
-            var participantCount = self.acceptedParticipant.count
-            // If user is creating this activity (admin)
-            if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
-                participantCount += 1
-            }
-            
-            if participantCount > 1 {
-                self.userNamesString = "\(participantCount) participants"
-            } else {
-                self.userNamesString = "1 participant"
-            }
-            collectionView.reloadData()
-        } else {
-            self.selectedFalconUsers = selectedFalconUsers
-            self.acceptedParticipant = selectedFalconUsers
-            self.userNamesString = "1 participant"
-            collectionView.reloadData()
-        }
-        
-        if active {
-            let membersIDs = fetchMembersIDs()
-            if Set(activity.participantsIDs!) != Set(membersIDs.0) {
-                let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-                updateParticipants(membersIDs: membersIDs)
-                groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
-            }
-            
-            dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-                }
-            })
-        }
-    }
-}
-
-extension MealDetailViewController: UpdateLocationDelegate {
-    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
-        self.locationAddress[self.locationName] = nil
-        if self.activity.locationAddress != nil {
-            self.activity.locationAddress![self.locationName] = nil
-        }
-        for (key, value) in locationAddress {
-            var newKey = String()
-            switch key {
-            case let oldKey where key.contains("/"):
-                newKey = oldKey.replacingOccurrences(of: "/", with: "")
-            case let oldKey where key.contains("."):
-                newKey = oldKey.replacingOccurrences(of: ".", with: "")
-            case let oldKey where key.contains("#"):
-                newKey = oldKey.replacingOccurrences(of: "#", with: "")
-            case let oldKey where key.contains("$"):
-                newKey = oldKey.replacingOccurrences(of: "$", with: "")
-            case let oldKey where key.contains("["):
-                newKey = oldKey.replacingOccurrences(of: "[", with: "")
-                if newKey.contains("]") {
-                    newKey = newKey.replacingOccurrences(of: "]", with: "")
-                }
-            case let oldKey where key.contains("]"):
-                newKey = oldKey.replacingOccurrences(of: "]", with: "")
-            default:
-                newKey = key
-            }
-            self.locationName = newKey
-            self.locationAddress[newKey] = value
-            collectionView.reloadData()
-            
-            self.activity.locationName = newKey
-            if activity.locationAddress == nil {
-                self.activity.locationAddress = self.locationAddress
-            } else {
-                self.activity.locationAddress![newKey] = value
-            }
-        }
-    }
 }

@@ -26,7 +26,7 @@ class ChatLogController: UICollectionViewController {
   let chatLogHistoryFetcher = ChatLogHistoryFetcher()
   let groupMembersManager = GroupMembersManager()
   
-    var reference = Database.database().reference()
+  var reference = Database.database().reference()
   var membersReference: DatabaseReference!
   var typingIndicatorReference: DatabaseReference!
   var userStatusReference: DatabaseReference!
@@ -673,7 +673,7 @@ class ChatLogController: UICollectionViewController {
             print("event \(String(describing: message.text))")
             print("id \(String(describing: eventID))")
             dispatchGroup.enter()
-            Service.shared.fetchEventsSegment(size: "50", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
+            Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
                 if let events = search?.embedded?.events {
                     let event = events[0]
                     dispatchGroup.leave()
@@ -712,7 +712,7 @@ class ChatLogController: UICollectionViewController {
             }
         } else if message.activityType == "attraction", let attractionID = message.activityID {
             dispatchGroup.enter()
-            Service.shared.fetchAttractionsSegment(size: "50", id: "", keyword: "", classificationName: "", classificationId: "") { (search, err) in
+            Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
                 let attraction = search?.embedded?.attractions![0]
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {

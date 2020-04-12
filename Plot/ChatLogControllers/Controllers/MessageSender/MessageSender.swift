@@ -31,7 +31,7 @@ class MessageSender: NSObject {
         self.text = text
         self.attachedMedia = media
         self.attachedActivity = activity
-  }
+    }
   
   public func sendMessage() {
     syncronizeMediaSending()

@@ -16,10 +16,15 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     let headerId = "headerId"
     let searchController = UISearchController(searchResultsController: nil)
     
+    var umbrellaActivity: Activity!
+    var schedule: Bool = false
+    
     var users = [User]()
     var filteredUsers = [User]()
+    var selectedFalconUsers = [User]()
     var conversations = [Conversation]()
     var favAct = [String: [String]]()
+    var conversation: Conversation?
     
     let viewPlaceholder = ViewPlaceholder()
         
@@ -28,7 +33,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     var cellheight: CGFloat = 0
     
     var showGroups = true
-    
+        
     fileprivate var reference: DatabaseReference!
     let favActivities = ActivityTypeViewController()
     

@@ -25,6 +25,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         didSet {
             if let _ = recipe {
                 extraLabel.text = nil
+                extraLabel.isHidden = true
                 setupViews()
 
             }
@@ -35,7 +36,6 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         didSet {
             if let _ = event {
                 extraLabel.text = "Other Dates:"
-                                    
                 setupViews()
             }
         }
@@ -45,7 +45,6 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         didSet {
             if attraction != nil {
                 extraLabel.text = "Other Dates:"
-                
                 setupViews()
             }
         }
@@ -55,7 +54,6 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         didSet {
             if let _ = workout {                
                 extraLabel.text = "Workout Preview:"
-                
                 setupViews()
 
             }
@@ -89,7 +87,6 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.text = "Location"
         label.numberOfLines = 0
         return label
     }()
@@ -104,8 +101,9 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
             imageView.image = UIImage(systemName: "info.circle", withConfiguration: smallConfiguration)!.withRenderingMode(.alwaysTemplate)
         } else {
             imageView.image = UIImage(named: "info")!.withRenderingMode(.alwaysTemplate)
+            imageView.tintColor = FalconPalette.defaultBlue
         }
-        imageView.tintColor = FalconPalette.defaultBlue
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     
@@ -129,7 +127,6 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.text = "1 participant"
         label.numberOfLines = 0
         return label
     }()
@@ -245,8 +242,10 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
     func setupViews() {
             
         if locationLabel.text == "Location" {
+            locationLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
             locationInfoView.isHidden = true
         } else {
+            locationLabel.textColor = ThemeManager.currentTheme().generalTitleColor
             locationInfoView.isHidden = false
         }
         
@@ -313,7 +312,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
             extraLabelStackView
             ], spacing: 5)
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 10, left: 0, bottom: 10, right: 0))
+        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 5, right: 0))
         
         
         let locationViewTapped = UITapGestureRecognizer(target: self, action: #selector(ActivityExpandedDetailCell.locationViewTapped(_:)))
@@ -345,9 +344,12 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
             return
         }
         
-        if locationLabel.text == "Location" {
+        print("locationLabel \(labelText)")
+        if labelText == "Location" {
+            locationLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
             locationInfoView.isHidden = true
         } else {
+            locationLabel.textColor = ThemeManager.currentTheme().generalTitleColor
             locationInfoView.isHidden = false
         }
         

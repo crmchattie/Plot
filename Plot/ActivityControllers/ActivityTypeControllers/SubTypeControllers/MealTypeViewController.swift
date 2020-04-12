@@ -232,7 +232,14 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+        cell.horizontalController.conversations = conversations
+        cell.horizontalController.users = users
+        cell.horizontalController.filteredUsers = filteredUsers
         cell.horizontalController.favAct = favAct
+        cell.horizontalController.conversation = conversation
+        cell.horizontalController.schedule = schedule
+        cell.horizontalController.umbrellaActivity = umbrellaActivity
+        cell.horizontalController.selectedFalconUsers = selectedFalconUsers
         cell.arrowView.isHidden = true
         cell.delegate = self
         if showGroups {
@@ -245,12 +252,21 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                     if let recipe = recipe as? Recipe {
                         print("meal \(recipe.title)")
                         let destination = MealDetailViewController()
-                        destination.hidesBottomBarWhenPushed = true
+                        if let umbrellaActivity = self!.umbrellaActivity {
+                            destination.schedule = true
+                            destination.umbrellaActivity = umbrellaActivity
+                        } else {
+                            destination.schedule = false
+                        }
                         destination.favAct = favAct
                         destination.recipe = recipe
                         destination.users = self!.users
                         destination.filteredUsers = self!.filteredUsers
                         destination.conversations = self!.conversations
+                        destination.conversation = self!.conversation
+                        destination.schedule = self!.schedule
+                        destination.umbrellaActivity = self!.umbrellaActivity
+                        destination.selectedFalconUsers = self!.selectedFalconUsers
                         self?.navigationController?.pushViewController(destination, animated: true)
                     }
                 }
@@ -271,16 +287,27 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         header.verticalController.recipes = recipes
         header.verticalController.favAct = favAct
         header.verticalController.collectionView.reloadData()
+        header.verticalController.conversations = conversations
+        header.verticalController.users = users
+        header.verticalController.filteredUsers = filteredUsers
+        header.verticalController.favAct = favAct
+        header.verticalController.conversation = conversation
+        header.verticalController.schedule = schedule
+        header.verticalController.umbrellaActivity = umbrellaActivity
+        header.verticalController.selectedFalconUsers = selectedFalconUsers
         header.verticalController.didSelectHandler = { [weak self] recipe, favAct in
             if let recipe = recipe as? Recipe {
                 print("meal \(recipe.title)")
                 let destination = MealDetailViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.recipe = recipe
                 destination.favAct = favAct
                 destination.users = self!.users
                 destination.filteredUsers = self!.filteredUsers
                 destination.conversations = self!.conversations
+                destination.conversation = self!.conversation
+                destination.schedule = self!.schedule
+                destination.umbrellaActivity = self!.umbrellaActivity
+                destination.selectedFalconUsers = self!.selectedFalconUsers
                 self?.navigationController?.pushViewController(destination, animated: true)
             }
         }

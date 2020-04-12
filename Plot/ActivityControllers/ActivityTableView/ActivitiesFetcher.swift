@@ -149,9 +149,9 @@ class ActivitiesFetcher: NSObject {
             activity.eventID = metaInfo.eventID
             
             if let scheduleFirebaseList = dictionary["schedule"] as? [AnyObject] {
-                var scheduleList = [Schedule]()
+                var scheduleList = [Activity]()
                 for schedule in scheduleFirebaseList {
-                    let sche = Schedule(dictionary: schedule as? [String : AnyObject])
+                    let sche = Activity(dictionary: schedule as? [String : AnyObject])
                     if sche.name == "nothing" { continue }
                     scheduleList.append(sche)
                 }
@@ -441,9 +441,9 @@ class ActivitiesFetcher: NSObject {
         
         if snapshot.key == scheduleKey {
             guard let scheduleFirebaseList = snapshot.value as? [AnyObject] else { return }
-            var scheduleList = [Schedule]()
+            var scheduleList = [Activity]()
             for schedule in scheduleFirebaseList {
-                let sche = Schedule(dictionary: schedule as? [String : AnyObject])
+                let sche = Activity(dictionary: schedule as? [String : AnyObject])
                 if sche.name == "nothing" { continue }
                 scheduleList.append(sche)
             }
@@ -570,7 +570,7 @@ class ActivitiesFetcher: NSObject {
         }
                 
         if snapshot.key == scheduleKey {
-            activities[index].schedule = [Schedule]()
+            activities[index].schedule = [Activity]()
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
