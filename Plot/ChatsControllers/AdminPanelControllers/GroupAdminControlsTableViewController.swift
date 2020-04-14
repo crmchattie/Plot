@@ -402,9 +402,9 @@ class GroupAdminControlsTableViewController: UITableViewController {
   
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
     if indexPath.section == 1, members[indexPath.row].id != conversationAdminID, members[indexPath.row].id != Auth.auth().currentUser!.uid {
-    return true
-    } else if indexPath.section == 2 {
         return true
+    } else if indexPath.section == 2 {
+        return false
     }
     else {
         return false
@@ -502,18 +502,18 @@ class GroupAdminControlsTableViewController: UITableViewController {
         }
       }
     } else if indexPath.section == 2 {
-        var activity: Activity!
-        
-        activity = activities[indexPath.row]
-        
-        let destination = CreateActivityViewController()
-        destination.hidesBottomBarWhenPushed = true
-        destination.activity = activity
-        destination.conversation = conversation
-        destination.users = members
-        destination.filteredUsers = members
-
-        navigationController?.pushViewController(destination, animated: true)
+//        var activity: Activity!
+//
+//        activity = activities[indexPath.row]
+//                
+//        let destination = CreateActivityViewController()
+//        destination.hidesBottomBarWhenPushed = true
+//        destination.activity = activity
+//        destination.conversation = conversation
+//        destination.users = members
+//        destination.filteredUsers = members
+//
+//        navigationController?.pushViewController(destination, animated: true)
     }
     
     tableView.deselectRow(at: indexPath, animated: true)

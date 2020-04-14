@@ -60,6 +60,7 @@ class MealDetailViewController: ActivityDetailViewController {
     fileprivate func setMoreActivity() {
         if let recipe = recipe {
             activity.recipeID = "\(recipe.id)"
+            activity.activityType = "recipe"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
 
@@ -580,17 +581,11 @@ extension MealDetailViewController: UpdateInvitees {
         }
         
         if active {
-            let membersIDs = fetchMembersIDs()
-            if Set(activity.participantsIDs!) != Set(membersIDs.0) {
-                let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-                updateParticipants(membersIDs: membersIDs)
-                groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
-            }
+            showActivityIndicator()
+            let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+            createActivity.updateActivityParticipants()
+            hideActivityIndicator()
             
-            dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-                }
-            })
         }
     }
 }

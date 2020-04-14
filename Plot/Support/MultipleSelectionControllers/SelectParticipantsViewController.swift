@@ -205,11 +205,6 @@ class SelectParticipantsViewController: UIViewController {
         navigationController?.pushViewController(destination, animated: true)
     }
     
-    func inviteParticipants() {
-        //    delegate?.updateInvitees(selectedFalconUsers: selectedFalconUsers)
-        //    self.navigationController?.popViewController(animated: true)
-    }
-    
     
     var chatIDForUsersUpdate = String()
     var informationMessageSender = InformationMessageSender()

@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Firebase
+import CodableFirebase
 
 class NotificationsViewController: UIViewController {
     
@@ -196,24 +198,132 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     func openActivityDetailView(forActivity activity: Activity) {
-            if let navController = self.navigationController {
+        if let navController = self.navigationController {
             self.showSpinner(onView: navController.view)
         } else {
             self.showSpinner(onView: self.view)
         }
         
-        let destination = CreateActivityViewController()
-        destination.hidesBottomBarWhenPushed = true
-        destination.activity = activity
-        destination.invitation = invitations[activity.activityID!]
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        destination.conversations = conversations
-        
-        activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
-            self?.removeSpinner()
-            destination.selectedFalconUsers = participants
-            self?.navigationController?.pushViewController(destination, animated: true)
+        let dispatchGroup = DispatchGroup()
+                
+        if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {
+            dispatchGroup.enter()
+            Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
+                let detailedRecipe = search
+                dispatchGroup.leave()
+                dispatchGroup.notify(queue: .main) {
+                    let destination = MealDetailViewController()
+                    destination.recipe = detailedRecipe
+                    destination.detailedRecipe = detailedRecipe
+                    destination.activity = activity
+                    destination.invitation = self.invitations[activity.activityID!]
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    destination.conversations = self.conversations
+                    self.activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
+                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                            self!.removeSpinner()
+                            destination.acceptedParticipant = acceptedParticipant
+                            destination.selectedFalconUsers = participants
+                            self?.navigationController?.pushViewController(destination, animated: true)
+                        }
+                    }
+                }
+            }
+        } else if let eventID = activity.eventID {
+            dispatchGroup.enter()
+            Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
+                if let events = search?.embedded?.events {
+                    let event = events[0]
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = EventDetailViewController()
+                        destination.event = event
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.conversations = self.conversations
+                        self.activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                self!.removeSpinner()
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self?.navigationController?.pushViewController(destination, animated: true)
+                            }
+                        }
+                    }
+                }
+            }
+        } else if let workoutID = activity.workoutID {
+            var reference = Database.database().reference()
+            let destination = WorkoutDetailViewController()
+            dispatchGroup.enter()
+            reference = Database.database().reference().child("workouts").child("workouts")
+            reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                    if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                        dispatchGroup.leave()
+                        destination.workout = workout
+                        destination.intColor = 0
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.conversations = self.conversations
+                        self.activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                self!.removeSpinner()
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self?.navigationController?.pushViewController(destination, animated: true)
+                            }
+                        }
+                    }
+                }
+              })
+            { (error) in
+                print(error.localizedDescription)
+            }
+        } else if let attractionID = activity.attractionID {
+            dispatchGroup.enter()
+            Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
+                let attraction = search?.embedded?.attractions![0]
+                dispatchGroup.leave()
+                dispatchGroup.notify(queue: .main) {
+                    let destination = EventDetailViewController()
+                    destination.attraction = attraction
+                    destination.activity = activity
+                    destination.invitation = self.invitations[activity.activityID!]
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    destination.conversations = self.conversations
+                    self.activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
+                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                            self!.removeSpinner()
+                            destination.acceptedParticipant = acceptedParticipant
+                            destination.selectedFalconUsers = participants
+                            self?.navigationController?.pushViewController(destination, animated: true)
+                        }
+                    }
+                }
+            }
+        } else {
+            self.removeSpinner()
+            let destination = CreateActivityViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.activity = activity
+            destination.invitation = invitations[activity.activityID!]
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
+                InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                    destination.acceptedParticipant = acceptedParticipant
+                    destination.selectedFalconUsers = participants
+                    self?.navigationController?.pushViewController(destination, animated: true)
+                }
+            }
         }
     }
     

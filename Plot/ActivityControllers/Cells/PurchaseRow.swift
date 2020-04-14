@@ -13,8 +13,7 @@ final class PurchaseCell: Cell<Purchase>, CellType {
     lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        //        label.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
-        label.font = UIFont.preferredFont(forTextStyle: .headline)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
         label.sizeToFit()
@@ -25,7 +24,6 @@ final class PurchaseCell: Cell<Purchase>, CellType {
     //activity type label (e.g. drinks, trip)
     lazy var participantsLabal: UILabel = {
         let label = UILabel()
-        //        label.font = UIFont.systemFont(ofSize: 13)
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -39,8 +37,7 @@ final class PurchaseCell: Cell<Purchase>, CellType {
     lazy var costLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        //        label.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
-        label.font = UIFont.preferredFont(forTextStyle: .headline)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false

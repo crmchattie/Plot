@@ -85,6 +85,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
+    var activityDates = [String]()
+    
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd"
@@ -116,6 +118,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         if !isAppLoaded {
             managePresense()
             activitiesFetcher.fetchActivities()
+        } else {
+            configureTabBarBadge()
         }
     }
     
@@ -247,7 +251,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @objc fileprivate func newActivity() {
         let destination = ActivityTypeViewController()
-    //        let destination = CreateActivityViewController()
         destination.hidesBottomBarWhenPushed = true
         destination.users = users
         destination.filteredUsers = filteredUsers
@@ -414,15 +417,13 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     func handleReloadTable() {
         handleReloadActivities()
         let allActivities = pinnedActivities + activities
-                
         saveDataToSharedContainer(activities: allActivities)
+//        compileActivityDates(activities: allActivities)
+
         
         if !isAppLoaded {
             activityView.tableView.reloadData()
             configureTabBarBadge()
-        } else {
-            configureTabBarBadge()
-            activityView.tableView.reloadData()
         }
         
         if allActivities.count == 0 {
@@ -439,7 +440,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }) { _ in
             self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!)
         }
-        activityView.calendar.reloadData()
     }
     
     func handleReloadActivities() {
@@ -555,7 +555,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-//        let days = calendar.scope == .week ? 7 : 31
         self.scrollToFirstActivityWithDate(date: calendar.currentPage)
     }
     
@@ -575,19 +574,9 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
-        dateFormatter.timeZone = TimeZone(identifier: "UTC")
-
-        for activity in activities {
-            if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval {
-                let startDate = Date(timeIntervalSince1970: startDate)
-                let endDate = Date(timeIntervalSince1970: endDate + 86400)
-                let dayDurationInSeconds: TimeInterval = 60*60*24
-                for activityDate in stride(from: startDate, to: endDate, by: dayDurationInSeconds) {
-                    if dateFormatter.string(from: date) == dateFormatter.string(from: activityDate) {
-                        return 1
-                    }
-                }
-            }
+        let dateString = dateFormatter.string(from: date)
+        if self.activityDates.contains(dateString) {
+            return 1
         }
         return 0
     }
@@ -623,7 +612,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         view.tintColor = ThemeManager.currentTheme().inputTextViewColor
         if let headerTitle = view as? UITableViewHeaderFooterView {
             headerTitle.textLabel?.textColor = FalconPalette.defaultBlue
-            //      headerTitle.textLabel?.font = UIFont.systemFont(ofSize: 10)
             headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
             headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
             headerTitle.textLabel?.minimumScaleFactor = 0.1
@@ -657,9 +645,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
-        
         cell.delegate = self
         cell.updateInvitationDelegate = self
         cell.activityViewControllerDataStore = self
@@ -670,7 +656,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             if let activityID = activity.activityID, let value = invitations[activityID] {
                 invitation = value
             }
-            
             cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
 
         } else {
@@ -679,7 +664,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             if let activityID = activity.activityID, let value = invitations[activityID] {
                 invitation = value
             }
-            
             cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
         }
         
@@ -833,6 +817,30 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
+    fileprivate func compileActivityDates(activities: [Activity]) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        
+        let activityDatesGroup = DispatchGroup()
+        for activity in activities {
+            activityDatesGroup.enter()
+            if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval {
+                let startDate = Date(timeIntervalSince1970: startDate)
+                let endDate = Date(timeIntervalSince1970: endDate + 60)
+                let dayDurationInSeconds: TimeInterval = 60
+                for activityDate in stride(from: startDate, to: endDate, by: dayDurationInSeconds) {
+                    activityDatesGroup.enter()
+                    activityDates.append(dateFormatter.string(from: activityDate))
+                    activityDatesGroup.leave()
+                }
+                activityDatesGroup.leave()
+            }
+        }
+        activityDatesGroup.notify(queue: .main) {
+            self.activityView.calendar.reloadData()
+        }
+    }
+    
     func showActivityIndicator() {
         if let tabController = self.tabBarController {
             self.showSpinner(onView: tabController.view)
@@ -980,6 +988,7 @@ extension ActivityViewController: ActivityViewControllerDataStore {
         guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
+        
         
         let group = DispatchGroup()
         let olderParticipants = self.activitiesParticipants[activityID]

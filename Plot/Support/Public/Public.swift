@@ -395,15 +395,15 @@ func timestampOfActivity(startDate: Date, endDate: Date, allDay: Bool) -> (Strin
                     endString = ""
                 } else {
                     startString = startDate.getShortDateStringForActivity() + " All Day"
-                    endString = "- " + endDate.getShortDateStringForActivity() + " All Day"
+                    endString = " - " + endDate.getShortDateStringForActivity() + " All Day"
                 }
             } else {
                 if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
                     startString = startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
-                    endString = "- " + endDate.getTimeStringForActivity()
+                    endString = " - " + endDate.getTimeStringForActivity()
                 } else {
                     startString = startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
-                    endString = "- " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
+                    endString = " - " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
                 }
             }
         } else { // start date is this week
@@ -414,24 +414,24 @@ func timestampOfActivity(startDate: Date, endDate: Date, allDay: Bool) -> (Strin
                 } else {
                     if endComponents.weekOfYear! >= 1 { // end date is next week
                         startString = startDate.dayOfWeekForActivity() + " All Day"
-                        endString = "- " + endDate.getShortDateStringForActivity() + " All Day"
+                        endString = " - " + endDate.getShortDateStringForActivity() + " All Day"
                     } else {
                         startString = startDate.dayOfWeekForActivity() + " All Day"
-                        endString = "- " + endDate.dayOfWeek() + " All Day"
+                        endString = " - " + endDate.dayOfWeek() + " All Day"
                     }
                 }
                 
             } else {
                 if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
                     startString = startDate.dayOfWeekForActivity() + " @ " + startDate.getTimeStringForActivity()
-                    endString = "- " + endDate.getTimeStringForActivity()
+                    endString = " - " + endDate.getTimeStringForActivity()
                 } else {
                     if endComponents.weekOfYear! >= 1 { // end date is next week
                         startString = startDate.dayOfWeekForActivity() + " @ " + startDate.getTimeStringForActivity()
-                        endString = "- " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
+                        endString = " - " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
                     } else {
                         startString = startDate.dayOfWeekForActivity() + " @ " + startDate.getTimeStringForActivity()
-                        endString = "- " + endDate.dayOfWeekForActivity() + " @ " + endDate.getTimeStringForActivity()
+                        endString = " - " + endDate.dayOfWeekForActivity() + " @ " + endDate.getTimeStringForActivity()
                     }
                 }
             }
@@ -444,23 +444,23 @@ func timestampOfActivity(startDate: Date, endDate: Date, allDay: Bool) -> (Strin
             } else {
                 if endComponents.weekOfYear! >= 1 { // end date is next week
                     startString = "Today All Day"
-                    endString = "- " + endDate.getShortDateStringForActivity() + " All Day"
+                    endString = " - " + endDate.getShortDateStringForActivity() + " All Day"
                 } else {
                     startString = "Today All Day"
-                    endString = "- " + endDate.dayOfWeekForActivity() + " All Day"
+                    endString = " - " + endDate.dayOfWeekForActivity() + " All Day"
                 }
             }
         } else {
             if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
                 startString = "Today @ " + startDate.getTimeStringForActivity()
-                endString = "- " + endDate.getTimeStringForActivity()
+                endString = " - " + endDate.getTimeStringForActivity()
             } else {
                 if endComponents.weekOfYear! >= 1 { // end date is next week
                     startString = "Today @ " + startDate.getTimeStringForActivity()
-                    endString = "- " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
+                    endString = " - " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
                 } else {
                     startString = "Today @ " + startDate.getTimeStringForActivity()
-                    endString = "- " + endDate.dayOfWeekForActivity() + " @ " + endDate.getTimeStringForActivity()
+                    endString = " - " + endDate.dayOfWeekForActivity() + " @ " + endDate.getTimeStringForActivity()
                 }
             }
         }

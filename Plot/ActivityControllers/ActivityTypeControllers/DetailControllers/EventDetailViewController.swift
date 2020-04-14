@@ -51,7 +51,7 @@ class EventDetailViewController: ActivityDetailViewController {
     fileprivate func setMoreActivity() {
         if let event = event {
             activity.name = event.name
-            activity.eventID = "\(event.id)"
+            activity.activityType = "event"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
                     startDateTime = date
@@ -648,17 +648,11 @@ extension EventDetailViewController: UpdateInvitees {
         }
         
         if active {
-            let membersIDs = fetchMembersIDs()
-            if Set(activity.participantsIDs!) != Set(membersIDs.0) {
-                let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-                updateParticipants(membersIDs: membersIDs)
-                groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
-            }
+            showActivityIndicator()
+            let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+            createActivity.updateActivityParticipants()
+            hideActivityIndicator()
             
-            dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-                }
-            })
         }
     }
 }

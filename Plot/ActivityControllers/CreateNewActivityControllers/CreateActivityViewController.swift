@@ -44,7 +44,7 @@ class CreateActivityViewController: FormViewController {
     var userNamesString: String = ""
     var thumbnailImage: String = ""
     var activityID = String()
-    let activityCreatingGroup = DispatchGroup()
+    let dispatchGroup = DispatchGroup()
     let informationMessageSender = InformationMessageSender()
     // Participants with accepted invites
     var acceptedParticipant: [User] = []
@@ -1084,7 +1084,6 @@ class CreateActivityViewController: FormViewController {
                 activity.schedule = [Activity]()
                 groupActivityReference.child("schedule").removeValue()
             } else {
-                print("schedule list is not empty")
                 var firebaseScheduleList = [[String: AnyObject?]]()
                 for schedule in scheduleList {
                     let firebaseSchedule = schedule.toAnyObject()
@@ -1493,7 +1492,7 @@ class CreateActivityViewController: FormViewController {
     }
     
     func uploadAvatar(chatImage: UIImage?, reference: DatabaseReference) {
-        guard let image = chatImage else { self.activityCreatingGroup.leave(); return }
+        guard let image = chatImage else { self.dispatchGroup.leave(); return }
         let thumbnailImage = createImageThumbnail(image)
         var images = [(image: UIImage, quality: CGFloat, key: String)]()
         let compressedImageData = compressImage(image: image)
@@ -1504,7 +1503,7 @@ class CreateActivityViewController: FormViewController {
         for _ in images { photoUpdatingGroup.enter() }
         
         photoUpdatingGroup.notify(queue: DispatchQueue.main, execute: {
-            self.activityCreatingGroup.leave()
+            self.dispatchGroup.leave()
         })
         
         for imageElement in images {
@@ -1513,87 +1512,6 @@ class CreateActivityViewController: FormViewController {
                     photoUpdatingGroup.leave()
                 })
             }
-        }
-    }
-
-    func connectMembersToGroupActivity(memberIDs: [String], activityID: String) {
-        let connectingMembersGroup = DispatchGroup()
-        for _ in memberIDs {
-            connectingMembersGroup.enter()
-        }
-        connectingMembersGroup.notify(queue: DispatchQueue.main, execute: {
-            self.activityCreatingGroup.leave()
-        })
-        for memberID in memberIDs {
-            let userReference = Database.database().reference().child("user-activities").child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["isGroupActivity": true]
-            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                connectingMembersGroup.leave()
-            })
-        }
-    }
-
-    func createGroupActivityNode(reference: DatabaseReference, childValues: [String: Any]) {
-        showActivityIndicator()
-        let nodeCreationGroup = DispatchGroup()
-        nodeCreationGroup.enter()
-        nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
-            self.activityCreatingGroup.leave()
-        })
-        reference.updateChildValues(childValues) { (error, reference) in
-            nodeCreationGroup.leave()
-        }
-    }
-    
-    func connectMembersToGroupChat(memberIDs: [String], chatID: String) {
-        let connectingMembersGroup = DispatchGroup()
-        for _ in memberIDs {
-            connectingMembersGroup.enter()
-        }
-        connectingMembersGroup.notify(queue: DispatchQueue.main, execute: {
-            self.activityCreatingGroup.leave()
-        })
-        for memberID in memberIDs {
-            let userReference = Database.database().reference().child("user-messages").child(memberID).child(chatID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["isGroupChat": true]
-            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                connectingMembersGroup.leave()
-            })
-        }
-    }
-    
-    func createGroupChatNode(reference: DatabaseReference, childValues: [String: Any], noImagesToUpload: Bool) {
-        showActivityIndicator()
-        let nodeCreationGroup = DispatchGroup()
-        nodeCreationGroup.enter()
-        nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
-            self.activityCreatingGroup.leave()
-        })
-        reference.updateChildValues(childValues) { (error, reference) in
-            nodeCreationGroup.leave()
-        }
-        hideActivityIndicator()
-    }
-
-    func updateParticipants(membersIDs: ([String], [String:AnyObject])) {
-        let participantsSet = Set(activity.participantsIDs!)
-        let membersSet = Set(membersIDs.0)
-        let difference = participantsSet.symmetricDifference(membersSet)
-        for member in difference {
-            if participantsSet.contains(member) {
-                Database.database().reference().child("user-activities").child(member).child(activityID).removeValue()
-            }
-            if let chatID = activity?.conversationID { Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("chatParticipantsIDs").updateChildValues(membersIDs.1)
-            }
-            
-            activityCreatingGroup.enter()
-            
-            if let chatID = activity?.conversationID {
-                activityCreatingGroup.enter()
-                connectMembersToGroupChat(memberIDs: membersIDs.0, chatID: chatID)
-            }
-            
-            connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
         }
     }
     
@@ -1626,25 +1544,6 @@ class CreateActivityViewController: FormViewController {
             destination.filteredConversations = conversations
             destination.filteredPinnedConversations = conversations
             present(navController, animated: true, completion: nil)
-        }
-    }
-            
-    func createChat(chatID: String, membersIDs: ([String], [String:AnyObject]), activityID: String) {
-        if let currentUserID = Auth.auth().currentUser?.uid {
-            if let nameRow: TextRow = form.rowBy(tag: "Activity Name"), let viewRow: ViewRow<UIImageView> = form.rowBy(tag: "Activity Image") {
-                let activities: [String] = [activityID]
-                let chatImage = viewRow.view?.image
-                let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-                let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "activities": activities as AnyObject, "chatName": nameRow.value as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject]
-                
-                activityCreatingGroup.enter()
-                activityCreatingGroup.enter()
-                activityCreatingGroup.enter()
-                createGroupChatNode(reference: groupChatsReference, childValues: childValues, noImagesToUpload: chatImage == nil)
-                uploadAvatar(chatImage: chatImage, reference: groupChatsReference)
-                connectMembersToGroupChat(memberIDs: membersIDs.0, chatID: chatID)
-                self.informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: membersIDs.0, text: "New group has been created")
-            }
         }
     }
     
@@ -1791,22 +1690,23 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
             if let _ = schedule.name {
                 scheduleRow.baseValue = schedule
                 scheduleRow.updateCell()
+                scheduleRow.reload()
                 if scheduleList.indices.contains(scheduleIndex) {
                     scheduleList[scheduleIndex] = schedule
                 } else {
                     scheduleList.append(schedule)
                 }
                 sortSchedule()
-                guard let localAddress = schedule.locationAddress else { return }
-                for (key, value) in localAddress {
-                    locationAddress[key] = value
+                if let localAddress = schedule.locationAddress {
+                    for (key, value) in localAddress {
+                        locationAddress[key] = value
+                    }
                 }
                 setupRightBarButton(with: "Update")
                 updateLists(type: "schedule")
             }
             else {
                 mvs.remove(at: scheduleIndex)
-                
             }
         }
     }

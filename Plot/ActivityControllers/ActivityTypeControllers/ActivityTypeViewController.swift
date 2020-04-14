@@ -91,6 +91,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
             delegate?.updateSchedule(schedule: activity)
         }
+        
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

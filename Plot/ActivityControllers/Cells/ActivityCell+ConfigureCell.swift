@@ -126,6 +126,14 @@ extension ActivityCell {
             invitationSegmentHeightConstraint.constant = 0
         }
         
+        if activity.recipeID != nil {
+            activityTypeButton.setImage(UIImage(named: "meal"), for: .normal)
+        } else if activity.workoutID != nil {
+            activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
+        } else if activity.eventID != nil {
+            activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+        }
+        
         let badgeString = activity.badge?.toString()
         let badgeInt = activity.badge ?? 0
         

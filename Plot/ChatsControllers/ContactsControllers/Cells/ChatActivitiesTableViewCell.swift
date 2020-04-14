@@ -44,21 +44,7 @@ class ChatActivitiesTableViewCell: UITableViewCell {
     }()
     
     
-    lazy var startTimeLabel: UILabel = {
-        let label = UILabel()
-        //        label.font = UIFont.systemFont(ofSize: 13)
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.numberOfLines = 1
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.isUserInteractionEnabled = true
-        label.sizeToFit()
-        
-        return label
-    }()
-    
-    lazy var endTimeLabel: UILabel = {
+    lazy var dateTimeLabel: UILabel = {
         let label = UILabel()
         //        label.font = UIFont.systemFont(ofSize: 13)
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
@@ -79,22 +65,21 @@ class ChatActivitiesTableViewCell: UITableViewCell {
         
         backgroundColor = .clear
         contentView.addSubview(nameLabel)
+        contentView.addSubview(dateTimeLabel)
         contentView.addSubview(locationNameLabel)
-        contentView.addSubview(startTimeLabel)
-        contentView.addSubview(endTimeLabel)
         
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
         
-        locationNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
+        dateTimeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
+        dateTimeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
+        dateTimeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
+                        
+        locationNameLabel.topAnchor.constraint(equalTo: dateTimeLabel.bottomAnchor, constant: 2).isActive = true
         locationNameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         locationNameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
-        
-        startTimeLabel.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor).isActive = true
-        startTimeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
-        
-        endTimeLabel.centerYAnchor.constraint(equalTo: locationNameLabel.centerYAnchor).isActive = true
-        endTimeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
+        locationNameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -106,12 +91,10 @@ class ChatActivitiesTableViewCell: UITableViewCell {
     
       nameLabel.text = ""
       locationNameLabel.text = ""
-      startTimeLabel.text = ""
-      endTimeLabel.text = ""
+      dateTimeLabel.text = ""
       nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
       locationNameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-      startTimeLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-      endTimeLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+      dateTimeLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
     }
     
     func configureCell(for activity: Activity) {
@@ -124,12 +107,9 @@ class ChatActivitiesTableViewCell: UITableViewCell {
           
           // set the texts to the labels
         nameLabel.text = activity.name
+        dateTimeLabel.text = formattedDate.0 + formattedDate.1
         if activity.locationName != "locationName" {
             locationNameLabel.text = activity.locationName
-        } else {
-            locationNameLabel.text = " "
         }
-        startTimeLabel.text = formattedDate.0
-        endTimeLabel.text = formattedDate.1
     }
 }

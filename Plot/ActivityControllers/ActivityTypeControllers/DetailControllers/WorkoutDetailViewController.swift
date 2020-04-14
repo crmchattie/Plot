@@ -44,6 +44,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
     fileprivate func setMoreActivity() {
         if let workout = workout {
             activity.name = workout.title
+            activity.activityType = "workout"
             activity.workoutID = "\(workout.identifier)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
@@ -541,17 +542,11 @@ extension WorkoutDetailViewController: UpdateInvitees {
         }
         
         if active {
-            let membersIDs = fetchMembersIDs()
-            if Set(activity.participantsIDs!) != Set(membersIDs.0) {
-                let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-                updateParticipants(membersIDs: membersIDs)
-                groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
-            }
+            showActivityIndicator()
+            let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+            createActivity.updateActivityParticipants()
+            hideActivityIndicator()
             
-            dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-                InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-                }
-            })
         }
     }
 }

@@ -60,8 +60,7 @@ class FalconUsersFetcher: NSObject {
     if userID == nil {
         return
     }
-    print("Fetching Plot Users")
-    
+
     clearObserversAndUsersIfNeeded()
     
     reference = Database.database().reference()
@@ -182,7 +181,6 @@ class FalconUsersFetcher: NSObject {
     
     //need to redo fetchAndObserveFalconUser: fetch once and create user friendship node
   fileprivate func fetchAndObserveFalconUser(for preparedNumber: String, asynchronously: Bool) {
-    
     
     //create reference to database + reference + child("users"); just a url
     reference = Database.database().reference()

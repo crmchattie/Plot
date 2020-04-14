@@ -68,14 +68,13 @@ class ActivityActions: NSObject {
             return
         }
         
+        if !active {
+            activity.admin = Auth.auth().currentUser?.uid
+        }
         
         storeReminder()
     
         var firebaseDictionary = activity.toAnyObject()
-        
-        if !active {
-            activity.admin = Auth.auth().currentUser?.uid
-        }
         
         let membersIDs = fetchMembersIDs()
         incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
@@ -86,6 +85,24 @@ class ActivityActions: NSObject {
             firebaseDictionary["participantsIDs"] = membersIDs.1 as AnyObject
             newActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
         }
+    }
+    
+    public func updateActivityParticipants() {
+        guard let _ = active, let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers else {
+            return
+        }
+        let membersIDs = fetchMembersIDs()
+        if Set(activity.participantsIDs!) != Set(membersIDs.0) {
+            let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+            updateParticipants(membersIDs: membersIDs)
+            groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
+        }
+        
+        dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+            InvitationsFetcher.updateInvitations(forActivity:activity, selectedParticipants: selectedFalconUsers) {
+                print("created invitations")
+            }
+        })
     }
     
     func updateActivity(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
@@ -106,12 +123,14 @@ class ActivityActions: NSObject {
                                 
         let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
                 
-        dispatchGroup.enter()
-        dispatchGroup.enter()
+        self.dispatchGroup.enter()
+        self.dispatchGroup.enter()
         createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
         connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
-        dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+        self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+            print("creating invitations")
             InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
+                print("created invitations")
             }
         })
     }
@@ -141,11 +160,39 @@ class ActivityActions: NSObject {
         return (membersIDs, membersIDsDictionary)
     }
     
+    func connectMembersToGroupActivity(memberIDs: [String], activityID: String) {
+        let connectingMembersGroup = DispatchGroup()
+        for _ in memberIDs {
+            connectingMembersGroup.enter()
+        }
+        connectingMembersGroup.notify(queue: DispatchQueue.main, execute: {
+            self.dispatchGroup.leave()
+        })
+        for memberID in memberIDs {
+            let userReference = Database.database().reference().child("user-activities").child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
+            let values:[String : Any] = ["isGroupActivity": true]
+            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                connectingMembersGroup.leave()
+            })
+        }
+    }
+
+    func createGroupActivityNode(reference: DatabaseReference, childValues: [String: Any]) {
+        print("child values \(childValues)")
+        let nodeCreationGroup = DispatchGroup()
+        nodeCreationGroup.enter()
+        nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
+            self.dispatchGroup.leave()
+        })
+        reference.updateChildValues(childValues) { (error, reference) in
+            nodeCreationGroup.leave()
+        }
+    }
+    
     func updateParticipants(membersIDs: ([String], [String:AnyObject])) {
         guard let activity = activity, let activityID = activityID else {
             return
         }
-        
         let participantsSet = Set(activity.participantsIDs!)
         let membersSet = Set(membersIDs.0)
         let difference = participantsSet.symmetricDifference(membersSet)
@@ -164,33 +211,6 @@ class ActivityActions: NSObject {
             }
             
             connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
-        }
-    }
-    
-    func connectMembersToGroupActivity(memberIDs: [String], activityID: String) {
-        for _ in memberIDs {
-            dispatchGroup.enter()
-        }
-        dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-            self.dispatchGroup.leave()
-        })
-        for memberID in memberIDs {
-            let userReference = Database.database().reference().child("user-activities").child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["isGroupActivity": true]
-            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                self.dispatchGroup.leave()
-            })
-        }
-    }
-
-    func createGroupActivityNode(reference: DatabaseReference, childValues: [String: Any]) {
-        let nodeCreationGroup = DispatchGroup()
-        nodeCreationGroup.enter()
-        nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
-            self.dispatchGroup.leave()
-        })
-        reference.updateChildValues(childValues) { (error, reference) in
-            nodeCreationGroup.leave()
         }
     }
     

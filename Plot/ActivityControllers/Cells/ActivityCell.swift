@@ -39,7 +39,7 @@ class ActivityCell: UITableViewCell {
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
         label.sizeToFit()
-        
+        label.numberOfLines = 0
         return label
     }()
     
@@ -207,7 +207,6 @@ class ActivityCell: UITableViewCell {
         
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4).isActive = true
         activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4).isActive = true
-        
         activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
         activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
         
@@ -218,7 +217,7 @@ class ActivityCell: UITableViewCell {
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: 10).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         
         activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
@@ -306,6 +305,7 @@ class ActivityCell: UITableViewCell {
         muteIndicator.isHidden = true
         newActivityIndicator.isHidden = true
         nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
     }
     
     @objc func indexChangedSegmentedControl(_ sender: UISegmentedControl) {

@@ -144,28 +144,11 @@ class ActivitiesFetcher: NSObject {
             activity.activityID = metaInfo.activityID
             activity.conversationID = metaInfo.conversationID
             activity.admin = metaInfo.admin
+            activity.schedule = metaInfo.schedule
+            activity.purchases = metaInfo.purchases
             activity.recipeID = metaInfo.recipeID
             activity.workoutID = metaInfo.workoutID
             activity.eventID = metaInfo.eventID
-            
-            if let scheduleFirebaseList = dictionary["schedule"] as? [AnyObject] {
-                var scheduleList = [Activity]()
-                for schedule in scheduleFirebaseList {
-                    let sche = Activity(dictionary: schedule as? [String : AnyObject])
-                    if sche.name == "nothing" { continue }
-                    scheduleList.append(sche)
-                }
-                activity.schedule = scheduleList
-            }
-            if let purchasesFirebaseList = dictionary["purchases"] as? [AnyObject] {
-                var purchasesList = [Purchase]()
-                for purchase in purchasesFirebaseList {
-                    let purch = Purchase(dictionary: purchase as? [String : AnyObject])
-                    if purch.name == "nothing" { continue }
-                    purchasesList.append(purch)
-                }
-                activity.purchases = purchasesList
-            }
             
             self.prefetchThumbnail(from: activity.activityOriginalPhotoURL)
             

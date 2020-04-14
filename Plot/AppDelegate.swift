@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import UserNotifications
+import CodableFirebase
 
 enum Identifiers {
     static let viewChatsAction = "VIEW_CHAT_IDENTIFIER"
@@ -280,7 +281,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         self.messagesFetcher?.loadMessagesData(for: conversation)
                     })
                 } else {
-                    let activityID = userInfo["activityID"] as? String                    
+                    let activityID = userInfo["activityID"] as? String
                     let groupChatDataReference = Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder)
                     groupChatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                         guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
@@ -292,23 +293,114 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         
                         let activity = Activity(dictionary: dictionary)
                         
-                        let activityController = CreateActivityViewController()
-                        
-                        activityController.activity = activity
-                        
-                        if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                            
-                            tabBarController.selectedIndex = 1
-                            
-                            tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                            
-                            if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                        let dispatchGroup = DispatchGroup()
                                 
-                                homeNavigationController.pushViewController(activityController, animated: true)
+                        if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {
+                            dispatchGroup.enter()
+                            Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
+                                let detailedRecipe = search
+                                dispatchGroup.leave()
+                                dispatchGroup.notify(queue: .main) {
+                                    let destination = MealDetailViewController()
+                                    destination.recipe = detailedRecipe
+                                    destination.detailedRecipe = detailedRecipe
+                                    destination.activity = activity
+                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                        tabBarController.selectedIndex = 1
+                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                            homeNavigationController.pushViewController(destination, animated: true)
+                                            
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        } else if let eventID = activity.eventID {
+                            dispatchGroup.enter()
+                            Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
+                                if let events = search?.embedded?.events {
+                                    let event = events[0]
+                                    dispatchGroup.leave()
+                                    dispatchGroup.notify(queue: .main) {
+                                        let destination = EventDetailViewController()
+                                        destination.event = event
+                                        destination.activity = activity
+                                        if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                            tabBarController.selectedIndex = 1
+                                            tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                            if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                                homeNavigationController.pushViewController(destination, animated: true)
+                                                
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+                            }
+                        } else if let workoutID = activity.workoutID {
+                            var reference = Database.database().reference()
+                            let destination = WorkoutDetailViewController()
+                            dispatchGroup.enter()
+                            reference = Database.database().reference().child("workouts").child("workouts")
+                            reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                                if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                                    if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                        dispatchGroup.leave()
+                                        destination.workout = workout
+                                        destination.intColor = 0
+                                        destination.activity = activity
+                                        if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                            tabBarController.selectedIndex = 1
+                                            tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                            if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                                homeNavigationController.pushViewController(destination, animated: true)
+                                                
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+                              })
+                            { (error) in
+                                print(error.localizedDescription)
+                            }
+                        } else if let attractionID = activity.attractionID {
+                            dispatchGroup.enter()
+                            Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
+                                let attraction = search?.embedded?.attractions![0]
+                                dispatchGroup.leave()
+                                dispatchGroup.notify(queue: .main) {
+                                    let destination = EventDetailViewController()
+                                    destination.attraction = attraction
+                                    destination.activity = activity
+                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                        tabBarController.selectedIndex = 1
+                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                            homeNavigationController.pushViewController(destination, animated: true)
+                                            
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        } else {
+                            let destination = CreateActivityViewController()
+                            destination.hidesBottomBarWhenPushed = true
+                            destination.activity = activity
+                            if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                tabBarController.selectedIndex = 1
+                                tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                    homeNavigationController.pushViewController(destination, animated: true)
+                                    
+                                }
                                 
                             }
                             
                         }
+                        
                     })
                 }
             }

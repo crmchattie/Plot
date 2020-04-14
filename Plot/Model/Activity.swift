@@ -83,6 +83,26 @@ class Activity: NSObject, Codable {
             participantsIDs = []
         }
         
+        if let scheduleFirebaseList = dictionary?["schedule"] as? [AnyObject] {
+            var scheduleList = [Activity]()
+            for schedule in scheduleFirebaseList {
+                let sche = Activity(dictionary: schedule as? [String : AnyObject])
+                if sche.name == "nothing" { continue }
+                scheduleList.append(sche)
+            }
+            schedule = scheduleList
+        }
+        
+        if let purchasesFirebaseList = dictionary?["purchases"] as? [AnyObject] {
+            var purchasesList = [Purchase]()
+            for purchase in purchasesFirebaseList {
+                let purch = Purchase(dictionary: purchase as? [String : AnyObject])
+                if purch.name == "nothing" { continue }
+                purchasesList.append(purch)
+            }
+            purchases = purchasesList
+        }
+        
         transportation = dictionary?["transportation"] as? String
         activityOriginalPhotoURL = dictionary?["activityOriginalPhotoURL"] as? String
         activityThumbnailPhotoURL = dictionary?["activityThumbnailPhotoURL"] as? String
@@ -92,8 +112,6 @@ class Activity: NSObject, Codable {
         endDateTime = dictionary?["endDateTime"] as? NSNumber
         reminder = dictionary?["reminder"] as? String
         notes = dictionary?["notes"] as? String
-        schedule = dictionary?["schedule"] as? [Activity]
-        purchases = dictionary?["purchases"] as? [Purchase]
         checklist = dictionary?["checklist"] as? [String: [String : Bool]]
         isGroupActivity = dictionary?["isGroupActivity"] as? Bool
         admin = dictionary?["admin"] as? String
@@ -239,15 +257,15 @@ class Activity: NSObject, Codable {
 }
 
 enum ActivityType: String {
-    case basic, complex, meal, workout, trip
+    case basic, complex, recipe, workout, event
     
     var activityCategoryText: String {
         switch self {
             case .basic: return "Build your own basic activity"
             case .complex: return "Build your own complex activity"
-            case .meal: return "Build your own meal"
+            case .recipe: return "Build your own recipe"
             case .workout: return "Build your own workout"
-            case .trip: return "Build your own trip"
+            case .event: return "Build your own event"
         }
     }
     
@@ -255,9 +273,9 @@ enum ActivityType: String {
         switch self {
             case .basic: return "Includes basic calendar activity fields"
             case .complex: return "Includes basic activity fields plus a schedule, a checklist and purchases fields"
-            case .meal: return "Includes sections for photo, name, ingredients, preparation and steps"
+            case .recipe: return "Includes sections for photo, name, ingredients, preparation and steps"
             case .workout: return "Able to pick and choose exercises, sets and weights"
-            case .trip: return "Add in transportation, lodgings and more"
+            case .event: return ""
         }
     }
     
@@ -265,9 +283,9 @@ enum ActivityType: String {
         switch self {
             case .basic: return "activityLarge"
             case .complex: return "activityLarge"
-            case .meal: return "meal"
+            case .recipe: return "meal"
             case .workout: return "workout"
-            case .trip: return "plane"
+            case .event: return "event"
         }
     }
 }

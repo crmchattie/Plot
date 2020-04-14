@@ -176,65 +176,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
             membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
             membersIDs.append(id)
         }
-        
-        print("membersIDs \(membersIDs)")
-        
+                
         return (membersIDs, membersIDsDictionary)
-    }
-    
-    func updateParticipants(membersIDs: ([String], [String:AnyObject])) {
-        let participantsSet = Set(activity.participantsIDs!)
-        let membersSet = Set(membersIDs.0)
-        let difference = participantsSet.symmetricDifference(membersSet)
-        for member in difference {
-            if participantsSet.contains(member) {
-            Database.database().reference().child("user-activities").child(member).child(activityID).removeValue()
-            }
-            if let chatID = activity?.conversationID { Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("chatParticipantsIDs").updateChildValues(membersIDs.1)
-            }
-            
-            dispatchGroup.enter()
-            
-            if let chatID = activity?.conversationID {
-                dispatchGroup.enter()
-                connectMembersToGroupChat(memberIDs: membersIDs.0, chatID: chatID)
-            }
-            
-            connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
-        }
-    }
-    
-    func connectMembersToGroupActivity(memberIDs: [String], activityID: String) {
-        for _ in memberIDs {
-            dispatchGroup.enter()
-        }
-        dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-            self.dispatchGroup.leave()
-        })
-        for memberID in memberIDs {
-            let userReference = Database.database().reference().child("user-activities").child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["isGroupActivity": true]
-            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                self.dispatchGroup.leave()
-            })
-        }
-    }
-    
-    func connectMembersToGroupChat(memberIDs: [String], chatID: String) {
-        let connectingMembersGroup = DispatchGroup()
-        for _ in memberIDs {
-            connectingMembersGroup.enter()
-        }
-        connectingMembersGroup.notify(queue: DispatchQueue.main, execute: {
-            self.dispatchGroup.leave()
-        })
-        for memberID in memberIDs {
-            let userReference = Database.database().reference().child("user-messages").child(memberID).child(chatID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["isGroupChat": true]
-            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                connectingMembersGroup.leave()
-            })
-        }
     }
     
     @objc func goToMap() {

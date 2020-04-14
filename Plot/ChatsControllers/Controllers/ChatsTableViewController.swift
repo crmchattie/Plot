@@ -87,7 +87,9 @@ class ChatsTableViewController: UITableViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
+    if appLoaded {
+        configureTabBarBadge()
+    }
 
   }
   deinit {

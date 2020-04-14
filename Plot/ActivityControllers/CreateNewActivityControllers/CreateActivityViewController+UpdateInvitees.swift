@@ -44,19 +44,11 @@ extension CreateActivityViewController: UpdateInvitees {
             }
             
             if active {
-                let membersIDs = fetchMembersIDs()
-                if Set(activity.participantsIDs!) != Set(membersIDs.0) {
-                    showActivityIndicator()
-                    let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-                    updateParticipants(membersIDs: membersIDs)
-                    groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
-                }
+                showActivityIndicator()
+                let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+                createActivity.updateActivityParticipants()
+                hideActivityIndicator()
                 
-                activityCreatingGroup.notify(queue: DispatchQueue.main, execute: {
-                    InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-                        self.hideActivityIndicator()
-                    }
-                })
             }
             
             decimalRowFunc()

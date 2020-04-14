@@ -74,15 +74,15 @@ class IncomingActivityMessageCell: BaseActivityMessageCell {
 //           messageImageView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor, constant: -4.8).isActive = true
 
            textView.topAnchor.constraint(equalTo: messageImageView.bottomAnchor, constant: 10).isActive = true
-           textView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 10).isActive = true
+           textView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 15).isActive = true
            textView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor, constant: -5).isActive = true
 
            categoryView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 2).isActive = true
-           categoryView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 10).isActive = true
+           categoryView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 15).isActive = true
            categoryView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor, constant: -5).isActive = true
 
            subcategoryView.topAnchor.constraint(equalTo: categoryView.bottomAnchor, constant: 2).isActive = true
-           subcategoryView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 10).isActive = true
+           subcategoryView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 15).isActive = true
            subcategoryView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor, constant: -5).isActive = true
         
         bubbleView.addSubview(progressView)
