@@ -195,6 +195,7 @@ extension UICollectionView {
   }
 }
 
+
 extension Array {
   func insertionIndexOf(elem: Element, isOrderedBefore: (Element, Element) -> Bool) -> Int {
     var lo = 0

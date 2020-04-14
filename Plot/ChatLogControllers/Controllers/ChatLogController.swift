@@ -652,6 +652,7 @@ class ChatLogController: UICollectionViewController {
     @objc func goToActivity(message: Message) {
         let dispatchGroup = DispatchGroup()
         print("going to activity")
+        
         if message.activityType == "recipe", let recipeString = message.activityID, let recipeID = Int(recipeString) {
             print("meal \(String(describing: message.text))")
             dispatchGroup.enter()
@@ -731,6 +732,7 @@ class ChatLogController: UICollectionViewController {
         }
         
     }
+    
   
   var canRefresh = true
   var isScrollViewAtTheBottom = true

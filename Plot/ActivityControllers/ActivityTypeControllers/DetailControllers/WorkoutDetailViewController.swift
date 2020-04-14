@@ -24,6 +24,12 @@ class WorkoutDetailViewController: ActivityDetailViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        setActivity()
+        
+        if !active {
+            setMoreActivity()
+        }
                     
         title = "Workout"
         
@@ -31,16 +37,13 @@ class WorkoutDetailViewController: ActivityDetailViewController {
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
         collectionView.register(WorkoutDetailCell.self, forCellWithReuseIdentifier: kWorkoutDetailCell)
         collectionView.register(ExerciseDetailCell.self, forCellWithReuseIdentifier: kExerciseDetailCell)
-        
-        if activity == nil {
-            setMoreActivity()
-        }
 
                                         
     }
     
     fileprivate func setMoreActivity() {
         if let workout = workout {
+            activity.name = workout.title
             activity.workoutID = "\(workout.identifier)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
@@ -54,15 +57,15 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    startDateTime = rounded
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
                     if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
-                        endDateTime = Date().addingTimeInterval(duration * 60)
+                        endDateTime = startDateTime!.addingTimeInterval(duration * 60)
                     } else {
-                        endDateTime = rounded
+                        endDateTime = startDateTime!
                     }
                 }
-                activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
-                activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
                 if let localName = umbrellaActivity.locationName, localName != "locationName", let localAddress = umbrellaActivity.locationAddress {
                     locationName = localName
                     locationAddress = localAddress
@@ -73,13 +76,17 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
                 (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                startDateTime = rounded
+                let timezone = TimeZone.current
+                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                startDateTime = rounded.addingTimeInterval(seconds)
                 if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
-                    endDateTime = Date().addingTimeInterval(duration * 60)
+                    endDateTime = startDateTime!.addingTimeInterval(duration * 60)
                 } else {
-                    endDateTime = rounded
+                    endDateTime = startDateTime!
                 }
             }
+            self.collectionView.reloadData()
+            activity.allDay = false
             activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
         }
@@ -129,10 +136,13 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                 cell.locationLabel.text = locationName
                 cell.participantsLabel.text = userNamesString
                 cell.rightReminderLabel.text = reminder
-                cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
-                cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
-                cell.startDatePicker.date = startDateTime!
-                cell.endDatePicker.date = endDateTime!
+                if let startDateTime = startDateTime, let endDateTime = endDateTime {
+                    dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
+                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
+                    cell.startDatePicker.date = startDateTime
+                    cell.endDatePicker.date = endDateTime
+                }
                 cell.workout = workout
                 return cell
             } else {

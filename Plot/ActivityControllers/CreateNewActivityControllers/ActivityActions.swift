@@ -9,11 +9,11 @@
 import UIKit
 import Firebase
 
-protocol CreateActivityDelegate: class {
+protocol ActivityActionsDelegate: class {
     
 }
 
-class CreateActivity: NSObject {
+class ActivityActions: NSObject {
     
     var activity: Activity?
     var activityID: String?
@@ -25,15 +25,38 @@ class CreateActivity: NSObject {
     
     let dispatchGroup = DispatchGroup()
     
-    weak var delegate: CreateActivityDelegate?
+    weak var delegate: ActivityActionsDelegate?
     
-    init(activity: Activity?, active: Bool?, selectedFalconUsers: [User]?) {
+    init(activity: Activity, active: Bool?, selectedFalconUsers: [User]) {
+        super.init()
         self.activity = activity
-        self.activityID = activity?.activityID
-        self.startDateTime = Date(timeIntervalSince1970: activity?.startDateTime as! TimeInterval)
-        self.endDateTime = Date(timeIntervalSince1970: activity?.endDateTime as! TimeInterval)
+        self.activityID = activity.activityID
         self.active = active
+        self.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
+        self.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
         self.selectedFalconUsers = selectedFalconUsers
+    
+    }
+    
+    public func deleteActivity() {
+        guard currentReachabilityStatus != .notReachable else {
+            return
+        }
+        
+        guard let _ = active, let _ = activity, let activityID = activityID, let _ = selectedFalconUsers else {
+            return
+        }
+                  
+        let membersIDs = fetchMembersIDs()
+        
+        for memberID in membersIDs.0 {
+        Database.database().reference().child("user-activities").child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+            Database.database().reference().child("user-activities").child(memberID).child(activityID).removeValue()
+        }
+                
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
+        
     }
     
     public func createNewActivity() {
@@ -41,16 +64,20 @@ class CreateActivity: NSObject {
             return
         }
         
-        guard let active = active, let activity = activity, let activityID = activityID else {
+        guard let active = active, let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
+        
         
         storeReminder()
     
         var firebaseDictionary = activity.toAnyObject()
         
-        let membersIDs = fetchMembersIDs()
+        if !active {
+            activity.admin = Auth.auth().currentUser?.uid
+        }
         
+        let membersIDs = fetchMembersIDs()
         incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
         
         if active {
@@ -68,24 +95,25 @@ class CreateActivity: NSObject {
         
         let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
         groupActivityReference.updateChildValues(firebaseDictionary)
+        
+        
     }
     
     func newActivity(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
         guard let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
-                
-        activity.admin = Auth.auth().currentUser?.uid
-        
+                                
         let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-        
+                
+        dispatchGroup.enter()
+        dispatchGroup.enter()
+        createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
+        connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
         dispatchGroup.notify(queue: DispatchQueue.main, execute: {
             InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
             }
         })
-        dispatchGroup.enter()
-        dispatchGroup.enter()
-        createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
@@ -123,7 +151,7 @@ class CreateActivity: NSObject {
         let difference = participantsSet.symmetricDifference(membersSet)
         for member in difference {
             if participantsSet.contains(member) {
-            Database.database().reference().child("user-activities").child(member).child(activityID).removeValue()
+                Database.database().reference().child("user-activities").child(member).child(activityID).removeValue()
             }
             if let chatID = activity.conversationID { Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("chatParticipantsIDs").updateChildValues(membersIDs.1)
             }
@@ -211,8 +239,8 @@ class CreateActivity: NSObject {
         guard let activity = activity, let activityID = activityID else {
             return
         }
-        
         let center = UNUserNotificationCenter.current()
+        guard activity.reminder != nil else { return }
         guard activity.reminder! != "None" else {
             center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
             return
@@ -269,5 +297,4 @@ class CreateActivity: NSObject {
             })
         })
     }
-    
 }

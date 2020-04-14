@@ -31,8 +31,8 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
   }
 }
 
-protocol UpdateActivityDelegate: class {
-    func updateActivity(activity: Activity)
+protocol ChooseActivityDelegate: class {
+    func chosenActivity(mergeActivity: Activity)
 }
 
 
@@ -56,7 +56,7 @@ class ChooseActivityTableViewController: UITableViewController {
 
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
-    weak var delegate : UpdateActivityDelegate?
+    weak var delegate : ChooseActivityDelegate?
     
     let activityCreatingGroup = DispatchGroup()
     let informationMessageSender = InformationMessageSender()
@@ -181,11 +181,6 @@ class ChooseActivityTableViewController: UITableViewController {
           return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
       }
       
-      pinnedActivities.sort { (activity1, activity2) -> Bool in
-          return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
-      }
-      
-      filteredPinnedActivities = pinnedActivities
       filteredActivities = activities
       
   }
@@ -205,37 +200,36 @@ class ChooseActivityTableViewController: UITableViewController {
 
     // MARK: - Table view data source
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    return true
+       return true
   }
   
   override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-
-      return ""
+        return ""
   }
   
   override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-      return 0
+        return 0
   }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-      view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
       
-      if let headerTitle = view as? UITableViewHeaderFooterView {
-        headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-      }
+        if let headerTitle = view as? UITableViewHeaderFooterView {
+            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
     }
   
   // MARK: - Table view data source
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-      return UITableView.automaticDimension
+        return UITableView.automaticDimension
     }
   
     override func numberOfSections(in tableView: UITableView) -> Int {
-      return 2
+        return 2
     }
   
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      return filteredActivities.count
+        return filteredActivities.count
     }
   
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -250,22 +244,14 @@ class ChooseActivityTableViewController: UITableViewController {
         
         cell.configureCell(for: indexPath, activity: activity, withInvitation: nil)
       
-      return cell
-  }
+        return cell
+    }
   
-  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let unpinnedActivity = filteredActivities[indexPath.row]
-    activity = unpinnedActivity
-    if let activity = activity, let activityName = activity.name?.trimmingCharacters(in: .whitespaces) {
-        let newActivityName = activityName
-        let text = "The \(newActivityName ) activity was connected to this chat"
-        if let conversationID = activity.conversationID {
-            informationMessageSender.sendInformatoinMessage(chatID: conversationID, membersIDs: activity.participantsIDs!, text: text)
-        }
-        delegate?.updateActivity(activity: activity)
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let activity = filteredActivities[indexPath.row]
+        delegate?.chosenActivity(mergeActivity: activity)
         dismiss(animated: true, completion: nil)
     }
-  }
 }
 
 extension ChooseActivityTableViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
@@ -287,14 +273,6 @@ extension ChooseActivityTableViewController: UISearchBarDelegate, UISearchContro
         
         filteredActivities = searchText.isEmpty ? activities :
             activities.filter({ (activity) -> Bool in
-                if let name = activity.name {
-                    return name.lowercased().contains(searchText.lowercased())
-                }
-                return ("").lowercased().contains(searchText.lowercased())
-            })
-
-        filteredPinnedActivities = searchText.isEmpty ? pinnedActivities :
-            pinnedActivities.filter({ (activity) -> Bool in
                 if let name = activity.name {
                     return name.lowercased().contains(searchText.lowercased())
                 }

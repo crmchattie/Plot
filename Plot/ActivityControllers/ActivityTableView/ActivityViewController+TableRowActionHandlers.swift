@@ -194,11 +194,28 @@ extension ActivityViewController {
         activityView.tableView.beginUpdates()
         filteredPinnedActivities.remove(at: indexPath.row)
         pinnedActivities.remove(at: index)
+        
+        if let invitation = invitations.removeValue(forKey: activityID) {
+            InvitationsFetcher.remove(invitation: invitation)
+        }
+        
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()
         
-        Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+    Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
         Database.database().reference().child("user-activities").child(currentUserID).child(activityID).removeValue()
+    
+        let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+            if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
+                var varMemberIDs = membersIDs
+                print("membersIDs \(varMemberIDs)")
+                varMemberIDs[currentUserID] = nil
+                print("membersIDs \(varMemberIDs)")
+                activityDataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
+            }
+        })
         
         configureTabBarBadge()
         if activities.count <= 0 && pinnedActivities.count <= 0 {
@@ -226,8 +243,21 @@ extension ActivityViewController {
         
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()
-        Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+    Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
         Database.database().reference().child("user-activities").child(currentUserID).child(activityID).removeValue()
+    
+        let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+            if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
+                var varMemberIDs = membersIDs
+                print("membersIDs \(varMemberIDs)")
+                varMemberIDs[currentUserID] = nil
+                print("membersIDs \(varMemberIDs)")
+                activityDataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
+            }
+
+        })
         
         configureTabBarBadge()
         if activities.count <= 0 && pinnedActivities.count <= 0 {

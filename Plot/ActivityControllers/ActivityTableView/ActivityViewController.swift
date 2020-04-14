@@ -246,7 +246,14 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     // MARK:- action: Selectors
     
     @objc fileprivate func newActivity() {
-        self.createActivity()
+        let destination = ActivityTypeViewController()
+    //        let destination = CreateActivityViewController()
+        destination.hidesBottomBarWhenPushed = true
+        destination.users = users
+        destination.filteredUsers = filteredUsers
+        destination.activities = activities + pinnedActivities
+        destination.conversations = conversations
+        navigationController?.pushViewController(destination, animated: true)
     }
     
     @objc fileprivate func showMappedActivities() {
@@ -264,16 +271,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         notificationsViewController.activityViewController = self
         let navigationViewController = UINavigationController(rootViewController: notificationsViewController)
         self.present(navigationViewController, animated: true, completion: nil)
-    }
-    
-    func createActivity() {
-        let destination = ActivityTypeViewController()
-//        let destination = CreateActivityViewController()
-        destination.hidesBottomBarWhenPushed = true
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        destination.conversations = conversations
-        navigationController?.pushViewController(destination, animated: true)
     }
     
     @objc fileprivate func arrowButtonTapped() {
@@ -701,6 +698,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             activity = unpinnedActivity
         }
         
+        showActivityIndicator()
+        
         if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {
             dispatchGroup.enter()
             Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
@@ -719,6 +718,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                         InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                             destination.acceptedParticipant = acceptedParticipant
                             destination.selectedFalconUsers = participants
+                            self.hideActivityIndicator()
                             self.navigationController?.pushViewController(destination, animated: true)
                         }
                     }
@@ -742,6 +742,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 destination.acceptedParticipant = acceptedParticipant
                                 destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
                                 self.navigationController?.pushViewController(destination, animated: true)
                             }
                         }
@@ -768,6 +769,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 destination.acceptedParticipant = acceptedParticipant
                                 destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
                                 self.navigationController?.pushViewController(destination, animated: true)
                             }
                         }
@@ -794,12 +796,14 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                         InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                             destination.acceptedParticipant = acceptedParticipant
                             destination.selectedFalconUsers = participants
+                            self.hideActivityIndicator()
                             self.navigationController?.pushViewController(destination, animated: true)
                         }
                     }
                 }
             }
         } else {
+            self.hideActivityIndicator()
             let destination = CreateActivityViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.activity = activity
@@ -827,6 +831,18 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             sharedContainer.set(activitiesArray, forKey: "ActivitiesArray")
             sharedContainer.synchronize()
         }
+    }
+    
+    func showActivityIndicator() {
+        if let tabController = self.tabBarController {
+            self.showSpinner(onView: tabController.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
     }
 }
 
@@ -964,7 +980,7 @@ extension ActivityViewController: ActivityViewControllerDataStore {
         guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-
+        
         let group = DispatchGroup()
         let olderParticipants = self.activitiesParticipants[activityID]
         var participants: [User] = []
@@ -1103,8 +1119,8 @@ extension ActivityViewController: MessagesDelegate {
     }
 }
 
-extension ActivityViewController: UpdateChatDelegate {
-    func updateChat(chatID: String, activityID: String?) {
+extension ActivityViewController: ChooseChatDelegate {
+    func chosenChat(chatID: String, activityID: String?) {
         
         if let conversation = conversations.first(where: {$0.chatID == chatID}) {
             if conversation.activities != nil {

@@ -38,7 +38,6 @@ class GeneralTabBarController: UITabBarController {
     
     fileprivate let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
-    
     fileprivate var isAppLoaded = false
     
     //  let contactsController = ContactsController()

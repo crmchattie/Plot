@@ -21,6 +21,7 @@ class SelectParticipantsViewController: UIViewController {
     
     var filteredUsers = [User]() {
         didSet {
+            checkIfThereAnyUsers()
             configureSections()
         }
     }
@@ -44,6 +45,7 @@ class SelectParticipantsViewController: UIViewController {
     var searchBar: UISearchBar?
     let tableView = UITableView()
     var movingBackwards: Bool = true
+    let viewPlaceholder = ViewPlaceholder()
     
     var activityObject: ActivityObject?
     
@@ -134,6 +136,15 @@ class SelectParticipantsViewController: UIViewController {
                     .sorted { $0.name ?? "" < $1.name ?? "" }
             }
         }
+    }
+    
+    func checkIfThereAnyUsers() {
+        if filteredUsers.count > 0 {
+            viewPlaceholder.remove(from: tableView, priority: .medium)
+        } else {
+            viewPlaceholder.add(for: tableView, title: .emptyUsers, subtitle: .emptyUsers, priority: .medium, position: .top)
+        }
+        tableView.reloadData()
     }
     
     fileprivate func setupMainView() {

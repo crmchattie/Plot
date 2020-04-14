@@ -433,13 +433,13 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
         cell.horizontalController.conversations = conversations
+        cell.horizontalController.activities = activities
         cell.horizontalController.users = users
         cell.horizontalController.filteredUsers = filteredUsers
         cell.horizontalController.favAct = favAct
         cell.horizontalController.conversation = conversation
         cell.horizontalController.schedule = schedule
         cell.horizontalController.umbrellaActivity = umbrellaActivity
-        cell.horizontalController.selectedFalconUsers = selectedFalconUsers
         cell.arrowView.isHidden = true
         cell.delegate = self
         if showGroups {
@@ -452,12 +452,6 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
                     if let workout = workout as? Workout {
                         print("workout \(String(describing: workout.title))")
                         let destination = WorkoutDetailViewController()
-                        if let umbrellaActivity = self!.umbrellaActivity {
-                            destination.schedule = true
-                            destination.umbrellaActivity = umbrellaActivity
-                        } else {
-                            destination.schedule = false
-                        }
                         destination.favAct = favAct
                         destination.workout = workout
                         if let index = workouts.firstIndex(where: {$0.identifier == workout.identifier} ) {
@@ -466,10 +460,11 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
                         destination.users = self!.users
                         destination.filteredUsers = self!.filteredUsers
                         destination.conversations = self!.conversations
+                        destination.activities = self!.activities
                         destination.conversation = self!.conversation
                         destination.schedule = self!.schedule
                         destination.umbrellaActivity = self!.umbrellaActivity
-                        destination.selectedFalconUsers = self!.selectedFalconUsers
+                        destination.delegate = self!
                         self?.navigationController?.pushViewController(destination, animated: true)
                     }
                 }
@@ -489,13 +484,13 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
         header.verticalController.workouts = workouts
         header.verticalController.collectionView.reloadData()
         header.verticalController.conversations = conversations
+        header.verticalController.activities = activities
         header.verticalController.users = users
         header.verticalController.filteredUsers = filteredUsers
         header.verticalController.favAct = favAct
         header.verticalController.conversation = conversation
         header.verticalController.schedule = schedule
         header.verticalController.umbrellaActivity = umbrellaActivity
-        header.verticalController.selectedFalconUsers = selectedFalconUsers
         header.verticalController.didSelectHandler = { [weak self] workout, favAct in
             if let workout = workout as? Workout {
                 print("workout \(String(describing: workout.title))")
@@ -508,10 +503,11 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
                 destination.users = self!.users
                 destination.filteredUsers = self!.filteredUsers
                 destination.conversations = self!.conversations
+                destination.activities = self!.activities
                 destination.conversation = self!.conversation
                 destination.schedule = self!.schedule
                 destination.umbrellaActivity = self!.umbrellaActivity
-                destination.selectedFalconUsers = self!.selectedFalconUsers
+                destination.delegate = self!
                 self?.navigationController?.pushViewController(destination, animated: true)
             }
         }

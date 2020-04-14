@@ -31,8 +31,8 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
   }
 }
 
-protocol UpdateChatDelegate: class {
-    func updateChat(chatID: String, activityID: String?)
+protocol ChooseChatDelegate: class {
+    func chosenChat(chatID: String, activityID: String?)
 }
 
 
@@ -57,7 +57,7 @@ class ChooseChatTableViewController: UITableViewController {
     let viewPlaceholder = ViewPlaceholder()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
-    weak var delegate : UpdateChatDelegate?
+    weak var delegate : ChooseChatDelegate?
     
     let activityCreatingGroup = DispatchGroup()
     let informationMessageSender = InformationMessageSender()
@@ -114,7 +114,7 @@ class ChooseChatTableViewController: UITableViewController {
                 let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
                 let membersIDs = fetchMembersIDs(activity: activity)
                 createChatwActivity(chatID: chatID, membersIDs: membersIDs, activity: activity)
-                delegate?.updateChat(chatID: chatID, activityID: activity.activityID!)
+                delegate?.chosenChat(chatID: chatID, activityID: activity.activityID!)
             } else if let activityObject = activityObject {
                 let destination = ContactsController()
                 destination.activityObject = activityObject
@@ -227,12 +227,12 @@ class ChooseChatTableViewController: UITableViewController {
     
     filteredConversations = conversations
 
-      tableView.reloadData()
+    tableView.reloadData()
     
     if filteredConversations.count == 0  {
-      checkIfThereAnyActiveChats(isEmpty: true)
+        checkIfThereAnyActiveChats(isEmpty: true)
     } else {
-      checkIfThereAnyActiveChats(isEmpty: false)
+        checkIfThereAnyActiveChats(isEmpty: false)
     }
     
   }
@@ -278,14 +278,12 @@ class ChooseChatTableViewController: UITableViewController {
   var messagesFetcher: MessagesFetcher? = nil
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    var conversation: Conversation!
-    let unpinnedConversation = filteredConversations[indexPath.row]
-    conversation = unpinnedConversation
+    let conversation = filteredConversations[indexPath.row]
     if let chatID = conversation.chatID, let activity = activity, let activityName = activity.name?.trimmingCharacters(in: .whitespaces) {
         let newActivityName = activityName
         let text = "The \(newActivityName ) activity was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: activity.participantsIDs!, text: text)
-        delegate?.updateChat(chatID: chatID, activityID: activity.activityID!)
+        delegate?.chosenChat(chatID: chatID, activityID: activity.activityID!)
         dismiss(animated: true, completion: nil)
     } else if let activityObject = activityObject {
         let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
@@ -355,7 +353,6 @@ extension ChooseChatTableViewController: UISearchBarDelegate, UISearchController
   func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
     searchBar.text = nil
     filteredConversations = conversations
-    filteredPinnedConversations = pinnedConversations
     handleReloadTable()
     guard #available(iOS 11.0, *) else {
       searchBar.setShowsCancelButton(false, animated: true)
@@ -368,14 +365,6 @@ extension ChooseChatTableViewController: UISearchBarDelegate, UISearchController
     
     filteredConversations = searchText.isEmpty ? conversations :
       conversations.filter({ (conversation) -> Bool in
-        if let chatName = conversation.chatName {
-          return chatName.lowercased().contains(searchText.lowercased())
-        }
-        return ("").lowercased().contains(searchText.lowercased())
-      })
-    
-    filteredPinnedConversations = searchText.isEmpty ? pinnedConversations :
-      pinnedConversations.filter({ (conversation) -> Bool in
         if let chatName = conversation.chatName {
           return chatName.lowercased().contains(searchText.lowercased())
         }

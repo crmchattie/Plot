@@ -26,11 +26,13 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
+    var activities = [Activity]()
     var conversations = [Conversation]()
     var conversation : Conversation?
     var favAct = [String: [String]]()
         
     var umbrellaActivity: Activity!
+    weak var delegate : UpdateScheduleDelegate?
     var schedule: Bool = false
             
     let activityIndicatorView: UIActivityIndicatorView = {
@@ -212,7 +214,7 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
     
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
-        let alert = UIAlertController(title: "Add Activity", message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Activity", message: nil, preferredStyle: .actionSheet)
         if let _ = umbrellaActivity {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")

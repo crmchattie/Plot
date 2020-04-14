@@ -13,6 +13,8 @@ import MapKit
 
 class ActivityDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     var umbrellaActivity: Activity!
+    weak var delegate : UpdateScheduleDelegate?
+
     var activity: Activity!
     
     var sections = [String]()
@@ -21,6 +23,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
     var acceptedParticipant: [User] = []
+    var activities = [Activity]()
     var conversations = [Conversation]()
     var conversation: Conversation?
     var favAct = [String: [String]]()
@@ -77,8 +80,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
-        setActivity()
+    
                         
         if favAct.isEmpty {
             fetchFavAct()
@@ -157,32 +159,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         })
     }
     
-    @objc func createNewActivity() {
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        
-        showActivityIndicator()
-        let createActivity = CreateActivity(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
-        createActivity.createNewActivity()
-        hideActivityIndicator()
-        
-        if !schedule {
-            if self.conversation == nil {
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else {
-                self.navigationController?.backToViewController(viewController: ChatLogController.self)
-            }
-        } else {
-            if self.conversation == nil {
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else {
-                self.navigationController?.backToViewController(viewController: ChatLogController.self)
-            }
-        }
-    }
-    
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
@@ -200,6 +176,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
             membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
             membersIDs.append(id)
         }
+        
+        print("membersIDs \(membersIDs)")
         
         return (membersIDs, membersIDsDictionary)
     }
@@ -271,7 +249,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     
     func scheduleReminder() {
         let center = UNUserNotificationCenter.current()
-        guard activity.reminder! != "None" else {
+        guard activity.reminder != nil else { return }
+        guard activity.reminder != "None" else {
             center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
             return
         }
@@ -312,6 +291,39 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         })
     }
     
+    func getSelectedFalconUsers(forActivity activity: Activity, completion: @escaping ([User])->()) {
+        guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        var selectedFalconUsers = [User]()
+        let group = DispatchGroup()
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if activity.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    selectedFalconUsers.append(user)
+                }
+                
+            })
+            
+            group.leave()
+            
+        }
+        
+        group.notify(queue: .main) {
+            completion(selectedFalconUsers)
+        }
+    }
+    
     func showActivityIndicator() {
         if let navController = self.navigationController {
             self.showSpinner(onView: navController.view)
@@ -324,6 +336,35 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     func hideActivityIndicator() {
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func changeTheme() {
+        let theme = ThemeManager.currentTheme()
+        view.backgroundColor = theme.generalBackgroundColor
+        
+        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
+        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
+        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
+        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+        
+        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
+        
+        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        collectionView.reloadData()
+        
     }
     
     

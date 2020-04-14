@@ -198,6 +198,17 @@ extension ChatsTableViewController {
     
     Database.database().reference().child("user-messages").child(currentUserID).child(conversationID).child(messageMetaDataFirebaseFolder).removeAllObservers()
     Database.database().reference().child("user-messages").child(currentUserID).child(conversationID).removeValue()
+    
+    let chatDataReference = Database.database().reference().child("groupChats").child(conversationID).child(messageMetaDataFirebaseFolder)
+        chatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+            if let membersIDs = dictionary["chatParticipantsIDs"] as? [String:AnyObject] {
+                var varMemberIDs = membersIDs
+                varMemberIDs[currentUserID] = nil
+                chatDataReference.updateChildValues(["chatParticipantsIDs": varMemberIDs as AnyObject])
+            }
+    })
+    
     configureTabBarBadge()
      if self.conversations.count <= 0 && self.pinnedConversations.count <= 0 {
       DispatchQueue.main.async {
@@ -222,6 +233,16 @@ extension ChatsTableViewController {
     
     Database.database().reference().child("user-messages").child(currentUserID).child(conversationID).child(messageMetaDataFirebaseFolder).removeAllObservers()
     Database.database().reference().child("user-messages").child(currentUserID).child(conversationID).removeValue()
+    
+        let chatDataReference = Database.database().reference().child("groupChats").child(conversationID).child(messageMetaDataFirebaseFolder)
+        chatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+            if let membersIDs = dictionary["chatParticipantsIDs"] as? [String:AnyObject] {
+                var varMemberIDs = membersIDs
+                varMemberIDs[currentUserID] = nil
+                chatDataReference.updateChildValues(["chatParticipantsIDs": varMemberIDs as AnyObject])
+            }
+    })
    
     configureTabBarBadge()
     if self.conversations.count <= 0 && self.pinnedConversations.count <= 0 {

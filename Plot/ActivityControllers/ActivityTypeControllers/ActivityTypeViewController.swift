@@ -11,9 +11,10 @@ import MapKit
 import Firebase
 import CodableFirebase
 
-
 class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
+    weak var delegate : UpdateScheduleDelegate?
+        
     fileprivate var reference: DatabaseReference!
         
     private let kActivityTypeCell = "ActivityTypeCell"
@@ -37,9 +38,10 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     var users = [User]()
     var filteredUsers = [User]()
-    var conversations = [Conversation]()
     var selectedFalconUsers = [User]()
-    var conversation : Conversation?
+    var activities = [Activity]()
+    var conversations = [Conversation]()
+    var conversation: Conversation?
         
     var groups = [Any]()
     
@@ -80,6 +82,15 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         print("view appearing")
         fetchFavAct()
 
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if (!self.isMovingFromParent || !self.isBeingDismissed) && navigationController?.visibleViewController is CreateActivityViewController {
+            let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
+            delegate?.updateSchedule(schedule: activity)
+        }
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -252,6 +263,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                             let destination = ScheduleViewController()
                             destination.users = self!.users
                             destination.filteredUsers = self!.filteredUsers
+                            destination.delegate = self!
                             destination.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
                             destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
                             self?.navigationController?.pushViewController(destination, animated: true)
@@ -287,13 +299,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
         cell.horizontalController.conversations = conversations
+        cell.horizontalController.activities = activities
         cell.horizontalController.users = users
         cell.horizontalController.filteredUsers = filteredUsers
         cell.horizontalController.favAct = favAct
         cell.horizontalController.conversation = conversation
         cell.horizontalController.schedule = schedule
         cell.horizontalController.umbrellaActivity = umbrellaActivity
-        cell.horizontalController.selectedFalconUsers = selectedFalconUsers
         cell.delegate = self
         cell.titleLabel.text = sections[indexPath.item]
 
@@ -329,20 +341,16 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 if let recipe = cellData as? Recipe {
                     print("meal \(recipe.title)")
                     let destination = MealDetailViewController()
-                    if let _ = self!.umbrellaActivity {
-                        destination.schedule = true
-                    } else {
-                        destination.schedule = false
-                    }
                     destination.favAct = favAct
                     destination.recipe = recipe
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
+                    destination.activities = self!.activities
                     destination.conversation = self!.conversation
                     destination.schedule = self!.schedule
                     destination.umbrellaActivity = self!.umbrellaActivity
-                    destination.selectedFalconUsers = self!.selectedFalconUsers
+                    destination.delegate = self!
                     self?.navigationController?.pushViewController(destination, animated: true)
                 } else if let event = cellData as? Event {
                     print("event \(String(describing: event.name))")
@@ -352,20 +360,15 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
+                    destination.activities = self!.activities
                     destination.conversation = self!.conversation
                     destination.schedule = self!.schedule
                     destination.umbrellaActivity = self!.umbrellaActivity
-                    destination.selectedFalconUsers = self!.selectedFalconUsers
+                    destination.delegate = self!
                     self?.navigationController?.pushViewController(destination, animated: true)
                 } else if let workout = cellData as? Workout {
                     print("workout \(String(describing: workout.title))")
                     let destination = WorkoutDetailViewController()
-                    if let umbrellaActivity = self!.umbrellaActivity {
-                        destination.schedule = true
-                        destination.umbrellaActivity = umbrellaActivity
-                    } else {
-                        destination.schedule = false
-                    }
                     destination.favAct = favAct
                     destination.workout = workout
                     if let index = self!.workoutIDs.firstIndex(of: workout.identifier) {
@@ -374,29 +377,25 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
+                    destination.activities = self!.activities
                     destination.conversation = self!.conversation
                     destination.schedule = self!.schedule
                     destination.umbrellaActivity = self!.umbrellaActivity
-                    destination.selectedFalconUsers = self!.selectedFalconUsers
+                    destination.delegate = self!
                     self?.navigationController?.pushViewController(destination, animated: true)
                 } else if let attraction = cellData as? Attraction {
                     print("attraction \(String(describing: attraction.name))")
                     let destination = EventDetailViewController()
-                    if let umbrellaActivity = self!.umbrellaActivity {
-                        destination.schedule = true
-                        destination.umbrellaActivity = umbrellaActivity
-                    } else {
-                        destination.schedule = false
-                    }
                     destination.favAct = favAct
                     destination.attraction = attraction
                     destination.users = self!.users
                     destination.filteredUsers = self!.filteredUsers
                     destination.conversations = self!.conversations
+                    destination.activities = self!.activities
                     destination.conversation = self!.conversation
                     destination.schedule = self!.schedule
                     destination.umbrellaActivity = self!.umbrellaActivity
-                    destination.selectedFalconUsers = self!.selectedFalconUsers
+                    destination.delegate = self!
                     self?.navigationController?.pushViewController(destination, animated: true)
                 }
                 else {
@@ -501,6 +500,35 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         }
         
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func changeTheme() {
+        let theme = ThemeManager.currentTheme()
+        view.backgroundColor = theme.generalBackgroundColor
+        
+        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
+        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
+        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
+        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+        
+        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
+        
+        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        collectionView.reloadData()
+        
+    }
   
 }
 
@@ -516,10 +544,11 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
+            destination.activities = activities
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
-            destination.selectedFalconUsers = selectedFalconUsers
+            destination.delegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Events":
             print("Event")
@@ -528,10 +557,11 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
+            destination.activities = activities
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
-            destination.selectedFalconUsers = selectedFalconUsers
+            destination.delegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Workouts":
             print("Workouts")
@@ -540,10 +570,11 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
+            destination.activities = activities
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
-            destination.selectedFalconUsers = selectedFalconUsers
+            destination.delegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Attractions":
             print("Attractions")
@@ -552,13 +583,20 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
+            destination.activities = activities
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
-            destination.selectedFalconUsers = selectedFalconUsers
+            destination.delegate = self
             navigationController?.pushViewController(destination, animated: true)
         default:
             print("Default")
         }
+    }
+}
+
+extension ActivityTypeViewController: UpdateScheduleDelegate {
+    func updateSchedule(schedule: Activity) {
+        delegate?.updateSchedule(schedule: schedule)
     }
 }

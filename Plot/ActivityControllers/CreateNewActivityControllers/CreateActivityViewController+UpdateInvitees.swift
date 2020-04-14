@@ -46,6 +46,7 @@ extension CreateActivityViewController: UpdateInvitees {
             if active {
                 let membersIDs = fetchMembersIDs()
                 if Set(activity.participantsIDs!) != Set(membersIDs.0) {
+                    showActivityIndicator()
                     let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
                     updateParticipants(membersIDs: membersIDs)
                     groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
@@ -53,7 +54,7 @@ extension CreateActivityViewController: UpdateInvitees {
                 
                 activityCreatingGroup.notify(queue: DispatchQueue.main, execute: {
                     InvitationsFetcher.updateInvitations(forActivity:self.activity, selectedParticipants: self.selectedFalconUsers) {
-    //                    self.hideActivityIndicator()
+                        self.hideActivityIndicator()
                     }
                 })
             }

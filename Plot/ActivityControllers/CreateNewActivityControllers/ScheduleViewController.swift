@@ -52,12 +52,12 @@ class ScheduleViewController: FormViewController {
             } else {
                 schedule.activityID = UUID().uuidString
             }
-            for ID in schedule!.participantsIDs!{
+            for ID in schedule!.participantsIDs! {
                 // users equals ACTIVITY selected falcon users
                 if let user = users.first(where: {$0.id == ID}) {
                     selectedFalconUsers.append(user)
                 }
-                userNamesString = "\(selectedFalconUsers.count + 1) participants"
+                userNamesString = "\(selectedFalconUsers.count) participants"
             }
             if let localName = schedule.locationName, localName != "locationName", let localAddress = schedule.locationAddress  {
                 locationName = localName
@@ -78,6 +78,9 @@ class ScheduleViewController: FormViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
+//        if (self.isMovingFromParentViewController || self.isBeingDismissed) {
+//          // Do your stuff here
+//        }
         if self.movingBackwards {
             print("Moving backwards")
             delegate?.updateSchedule(schedule: schedule)
@@ -179,10 +182,10 @@ class ScheduleViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
-                if self.active && self.schedule.locationName != "locationName" {
+                if self.active, let localName = schedule.locationName, localName != "locationName" {
                     row.cell.accessoryType = .detailDisclosureButton
                     row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = self.schedule.locationName
+                    row.title = localName
                 }
                 }.onCellSelection({ _,_ in
                     self.openLocationFinder()
@@ -574,7 +577,8 @@ class ScheduleViewController: FormViewController {
         schedule.participantsIDs = membersIDs.0
 
         delegate?.updateSchedule(schedule: schedule)
-        self.navigationController?.popViewController(animated: true)
+        self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+        
     }
     
     func scheduleReminder() {

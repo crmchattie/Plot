@@ -60,12 +60,6 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         }
     }
     
-    var userNamesString: String?
-    var locationName: String?
-    
-    var startDateTime: Date?
-    var endDateTime: Date?
-    
     weak var delegate: ActivityExpandedDetailCellDelegate?
     
     override init(frame: CGRect) {
@@ -171,6 +165,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         datePicker.datePickerMode = UIDatePicker.Mode.dateAndTime
         datePicker.minuteInterval = 5
         datePicker.isHidden = true
+        datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
         return datePicker
     }()
     
@@ -204,6 +199,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         datePicker.datePickerMode = UIDatePicker.Mode.dateAndTime
         datePicker.minuteInterval = 5
         datePicker.isHidden = true
+        datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
         return datePicker
     }()
     
@@ -240,6 +236,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
     }()
    
     func setupViews() {
+        
             
         if locationLabel.text == "Location" {
             locationLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor

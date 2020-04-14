@@ -17,7 +17,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         //        label.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
-        label.font = UIFont.preferredFont(forTextStyle: .headline)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
         label.sizeToFit()

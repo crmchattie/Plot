@@ -25,15 +25,10 @@ class EventDetailViewController: ActivityDetailViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-            
-        title = "Event"
-                
-        collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
-        collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
-        collectionView.register(EventDetailCell.self, forCellWithReuseIdentifier: kEventDetailCell)
-        collectionView.register(AttractionDetailCell.self, forCellWithReuseIdentifier: kAttractionDetailCell)
         
-        if activity == nil {
+        setActivity()
+        
+        if !active {
             setMoreActivity()
         }
         
@@ -42,11 +37,20 @@ class EventDetailViewController: ActivityDetailViewController {
         } else {
             updateData()
         }
+            
+        title = "Event"
+                
+        collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
+        collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
+        collectionView.register(EventDetailCell.self, forCellWithReuseIdentifier: kEventDetailCell)
+        collectionView.register(AttractionDetailCell.self, forCellWithReuseIdentifier: kAttractionDetailCell)
+        
                                         
     }
     
     fileprivate func setMoreActivity() {
         if let event = event {
+            activity.name = event.name
             activity.eventID = "\(event.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
@@ -59,8 +63,10 @@ class EventDetailViewController: ActivityDetailViewController {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    startDateTime = rounded
-                    endDateTime = rounded
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
+                    endDateTime = startDateTime
                 }
             } else if !schedule {
                 if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
@@ -70,10 +76,13 @@ class EventDetailViewController: ActivityDetailViewController {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    startDateTime = rounded
-                    endDateTime = rounded
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
+                    endDateTime = startDateTime
                 }
             }
+            activity.allDay = false
             activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
 
@@ -83,6 +92,8 @@ class EventDetailViewController: ActivityDetailViewController {
                 activity.locationName = locationName
                 activity.locationAddress = locationAddress
             }
+            self.collectionView.reloadData()
+
         }
     }
     
@@ -215,10 +226,13 @@ class EventDetailViewController: ActivityDetailViewController {
                 cell.locationLabel.text = locationName
                 cell.participantsLabel.text = userNamesString
                 cell.rightReminderLabel.text = reminder
-                cell.startDateLabel.text = dateFormatter.string(from: startDateTime!)
-                cell.endDateLabel.text = dateFormatter.string(from: endDateTime!)
-                cell.startDatePicker.date = startDateTime!
-                cell.endDatePicker.date = endDateTime!
+                if let startDateTime = startDateTime, let endDateTime = endDateTime {
+                    dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
+                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
+                    cell.startDatePicker.date = startDateTime
+                    cell.endDatePicker.date = endDateTime
+                }
                 cell.event = event
                 return cell
             } else {

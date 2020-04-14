@@ -77,7 +77,6 @@ class CreateActivityViewController: FormViewController {
             if activity.activityID != nil {
                 activityID = activity.activityID!
             }
-            
             if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
                 locationName = localName
                 locationAddress = localAddress
@@ -337,12 +336,10 @@ class CreateActivityViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
-                if self.active && self.activity.locationName != "locationName" {
-                    if let value = self.activity.locationName, !value.isEmpty {
-                        row.cell.accessoryType = .detailDisclosureButton
-                    }
+                if self.active, let localName = activity.locationName, localName != "locationName" {
+                    row.cell.accessoryType = .detailDisclosureButton
                     row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = self.activity.locationName
+                    row.title = localName
                 }
                 }.onCellSelection({ _,_ in
                     self.openLocationFinder()
@@ -1303,6 +1300,7 @@ class CreateActivityViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
+        showActivityIndicator()
         if scheduleList.indices.contains(scheduleIndex) {
             let dispatchGroup = DispatchGroup()
             let scheduleItem = scheduleList[scheduleIndex]
@@ -1318,6 +1316,10 @@ class CreateActivityViewController: FormViewController {
                         destination.detailedRecipe = detailedRecipe
                         destination.users = self.acceptedParticipant
                         destination.filteredUsers = self.acceptedParticipant
+                        destination.umbrellaActivity = self.activity
+                        destination.schedule = true
+                        destination.delegate = self
+                        self.hideActivityIndicator()
                         self.navigationController?.pushViewController(destination, animated: true)
                     }
                 }
@@ -1333,6 +1335,10 @@ class CreateActivityViewController: FormViewController {
                             destination.event = event
                             destination.users = self.acceptedParticipant
                             destination.filteredUsers = self.acceptedParticipant
+                            destination.umbrellaActivity = self.activity
+                            destination.schedule = true
+                            destination.delegate = self
+                            self.hideActivityIndicator()
                             self.navigationController?.pushViewController(destination, animated: true)
                         }
                     }
@@ -1351,6 +1357,10 @@ class CreateActivityViewController: FormViewController {
                             destination.intColor = 0
                             destination.users = self.acceptedParticipant
                             destination.filteredUsers = self.acceptedParticipant
+                            destination.umbrellaActivity = self.activity
+                            destination.schedule = true
+                            destination.delegate = self
+                            self.hideActivityIndicator()
                             self.navigationController?.pushViewController(destination, animated: true)
                         }
                     }
@@ -1370,6 +1380,10 @@ class CreateActivityViewController: FormViewController {
                         destination.users = self.acceptedParticipant
                         destination.filteredUsers = self.acceptedParticipant
                         destination.conversations = self.conversations
+                        destination.umbrellaActivity = self.activity
+                        destination.schedule = true
+                        destination.delegate = self
+                        self.hideActivityIndicator()
                         self.navigationController?.pushViewController(destination, animated: true)
                     }
                 }
@@ -1386,16 +1400,17 @@ class CreateActivityViewController: FormViewController {
                     }
                 }
                 destination.delegate = self
+                self.hideActivityIndicator()
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         } else {
             let destination = ActivityTypeViewController()
             destination.users = acceptedParticipant
             destination.filteredUsers = acceptedParticipant
-            destination.selectedFalconUsers = acceptedParticipant
             destination.umbrellaActivity = activity
             destination.schedule = true
-//        destination.delegate = self
+            destination.delegate = self
+            self.hideActivityIndicator()
             self.navigationController?.pushViewController(destination, animated: true)
 
         }
@@ -1423,7 +1438,7 @@ class CreateActivityViewController: FormViewController {
         }
         
         showActivityIndicator()
-        let createActivity = CreateActivity(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+        let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.createNewActivity()
         hideActivityIndicator()
         
@@ -1566,7 +1581,7 @@ class CreateActivityViewController: FormViewController {
         let difference = participantsSet.symmetricDifference(membersSet)
         for member in difference {
             if participantsSet.contains(member) {
-            Database.database().reference().child("user-activities").child(member).child(activityID).removeValue()
+                Database.database().reference().child("user-activities").child(member).child(activityID).removeValue()
             }
             if let chatID = activity?.conversationID { Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("chatParticipantsIDs").updateChildValues(membersIDs.1)
             }
@@ -1791,9 +1806,7 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
             }
             else {
                 mvs.remove(at: scheduleIndex)
-//                scheduleList.append(schedule)
-//                scheduleRow.baseValue = nil
-//                scheduleRow.updateCell()
+                
             }
         }
     }
@@ -1835,8 +1848,8 @@ extension CreateActivityViewController: UpdateActivityPhotosDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateChatDelegate {
-    func updateChat(chatID: String, activityID: String?) {
+extension CreateActivityViewController: ChooseChatDelegate {
+    func chosenChat(chatID: String, activityID: String?) {
         if let conversation = conversations.first(where: {$0.chatID == chatID}) {
             if conversation.activities != nil {
                    var activities = conversation.activities!

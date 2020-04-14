@@ -11,6 +11,7 @@ import Firebase
 
 class ActivitySubTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
+    weak var delegate : UpdateScheduleDelegate?
     
     let kActivityTypeCell = "ActivityTypeCell"
     let headerId = "headerId"
@@ -21,7 +22,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     
     var users = [User]()
     var filteredUsers = [User]()
-    var selectedFalconUsers = [User]()
+    var activities = [Activity]()
     var conversations = [Conversation]()
     var favAct = [String: [String]]()
     var conversation: Conversation?
@@ -102,6 +103,41 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func changeTheme() {
+        let theme = ThemeManager.currentTheme()
+        view.backgroundColor = theme.generalBackgroundColor
+        
+        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
+        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
+        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
+        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+        
+        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
+        
+        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        collectionView.reloadData()
+        
+    }
+    
+    
+}
+
+extension ActivitySubTypeViewController: UpdateScheduleDelegate {
+    func updateSchedule(schedule: Activity) {
+        delegate?.updateSchedule(schedule: schedule)
+    }
 }
 
