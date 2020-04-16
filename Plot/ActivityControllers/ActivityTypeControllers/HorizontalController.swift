@@ -214,7 +214,7 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
     
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
-        let alert = UIAlertController(title: "Activity", message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         if let _ = umbrellaActivity {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")

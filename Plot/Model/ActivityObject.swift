@@ -11,9 +11,10 @@ import Photos
 
 class ActivityObject: NSObject {
     var object: Data?
-    var activityName: String?
-    var activityType: String?
     var activityID: String?
+    var activityName: String?
+    var activityTypeID: String?
+    var activityType: String?
     var activityImageURL: String?
     var activityCategory: String?
     var activitySubcategory: String?
@@ -21,8 +22,9 @@ class ActivityObject: NSObject {
     init(dictionary: [String: AnyObject]) {
         super.init()
         activityName = dictionary["activityName"] as? String
-        activityType = dictionary["activityType"] as? String
         activityID = dictionary["activityID"] as? String
+        activityTypeID = dictionary["activityTypeID"] as? String
+        activityType = dictionary["activityType"] as? String
         activityImageURL = dictionary["activityImageURL"] as? String
         activityCategory = dictionary["activityCategory"] as? String
         activitySubcategory = dictionary["activitySubcategory"] as? String

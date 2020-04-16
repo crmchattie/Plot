@@ -200,7 +200,7 @@ class Activity: NSObject, Codable {
         if let value = self.schedule {
             var firebaseScheduleList = [[String: AnyObject?]]()
             for schedule in value {
-                let firebaseSchedule = schedule.toAnyObject()
+                let firebaseSchedule = schedule.scheduleToAnyObject()
                 firebaseScheduleList.append(firebaseSchedule)
             }
             activityDict["schedule"] = firebaseScheduleList as AnyObject
@@ -236,6 +236,76 @@ class Activity: NSObject, Codable {
         }
         
         return activityDict
+    }
+    
+    func scheduleToAnyObject() -> [String: AnyObject] {
+        var scheduleDict = [String: AnyObject]()
+                
+        if let value = self.name as AnyObject? {
+            scheduleDict["name"] = value
+        }
+        
+        if let value = self.activityID as AnyObject? {
+            scheduleDict["activityID"] = value
+        }
+        
+        if let value = self.activityType as AnyObject? {
+            scheduleDict["activityType"] = value
+        }
+        
+        if let value = self.activityDescription as AnyObject? {
+            scheduleDict["activityDescription"] = value
+        }
+        
+        if let value = self.locationName as AnyObject? {
+            scheduleDict["locationName"] = value
+        }
+        
+        if let value = self.locationAddress as AnyObject? {
+            scheduleDict["locationAddress"] = value
+        }
+        
+        if let value = self.participantsIDs as AnyObject? {
+            scheduleDict["participantsIDs"] = value
+        }
+        
+        if let value = self.transportation as AnyObject? {
+            scheduleDict["transportation"] = value
+        }
+        
+        if let value = self.allDay as AnyObject? {
+            scheduleDict["allDay"] = value
+        }
+        
+        if let value = self.startDateTime as AnyObject? {
+            scheduleDict["startDateTime"] = value
+        }
+        
+        if let value = self.endDateTime as AnyObject? {
+            scheduleDict["endDateTime"] = value
+        }
+        
+        if let value = self.reminder as AnyObject? {
+            scheduleDict["reminder"] = value
+        }
+        
+        if let value = self.checklist as AnyObject? {
+            scheduleDict["checklist"] = value
+        }
+        
+        if let value = self.recipeID as AnyObject? {
+            scheduleDict["recipeID"] = value
+        }
+        
+        if let value = self.workoutID as AnyObject? {
+            scheduleDict["workoutID"] = value
+        }
+        
+        if let value = self.eventID as AnyObject? {
+            scheduleDict["eventID"] = value
+        }
+        
+        return scheduleDict
     }
     
     func isBasic() -> Bool {

@@ -29,6 +29,7 @@ enum ViewPlaceholderTitle: String {
   case emptyRecipes = "Could not find any recipes that match the filter(s) and/or keyword search"
   case emptyEvents = "Could not find any events that match the filter(s) and/or keyword search"
   case emptyWorkouts = "Could not find any workouts that match the filter(s)"
+  case emptyLocationSearch = "Please search for locations above"
 }
 
 enum ViewPlaceholderSubtitle: String {

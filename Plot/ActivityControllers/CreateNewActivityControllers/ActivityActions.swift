@@ -46,7 +46,7 @@ class ActivityActions: NSObject {
         guard let _ = active, let _ = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
-                  
+                          
         let membersIDs = fetchMembersIDs()
         
         for memberID in membersIDs.0 {
@@ -100,7 +100,6 @@ class ActivityActions: NSObject {
         
         dispatchGroup.notify(queue: DispatchQueue.main, execute: {
             InvitationsFetcher.updateInvitations(forActivity:activity, selectedParticipants: selectedFalconUsers) {
-                print("created invitations")
             }
         })
     }
@@ -128,9 +127,7 @@ class ActivityActions: NSObject {
         createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
         connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
         self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-            print("creating invitations")
             InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
-                print("created invitations")
             }
         })
     }

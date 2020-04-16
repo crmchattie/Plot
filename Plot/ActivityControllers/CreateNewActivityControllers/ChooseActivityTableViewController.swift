@@ -37,18 +37,16 @@ protocol ChooseActivityDelegate: class {
 
 
 class ChooseActivityTableViewController: UITableViewController {
+    
+    let activityCellID = "activityCellID"
   
-    fileprivate let newGroupCellID = "newGroupCellID"
-    fileprivate let userCellID = "userCellID"
     fileprivate var isAppLoaded = false
     
     var searchBar: UISearchBar?
     var searchActivityController: UISearchController?
-
+    
     var activities = [Activity]()
     var filteredActivities = [Activity]()
-    var pinnedActivities = [Activity]()
-    var filteredPinnedActivities = [Activity]()
     
     var activity: Activity?
     var users = [User]()
@@ -68,6 +66,13 @@ class ChooseActivityTableViewController: UITableViewController {
         
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    if let activity = activity {
+        if let index = activities.firstIndex(of: activity) {
+            activities.remove(at: index)
+            filteredActivities.remove(at: index)
+        }
+    }
    
     configureTableView()
     setupSearchController()
@@ -82,7 +87,7 @@ class ChooseActivityTableViewController: UITableViewController {
   }
 
   fileprivate func configureTableView() {
-    tableView.register(UserCell.self, forCellReuseIdentifier: userCellID)
+    tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
     tableView.allowsMultipleSelectionDuringEditing = false
     view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
@@ -97,54 +102,6 @@ class ChooseActivityTableViewController: UITableViewController {
   
     @objc fileprivate func closeActivity() {
         dismiss(animated: true, completion: nil)
-    }
-    
-    
-    func fetchMembersIDs(activity: Activity) -> ([String], [String:AnyObject]) {
-        var membersIDs = [String]()
-        var membersIDsDictionary = [String:AnyObject]()
-
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
-
-        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-        membersIDs.append(currentUserID)
-        
-        if let participants = activity.participantsIDs {
-            for participant in participants {
-                membersIDsDictionary.updateValue(participant as AnyObject, forKey: participant)
-                membersIDs.append(participant)
-            }
-        }
-
-        return (membersIDs, membersIDsDictionary)
-    }
-    
-    func connectMembersToGroupChat(memberIDs: [String], chatID: String) {
-        let connectingMembersGroup = DispatchGroup()
-        for _ in memberIDs {
-            connectingMembersGroup.enter()
-        }
-        connectingMembersGroup.notify(queue: DispatchQueue.main, execute: {
-            self.activityCreatingGroup.leave()
-        })
-        for memberID in memberIDs {
-            let userReference = Database.database().reference().child("user-messages").child(memberID).child(chatID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["isGroupChat": true]
-            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                connectingMembersGroup.leave()
-            })
-        }
-    }
-
-    func createGroupChatNode(reference: DatabaseReference, childValues: [String: Any]) {
-        let nodeCreationGroup = DispatchGroup()
-        nodeCreationGroup.enter()
-        nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
-            self.activityCreatingGroup.leave()
-        })
-        reference.updateChildValues(childValues) { (error, reference) in
-            nodeCreationGroup.leave()
-        }
     }
 
   fileprivate func setupSearchController() {
@@ -165,14 +122,6 @@ class ChooseActivityTableViewController: UITableViewController {
           searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
           tableView.tableHeaderView = searchBar
       }
-  }
-  
-  func checkIfThereAnyActivities(isEmpty: Bool) {
-      guard isEmpty else {
-          viewPlaceholder.remove(from: tableView, priority: .medium)
-          return
-      }
-      viewPlaceholder.add(for: tableView, title: .emptyActivities, subtitle: .emptyActivities, priority: .medium, position: .top)
   }
   
   
@@ -225,7 +174,7 @@ class ChooseActivityTableViewController: UITableViewController {
     }
   
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 1
     }
   
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

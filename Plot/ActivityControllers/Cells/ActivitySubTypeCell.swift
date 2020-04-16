@@ -226,7 +226,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                 let data = compressImage(image: image)
                 activity = ["activityType": "recipe",
                             "activityName": "\(recipe.title)",
-                            "activityID": "\(recipe.id)",
+                            "activityTypeID": "\(recipe.id)",
                             "activityImageURL": imageURL,
                             "activityCategory": category,
                             "activitySubcategory": subcategory,
@@ -237,7 +237,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                             "activityName": "\(recipe.title)",
                             "activityCategory": "\(categoryLabel.text ?? "")",
                             "activitySubcategory": "\(subcategoryLabel.text ?? "")",
-                            "activityID": "\(recipe.id)"] as [String: AnyObject]
+                            "activityTypeID": "\(recipe.id)"] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             }
             self.delegate?.shareButtonTapped(activityObject: activityObject)
@@ -246,20 +246,20 @@ class ActivitySubTypeCell: UICollectionViewCell {
             var activityObject: ActivityObject
             if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
                 let data = compressImage(image: image)
-                activity = ["activityType": "workout",
+                activity = ["activityTypeID": "workout",
                             "activityName": "\(workout.title)",
-                            "activityID": "\(workout.identifier)",
+                            "activityTypeID": "\(workout.identifier)",
                             "activityCategory": category,
                             "activitySubcategory": subcategory,
                             "activityImageURL": imageURL,
                             "object": data] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             } else {
-                activity = ["activityType": "workout",
+                activity = ["activityTypeID": "workout",
                             "activityName": "\(workout.title)",
                             "activityCategory": "\(categoryLabel.text ?? "")",
                             "activitySubcategory": "\(subcategoryLabel.text ?? "")",
-                            "activityID": "\(workout.identifier)"] as [String: AnyObject]
+                            "activityTypeID": "\(workout.identifier)"] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             }
             self.delegate?.shareButtonTapped(activityObject: activityObject)
@@ -270,7 +270,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                 let data = compressImage(image: image)
                 activity = ["activityType": "event",
                             "activityName": "\(event.name)",
-                            "activityID": "\(event.id)",
+                            "activityTypeID": "\(event.id)",
                             "activityImageURL": imageURL,
                             "activityCategory": category,
                             "activitySubcategory": subcategory,
@@ -281,7 +281,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                             "activityName": "\(event.name)",
                             "activityCategory": "\(categoryLabel.text ?? "")",
                             "activitySubcategory": "\(subcategoryLabel.text ?? "")",
-                            "activityID": "\(event.id)"] as [String: AnyObject]
+                            "activityTypeID": "\(event.id)"] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             }
             self.delegate?.shareButtonTapped(activityObject: activityObject)
@@ -292,7 +292,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                 let data = compressImage(image: image)
                 activity = ["activityType": "attraction",
                             "activityName": "\(attraction.name)",
-                            "activityID": "\(attraction.id)",
+                            "activityTypeID": "\(attraction.id)",
                             "activityImageURL": imageURL,
                             "activityCategory": category,
                             "activitySubcategory": subcategory,
@@ -303,7 +303,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                             "activityName": "\(attraction.name)",
                             "activityCategory": "\(categoryLabel.text ?? "")",
                             "activitySubcategory": "\(subcategoryLabel.text ?? "")",
-                            "activityID": "\(attraction.id)"] as [String: AnyObject]
+                            "activityTypeID": "\(attraction.id)"] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             }
             self.delegate?.shareButtonTapped(activityObject: activityObject)

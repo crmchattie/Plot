@@ -57,6 +57,9 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     var locationManager = CLLocationManager()
     
     let dateFormatter = DateFormatter()
+    
+    var chatLogController: ChatLogController? = nil
+    var messagesFetcher: MessagesFetcher? = nil
 
         
     init() {
@@ -180,16 +183,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         return (membersIDs, membersIDsDictionary)
     }
     
-    @objc func goToMap() {
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        let destination = MapViewController()
-        destination.locationAddress = locationAddress
-        navigationController?.pushViewController(destination, animated: true)
-    }
-    
     func scheduleReminder() {
         let center = UNUserNotificationCenter.current()
         guard activity.reminder != nil else { return }
@@ -310,6 +303,48 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         
     }
     
+    @objc func goToMap(locationAddress: [String: [Double]]) {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = MapViewController()
+        destination.locationAddress = locationAddress
+        navigationController?.pushViewController(destination, animated: true)
+    }
     
+}
+
+extension ActivityDetailViewController: MessagesDelegate {
     
+    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
+        chatLogController?.updateMessageStatus(messageRef: reference)
+    }
+    
+    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
+        
+        chatLogController?.hidesBottomBarWhenPushed = true
+        chatLogController?.messagesFetcher = messagesFetcher
+        chatLogController?.messages = messages
+        chatLogController?.conversation = conversation
+        chatLogController?.activityID = activityID
+        
+        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
+            chatLogController?.observeTypingIndicator()
+            chatLogController?.configureTitleViewWithOnlineStatus()
+        }
+        
+        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
+        guard let destination = chatLogController else { return }
+        
+        if #available(iOS 11.0, *) {
+        } else {
+            self.chatLogController?.startCollectionViewAtBottom()
+        }
+        
+        navigationController?.pushViewController(destination, animated: true)
+        chatLogController = nil
+        messagesFetcher?.delegate = nil
+        messagesFetcher = nil
+    }
 }

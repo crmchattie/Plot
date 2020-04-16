@@ -1079,15 +1079,23 @@ extension UIView {
         layer.mask = mask
     }
 }
-let alert = UIAlertController(title: "Activity Sent!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let messageAlert = UIAlertController(title: "Activity Sent!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let activityAlert = UIAlertController(title: "Activity Created!", message: nil, preferredStyle: UIAlertController.Style.alert)
 
 extension UIViewController {
     func messageSentAlert() {
-        // create the alert
-        self.present(alert, animated: true, completion: nil)
+        self.present(messageAlert, animated: true, completion: nil)
     }
-    func removeAlert() {
-        alert.dismiss(animated: true, completion: nil)
+    func activitySentAlert() {
+        self.present(activityAlert, animated: true, completion: nil)
+    }
+    func removeMessageAlert() {
+        messageAlert.dismiss(animated: true, completion: nil)
+    }
+    func removeActivityAlert() {
+        activityAlert.dismiss(animated: true, completion: nil)
     }
 }
 

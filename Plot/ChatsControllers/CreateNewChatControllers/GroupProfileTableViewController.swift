@@ -224,7 +224,7 @@ extension GroupProfileTableViewController {
             messageSender.sendMessage()
             self.messageSentAlert()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
-                self.removeAlert()
+                self.removeMessageAlert()
                 self.dismiss(animated: true, completion: nil)
             })
             return

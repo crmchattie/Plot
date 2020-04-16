@@ -128,7 +128,6 @@ class MealDetailViewController: ActivityDetailViewController {
                     dispatchGroup.enter()
                     firstHeight += estimateFrameForText(width: 400 - 30, text: ingredient.original?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
                     dispatchGroup.leave()
-                    print("i \(i) \(firstHeight)")
                     i += 1
                 }
             }
@@ -218,14 +217,12 @@ class MealDetailViewController: ActivityDetailViewController {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var height: CGFloat = 0
-        print("indexPath.item \(indexPath.item)")
         if indexPath.item == 0 {
             let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
             dummyCell.recipe = recipe
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
-            print("height \(height)")
             return CGSize(width: view.frame.width, height: height)
         } else if indexPath.item == 1 {
             if secondSectionHeight == 0 {
@@ -235,7 +232,6 @@ class MealDetailViewController: ActivityDetailViewController {
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 150))
                 height = estimatedSize.height
                 secondSectionHeight = height
-                print("height \(height)")
                 return CGSize(width: view.frame.width, height: height)
             }
             else {
@@ -243,7 +239,6 @@ class MealDetailViewController: ActivityDetailViewController {
             }
         } else {
             if heightArray.count == 3, let maxHeight = heightArray.max() {
-                print("heightArray.max() \(maxHeight)")
                 return CGSize(width: self.view.frame.width, height: maxHeight + 50)
             } else {
                 return CGSize(width: self.view.frame.width, height: 150)
@@ -260,10 +255,6 @@ class MealDetailViewController: ActivityDetailViewController {
     
     func updateHeight() {
         heightArray += [firstHeight, secondHeight, thirdHeight]
-        print("updating height \(firstHeight)")
-        print("updating height \(secondHeight)")
-        print("updating height \(thirdHeight)")
-        print("updating height \(heightArray)")
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
@@ -344,6 +335,27 @@ class MealDetailViewController: ActivityDetailViewController {
         }
     }
     
+    @objc func goToChat() {
+        if activity.conversationID != nil {
+            if let convo = conversations.first(where: {$0.chatID == activity!.conversationID}) {
+                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+                self.messagesFetcher = MessagesFetcher()
+                self.messagesFetcher?.delegate = self
+                self.messagesFetcher?.loadMessagesData(for: convo)
+            }
+        } else {
+            let destination = ChooseChatTableViewController()
+            let navController = UINavigationController(rootViewController: destination)
+            destination.delegate = self
+            destination.activity = activity
+            destination.conversations = conversations
+            destination.pinnedConversations = conversations
+            destination.filteredConversations = conversations
+            destination.filteredPinnedConversations = conversations
+            present(navController, animated: true, completion: nil)
+        }
+    }
+    
 }
 
 extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
@@ -363,13 +375,11 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
     }
     
     func locationViewTapped(labelText: String) {
-        print("labelText \(labelText)")
         openLocationFinder()
         
     }
     
     func infoViewTapped() {
-        print("infoview")
         
         guard let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
             return
@@ -401,7 +411,7 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             
             let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
             let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
-                self.goToMap()
+                self.goToMap(locationAddress: self.locationAddress)
             }
             let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
                 let pasteboard = UIPasteboard.general
@@ -459,12 +469,10 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
     }
     
     func reminderViewTapped(labelText: String) {
-        print("labelText \(labelText)")
         
         let alertController = UIAlertController(title: "Reminder", message: nil, preferredStyle: .alert)
         
         let noneAddress = UIAlertAction(title: EventAlert.None.rawValue, style: .default) { (action:UIAlertAction) in
-            print("none")
             self.reminder = EventAlert.None.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.None.description
@@ -473,7 +481,6 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let atTimeAddress = UIAlertAction(title: EventAlert.At_time_of_event.rawValue, style: .default) { (action:UIAlertAction) in
-            print("atTimeAddress")
             self.reminder = EventAlert.At_time_of_event.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.At_time_of_event.description
@@ -483,7 +490,6 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
 
         }
         let fifteenAddress = UIAlertAction(title: EventAlert.Fifteen_Minutes.rawValue, style: .default) { (action:UIAlertAction) in
-            print("fifteenAddress")
             self.reminder = EventAlert.Fifteen_Minutes.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.Fifteen_Minutes.description
@@ -492,7 +498,6 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let halfHourAddress = UIAlertAction(title: EventAlert.Half_Hour.rawValue, style: .default) { (action:UIAlertAction) in
-            print("halfHourAddress")
             self.reminder = EventAlert.Half_Hour.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.Half_Hour.description
@@ -501,7 +506,6 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let oneHourAddress = UIAlertAction(title: EventAlert.One_Hour.rawValue, style: .default) { (action:UIAlertAction) in
-            print("oneHourAddress")
             self.reminder = EventAlert.One_Hour.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Hour.description
@@ -510,7 +514,6 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let oneDayAddress = UIAlertAction(title: EventAlert.One_Day.rawValue, style: .default) { (action:UIAlertAction) in
-            print("oneDayAddress")
             self.reminder = EventAlert.One_Day.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Day.description
@@ -519,7 +522,6 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let oneWeekAddress = UIAlertAction(title: EventAlert.One_Week.rawValue, style: .default) { (action:UIAlertAction) in
-            print("oneWeekAddress")
             self.reminder = EventAlert.One_Week.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Week.description
@@ -528,7 +530,6 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let oneMonthAddress = UIAlertAction(title: EventAlert.One_Month.rawValue, style: .default) { (action:UIAlertAction) in
-            print("oneMonthAddress")
             self.reminder = EventAlert.One_Month.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Month.description
@@ -631,380 +632,21 @@ extension MealDetailViewController: UpdateLocationDelegate {
     }
 }
 
-extension MealDetailViewController: ActivityDetailCellDelegate {
-    func plusButtonTapped(type: Any) {
-        print("plusButtonTapped")
-        
-        if active, schedule, let activity = activity {
-            let membersIDs = self.fetchMembersIDs()
-            activity.participantsIDs = membersIDs.0
-            
-            self.delegate?.updateSchedule(schedule: activity)
-            self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
-                
-        }
-        
-        let alert = UIAlertController(title: "Activity", message: nil, preferredStyle: .actionSheet)
-        
-        if active, let activity = activity {
-            alert.addAction(UIAlertAction(title: "Update Activity", style: .default, handler: { (_) in
-                print("User click Approve button")
-                                
-                // update activity
-                self.showActivityIndicator()
-                let createActivity = ActivityActions(activity: activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createActivity.createNewActivity()
-                self.hideActivityIndicator()
-                
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                }
-                
-            }))
-            
-            if !self.schedule {
-                alert.addAction(UIAlertAction(title: "Duplicate Activity", style: .default, handler: { (_) in
-                    print("User click Approve button")
-                    // create new activity with updated time
-                    guard self.currentReachabilityStatus != .notReachable else {
-                        basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-                        return
-                    }
-                    
-                    let membersIDs = self.fetchMembersIDs()
-                    activity.participantsIDs = membersIDs.0
-                    
-                    var newActivityID: String!
-                    let newActivity = activity
-                                
-                    if let currentUserID = Auth.auth().currentUser?.uid {
-                        newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
-                        
-                        let original = Date()
-                        let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        self.startDateTime = rounded
-                        self.endDateTime = rounded.addingTimeInterval(Double(self.recipe?.readyInMinutes ?? 0) * 60)
-                        
-                        newActivity.activityID = newActivityID
-                        newActivity.startDateTime = NSNumber(value: Int((self.startDateTime!).timeIntervalSince1970))
-                        newActivity.endDateTime = NSNumber(value: Int((self.endDateTime!).timeIntervalSince1970))
-                        
-                        self.showActivityIndicator()
-                        let createActivity = ActivityActions(activity: newActivity, active: !self.active, selectedFalconUsers: self.selectedFalconUsers)
-                        createActivity.createNewActivity()
-                        self.hideActivityIndicator()
-                        
-                        if self.conversation == nil {
-                            self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                        } else {
-                            self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                        }
-                    }
-                    
-
-                }))
-                
-                alert.addAction(UIAlertAction(title: "Merge with Activity", style: .default, handler: { (_) in
-                    print("User click Edit button")
-                    
-                    let membersIDs = self.fetchMembersIDs()
-                    activity.participantsIDs = membersIDs.0
-                    
-                    // ChooseActivityTableViewController
-                    let destination = ChooseActivityTableViewController()
-                    let navController = UINavigationController(rootViewController: destination)
-                    destination.delegate = self
-                    destination.activities = self.activities
-                    destination.pinnedActivities = self.activities
-                    destination.filteredActivities = self.activities
-                    destination.filteredPinnedActivities = self.activities
-                    self.present(navController, animated: true, completion: nil)
-                
-                }))
-                
-                alert.addAction(UIAlertAction(title: "Duplicate & Merge with Activity", style: .default, handler: { (_) in
-                    print("User click Edit button")
-                    
-                    if let currentUserID = Auth.auth().currentUser?.uid {
-                        
-                        let membersIDs = self.fetchMembersIDs()
-                        activity.participantsIDs = membersIDs.0
-                        
-                        //duplicate activity
-                        var newActivityID: String!
-                        let newActivity = activity
-                        
-                        newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
-                        newActivity.activityID = newActivityID
-                        self.showActivityIndicator()
-                        let createActivity = ActivityActions(activity: newActivity, active: !self.active, selectedFalconUsers: self.selectedFalconUsers)
-                        createActivity.createNewActivity()
-                        self.hideActivityIndicator()
-                        
-                        // ChooseActivityTableViewController
-                        let destination = ChooseActivityTableViewController()
-                        let navController = UINavigationController(rootViewController: destination)
-                        destination.delegate = self
-                        destination.activities = self.activities
-                        destination.pinnedActivities = self.activities
-                        destination.filteredActivities = self.activities
-                        destination.filteredPinnedActivities = self.activities
-                        self.present(navController, animated: true, completion: nil)
-                    }
-                
-                }))
-            }
-            
-        } else if schedule, let _ = umbrellaActivity {
-            alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
-                print("User click Approve button")
-                self.activity.name = self.recipe?.title
-                
-                let membersIDs = self.fetchMembersIDs()
-                self.activity.participantsIDs = membersIDs.0
-                
-                self.delegate?.updateSchedule(schedule: self.activity)
-                
-                self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
-                
-            }))
-            
-        } else if !schedule {
-            alert.addAction(UIAlertAction(title: "Create New Activity", style: .default, handler: { (_) in
-                print("User click Approve button")
-                // create new activity
-                
-                self.activity.name = self.recipe?.title
-                
-                let membersIDs = self.fetchMembersIDs()
-                self.activity.participantsIDs = membersIDs.0
-                
-                self.showActivityIndicator()
-                let createActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createActivity.createNewActivity()
-                self.hideActivityIndicator()
-                
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                }
-                
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
-                print("User click Edit button")
-                
-                self.activity.name = self.recipe?.title
-                
-                let membersIDs = self.fetchMembersIDs()
-                self.activity.participantsIDs = membersIDs.0
-                
-                // ChooseActivityTableViewController
-                let destination = ChooseActivityTableViewController()
-                let navController = UINavigationController(rootViewController: destination)
-                destination.delegate = self
-                destination.activities = self.activities
-                destination.pinnedActivities = self.activities
-                destination.filteredActivities = self.activities
-                destination.filteredPinnedActivities = self.activities
-                self.present(navController, animated: true, completion: nil)
-            
-            }))
-
-        }
-        
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-    }
-    
-    func shareButtonTapped(activityObject: ActivityObject) {
-        
-        let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
-            print("User click Approve button")
-            let destination = ChooseChatTableViewController()
-            let navController = UINavigationController(rootViewController: destination)
-            destination.activityObject = activityObject
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.filteredConversations = self.conversations
-            destination.filteredPinnedConversations = self.conversations
-            self.present(navController, animated: true, completion: nil)
-            
-        }))
-
-        alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
-            print("User click Edit button")
-                // Fallback on earlier versions
-            let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
-            guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
-                else { return }
-            let shareContent: [Any] = [shareText, url]
-            let activityController = UIActivityViewController(activityItems: shareContent,
-                                                              applicationActivities: nil)
-            self.present(activityController, animated: true, completion: nil)
-            activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-            Bool, arrayReturnedItems: [Any]?, error: Error?) in
-                if completed {
-                    print("share completed")
-                    return
-                } else {
-                    print("cancel")
-                }
-                if let shareError = error {
-                    print("error while sharing: \(shareError.localizedDescription)")
-                }
-            }
-            
-        }))
-        
-
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-        print("shareButtonTapped")
-    }
-    
-    func heartButtonTapped(type: Any) {
-        print("heartButtonTapped")
-        if let currentUserID = Auth.auth().currentUser?.uid {
-            let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
-            if let recipe = type as? Recipe {
-                print(recipe.title)
-                databaseReference.child("recipes").observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists() {
-                        var value = snapshot.value as! [String]
-                        if value.contains("\(recipe.id)") {
-                            if let index = value.firstIndex(of: "\(recipe.id)") {
-                                value.remove(at: index)
-                            }
-                            databaseReference.updateChildValues(["recipes": value as NSArray])
-                        } else {
-                            value.append("\(recipe.id)")
-                            databaseReference.updateChildValues(["recipes": value as NSArray])
-                        }
-                        self.favAct["recipes"] = value
-                    } else {
-                        self.favAct["recipes"] = ["\(recipe.id)"]
-                        databaseReference.updateChildValues(["recipes": ["\(recipe.id)"]])
-                    }
-                })
-            }
-        }
-        
-    }
-
-}
-
-extension MealDetailViewController: ChooseActivityDelegate {
-    func chosenActivity(mergeActivity: Activity) {
-        print("found activity")
-        if let activity = activity {
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
-                if let currentUserID = Auth.auth().currentUser?.uid {
-                    let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
-                    let newActivity = Activity(dictionary: ["activityID": newActivityID as AnyObject])
-                    newActivity.startDateTime = mergeActivity.startDateTime
-                    newActivity.endDateTime = mergeActivity.endDateTime
-                    newActivity.name = mergeActivity.name
-                    newActivity.reminder = mergeActivity.reminder
-                    if let location = mergeActivity.locationName, location != "Location" {
-                        newActivity.locationName = mergeActivity.locationName
-                        newActivity.locationAddress = mergeActivity.locationAddress
-                    }
-                    newActivity.participantsIDs = mergeActivity.participantsIDs
-                    if let oldParticipantsIDs = activity.participantsIDs {
-                        if let newParticipantsIDs = newActivity.participantsIDs {
-                            for id in oldParticipantsIDs {
-                                if !newParticipantsIDs.contains(id) {
-                                    newActivity.participantsIDs!.append(id)
-                                }
-                            }
-                        } else {
-                            newActivity.participantsIDs = activity.participantsIDs
-                        }
-                    }
-                    let scheduleList = [mergeActivity, activity]
-                    newActivity.schedule = scheduleList
-                    
-                    self.showActivityIndicator()
-                    
-                    // need to delete current activity and merge activity
-                    if active {
-                        self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-                            let deleteFirstActivity = ActivityActions(activity: mergeActivity, active: nil, selectedFalconUsers: participants)
-                            deleteFirstActivity.deleteActivity()
-                        }
-                        self.getSelectedFalconUsers(forActivity: activity) { (participants) in
-                            let deleteSecondActivity = ActivityActions(activity: activity, active: nil, selectedFalconUsers: participants)
-                            deleteSecondActivity.deleteActivity()
-                        }
-                        
-                    // need to delete merge activity
-                    } else {
-                        self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-                            let deleteActivity = ActivityActions(activity: mergeActivity, active: nil, selectedFalconUsers: participants)
-                            deleteActivity.deleteActivity()
-                        }
-                    }
-                    
-                    self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
-                        let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
-                        createActivity.createNewActivity()
-                    }
-                    
-                    self.hideActivityIndicator()
-                }
-            } else {
-                if mergeActivity.schedule != nil {
-                    var scheduleList = mergeActivity.schedule!
-                    scheduleList.append(activity)
-                    mergeActivity.schedule = scheduleList
-                } else {
-                    let scheduleList = [activity]
-                    mergeActivity.schedule = scheduleList
-                }
-                
-                self.showActivityIndicator()
-                
-                // need to delete current activity
-                if active {
-                    self.getSelectedFalconUsers(forActivity: activity) { (participants) in
-                        let deleteActivity = ActivityActions(activity: activity, active: nil, selectedFalconUsers: participants)
-                        deleteActivity.deleteActivity()
-                    }
-                }
-                
-                self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-                    let createActivity = ActivityActions(activity: mergeActivity, active: false, selectedFalconUsers: participants)
-                    createActivity.createNewActivity()
-                }
-                
-                self.hideActivityIndicator()
-                
-            
-            }
-            
-            if self.conversation == nil {
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else {
-                self.navigationController?.backToViewController(viewController: ChatLogController.self)
-            }
-        }
+extension MealDetailViewController: ChooseChatDelegate {
+    func chosenChat(chatID: String, activityID: String?) {
+        if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+            if conversation.activities != nil {
+                   var activities = conversation.activities!
+                   activities.append(activityID!)
+                   let updatedActivities = ["activities": activities as AnyObject]
+                   Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+               } else {
+                   let updatedActivities = ["activities": [activityID!] as AnyObject]
+                   Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+               }
+           }
+        let updatedConversationID = ["conversationID": chatID as AnyObject]
+        Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+        activity.conversationID = chatID
     }
 }

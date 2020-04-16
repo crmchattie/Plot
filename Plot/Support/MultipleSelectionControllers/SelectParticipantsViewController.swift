@@ -186,7 +186,7 @@ class SelectParticipantsViewController: UIViewController {
                         let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
                         messageSender.sendMessage()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
-                            self.removeAlert()
+                            self.removeMessageAlert()
                             self.dismiss(animated: true, completion: nil)
                         })
                         return
@@ -212,7 +212,7 @@ class SelectParticipantsViewController: UIViewController {
     func addNewMembers() {
         
         //    ARSLineProgress.ars_showOnView(view)
-           if let navController = self.navigationController {
+        if let navController = self.navigationController {
              self.showSpinner(onView: navController.view)
          } else {
              self.showSpinner(onView: self.view)

@@ -92,12 +92,12 @@ extension ActivityCell {
         muteIndicator.isHidden = !isActivityMuted
         
         if activity.activityType != "nothing" && activity.activityType != nil {
-            activityTypeLabel.text = activity.activityType
+            activityTypeLabel.text = activity.activityType?.capitalized
         } else {
             activityTypeLabel.text = ""
         }
         
-        if activity.locationName != "locationName" && activity.locationName != nil {
+        if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
             activityAddressLabel.text = activity.locationName
         } else {
             activityAddressLabel.text = ""
@@ -153,18 +153,14 @@ extension ActivityCell {
         
         if activity.locationAddress == nil {
             mapButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-            mapButton.isUserInteractionEnabled = false
         } else {
             mapButton.tintColor = .systemBlue
-            mapButton.isUserInteractionEnabled = true
         }
 
-        if activity.participantsIDs!.count == 1 {
+        if activity.conversationID == nil {
             chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-            chatButton.isUserInteractionEnabled = false
         } else {
             chatButton.tintColor = .systemBlue
-            chatButton.isUserInteractionEnabled = true
         }
     }
     

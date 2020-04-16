@@ -223,68 +223,89 @@ class WorkoutDetailViewController: ActivityDetailViewController {
     //        self.present(navigationViewController, animated: true, completion: nil)
         }
             
-        //update so existing invitees are shown as selected
-        @objc fileprivate func openParticipantsInviter() {
-            guard currentReachabilityStatus != .notReachable else {
-                basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-                return
-            }
-            let destination = SelectActivityMembersViewController()
-            var uniqueUsers = users
-            for participant in selectedFalconUsers {
-                if let userIndex = users.firstIndex(where: { (user) -> Bool in
-                    return user.id == participant.id }) {
-                    uniqueUsers[userIndex] = participant
-                } else {
-                    uniqueUsers.append(participant)
-                }
-            }
-            
-            destination.ownerID = self.activity.admin
-            destination.users = uniqueUsers
-            destination.filteredUsers = uniqueUsers
-            if !selectedFalconUsers.isEmpty{
-                destination.priorSelectedUsers = selectedFalconUsers
-            }
-            
-            destination.delegate = self
-            
-            if self.selectedFalconUsers.count > 0 {
-                let dispatchGroup = DispatchGroup()
-                for user in self.selectedFalconUsers {
-                    dispatchGroup.enter()
-                    guard let currentUserID = Auth.auth().currentUser?.uid, let userID = user.id else {
-                        dispatchGroup.leave()
-                        continue
-                    }
-                    
-                    if userID == activity.admin {
-                        if userID != currentUserID {
-                            self.userInvitationStatus[userID] = .accepted
-                        }
-                        
-                        dispatchGroup.leave()
-                        continue
-                    }
-                    
-                    InvitationsFetcher.activityInvitation(forUser: userID, activityID: self.activity.activityID!) { (invitation) in
-                        if let invitation = invitation {
-                            self.userInvitationStatus[userID] = invitation.status
-                        }
-                        dispatchGroup.leave()
-                    }
-                }
-                dispatchGroup.notify(queue: .main) {
-                    destination.userInvitationStatus = self.userInvitationStatus
-                    InvitationsFetcher.getAcceptedParticipant(forActivity: self.activity, allParticipants: self.selectedFalconUsers) { acceptedParticipant in
-                        self.acceptedParticipant = acceptedParticipant
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    }
-                }
+    //update so existing invitees are shown as selected
+    @objc fileprivate func openParticipantsInviter() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = SelectActivityMembersViewController()
+        var uniqueUsers = users
+        for participant in selectedFalconUsers {
+            if let userIndex = users.firstIndex(where: { (user) -> Bool in
+                return user.id == participant.id }) {
+                uniqueUsers[userIndex] = participant
             } else {
-                self.navigationController?.pushViewController(destination, animated: true)
+                uniqueUsers.append(participant)
             }
         }
+        
+        destination.ownerID = self.activity.admin
+        destination.users = uniqueUsers
+        destination.filteredUsers = uniqueUsers
+        if !selectedFalconUsers.isEmpty{
+            destination.priorSelectedUsers = selectedFalconUsers
+        }
+        
+        destination.delegate = self
+        
+        if self.selectedFalconUsers.count > 0 {
+            let dispatchGroup = DispatchGroup()
+            for user in self.selectedFalconUsers {
+                dispatchGroup.enter()
+                guard let currentUserID = Auth.auth().currentUser?.uid, let userID = user.id else {
+                    dispatchGroup.leave()
+                    continue
+                }
+                
+                if userID == activity.admin {
+                    if userID != currentUserID {
+                        self.userInvitationStatus[userID] = .accepted
+                    }
+                    
+                    dispatchGroup.leave()
+                    continue
+                }
+                
+                InvitationsFetcher.activityInvitation(forUser: userID, activityID: self.activity.activityID!) { (invitation) in
+                    if let invitation = invitation {
+                        self.userInvitationStatus[userID] = invitation.status
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+            dispatchGroup.notify(queue: .main) {
+                destination.userInvitationStatus = self.userInvitationStatus
+                InvitationsFetcher.getAcceptedParticipant(forActivity: self.activity, allParticipants: self.selectedFalconUsers) { acceptedParticipant in
+                    self.acceptedParticipant = acceptedParticipant
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
+            }
+        } else {
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
+    @objc func goToChat() {
+        if activity.conversationID != nil {
+            if let convo = conversations.first(where: {$0.chatID == activity!.conversationID}) {
+                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+                self.messagesFetcher = MessagesFetcher()
+                self.messagesFetcher?.delegate = self
+                self.messagesFetcher?.loadMessagesData(for: convo)
+            }
+        } else {
+            let destination = ChooseChatTableViewController()
+            let navController = UINavigationController(rootViewController: destination)
+            destination.delegate = self
+            destination.activity = activity
+            destination.conversations = conversations
+            destination.pinnedConversations = conversations
+            destination.filteredConversations = conversations
+            destination.filteredPinnedConversations = conversations
+            present(navController, animated: true, completion: nil)
+        }
+    }
 }
 
 extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
@@ -342,7 +363,7 @@ extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
             
             let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
             let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
-                self.goToMap()
+                self.goToMap(locationAddress: self.locationAddress)
             }
             let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
                 let pasteboard = UIPasteboard.general
@@ -595,7 +616,7 @@ extension WorkoutDetailViewController: UpdateLocationDelegate {
 extension WorkoutDetailViewController: ActivityDetailCellDelegate {
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
-        let alert = UIAlertController(title: "Add Activity", message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         if let _ = activity {
             alert.addAction(UIAlertAction(title: "Duplicate Activity", style: .default, handler: { (_) in
@@ -640,6 +661,10 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
     }
     
     func shareButtonTapped(activityObject: ActivityObject) {
+        
+        if let activity = activity {
+            activityObject.activityID = activity.activityID
+        }
         
         let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
 
@@ -721,6 +746,61 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
         }
         
     }
+    
+    func dotsButtonTapped() {
+    
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if activity.conversationID == nil {
+            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
+                print("User click Approve button")
+                self.goToChat()
+
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+                print("User click Approve button")
+                self.goToChat()
+
+            }))
+        }
+            
+        if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
+            alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
+                print("User click Edit button")
+                self.goToMap(locationAddress: localAddress)
+            }))
+        }
+           
+
+       alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+           print("User click Dismiss button")
+       }))
+
+       self.present(alert, animated: true, completion: {
+           print("completion block")
+       })
+        print("shareButtonTapped")
+        
+    }
 
 }
 
+extension WorkoutDetailViewController: ChooseChatDelegate {
+    func chosenChat(chatID: String, activityID: String?) {
+        if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+            if conversation.activities != nil {
+                   var activities = conversation.activities!
+                   activities.append(activityID!)
+                   let updatedActivities = ["activities": activities as AnyObject]
+                   Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+               } else {
+                   let updatedActivities = ["activities": [activityID!] as AnyObject]
+                   Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+               }
+           }
+        let updatedConversationID = ["conversationID": chatID as AnyObject]
+        Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+        activity.conversationID = chatID
+    }
+}

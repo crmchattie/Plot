@@ -653,7 +653,7 @@ class ChatLogController: UICollectionViewController {
         let dispatchGroup = DispatchGroup()
         print("going to activity")
         
-        if message.activityType == "recipe", let recipeString = message.activityID, let recipeID = Int(recipeString) {
+        if message.activityType == "recipe", let recipeString = message.activityTypeID, let recipeID = Int(recipeString) {
             print("meal \(String(describing: message.text))")
             dispatchGroup.enter()
             Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
@@ -661,7 +661,6 @@ class ChatLogController: UICollectionViewController {
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
                     let destination = MealDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
                     destination.recipe = detailedRecipe
                     destination.detailedRecipe = detailedRecipe
                     destination.users = self.users
@@ -670,7 +669,7 @@ class ChatLogController: UICollectionViewController {
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
-        } else if message.activityType == "event", let eventID = message.activityID {
+        } else if message.activityType == "event", let eventID = message.activityTypeID {
             print("event \(String(describing: message.text))")
             print("id \(String(describing: eventID))")
             dispatchGroup.enter()
@@ -680,7 +679,6 @@ class ChatLogController: UICollectionViewController {
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
                         let destination = EventDetailViewController()
-                        destination.hidesBottomBarWhenPushed = true
                         destination.event = event
                         destination.users = self.users
                         destination.filteredUsers = self.filteredUsers
@@ -689,16 +687,15 @@ class ChatLogController: UICollectionViewController {
                     }
                 }
             }
-        } else if message.activityType == "workout", let workoutID = message.activityID {
+        } else if message.activityType == "workout", let workoutID = message.activityTypeID {
             print("workout \(String(describing: message.text))")
-            let destination = WorkoutDetailViewController()
-            destination.hidesBottomBarWhenPushed = true
             dispatchGroup.enter()
             self.reference = Database.database().reference().child("workouts").child("workouts")
             self.reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
                     if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
                         dispatchGroup.leave()
+                        let destination = WorkoutDetailViewController()
                         destination.workout = workout
                         destination.intColor = 0
                         destination.users = self.users
@@ -711,14 +708,13 @@ class ChatLogController: UICollectionViewController {
             { (error) in
                 print(error.localizedDescription)
             }
-        } else if message.activityType == "attraction", let attractionID = message.activityID {
+        } else if message.activityType == "attraction", let attractionID = message.activityTypeID {
             dispatchGroup.enter()
             Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
                 let attraction = search?.embedded?.attractions![0]
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
                     let destination = EventDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
                     destination.attraction = attraction
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
@@ -726,11 +722,32 @@ class ChatLogController: UICollectionViewController {
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
+        } else {
+            if let activityID = message.activityID, let currentUserID = Auth.auth().currentUser?.uid {
+                let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+                activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
+                
+                    let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+                    
+                    dictionary.updateValue(activityID as AnyObject, forKey: "activityID")
+                        
+                    let activity = Activity(dictionary: dictionary)
+                    activity.participantsIDs = nil
+                    activity.admin = currentUserID
+                    activity.activityID = newActivityID
+                    
+                    let destination = CreateActivityViewController()
+                    destination.sentActivity = true
+                    destination.activity = activity
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    destination.conversations = self.conversations
+                    self.navigationController?.pushViewController(destination, animated: true)
+                
+                })
+            }
         }
-        else {
-            print("neither meals or events")
-        }
-        
     }
     
   

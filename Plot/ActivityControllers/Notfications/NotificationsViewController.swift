@@ -213,6 +213,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
                     let destination = MealDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
                     destination.recipe = detailedRecipe
                     destination.detailedRecipe = detailedRecipe
                     destination.activity = activity
@@ -238,6 +239,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
                         let destination = EventDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
                         destination.event = event
                         destination.activity = activity
                         destination.invitation = self.invitations[activity.activityID!]
@@ -257,13 +259,14 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             }
         } else if let workoutID = activity.workoutID {
             var reference = Database.database().reference()
-            let destination = WorkoutDetailViewController()
             dispatchGroup.enter()
             reference = Database.database().reference().child("workouts").child("workouts")
             reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
                     if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
                         dispatchGroup.leave()
+                        let destination = WorkoutDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
                         destination.workout = workout
                         destination.intColor = 0
                         destination.activity = activity
@@ -292,6 +295,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
                     let destination = EventDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
                     destination.attraction = attraction
                     destination.activity = activity
                     destination.invitation = self.invitations[activity.activityID!]

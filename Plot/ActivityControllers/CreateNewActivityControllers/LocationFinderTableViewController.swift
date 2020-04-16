@@ -24,6 +24,8 @@ class LocationFinderTableViewController: UIViewController {
     var locationName = "Location"
     var locationAddress = ["locationAddress": [0.0]]
     
+    var viewPlaceholder = ViewPlaceholder()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -96,6 +98,14 @@ class LocationFinderTableViewController: UIViewController {
         print("select location deinit")
     }
     
+    func checkIfThereAreAnyLocations(isEmpty: Bool) {
+        guard isEmpty else {
+            viewPlaceholder.remove(from: searchResultsTableView, priority: .medium)
+            return
+        }
+        viewPlaceholder.add(for: searchResultsTableView, title: .emptyLocationSearch, subtitle: .emptyUsers, priority: .medium, position: .top)
+    }
+    
 }
 
 
@@ -126,6 +136,11 @@ extension LocationFinderTableViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if searchResults.count == 0 {
+            checkIfThereAreAnyLocations(isEmpty: true)
+        } else {
+            checkIfThereAreAnyLocations(isEmpty: false)
+        }
         return searchResults.count
     }
     

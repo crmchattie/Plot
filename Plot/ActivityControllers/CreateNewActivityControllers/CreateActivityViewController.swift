@@ -28,6 +28,7 @@ class CreateActivityViewController: FormViewController {
     var selectedFalconUsers = [User]()
     var userInvitationStatus: [String: Status] = [:]
     var conversations = [Conversation]()
+    var activities = [Activity]()
     var conversation: Conversation!
     let avatarOpener = AvatarOpener()
     var locationName : String = "locationName"
@@ -51,8 +52,10 @@ class CreateActivityViewController: FormViewController {
     
     fileprivate var reminderDate: Date?
     
-    var active: Bool = false
-    var includeSubSections: Bool = true
+    var active = false
+    var includeSubSections = true
+    var sentActivity = false
+    
     
     typealias CompletionHandler = (_ success: Bool) -> Void
     
@@ -90,6 +93,7 @@ class CreateActivityViewController: FormViewController {
                         locationAddress[key] = value
                     }
                 }
+                sortSchedule()
             }
             if activity.purchases != nil {
                 for purchase in activity.purchases! {
@@ -141,9 +145,8 @@ class CreateActivityViewController: FormViewController {
     }
     
     fileprivate func setupMainView() {
-        navigationItem.largeTitleDisplayMode = .always
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = "New Activity"
+        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.title = "Activity"
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -155,51 +158,24 @@ class CreateActivityViewController: FormViewController {
     }
     
     func setupRightBarButton(with title: String) {
-        let checkImage = UIImage(named: "checkNav")
-        if title == "Create" {
-            let checkBarButton = UIBarButtonItem(image: checkImage, style: .plain, target: self, action: #selector(createNewActivity))
-            navigationItem.rightBarButtonItem = checkBarButton
+        if title == "Create" || sentActivity {
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
+            navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = false
-        } else {
-            let chatsImage = UIImage(named: "chatNav")
-            let mapsImage = UIImage(named: "map")
-            if activity.participantsIDs!.count > 1 && conversation == nil {
-                if #available(iOS 11.0, *) {
-                    let checkBarButton = UIButton(type: .system)
-                    checkBarButton.setImage(checkImage, for: .normal)
-                    checkBarButton.addTarget(self, action: #selector(createNewActivity), for: .touchUpInside)
-                    
-                    let chatBarButton = UIButton(type: .system)
-                    chatBarButton.setImage(chatsImage, for: .normal)
-                    chatBarButton.addTarget(self, action: #selector(goToChat), for: .touchUpInside)
-                    
-                    let mapBarButton = UIButton(type: .system)
-                    mapBarButton.setImage(mapsImage, for: .normal)
-                    mapBarButton.addTarget(self, action: #selector(goToMap), for: .touchUpInside)
-                    
-                    navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: checkBarButton), UIBarButtonItem(customView: chatBarButton), UIBarButtonItem(customView: mapBarButton)]
-                } else {
-                    let checkBarButton = UIBarButtonItem(image: checkImage, style: .plain, target: self, action: #selector(createNewActivity))
-                    let chatBarButton = UIBarButtonItem(image: chatsImage, style: .plain, target: self, action: #selector(goToChat))
-                    let mapBarButton = UIBarButtonItem(image: mapsImage, style: .plain, target: self, action: #selector(goToMap))
-                    navigationItem.rightBarButtonItems = [checkBarButton, chatBarButton, mapBarButton]
-                }
+        } else if !sentActivity {
+            let dotsImage = UIImage(named: "dots")
+            if #available(iOS 11.0, *) {
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
+                
+                let dotsBarButton = UIButton(type: .system)
+                dotsBarButton.setImage(dotsImage, for: .normal)
+                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
+                                
+                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
             } else {
-                if #available(iOS 11.0, *) {
-                    let checkBarButton = UIButton(type: .system)
-                    checkBarButton.setImage(checkImage, for: .normal)
-                    checkBarButton.addTarget(self, action: #selector(createNewActivity), for: .touchUpInside)
-                    
-                    let mapBarButton = UIButton(type: .system)
-                    mapBarButton.setImage(mapsImage, for: .normal)
-                    mapBarButton.addTarget(self, action: #selector(goToMap), for: .touchUpInside)
-                    
-                    navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: checkBarButton), UIBarButtonItem(customView: mapBarButton)]
-                } else {
-                    let checkBarButton = UIBarButtonItem(image: checkImage, style: .plain, target: self, action: #selector(createNewActivity))
-                    let mapBarButton = UIBarButtonItem(image: mapsImage, style: .plain, target: self, action: #selector(goToMap))
-                    navigationItem.rightBarButtonItems = [checkBarButton, mapBarButton]
-                }
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
+                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
             }
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
@@ -256,7 +232,6 @@ class CreateActivityViewController: FormViewController {
                 $0.placeholder = $0.tag
                 if self.active {
                     $0.value = self.activity.name
-                    self.navigationItem.title = $0.value
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     $0.cell.textField.becomeFirstResponder()
@@ -264,10 +239,8 @@ class CreateActivityViewController: FormViewController {
                 }.onChange() { [unowned self] row in
                     self.activity.name = row.value
                     if row.value == nil {
-                        self.navigationItem.title = "New Activity"
                         self.navigationItem.rightBarButtonItem?.isEnabled = false
                     } else {
-                        self.navigationItem.title = row.value
                         self.navigationItem.rightBarButtonItem?.isEnabled = true
                     }
                 }.cellUpdate { cell, row in
@@ -275,6 +248,33 @@ class CreateActivityViewController: FormViewController {
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
+            
+//            <<< TextAreaRow("Activity Name") {
+//            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//            $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//            $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            $0.placeholder = $0.tag
+//            $0.textAreaHeight = .dynamic(initialTextViewHeight: 200)
+//            if self.active {
+//                $0.value = self.activity.name
+//                self.navigationItem.rightBarButtonItem?.isEnabled = true
+//            } else {
+//                $0.cell.textView.becomeFirstResponder()
+//            }
+//            }.cellUpdate({ (cell, row) in
+//                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            }).onChange() { [unowned self] row in
+//                self.activity.name = row.value
+//                if row.value == nil {
+//                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+//                } else {
+//                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+//                }
+//            }
             
             <<< TextRow("Activity Type") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -1436,24 +1436,25 @@ class CreateActivityViewController: FormViewController {
             return
         }
         
-        showActivityIndicator()
-        let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
-        createActivity.createNewActivity()
-        hideActivityIndicator()
-        
-        if active {
-            if self.conversation == nil {
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else {
-                self.navigationController?.backToViewController(viewController: ChatLogController.self)
-            }
+        if sentActivity {
+            showActivityIndicator()
+            let createActivity = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers)
+            createActivity.createNewActivity()
+            hideActivityIndicator()
+            self.navigationController?.popViewController(animated: true)
         } else {
-            if self.conversation == nil {
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else {
-                self.navigationController?.backToViewController(viewController: ChatLogController.self)
-            }
+            showActivityIndicator()
+           let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+           createActivity.createNewActivity()
+           hideActivityIndicator()
+           if self.conversation == nil {
+               self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+           } else {
+               self.navigationController?.backToViewController(viewController: ChatLogController.self)
+           }
         }
+        
+        
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
@@ -1491,30 +1492,6 @@ class CreateActivityViewController: FormViewController {
         self.removeSpinner()
     }
     
-    func uploadAvatar(chatImage: UIImage?, reference: DatabaseReference) {
-        guard let image = chatImage else { self.dispatchGroup.leave(); return }
-        let thumbnailImage = createImageThumbnail(image)
-        var images = [(image: UIImage, quality: CGFloat, key: String)]()
-        let compressedImageData = compressImage(image: image)
-        let compressedImage = UIImage(data: compressedImageData)
-        images.append((image: compressedImage!, quality: 0.5, key: "chatOriginalPhotoURL"))
-        images.append((image: thumbnailImage, quality: 1, key: "chatThumbnailPhotoURL"))
-        let photoUpdatingGroup = DispatchGroup()
-        for _ in images { photoUpdatingGroup.enter() }
-        
-        photoUpdatingGroup.notify(queue: DispatchQueue.main, execute: {
-            self.dispatchGroup.leave()
-        })
-        
-        for imageElement in images {
-            uploadAvatarForUserToFirebaseStorageUsingImage(imageElement.image, quality: imageElement.quality) { (url) in
-                reference.updateChildValues([imageElement.key: url], withCompletionBlock: { (_, _) in
-                    photoUpdatingGroup.leave()
-                })
-            }
-        }
-    }
-    
     var activityAvatarURL = String() {
         didSet {
             print("activity avatar \(activityAvatarURL)")
@@ -1524,6 +1501,50 @@ class CreateActivityViewController: FormViewController {
                 viewRow.cell.view!.hideActivityIndicator()
             })
         }
+    }
+    
+    @objc func goToExtras() {
+       let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Share Activity", style: .default, handler: { (_) in
+            print("User click Edit button")
+            self.shareActivity()
+        }))
+
+        
+        if activity.conversationID == nil {
+            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
+                print("User click Approve button")
+                self.goToChat()
+
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+                print("User click Approve button")
+                self.goToChat()
+
+            }))
+        }
+            
+        if let localName = activity.locationName, localName != "locationName", let _ = activity.locationAddress {
+            alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
+                print("User click Edit button")
+                self.goToMap()
+            }))
+        }
+        
+        
+           
+
+       alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+           print("User click Dismiss button")
+       }))
+
+       self.present(alert, animated: true, completion: {
+           print("completion block")
+       })
+        print("shareButtonTapped")
+        
     }
     
     @objc func goToChat() {
@@ -1555,6 +1576,77 @@ class CreateActivityViewController: FormViewController {
         let destination = MapViewController()
         destination.locationAddress = locationAddress
         navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    func shareActivity() {
+        
+        if let activity = activity, let name = activity.name {
+            let imageName = "activityLarge.png"
+            if let image = UIImage(named: imageName) {
+                
+                print("image")
+                
+                let data = compressImage(image: image)
+                let aO = ["activityName": "\(name)",
+                            "activityID": activityID,
+                            "object": data] as [String: AnyObject]
+                let activityObject = ActivityObject(dictionary: aO)
+            
+                let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
+
+                alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+                    print("User click Approve button")
+                    let destination = ChooseChatTableViewController()
+                    let navController = UINavigationController(rootViewController: destination)
+                    destination.activityObject = activityObject
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    destination.conversations = self.conversations
+                    destination.filteredConversations = self.conversations
+                    destination.filteredPinnedConversations = self.conversations
+                    self.present(navController, animated: true, completion: nil)
+                    
+                }))
+
+                alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+                    print("User click Edit button")
+                        // Fallback on earlier versions
+                    let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+                    guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+                        else { return }
+                    let shareContent: [Any] = [shareText, url]
+                    let activityController = UIActivityViewController(activityItems: shareContent,
+                                                                      applicationActivities: nil)
+                    self.present(activityController, animated: true, completion: nil)
+                    activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+                    Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                        if completed {
+                            print("share completed")
+                            return
+                        } else {
+                            print("cancel")
+                        }
+                        if let shareError = error {
+                            print("error while sharing: \(shareError.localizedDescription)")
+                        }
+                    }
+                    
+                }))
+                
+
+                alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+                    print("User click Dismiss button")
+                }))
+
+                self.present(alert, animated: true, completion: {
+                    print("completion block")
+                })
+                print("shareButtonTapped")
+            }
+        
+
+        }
+        
     }
     
     fileprivate func resetBadgeForSelf() {
@@ -1605,10 +1697,8 @@ extension CreateActivityViewController: UITextFieldDelegate {
     @objc func textFieldDidChange(_ textField: UITextField) {
         if textField.text?.count == 0 {
             navigationItem.rightBarButtonItem?.isEnabled = false
-            navigationItem.title = "New Activity"
         } else {
             navigationItem.rightBarButtonItem?.isEnabled = true
-            navigationItem.title = textField.text
         }
     }
 }
@@ -1763,6 +1853,7 @@ extension CreateActivityViewController: ChooseChatDelegate {
            }
         let updatedConversationID = ["conversationID": chatID as AnyObject]
         Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+        activity.conversationID = chatID
     }
 }
 

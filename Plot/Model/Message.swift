@@ -50,6 +50,7 @@ class Message: NSObject  {
   
     var senderName: String? //local only, group messages only
     
+    var activityTypeID: String?
     var activityType: String?
     var activityID: String?
     var activityImageURL: String?
@@ -94,6 +95,7 @@ class Message: NSObject  {
       
         senderName = dictionary["senderName"] as? String
         
+        activityTypeID = dictionary["activityTypeID"] as? String
         activityType = dictionary["activityType"] as? String
         activityID = dictionary["activityID"] as? String
         activityImageURL = dictionary["activityImageURL"] as? String

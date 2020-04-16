@@ -210,9 +210,7 @@ extension ActivityViewController {
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
             if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
                 var varMemberIDs = membersIDs
-                print("membersIDs \(varMemberIDs)")
                 varMemberIDs[currentUserID] = nil
-                print("membersIDs \(varMemberIDs)")
                 activityDataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
             }
         })
@@ -251,9 +249,7 @@ extension ActivityViewController {
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
             if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
                 var varMemberIDs = membersIDs
-                print("membersIDs \(varMemberIDs)")
                 varMemberIDs[currentUserID] = nil
-                print("membersIDs \(varMemberIDs)")
                 activityDataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
             }
 

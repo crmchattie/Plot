@@ -180,7 +180,6 @@ class ActivityCell: UITableViewCell {
     let mapButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "map"), for: .normal)
-        button.tintColor = .systemBlue
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()

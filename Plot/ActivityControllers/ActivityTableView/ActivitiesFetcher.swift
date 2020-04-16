@@ -119,7 +119,7 @@ class ActivitiesFetcher: NSObject {
         activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
             guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
             
-            dictionary.updateValue(activityID as AnyObject, forKey: "id")
+            dictionary.updateValue(activityID as AnyObject, forKey: "activityID")
             
             if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
                 dictionary.updateValue(Array(membersIDs.values) as AnyObject, forKey: "participantsIDs")

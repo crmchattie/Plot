@@ -424,6 +424,9 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         if !isAppLoaded {
             activityView.tableView.reloadData()
             configureTabBarBadge()
+        } else {
+            activityView.tableView.reloadData()
+            configureTabBarBadge()
         }
         
         if allActivities.count == 0 {
@@ -691,12 +694,14 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
                     let destination = MealDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
                     destination.recipe = detailedRecipe
                     destination.detailedRecipe = detailedRecipe
                     destination.activity = activity
                     destination.invitation = self.invitations[activity.activityID!]
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
+                    destination.activities = self.filteredActivities + self.filteredPinnedActivities
                     destination.conversations = self.conversations
                     self.getParticipants(forActivity: activity) { (participants) in
                         InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
@@ -716,11 +721,13 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
                         let destination = EventDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
                         destination.event = event
                         destination.activity = activity
                         destination.invitation = self.invitations[activity.activityID!]
                         destination.users = self.users
                         destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.filteredActivities + self.filteredPinnedActivities
                         destination.conversations = self.conversations
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
@@ -735,19 +742,21 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             }
         } else if let workoutID = activity.workoutID {
             var reference = Database.database().reference()
-            let destination = WorkoutDetailViewController()
             dispatchGroup.enter()
             reference = Database.database().reference().child("workouts").child("workouts")
             reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
                     if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
                         dispatchGroup.leave()
+                        let destination = WorkoutDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
                         destination.workout = workout
                         destination.intColor = 0
                         destination.activity = activity
                         destination.invitation = self.invitations[activity.activityID!]
                         destination.users = self.users
                         destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.filteredActivities + self.filteredPinnedActivities
                         destination.conversations = self.conversations
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
@@ -770,11 +779,13 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
                     let destination = EventDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
                     destination.attraction = attraction
                     destination.activity = activity
                     destination.invitation = self.invitations[activity.activityID!]
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
+                    destination.activities = self.filteredActivities + self.filteredPinnedActivities
                     destination.conversations = self.conversations
                     self.getParticipants(forActivity: activity) { (participants) in
                         InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
@@ -794,6 +805,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             destination.invitation = invitations[activity.activityID!]
             destination.users = users
             destination.filteredUsers = filteredUsers
+            destination.activities = filteredActivities + filteredPinnedActivities
             destination.conversations = conversations
             self.getParticipants(forActivity: activity) { (participants) in
                 InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
@@ -930,10 +942,19 @@ extension ActivityViewController: ActivityUpdatesDelegate {
         if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
             activities.remove(at: index)
         }
+        
+        if let index = pinnedActivities.firstIndex(where: {$0.activityID == activityID}) {
+            pinnedActivities.remove(at: index)
+        }
 
         if let index = filteredActivities.firstIndex(where: {$0.activityID == activityID}) {
             filteredActivities.remove(at: index)
             let indexPath = IndexPath(row: index, section: 1)
+            deleteCell(at: indexPath)
+        }
+        if let index = filteredPinnedActivities.firstIndex(where: {$0.activityID == activityID}) {
+            filteredPinnedActivities.remove(at: index)
+            let indexPath = IndexPath(row: index, section: 0)
             deleteCell(at: indexPath)
         }
     }
@@ -968,6 +989,10 @@ extension ActivityViewController {
     func updateCellForActivityID(activityID: String) {
         if let index = filteredActivities.firstIndex(where: {$0.activityID == activityID}) {
             let indexPath = IndexPath(row: index, section: 1)
+            updateCell(at: indexPath)
+        }
+        if let index = filteredPinnedActivities.firstIndex(where: {$0.activityID == activityID}) {
+            let indexPath = IndexPath(row: index, section: 0)
             updateCell(at: indexPath)
         }
     }

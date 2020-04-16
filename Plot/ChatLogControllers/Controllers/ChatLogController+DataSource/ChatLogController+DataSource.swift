@@ -258,15 +258,25 @@ extension ChatLogController: UICollectionViewDelegateFlowLayout {
     }
     
     if isActivityMessage {
-        if isGroupChat, !isOutgoingMessage {
-            cellHeight = 175 + message.estimatedFrameForText!.height + 15 + 35
-            if cellHeight < 285 {
-                cellHeight = 285
+        if message.activityType == "recipe" || message.activityType == "workout" || message.activityType == "event" || message.activityType == "attraction" {
+            if isGroupChat, !isOutgoingMessage {
+                cellHeight = 175 + message.estimatedFrameForText!.height + 15 + 35
+                if cellHeight < 285 {
+                    cellHeight = 285
+                }
+            } else {
+                cellHeight = 175 + message.estimatedFrameForText!.height + 15
+                if cellHeight < 250 {
+                    cellHeight = 250
+                }
             }
         } else {
-            cellHeight = 175 + message.estimatedFrameForText!.height + 15
-            if cellHeight < 250 {
-                cellHeight = 250
+            if isGroupChat, !isOutgoingMessage {
+                cellHeight = 175 + message.estimatedFrameForText!.height + 15 + 35
+                
+            } else {
+                cellHeight = 175 + message.estimatedFrameForText!.height + 15
+                
             }
         }
     } else if isTextMessage {

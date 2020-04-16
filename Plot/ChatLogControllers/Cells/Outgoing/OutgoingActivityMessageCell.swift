@@ -55,7 +55,7 @@ class OutgoingActivityMessageCell: BaseActivityMessageCell {
     contentView.addSubview(deliveryStatus)
     messageImageView.topAnchor.constraint(equalTo: bubbleView.topAnchor, constant: -1).isActive = true
     messageImageView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 0).isActive = true
-    messageImageView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor, constant: -4.8).isActive = true
+    messageImageView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor, constant: -4.7).isActive = true
  
     textView.topAnchor.constraint(equalTo: messageImageView.bottomAnchor, constant: 10).isActive = true
     textView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 10).isActive = true

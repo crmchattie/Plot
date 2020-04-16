@@ -283,11 +283,12 @@ class MessageSender: NSObject {
                                               "fromId": fromID as AnyObject,
                                               "timestamp": timestamp,
                                               "text": text as AnyObject,
-                                              "activityID": activityObject.activityID as AnyObject,
+                                              "activityTypeID": activityObject.activityTypeID as AnyObject,
                                               "activityType": activityObject.activityType as AnyObject,
                                               "activityImageURL": activityObject.activityImageURL as AnyObject,
                                               "activityCategory": activityObject.activityCategory as AnyObject,
                                               "activitySubcategory": activityObject.activitySubcategory as AnyObject,
+                                              "activityID": activityObject.activityID as AnyObject,
                                               "imageWidth": activityObject.object!.asUIImage!.size.width as AnyObject,
                                               "imageHeight": activityObject.object!.asUIImage!.size.height as AnyObject]
       

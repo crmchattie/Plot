@@ -214,8 +214,6 @@ class InvitationsFetcher: NSObject {
             return
         }
         
-
-        
         var invitations: [Invitation] = []
         // only create invitations for participants that did not create activity aka are not admin
         for participant in selectedParticipants {
