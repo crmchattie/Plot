@@ -162,7 +162,7 @@ class CreateActivityViewController: FormViewController {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
             navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = false
-        } else if !sentActivity {
+        } else {
             let dotsImage = UIImage(named: "dots")
             if #available(iOS 11.0, *) {
                 let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
@@ -282,7 +282,7 @@ class CreateActivityViewController: FormViewController {
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
                 if self.active && self.activity.activityType != "nothing" && self.activity.activityType != nil {
-                    $0.value = self.activity.activityType
+                    $0.value = self.activity.activityType?.capitalized
                 }
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -512,7 +512,7 @@ class CreateActivityViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
-            }
+                }
             
             <<< DateTimeInlineRow("Ends"){
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -554,32 +554,31 @@ class CreateActivityViewController: FormViewController {
                     }
                     self!.activity.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.endDateTime = row.value
-                }
-                .onExpandInlineRow { [weak self] cell, row, inlineRow in
-                    inlineRow.cellUpdate { cell, dateRow in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-                        let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
-                        if allRow.value ?? false {
-                            cell.datePicker.datePickerMode = .date
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                }.onExpandInlineRow { [weak self] cell, row, inlineRow in
+                        inlineRow.cellUpdate() { cell, row in
+                            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                            let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
+                            if allRow.value ?? false {
+                                cell.datePicker.datePickerMode = .date
+                                cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            }
+                            else {
+                                cell.datePicker.datePickerMode = .dateAndTime
+                                cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            }
                         }
-                        else {
-                            cell.datePicker.datePickerMode = .dateAndTime
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        let color = cell.detailTextLabel?.textColor
+                        row.onCollapseInlineRow { cell, _, _ in
+                            cell.detailTextLabel?.textColor = color
                         }
+                        cell.detailTextLabel?.textColor = cell.tintColor
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        
                     }
-                    let color = cell.detailTextLabel?.textColor
-                    row.onCollapseInlineRow { cell, _, _ in
-                        cell.detailTextLabel?.textColor = color
-                    }
-                    cell.detailTextLabel?.textColor = cell.tintColor
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    
-            }
             
             <<< AlertRow<EventAlert>("Reminder") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -1431,30 +1430,53 @@ class CreateActivityViewController: FormViewController {
     }
     
     @objc func createNewActivity() {
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
         
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+        if !active || sentActivity {
+            alert.addAction(UIAlertAction(title: "Create New Activity", style: .default, handler: { (_) in
+                self.createActivity()
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "Update Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                self.createActivity()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Duplicate Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                self.duplicateActivity()
+            }))
+            
+        }
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+         print("shareButtonTapped")
+    }
+    
+    func createActivity() {
         if sentActivity {
             showActivityIndicator()
-            let createActivity = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers)
+            let createActivity = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
             createActivity.createNewActivity()
             hideActivityIndicator()
             self.navigationController?.popViewController(animated: true)
         } else {
             showActivityIndicator()
-           let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
-           createActivity.createNewActivity()
-           hideActivityIndicator()
-           if self.conversation == nil {
+            let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+            createActivity.createNewActivity()
+            hideActivityIndicator()
+            if self.conversation == nil {
                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-           } else {
+            } else {
                self.navigationController?.backToViewController(viewController: ChatLogController.self)
-           }
+            }
         }
-        
-        
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
@@ -1504,13 +1526,7 @@ class CreateActivityViewController: FormViewController {
     }
     
     @objc func goToExtras() {
-       let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        alert.addAction(UIAlertAction(title: "Share Activity", style: .default, handler: { (_) in
-            print("User click Edit button")
-            self.shareActivity()
-        }))
-
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         if activity.conversationID == nil {
             alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
@@ -1523,6 +1539,7 @@ class CreateActivityViewController: FormViewController {
                 print("User click Approve button")
                 self.goToChat()
 
+                
             }))
         }
             
@@ -1533,16 +1550,18 @@ class CreateActivityViewController: FormViewController {
             }))
         }
         
-        
-           
+        alert.addAction(UIAlertAction(title: "Share Activity", style: .default, handler: { (_) in
+            print("User click Edit button")
+            self.shareActivity()
+        }))
 
-       alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-           print("User click Dismiss button")
-       }))
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
 
-       self.present(alert, animated: true, completion: {
-           print("completion block")
-       })
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
         print("shareButtonTapped")
         
     }
@@ -1579,16 +1598,13 @@ class CreateActivityViewController: FormViewController {
     }
     
     func shareActivity() {
-        
         if let activity = activity, let name = activity.name {
-            let imageName = "activityLarge.png"
-            if let image = UIImage(named: imageName) {
-                
-                print("image")
-                
+            let imageName = "activityLarge"
+            if let image = UIImage(named: imageName) {                
                 let data = compressImage(image: image)
                 let aO = ["activityName": "\(name)",
                             "activityID": activityID,
+                            "activityImageURL": "\(imageName)",
                             "object": data] as [String: AnyObject]
                 let activityObject = ActivityObject(dictionary: aO)
             
@@ -1647,6 +1663,41 @@ class CreateActivityViewController: FormViewController {
 
         }
         
+    }
+    
+    func duplicateActivity() {
+        
+        if let activity = activity, let currentUserID = Auth.auth().currentUser?.uid {
+            var newActivityID: String!
+            
+            newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+            
+            let newActivity = activity.copy() as! Activity
+            newActivity.activityID = newActivityID
+            newActivity.admin = currentUserID
+            newActivity.participantsIDs = nil
+            newActivity.activityPhotos = nil
+            newActivity.activityOriginalPhotoURL = nil
+            newActivity.activityThumbnailPhotoURL = nil
+            newActivity.conversationID = nil
+            
+            if let scheduleList = newActivity.schedule {
+                for schedule in scheduleList {
+                    schedule.participantsIDs = nil
+                }
+            }
+            
+            self.showActivityIndicator()
+            let createActivity = ActivityActions(activity: newActivity, active: !self.active, selectedFalconUsers: [])
+            createActivity.createNewActivity()
+            self.hideActivityIndicator()
+
+            if self.conversation == nil {
+                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+            } else {
+               self.navigationController?.backToViewController(viewController: ChatLogController.self)
+            }
+        }
     }
     
     fileprivate func resetBadgeForSelf() {

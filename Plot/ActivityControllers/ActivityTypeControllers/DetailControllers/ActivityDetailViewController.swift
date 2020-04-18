@@ -130,18 +130,32 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
             }
         }
         
-        var participantCount = self.acceptedParticipant.count
-        
-        // If user is creating this activity (admin)
-        if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
-            participantCount += 1
+        if !schedule {
+            var participantCount = self.acceptedParticipant.count
+            
+            // If user is creating this activity (admin)
+            if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
+                participantCount += 1
+            }
+            
+            if participantCount > 1 {
+                self.userNamesString = "\(participantCount) participants"
+            } else {
+                self.userNamesString = "1 participant"
+            }
+        } else if schedule {
+            userNamesString = "Participants"
+            if let participants = activity.participantsIDs {
+                for ID in participants {
+                    // users equals ACTIVITY selected falcon users
+                    if let user = users.first(where: {$0.id == ID}) {
+                        selectedFalconUsers.append(user)
+                    }
+                }
+            }
+
         }
-        
-        if participantCount > 1 {
-            self.userNamesString = "\(participantCount) participants"
-        } else {
-            self.userNamesString = "1 participant"
-        }
+        collectionView.reloadData()
     }
     
     func fetchFavAct() {

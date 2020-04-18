@@ -418,6 +418,13 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                         self?.navigationController?.pushViewController(destination, animated: true)
                     }
                 }
+                cell.horizontalController.removeControllerHandler = { [weak self] type in
+                    if type == "activity" {
+                        self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                    } else if type == "schedule" {
+                        self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+                    }
+                }
             }
         }
         return cell
@@ -458,6 +465,13 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 destination.umbrellaActivity = self!.umbrellaActivity
                 destination.delegate = self!
                 self?.navigationController?.pushViewController(destination, animated: true)
+            }
+        }
+        header.verticalController.removeControllerHandler = { [weak self] type in
+            if type == "activity" {
+                self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
+            } else if type == "schedule" {
+                self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
             }
         }
         return header

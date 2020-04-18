@@ -298,7 +298,7 @@ class MealDetailViewController: ActivityDetailViewController {
         
         destination.delegate = self
         
-        if self.selectedFalconUsers.count > 0 {
+        if self.selectedFalconUsers.count > 0 && !schedule {
             let dispatchGroup = DispatchGroup()
             for user in self.selectedFalconUsers {
                 dispatchGroup.enter()
@@ -558,35 +558,44 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
 
 extension MealDetailViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-        if !selectedFalconUsers.isEmpty {
-            self.selectedFalconUsers = selectedFalconUsers
-            self.acceptedParticipant = acceptedParticipant.filter { selectedFalconUsers.contains($0) }
-            
-            var participantCount = self.acceptedParticipant.count
-            // If user is creating this activity (admin)
-            if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
-                participantCount += 1
-            }
-            
-            if participantCount > 1 {
-                self.userNamesString = "\(participantCount) participants"
+        if !schedule {
+            if !selectedFalconUsers.isEmpty {
+                self.selectedFalconUsers = selectedFalconUsers
+                self.acceptedParticipant = acceptedParticipant.filter { selectedFalconUsers.contains($0) }
+                
+                var participantCount = self.acceptedParticipant.count
+                // If user is creating this activity (admin)
+                if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
+                    participantCount += 1
+                }
+                
+                if participantCount > 1 {
+                    self.userNamesString = "\(participantCount) participants"
+                } else {
+                    self.userNamesString = "1 participant"
+                }
             } else {
+                self.selectedFalconUsers = selectedFalconUsers
+                self.acceptedParticipant = selectedFalconUsers
                 self.userNamesString = "1 participant"
             }
             collectionView.reloadData()
-        } else {
-            self.selectedFalconUsers = selectedFalconUsers
-            self.acceptedParticipant = selectedFalconUsers
-            self.userNamesString = "1 participant"
-            collectionView.reloadData()
-        }
-        
-        if active {
-            showActivityIndicator()
-            let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
-            createActivity.updateActivityParticipants()
-            hideActivityIndicator()
             
+            if active {
+                showActivityIndicator()
+                let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+                createActivity.updateActivityParticipants()
+                hideActivityIndicator()
+                
+            }
+        } else if schedule {
+            self.userNamesString = "Participants"
+            if !selectedFalconUsers.isEmpty {
+                self.selectedFalconUsers = selectedFalconUsers
+            } else {
+                self.selectedFalconUsers = selectedFalconUsers
+            }
+            collectionView.reloadData()
         }
     }
 }

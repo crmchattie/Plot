@@ -132,6 +132,8 @@ extension ActivityCell {
             activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
         } else if activity.eventID != nil {
             activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+        } else {
+            activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
         }
         
         let badgeString = activity.badge?.toString()

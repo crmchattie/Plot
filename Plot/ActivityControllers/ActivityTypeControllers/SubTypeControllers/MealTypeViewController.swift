@@ -265,13 +265,18 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                         self?.navigationController?.pushViewController(destination, animated: true)
                     }
                 }
+                cell.horizontalController.removeControllerHandler = { [weak self] type in
+                    if type == "activity" {
+                        self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                    } else if type == "schedule" {
+                        self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+                    }
+                }
             }
         }
         return cell
     }
-    
-    
-    
+        
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: view.frame.width, height: cellheight)
     }
@@ -305,6 +310,13 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 destination.umbrellaActivity = self!.umbrellaActivity
                 destination.delegate = self!
                 self?.navigationController?.pushViewController(destination, animated: true)
+            }
+        }
+        header.verticalController.removeControllerHandler = { [weak self] type in
+            if type == "activity" {
+                self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
+            } else if type == "schedule" {
+                self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
             }
         }
         return header

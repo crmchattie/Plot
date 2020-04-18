@@ -72,11 +72,13 @@ class ActivityActions: NSObject {
             activity.admin = Auth.auth().currentUser?.uid
         }
         
+        let membersIDs = fetchMembersIDs()
+        activity.participantsIDs = membersIDs.0
+        
         storeReminder()
     
         var firebaseDictionary = activity.toAnyObject()
         
-        let membersIDs = fetchMembersIDs()
         incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
         
         if active {

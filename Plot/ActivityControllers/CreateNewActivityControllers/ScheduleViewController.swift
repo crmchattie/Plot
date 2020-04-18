@@ -38,9 +38,7 @@ class ScheduleViewController: FormViewController {
     var scheduleID = String()
     
     fileprivate var active: Bool = false
-    
-    fileprivate var movingBackwards: Bool = true
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         setupMainView()
@@ -52,12 +50,12 @@ class ScheduleViewController: FormViewController {
             } else {
                 schedule.activityID = UUID().uuidString
             }
+            userNamesString = "Participants"
             for ID in schedule!.participantsIDs! {
                 // users equals ACTIVITY selected falcon users
                 if let user = users.first(where: {$0.id == ID}) {
                     selectedFalconUsers.append(user)
                 }
-                userNamesString = "\(selectedFalconUsers.count) participants"
             }
             if let localName = schedule.locationName, localName != "locationName", let localAddress = schedule.locationAddress  {
                 locationName = localName
@@ -73,18 +71,6 @@ class ScheduleViewController: FormViewController {
             
         initializeForm()
         
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-//        if (self.isMovingFromParentViewController || self.isBeingDismissed) {
-//          // Do your stuff here
-//        }
-        if self.movingBackwards {
-            print("Moving backwards")
-            delegate?.updateSchedule(schedule: schedule)
-        }
     }
     
     fileprivate func setupMainView() {
@@ -204,24 +190,24 @@ class ScheduleViewController: FormViewController {
             <<< ButtonRow("Participants") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
-                if !self.selectedFalconUsers.isEmpty {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = self.userNamesString
-                }
+//                if !self.selectedFalconUsers.isEmpty {
+//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                }
                 }.onCellSelection({ _,_ in
                     self.openParticipantsInviter()
                 }).cellUpdate { cell, row in
                     cell.accessoryType = .disclosureIndicator
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.textLabel?.textAlignment = .left
-                    if row.title == "Participants" {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    } else {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
+//                    if !self.selectedFalconUsers.isEmpty {
+//                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    } else {
+//                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    }
             }
             
 //            <<< ActionSheetRow<String>("Transportation") {
@@ -525,8 +511,6 @@ class ScheduleViewController: FormViewController {
     }
     
     @objc fileprivate func rightBarButtonTapped() {
-        movingBackwards = false
-        
         let mvs = (form.values()["checklistfields"] as! [Any?]).compactMap { $0 }
         if !mvs.isEmpty {
             checklistDict = [String: [String : Bool]]()
@@ -618,7 +602,6 @@ class ScheduleViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        movingBackwards = false
         let destination = LocationFinderTableViewController()
         destination.delegate = self
         self.navigationController?.pushViewController(destination, animated: true)
@@ -632,7 +615,6 @@ class ScheduleViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        movingBackwards = false
         let destination = SelectActivityMembersViewController()
         destination.users = users
         destination.filteredUsers = filteredUsers
@@ -771,25 +753,23 @@ extension ScheduleViewController: UpdateLocationDelegate {
             locationRow.title = locationName
             locationRow.updateCell()
         }
-        movingBackwards = true
     }
 }
 
 extension ScheduleViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
+        if let _: ButtonRow = form.rowBy(tag: "Participants") {
             if !selectedFalconUsers.isEmpty {
                 self.selectedFalconUsers = selectedFalconUsers
-                self.userNamesString = "\(self.selectedFalconUsers.count + 1) participants"
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
+//                self.userNamesString = "\(self.selectedFalconUsers.count + 1) participants"
+//                inviteesRow.title = self.userNamesString
+//                inviteesRow.updateCell()
             } else {
                 self.selectedFalconUsers = selectedFalconUsers
-                inviteesRow.title = "Participants"
-                inviteesRow.updateCell()
+//                inviteesRow.title = "Participants"
+//                inviteesRow.updateCell()
             }
         }
-        movingBackwards = true
     }
 }
 

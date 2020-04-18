@@ -280,12 +280,11 @@ class ChatsTableViewController: UITableViewController {
     }
     
     if !isAppLoaded {
-      UIView.transition(with: tableView, duration: 0.15, options: .transitionCrossDissolve, animations: { self.tableView.reloadData()}, completion: nil)
-      
+      self.tableView.reloadData()
       configureTabBarBadge()
     } else {
-      configureTabBarBadge()
-      tableView.reloadData()
+        tableView.reloadData()
+        configureTabBarBadge()
     }
     
     if filteredConversations.count == 0 && filteredPinnedConversations.count == 0 {

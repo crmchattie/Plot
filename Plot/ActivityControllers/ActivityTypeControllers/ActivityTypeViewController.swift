@@ -403,6 +403,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     print("neither meals or events")
                 }
             }
+            cell.horizontalController.removeControllerHandler = { [weak self] type in
+                if type == "activity" {
+                    self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                } else if type == "schedule" {
+                    self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+                }
+            }
         }
         return cell
         

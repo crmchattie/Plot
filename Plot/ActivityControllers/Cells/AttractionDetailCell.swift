@@ -9,7 +9,7 @@
 import UIKit
 
 protocol AttractionDetailCellDelegate: class {
-    func labelTapped(event: Event)
+    func viewTapped(event: Event)
 }
 
 class AttractionDetailCell: UICollectionViewCell {
@@ -71,26 +71,38 @@ class AttractionDetailCell: UICollectionViewCell {
         label.numberOfLines = 0
         return label
     }()
+    
+    let arrowView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "chevronRightBlack")!.withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        return imageView
+    }()
    
     func setupViews() {
+        
+//        arrowView.constrainWidth(constant: 20)
+//        arrowView.constrainHeight(constant: 20)
                 
         let nameDetailStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel], spacing: 2)
         nameDetailStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         nameDetailStackView.isLayoutMarginsRelativeArrangement = true
         
-        
         addSubview(nameDetailStackView)
         nameDetailStackView.fillSuperview(padding: .init(top: 0, left: 25, bottom: 15, right: 15))
         
-        let eventGesture = UITapGestureRecognizer(target: self, action: #selector(labelTapped(_:)))
+        let eventGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         nameDetailStackView.addGestureRecognizer(eventGesture)
        
             
     }
     
-    @objc func labelTapped(_ sender: UITapGestureRecognizer) {
+    @objc func viewTapped(_ sender: UITapGestureRecognizer) {
         if let event = event {
-            self.delegate?.labelTapped(event: event)
+            self.delegate?.viewTapped(event: event)
         }
     }
         

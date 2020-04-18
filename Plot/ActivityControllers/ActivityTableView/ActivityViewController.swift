@@ -418,11 +418,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         handleReloadActivities()
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
-//        compileActivityDates(activities: allActivities)
 
         
         if !isAppLoaded {
-            activityView.tableView.reloadData()
+            activityView.tableView.reloadDataWithCompletion() {
+                self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!)
+            }
             configureTabBarBadge()
         } else {
             activityView.tableView.reloadData()
@@ -439,10 +440,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         delegate?.manageAppearanceActivity(self, didFinishLoadingWith: true)
         isAppLoaded = true
         
-        UIView.transition(with: activityView.tableView, duration: 0.15, options: .transitionCrossDissolve, animations: { self.activityView.tableView.reloadData()
-        }) { _ in
-            self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!)
-        }
+//        compileActivityDates(activities: allActivities)
+        
     }
     
     func handleReloadActivities() {
@@ -484,7 +483,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                     activityFound = true
                     break
                 }
-                
                 index += 1
 
             }
@@ -492,14 +490,17 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         let numberOfSections = activityView.tableView.numberOfSections
         if activityFound && numberOfSections > 1 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
-                let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
-                if index < numberOfRows {
-                    let indexPath = IndexPath(row: index, section: 1)
-                    self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
-                    
-                }
+            let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
+            if index < numberOfRows {
+                let indexPath = IndexPath(row: index, section: 1)
+                self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                
             }
+        } else if !activityFound {
+            let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
+            let indexPath = IndexPath(row: numberOfRows - 1, section: 1)
+            self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                
         }
     }
     
@@ -574,15 +575,16 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
-        let dateString = dateFormatter.string(from: date)
-        if self.activityDates.contains(dateString) {
-            return 1
-        }
-        return 0
-    }
+//    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
+//        print("date \(date)")
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "yyyy/MM/dd"
+//        let dateString = dateFormatter.string(from: date)
+//        if self.activityDates.contains(dateString) {
+//            return 1
+//        }
+//        return 0
+//    }
     
     // MARK: - Table view data source
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -864,6 +866,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
     }
+    
 }
 
 extension ActivityViewController: DeleteAndExitDelegate {
@@ -1169,5 +1172,22 @@ extension ActivityViewController: ChooseChatDelegate {
            }
         let updatedConversationID = ["conversationID": chatID as AnyObject]
         Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+    }
+}
+
+class UITableViewWithReloadCompletion: UITableView {
+
+    var reloadDataCompletionBlock: (() -> Void)?
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        self.reloadDataCompletionBlock?()
+        self.reloadDataCompletionBlock = nil
+    }
+
+    func reloadDataWithCompletion(completion:@escaping () -> Void) {
+        reloadDataCompletionBlock = completion
+        self.reloadData()
     }
 }

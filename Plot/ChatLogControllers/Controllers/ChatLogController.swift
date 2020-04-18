@@ -654,7 +654,6 @@ class ChatLogController: UICollectionViewController {
         print("going to activity")
         
         if message.activityType == "recipe", let recipeString = message.activityTypeID, let recipeID = Int(recipeString) {
-            print("meal \(String(describing: message.text))")
             dispatchGroup.enter()
             Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
                 let detailedRecipe = search
@@ -670,8 +669,6 @@ class ChatLogController: UICollectionViewController {
                 }
             }
         } else if message.activityType == "event", let eventID = message.activityTypeID {
-            print("event \(String(describing: message.text))")
-            print("id \(String(describing: eventID))")
             dispatchGroup.enter()
             Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
                 if let events = search?.embedded?.events {
@@ -688,7 +685,6 @@ class ChatLogController: UICollectionViewController {
                 }
             }
         } else if message.activityType == "workout", let workoutID = message.activityTypeID {
-            print("workout \(String(describing: message.text))")
             dispatchGroup.enter()
             self.reference = Database.database().reference().child("workouts").child("workouts")
             self.reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -728,18 +724,29 @@ class ChatLogController: UICollectionViewController {
                 activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                     guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
                 
-                    let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
-                    
                     dictionary.updateValue(activityID as AnyObject, forKey: "activityID")
-                        
                     let activity = Activity(dictionary: dictionary)
-                    activity.participantsIDs = nil
-                    activity.admin = currentUserID
-                    activity.activityID = newActivityID
+                    
+                    //duplicate activity
+                    let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+                    let newActivity = activity.copy() as! Activity
+                    newActivity.activityID = newActivityID
+                    newActivity.admin = currentUserID
+                    newActivity.participantsIDs = nil
+                    newActivity.activityPhotos = nil
+                    newActivity.activityOriginalPhotoURL = nil
+                    newActivity.activityThumbnailPhotoURL = nil
+                    newActivity.conversationID = nil
+                    
+                    if let scheduleList = newActivity.schedule {
+                        for schedule in scheduleList {
+                            schedule.participantsIDs = nil
+                        }
+                    }
                     
                     let destination = CreateActivityViewController()
                     destination.sentActivity = true
-                    destination.activity = activity
+                    destination.activity = newActivity
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
                     destination.conversations = self.conversations

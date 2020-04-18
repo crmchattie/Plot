@@ -19,7 +19,7 @@ extension CreateActivityViewController: UpdateInvitees {
         if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
             if !selectedFalconUsers.isEmpty {
                 self.selectedFalconUsers = selectedFalconUsers
-                self.acceptedParticipant = acceptedParticipant.filter { selectedFalconUsers.contains($0) }
+                self.acceptedParticipant = acceptedParticipant.filter {selectedFalconUsers.contains($0)}
                 
                 var participantCount = self.acceptedParticipant.count
                 // If user is creating this activity (admin)

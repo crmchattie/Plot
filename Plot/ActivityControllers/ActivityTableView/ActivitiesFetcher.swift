@@ -113,11 +113,16 @@ class ActivitiesFetcher: NSObject {
     
     fileprivate func loadAdditionalMetadata(for activity: Activity) {
         
-        guard let activityID = activity.activityID else { return }
-        
+        guard let activityID = activity.activityID, let currentUserID = Auth.auth().currentUser?.uid else { return }
+                
         let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
         activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-            guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
+            guard var dictionary = snapshot.value as? [String: AnyObject] else {
+                Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+                Database.database().reference().child("user-activities").child(currentUserID).child(activityID).removeValue()
+                return
+                
+            }
             
             dictionary.updateValue(activityID as AnyObject, forKey: "activityID")
             

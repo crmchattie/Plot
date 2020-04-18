@@ -71,7 +71,6 @@ class ActivityTypeCell: UICollectionViewCell {
         view.addGestureRecognizer(viewTap)
                 
         
-        
     }
     
     @objc func viewTapped(_ sender: UITapGestureRecognizer) {

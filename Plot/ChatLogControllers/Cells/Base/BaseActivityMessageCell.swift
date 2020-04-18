@@ -11,7 +11,6 @@ import SDWebImage
 
 class BaseActivityMessageCell: BaseMessageCell {
     
-          
     lazy var messageImageView: UIImageView = {
         let messageImageView = UIImageView()
         messageImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -36,23 +35,30 @@ class BaseActivityMessageCell: BaseMessageCell {
     }
   
     func setupImageFromURL(message: Message, messageImageUrl: URL) {
-        progressView.startLoading()
-        progressView.isHidden = false
-        let options:SDWebImageOptions = [.continueInBackground, .lowPriority, .scaleDownLargeImages]
-        messageImageView.sd_setImage(with: messageImageUrl, placeholderImage: nil, options: options, progress: { (_, _, _) in
-          
-            DispatchQueue.main.async {
-                self.progressView.progress = self.messageImageView.sd_imageProgress.fractionCompleted
-            }
-          
-            }, completed: { (_, error, _, _) in
-          
-            if error != nil {
-                self.progressView.isHidden = false
-                return
-            }
-            self.progressView.isHidden = true
-        })
+        print("activityImageURL \(message.activityImageURL)")
+        if message.activityImageURL == "workout" || message.activityImageURL == "activityLarge"  {
+            messageImageView.image = UIImage(named: message.activityImageURL ?? "activityLarge")?.withRenderingMode(.alwaysTemplate)
+            messageImageView.tintColor = UIColor.white
+            messageImageView.backgroundColor = FalconPalette.defaultDarkBlue
+        } else {
+            progressView.startLoading()
+            progressView.isHidden = false
+            let options:SDWebImageOptions = [.continueInBackground, .lowPriority, .scaleDownLargeImages]
+            messageImageView.sd_setImage(with: messageImageUrl, placeholderImage: nil, options: options, progress: { (_, _, _) in
+              
+                DispatchQueue.main.async {
+                    self.progressView.progress = self.messageImageView.sd_imageProgress.fractionCompleted
+                }
+              
+                }, completed: { (_, error, _, _) in
+              
+                if error != nil {
+                    self.progressView.isHidden = false
+                    return
+                }
+                self.progressView.isHidden = true
+            })
+        }
     }
     
     @objc func goToActivity(_ tapGesture: UITapGestureRecognizer) {

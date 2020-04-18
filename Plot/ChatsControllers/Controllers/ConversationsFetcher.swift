@@ -166,8 +166,8 @@ import SDWebImage
         guard var dictionary = snapshot.value as? [String: AnyObject]
         else {
 //            print("conversation ID returning \(chatID)")
+        Database.database().reference().child("user-messages").child(currentUserID).child(chatID).removeAllObservers()
             Database.database().reference().child("user-messages").child(currentUserID).child(chatID).removeValue()
-            self.group.leave()
             return
         }
         dictionary.updateValue(chatID as AnyObject, forKey: "id")

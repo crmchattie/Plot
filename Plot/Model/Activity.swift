@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-class Activity: NSObject, Codable {
+class Activity: NSObject, NSCopying, Codable {
     
     var activityID: String?
     var name: String?
@@ -122,8 +122,13 @@ class Activity: NSObject, Codable {
         calendarExport = dictionary?["calendarExport"] as? Bool
         recipeID = dictionary?["recipeID"] as? String
         workoutID = dictionary?["workoutID"] as? String
-        eventID = dictionary?["purchasesID"] as? String
+        eventID = dictionary?["eventID"] as? String
         attractionID = dictionary?["attractionID"] as? String
+    }
+    
+    func copy(with zone: NSZone? = nil) -> Any {
+        let copy = Activity(dictionary: self.toAnyObject())
+        return copy
     }
     
     func toAnyObject() -> [String: AnyObject] {

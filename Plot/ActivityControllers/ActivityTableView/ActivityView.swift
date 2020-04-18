@@ -15,8 +15,8 @@ class ActivityView: UIView {
     let calendar = FSCalendar()
     var calendarHeightConstraint: NSLayoutConstraint?
 
-    let tableView: UITableView = {
-        let tableView = UITableView()
+    let tableView: UITableViewWithReloadCompletion = {
+        let tableView = UITableViewWithReloadCompletion()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return tableView
@@ -52,7 +52,7 @@ class ActivityView: UIView {
             arrowButton.heightAnchor.constraint(equalToConstant: 15),
             arrowButton.centerXAnchor.constraint(equalTo: calendar.centerXAnchor),
             
-            tableView.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: -4),
+            tableView.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: 5),
             tableView.leftAnchor.constraint(equalTo: leftAnchor),
             tableView.rightAnchor.constraint(equalTo: rightAnchor),
             tableView.bottomAnchor.constraint(equalTo: bottomAnchor)

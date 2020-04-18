@@ -19,7 +19,6 @@ class ActivitySubTypeCell: UICollectionViewCell {
     var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
     var intColor: Int = 0
     
-    
     var favAct = [String: [String]]()
     
     var recipe: Recipe! {
@@ -164,7 +163,6 @@ class ActivitySubTypeCell: UICollectionViewCell {
     
     let imageView = UIImageView(cornerRadius: 8)
     
-
     func setupViews() {
         
         if let heartImage = heartButtonImage {
@@ -246,7 +244,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
             var activityObject: ActivityObject
             if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
                 let data = compressImage(image: image)
-                activity = ["activityTypeID": "workout",
+                activity = ["activityType": "workout",
                             "activityName": "\(workout.title)",
                             "activityTypeID": "\(workout.identifier)",
                             "activityCategory": category,
@@ -255,7 +253,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                             "object": data] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             } else {
-                activity = ["activityTypeID": "workout",
+                activity = ["activityType": "workout",
                             "activityName": "\(workout.title)",
                             "activityCategory": "\(categoryLabel.text ?? "")",
                             "activitySubcategory": "\(subcategoryLabel.text ?? "")",

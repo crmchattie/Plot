@@ -26,10 +26,14 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     var conversations = [Conversation]()
     var conversation : Conversation?
     var favAct = [String: [String]]()
+    var activity: Activity!
     
     var umbrellaActivity: Activity!
     weak var delegate : UpdateScheduleDelegate?
     var schedule: Bool = false
+    
+    var startDateTime: Date?
+    var endDateTime: Date?
         
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
@@ -55,6 +59,7 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     }
     
     var didSelectHandler: ((Any, [String: [String]]) -> ())?
+    var removeControllerHandler: ((String) -> ())?
         
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("item selected")
@@ -164,32 +169,6 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
         return .init(width: view.frame.width - 48, height: 367)
     }
     
-//    func createNewActivity() {
-//        guard currentReachabilityStatus != .notReachable else {
-//            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-//            return
-//        }
-//        
-//        showActivityIndicator()
-//        let createActivity = CreateActivity(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
-//        createActivity.createNewActivity()
-//        hideActivityIndicator()
-//        
-//        if active {
-//            if self.conversation == nil {
-//                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-//            } else {
-//                self.navigationController?.backToViewController(viewController: ChatLogController.self)
-//            }
-//        } else {
-//            if self.conversation == nil {
-//                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-//            } else {
-//                self.navigationController?.backToViewController(viewController: ChatLogController.self)
-//            }
-//        }
-//    }
-    
     func showActivityIndicator() {
         if let navController = self.navigationController {
             self.showSpinner(onView: navController.view)
@@ -204,30 +183,218 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
         self.removeSpinner()
     }
     
+    func getSelectedFalconUsers(forActivity activity: Activity, completion: @escaping ([User])->()) {
+        guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        var selectedFalconUsers = [User]()
+        let group = DispatchGroup()
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if activity.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    selectedFalconUsers.append(user)
+                }
+                
+            })
+            
+            group.leave()
+            
+        }
+        
+        group.notify(queue: .main) {
+            completion(selectedFalconUsers)
+        }
+    }
+    
 }
 
 extension VerticalController: ActivitySubTypeCellDelegate {
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
+        
+        if schedule {
+            let activityID = UUID().uuidString
+            activity = Activity(dictionary: ["activityID": activityID as AnyObject])
+        } else if !schedule {
+            if let currentUserID = Auth.auth().currentUser?.uid {
+                let activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+                activity = Activity(dictionary: ["activityID": activityID as AnyObject])
+            }
+        }
+        
+        if let recipe = type as? Recipe {
+            activity.name = recipe.title
+            activity.recipeID = "\(recipe.id)"
+            activity.activityType = "recipe"
+            if schedule, let umbrellaActivity = umbrellaActivity {
+                if let startDate = umbrellaActivity.startDateTime {
+                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                    endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
+                    endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+                }
+                if let localName = umbrellaActivity.locationName, localName != "locationName", let localAddress = umbrellaActivity.locationAddress {
+                    activity.locationName = localName
+                    activity.locationAddress = localAddress
+                }
+            } else if !schedule {
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                let timezone = TimeZone.current
+                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                startDateTime = rounded.addingTimeInterval(seconds)
+                endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+            }
+            activity.allDay = false
+            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
+        } else if let workout = type as? Workout {
+            activity.name = workout.title
+            activity.activityType = "workout"
+            activity.workoutID = "\(workout.identifier)"
+            if schedule, let umbrellaActivity = umbrellaActivity {
+                if let startDate = umbrellaActivity.startDateTime {
+                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                    if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
+                        endDateTime = startDateTime!.addingTimeInterval(duration * 60)
+                    } else {
+                        endDateTime = startDateTime
+                    }
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
+                    if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
+                        endDateTime = startDateTime!.addingTimeInterval(duration * 60)
+                    } else {
+                        endDateTime = startDateTime!
+                    }
+                }
+                if let localName = umbrellaActivity.locationName, localName != "locationName", let localAddress = umbrellaActivity.locationAddress {
+                    activity.locationName = localName
+                    activity.locationAddress = localAddress
+                }
+            } else if !schedule {
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                let timezone = TimeZone.current
+                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                startDateTime = rounded.addingTimeInterval(seconds)
+                if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
+                    endDateTime = startDateTime!.addingTimeInterval(duration * 60)
+                } else {
+                    endDateTime = startDateTime!
+                }
+            }
+            activity.allDay = false
+            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
+        } else if let event = type as? Event {
+            activity.name = event.name
+            activity.activityType = "event"
+            activity.eventID = "\(event.id)"
+            if schedule, let umbrellaActivity = umbrellaActivity {
+                if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
+                    startDateTime = date
+                    endDateTime = date
+                } else if let startDate = umbrellaActivity.startDateTime {
+                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                    endDateTime = startDateTime
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
+                    endDateTime = startDateTime
+                }
+            } else if !schedule {
+                if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
+                    startDateTime = date
+                    endDateTime = date
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
+                    endDateTime = startDateTime
+                }
+            }
+            activity.allDay = false
+            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
+
+            if let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
+                activity.locationName = locationName
+                activity.locationAddress = [locationName: [Double(latitude)!, Double(longitude)!]]
+            }
+        } else if let attraction = type as? Attraction {
+            activity.name = attraction.name
+        } else {
+            return
+        }
+        
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        if let _ = umbrellaActivity {
+        
+        if schedule, let _ = umbrellaActivity {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
-                //add to schedule
+                
+                self.delegate?.updateSchedule(schedule: self.activity)
+                self.removeControllerHandler?("schedule")
                 
             }))
             
-        } else {
+        } else if !schedule {
             alert.addAction(UIAlertAction(title: "Create New Activity", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new activity
-//                self.createNewActivity()
+                                                    
+                self.showActivityIndicator()
+                let createActivity = ActivityActions(activity: self.activity, active: false, selectedFalconUsers: [])
+                createActivity.createNewActivity()
+                self.hideActivityIndicator()
+                self.removeControllerHandler?("activity")
+                                                    
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
+                    
+                    // ChooseActivityTableViewController
+                    let destination = ChooseActivityTableViewController()
+                    let navController = UINavigationController(rootViewController: destination)
+                    destination.delegate = self
+                destination.activity = self.activity
+                    destination.activities = self.activities
+                    destination.filteredActivities = self.activities
+                    self.present(navController, animated: true, completion: nil)
+            
             }))
 
-            alert.addAction(UIAlertAction(title: "Merge with Activity", style: .default, handler: { (_) in
-                print("User click Edit button")
-                // ChooseActivityTableViewController
-            }))
         }
         
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
@@ -382,4 +549,82 @@ extension VerticalController: ActivitySubTypeCellDelegate {
         
     }
     
+}
+
+extension VerticalController: ChooseActivityDelegate {
+    func chosenActivity(mergeActivity: Activity) {
+        if let activity = activity {
+            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    
+                    let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+                    let newActivity = mergeActivity.copy() as! Activity
+                    newActivity.activityID = newActivityID
+                    
+                    if let oldParticipantsIDs = activity.participantsIDs {
+                        if let newParticipantsIDs = newActivity.participantsIDs {
+                            for id in oldParticipantsIDs {
+                                if !newParticipantsIDs.contains(id) {
+                                    newActivity.participantsIDs!.append(id)
+                                }
+                            }
+                        } else {
+                            newActivity.participantsIDs = activity.participantsIDs
+                        }
+                    }
+                    mergeActivity.participantsIDs = newActivity.participantsIDs
+                    activity.participantsIDs = newActivity.participantsIDs
+                    
+                    let scheduleList = [mergeActivity, activity]
+                    newActivity.schedule = scheduleList
+                                       
+                    self.showActivityIndicator()
+                                            
+                    // need to delete merge activity
+                    self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
+                        let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
+                        deleteActivity.deleteActivity()
+                    }
+                    
+                    self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
+                        let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
+                        createActivity.createNewActivity()
+                    }
+                    
+                    self.hideActivityIndicator()
+                }
+            } else {
+                if mergeActivity.schedule != nil {
+                    var scheduleList = mergeActivity.schedule!
+                    scheduleList.append(activity)
+                    mergeActivity.schedule = scheduleList
+                } else {
+                    let scheduleList = [activity]
+                    mergeActivity.schedule = scheduleList
+                }
+                
+                if let oldParticipantsIDs = activity.participantsIDs {
+                    if let newParticipantsIDs = mergeActivity.participantsIDs {
+                        for id in oldParticipantsIDs {
+                            if !newParticipantsIDs.contains(id) {
+                                mergeActivity.participantsIDs!.append(id)
+                            }
+                        }
+                    } else {
+                        mergeActivity.participantsIDs = activity.participantsIDs
+                    }
+                }
+                
+                self.showActivityIndicator()
+                
+                self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
+                    let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
+                    createActivity.createNewActivity()
+                }
+                
+                self.hideActivityIndicator()
+            }
+            self.removeControllerHandler?("activity")
+        }
+    }
 }

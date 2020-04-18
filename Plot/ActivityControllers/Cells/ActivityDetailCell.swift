@@ -9,7 +9,7 @@
 import UIKit
 
 protocol ActivityDetailCellDelegate: class {
-    func plusButtonTapped(type: Any)
+    func plusButtonTapped()
     func shareButtonTapped(activityObject: ActivityObject)
     func heartButtonTapped(type: Any)
     func dotsButtonTapped()
@@ -216,15 +216,7 @@ class ActivityDetailCell: UICollectionViewCell {
     }
     
     @objc func plusButtonTapped() {
-        if let recipe = recipe {
-            self.delegate?.plusButtonTapped(type: recipe)
-        } else if let workout = workout {
-            self.delegate?.plusButtonTapped(type: workout)
-        } else if let event = event {
-            self.delegate?.plusButtonTapped(type: event)
-        } else if let attraction = attraction {
-            self.delegate?.plusButtonTapped(type: attraction)
-        }
+        self.delegate?.plusButtonTapped()
     }
     
     @objc func shareButtonTapped() {
@@ -256,7 +248,7 @@ class ActivityDetailCell: UICollectionViewCell {
             var activityObject: ActivityObject
             if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
                 let data = compressImage(image: image)
-                activity = ["activityTypeID": "workout",
+                activity = ["activityType": "workout",
                             "activityName": "\(workout.title)",
                             "activityTypeID": "\(workout.identifier)",
                             "activityCategory": category,
@@ -265,7 +257,7 @@ class ActivityDetailCell: UICollectionViewCell {
                             "object": data] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             } else {
-                activity = ["activityTypeID": "workout",
+                activity = ["activityType": "workout",
                             "activityName": "\(workout.title)",
                             "activityCategory": "\(categoryLabel.text ?? "")",
                             "activitySubcategory": "\(subcategoryLabel.text ?? "")",
