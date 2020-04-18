@@ -12,7 +12,7 @@ enum filter: String {
     //recipes
     case cuisine, excludeCuisine, diet, intolerances, recipeType
     //ticketmaster
-    case eventType, eventStartDate, location
+    case eventType, eventStartDate, eventEndDate, location
     //workouts
     case workoutType, muscles, duration
     
@@ -25,6 +25,7 @@ enum filter: String {
                 case .recipeType: return "Recipes"
                 case .eventType: return "Events"
                 case .eventStartDate: return "Events"
+                case .eventEndDate: return "Events"
                 case .location: return "Events"
                 case .workoutType: return "Workouts"
                 case .muscles: return "Workouts"
@@ -43,6 +44,7 @@ enum filter: String {
             case .recipeType: return "single"
             case .eventType: return "single"
             case .eventStartDate: return "date"
+            case .eventEndDate: return "date"
             case .location: return "input"
             case .workoutType: return "single"
             case .muscles: return "multiple"
@@ -61,6 +63,7 @@ enum filter: String {
             case .recipeType: return "Type"
             case .eventType: return "Type"
             case .eventStartDate: return "Start Date"
+            case .eventEndDate: return "End Date"
             case .location: return "Location"
             case .workoutType: return "Type"
             case .muscles: return "Muscles"
@@ -78,6 +81,7 @@ enum filter: String {
             case .recipeType: return "Choose type of recipe"
             case .eventType: return "Choose type of event"
             case .eventStartDate: return "Filter events with a start date after this date"
+            case .eventEndDate: return "Filter events with an end date before this date"
             case .location: return "Filter events via location"
             case .workoutType: return "Workout includes type e.g. has cardio component"
             case .muscles: return "Workout includes one or more muscles"
@@ -96,6 +100,7 @@ enum filter: String {
             case .recipeType: return ["Main Course", "Side Dish", "Dessert", "Appetizer", "Salad", "Bread", "Breakfast", "Soup", "Beverage", "Sauce", "Marinade", "Fingerfood", "Snack", "Drink"]
             case .eventType: return ["Music", "Sports", "Arts & Theater", "Family", "Film", "Miscellaneous"]
             case .eventStartDate: return []
+            case .eventEndDate: return []
             case .location: return []
             case .workoutType: return ["Yoga", "Stretch", "Cardio", "Strength", "HIIT"]
             case .muscles: return ["Biceps", "Knees", "Lower Back", "Shoulders", "Calves", "Middle Back / Lats", "Spine", "Chest", "Glutes & Hip Flexors", "Quadriceps", "Upper Back & Lower Traps", "Hamstrings", "Abs", "Triceps", "Ankles", "Forearms", "Obliques", "Neck & Upper Traps"]

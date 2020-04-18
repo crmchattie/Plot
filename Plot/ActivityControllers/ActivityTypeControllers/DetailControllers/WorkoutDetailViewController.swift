@@ -166,7 +166,6 @@ class WorkoutDetailViewController: ActivityDetailViewController {
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
-            print("height zeroSectionHeight \(height)")
             return CGSize(width: view.frame.width, height: height)
         } else if indexPath.section == 1 {
             let dummyCell = WorkoutDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
@@ -174,7 +173,6 @@ class WorkoutDetailViewController: ActivityDetailViewController {
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
-            print("height firstSectionHeight \(height)")
             return CGSize(width: view.frame.width, height: height)
         } else if indexPath.section == 2 {
             if secondSectionHeight == 0 {
@@ -184,7 +182,6 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 215))
                 height = estimatedSize.height
                 secondSectionHeight = height
-                print("height secondSectionHeight \(height)")
                 return CGSize(width: view.frame.width, height: height)
             }
             else {
@@ -196,7 +193,6 @@ class WorkoutDetailViewController: ActivityDetailViewController {
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 30))
             height = estimatedSize.height
-            print("height thirdSectionHeight \(height)")
             return CGSize(width: view.frame.width, height: height)
         }
         
@@ -587,35 +583,34 @@ extension WorkoutDetailViewController: UpdateLocationDelegate {
             self.activity.locationAddress![self.locationName] = nil
         }
         for (key, value) in locationAddress {
-            var newKey = String()
-            switch key {
-            case let oldKey where key.contains("/"):
-                newKey = oldKey.replacingOccurrences(of: "/", with: "")
-            case let oldKey where key.contains("."):
-                newKey = oldKey.replacingOccurrences(of: ".", with: "")
-            case let oldKey where key.contains("#"):
-                newKey = oldKey.replacingOccurrences(of: "#", with: "")
-            case let oldKey where key.contains("$"):
-                newKey = oldKey.replacingOccurrences(of: "$", with: "")
-            case let oldKey where key.contains("["):
-                newKey = oldKey.replacingOccurrences(of: "[", with: "")
-                if newKey.contains("]") {
-                    newKey = newKey.replacingOccurrences(of: "]", with: "")
-                }
-            case let oldKey where key.contains("]"):
-                newKey = oldKey.replacingOccurrences(of: "]", with: "")
-            default:
-                newKey = key
+            var newLocationName = key
+            if newLocationName.contains("/") {
+                newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
             }
-            self.locationName = newKey
-            self.locationAddress[newKey] = value
+            if newLocationName.contains(".") {
+                newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
+            }
+            if newLocationName.contains("#") {
+                newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
+            }
+            if newLocationName.contains("$") {
+                newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
+            }
+            if newLocationName.contains("[") {
+                newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
+            }
+            if newLocationName.contains("]") {
+                newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
+            }
+            self.locationName = newLocationName
+            self.locationAddress[newLocationName] = value
             collectionView.reloadData()
             
-            self.activity.locationName = newKey
+            self.activity.locationName = newLocationName
             if activity.locationAddress == nil {
                 self.activity.locationAddress = self.locationAddress
             } else {
-                self.activity.locationAddress![newKey] = value
+                self.activity.locationAddress![newLocationName] = value
             }
         }
     }

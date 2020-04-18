@@ -721,37 +721,38 @@ extension ScheduleViewController: UpdateLocationDelegate {
                 self.schedule.locationAddress![self.locationName] = nil
             }
             for (key, value) in locationAddress {
-                var newKey = String()
-                switch key {
-                case let oldKey where key.contains("/"):
-                    newKey = oldKey.replacingOccurrences(of: "/", with: "")
-                case let oldKey where key.contains("."):
-                    newKey = oldKey.replacingOccurrences(of: ".", with: "")
-                case let oldKey where key.contains("#"):
-                    newKey = oldKey.replacingOccurrences(of: "#", with: "")
-                case let oldKey where key.contains("$"):
-                    newKey = oldKey.replacingOccurrences(of: "$", with: "")
-                case let oldKey where key.contains("["):
-                    newKey = oldKey.replacingOccurrences(of: "[", with: "")
-                    if newKey.contains("]") {
-                        newKey = newKey.replacingOccurrences(of: "]", with: "")
-                    }
-                case let oldKey where key.contains("]"):
-                    newKey = oldKey.replacingOccurrences(of: "]", with: "")
-                default:
-                    newKey = key
+                var newLocationName = key
+                if newLocationName.contains("/") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
                 }
-                self.locationName = newKey
-                self.schedule.locationName = newKey
-                self.locationAddress[newKey] = value
+                if newLocationName.contains(".") {
+                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
+                }
+                if newLocationName.contains("#") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
+                }
+                if newLocationName.contains("$") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
+                }
+                if newLocationName.contains("[") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
+                }
+                if newLocationName.contains("]") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
+                }
+                locationRow.title = newLocationName
+                locationRow.updateCell()
+
+                self.locationName = newLocationName
+                self.locationAddress[newLocationName] = value
+                
+                self.schedule.locationName = newLocationName
                 if schedule.locationAddress == nil {
                     self.schedule.locationAddress = self.locationAddress
                 } else {
-                    self.schedule.locationAddress![newKey] = value
+                    self.schedule.locationAddress![newLocationName] = value
                 }
             }
-            locationRow.title = locationName
-            locationRow.updateCell()
         }
     }
 }

@@ -60,6 +60,7 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     
     var didSelectHandler: ((Any, [String: [String]]) -> ())?
     var removeControllerHandler: ((String) -> ())?
+    var favActHandler: (([String: [String]]) -> ())?
         
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("item selected")
@@ -349,8 +350,27 @@ extension VerticalController: ActivitySubTypeCellDelegate {
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
 
             if let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
-                activity.locationName = locationName
-                activity.locationAddress = [locationName: [Double(latitude)!, Double(longitude)!]]
+                var newLocationName = locationName
+                if newLocationName.contains("/") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
+                }
+                if newLocationName.contains(".") {
+                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
+                }
+                if newLocationName.contains("#") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
+                }
+                if newLocationName.contains("$") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
+                }
+                if newLocationName.contains("[") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
+                }
+                if newLocationName.contains("]") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
+                }
+                activity.locationName = newLocationName
+                activity.locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
             }
         } else if let attraction = type as? Attraction {
             activity.name = attraction.name
@@ -483,6 +503,7 @@ extension VerticalController: ActivitySubTypeCellDelegate {
                         self.favAct["recipes"] = ["\(recipe.id)"]
                         databaseReference.updateChildValues(["recipes": ["\(recipe.id)"]])
                     }
+                    self.favActHandler?(self.favAct)
                 })
             } else if let workout = type as? Workout {
                 print(workout.title)
@@ -503,6 +524,7 @@ extension VerticalController: ActivitySubTypeCellDelegate {
                         self.favAct["workouts"] = ["\(workout.identifier)"]
                         databaseReference.updateChildValues(["workouts": ["\(workout.identifier)"]])
                     }
+                    self.favActHandler?(self.favAct)
                 })
             } else if let event = type as? Event {
                 print(event.name)
@@ -523,6 +545,7 @@ extension VerticalController: ActivitySubTypeCellDelegate {
                         self.favAct["events"] = ["\(event.id)"]
                         databaseReference.updateChildValues(["events": ["\(event.id)"]])
                     }
+                    self.favActHandler?(self.favAct)
                 })
             } else if let attraction = type as? Attraction {
                 print(attraction.name)
@@ -543,10 +566,10 @@ extension VerticalController: ActivitySubTypeCellDelegate {
                         self.favAct["attractions"] = ["\(attraction.id)"]
                         databaseReference.updateChildValues(["attractions": ["\(attraction.id)"]])
                     }
+                    self.favActHandler?(self.favAct)
                 })
             }
         }
-        
     }
     
 }
@@ -560,6 +583,9 @@ extension VerticalController: ChooseActivityDelegate {
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
                     newActivity.activityID = newActivityID
+                    newActivity.recipeID = nil
+                    newActivity.workoutID = nil
+                    newActivity.eventID = nil
                     
                     if let oldParticipantsIDs = activity.participantsIDs {
                         if let newParticipantsIDs = newActivity.participantsIDs {

@@ -326,6 +326,9 @@ extension MealDetailViewController: ChooseActivityDelegate {
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
                     newActivity.activityID = newActivityID
+                    newActivity.recipeID = nil
+                    newActivity.workoutID = nil
+                    newActivity.eventID = nil
                     
                     if let oldParticipantsIDs = activity.participantsIDs {
                         if let newParticipantsIDs = newActivity.participantsIDs {
@@ -740,6 +743,9 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
                     newActivity.activityID = newActivityID
+                    newActivity.recipeID = nil
+                    newActivity.workoutID = nil
+                    newActivity.eventID = nil
                     
                     if let oldParticipantsIDs = activity.participantsIDs {
                         if let newParticipantsIDs = newActivity.participantsIDs {
@@ -1175,6 +1181,9 @@ extension EventDetailViewController: ChooseActivityDelegate {
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
                     newActivity.activityID = newActivityID
+                    newActivity.recipeID = nil
+                    newActivity.workoutID = nil
+                    newActivity.eventID = nil
                     
                     if let oldParticipantsIDs = activity.participantsIDs {
                         if let newParticipantsIDs = newActivity.participantsIDs {

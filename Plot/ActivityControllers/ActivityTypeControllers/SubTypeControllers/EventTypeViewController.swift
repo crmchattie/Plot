@@ -19,7 +19,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     private let sportsSegmentID = "KZFzniwnSyZfZ7v7nE"
     private let artstheatreSegmentID = "KZFzniwnSyZfZ7v7na"
 
-    var filters: [filter] = [.eventType, .eventStartDate, .location]
+    var filters: [filter] = [.eventType, .eventStartDate, .eventEndDate, .location]
     var filterDictionary = [String: [String]]()
     var sections: [String] = ["Music", "Sports", "Shows"]
     var attractions = [String]()
@@ -90,16 +90,15 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         if favorites == "true" {
             if let events = self.favAct["events"] {
                 for event in events {
-                    dispatchGroup.enter()
                     if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                         dispatchGroup.enter()
                         Service.shared.fetchEventsSegmentLatLong(size: "50", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                             self.removeSpinner()
                             dispatchGroup.leave()
                             if let events = search?.embedded?.events {
-                                self.searchActivities = events
+                                self.searchActivities = sortEvents(events: events)
                                 dispatchGroup.notify(queue: .main) {
-                                    self.collectionView.reloadData()
+                                    self.checkIfThereAnyActivities()
                                 }
                             }
                         }
@@ -109,26 +108,32 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                             self.removeSpinner()
                             dispatchGroup.leave()
                             if let events = search?.embedded?.events {
-                                self.searchActivities = events
+                                self.searchActivities = sortEvents(events: events)
                                 dispatchGroup.notify(queue: .main) {
-                                    self.collectionView.reloadData()
+                                    self.checkIfThereAnyActivities()
                                 }
                             }
                         }
                     }
                 }
+                self.removeSpinner()
+                self.checkIfThereAnyActivities()
+            } else {
+                self.removeSpinner()
+                self.checkIfThereAnyActivities()
             }
         } else {
-            dispatchGroup.enter()
             if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                 dispatchGroup.enter()
                 Service.shared.fetchEventsSegmentLatLong(size: "50", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                     self.removeSpinner()
                     dispatchGroup.leave()
                     if let events = search?.embedded?.events {
-                        self.searchActivities = events
+                        self.searchActivities = sortEvents(events: events)
+                        print("added events")
+                        print(self.searchActivities)
                         dispatchGroup.notify(queue: .main) {
-                            self.collectionView.reloadData()
+                            self.checkIfThereAnyActivities()
                         }
                     }
                 }
@@ -138,35 +143,25 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                     self.removeSpinner()
                     dispatchGroup.leave()
                     if let events = search?.embedded?.events {
-                        self.searchActivities = events
+                        self.searchActivities = sortEvents(events: events)
+                        print(self.searchActivities)
+                        print("added events")
                         dispatchGroup.notify(queue: .main) {
-                            self.collectionView.reloadData()
+                            print("checking for events")
+                            self.checkIfThereAnyActivities()
                         }
                     }
                 }
             }
         }
-        checkIfThereAnyActivities()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        if !filterDictionary.values.isEmpty && searchActivities.isEmpty {
-            showGroups = false
-            complexSearch(query: "", eventType: filterDictionary["eventType"]?[0] ?? "", eventStartDate: filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: filterDictionary["eventEndDate"]?[0] ?? "", zipcode: filterDictionary["zipcode"]?[0] ?? "", city: filterDictionary["city"]?[0] ?? "", state: filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
-        } else if !filterDictionary.values.isEmpty && !searchActivities.isEmpty {
-            self.checkIfThereAnyActivities()
-            showGroups = false
-            self.headerheight = view.frame.height
-            self.cellheight = 0
-            self.collectionView.reloadData()
-        } else {
-            viewPlaceholder.remove(from: view, priority: .medium)
-            searchActivities = [Event]()
-            showGroups = true
-            headerheight = 0
-            cellheight = 397
-            checkIfThereAnyActivities()
-        }
+        searchActivities = [Event]()
+        showGroups = true
+        headerheight = 0
+        cellheight = 405
+        self.checkIfThereAnyActivities()
     }
     
     fileprivate func fetchData() {
@@ -177,7 +172,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         }
                 
         headerheight = 0
-        cellheight = 397
+        cellheight = 405
             
         var musicEvents: [Event]?
         var sportsEvents: [Event]?
@@ -425,6 +420,10 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                         self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
                     }
                 }
+                cell.horizontalController.favActHandler = { [weak self] favAct in
+                    print("fav Act \(favAct)")
+                    self!.favAct = favAct
+                }
             }
         }
         return cell
@@ -474,6 +473,10 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
             }
         }
+        header.verticalController.favActHandler = { [weak self] favAct in
+            print("fav Act \(favAct)")
+            self!.favAct = favAct
+        }
         return header
     }
     
@@ -482,7 +485,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     }
     
     func checkIfThereAnyActivities() {
-        if searchActivities.count > 0 {
+        if searchActivities.count > 0 || showGroups {
             viewPlaceholder.remove(from: view, priority: .medium)
         } else {
             viewPlaceholder.add(for: view, title: .emptyEvents, subtitle: .emptyRecipesEvents, priority: .medium, position: .top)
@@ -515,13 +518,12 @@ extension EventTypeViewController: UpdateFilter {
             self.filterDictionary = filterDictionary
             complexSearch(query: "", eventType: filterDictionary["eventType"]?[0] ?? "", eventStartDate: filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: filterDictionary["eventEndDate"]?[0] ?? "", zipcode: filterDictionary["zipcode"]?[0] ?? "", city: filterDictionary["city"]?[0] ?? "", state: filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         } else {
-            viewPlaceholder.remove(from: view, priority: .medium)
             searchActivities = [Event]()
             self.filterDictionary = filterDictionary
             showGroups = true
             headerheight = 0
             cellheight = 397
-            self.collectionView.reloadData()
+            checkIfThereAnyActivities()
         }
     }
         

@@ -294,14 +294,17 @@ class FilterViewController: FormViewController {
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = filter.titleText
                     $0.dateFormatter?.dateStyle = .full
-                    if $0.tag == "eventStartDate", filterDictionary["eventStartDate"] != nil, let value = filterDictionary["eventStartDate"], let date = value[0].toDate() {
+                    if filterDictionary["\(filter.rawValue)"] != nil, let value = filterDictionary["\(filter.rawValue)"], let date = value[0].toDate() {
                         $0.value = date
+                        $0.updateCell()
+                    } else {
+                        $0.value = Date()
                         $0.updateCell()
                     }
                 }
                 .onChange { [weak self] row in
-                    if row.tag == "eventStartDate", let dateString = row.value?.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'") {
-                        self?.filterDictionary["eventStartDate"] = [dateString]
+                    if (row.tag == "eventStartDate" || row.tag == "eventEndDate"), let dateString = row.value?.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'") {
+                        self?.filterDictionary["\(filter.rawValue)"] = [dateString]
                     }
                 }
             }

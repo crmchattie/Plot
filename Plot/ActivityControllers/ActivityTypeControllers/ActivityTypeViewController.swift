@@ -410,6 +410,9 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
                 }
             }
+            cell.horizontalController.favActHandler = { [weak self] favAct in
+                self!.favAct = favAct
+            }
         }
         return cell
         

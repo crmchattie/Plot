@@ -87,9 +87,28 @@ class EventDetailViewController: ActivityDetailViewController {
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
 
             if locationName == "Location", let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
-                self.locationName = locationName
-                locationAddress = [locationName: [Double(latitude)!, Double(longitude)!]]
-                activity.locationName = locationName
+                var newLocationName = locationName
+                if newLocationName.contains("/") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
+                }
+                if newLocationName.contains(".") {
+                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
+                }
+                if newLocationName.contains("#") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
+                }
+                if newLocationName.contains("$") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
+                }
+                if newLocationName.contains("[") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
+                }
+                if newLocationName.contains("]") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
+                }
+                self.locationName = newLocationName
+                locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
+                activity.locationName = newLocationName
                 activity.locationAddress = locationAddress
             }
             self.collectionView.reloadData()
@@ -688,35 +707,34 @@ extension EventDetailViewController: UpdateLocationDelegate {
             self.activity.locationAddress![self.locationName] = nil
         }
         for (key, value) in locationAddress {
-            var newKey = String()
-            switch key {
-            case let oldKey where key.contains("/"):
-                newKey = oldKey.replacingOccurrences(of: "/", with: "")
-            case let oldKey where key.contains("."):
-                newKey = oldKey.replacingOccurrences(of: ".", with: "")
-            case let oldKey where key.contains("#"):
-                newKey = oldKey.replacingOccurrences(of: "#", with: "")
-            case let oldKey where key.contains("$"):
-                newKey = oldKey.replacingOccurrences(of: "$", with: "")
-            case let oldKey where key.contains("["):
-                newKey = oldKey.replacingOccurrences(of: "[", with: "")
-                if newKey.contains("]") {
-                    newKey = newKey.replacingOccurrences(of: "]", with: "")
-                }
-            case let oldKey where key.contains("]"):
-                newKey = oldKey.replacingOccurrences(of: "]", with: "")
-            default:
-                newKey = key
+            var newLocationName = key
+            if newLocationName.contains("/") {
+                newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
             }
-            self.locationName = newKey
-            self.locationAddress[newKey] = value
+            if newLocationName.contains(".") {
+                newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
+            }
+            if newLocationName.contains("#") {
+                newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
+            }
+            if newLocationName.contains("$") {
+                newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
+            }
+            if newLocationName.contains("[") {
+                newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
+            }
+            if newLocationName.contains("]") {
+                newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
+            }
+            self.locationName = newLocationName
+            self.locationAddress[newLocationName] = value
             collectionView.reloadData()
             
-            self.activity.locationName = newKey
+            self.activity.locationName = newLocationName
             if activity.locationAddress == nil {
                 self.activity.locationAddress = self.locationAddress
             } else {
-                self.activity.locationAddress![newKey] = value
+                self.activity.locationAddress![newLocationName] = value
             }
         }
     }

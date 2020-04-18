@@ -143,29 +143,16 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         }
         
         dispatchGroup.notify(queue: .main) {
-            self.collectionView.reloadData()
             self.checkIfThereAnyActivities()
         }
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        if !filterDictionary.values.isEmpty && searchActivities.isEmpty {
-            showGroups = false
-            complexSearch(query: "", cuisine: filterDictionary["cuisine"] ?? [], excludeCuisine: filterDictionary["excludeCuisine"] ?? [], diet: filterDictionary["diet"]?[0] ?? "", intolerances: filterDictionary["intolerances"] ?? [], type: filterDictionary["recipeType"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
-        } else if !filterDictionary.values.isEmpty && !searchActivities.isEmpty {
-            self.checkIfThereAnyActivities()
-            showGroups = false
-            self.headerheight = view.frame.height
-            self.cellheight = 0
-            self.collectionView.reloadData()
-        } else {
-            viewPlaceholder.remove(from: view, priority: .medium)
-            searchActivities = [Recipe]()
-            showGroups = true
-            headerheight = 0
-            cellheight = 397
-            checkIfThereAnyActivities()
-        }
+        searchActivities = [Recipe]()
+        showGroups = true
+        headerheight = 0
+        cellheight = 397
+        self.checkIfThereAnyActivities()
     }
     
     fileprivate func fetchData() {
@@ -272,6 +259,9 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                         self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
                     }
                 }
+                cell.horizontalController.favActHandler = { [weak self] favAct in
+                    self!.favAct = favAct
+                }
             }
         }
         return cell
@@ -319,6 +309,9 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
             }
         }
+        header.verticalController.favActHandler = { [weak self] favAct in
+            self!.favAct = favAct
+        }
         return header
     }
     
@@ -327,7 +320,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     }
     
     func checkIfThereAnyActivities() {
-        if searchActivities.count > 0 {
+        if searchActivities.count > 0 || showGroups {
             viewPlaceholder.remove(from: view, priority: .medium)
         } else {
             viewPlaceholder.add(for: view, title: .emptyRecipes, subtitle: .emptyRecipesEvents, priority: .medium, position: .top)
@@ -359,13 +352,12 @@ extension MealTypeViewController: UpdateFilter {
             self.filterDictionary = filterDictionary
             complexSearch(query: "", cuisine: filterDictionary["cuisine"] ?? [], excludeCuisine: filterDictionary["excludeCuisine"] ?? [], diet: filterDictionary["diet"]?[0] ?? "", intolerances: filterDictionary["intolerances"] ?? [], type: filterDictionary["recipeType"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         } else {
-            viewPlaceholder.remove(from: view, priority: .medium)
             searchActivities = [Recipe]()
             self.filterDictionary = filterDictionary
             showGroups = true
             headerheight = 0
             cellheight = 397
-            self.collectionView.reloadData()
+            checkIfThereAnyActivities()
         }
     }
         
