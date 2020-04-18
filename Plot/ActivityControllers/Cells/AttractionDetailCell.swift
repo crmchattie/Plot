@@ -84,15 +84,21 @@ class AttractionDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-//        arrowView.constrainWidth(constant: 20)
-//        arrowView.constrainHeight(constant: 20)
+        arrowView.constrainWidth(constant: 20)
+        arrowView.constrainHeight(constant: 20)
                 
         let nameDetailStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel], spacing: 2)
         nameDetailStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         nameDetailStackView.isLayoutMarginsRelativeArrangement = true
         
-        addSubview(nameDetailStackView)
-        nameDetailStackView.fillSuperview(padding: .init(top: 0, left: 25, bottom: 15, right: 15))
+        let arrowStackView = VerticalStackView(arrangedSubviews: [UIView(), arrowView, UIView()], spacing: 2)
+        arrowStackView.distribution = .equalCentering
+        
+        let stackView = UIStackView(arrangedSubviews: [nameDetailStackView, arrowStackView])
+        stackView.spacing = 2
+        addSubview(stackView)
+        
+        stackView.fillSuperview(padding: .init(top: 0, left: 25, bottom: 15, right: 15))
         
         let eventGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         nameDetailStackView.addGestureRecognizer(eventGesture)

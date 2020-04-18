@@ -89,7 +89,7 @@ class WorkoutDetailCell: UICollectionViewCell {
             clickView
             ], spacing: 2)
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 15, right: 0))
+        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 18, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         clickView.addGestureRecognizer(viewGesture)

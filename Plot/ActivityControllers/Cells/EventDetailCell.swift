@@ -67,7 +67,7 @@ class EventDetailCell: UICollectionViewCell {
             [clickView
             ], spacing: 0)
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 15, right: 0))
+        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 20, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         clickView.addGestureRecognizer(viewGesture)
