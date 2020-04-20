@@ -79,11 +79,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         self.cellheight = 0
         self.collectionView.reloadData()
 
-        if let navController = self.navigationController {
-            self.showSpinner(onView: navController.view)
-        } else {
-            self.showSpinner(onView: self.view)
-        }
+        self.showSpinner(onView: self.view)
 
         let dispatchGroup = DispatchGroup()
         
@@ -413,10 +409,11 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                         self?.navigationController?.pushViewController(destination, animated: true)
                     }
                 }
-                cell.horizontalController.removeControllerHandler = { [weak self] type in
+                cell.horizontalController.removeControllerHandler = { [weak self] type, activity in
                     if type == "activity" {
                         self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
                     } else if type == "schedule" {
+                        self!.updateSchedule(schedule: activity)
                         self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
                     }
                 }
@@ -466,10 +463,11 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 self?.navigationController?.pushViewController(destination, animated: true)
             }
         }
-        header.verticalController.removeControllerHandler = { [weak self] type in
+        header.verticalController.removeControllerHandler = { [weak self] type, activity in
             if type == "activity" {
                 self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
             } else if type == "schedule" {
+                self!.updateSchedule(schedule: activity)
                 self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
             }
         }

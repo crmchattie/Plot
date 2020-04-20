@@ -59,7 +59,7 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     }
     
     var didSelectHandler: ((Any, [String: [String]]) -> ())?
-    var removeControllerHandler: ((String) -> ())?
+    var removeControllerHandler: ((String, Activity) -> ())?
     var favActHandler: (([String: [String]]) -> ())?
         
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -385,7 +385,7 @@ extension VerticalController: ActivitySubTypeCellDelegate {
                 print("User click Approve button")
                 
                 self.delegate?.updateSchedule(schedule: self.activity)
-                self.removeControllerHandler?("schedule")
+                self.removeControllerHandler?("schedule", self.activity)
                 
             }))
             
@@ -398,7 +398,7 @@ extension VerticalController: ActivitySubTypeCellDelegate {
                 let createActivity = ActivityActions(activity: self.activity, active: false, selectedFalconUsers: [])
                 createActivity.createNewActivity()
                 self.hideActivityIndicator()
-                self.removeControllerHandler?("activity")
+                self.removeControllerHandler?("activity", self.activity)
                                                     
             }))
             
@@ -650,7 +650,7 @@ extension VerticalController: ChooseActivityDelegate {
                 
                 self.hideActivityIndicator()
             }
-            self.removeControllerHandler?("activity")
+            self.removeControllerHandler?("activity", activity)
         }
     }
 }

@@ -35,6 +35,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     var umbrellaActivity: Activity!
     var schedule: Bool = false
+    var movingBackwards: Bool = true
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -86,8 +87,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        print("view is disappearing")
+        print("\(!self.isMovingFromParent)")
+        print("\(!self.isBeingDismissed)")
+        print("\(navigationController?.visibleViewController is CreateActivityViewController)")
         
-        if (!self.isMovingFromParent || !self.isBeingDismissed) && navigationController?.visibleViewController is CreateActivityViewController {
+        if movingBackwards && navigationController?.visibleViewController is CreateActivityViewController {
+            print("running update schedule")
             let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
             delegate?.updateSchedule(schedule: activity)
         }
@@ -403,10 +409,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     print("neither meals or events")
                 }
             }
-            cell.horizontalController.removeControllerHandler = { [weak self] type in
+            cell.horizontalController.removeControllerHandler = { [weak self] type, activity in
                 if type == "activity" {
+                    self!.movingBackwards = false
                     self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
                 } else if type == "schedule" {
+                    self!.movingBackwards = false
+                    self!.updateSchedule(schedule: activity)
                     self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
                 }
             }
@@ -608,6 +617,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
 
 extension ActivityTypeViewController: UpdateScheduleDelegate {
     func updateSchedule(schedule: Activity) {
+        print("updating schedule")
         delegate?.updateSchedule(schedule: schedule)
     }
 }

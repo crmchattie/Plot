@@ -65,7 +65,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     }
     
     var didSelectHandler: ((Any, [String: [String]]) -> ())?
-    var removeControllerHandler: ((String) -> ())?
+    var removeControllerHandler: ((String, Activity) -> ())?
     var favActHandler: (([String: [String]]) -> ())?
         
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -388,9 +388,9 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
         if schedule, let _ = umbrellaActivity {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
-                
+                                
                 self.delegate?.updateSchedule(schedule: self.activity)
-                self.removeControllerHandler?("schedule")
+                self.removeControllerHandler?("schedule", self.activity)
             }))
             
         } else if !schedule {
@@ -402,7 +402,7 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
                 let createActivity = ActivityActions(activity: self.activity, active: false, selectedFalconUsers: [])
                 createActivity.createNewActivity()
                 self.hideActivityIndicator()
-                self.removeControllerHandler?("activity")
+                self.removeControllerHandler?("activity", self.activity)
             }))
             
             alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
@@ -654,7 +654,7 @@ extension HorizontalController: ChooseActivityDelegate {
                 
                 self.hideActivityIndicator()
             }
-            self.removeControllerHandler?("activity")
+            self.removeControllerHandler?("activity", activity)
         }
     }
 }
