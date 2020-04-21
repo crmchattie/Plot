@@ -188,7 +188,6 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
         guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-        
         var selectedFalconUsers = [User]()
         let group = DispatchGroup()
         for id in participantsIDs {
@@ -205,11 +204,8 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
                     let user = User(dictionary: dictionary)
                     selectedFalconUsers.append(user)
                 }
-                
+                group.leave()
             })
-            
-            group.leave()
-            
         }
         
         group.notify(queue: .main) {
@@ -577,9 +573,9 @@ extension VerticalController: ActivitySubTypeCellDelegate {
 extension VerticalController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
+            let dispatchGroup = DispatchGroup()
             if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
-                    
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
                     newActivity.activityID = newActivityID
@@ -587,17 +583,6 @@ extension VerticalController: ChooseActivityDelegate {
                     newActivity.workoutID = nil
                     newActivity.eventID = nil
                     
-                    if let oldParticipantsIDs = activity.participantsIDs {
-                        if let newParticipantsIDs = newActivity.participantsIDs {
-                            for id in oldParticipantsIDs {
-                                if !newParticipantsIDs.contains(id) {
-                                    newActivity.participantsIDs!.append(id)
-                                }
-                            }
-                        } else {
-                            newActivity.participantsIDs = activity.participantsIDs
-                        }
-                    }
                     mergeActivity.participantsIDs = newActivity.participantsIDs
                     activity.participantsIDs = newActivity.participantsIDs
                     
@@ -607,16 +592,19 @@ extension VerticalController: ChooseActivityDelegate {
                     self.showActivityIndicator()
                                             
                     // need to delete merge activity
+                    dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                         let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                         deleteActivity.deleteActivity()
+                        dispatchGroup.leave()
                     }
                     
+                    dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
                         let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
                         createActivity.createNewActivity()
+                        dispatchGroup.leave()
                     }
-                    
                     self.hideActivityIndicator()
                 }
             } else {
@@ -628,29 +616,20 @@ extension VerticalController: ChooseActivityDelegate {
                     let scheduleList = [activity]
                     mergeActivity.schedule = scheduleList
                 }
-                
-                if let oldParticipantsIDs = activity.participantsIDs {
-                    if let newParticipantsIDs = mergeActivity.participantsIDs {
-                        for id in oldParticipantsIDs {
-                            if !newParticipantsIDs.contains(id) {
-                                mergeActivity.participantsIDs!.append(id)
-                            }
-                        }
-                    } else {
-                        mergeActivity.participantsIDs = activity.participantsIDs
-                    }
-                }
-                
-                self.showActivityIndicator()
-                
+                                
+                dispatchGroup.enter()
                 self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
+                    print("\(participants)")
+                    self.showActivityIndicator()
                     let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                     createActivity.createNewActivity()
+                    dispatchGroup.leave()
+                    self.hideActivityIndicator()
                 }
-                
-                self.hideActivityIndicator()
             }
-            self.removeControllerHandler?("activity", activity)
+            dispatchGroup.notify(queue: .main) {
+                self.removeControllerHandler?("activity", activity)
+            }
         }
     }
 }

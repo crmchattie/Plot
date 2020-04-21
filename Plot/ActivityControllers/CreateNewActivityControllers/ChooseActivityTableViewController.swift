@@ -197,9 +197,10 @@ class ChooseActivityTableViewController: UITableViewController {
     }
   
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.navigationItem.searchController?.isActive = false
         let activity = filteredActivities[indexPath.row]
         delegate?.chosenActivity(mergeActivity: activity)
-        dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
 }
 

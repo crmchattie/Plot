@@ -26,6 +26,7 @@ class CreateActivityViewController: FormViewController {
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
+    var purchaseUsers = [User]()
     var userInvitationStatus: [String: Status] = [:]
     var conversations = [Conversation]()
     var activities = [Activity]()
@@ -119,6 +120,7 @@ class CreateActivityViewController: FormViewController {
         initializeForm()
         
         var participantCount = self.acceptedParticipant.count
+        
         // If user is creating this activity (admin)
         if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
             participantCount += 1
@@ -135,9 +137,29 @@ class CreateActivityViewController: FormViewController {
             inviteesRow.updateCell()
         }
         
-        for user in self.acceptedParticipant {
-            guard let currentUserID = Auth.auth().currentUser?.uid, let userID = user.id, currentUserID != userID else { continue }
-            self.purchaseDict[user] = 0.00
+        purchaseUsers = self.acceptedParticipant
+        
+        if let currentUserID = Auth.auth().currentUser?.uid, activity.admin == currentUserID {
+            let participantReference = Database.database().reference().child("users").child(currentUserID)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    self.purchaseUsers.append(user)
+                    for user in self.purchaseUsers {
+                        self.purchaseDict[user] = 0.00
+                    }
+                    
+                    self.decimalRowFunc()
+                    self.purchaseBreakdown()
+                    self.updateDecimalRow()
+                }
+            })
+        } else {
+            for user in self.purchaseUsers {
+                self.purchaseDict[user] = 0.00
+            }
+            
             self.decimalRowFunc()
             self.purchaseBreakdown()
             self.updateDecimalRow()
@@ -873,7 +895,7 @@ class CreateActivityViewController: FormViewController {
     
     func decimalRowFunc() {
         var mvs = form.sectionBy(tag: "Balances")
-        for user in acceptedParticipant {
+        for user in purchaseUsers {
             if let userName = user.name, let _ : DecimalRow = form.rowBy(tag: "\(userName)") {
                 continue
             } else {
@@ -903,7 +925,7 @@ class CreateActivityViewController: FormViewController {
             }
         }
         for (key, _) in purchaseDict {
-            if !acceptedParticipant.contains(key) {
+            if !purchaseUsers.contains(key) {
                 let sectionMVS : SegmentedRow<String> = form.rowBy(tag: "sections")!
                 sectionMVS.value = "Purchases"
                 sectionMVS.updateCell()
@@ -917,26 +939,62 @@ class CreateActivityViewController: FormViewController {
     
     func purchaseBreakdown() {
         purchaseDict = [User: Double]()
-        for user in acceptedParticipant {
+        for user in purchaseUsers {
             purchaseDict[user] = 0.00
         }
         guard let currentUser = Auth.auth().currentUser else { return }
         for purchase in purchaseList {
-            let costPerPerson = purchase.cost! / Double(purchase.participantsIDs!.count)
-            if purchase.participantsIDs![0] == currentUser.uid {
-                for ID in purchase.participantsIDs!{
-                    if let user = acceptedParticipant.first(where: {$0.id == ID}) {
+            if let purchaser = purchase.purchaser {
+                var costPerPerson: Double = 0.00
+                if let purchaseRowCount = purchase.purchaseRowCount {
+                    costPerPerson = purchase.cost! / Double(purchaseRowCount)
+                } else if let participants = purchase.participantsIDs {
+                    costPerPerson = purchase.cost! / Double(participants.count)
+                }
+                // minus cost from purchaser's balance
+                for ID in purchaser {
+                    if let user = purchaseUsers.first(where: {$0.id == ID}) {
                         var value = purchaseDict[user] ?? 0.00
-                        value += costPerPerson
+                        value -= costPerPerson
                         purchaseDict[user] = value
                     }
                 }
+                // add cost to non-purchasers balance
+                if let participants = purchase.participantsIDs {
+                    for ID in participants {
+                        if let user = purchaseUsers.first(where: {$0.id == ID}), !purchaser.contains(ID) {
+                            var value = purchaseDict[user] ?? 0.00
+                            value += costPerPerson
+                            purchaseDict[user] = value
+                        }
+                    }
+                // add cost to non-purchasers balance based on custom input
+                } else {
+                    for user in purchaseUsers {
+                        if let ID = user.id, !purchaser.contains(ID) {
+                            var value = purchaseDict[user] ?? 0.00
+                            value += costPerPerson
+                            purchaseDict[user] = value
+                        }
+                    }
+                }
             } else {
-                let ID = purchase.participantsIDs![0]
-                if let user = acceptedParticipant.first(where: {$0.id == ID}) {
-                    var value = purchaseDict[user] ?? 0.00
-                    value -= costPerPerson
-                    purchaseDict[user] = value
+                let costPerPerson = purchase.cost! / Double(purchase.participantsIDs!.count)
+                if purchase.participantsIDs![0] == currentUser.uid {
+                    for ID in purchase.participantsIDs!{
+                        if let user = purchaseUsers.first(where: {$0.id == ID}) {
+                            var value = purchaseDict[user] ?? 0.00
+                            value += costPerPerson
+                            purchaseDict[user] = value
+                        }
+                    }
+                } else {
+                    let ID = purchase.participantsIDs![0]
+                    if let user = purchaseUsers.first(where: {$0.id == ID}) {
+                        var value = purchaseDict[user] ?? 0.00
+                        value -= costPerPerson
+                        purchaseDict[user] = value
+                    }
                 }
             }
         }
@@ -1250,7 +1308,7 @@ class CreateActivityViewController: FormViewController {
         destination.ownerID = self.activity.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
-        if !selectedFalconUsers.isEmpty{
+        if !selectedFalconUsers.isEmpty {
             destination.priorSelectedUsers = selectedFalconUsers
         }
         
@@ -1420,8 +1478,8 @@ class CreateActivityViewController: FormViewController {
             return
         }
         let destination = PurchasesViewController()
-        destination.users = acceptedParticipant
-        destination.filteredUsers = acceptedParticipant
+        destination.users = purchaseUsers
+        destination.filteredUsers = purchaseUsers
         if purchaseList.indices.contains(purchaseIndex) {
             destination.purchase = purchaseList[purchaseIndex]
         }

@@ -83,8 +83,10 @@ final class PurchaseCell: Cell<Purchase>, CellType {
         // set the texts to the labels
         nameLabel.text = purchase.name
         costLabel.text = String(format: "$%.02f", purchase.cost!)
-        if purchase.participantsIDs!.count > 1 {
-            participantsLabal.text = "Purchase split among \(String(describing: purchase.participantsIDs!.count)) participants"
+        if let purchaseRowCount = purchase.purchaseRowCount {
+            participantsLabal.text = "Purchase split among \(purchaseRowCount) participants"
+        } else if let participants = purchase.participantsIDs, participants.count > 1 {
+            participantsLabal.text = "Purchase split among \(participants.count) participants"
         } else {
             participantsLabal.text = "Purchase not split"
         }

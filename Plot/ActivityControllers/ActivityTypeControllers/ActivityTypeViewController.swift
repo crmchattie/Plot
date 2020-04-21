@@ -87,13 +87,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        print("view is disappearing")
-        print("\(!self.isMovingFromParent)")
-        print("\(!self.isBeingDismissed)")
-        print("\(navigationController?.visibleViewController is CreateActivityViewController)")
         
         if movingBackwards && navigationController?.visibleViewController is CreateActivityViewController {
-            print("running update schedule")
             let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
             delegate?.updateSchedule(schedule: activity)
         }

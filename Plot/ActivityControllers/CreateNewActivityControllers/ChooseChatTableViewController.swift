@@ -278,6 +278,7 @@ class ChooseChatTableViewController: UITableViewController {
   var messagesFetcher: MessagesFetcher? = nil
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    self.navigationItem.searchController?.isActive = false
     let conversation = filteredConversations[indexPath.row]
     if let chatID = conversation.chatID, let activity = activity, let activityName = activity.name?.trimmingCharacters(in: .whitespaces) {
         let newActivityName = activityName

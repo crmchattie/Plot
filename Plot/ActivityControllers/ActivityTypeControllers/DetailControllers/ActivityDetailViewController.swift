@@ -245,7 +245,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-        
         var selectedFalconUsers = [User]()
         let group = DispatchGroup()
         for id in participantsIDs {
@@ -262,11 +261,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
                     let user = User(dictionary: dictionary)
                     selectedFalconUsers.append(user)
                 }
-                
+                group.leave()
             })
-            
-            group.leave()
-            
         }
         
         group.notify(queue: .main) {

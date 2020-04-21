@@ -182,7 +182,7 @@ class InvitationsFetcher: NSObject {
                 }
                 
                 // If user is admin of the activity it won't have an invitation
-                // It should consider as accepted
+                // It should be considered as accepted
                 if userID == activity.admin {
                     acceptedParticipant.append(user)
                     dispatchGroup.leave()

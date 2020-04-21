@@ -11,8 +11,6 @@ import Firebase
 
 extension MealDetailViewController: ActivityDetailCellDelegate {
     func plusButtonTapped() {
-        print("plusButtonTapped")
-        
         if active, schedule, let activity = activity {
             
             let membersIDs = self.fetchMembersIDs()
@@ -320,6 +318,7 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
 extension MealDetailViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
+            let dispatchGroup = DispatchGroup()
             if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     
@@ -351,26 +350,34 @@ extension MealDetailViewController: ChooseActivityDelegate {
                     
                     // need to delete current activity and merge activity
                     if active {
+                        dispatchGroup.enter()
                         self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                             let deleteFirstActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                             deleteFirstActivity.deleteActivity()
+                            dispatchGroup.leave()
                         }
+                        dispatchGroup.enter()
                         self.getSelectedFalconUsers(forActivity: activity) { (participants) in
                             let deleteSecondActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
                             deleteSecondActivity.deleteActivity()
+                            dispatchGroup.leave()
                         }
                         
                     // need to delete merge activity
                     } else {
+                        dispatchGroup.enter()
                         self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                             let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                             deleteActivity.deleteActivity()
+                            dispatchGroup.leave()
                         }
                     }
                     
+                    dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
                         let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
                         createActivity.createNewActivity()
+                        dispatchGroup.leave()
                     }
                     
                     self.hideActivityIndicator()
@@ -401,26 +408,30 @@ extension MealDetailViewController: ChooseActivityDelegate {
                 
                 // need to delete current activity
                 if active {
+                    dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: activity) { (participants) in
                         let deleteActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
                         deleteActivity.deleteActivity()
+                        dispatchGroup.leave()
                     }
                 }
                 
+                dispatchGroup.enter()
                 self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                     let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                     createActivity.createNewActivity()
+                    dispatchGroup.leave()
+                    self.hideActivityIndicator()
                 }
-                
-                self.hideActivityIndicator()
-                
             
             }
             
-            if self.conversation == nil {
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else {
-                self.navigationController?.backToViewController(viewController: ChatLogController.self)
+            dispatchGroup.notify(queue: .main) {
+                if self.conversation == nil {
+                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                } else {
+                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                }
             }
         }
     }
@@ -428,8 +439,6 @@ extension MealDetailViewController: ChooseActivityDelegate {
 
 extension WorkoutDetailViewController: ActivityDetailCellDelegate {
     func plusButtonTapped() {
-        print("plusButtonTapped")
-        
         if active, schedule, let activity = activity {
             
             let membersIDs = self.fetchMembersIDs()
@@ -737,6 +746,7 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
 extension WorkoutDetailViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
+            let dispatchGroup = DispatchGroup()
             if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     
@@ -768,26 +778,34 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
                     
                     // need to delete current activity and merge activity
                     if active {
+                        dispatchGroup.enter()
                         self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                             let deleteFirstActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                             deleteFirstActivity.deleteActivity()
+                            dispatchGroup.leave()
                         }
+                        dispatchGroup.enter()
                         self.getSelectedFalconUsers(forActivity: activity) { (participants) in
                             let deleteSecondActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
                             deleteSecondActivity.deleteActivity()
+                            dispatchGroup.leave()
                         }
                         
                     // need to delete merge activity
                     } else {
+                        dispatchGroup.enter()
                         self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                             let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                             deleteActivity.deleteActivity()
+                            dispatchGroup.leave()
                         }
                     }
                     
+                    dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
                         let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
                         createActivity.createNewActivity()
+                        dispatchGroup.leave()
                     }
                     
                     self.hideActivityIndicator()
@@ -818,26 +836,30 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
                 
                 // need to delete current activity
                 if active {
+                    dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: activity) { (participants) in
                         let deleteActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
                         deleteActivity.deleteActivity()
+                        dispatchGroup.leave()
                     }
                 }
                 
+                dispatchGroup.enter()
                 self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                     let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                     createActivity.createNewActivity()
+                    dispatchGroup.leave()
+                    self.hideActivityIndicator()
                 }
-                
-                self.hideActivityIndicator()
-                
             
             }
             
-            if self.conversation == nil {
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else {
-                self.navigationController?.backToViewController(viewController: ChatLogController.self)
+            dispatchGroup.notify(queue: .main) {
+                if self.conversation == nil {
+                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                } else {
+                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                }
             }
         }
     }
@@ -846,8 +868,6 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
 extension EventDetailViewController: ActivityDetailCellDelegate {
     
     func plusButtonTapped() {
-        print("plusButtonTapped")
-        
         if active, schedule, let activity = activity {
             
             let membersIDs = self.fetchMembersIDs()
@@ -1175,6 +1195,7 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
 extension EventDetailViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
+            let dispatchGroup = DispatchGroup()
             if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     
@@ -1196,7 +1217,6 @@ extension EventDetailViewController: ChooseActivityDelegate {
                             newActivity.participantsIDs = activity.participantsIDs
                         }
                     }
-                    
                     mergeActivity.participantsIDs = newActivity.participantsIDs
                     activity.participantsIDs = newActivity.participantsIDs
                     
@@ -1207,26 +1227,34 @@ extension EventDetailViewController: ChooseActivityDelegate {
                     
                     // need to delete current activity and merge activity
                     if active {
+                        dispatchGroup.enter()
                         self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                             let deleteFirstActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                             deleteFirstActivity.deleteActivity()
+                            dispatchGroup.leave()
                         }
+                        dispatchGroup.enter()
                         self.getSelectedFalconUsers(forActivity: activity) { (participants) in
                             let deleteSecondActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
                             deleteSecondActivity.deleteActivity()
+                            dispatchGroup.leave()
                         }
                         
                     // need to delete merge activity
                     } else {
+                        dispatchGroup.enter()
                         self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                             let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                             deleteActivity.deleteActivity()
+                            dispatchGroup.leave()
                         }
                     }
                     
+                    dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
                         let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
                         createActivity.createNewActivity()
+                        dispatchGroup.leave()
                     }
                     
                     self.hideActivityIndicator()
@@ -1257,26 +1285,30 @@ extension EventDetailViewController: ChooseActivityDelegate {
                 
                 // need to delete current activity
                 if active {
+                    dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: activity) { (participants) in
                         let deleteActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
                         deleteActivity.deleteActivity()
+                        dispatchGroup.leave()
                     }
                 }
                 
+                dispatchGroup.enter()
                 self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                     let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                     createActivity.createNewActivity()
+                    dispatchGroup.leave()
+                    self.hideActivityIndicator()
                 }
-                
-                self.hideActivityIndicator()
-                
             
             }
             
-            if self.conversation == nil {
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else {
-                self.navigationController?.backToViewController(viewController: ChatLogController.self)
+            dispatchGroup.notify(queue: .main) {
+                if self.conversation == nil {
+                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                } else {
+                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                }
             }
         }
     }

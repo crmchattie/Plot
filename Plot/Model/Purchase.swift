@@ -15,6 +15,8 @@ class Purchase: NSObject, Codable {
     var purchaseDescription: String?
     var cost: Double?
     var participantsIDs: [String]?
+    var purchaser: [String]?
+    var purchaseRowCount: Int?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -22,6 +24,8 @@ class Purchase: NSObject, Codable {
         case purchaseDescription
         case cost
         case participantsIDs
+        case purchaser
+        case purchaseRowCount
     }
 
     init(dictionary: [String: AnyObject]?){
@@ -32,14 +36,18 @@ class Purchase: NSObject, Codable {
         purchaseDescription = dictionary?["purchaseDescription"] as? String
         cost = dictionary?["cost"] as? Double
         participantsIDs = dictionary?["participantsIDs"] as? [String]
+        purchaser = dictionary?["purchaser"] as? [String]
+        purchaseRowCount = dictionary?["purchaseRowCount"] as? Int
         
     }
     
     func toAnyObject() -> [String: AnyObject?] {
         var purchaseDict = [String: AnyObject?]()
         
-        purchaseDict["name"] = self.name as AnyObject?
-        
+        if let value = self.name as AnyObject? {
+            purchaseDict["name"] = value
+        }
+                
         if let value = self.purchaseType as AnyObject? {
             purchaseDict["purchaseType"] = value
         }
@@ -48,8 +56,21 @@ class Purchase: NSObject, Codable {
             purchaseDict["purchaseDescription"] = value
         }
         
-        purchaseDict["cost"] = self.cost as AnyObject?
-        purchaseDict["participantsIDs"] = self.participantsIDs as AnyObject?
+        if let value = self.cost as AnyObject? {
+            purchaseDict["cost"] = value
+        }
+        
+        if let value = self.participantsIDs as AnyObject? {
+            purchaseDict["participantsIDs"] = value
+        }
+        
+        if let value = self.purchaser as AnyObject? {
+            purchaseDict["purchaser"] = value
+        }
+                
+        if let value = self.purchaseRowCount as AnyObject? {
+            purchaseDict["purchaseRowCount"] = value
+        }
         
         return purchaseDict
     }
