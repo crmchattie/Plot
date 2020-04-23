@@ -73,6 +73,13 @@ class ActivityTypeCell: UICollectionViewCell {
         
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        arrowView.tintColor = ThemeManager.currentTheme().generalTitleColor
+
+    }
+    
     @objc func viewTapped(_ sender: UITapGestureRecognizer) {
         guard let labelText = titleLabel.text else {
             return

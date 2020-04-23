@@ -45,6 +45,10 @@
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
 		103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103E968922C2B309007D6668 /* PurchaseRow.swift */; };
 		1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1040E582242AA05D00304D05 /* MessageViewController.swift */; };
+		1051AC96244F8B2D0066761C /* MasterActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC95244F8B2D0066761C /* MasterActivityView.swift */; };
+		1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */; };
+		1051AC9B244F8C5F0066761C /* ListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9A244F8C5F0066761C /* ListsViewController.swift */; };
+		1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */; };
 		105E12532447955500A278D0 /* ActivityDetailCellDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */; };
 		105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66E824149DC600F6EDB6 /* EventDetailCell.swift */; };
 		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
@@ -77,7 +81,6 @@
 		109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */; };
 		109FEB3D22A7003000621D2F /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3C22A7003000621D2F /* Schedule.swift */; };
 		109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB4122A9C3DD00621D2F /* Purchase.swift */; };
-		10C50F952274A82800111033 /* ActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F942274A82800111033 /* ActivityTableViewController.swift */; };
 		10C50F972274E21900111033 /* ActivityViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F962274E21900111033 /* ActivityViewController+SearchHandlers.swift */; };
 		10C50F9B2274E80500111033 /* ActivityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F9A2274E80500111033 /* ActivityCell.swift */; };
 		10C50FA22274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */; };
@@ -339,6 +342,10 @@
 		10367D42230B126800D25885 /* ActivityImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityImageCell.swift; sourceTree = "<group>"; };
 		103E968922C2B309007D6668 /* PurchaseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseRow.swift; sourceTree = "<group>"; };
 		1040E582242AA05D00304D05 /* MessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
+		1051AC95244F8B2D0066761C /* MasterActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterActivityView.swift; sourceTree = "<group>"; };
+		1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterActivityContainerController.swift; sourceTree = "<group>"; };
+		1051AC9A244F8C5F0066761C /* ListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsViewController.swift; sourceTree = "<group>"; };
+		1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSegmentedControl.swift; sourceTree = "<group>"; };
 		1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.release.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.release.xcconfig"; sourceTree = "<group>"; };
 		105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCellDelegates.swift; sourceTree = "<group>"; };
 		105F66E824149DC600F6EDB6 /* EventDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailCell.swift; sourceTree = "<group>"; };
@@ -372,7 +379,6 @@
 		109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleRow.swift; sourceTree = "<group>"; };
 		109FEB3C22A7003000621D2F /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		109FEB4122A9C3DD00621D2F /* Purchase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Purchase.swift; sourceTree = "<group>"; };
-		10C50F942274A82800111033 /* ActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTableViewController.swift; sourceTree = "<group>"; };
 		10C50F962274E21900111033 /* ActivityViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C50F9A2274E80500111033 /* ActivityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCell.swift; sourceTree = "<group>"; };
 		10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
@@ -657,6 +663,24 @@
 			path = ShareExtension;
 			sourceTree = "<group>";
 		};
+		1051AC94244F8AF80066761C /* MasterActivityController */ = {
+			isa = PBXGroup;
+			children = (
+				1051AC95244F8B2D0066761C /* MasterActivityView.swift */,
+				1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */,
+				1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */,
+			);
+			path = MasterActivityController;
+			sourceTree = "<group>";
+		};
+		1051AC99244F8C470066761C /* ListViewController */ = {
+			isa = PBXGroup;
+			children = (
+				1051AC9A244F8C5F0066761C /* ListsViewController.swift */,
+			);
+			path = ListViewController;
+			sourceTree = "<group>";
+		};
 		1082B66523EF25D300A27046 /* DetailControllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -673,6 +697,7 @@
 		10C50F932273818D00111033 /* ActivityControllers */ = {
 			isa = PBXGroup;
 			children = (
+				1051AC99244F8C470066761C /* ListViewController */,
 				26E8E3A4238B2C81000F30C8 /* Notfications */,
 				26E8EFE5237F38D500B9067E /* Map */,
 				10C50F982274E7C300111033 /* ActivityTableView */,
@@ -694,7 +719,6 @@
 				265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */,
 				10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */,
 				26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */,
-				10C50F942274A82800111033 /* ActivityTableViewController.swift */,
 			);
 			path = ActivityTableView;
 			sourceTree = "<group>";
@@ -826,6 +850,7 @@
 				10ED542C22CAEA41003797CF /* Plot.entitlements */,
 				4BE9F1DE219B457C00C6768F /* Pigeon-project.entitlements */,
 				4BAEE47221272C4F0045AB10 /* AuthenticationControllers */,
+				1051AC94244F8AF80066761C /* MasterActivityController */,
 				10C50F932273818D00111033 /* ActivityControllers */,
 				4BAEE4A421272D880045AB10 /* ChatsControllers */,
 				4BAEE4AB21272D880045AB10 /* ChatLogControllers */,
@@ -1849,7 +1874,6 @@
 				4BAEE5E1212735E50045AB10 /* ImagePickerTrayController.swift in Sources */,
 				10196F0224411B5600B6AFDF /* MapViewController.swift in Sources */,
 				109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */,
-				10C50F952274A82800111033 /* ActivityTableViewController.swift in Sources */,
 				4BAEE5B5212735E50045AB10 /* INSPhotosDataSource.swift in Sources */,
 				4BAEE4FA21272D890045AB10 /* ChatLogController+MediaPickerHandlers.swift in Sources */,
 				26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */,
@@ -1884,6 +1908,7 @@
 				4BAEE50B21272D890045AB10 /* UserCell+ConfigureCell.swift in Sources */,
 				4BA1E77A215250F900391BCB /* StorageMediaUploader.swift in Sources */,
 				10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */,
+				1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */,
 				105F66F724171A3C00F6EDB6 /* WorkoutDetailViewController.swift in Sources */,
 				4BAEE48721272C4F0045AB10 /* OnboardingContainerView.swift in Sources */,
 				4BAEE5CE212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift in Sources */,
@@ -1991,6 +2016,7 @@
 				4BAEE50D21272D890045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift in Sources */,
 				109F849723D67A85002C0044 /* SearchHeader.swift in Sources */,
 				1069B2D4243115950048244C /* ActivityObject.swift in Sources */,
+				1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */,
 				1024ABA423C1225D00A5875D /* UIView+Layout.swift in Sources */,
 				4BAEE54F212735880045AB10 /* User.swift in Sources */,
 				4BAEE5E0212735E50045AB10 /* UIImageExtensions.swift in Sources */,
@@ -2007,10 +2033,12 @@
 				1092F240241482C600E8CE16 /* MealDetailViewCell.swift in Sources */,
 				4BAEE5EA212735E50045AB10 /* Country.swift in Sources */,
 				4BAEE4FE21272D890045AB10 /* OutgoingVoiceMessageCell.swift in Sources */,
+				1051AC96244F8B2D0066761C /* MasterActivityView.swift in Sources */,
 				4BAEE51321272D890045AB10 /* ChatLogController+PhotoEditorDelegate.swift in Sources */,
 				109F849923D6860D002C0044 /* FilterViewController.swift in Sources */,
 				4BAEE4EF21272D890045AB10 /* IncomingPhotoMessageCell.swift in Sources */,
 				4BAEE5F7212735E50045AB10 /* AvatarOpenerOverlay.swift in Sources */,
+				1051AC9B244F8C5F0066761C /* ListsViewController.swift in Sources */,
 				105F66FB24185B4000F6EDB6 /* ExerciseDetailCell.swift in Sources */,
 				1069B2D02430EC880048244C /* IncomingActivityMessageCell.swift in Sources */,
 				109F848E23D60113002C0044 /* ActivitySubTypeViewController.swift in Sources */,
@@ -2208,7 +2236,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OBJC_BRIDGING_HEADER = "Plot/Plot-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -2266,7 +2294,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Plot/Plot-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

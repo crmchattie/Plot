@@ -166,20 +166,6 @@ extension ActivityCell {
         }
     }
     
-    func updateParticipantsThumbnail(activity: Activity, acceptedParticipants: [User]) {
-        let participants = acceptedParticipants.filter({$0.id != Auth.auth().currentUser?.uid})
-        
-        let participantsCount = participants.count
-        for i in 0..<thumbnails.count {
-            if i < participantsCount {
-                thumbnails[i].isHidden = false
-                thumbnails[i].image = UIImage(named: "UserpicIcon")
-            } else {
-                thumbnails[i].isHidden = true
-            }
-        }
-    }
-    
     func loadParticipantsThumbnail(activity: Activity) {
         self.activityViewControllerDataStore?.getParticipants(forActivity: activity, completion: { [weak self] (participants) in
             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
@@ -190,7 +176,7 @@ extension ActivityCell {
                         continue
                     }
                     
-                    if i > 7 {
+                    if i > 9 {
                         return
                     }
                     
@@ -207,5 +193,19 @@ extension ActivityCell {
                 }
             }
         })
+    }
+    
+    func updateParticipantsThumbnail(activity: Activity, acceptedParticipants: [User]) {
+        let participants = acceptedParticipants.filter({$0.id != Auth.auth().currentUser?.uid})
+        
+        let participantsCount = participants.count
+        for i in 0..<thumbnails.count {
+            if i < participantsCount {
+                thumbnails[i].isHidden = false
+                thumbnails[i].image = UIImage(named: "UserpicIcon")
+            } else {
+                thumbnails[i].isHidden = true
+            }
+        }
     }
 }

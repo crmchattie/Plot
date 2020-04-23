@@ -466,7 +466,6 @@ class ChatLogController: UICollectionViewController {
     if #available(iOS 11.0, *) {
       collectionView?.translatesAutoresizingMaskIntoConstraints = false
       extendedLayoutIncludesOpaqueBars = true
-      automaticallyAdjustsScrollViewInsets = false
       navigationItem.largeTitleDisplayMode = .never
 
       collectionView?.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
@@ -477,7 +476,7 @@ class ChatLogController: UICollectionViewController {
     } else {
       let frameHeight = view.frame.height - inputContainerView.frame.height
       collectionView?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: frameHeight)
-      automaticallyAdjustsScrollViewInsets = true
+      collectionView?.contentInsetAdjustmentBehavior = .automatic
       extendedLayoutIncludesOpaqueBars = true
     }
     collectionView?.addSubview(refreshControl)

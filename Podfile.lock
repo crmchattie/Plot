@@ -75,7 +75,7 @@ PODS:
   - FLAnimatedImage (1.0.12)
   - FloatingPanel (1.7.1)
   - FSCalendar (2.8.1)
-  - FTPopOverMenu_Swift (0.1.4)
+  - FTPopOverMenu_Swift (0.2.1)
   - GoogleAppMeasurement (6.1.7):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
@@ -140,7 +140,7 @@ DEPENDENCIES:
   - FLAnimatedImage
   - FloatingPanel
   - FSCalendar
-  - FTPopOverMenu_Swift (~> 0.1.4)
+  - FTPopOverMenu_Swift (~> 0.2.0)
   - PhoneNumberKit
   - SDWebImage
   - SplitRow
@@ -201,7 +201,7 @@ SPEC CHECKSUMS:
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   FloatingPanel: 2f87246071476cf05d77ba3f50a373ca4b04549e
   FSCalendar: 5245140456fcbcac5824c203b98bd8068bdfee1a
-  FTPopOverMenu_Swift: e4cafd1085d8125339c710fa9e53477fd615b1e2
+  FTPopOverMenu_Swift: c91ce7301c358264743de028bc28177ee9d8e1a4
   GoogleAppMeasurement: db118eb61a97dd8c4f7014e368d3c335cbbcf80a
   GoogleDataTransport: 8e9b210c97d55fbff306cc5468ff91b9cb32dcf5
   GoogleDataTransportCCTSupport: 202d7cdf9c4a7d81a2bb7f7e7e1ba6faa421b1f2
@@ -215,6 +215,6 @@ SPEC CHECKSUMS:
   SplitRow: 921e76fbbd7ef50d005131d6665a6e10f26df04b
   ViewRow: 8da541e9c019f3be63f4e28f311a62cac2045ecf
 
-PODFILE CHECKSUM: a7364fd6da0e26fd7cab4882f438e930df172f69
+PODFILE CHECKSUM: 7a619cc943545239cf31e50779260309e06baf8e
 
 COCOAPODS: 1.6.1

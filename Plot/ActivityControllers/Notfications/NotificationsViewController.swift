@@ -19,6 +19,13 @@ class NotificationsViewController: UIViewController {
     weak var activityViewController: ActivityViewController?
     var invitedActivities: [Activity] = []
     var notificationActivities: [Activity] = []
+    var chatLogController: ChatLogController? = nil
+    var messagesFetcher: MessagesFetcher? = nil
+    
+    var invitations = [String: Invitation]()
+    var users = [User]()
+    var filteredUsers = [User]()
+    var conversations = [Conversation]()
     
     let tableView: UITableView = {
         let tableView = UITableView()
@@ -29,12 +36,18 @@ class NotificationsViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        self.navigationController?.navigationBar.prefersLargeTitles = false
+        self.navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print("loading updates")
         
         self.title = invitationsText
         let theme = ThemeManager.currentTheme()
@@ -67,6 +80,8 @@ class NotificationsViewController: UIViewController {
         tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: notificationCellID)
         tableView.isUserInteractionEnabled = true
+        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorColor = .clear
         tableView.rowHeight = UITableView.automaticDimension
@@ -74,6 +89,36 @@ class NotificationsViewController: UIViewController {
         view.addSubview(tableView)
         
         NotificationCenter.default.addObserver(self, selector: #selector(userNotification(notification:)), name: .userNotification, object: nil)
+        
+        addObservers()
+                
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func changeTheme() {
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        if #available(iOS 13.0, *) {
+            segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+        } else {
+            // Fallback on earlier versions
+        }
+        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.reloadData()
+    }
+    
+    func sortInvitedActivities() {
+        var invitationValues = Array(invitations.values)
+        invitationValues.sort { (invitation1, invitation2) -> Bool in
+            return invitation1.dateInvited > invitation2.dateInvited
+        }
+        let invitationActivityIDs = invitationValues.map({ $0.activityID})
+        invitedActivities = invitedActivities.sorted { invitationActivityIDs.firstIndex(of: $0.activityID!)! < invitationActivityIDs.firstIndex(of: $1.activityID!)! }
+        tableView.reloadData()
     }
     
     @objc func userNotification(notification: NSNotification) {
@@ -84,9 +129,7 @@ class NotificationsViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
         segmentedControl.frame = CGRect(x: view.frame.width * 0.125, y: 10, width: view.frame.width * 0.75, height: 30)
-        
         var frame = view.frame
         frame.origin.y = segmentedControl.frame.maxY + 10
         frame.size.height -= frame.origin.y
@@ -115,28 +158,12 @@ class NotificationsViewController: UIViewController {
 
 
 extension NotificationsViewController: UITableViewDataSource, UITableViewDelegate {
-    
-    var invitations: [String: Invitation] {
-        return activityViewController?.invitations ?? [:]
-    }
-    
+        
     var notifications: [PLNotification] {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         return appDelegate.notifications
     }
-    
-    var users: [User] {
-        return activityViewController?.users ?? []
-    }
-    
-    var filteredUsers: [User] {
-        return activityViewController?.filteredUsers ?? []
-    }
-    
-    var conversations: [Conversation] {
-        return activityViewController?.conversations ?? []
-    }
-    
+        
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if segmentedControl.selectedSegmentIndex == 0 {
             return invitedActivities.count
@@ -158,7 +185,6 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
                 if let activityID = activity.activityID, let value = invitations[activityID] {
                     invitation = value
                 }
-                
                 activityCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
             }
             
@@ -167,7 +193,6 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             let theme = ThemeManager.currentTheme()
             let cell = tableView.dequeueReusableCell(withIdentifier: notificationCellID, for: indexPath)
             let notification = notifications[indexPath.row]
-            
             cell.textLabel?.text = notification.description
             cell.textLabel?.sizeToFit()
             cell.textLabel?.numberOfLines = 0
@@ -175,7 +200,6 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             cell.textLabel?.textColor = theme.generalTitleColor
             let imageName = notification.aps.category == Identifiers.chatCategory ? "chat" : "activity"
             cell.backgroundColor = .clear
-            
             let button = UIButton(type: .system)
             button.setImage(UIImage(named:imageName), for: .normal)
             button.isUserInteractionEnabled = true
@@ -190,11 +214,36 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
         if segmentedControl.selectedSegmentIndex == 0 {
             let activity = invitedActivities[indexPath.row]
             openActivityDetailView(forActivity: activity)
+        } else {
+            let notification = notifications[indexPath.row]
+            if notification.aps.category == Identifiers.chatCategory {
+                if let chatID = notification.chatID {
+                    if let conversation = conversations.first(where: { (conversation) -> Bool in
+                        conversation.chatID == chatID
+                    }) {
+                        openChatDetailView(forChat: conversation)
+                    }
+                }
+            } else if notification.aps.category == Identifiers.activityCategory {
+                if let activityID = notification.activityID {
+                    if let activity = notificationActivities.first(where: { (activity) -> Bool in
+                        activity.activityID == activityID
+                    }) {
+                        openActivityDetailView(forActivity: activity)
+                    }
+                }
+            }
         }
+    }
+    
+    func openChatDetailView(forChat chat: Conversation) {
+        chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+        messagesFetcher = MessagesFetcher()
+        messagesFetcher?.delegate = self
+        messagesFetcher?.loadMessagesData(for: chat)
     }
     
     func openActivityDetailView(forActivity activity: Activity) {
@@ -351,5 +400,43 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
                 }
             }
         }
+    }
+}
+
+extension NotificationsViewController: MessagesDelegate {
+    
+    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
+        chatLogController?.updateMessageStatus(messageRef: reference)
+    }
+    
+    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
+        
+        chatLogController?.hidesBottomBarWhenPushed = true
+        chatLogController?.messagesFetcher = messagesFetcher
+        chatLogController?.messages = messages
+        chatLogController?.conversation = conversation
+        //chatLogController?.activityID = activityID
+        
+        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
+            chatLogController?.observeTypingIndicator()
+            chatLogController?.configureTitleViewWithOnlineStatus()
+        }
+        
+        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
+        guard let destination = chatLogController else { return }
+        
+        self.chatLogController?.startCollectionViewAtBottom()
+        
+        
+        // If we're presenting a modal sheet
+        if let presentedViewController = presentedViewController as? UINavigationController {
+            presentedViewController.pushViewController(destination, animated: true)
+        } else {
+            navigationController?.pushViewController(destination, animated: true)
+        }
+        
+        chatLogController = nil
+        messagesFetcher?.delegate = nil
+        messagesFetcher = nil
     }
 }

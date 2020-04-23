@@ -75,7 +75,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         super.viewDidLoad()
             
         navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = false
                 
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
@@ -93,6 +93,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         dateFormatter.timeStyle = .short
         
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        
+        addObservers()
 
     }
     

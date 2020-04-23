@@ -33,12 +33,16 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 //update to change first controller shown
-protocol ManageAppearanceChat: class {
-  func manageAppearanceChat(_ chatsController: ChatsTableViewController, didFinishLoadingWith state: Bool )
-}
+//protocol ManageAppearanceChat: class {
+//  func manageAppearanceChat(_ chatsController: ChatsTableViewController, didFinishLoadingWith state: Bool )
+//}
 
 protocol ChatsViewControllerDataStore: class {
     func getParticipants(forConversation conversation: Conversation, completion: @escaping ([User])->())
+}
+
+protocol HomeBaseChats: class {
+    func sendChats(conversations: [Conversation])
 }
 
 class ChatsTableViewController: UITableViewController {
@@ -46,7 +50,8 @@ class ChatsTableViewController: UITableViewController {
     fileprivate let userCellID = "userCellID"
     fileprivate var isAppLoaded = false
     
-    weak var delegate: ManageAppearanceChat?
+//    weak var delegate: ManageAppearanceChat?
+    weak var delegate: HomeBaseChats?
 
     var searchBar: UISearchBar?
     var searchChatsController: UISearchController?
@@ -72,7 +77,12 @@ class ChatsTableViewController: UITableViewController {
     
   override func viewDidLoad() {
     super.viewDidLoad()
+        
+    navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+    navigationController?.navigationBar.shadowImage = UIImage()
+    navigationController?.navigationBar.layoutIfNeeded()
    
+    print("chat view did load")
     configureTableView()
     setupSearchController()
     addObservers()
@@ -81,14 +91,21 @@ class ChatsTableViewController: UITableViewController {
         conversationsFetcher.fetchConversations()
     }
     
+    
     tableView.rowHeight = UITableView.automaticDimension
     tableView.estimatedRowHeight = 105
   }
   
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    if appLoaded {
-        configureTabBarBadge()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        if appLoaded {
+            configureTabBarBadge()
+    }
+    
+    func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
 
   }
@@ -102,16 +119,6 @@ class ChatsTableViewController: UITableViewController {
   
   @objc fileprivate func changeTheme() {
     view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-    
-    navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
-    navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-    let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
-    navigationController?.navigationBar.titleTextAttributes = textAttributes
-    navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
-    navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-    
-    tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-    tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
     
     tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
     tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -149,6 +156,7 @@ class ChatsTableViewController: UITableViewController {
 //    falconUsersFetcher.delegate = self
 //    contactsFetcher.delegate = self
   }
+    
   
   @objc fileprivate func newChat() {
     let destination = ContactsController()
@@ -214,7 +222,7 @@ class ChatsTableViewController: UITableViewController {
     guard let uid = Auth.auth().currentUser?.uid else { return }
     
     guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-    guard let tabItem = tabItems[Tabs.chats.rawValue] as? UITabBarItem else { return }
+    guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
     var badge = 0
     
     for conversation in filteredConversations {
@@ -272,12 +280,7 @@ class ChatsTableViewController: UITableViewController {
     filteredConversations = conversations
     let allConversations = conversations + pinnedConversations
     
-    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-    
-    if nav.topViewController is ActivityViewController {
-        let activityTab = nav.topViewController as! ActivityViewController
-        activityTab.conversations = allConversations
-    }
+    delegate?.sendChats(conversations: allConversations)
     
     if !isAppLoaded {
       self.tableView.reloadData()
@@ -294,7 +297,7 @@ class ChatsTableViewController: UITableViewController {
     }
     
     guard !isAppLoaded else { return }
-    delegate?.manageAppearanceChat(self, didFinishLoadingWith: true)
+//    delegate?.manageAppearanceChat(self, didFinishLoadingWith: true)
     isAppLoaded = true
   }
   

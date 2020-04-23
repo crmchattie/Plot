@@ -39,6 +39,10 @@ class AccountSettingsController: UITableViewController {
     extendedLayoutIncludesOpaqueBars = true
     edgesForExtendedLayout = UIRectEdge.top
     tableView = UITableView(frame: tableView.frame, style: .grouped)
+    
+    navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+    navigationController?.navigationBar.shadowImage = UIImage()
+    navigationController?.navigationBar.layoutIfNeeded()
    
     configureTableView()
     configureContainerView()
@@ -284,7 +288,7 @@ class AccountSettingsController: UITableViewController {
       self.present(newNavigationController, animated: true, completion: {
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearUserData"), object: nil)
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearContacts"), object: nil)
-        self.tabBarController?.selectedIndex = Tabs.chats.rawValue
+        self.tabBarController?.selectedIndex = Tabs.home.rawValue
       })
     }
   }

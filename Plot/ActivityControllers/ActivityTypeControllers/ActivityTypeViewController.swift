@@ -55,13 +55,20 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.largeTitleDisplayMode = .always
-        navigationController?.navigationBar.prefersLargeTitles = true
-        title = "Choose Activity"
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
+        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
+        
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -71,18 +78,19 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         
         collectionView.register(ActivityTypeCell.self, forCellWithReuseIdentifier: kActivityTypeCell)
         collectionView.register(ActivityHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerId)
-        
+                
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-                        
-        fetchData()
         
+        addObservers()
+                
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        print("view appearing")
+        if groups.isEmpty {
+            fetchData()
+        }
         fetchFavAct()
-
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -92,6 +100,33 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
             delegate?.updateSchedule(schedule: activity)
         }
+        
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func changeTheme() {
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
+        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
+        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
+        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+        
+        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
+        
+        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.reloadData()
         
     }
     
@@ -263,6 +298,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         print("basic")
                         if let activity = self!.umbrellaActivity {
                             let destination = ScheduleViewController()
+                            destination.hidesBottomBarWhenPushed = true
                             destination.users = self!.users
                             destination.filteredUsers = self!.filteredUsers
                             destination.delegate = self!
@@ -271,6 +307,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                             self?.navigationController?.pushViewController(destination, animated: true)
                         } else {
                             let destination = CreateActivityViewController()
+                            destination.hidesBottomBarWhenPushed = true
                             destination.users = self!.users
                             destination.filteredUsers = self!.filteredUsers
                             destination.conversations = self!.conversations
@@ -343,6 +380,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 if let recipe = cellData as? Recipe {
                     print("meal \(recipe.title)")
                     let destination = MealDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
                     destination.favAct = favAct
                     destination.recipe = recipe
                     destination.users = self!.users
@@ -357,6 +395,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if let event = cellData as? Event {
                     print("event \(String(describing: event.name))")
                     let destination = EventDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
                     destination.favAct = favAct
                     destination.event = event
                     destination.users = self!.users
@@ -371,6 +410,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if let workout = cellData as? Workout {
                     print("workout \(String(describing: workout.title))")
                     let destination = WorkoutDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
                     destination.favAct = favAct
                     destination.workout = workout
                     if let index = self!.workoutIDs.firstIndex(of: workout.identifier) {
@@ -388,6 +428,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if let attraction = cellData as? Attraction {
                     print("attraction \(String(describing: attraction.name))")
                     let destination = EventDetailViewController()
+                    destination.hidesBottomBarWhenPushed = true
                     destination.favAct = favAct
                     destination.attraction = attraction
                     destination.users = self!.users
@@ -515,35 +556,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         }
         
     }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        
-        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
-        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
-        navigationController?.navigationBar.titleTextAttributes = textAttributes
-        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
-        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-        
-        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
-        
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
-        collectionView.reloadData()
-        
-    }
   
 }
 
@@ -552,6 +564,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
         switch labelText {
         case "Recipes":
             let destination = MealTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
             if let recipes = self.recipes, !recipes.isEmpty {
                 destination.groups.append(recipes)
             }
@@ -568,6 +581,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
         case "Events":
             print("Event")
             let destination = EventTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
@@ -581,6 +595,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
         case "Workouts":
             print("Workouts")
             let destination = WorkoutTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
@@ -594,6 +609,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
         case "Attractions":
             print("Attractions")
             let destination = EventTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers

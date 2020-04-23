@@ -30,6 +30,12 @@ class ActivityHeader: UICollectionReusableView {
         activityHeaderHorizontalController.view.anchor(top: titleLabel.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor)
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

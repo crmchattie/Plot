@@ -36,6 +36,10 @@ class Activity: NSObject {
     var muted: Bool?
     var conversationID: String?
     var calendarExport: Bool?
+    var recipeID: String?
+    var workoutID: String?
+    var eventID: String?
+    var attractionID: String?
     
     init(dictionary: [String: AnyObject]?){
         super.init()
@@ -66,6 +70,10 @@ class Activity: NSObject {
         muted = dictionary?["muted"] as? Bool
         conversationID = dictionary?["conversationID"] as? String
         calendarExport = dictionary?["calendarExport"] as? Bool
+        recipeID = dictionary?["recipeID"] as? String
+        workoutID = dictionary?["workoutID"] as? String
+        eventID = dictionary?["eventID"] as? String
+        attractionID = dictionary?["attractionID"] as? String
         
     }
     
@@ -144,6 +152,26 @@ class Activity: NSObject {
         
         if let value = self.conversationID as AnyObject? {
             activityDict["conversationID"] = value
+        }
+        
+        if let value = self.checklist as AnyObject? {
+            activityDict["checklist"] = value
+        }
+        
+        if let value = self.recipeID as AnyObject? {
+            activityDict["recipeID"] = value
+        }
+        
+        if let value = self.workoutID as AnyObject? {
+            activityDict["workoutID"] = value
+        }
+        
+        if let value = self.eventID as AnyObject? {
+            activityDict["eventID"] = value
+        }
+        
+        if let value = self.attractionID as AnyObject? {
+            activityDict["attractionID"] = value
         }
         
         return activityDict

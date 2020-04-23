@@ -76,7 +76,7 @@ extension UserCell {
             for i in 0..<users.count {
                 let user = users[i]
                 
-                if i > 7 {
+                if i > 9 {
                     return
                 }
                 

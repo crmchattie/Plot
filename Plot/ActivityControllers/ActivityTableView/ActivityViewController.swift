@@ -34,17 +34,18 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 let activityCellID = "activityCellID"
 let notificationCellID = "notificationCellID"
 
-//update to change first controller shown
-protocol ManageAppearanceActivity: class {
-    func manageAppearanceActivity(_ activityController: ActivityViewController, didFinishLoadingWith state: Bool )
-}
-
 protocol UpdateInvitationDelegate: class {
     func updateInvitation(invitation: Invitation)
 }
 
 protocol ActivityViewControllerDataStore: class {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->())
+}
+
+protocol HomeBaseActivities: class {
+    func manageAppearanceActivity(_ activityController: ActivityViewController, didFinishLoadingWith state: Bool )
+    func sendActivities(activities: [Activity], invitedActivities: [Activity], invitations: [String: Invitation])
+    func sendDate(selectedDate: Date)
 }
 
 class ActivityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance, UIGestureRecognizerDelegate {
@@ -54,7 +55,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     let activityView = ActivityView()
     
-    weak var delegate: ManageAppearanceActivity?
+//    weak var delegate: ManageAppearanceActivity?
+    weak var delegate: HomeBaseActivities?
     
     var searchBar: UISearchBar?
     var searchActivityController: UISearchController?
@@ -104,23 +106,32 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("activities view did load")
+        
+        if !isAppLoaded {
+            managePresense()
+            activitiesFetcher.fetchActivities()
+        }
+
         activitiesFetcher.delegate = self
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
         setupSearchController()
         addObservers()
-        
+                
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if !isAppLoaded {
-            managePresense()
-            activitiesFetcher.fetchActivities()
-        } else {
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        if isAppLoaded {
             configureTabBarBadge()
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     deinit {
@@ -134,16 +145,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     @objc fileprivate func changeTheme() {
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
-        
-        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
-        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
-        navigationController?.navigationBar.titleTextAttributes = textAttributes
-        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
-        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-        
-        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
         
         activityView.tableView.indicatorStyle = theme.scrollBarStyle
         activityView.tableView.sectionIndexBackgroundColor = theme.generalBackgroundColor
@@ -199,6 +200,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func configureView() {
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         view.addSubview(activityView)
         activityView.translatesAutoresizingMaskIntoConstraints = false
         activityView.topAnchor.constraint(equalTo:view.safeAreaLayoutGuide.topAnchor).isActive = true
@@ -208,14 +213,14 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         activityView.arrowButton.addTarget(self, action: #selector(arrowButtonTapped), for: .touchUpInside)
         
-        navigationItem.leftBarButtonItem = editButtonItem
-        let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
+//        navigationItem.leftBarButtonItem = editButtonItem
+//        let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
+//
+//        let mapBarButton = UIBarButtonItem(image: UIImage(named: "map")!, style: .plain, target: self, action: #selector(showMappedActivities))
+//
+//        let notificaionBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell")!, style: .plain, target: self, action: #selector(showNotifications))
         
-        let mapBarButton = UIBarButtonItem(image: UIImage(named: "map")!, style: .plain, target: self, action: #selector(showMappedActivities))
-        
-        let notificaionBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell")!, style: .plain, target: self, action: #selector(showNotifications))
-        
-        navigationItem.rightBarButtonItems = [newActivityBarButton, notificaionBarButton, mapBarButton]
+//        navigationItem.rightBarButtonItems = [newActivityBarButton, notificaionBarButton, mapBarButton]
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         activityView.tableView.separatorStyle = .none
@@ -229,6 +234,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.calendar.register(FSCalendarCell.self, forCellReuseIdentifier: "cell")
         activityView.calendar.scope = getCalendarScope()
         activityView.calendar.swipeToChooseGesture.isEnabled = true // Swipe-To-Choose
+        activityView.calendar.calendarHeaderView.isHidden = true
+        activityView.calendar.headerHeight = 10.0
         activityView.calendar.appearance.headerMinimumDissolvedAlpha = 0.0
         
         let scopeGesture = UIPanGestureRecognizer(target: activityView.calendar, action: #selector(activityView.calendar.handleScopeGesture(_:)));
@@ -249,32 +256,32 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // MARK:- action: Selectors
     
-    @objc fileprivate func newActivity() {
-        let destination = ActivityTypeViewController()
-        destination.hidesBottomBarWhenPushed = true
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        destination.activities = activities + pinnedActivities
-        destination.conversations = conversations
-        navigationController?.pushViewController(destination, animated: true)
-    }
-    
-    @objc fileprivate func showMappedActivities() {
-        let mapActivitiesViewController = MapActivitiesViewController()
-        mapActivitiesViewController.activityViewController = self
-        let navigationViewController = UINavigationController(rootViewController: mapActivitiesViewController)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
-    }
-    
-    @objc fileprivate func showNotifications() {
-        let notificationsViewController = NotificationsViewController()
-        notificationsViewController.invitedActivities = self.invitedActivities
-        notificationsViewController.notificationActivities = self.activities + self.pinnedActivities
-        notificationsViewController.activityViewController = self
-        let navigationViewController = UINavigationController(rootViewController: notificationsViewController)
-        self.present(navigationViewController, animated: true, completion: nil)
-    }
+//    @objc fileprivate func newActivity() {
+//        let destination = ActivityTypeViewController()
+//        destination.hidesBottomBarWhenPushed = true
+//        destination.users = users
+//        destination.filteredUsers = filteredUsers
+//        destination.activities = activities + pinnedActivities
+//        destination.conversations = conversations
+//        navigationController?.pushViewController(destination, animated: true)
+//    }
+//    
+//    @objc fileprivate func showMappedActivities() {
+//        let mapActivitiesViewController = MapActivitiesViewController()
+//        mapActivitiesViewController.activityViewController = self
+//        let navigationViewController = UINavigationController(rootViewController: mapActivitiesViewController)
+//        navigationViewController.modalPresentationStyle = .fullScreen
+//        self.present(navigationViewController, animated: true, completion: nil)
+//    }
+//    
+//    @objc fileprivate func showNotifications() {
+//        let notificationsViewController = NotificationsViewController()
+//        notificationsViewController.invitedActivities = self.invitedActivities
+//        notificationsViewController.notificationActivities = self.activities + self.pinnedActivities
+//        notificationsViewController.activityViewController = self
+//        let navigationViewController = UINavigationController(rootViewController: notificationsViewController)
+//        self.present(navigationViewController, animated: true, completion: nil)
+//    }
     
     @objc fileprivate func arrowButtonTapped() {
         if activityView.calendar.scope == .month {
@@ -363,7 +370,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func configureTabBarBadge() {
         guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-        guard let tabItem = tabItems[Tabs.activity.rawValue] as? UITabBarItem else { return }
+        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
         var badge = 0
         
         for activity in filteredActivities {
@@ -418,11 +425,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         handleReloadActivities()
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
+        delegate?.sendActivities(activities: allActivities, invitedActivities: invitedActivities, invitations: invitations)
 
-        
         if !isAppLoaded {
             activityView.tableView.reloadDataWithCompletion() {
-                self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!)
+                self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, animated: false)
             }
             configureTabBarBadge()
         } else {
@@ -471,7 +478,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         self.activityView.tableView.reloadData()
     }
     
-    func scrollToFirstActivityWithDate(date: Date) {
+    func scrollToFirstActivityWithDate(date: Date, animated: Bool) {
         let currentDate = date.stripTime()
         var index = 0
         var activityFound = false
@@ -493,13 +500,13 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
             if index < numberOfRows {
                 let indexPath = IndexPath(row: index, section: 1)
-                self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
                 
             }
         } else if !activityFound {
             let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
             let indexPath = IndexPath(row: numberOfRows - 1, section: 1)
-            self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+            self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
                 
         }
     }
@@ -526,20 +533,20 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     func scrollViewDidScroll(_ scrollView: UIScrollView)
     {
         if canTransitionToLarge && scrollView.contentOffset.y <= 0 {
-            UIView.animate(withDuration: 0.5) {
-                if #available(iOS 11.0, *) {
-                    self.navigationItem.largeTitleDisplayMode = .always
-                }
-            }
+//            UIView.animate(withDuration: 0.5) {
+//                if #available(iOS 11.0, *) {
+//                    self.navigationItem.largeTitleDisplayMode = .always
+//                }
+//            }
             canTransitionToLarge = false
             canTransitionToSmall = true
         }
         else if canTransitionToSmall && scrollView.contentOffset.y > 0 {
-            UIView.animate(withDuration: 0.5) {
-                if #available(iOS 11.0, *) {
-                    self.navigationItem.largeTitleDisplayMode = .never
-                }
-            }
+//            UIView.animate(withDuration: 0.5) {
+//                if #available(iOS 11.0, *) {
+//                    self.navigationItem.largeTitleDisplayMode = .never
+//                }
+//            }
             canTransitionToLarge = true
             canTransitionToSmall = false
         }
@@ -555,11 +562,13 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        self.scrollToFirstActivityWithDate(date: date)
+        self.scrollToFirstActivityWithDate(date: date, animated: true)
+        self.delegate?.sendDate(selectedDate: date)
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        self.scrollToFirstActivityWithDate(date: calendar.currentPage)
+        self.scrollToFirstActivityWithDate(date: calendar.currentPage, animated: true)
+        self.delegate?.sendDate(selectedDate: calendar.currentPage)
     }
     
     func saveCalendar(scope: FSCalendarScope) {
@@ -671,6 +680,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
         }
+        
         
         return cell
     }

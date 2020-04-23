@@ -15,7 +15,7 @@ target 'Plot' do
   pod 'SDWebImage', :modular_headers => true
   pod 'PhoneNumberKit'
   pod 'FLAnimatedImage', :modular_headers => true
-  pod 'FTPopOverMenu_Swift', '~> 0.1.4'
+  pod 'FTPopOverMenu_Swift', '~> 0.2.0'
   pod 'CropViewController'
   pod 'Eureka'
   pod 'SplitRow'

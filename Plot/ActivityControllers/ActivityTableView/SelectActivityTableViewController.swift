@@ -125,16 +125,14 @@ class SelectActivityTableViewController: UITableViewController {
     }
     
     @objc fileprivate func newActivity() {
-        let destination = CreateActivityViewController()
+        let destination = ActivityTypeViewController()
         destination.hidesBottomBarWhenPushed = true
         destination.users = users
         destination.filteredUsers = filteredUsers
+        destination.activities = activities + pinnedActivities
         destination.selectedFalconUsers = selectedFalconUsers
         destination.conversation = conversation
-        //        print("New Activity update: update users: \(users)")
-        //        print("New Activity update: update filtered users: \(filteredUsers)")
         navigationController?.pushViewController(destination, animated: true)
-        
     }
     
     

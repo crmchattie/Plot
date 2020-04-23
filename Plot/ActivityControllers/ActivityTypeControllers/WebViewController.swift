@@ -27,7 +27,7 @@ class WebViewController: UIViewController, WKUIDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(urlString)
+        print(urlString ?? "")
         
         title = controllerTitle
 

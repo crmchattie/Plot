@@ -64,6 +64,8 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         
         collectionView.register(ActivityTypeCell.self, forCellWithReuseIdentifier: kActivityTypeCell)
         collectionView.register(SearchHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerId)
+        
+        addObservers()
                 
         
     }
@@ -127,7 +129,6 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
         collectionView.reloadData()
         
     }

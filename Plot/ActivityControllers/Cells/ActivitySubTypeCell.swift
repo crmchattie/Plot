@@ -203,6 +203,16 @@ class ActivitySubTypeCell: UICollectionViewCell {
 
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+
+    }
+
+    
     @objc func plusButtonTapped() {
         if let recipe = recipe {
             self.delegate?.plusButtonTapped(type: recipe)

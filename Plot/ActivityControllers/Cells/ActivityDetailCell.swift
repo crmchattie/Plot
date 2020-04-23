@@ -214,6 +214,16 @@ class ActivityDetailCell: UICollectionViewCell {
         dotsButton.addTarget(self, action: #selector(dotsButtonTapped), for: .touchUpInside)
 
     }
+        
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        dotsButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+
+    }
     
     @objc func plusButtonTapped() {
         self.delegate?.plusButtonTapped()

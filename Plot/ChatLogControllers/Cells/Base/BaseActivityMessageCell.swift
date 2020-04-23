@@ -35,7 +35,6 @@ class BaseActivityMessageCell: BaseMessageCell {
     }
   
     func setupImageFromURL(message: Message, messageImageUrl: URL) {
-        print("activityImageURL \(message.activityImageURL)")
         if message.activityImageURL == "workout" || message.activityImageURL == "activityLarge"  {
             messageImageView.image = UIImage(named: message.activityImageURL ?? "activityLarge")?.withRenderingMode(.alwaysTemplate)
             messageImageView.tintColor = UIColor.white

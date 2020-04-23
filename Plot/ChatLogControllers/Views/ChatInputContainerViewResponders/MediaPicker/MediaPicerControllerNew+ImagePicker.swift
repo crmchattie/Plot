@@ -124,7 +124,7 @@ extension MediaPickerControllerNew {
 
 		} else {
 
-			if let imageURL = info[UIImagePickerController.InfoKey.referenceURL] as? URL {
+            if let imageURL = info[UIImagePickerController.InfoKey.imageURL] as? URL {
                 
 				let result = PHAsset.fetchAssets(withALAssetURLs: [imageURL], options: nil)
 				let asset = result.firstObject

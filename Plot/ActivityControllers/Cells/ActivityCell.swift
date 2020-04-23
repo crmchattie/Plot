@@ -24,7 +24,7 @@ class ActivityCell: UITableViewCell {
     let invitationSegmentHeightConstant: CGFloat = 30
     var invitation: Invitation?
     var participants: [User] = []
-    let thumbnailsCount = 8
+    let thumbnailsCount = 10
     weak var updateInvitationDelegate: UpdateInvitationDelegate?
     weak var activityViewControllerDataStore: ActivityViewControllerDataStore?
     weak var delegate: ActivityCellDelegate?

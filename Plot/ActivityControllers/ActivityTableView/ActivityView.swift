@@ -47,12 +47,12 @@ class ActivityView: UIView {
             calendar.rightAnchor.constraint(equalTo: rightAnchor),
 //            calendar.bottomAnchor.constraint(equalTo: arrowButton.topAnchor, constant: 10),
             
-            arrowButton.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: -7),
+            arrowButton.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: -12),
             arrowButton.widthAnchor.constraint(equalToConstant: 15),
             arrowButton.heightAnchor.constraint(equalToConstant: 15),
             arrowButton.centerXAnchor.constraint(equalTo: calendar.centerXAnchor),
             
-            tableView.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: 5),
+            tableView.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: 0),
             tableView.leftAnchor.constraint(equalTo: leftAnchor),
             tableView.rightAnchor.constraint(equalTo: rightAnchor),
             tableView.bottomAnchor.constraint(equalTo: bottomAnchor)

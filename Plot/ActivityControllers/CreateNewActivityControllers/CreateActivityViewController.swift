@@ -1129,7 +1129,7 @@ class CreateActivityViewController: FormViewController {
             for index in 0...mvs.count - 2 {
                 let scheduleRow = mvs.allRows[index]
                 scheduleRow.baseValue = scheduleList[index]
-                scheduleRow.updateCell()
+                scheduleRow.reload()
             }
         }
     }
@@ -1889,7 +1889,6 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
             let scheduleRow = mvs.allRows[scheduleIndex]
             if let _ = schedule.name {
                 scheduleRow.baseValue = schedule
-                scheduleRow.updateCell()
                 scheduleRow.reload()
                 if scheduleList.indices.contains(scheduleIndex) {
                     scheduleList[scheduleIndex] = schedule
@@ -1904,8 +1903,7 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
                 }
                 setupRightBarButton(with: "Update")
                 updateLists(type: "schedule")
-            }
-            else {
+            } else {
                 mvs.remove(at: scheduleIndex)
             }
         }

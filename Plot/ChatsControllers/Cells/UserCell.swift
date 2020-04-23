@@ -17,7 +17,7 @@ protocol ChatCellDelegate: class {
 
 class UserCell: UITableViewCell {
     
-    let thumbnailsCount = 8
+    let thumbnailsCount = 10
     var thumbnails: [UIImageView] = []
     weak var chatsViewControllerDataStore: ChatsViewControllerDataStore?
     var conversation: Conversation?

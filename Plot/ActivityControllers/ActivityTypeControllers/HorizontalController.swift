@@ -56,8 +56,23 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
         
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
-    
+        
+        addObservers()
 
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func changeTheme() {
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.reloadData()
+        
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

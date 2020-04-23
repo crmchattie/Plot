@@ -427,7 +427,7 @@ extension ActivityTableViewController: DeleteAndExitDelegate {
         guard let row = activityIndex(for: otherActivityID, at: section) else { return }
         
         let indexPath = IndexPath(row: row, section: section)
-//        section == 0 ? deletePinnedActivity(at: indexPath) : deleteUnPinnedActivity(at: indexPath)
+        section == 0 ? deletePinnedActivity(at: indexPath) : deleteUnPinnedActivity(at: indexPath)
     }
     
     func activityIndex(for otherActivityID: String, at section: Int) -> Int? {

@@ -52,10 +52,26 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
         
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.register(ActivitySubTypeCell.self, forCellWithReuseIdentifier: kActivitySubTypeCell)
+        
+        addObservers()
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func changeTheme() {
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.reloadData()
+        
     }
     
     var didSelectHandler: ((Any, [String: [String]]) -> ())?

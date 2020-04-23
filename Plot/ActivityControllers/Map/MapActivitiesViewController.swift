@@ -17,9 +17,13 @@ import CodableFirebase
 class MapActivitiesViewController: UIViewController, UISearchBarDelegate, FloatingPanelControllerDelegate {
     
     weak var activityViewController: ActivityViewController?
-    var activities: [Activity] {
-        return activityViewController?.activities ?? []
+    var activities: [Activity] = [] {
+        didSet {
+            populateLocations()
+        }
     }
+    var locationActivities: [Activity] = []
+    var conversations = [Conversation]()
     
     let fpc: FloatingPanelController = {
         let fpc = FloatingPanelController()
@@ -36,34 +40,34 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
         return mapView
     }()
     
-    let closeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "close"), for: .normal)
-        button.tintColor = .systemBlue
-        return button
-    }()
+    var chatLogController: ChatLogController? = nil
+    var messagesFetcher: MessagesFetcher? = nil
+    
+//    let closeButton: UIButton = {
+//        let button = UIButton(type: .system)
+//        button.setImage(UIImage(named: "close"), for: .normal)
+//        button.tintColor = .systemBlue
+//        return button
+//    }()
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        print("viewDidLoad map")
         view.backgroundColor = .clear
         view.addSubview(mapView)
-        view.addSubview(closeButton)
+//        view.addSubview(closeButton)
         
-        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+//        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         
         mapView.delegate = self
-        if #available(iOS 13.0, *) {
-            mapView.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-        }
         
         fpc.delegate = self
-        searchVC.activityViewController = activityViewController
         searchVC.activityCellDelegate = self
         
         // Initialize FloatingPanelController and add the view
@@ -76,18 +80,43 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
         fpc.set(contentViewController: searchVC)
         fpc.track(scrollView: searchVC.tableView)
         
-        populateLocations()
+        //  Add FloatingPanel to a view with animation.
+        fpc.addPanel(toParent: self, animated: true)
+        
+        addObservers()
+                
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func changeTheme() {
+        view.backgroundColor = .clear
+        if #available(iOS 13.0, *) {
+            mapView.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+        }
+        searchVC.tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        searchVC.tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        searchVC.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        searchVC.tableView.reloadData()
+    }
+    
+    func myViewDidLoad() {
+        if #available(iOS 13.0, *) {
+            mapView.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+        }
+        searchVC.activityViewController = activityViewController
+        searchVC.conversations = conversations
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        //  Add FloatingPanel to a view with animation.
-        fpc.addPanel(toParent: self, animated: true)
 
         // Must be here
         //searchVC.searchBar.delegate = self
@@ -100,10 +129,9 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
         mapView.frame = view.frame
-        let closeButtonFrame = CGRect(x: view.frame.width - 45, y: 40, width: 30, height: 30)
-        closeButton.frame = closeButtonFrame
+//        let closeButtonFrame = CGRect(x: view.frame.width - 45, y: 40, width: 30, height: 30)
+//        closeButton.frame = closeButtonFrame
     }
     
     func setupMapView() {
@@ -119,7 +147,6 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
     }
     
     func populateLocations() {
-        var locationActivities: [Activity] = []
         for activity in activities {
             if let locationAddress = activity.locationAddress {
                 for (key, value) in locationAddress {
@@ -141,6 +168,8 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
         
         self.mapView.showAnnotations(self.mapView.annotations, animated: true)
         searchVC.activities = locationActivities
+        searchVC.tableView.reloadData()
+
     }
 
     func teardownMapView() {
@@ -208,9 +237,6 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
         }, completion: nil)
     }
     
-    @objc func closeButtonTapped() {
-        self.dismiss(animated: true, completion: nil)
-    }
 }
 
 extension MapActivitiesViewController: MKMapViewDelegate {
@@ -246,7 +272,6 @@ extension MapActivitiesViewController: MKMapViewDelegate {
         
         let launchOptions = [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving]
         
-
         let addressDictionary = [CNPostalAddressStreetKey: location.subtitle ?? ""]
         let placemark = MKPlacemark(coordinate: location.coordinate, addressDictionary: addressDictionary)
         
@@ -272,7 +297,6 @@ extension MapActivitiesViewController: MKMapViewDelegate {
 
 extension MapActivitiesViewController: ActivityCellDelegate {
     func openMap(forActivity activity: Activity) {
-        
         if let annotations = self.mapView.annotations as? [ActivityAnnotation] {
             if let first = annotations.first(where: { (activityAnnotation) -> Bool in
                 activityAnnotation.activity.activityID == activity.activityID
@@ -286,7 +310,56 @@ extension MapActivitiesViewController: ActivityCellDelegate {
     }
     
     func openChat(forConversation conversationID: String?, activityID: String?) {
-        self.activityViewController?.openChat(forConversation: conversationID, activityID: activityID)
+        if let conversation = conversations.first(where: { (conversation) -> Bool in
+            conversation.chatID == conversationID
+        }) {
+            openChatDetailView(forChat: conversation)
+        }
+    }
+    
+    func openChatDetailView(forChat chat: Conversation) {
+        chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+        messagesFetcher = MessagesFetcher()
+        messagesFetcher?.delegate = self
+        messagesFetcher?.loadMessagesData(for: chat)
+    }
+}
+
+extension MapActivitiesViewController: MessagesDelegate {
+    
+    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
+        chatLogController?.updateMessageStatus(messageRef: reference)
+    }
+    
+    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
+        
+        chatLogController?.hidesBottomBarWhenPushed = true
+        chatLogController?.messagesFetcher = messagesFetcher
+        chatLogController?.messages = messages
+        chatLogController?.conversation = conversation
+        //chatLogController?.activityID = activityID
+        
+        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
+            chatLogController?.observeTypingIndicator()
+            chatLogController?.configureTitleViewWithOnlineStatus()
+        }
+        
+        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
+        guard let destination = chatLogController else { return }
+        
+        self.chatLogController?.startCollectionViewAtBottom()
+        
+        
+        // If we're presenting a modal sheet
+        if let presentedViewController = presentedViewController as? UINavigationController {
+            presentedViewController.pushViewController(destination, animated: true)
+        } else {
+            navigationController?.pushViewController(destination, animated: true)
+        }
+        
+        chatLogController = nil
+        messagesFetcher?.delegate = nil
+        messagesFetcher = nil
     }
 }
 
@@ -296,22 +369,10 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
     weak var activityCellDelegate: ActivityCellDelegate?
     
     var activities: [Activity] = []
-    
-    var invitations: [String: Invitation] {
-        return activityViewController?.invitations ?? [:]
-    }
-    
-    var users: [User] {
-        return activityViewController?.users ?? []
-    }
-    
-    var filteredUsers: [User] {
-        return activityViewController?.filteredUsers ?? []
-    }
-    
-    var conversations: [Conversation] {
-        return activityViewController?.conversations ?? []
-    }
+    var invitations = [String: Invitation]()
+    var users = [User]()
+    var filteredUsers = [User]()
+    var conversations = [Conversation]()
     
     let tableView: UITableView = {
         let tableView = UITableView()
@@ -348,6 +409,16 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
         visualEffectView.frame = view.frame
         tableView.frame = visualEffectView.frame
         
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+                ])
+        
+        
+        
         //hideHeader()
     }
 
@@ -380,21 +451,18 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath)
-        
-        if let activityCell = cell as? ActivityCell {
-            activityCell.delegate = activityCellDelegate
-            activityCell.updateInvitationDelegate = activityViewController
-            activityCell.activityViewControllerDataStore = activityViewController
-            
-            let activity = activities[indexPath.row]
-            var invitation: Invitation?
-            if let activityID = activity.activityID, let value = invitations[activityID] {
-                invitation = value
-            }
-            
-            activityCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
-        }
-        
+         if let activityCell = cell as? ActivityCell {
+               activityCell.delegate = activityCellDelegate
+               activityCell.updateInvitationDelegate = activityViewController
+               activityCell.activityViewControllerDataStore = activityViewController
+               
+               let activity = activities[indexPath.row]
+               var invitation: Invitation?
+               if let activityID = activity.activityID, let value = invitations[activityID] {
+                   invitation = value
+               }
+               activityCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+           }
         return cell
     }
 
@@ -408,7 +476,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
         }
         
         let activity = activities[indexPath.row]
-        
+                
         let dispatchGroup = DispatchGroup()
                 
         if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {

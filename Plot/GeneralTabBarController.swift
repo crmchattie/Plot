@@ -13,9 +13,9 @@ import Contacts
 //update this file to update nav bar
 
 enum Tabs: Int {
-    //  case contacts = 0
-    case chats = 0
-    case activity = 1
+    
+    case discover = 0
+    case home = 1
     case settings = 2
 }
 
@@ -40,9 +40,8 @@ class GeneralTabBarController: UITabBarController {
 
     fileprivate var isAppLoaded = false
     
-    //  let contactsController = ContactsController()
-    let activityController = ActivityViewController()
-    let chatsController = ChatsTableViewController()
+    let homeController = MasterActivityContainerController()
+    let discoverController = ActivityTypeViewController()
     let settingsController = AccountSettingsController()
     var window: UIWindow?
     
@@ -70,34 +69,14 @@ class GeneralTabBarController: UITabBarController {
                         
         appDelegate.loadNotifications()
 
-        activityController.delegate = self
-        chatsController.delegate = self
+        homeController.delegate = self
         setOnlineStatus()
         configureTabBar()
         
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        guard UIApplication.shared.applicationState == .inactive else {
-            return
-        }
-
-        if #available(iOS 12.0, *) {
-            if self.traitCollection.userInterfaceStyle == .dark {
-                let theme = Theme.Dark
-                ThemeManager.applyTheme(theme: theme)
-            } else if self.traitCollection.userInterfaceStyle == .light {
-                let theme = Theme.Default
-                ThemeManager.applyTheme(theme: theme)
-            }
-        } else {
-            // Fallback on earlier versions
-        }
-    }
-    
     fileprivate func configureTabBar() {
-    UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor], for: .normal)
+        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor], for: .normal)
         tabBar.unselectedItemTintColor = ThemeManager.currentTheme().generalSubtitleColor
         tabBar.isTranslucent = false
         tabBar.layer.borderWidth = 0.50
@@ -126,43 +105,62 @@ class GeneralTabBarController: UITabBarController {
         onceToken = 1
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard UIApplication.shared.applicationState == .inactive else {
+            return
+        }
+
+        if #available(iOS 12.0, *) {
+            if self.traitCollection.userInterfaceStyle == .dark {
+                let theme = Theme.Dark
+                ThemeManager.applyTheme(theme: theme)
+            } else if self.traitCollection.userInterfaceStyle == .light {
+                let theme = Theme.Default
+                ThemeManager.applyTheme(theme: theme)
+            }
+        } else {
+            // Fallback on earlier versions
+        }
+    }
+    
     fileprivate func setTabs() {
-        //    contactsController.title = "Contacts"
-        activityController.title = "Activities"
-        chatsController.title = "Chats"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMMM yyyy"
+        let dateString = dateFormatter.string(from: Date())
+        
+        homeController.title = dateString
+        discoverController.title = "Discover"
         settingsController.title = "Settings"
         
-        //    let contactsNavigationController = UINavigationController(rootViewController: contactsController)
-        let activityNavigationController = UINavigationController(rootViewController: activityController)
-        let chatsNavigationController = UINavigationController(rootViewController: chatsController)
+        let homeNavigationController = UINavigationController(rootViewController: homeController)
+        let discoverNavigationController = UINavigationController(rootViewController: discoverController)
         let settingsNavigationController = UINavigationController(rootViewController: settingsController)
         
         if #available(iOS 11.0, *) {
-            //      contactsNavigationController.navigationBar.prefersLargeTitles = true
-            activityNavigationController.navigationBar.prefersLargeTitles = true
-            settingsNavigationController.navigationBar.prefersLargeTitles = true
-            chatsNavigationController.navigationBar.prefersLargeTitles = true
+            homeNavigationController.navigationBar.prefersLargeTitles = false
+            settingsNavigationController.navigationBar.prefersLargeTitles = false
+            discoverNavigationController.navigationBar.prefersLargeTitles = false
         }
         
-        //    let contactsImage =  UIImage(named: "user")
-        let activityImage = UIImage(named: "activity")
-        let chatsImage = UIImage(named: "chat")
+        let homeImage = UIImage(named: "home")
+        let discoverImage = UIImage(named: "discover")
         let settingsImage = UIImage(named: "settings")
         
-        //    let contactsTabItem = UITabBarItem(title: contactsController.title, image: contactsImage, selectedImage: nil)
-        let activityTabItem = UITabBarItem(title: activityController.title, image: activityImage, selectedImage: nil)
-        let chatsTabItem = UITabBarItem(title: chatsController.title, image: chatsImage, selectedImage: nil)
-        let settingsTabItem = UITabBarItem(title: settingsController.title, image: settingsImage, selectedImage: nil)
+        let homeTabItem = UITabBarItem(title: nil, image: homeImage, selectedImage: nil)
+        homeTabItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
+        let discoverTabItem = UITabBarItem(title: nil, image: discoverImage, selectedImage: nil)
+        discoverTabItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
+        let settingsTabItem = UITabBarItem(title: nil, image: settingsImage, selectedImage: nil)
+        settingsTabItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
         
-        //    contactsController.tabBarItem = contactsTabItem
-        activityController.tabBarItem = activityTabItem
-        chatsController.tabBarItem = chatsTabItem
+        homeController.tabBarItem = homeTabItem
+        discoverController.tabBarItem = discoverTabItem
         settingsController.tabBarItem = settingsTabItem
         
-        //    let tabBarControllers = [contactsNavigationController, chatsNavigationController as UIViewController, settingsNavigationController]
-        let tabBarControllers = [chatsNavigationController, activityNavigationController as UIViewController,  settingsNavigationController]
+        let tabBarControllers = [discoverNavigationController, homeNavigationController as UIViewController,  settingsNavigationController]
         viewControllers = tabBarControllers
-        selectedIndex = Tabs.activity.rawValue
+        selectedIndex = Tabs.home.rawValue
     }
     
     func presentOnboardingController() {
@@ -304,7 +302,7 @@ class GeneralTabBarController: UITabBarController {
             }
             
             dispatchGroup.notify(queue: .main) {
-                self.activityController.handleReloadTable()
+                self.homeController.activitiesVC.handleReloadTable()
             }
         } catch {
             print(error)
@@ -312,13 +310,13 @@ class GeneralTabBarController: UITabBarController {
     }
 }
 
-extension GeneralTabBarController: ManageAppearanceChat {
-    func manageAppearanceChat(_ chatsController: ChatsTableViewController, didFinishLoadingWith state: Bool) {
+extension GeneralTabBarController: ManageAppearanceHome {
+    func manageAppearanceHome(_ homeController: MasterActivityContainerController, didFinishLoadingWith state: Bool) {
         guard !isAppLoaded else { return }
         isAppLoaded = true
-        print("manageAppearanceChat")
+        print("manageAppearanceHome")
         let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
-        _ = activityController.view
+        _ = discoverController.view
         _ = settingsController.view
         guard state else { return }
         if isBiometricalAuthEnabled {
@@ -332,30 +330,50 @@ extension GeneralTabBarController: ManageAppearanceChat {
     }
 }
 
-extension GeneralTabBarController: ManageAppearanceActivity {
-    func manageAppearanceActivity(_ activityController: ActivityViewController, didFinishLoadingWith state: Bool) {
-        guard !isAppLoaded else { return }
-        isAppLoaded = true
-        print("manageAppearanceActivity")
-        let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
-        _ = chatsController.view
-        _ = settingsController.view
-        guard state else { return }
-        if isBiometricalAuthEnabled {
-            splashContainer.authenticationWithTouchID()
-        } else {
-            self.splashContainer.showSecuredData()
-        }
-        grabContacts()
-//        appDelegate.registerForPushNotifications(application: UIApplication.shared)
-        addSampleActivityForNewUser()
-    }
-}
+//extension GeneralTabBarController: ManageAppearanceChat {
+//    func manageAppearanceChat(_ chatsController: ChatsTableViewController, didFinishLoadingWith state: Bool) {
+//        guard !isAppLoaded else { return }
+//        isAppLoaded = true
+//        print("manageAppearanceChat")
+//        let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
+//        _ = discoverController.view
+//        _ = settingsController.view
+//        guard state else { return }
+//        if isBiometricalAuthEnabled {
+//            splashContainer.authenticationWithTouchID()
+//        } else {
+//            self.splashContainer.showSecuredData()
+//        }
+//        grabContacts()
+////        appDelegate.registerForPushNotifications(application: UIApplication.shared)
+//
+//    }
+//}
+
+//extension GeneralTabBarController: ManageAppearanceActivity {
+//    func manageAppearanceActivity(_ activityController: ActivityViewController, didFinishLoadingWith state: Bool) {
+//        guard !isAppLoaded else { return }
+//        isAppLoaded = true
+//        print("manageAppearanceActivity")
+//        let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
+//        _ = discoverController.view
+//        _ = settingsController.view
+//        guard state else { return }
+//        if isBiometricalAuthEnabled {
+//            splashContainer.authenticationWithTouchID()
+//        } else {
+//            self.splashContainer.showSecuredData()
+//        }
+//        grabContacts()
+////        appDelegate.registerForPushNotifications(application: UIApplication.shared)
+//        addSampleActivityForNewUser()
+//    }
+//}
 
 extension GeneralTabBarController: ContactsUpdatesDelegate {
     func contacts(updateDatasource contacts: [CNContact]) {
-        chatsController.contacts = contacts
-        chatsController.filteredContacts = contacts
+        homeController.contacts = contacts
+        homeController.filteredContacts = contacts
         DispatchQueue.global(qos: .default).async {
             self.falconUsersFetcher.fetchFalconUsers(asynchronously: true)
         }
@@ -367,10 +385,10 @@ extension GeneralTabBarController: ContactsUpdatesDelegate {
 
 extension GeneralTabBarController: FalconUsersUpdatesDelegate {
     func falconUsers(shouldBeUpdatedTo users: [User]) {
-        chatsController.users = users
-        chatsController.filteredUsers = users
-        activityController.users = users
-        activityController.filteredUsers = users
+        homeController.users = users
+        homeController.filteredUsers = users
+        discoverController.users = users
+        discoverController.filteredUsers = users
         globalUsers = users
     }
 }
