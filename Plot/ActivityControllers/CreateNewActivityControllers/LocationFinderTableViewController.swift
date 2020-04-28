@@ -103,7 +103,7 @@ class LocationFinderTableViewController: UIViewController {
             viewPlaceholder.remove(from: searchResultsTableView, priority: .medium)
             return
         }
-        viewPlaceholder.add(for: searchResultsTableView, title: .emptyLocationSearch, subtitle: .emptyUsers, priority: .medium, position: .top)
+        viewPlaceholder.add(for: searchResultsTableView, title: .emptyLocationSearch, subtitle: .empty, priority: .medium, position: .top)
     }
     
 }

@@ -58,6 +58,7 @@ class MasterActivityContainerController: UIViewController {
             if nav.topViewController is ActivityTypeViewController {
                 let activityTab = nav.topViewController as! ActivityTypeViewController
                 activityTab.activities = activities
+                
             }
         }
     }
@@ -74,10 +75,10 @@ class MasterActivityContainerController: UIViewController {
     }
     var selectedDate = Date()
     
-    let titles = ["Updates", "Chats", "Activities", "Map", "Lists"]
+    let titles = ["Updates", "Chats", "Activities", "Lists", "Map"]
     var index: Int = 2
     
-    let customSegmented = CustomSegmentedControl(buttonImages: ["notification-bell","chat","activity", "map", "list"])
+    let customSegmented = CustomSegmentedControl(buttonImages: ["notification-bell","chat","activity", "list", "map"])
     let containerView = UIView()
     
     weak var delegate: ManageAppearanceHome?
@@ -100,20 +101,21 @@ class MasterActivityContainerController: UIViewController {
         return vc
     }()
     
-    lazy var notificationsVC: NotificationsViewController = {
-        let vc = NotificationsViewController()
+    lazy var listsVC: ListsViewController = {
+        let vc = ListsViewController()
         self.addAsChildVC(childVC: vc)
         return vc
     }()
     
-    lazy var listsVC: ListsViewController = {
-        let vc = ListsViewController()
+    lazy var notificationsVC: NotificationsViewController = {
+        let vc = NotificationsViewController()
         self.addAsChildVC(childVC: vc)
         return vc
     }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("viewDidLoad")
         setupViews()
         setNavBar()
         activitiesVC.delegate = self
@@ -124,31 +126,11 @@ class MasterActivityContainerController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        print("viewWillAppear")
-        print(navigationController?.isNavigationBarHidden)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        customSegmented.selectedIndex = index
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        print("viewWillDisappear")
-        print(navigationController?.isNavigationBarHidden)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-        customSegmented.selectedIndex = index
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        print("viewDidLayoutSubviews")
-        print(navigationController?.isNavigationBarHidden)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        print("viewWillLayoutSubviews")
-        print(navigationController?.isNavigationBarHidden)
         navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
@@ -250,6 +232,38 @@ class MasterActivityContainerController: UIViewController {
     }
 }
 
+extension MasterActivityContainerController: CustomSegmentedControlDelegate {
+    func changeToIndex(index:Int) {
+        print("changeToIndex \(index)")
+        if self.index == 1 {
+            if chatsVC.tableView.isEditing == true {
+                chatsVC.tableView.setEditing(false, animated: true)
+                editButtonItem.style = .plain
+                editButtonItem.title = "Edit"
+            }
+        } else if self.index == 2 {
+            if activitiesVC.activityView.tableView.isEditing == true {
+                activitiesVC.activityView.tableView.setEditing(false, animated: true)
+                editButtonItem.style = .plain
+                editButtonItem.title = "Edit"
+            }
+        }
+        notificationsVC.view.isHidden = !(index == 0)
+        if index == 0 {
+            notificationsVC.sortInvitedActivities()
+        }
+        chatsVC.view.isHidden = !(index == 1)
+        activitiesVC.view.isHidden = !(index == 2)
+        listsVC.view.isHidden = !(index == 3)
+        mapVC.view.isHidden = !(index == 4)
+        if index == 3 {
+            mapVC.myViewDidLoad()
+        }
+        self.index = index
+        setNavBar()
+    }
+}
+
 extension MasterActivityContainerController {
     override var editButtonItem: UIBarButtonItem {
         let editButton = super.editButtonItem
@@ -282,8 +296,6 @@ extension MasterActivityContainerController {
     }
     
     @objc fileprivate func newActivity() {
-        let destination = ActivityTypeViewController()
-        destination.hidesBottomBarWhenPushed = true
         tabBarController?.selectedIndex = 0
     }
     
@@ -299,37 +311,6 @@ extension MasterActivityContainerController {
           destination.conversations = conversations
       }
       navigationController?.pushViewController(destination, animated: true)
-    }
-}
-
-extension MasterActivityContainerController: CustomSegmentedControlDelegate {
-    func changeToIndex(index:Int) {
-        if self.index == 1 {
-            if chatsVC.tableView.isEditing == true {
-                chatsVC.tableView.setEditing(false, animated: true)
-                editButtonItem.style = .plain
-                editButtonItem.title = "Edit"
-            }
-        } else if self.index == 2 {
-            if activitiesVC.activityView.tableView.isEditing == true {
-                activitiesVC.activityView.tableView.setEditing(false, animated: true)
-                editButtonItem.style = .plain
-                editButtonItem.title = "Edit"
-            }
-        }
-        notificationsVC.view.isHidden = !(index == 0)
-        if index == 0 {
-            notificationsVC.sortInvitedActivities()
-        }
-        chatsVC.view.isHidden = !(index == 1)
-        activitiesVC.view.isHidden = !(index == 2)
-        mapVC.view.isHidden = !(index == 3)
-        if index == 3 {
-            mapVC.myViewDidLoad()
-        }
-        listsVC.view.isHidden = !(index == 4)
-        self.index = index
-        setNavBar()
     }
 }
 

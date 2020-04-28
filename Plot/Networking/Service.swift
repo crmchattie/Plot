@@ -198,6 +198,74 @@ class Service {
         
     }
     
+    func fetchWeatherRealTime(lat: Double, long: Double, completion: @escaping ((WeatherElement?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: ClimaCellAPI.realTimeUrlString)!
+        }()
+        
+        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
+        var parameters = ["lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+       
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchWeatherNowCast(startDateTime: String, endDateTime: String, lat: Double, long: Double, completion: @escaping ((WeatherElement?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: ClimaCellAPI.nowCastUrlString)!
+        }()
+        
+        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
+        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+       
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchWeatherHourly(startDateTime: String, endDateTime: String, lat: Double, long: Double, completion: @escaping ((WeatherElement?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: ClimaCellAPI.hourlyUrlString)!
+        }()
+        
+        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
+        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+       
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchWeatherDaily(startDateTime: String, endDateTime: String, lat: Double, long: Double, completion: @escaping ((DailyWeatherElement?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: ClimaCellAPI.dailyUrlString)!
+        }()
+        
+        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
+        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+       
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
     // declare my generic json function here
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
         
@@ -239,6 +307,14 @@ struct TicketMasterAPI {
 struct StubHubAPI {
     static let baseUrlString = "https://api.stubhub.com/sellers/search/events/v3"
     static fileprivate let apiKey = "xVBMj11niDRbEux46AZ5piTO7305GkPY"
+}
+
+struct ClimaCellAPI {
+    static fileprivate let apiKey = "pEDT4UvIaMtu2agpiPZZh0Hl1QLhxyTL"
+    static let realTimeUrlString = "https://api.climacell.co/v3/weather/realtime"
+    static let nowCastUrlString = "https://api.climacell.co/v3/weather/nowcast"
+    static let hourlyUrlString = "https://api.climacell.co/v3/weather/forecast/hourly"
+    static let dailyUrlString = "https://api.climacell.co/v3/weather/forecast/daily"
 }
 
 extension URLRequest {

@@ -38,6 +38,8 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     
     var startDateTime: Date?
     var endDateTime: Date?
+    
+    lazy var indexPathItem: Int = 0
             
     let activityIndicatorView: UIActivityIndicatorView = {
         let aiv = UIActivityIndicatorView(style: .whiteLarge)
@@ -159,7 +161,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             } else {
                 cell.heartButtonImage = "heart"
             }
-            cell.intColor = (indexPath.item % 5)
+            cell.intColor = ((indexPath.item + indexPathItem % 5) % 5)
             cell.workout = workout
             cell.event = nil
             cell.recipe = nil

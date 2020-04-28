@@ -28,13 +28,7 @@ class ShareViewController: UIViewController {
     var searchExtensionController: UISearchController?
     var searchBar: UISearchBar?
     
-    
-//    private lazy var tableView: UITableView = {
-//        let tableView = UITableView(frame: self.view.frame)
-//        tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        return tableView
-//    }()
-    
+        
     let shareHeaderView = ShareHeaderView()
     
     override func viewDidLoad() {
@@ -65,6 +59,9 @@ class ShareViewController: UIViewController {
         shareHeaderView.tableView.dataSource = self
         shareHeaderView.tableView.delegate = self
         shareHeaderView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: Identifiers.ActivityCell)
+        shareHeaderView.tableView.rowHeight = UITableView.automaticDimension
+        shareHeaderView.tableView.estimatedRowHeight = 40
+        shareHeaderView.tableView.separatorStyle = .none
     }
     
     fileprivate func setupNavBar() {
@@ -83,6 +80,9 @@ class ShareViewController: UIViewController {
             for activity in activities {
                 let decodedData = NSKeyedUnarchiver.unarchiveObject(with: activity as! Data) as! [String: AnyObject]
                 let decodedActivity = Activity(dictionary: decodedData)
+                if decodedActivity.recipeID != nil || decodedActivity.workoutID != nil || decodedActivity.eventID != nil {
+                    continue
+                }
                 activitiesArray.append(decodedActivity)
             }
         }
@@ -240,9 +240,9 @@ extension ShareViewController: UITableViewDataSource {
         return activitiesArray.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.ActivityCell, for: indexPath)
-        cell.textLabel?.text = activitiesArray[indexPath.row].name
-        cell.backgroundColor = .clear
+        let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.ActivityCell, for: indexPath) as? ActivityCell ?? ActivityCell()        
+        let activity = activitiesArray[indexPath.row]
+        cell.configureCell(for: indexPath, activity: activity)
         return cell
     }
 }

@@ -686,7 +686,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let dispatchGroup = DispatchGroup()
         var activity: Activity!
         
         if indexPath.section == 0 {
@@ -696,45 +695,24 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             let unpinnedActivity = filteredActivities[indexPath.row]
             activity = unpinnedActivity
         }
+        loadActivity(activity: activity)
+    }
+    
+    func loadActivity(activity: Activity) {
         
+        let dispatchGroup = DispatchGroup()
         showActivityIndicator()
         
         if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {
             dispatchGroup.enter()
             Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
-                let detailedRecipe = search
-                dispatchGroup.leave()
-                dispatchGroup.notify(queue: .main) {
-                    let destination = MealDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
-                    destination.recipe = detailedRecipe
-                    destination.detailedRecipe = detailedRecipe
-                    destination.activity = activity
-                    destination.invitation = self.invitations[activity.activityID!]
-                    destination.users = self.users
-                    destination.filteredUsers = self.filteredUsers
-                    destination.activities = self.filteredActivities + self.filteredPinnedActivities
-                    destination.conversations = self.conversations
-                    self.getParticipants(forActivity: activity) { (participants) in
-                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                            destination.acceptedParticipant = acceptedParticipant
-                            destination.selectedFalconUsers = participants
-                            self.hideActivityIndicator()
-                            self.navigationController?.pushViewController(destination, animated: true)
-                        }
-                    }
-                }
-            }
-        } else if let eventID = activity.eventID {
-            dispatchGroup.enter()
-            Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
-                if let events = search?.embedded?.events {
-                    let event = events[0]
+                if let detailedRecipe = search {
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
-                        let destination = EventDetailViewController()
+                        let destination = MealDetailViewController()
                         destination.hidesBottomBarWhenPushed = true
-                        destination.event = event
+                        destination.recipe = detailedRecipe
+                        destination.detailedRecipe = detailedRecipe
                         destination.activity = activity
                         destination.invitation = self.invitations[activity.activityID!]
                         destination.users = self.users
@@ -749,6 +727,54 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                                 self.navigationController?.pushViewController(destination, animated: true)
                             }
                         }
+                    }
+                } else {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        self.hideActivityIndicator()
+                        self.activityNotFoundAlert()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.dismiss(animated: true, completion: nil)
+                        })
+                    }
+                }
+            }
+        } else if let eventID = activity.eventID {
+            print("\(eventID)")
+            dispatchGroup.enter()
+            Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
+                if let events = search?.embedded?.events {
+                    let event = events[0]
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        print("\(eventID)")
+                        let destination = EventDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.event = event
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.filteredActivities + self.filteredPinnedActivities
+                        destination.conversations = self.conversations
+                        self.getParticipants(forActivity: activity) { (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                print("\(eventID)")
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
+                                self.navigationController?.pushViewController(destination, animated: true)
+                            }
+                        }
+                    }
+                } else {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        self.hideActivityIndicator()
+                        self.activityNotFoundAlert()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.dismiss(animated: true, completion: nil)
+                        })
                     }
                 }
             }
@@ -787,25 +813,35 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         } else if let attractionID = activity.attractionID {
             dispatchGroup.enter()
             Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
-                let attraction = search?.embedded?.attractions![0]
-                dispatchGroup.leave()
-                dispatchGroup.notify(queue: .main) {
-                    let destination = EventDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
-                    destination.attraction = attraction
-                    destination.activity = activity
-                    destination.invitation = self.invitations[activity.activityID!]
-                    destination.users = self.users
-                    destination.filteredUsers = self.filteredUsers
-                    destination.activities = self.filteredActivities + self.filteredPinnedActivities
-                    destination.conversations = self.conversations
-                    self.getParticipants(forActivity: activity) { (participants) in
-                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                            destination.acceptedParticipant = acceptedParticipant
-                            destination.selectedFalconUsers = participants
-                            self.hideActivityIndicator()
-                            self.navigationController?.pushViewController(destination, animated: true)
+                if let attraction = search?.embedded?.attractions![0] {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = EventDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.attraction = attraction
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.filteredActivities + self.filteredPinnedActivities
+                        destination.conversations = self.conversations
+                        self.getParticipants(forActivity: activity) { (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
+                                self.navigationController?.pushViewController(destination, animated: true)
+                            }
                         }
+                    }
+                } else {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        self.hideActivityIndicator()
+                        self.activityNotFoundAlert()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.dismiss(animated: true, completion: nil)
+                        })
                     }
                 }
             }

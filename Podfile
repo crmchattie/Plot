@@ -24,7 +24,6 @@ target 'Plot' do
   pod 'CodableFirebase'
   pod 'FloatingPanel'
   
-  #status bars -- change to SVProgressHUD or something like it
 	pod 'ARSLineProgress'
 
 end
@@ -37,7 +36,6 @@ target 'ShareExtension' do
   pod 'Firebase/Database'
   pod 'Firebase/Auth'
   pod 'Firebase/Storage'
-  pod 'Firebase/Analytics'
   pod 'Firebase/Messaging'
 
 end

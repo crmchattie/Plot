@@ -404,7 +404,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
     if indexPath.section == 1, members[indexPath.row].id != conversationAdminID, members[indexPath.row].id != Auth.auth().currentUser!.uid {
         return true
     } else if indexPath.section == 2 {
-        return false
+        return true
     }
     else {
         return false

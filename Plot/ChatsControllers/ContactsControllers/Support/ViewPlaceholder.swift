@@ -9,38 +9,43 @@
 import UIKit
 
 enum ViewPlaceholderPriority: CGFloat {
-  case low = 0.1
-  case medium = 0.5
-  case high = 1.0
+    case low = 0.1
+    case medium = 0.5
+    case high = 1.0
 }
 
 enum ViewPlaceholderPosition {
-  case top
-  case center
+    case top
+    case center
 }
 
 enum ViewPlaceholderTitle: String {
-  case denied = "Plot doesn't have access to your contacts"
-  case empty = "You don't have any Plot Users yet."
-  case emptyChat = "You don't have any active conversations yet."
-  case emptyActivities = "You don't have any activities yet."
-  case emptyUsers = "No users available to invite"
-  case emptyPhotos = "You don't have any photos yet."
-  case emptyRecipes = "Could not find any recipes that match the filter(s) and/or keyword search"
-  case emptyEvents = "Could not find any events that match the filter(s) and/or keyword search"
-  case emptyWorkouts = "Could not find any workouts that match the filter(s)"
-  case emptyLocationSearch = "Please search for locations above"
+    case denied = "Plot doesn't have access to your contacts"
+    case emptyContacts = "You don't have any Plot Users yet"
+    case emptyChat = "You don't have any active conversations yet"
+    case emptyActivities = "You don't have any activities yet"
+    case emptyUsers = "No users available to invite"
+    case emptyPhotos = "You don't have any photos yet"
+    case emptyRecipes = "Could not find any recipes that match the filter(s) and/or keyword search"
+    case emptyEvents = "Could not find any events that match the filter(s) and/or keyword search"
+    case emptyWorkouts = "Could not find any workouts that match the filter(s)"
+    case emptyLocationSearch = "Please search for locations above"
+    case emptyNotifications = "You don't have any notifications yet"
+    case emptyInvitedActivities = "You have not yet been invited to any activities"
+    case emptyLists = "You don't have any lists yet"
 }
 
 enum ViewPlaceholderSubtitle: String {
-  case denied = "Please go to your iPhone Settings –– Privacy –– Contacts. Then select ON for Plot. If you have Privacy Restrictions ON, please go to Screen Time - Content & Privacy Restrictions - Contacts. Then select ALLOW for Plot"
-  case empty = "You can invite your friends to Plot with the notepad button in the upper right corner."
-  case emptyChat = "You can create your first message with the notepad button in the upper right corner."
-  case emptyActivities = "You can add an activity with the plus button in the upper right corner."
-  case emptyUsers = ""
-  case emptyPhotos = "You can add photos with the plus button in the upper right corner."
-  case emptyRecipesEvents = "You can update the search via the search bar and/or by adjusting filters in the upper right corner"
-  case emptyWorkouts = "You can update the search by adjusting filters in the upper right corner"
+    case empty = ""
+    case denied = "Please go to your iPhone Settings –– Privacy –– Contacts. Then select ON for Plot. If you have Privacy Restrictions ON, please go to Screen Time - Content & Privacy Restrictions - Contacts. Then select ALLOW for Plot"
+    case emptyContacts = "You can invite your friends to Plot with the notepad button in the upper right corner"
+    case emptyChat = "You can create your first message with the notepad button in the upper right corner"
+    case emptyActivities = "You can add an activity with the plus button in the upper right corner"
+    case emptyPhotos = "You can add photos with the plus button in the upper right corner"
+    case emptyRecipesEvents = "You can update the search via the search bar and/or by adjusting filters in the upper right corner"
+    case emptyWorkouts = "You can update the search by adjusting filters in the upper right corner"
+    case emptyInvitedActivities = "Once you are invited to an activity it will appear here"
+    case emptyMap = "Activities will appear here and on the map as pins"
 }
 
 class ViewPlaceholder: UIView {

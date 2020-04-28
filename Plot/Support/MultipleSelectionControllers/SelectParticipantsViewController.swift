@@ -142,7 +142,7 @@ class SelectParticipantsViewController: UIViewController {
         if filteredUsers.count > 0 {
             viewPlaceholder.remove(from: tableView, priority: .medium)
         } else {
-            viewPlaceholder.add(for: tableView, title: .emptyUsers, subtitle: .emptyUsers, priority: .medium, position: .top)
+            viewPlaceholder.add(for: tableView, title: .emptyUsers, subtitle: .empty, priority: .medium, position: .top)
         }
         tableView.reloadData()
     }

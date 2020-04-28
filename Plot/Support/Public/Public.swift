@@ -1084,18 +1084,26 @@ let messageAlert = UIAlertController(title: "Activity Sent!", message: nil, pref
 
 let activityAlert = UIAlertController(title: "Activity Created!", message: nil, preferredStyle: UIAlertController.Style.alert)
 
+let activityNFAlert = UIAlertController(title: "Issue loading activity", message: nil, preferredStyle: UIAlertController.Style.alert)
+
 extension UIViewController {
     func messageSentAlert() {
         self.present(messageAlert, animated: true, completion: nil)
     }
-    func activitySentAlert() {
-        self.present(activityAlert, animated: true, completion: nil)
-    }
     func removeMessageAlert() {
         messageAlert.dismiss(animated: true, completion: nil)
     }
+    func activitySentAlert() {
+        self.present(activityAlert, animated: true, completion: nil)
+    }
     func removeActivityAlert() {
         activityAlert.dismiss(animated: true, completion: nil)
+    }
+    func activityNotFoundAlert() {
+        self.present(activityNFAlert, animated: true, completion: nil)
+    }
+    func removeActivityNotFoundAlert() {
+        activityNFAlert.dismiss(animated: true, completion: nil)
     }
 }
 

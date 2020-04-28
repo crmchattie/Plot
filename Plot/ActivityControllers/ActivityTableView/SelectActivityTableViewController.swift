@@ -112,8 +112,8 @@ class SelectActivityTableViewController: UITableViewController {
         tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
-        navigationItem.rightBarButtonItem = newActivityBarButton
+//        let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
+//        navigationItem.rightBarButtonItem = newActivityBarButton
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
         extendedLayoutIncludesOpaqueBars = true
@@ -124,16 +124,16 @@ class SelectActivityTableViewController: UITableViewController {
         
     }
     
-    @objc fileprivate func newActivity() {
-        let destination = ActivityTypeViewController()
-        destination.hidesBottomBarWhenPushed = true
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        destination.activities = activities + pinnedActivities
-        destination.selectedFalconUsers = selectedFalconUsers
-        destination.conversation = conversation
-        navigationController?.pushViewController(destination, animated: true)
-    }
+//    @objc fileprivate func newActivity() {
+//        let destination = ActivityTypeViewController()
+//        destination.hidesBottomBarWhenPushed = true
+//        destination.users = users
+//        destination.filteredUsers = filteredUsers
+//        destination.activities = activities + pinnedActivities
+//        destination.selectedFalconUsers = selectedFalconUsers
+//        destination.conversation = conversation
+//        navigationController?.pushViewController(destination, animated: true)
+//    }
     
     
     fileprivate func setupSearchController() {

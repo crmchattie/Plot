@@ -22,6 +22,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     
     var users = [User]()
     var filteredUsers = [User]()
+    var selectedFalconUsers = [User]()
     var activities = [Activity]()
     var conversations = [Conversation]()
     var favAct = [String: [String]]()

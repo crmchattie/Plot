@@ -222,7 +222,7 @@ class MessagesFetcher: NSObject {
   }
     
     func estimateFrameForActivity(_ text: String) -> CGRect {
-      let size = CGSize(width: 225, height: 10000)
+      let size = CGSize(width: 175, height: 10000)
       let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
       let attributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .callout)]
       return text.boundingRect(with: size, options: options, attributes: attributes, context: nil).integral

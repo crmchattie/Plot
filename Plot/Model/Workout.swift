@@ -12,10 +12,12 @@ import Foundation
 struct Workout: Codable {
     let id, title, identifier: String
     let notes, workoutDuration, tagsStr: String?
+    let equipment: [String]?
+    let equipment_level: String?
     let exercises: [Exercise]?
 
     enum CodingKeys: String, CodingKey {
-        case id, title, notes, identifier
+        case id, title, notes, identifier, equipment, equipment_level
         case workoutDuration = "workout_duration"
         case tagsStr = "tags_str"
         case exercises
@@ -36,6 +38,8 @@ struct Exercise: Codable {
     let muscleGroups, muscleGroupsSecondary: String?
     let diagramImgs: DiagramImgs?
     let ssHex: String?
+    let equipment: [String]?
+    let equipment_level: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -59,6 +63,8 @@ struct Exercise: Codable {
         case muscleGroupsSecondary = "muscle_groups_secondary"
         case diagramImgs = "diagram_imgs"
         case ssHex = "ss_hex"
+        case equipment
+        case equipment_level
     }
 }
 

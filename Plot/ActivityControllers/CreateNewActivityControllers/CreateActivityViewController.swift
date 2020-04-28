@@ -690,7 +690,7 @@ class CreateActivityViewController: FormViewController {
                     } else {
                         // Fallback on earlier versions
                     }
-                    $0.options = ["Schedule", "Checklist", "Purchases"]
+                    $0.options = ["Schedule", "Lists", "Purchases"]
                     if includeSubSections {
                         $0.value = "Schedule"
                     } else {
@@ -752,14 +752,14 @@ class CreateActivityViewController: FormViewController {
 
     form +++
         MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
-                           header: "Checklist",
-                           footer: "Add a checklist item") {
-                            $0.tag = "checklistfields"
-                            $0.hidden = "$sections != 'Checklist'"
+                           header: "Lists",
+                           footer: "Add a checklist, recipe list and/or a packing list") {
+                            $0.tag = "listsfields"
+                            $0.hidden = "$sections != 'Lists'"
                             $0.addButtonProvider = { section in
                                 return ButtonRow(){
                                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                    $0.title = "Add New Item"
+                                    $0.title = "Add New List"
                                     }.cellUpdate { cell, row in
                                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                         cell.textLabel?.textAlignment = .left
@@ -773,7 +773,7 @@ class CreateActivityViewController: FormViewController {
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                         $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                                         $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                        $0.placeholder = "Item"
+                                        $0.placeholder = "List"
                                         }.cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                             cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -799,14 +799,14 @@ class CreateActivityViewController: FormViewController {
                                     }.cellUpdate { cell, row in
                                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                     }.onChange() { _ in
-                                        self.updateLists(type: "checklist")
+                                        self.updateLists(type: "lists")
                                 }
                                 
                             }
                             
     }
                                 for (_, value) in checklistDict {
-                                    var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
+                                    var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                                     mvs.insert(SplitRow<TextRow, CheckRow>() {
                                         $0.rowLeftPercentage = 0.75
                                         $0.rowLeft = TextRow(){
@@ -838,7 +838,7 @@ class CreateActivityViewController: FormViewController {
                                         }.cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                         }.onChange() { _ in
-                                            self.updateLists(type: "checklist")
+                                            self.updateLists(type: "lists")
                                     } , at: mvs.count - 1)
                                     
                                 }
@@ -1100,7 +1100,7 @@ class CreateActivityViewController: FormViewController {
                 }
                 self!.updateLists(type: "purchases")
             } else {
-                self!.updateLists(type: "checklist")
+                self!.updateLists(type: "lists")
             }
         }
     }
@@ -1165,14 +1165,14 @@ class CreateActivityViewController: FormViewController {
             }
         } else {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-            if let mvs = (form.values()["checklistfields"] as? [Any?])?.compactMap({ $0 }) {
+            if let mvs = (form.values()["listsfields"] as? [Any?])?.compactMap({ $0 }) {
                 if !mvs.isEmpty {
                     checklistDict = [String: [String : Bool]]()
                     var index = 1
                     for element in mvs {
                         let value = element as! SplitRowValue<Swift.String, Swift.Bool>
                         if let text = value.left, let state = value.right {
-                            checklistDict["checklist_\(index)"] = [text : state]
+                            checklistDict["lists_\(index)"] = [text : state]
                         }
                         index += 1
                     }

@@ -33,11 +33,7 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
                 createActivity.createNewActivity()
                 self.hideActivityIndicator()
                 
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                }
+                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
                 
             }))
             
@@ -72,11 +68,7 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                     
-                    if self.conversation == nil {
-                        self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                    } else {
-                        self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                    }
+                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
                 }
                 
 
@@ -152,11 +144,14 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                                         
-                    if self.conversation == nil {
-                        self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                    } else {
-                        self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                    if nav.topViewController is MasterActivityContainerController {
+                        let homeTab = nav.topViewController as! MasterActivityContainerController
+                        homeTab.customSegmented.setIndex(index: 2)
+                        homeTab.changeToIndex(index: 2)
                     }
+                    self.tabBarController?.selectedIndex = 1
+                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
                 }
                 
             }))
@@ -427,10 +422,17 @@ extension MealDetailViewController: ChooseActivityDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                if self.active {
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                    if nav.topViewController is MasterActivityContainerController {
+                        let homeTab = nav.topViewController as! MasterActivityContainerController
+                        homeTab.customSegmented.setIndex(index: 2)
+                        homeTab.changeToIndex(index: 2)
+                    }
+                    self.tabBarController?.selectedIndex = 1
+                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
                 }
             }
         }
@@ -461,11 +463,7 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                 createActivity.createNewActivity()
                 self.hideActivityIndicator()
                 
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                }
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 
             }))
             
@@ -500,11 +498,8 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                     
-                    if self.conversation == nil {
-                        self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                    } else {
-                        self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                    }
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                    
                 }
                 
 
@@ -579,12 +574,15 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                     let createActivity = ActivityActions(activity: activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
-                                        
-                    if self.conversation == nil {
-                        self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                    } else {
-                        self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                    
+                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                    if nav.topViewController is MasterActivityContainerController {
+                        let homeTab = nav.topViewController as! MasterActivityContainerController
+                        homeTab.customSegmented.setIndex(index: 2)
+                        homeTab.changeToIndex(index: 2)
                     }
+                    self.tabBarController?.selectedIndex = 1
+                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
                 }
                 
             }))
@@ -855,10 +853,17 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                if self.active {
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                    if nav.topViewController is MasterActivityContainerController {
+                        let homeTab = nav.topViewController as! MasterActivityContainerController
+                        homeTab.customSegmented.setIndex(index: 2)
+                        homeTab.changeToIndex(index: 2)
+                    }
+                    self.tabBarController?.selectedIndex = 1
+                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
                 }
             }
         }
@@ -890,11 +895,7 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                 createActivity.createNewActivity()
                 self.hideActivityIndicator()
                 
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                }
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 
             }))
             
@@ -929,11 +930,8 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                     
-                    if self.conversation == nil {
-                        self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                    } else {
-                        self.navigationController?.backToViewController(viewController: ChatLogController.self)
-                    }
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+
                 }
                 
 
@@ -1009,11 +1007,14 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                                         
-                    if self.conversation == nil {
-                        self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-                    } else {
-                        self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                    if nav.topViewController is MasterActivityContainerController {
+                        let homeTab = nav.topViewController as! MasterActivityContainerController
+                        homeTab.customSegmented.setIndex(index: 2)
+                        homeTab.changeToIndex(index: 2)
                     }
+                    self.tabBarController?.selectedIndex = 1
+                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
                 }
                 
             }))
@@ -1304,10 +1305,17 @@ extension EventDetailViewController: ChooseActivityDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                if self.conversation == nil {
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                if self.active {
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 } else {
-                    self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                    if nav.topViewController is MasterActivityContainerController {
+                        let homeTab = nav.topViewController as! MasterActivityContainerController
+                        homeTab.customSegmented.setIndex(index: 2)
+                        homeTab.changeToIndex(index: 2)
+                    }
+                    self.tabBarController?.selectedIndex = 1
+                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
                 }
             }
         }

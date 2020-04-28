@@ -593,34 +593,37 @@ extension ChatsTableViewController: ChatCellDelegate {
     }
     
     func openActivity(forConversation conversation: Conversation) {
-        if conversation.activities == nil {
-            let destination = ActivityTypeViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.users = users
-            destination.filteredUsers = filteredUsers
-            var selectedFalconUsers = [User]()
-            for ID in conversation.chatParticipantsIDs! {
-                guard let currentUserID = Auth.auth().currentUser?.uid, currentUserID != ID else { continue }
-                let newMemberReference = Database.database().reference().child("users").child(ID)
-                
-                newMemberReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    
-                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    
-                    let user = User(dictionary: dictionary)
-                    
-                    selectedFalconUsers.append(user)
-                    destination.selectedFalconUsers = selectedFalconUsers
-                })
-            }
-            destination.conversation = conversation
-            navigationController?.pushViewController(destination, animated: true)
-        }
-        else {
+//        if conversation.activities == nil {
+//            let destination = ActivityTypeViewController()
+//            destination.hidesBottomBarWhenPushed = true
+//            destination.conversation = conversation
+//            destination.users = users
+//            destination.filteredUsers = filteredUsers
+//            var selectedFalconUsers = [User]()
+//            for ID in conversation.chatParticipantsIDs! {
+//                guard let currentUserID = Auth.auth().currentUser?.uid, currentUserID != ID else { continue }
+//                let newMemberReference = Database.database().reference().child("users").child(ID)
+//
+//                newMemberReference.observeSingleEvent(of: .value, with: { (snapshot) in
+//
+//                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
+//                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+//
+//                    let user = User(dictionary: dictionary)
+//
+//                    selectedFalconUsers.append(user)
+//                    destination.selectedFalconUsers = selectedFalconUsers
+//
+//                })
+//            }
+//            navigationController?.pushViewController(destination, animated: true)
+//
+//        }
+//        else {
+        if let convoActivities = conversation.activities {
             var activities = [Activity]()
             let destination = SelectActivityTableViewController()
-            destination.hidesBottomBarWhenPushed = false
+            destination.hidesBottomBarWhenPushed = true
             destination.conversation = conversation
             destination.users = users
             destination.filteredUsers = filteredUsers
@@ -640,7 +643,7 @@ extension ChatsTableViewController: ChatCellDelegate {
                     destination.selectedFalconUsers = selectedFalconUsers
                 })
             }
-            for activityID in conversation.activities! {
+            for activityID in convoActivities {
                 let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
                 activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                     guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
@@ -660,6 +663,8 @@ extension ChatsTableViewController: ChatCellDelegate {
             }
             navigationController?.pushViewController(destination, animated: true)
         }
+            
+//        }
         
     }
 }

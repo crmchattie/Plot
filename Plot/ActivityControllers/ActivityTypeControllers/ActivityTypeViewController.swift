@@ -448,7 +448,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             cell.horizontalController.removeControllerHandler = { [weak self] type, activity in
                 if type == "activity" {
                     self!.movingBackwards = false
-                    self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                    (self!.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
+                    self!.tabBarController?.selectedIndex = 1
                 } else if type == "schedule" {
                     self!.movingBackwards = false
                     self!.updateSchedule(schedule: activity)

@@ -42,14 +42,7 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
-    
-//    let closeButton: UIButton = {
-//        let button = UIButton(type: .system)
-//        button.setImage(UIImage(named: "close"), for: .normal)
-//        button.tintColor = .systemBlue
-//        return button
-//    }()
-    
+            
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
@@ -61,9 +54,6 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
         print("viewDidLoad map")
         view.backgroundColor = .clear
         view.addSubview(mapView)
-//        view.addSubview(closeButton)
-        
-//        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         
         mapView.delegate = self
         
@@ -130,17 +120,9 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         mapView.frame = view.frame
-//        let closeButtonFrame = CGRect(x: view.frame.width - 45, y: 40, width: 30, height: 30)
-//        closeButton.frame = closeButtonFrame
     }
     
     func setupMapView() {
-//        let center = CLLocationCoordinate2D(latitude: 37.623198015869235,
-//                                            longitude: -122.43066818432008)
-//        let span = MKCoordinateSpan(latitudeDelta: 0.4425100023575723,
-//                                    longitudeDelta: 0.28543697435880233)
-//        let region = MKCoordinateRegion(center: center, span: span)
-//        mapView.region = region
         mapView.showsCompass = true
         mapView.showsUserLocation = true
         mapView.delegate = self
@@ -310,57 +292,11 @@ extension MapActivitiesViewController: ActivityCellDelegate {
     }
     
     func openChat(forConversation conversationID: String?, activityID: String?) {
-        if let conversation = conversations.first(where: { (conversation) -> Bool in
-            conversation.chatID == conversationID
-        }) {
-            openChatDetailView(forChat: conversation)
-        }
+        
+        activityViewController!.openChat(forConversation: conversationID, activityID: activityID)
+        
     }
     
-    func openChatDetailView(forChat chat: Conversation) {
-        chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-        messagesFetcher = MessagesFetcher()
-        messagesFetcher?.delegate = self
-        messagesFetcher?.loadMessagesData(for: chat)
-    }
-}
-
-extension MapActivitiesViewController: MessagesDelegate {
-    
-    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
-        chatLogController?.updateMessageStatus(messageRef: reference)
-    }
-    
-    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-        
-        chatLogController?.hidesBottomBarWhenPushed = true
-        chatLogController?.messagesFetcher = messagesFetcher
-        chatLogController?.messages = messages
-        chatLogController?.conversation = conversation
-        //chatLogController?.activityID = activityID
-        
-        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
-            chatLogController?.observeTypingIndicator()
-            chatLogController?.configureTitleViewWithOnlineStatus()
-        }
-        
-        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
-        guard let destination = chatLogController else { return }
-        
-        self.chatLogController?.startCollectionViewAtBottom()
-        
-        
-        // If we're presenting a modal sheet
-        if let presentedViewController = presentedViewController as? UINavigationController {
-            presentedViewController.pushViewController(destination, animated: true)
-        } else {
-            navigationController?.pushViewController(destination, animated: true)
-        }
-        
-        chatLogController = nil
-        messagesFetcher?.delegate = nil
-        messagesFetcher = nil
-    }
 }
 
 class SearchPanelViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -373,6 +309,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
+    let viewPlaceholder = ViewPlaceholder()
     
     let tableView: UITableView = {
         let tableView = UITableView()
@@ -444,8 +381,21 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
             shadowLayer.shadowRadius = 3.0
         }
     }
+    
+    func checkIfThereAnyActivities(isEmpty: Bool) {
+        guard isEmpty else {
+            viewPlaceholder.remove(from: tableView, priority: .medium)
+            return
+        }
+        viewPlaceholder.add(for: tableView, title: .emptyActivities, subtitle: .emptyMap, priority: .medium, position: .top)
+    }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if activities.isEmpty {
+            checkIfThereAnyActivities(isEmpty: true)
+        } else {
+            checkIfThereAnyActivities(isEmpty: false)
+        }
         return activities.count
     }
 
@@ -469,139 +419,9 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if let navController = self.navigationController {
-            self.showSpinner(onView: navController.view)
-        } else {
-            self.showSpinner(onView: self.view)
-        }
-        
         let activity = activities[indexPath.row]
                 
-        let dispatchGroup = DispatchGroup()
-                
-        if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {
-            dispatchGroup.enter()
-            Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
-                let detailedRecipe = search
-                dispatchGroup.leave()
-                dispatchGroup.notify(queue: .main) {
-                    let destination = MealDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
-                    destination.recipe = detailedRecipe
-                    destination.detailedRecipe = detailedRecipe
-                    destination.activity = activity
-                    destination.invitation = self.invitations[activity.activityID!]
-                    destination.users = self.users
-                    destination.filteredUsers = self.filteredUsers
-                    destination.conversations = self.conversations
-                    self.activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
-                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                            self!.removeSpinner()
-                            destination.acceptedParticipant = acceptedParticipant
-                            destination.selectedFalconUsers = participants
-                            self?.navigationController?.pushViewController(destination, animated: true)
-                        }
-                    }
-                }
-            }
-        } else if let eventID = activity.eventID {
-            dispatchGroup.enter()
-            Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
-                if let events = search?.embedded?.events {
-                    let event = events[0]
-                    dispatchGroup.leave()
-                    dispatchGroup.notify(queue: .main) {
-                        let destination = EventDetailViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.event = event
-                        destination.activity = activity
-                        destination.invitation = self.invitations[activity.activityID!]
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.conversations = self.conversations
-                        self.activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
-                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                                self!.removeSpinner()
-                                destination.acceptedParticipant = acceptedParticipant
-                                destination.selectedFalconUsers = participants
-                                self?.navigationController?.pushViewController(destination, animated: true)
-                            }
-                        }
-                    }
-                }
-            }
-        } else if let workoutID = activity.workoutID {
-            var reference = Database.database().reference()
-            dispatchGroup.enter()
-            reference = Database.database().reference().child("workouts").child("workouts")
-            reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
-                    if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
-                        dispatchGroup.leave()
-                        let destination = WorkoutDetailViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.workout = workout
-                        destination.intColor = 0
-                        destination.activity = activity
-                        destination.invitation = self.invitations[activity.activityID!]
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.conversations = self.conversations
-                        self.activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
-                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                                self!.removeSpinner()
-                                destination.acceptedParticipant = acceptedParticipant
-                                destination.selectedFalconUsers = participants
-                                self?.navigationController?.pushViewController(destination, animated: true)
-                            }
-                        }
-                    }
-                }
-              })
-            { (error) in
-                print(error.localizedDescription)
-            }
-        } else if let attractionID = activity.attractionID {
-            dispatchGroup.enter()
-            Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
-                let attraction = search?.embedded?.attractions![0]
-                dispatchGroup.leave()
-                dispatchGroup.notify(queue: .main) {
-                    let destination = EventDetailViewController()
-                    destination.hidesBottomBarWhenPushed = true
-                    destination.attraction = attraction
-                    destination.activity = activity
-                    destination.invitation = self.invitations[activity.activityID!]
-                    destination.users = self.users
-                    destination.filteredUsers = self.filteredUsers
-                    destination.conversations = self.conversations
-                    self.activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
-                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                            self!.removeSpinner()
-                            destination.acceptedParticipant = acceptedParticipant
-                            destination.selectedFalconUsers = participants
-                            self?.navigationController?.pushViewController(destination, animated: true)
-                        }
-                    }
-                }
-            }
-        } else {
-            self.removeSpinner()
-            let destination = CreateActivityViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.activity = activity
-            destination.invitation = invitations[activity.activityID!]
-            destination.users = users
-            destination.filteredUsers = filteredUsers
-            destination.conversations = conversations
-            activityViewController?.getParticipants(forActivity: activity) { [weak self] (participants) in
-                InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                    destination.acceptedParticipant = acceptedParticipant
-                    destination.selectedFalconUsers = participants
-                    self?.navigationController?.pushViewController(destination, animated: true)
-                }
-            }
-        }
+        activityViewController!.loadActivity(activity: activity)
     }
 
     func showHeader() {

@@ -49,6 +49,12 @@ extension UserCell {
       badgeLabel.isHidden = true
     }
     
+    if conversations[indexPath.row].activities != nil {
+        activityButton.tintColor = .systemBlue
+    } else {
+        activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+    }
+    
     updateParticipantsThumbnail(conversation: conversations[indexPath.row])
   }
     

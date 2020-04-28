@@ -16,7 +16,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
 
     var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .recipeType]
     var filterDictionary = [String: [String]]()
-    var sections: [String] = ["American", "Italian", "Vegetarian"]
+    var sections: [String] = ["American", "Italian", "Vegetarian", "Mexican", "Breakfast", "Dessert"]
     
         
     override func viewDidLoad() {
@@ -75,7 +75,6 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         let dispatchGroup = DispatchGroup()
         
         if favorites == "true" {
-            print("in favorites")
             if let recipes = self.favAct["recipes"] {
                 for recipeID in recipes {
                     var recipe: Recipe!
@@ -163,12 +162,15 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
             
         var recipes2: [Recipe]?
         var recipes3: [Recipe]?
+        var recipes4: [Recipe]?
+        var recipes5: [Recipe]?
+        var recipes6: [Recipe]?
         
         // help you sync your data fetches together
         let dispatchGroup = DispatchGroup()
         
         dispatchGroup.enter()
-        Service.shared.fetchRecipesSimple(query: "", cuisine: "Italian") { (search, err) in
+        Service.shared.fetchRecipesSimple(query: "", cuisine: "\(self.sections[1])") { (search, err) in
             recipes2 = search?.recipes
             dispatchGroup.leave()
             
@@ -177,24 +179,78 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 if let group = recipes2 {
                     self.groups.append(group)
                 } else {
-                    self.sections.removeAll{ $0 == "Italian"}
+                    self.sections.removeAll{ $0 == self.sections[1]}
                 }
                 self.collectionView.reloadData()
                 
                 dispatchGroup.enter()
-                Service.shared.fetchRecipesSimple(query: "vegetarian", cuisine: "") { (search, err) in
+                Service.shared.fetchRecipesSimple(query: "\(self.sections[2])", cuisine: "") { (search, err) in
 //                Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
                     recipes3 = search?.recipes
                     dispatchGroup.leave()
                     
                     dispatchGroup.notify(queue: .main) {
-                    self.removeSpinner()
-                    if let group = recipes3 {
-                        self.groups.append(group)
-                    } else {
-                        self.sections.removeAll{ $0 == "Vegetarian"}
-                    }
-                    self.collectionView.reloadData()
+                        self.removeSpinner()
+                        if let group = recipes3 {
+                            self.groups.append(group)
+                        } else {
+                            self.sections.removeAll{ $0 == self.sections[2]}
+                        }
+                        self.collectionView.reloadData()
+                            
+                        dispatchGroup.enter()
+                        Service.shared.fetchRecipesSimple(query: "", cuisine: "\(self.sections[3])") { (search, err) in
+//                        Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                        recipes4 = search?.recipes
+                        dispatchGroup.leave()
+                        
+                        dispatchGroup.notify(queue: .main) {
+                            self.removeSpinner()
+                            if let group = recipes4 {
+                                self.groups.append(group)
+                            } else {
+                                self.sections.removeAll{ $0 == self.sections[3]}
+                            }
+                            self.collectionView.reloadData()
+                            
+                            dispatchGroup.enter()
+                            Service.shared.fetchRecipesSimple(query: "\(self.sections[4])", cuisine: "") { (search, err) in
+    //                        Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                                recipes5 = search?.recipes
+                                dispatchGroup.leave()
+                                
+                                dispatchGroup.notify(queue: .main) {
+                                    self.removeSpinner()
+                                    if let group = recipes5 {
+                                        self.groups.append(group)
+                                    } else {
+                                        self.sections.removeAll{ $0 == self.sections[4]}
+                                    }
+                                    self.collectionView.reloadData()
+                                    
+                                    dispatchGroup.enter()
+                                    Service.shared.fetchRecipesSimple(query: "\(self.sections[5])", cuisine: "") { (search, err) in
+            //                        Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                                        recipes6 = search?.recipes
+                                        dispatchGroup.leave()
+                                        
+                                        dispatchGroup.notify(queue: .main) {
+                                            self.removeSpinner()
+                                            if let group = recipes6 {
+                                                self.groups.append(group)
+                                            } else {
+                                                self.sections.removeAll{ $0 == self.sections[5]}
+                                            }
+                                            self.collectionView.reloadData()
+                                                
+                                        }
+                                    }
+                                        
+                                }
+                            }
+                                
+                            }
+                        }
                     }
                 }
             }
@@ -250,7 +306,14 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 }
                 cell.horizontalController.removeControllerHandler = { [weak self] type, activity in
                     if type == "activity" {
-                        self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                        let nav = self?.tabBarController!.viewControllers![1] as! UINavigationController
+                        if nav.topViewController is MasterActivityContainerController {
+                            let homeTab = nav.topViewController as! MasterActivityContainerController
+                            homeTab.customSegmented.setIndex(index: 2)
+                            homeTab.changeToIndex(index: 2)
+                        }
+                        self!.tabBarController?.selectedIndex = 1
+                        self!.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
                     } else if type == "schedule" {
                         self!.updateSchedule(schedule: activity)
                         self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)

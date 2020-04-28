@@ -108,7 +108,7 @@ class ChatActivitiesTableViewCell: UITableViewCell {
           // set the texts to the labels
         nameLabel.text = activity.name
         dateTimeLabel.text = formattedDate.0 + formattedDate.1
-        if activity.locationName != "locationName" {
+        if activity.locationName != "locationName" && activity.locationName != "Location" {
             locationNameLabel.text = activity.locationName
         }
     }

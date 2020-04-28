@@ -117,7 +117,7 @@ class SelectChatTableViewController: UITableViewController {
   
   func checkNumberOfContacts() {
     guard users.count == 0 else { return }
-    viewPlaceholder.add(for: self.view, title: .empty, subtitle: .empty, priority: .low, position: .center)
+    viewPlaceholder.add(for: self.view, title: .emptyContacts, subtitle: .emptyContacts, priority: .low, position: .center)
   }
   
   fileprivate func correctSearchBarForCurrentIOSVersion() -> UISearchBar {
