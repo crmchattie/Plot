@@ -36,7 +36,7 @@ struct TicketMasterSearchResult: Codable {
         let local: String?
         let images: [Image]?
         let distance: Double?
-        let units: Units?
+        let units: TicketUnits?
         let sales: Sales?
         let dates: Dates?
         let classifications: [Classification]?
@@ -178,7 +178,7 @@ struct TicketMasterSearchResult: Codable {
         let local: String?
         let images: [Image]?
         let distance: Double?
-        let units: Units?
+        let units: TicketUnits?
         let postalCode: String?
         let timezone: String?
         let city: City?
@@ -267,7 +267,7 @@ struct TicketMasterSearchResult: Codable {
         case venue = "venue"
     }
 
-    enum Units: String, Codable {
+    enum TicketUnits: String, Codable {
         case miles = "MILES"
     }
 

@@ -7,14 +7,26 @@ import Foundation
 
 // MARK: - DailyWeatherElement
 struct DailyWeatherElement: Codable {
-    let lon, lat: Double?
-    let observationTime: ObservationTime?
-    let precipitation: [Precipitation]?
+    
+    let temp: [Temp]?
+    let precipitationProbability: PrecipitationProbability?
+    let weatherCode, observationTime: ObservationTime?
+    let lat, lon: Double?
 
     enum CodingKeys: String, CodingKey {
-        case lon, lat
+        case temp
+        case precipitationProbability = "precipitation_probability"
+        case weatherCode = "weather_code"
         case observationTime = "observation_time"
-        case precipitation
+        case lat, lon
+    }
+    
+    static func == (lhs: DailyWeatherElement, rhs: DailyWeatherElement) -> Bool {
+        if lhs.temp == rhs.temp && lhs.precipitationProbability == rhs.precipitationProbability && lhs.weatherCode == rhs.weatherCode && lhs.observationTime == rhs.observationTime && lhs.lat == rhs.lat && lhs.lon == rhs.lon {
+            return true
+        } else {
+            return false
+        }
     }
 }
 
@@ -37,16 +49,20 @@ extension DailyWeatherElement {
     }
 
     func with(
-        lon: Double?? = nil,
-        lat: Double?? = nil,
+        temp: [Temp]?? = nil,
+        precipitationProbability: PrecipitationProbability?? = nil,
+        weatherCode: ObservationTime?? = nil,
         observationTime: ObservationTime?? = nil,
-        precipitation: [Precipitation]?? = nil
+        lat: Double?? = nil,
+        lon: Double?? = nil
     ) -> DailyWeatherElement {
         return DailyWeatherElement(
-            lon: lon ?? self.lon,
-            lat: lat ?? self.lat,
+            temp: temp ?? self.temp,
+            precipitationProbability: precipitationProbability ?? self.precipitationProbability,
+            weatherCode: weatherCode ?? self.weatherCode,
             observationTime: observationTime ?? self.observationTime,
-            precipitation: precipitation ?? self.precipitation
+            lat: lat ?? self.lat,
+            lon: lon ?? self.lon
         )
     }
 
@@ -99,22 +115,78 @@ extension ObservationTime {
     }
 }
 
-// MARK: - Precipitation
-struct Precipitation: Codable {
-    let observationTime: Date?
-    let max: Max?
+// MARK: - PrecipitationProbability
+struct PrecipitationProbability: Codable {
+    let value: Double?
+    let units: WeatherUnits?
+}
 
-    enum CodingKeys: String, CodingKey {
-        case observationTime = "observation_time"
-        case max
+// MARK: PrecipitationProbability convenience initializers and mutators
+
+extension PrecipitationProbability {
+    init(data: Data) throws {
+        self = try newJSONDecoder().decode(PrecipitationProbability.self, from: data)
+    }
+
+    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
+        guard let data = json.data(using: encoding) else {
+            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
+        }
+        try self.init(data: data)
+    }
+
+    init(fromURL url: URL) throws {
+        try self.init(data: try Data(contentsOf: url))
+    }
+
+    func with(
+        value: Double?? = nil,
+        units: WeatherUnits?? = nil
+    ) -> PrecipitationProbability {
+        return PrecipitationProbability(
+            value: value ?? self.value,
+            units: units ?? self.units
+        )
+    }
+
+    func jsonData() throws -> Data {
+        return try newJSONEncoder().encode(self)
+    }
+
+    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
+        return String(data: try self.jsonData(), encoding: encoding)
     }
 }
 
-// MARK: Precipitation convenience initializers and mutators
+enum WeatherUnits: String, Codable {
+    case empty = "%"
+    case f = "F"
+}
 
-extension Precipitation {
+// MARK: - Temp
+struct Temp: Codable, Equatable {
+    let observationTime: Date?
+    let min, max: PrecipitationProbability?
+
+    enum CodingKeys: String, CodingKey {
+        case observationTime = "observation_time"
+        case min, max
+    }
+    
+    static func == (lhs: Temp, rhs: Temp) -> Bool {
+        if lhs.observationTime == rhs.observationTime && lhs.max == rhs.max && lhs.min == rhs.min {
+            return true
+        } else {
+            return false
+        }
+    }
+}
+
+// MARK: Temp convenience initializers and mutators
+
+extension Temp {
     init(data: Data) throws {
-        self = try newJSONDecoder().decode(Precipitation.self, from: data)
+        self = try newJSONDecoder().decode(Temp.self, from: data)
     }
 
     init(_ json: String, using encoding: String.Encoding = .utf8) throws {
@@ -130,54 +202,13 @@ extension Precipitation {
 
     func with(
         observationTime: Date?? = nil,
-        max: Max?? = nil
-    ) -> Precipitation {
-        return Precipitation(
+        min: PrecipitationProbability?? = nil,
+        max: PrecipitationProbability?? = nil
+    ) -> Temp {
+        return Temp(
             observationTime: observationTime ?? self.observationTime,
+            min: min ?? self.min,
             max: max ?? self.max
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-// MARK: - Max
-struct Max: Codable {
-    let value: Int?
-    let units: String?
-}
-
-// MARK: Max convenience initializers and mutators
-
-extension Max {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(Max.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        value: Int?? = nil,
-        units: String?? = nil
-    ) -> Max {
-        return Max(
-            value: value ?? self.value,
-            units: units ?? self.units
         )
     }
 
@@ -233,18 +264,4 @@ func newJSONEncoder() -> JSONEncoder {
         encoder.dateEncodingStrategy = .iso8601
     }
     return encoder
-}
-
-// MARK: - WeatherElement
-struct WeatherElement: Codable {
-    let lon, lat: Double?
-    let observationTime: ObservationTime?
-    let windGust, precipitation: Precipitation?
-
-    enum CodingKeys: String, CodingKey {
-        case lon, lat
-        case observationTime = "observation_time"
-        case windGust = "wind_gust"
-        case precipitation
-    }
 }

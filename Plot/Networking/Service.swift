@@ -198,56 +198,56 @@ class Service {
         
     }
     
-    func fetchWeatherRealTime(lat: Double, long: Double, completion: @escaping ((WeatherElement?), Error?) -> ()) {
-        
-        let baseURL: URL = {
-            return URL(string: ClimaCellAPI.realTimeUrlString)!
-        }()
-        
-        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
-        var parameters = ["lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
-       
-        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-        
-        let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: parameters)
-        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-        
-    }
-    
-    func fetchWeatherNowCast(startDateTime: String, endDateTime: String, lat: Double, long: Double, completion: @escaping ((WeatherElement?), Error?) -> ()) {
-        
-        let baseURL: URL = {
-            return URL(string: ClimaCellAPI.nowCastUrlString)!
-        }()
-        
-        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
-        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
-       
-        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-        
-        let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: parameters)
-        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-        
-    }
-    
-    func fetchWeatherHourly(startDateTime: String, endDateTime: String, lat: Double, long: Double, completion: @escaping ((WeatherElement?), Error?) -> ()) {
-        
-        let baseURL: URL = {
-            return URL(string: ClimaCellAPI.hourlyUrlString)!
-        }()
-        
-        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
-        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
-       
-        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-        
-        let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: parameters)
-        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-        
-    }
+//    func fetchWeatherRealTime(lat: Double, long: Double, completion: @escaping ((WeatherElement?), Error?) -> ()) {
+//        
+//        let baseURL: URL = {
+//            return URL(string: ClimaCellAPI.realTimeUrlString)!
+//        }()
+//        
+//        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
+//        var parameters = ["lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+//       
+//        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+//        
+//        let urlRequest = URLRequest(url: baseURL)
+//        let encodedURLRequest = urlRequest.encode(with: parameters)
+//        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+//        
+//    }
+//    
+//    func fetchWeatherNowCast(startDateTime: String, endDateTime: String, lat: Double, long: Double, completion: @escaping ((WeatherElement?), Error?) -> ()) {
+//        
+//        let baseURL: URL = {
+//            return URL(string: ClimaCellAPI.nowCastUrlString)!
+//        }()
+//        
+//        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
+//        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+//       
+//        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+//        
+//        let urlRequest = URLRequest(url: baseURL)
+//        let encodedURLRequest = urlRequest.encode(with: parameters)
+//        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+//        
+//    }
+//    
+//    func fetchWeatherHourly(startDateTime: String, endDateTime: String, lat: Double, long: Double, completion: @escaping ((WeatherElement?), Error?) -> ()) {
+//        
+//        let baseURL: URL = {
+//            return URL(string: ClimaCellAPI.hourlyUrlString)!
+//        }()
+//        
+//        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
+//        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+//       
+//        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+//        
+//        let urlRequest = URLRequest(url: baseURL)
+//        let encodedURLRequest = urlRequest.encode(with: parameters)
+//        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+//        
+//    }
     
     func fetchWeatherDaily(startDateTime: String, endDateTime: String, lat: Double, long: Double, completion: @escaping ((DailyWeatherElement?), Error?) -> ()) {
         

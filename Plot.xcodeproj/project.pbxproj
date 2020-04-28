@@ -25,6 +25,7 @@
 		10196F0D24411C2800B6AFDF /* ChooseActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */; };
 		101B90902457999600EDDB90 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B908F2457999600EDDB90 /* Weather.swift */; };
 		101B90932458809000EDDB90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101B90922458809000EDDB90 /* Assets.xcassets */; };
+		101B90972458DA2D00EDDB90 /* WeatherRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B90962458DA2D00EDDB90 /* WeatherRow.swift */; };
 		102076CC23C2D3B5009AEAA4 /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102076CB23C2D3B5009AEAA4 /* Service.swift */; };
 		102076CE23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */; };
 		10217A7723102CA4004CBA9E /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10217A7623102CA4004CBA9E /* ActivityView.swift */; };
@@ -321,6 +322,7 @@
 		10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseActivityTableViewController.swift; sourceTree = "<group>"; };
 		101B908F2457999600EDDB90 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		101B90922458809000EDDB90 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		101B90962458DA2D00EDDB90 /* WeatherRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherRow.swift; sourceTree = "<group>"; };
 		102076CB23C2D3B5009AEAA4 /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
 		102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketMasterSearchResult.swift; sourceTree = "<group>"; };
 		10217A7623102CA4004CBA9E /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
@@ -735,6 +737,7 @@
 				10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */,
 				109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */,
 				103E968922C2B309007D6668 /* PurchaseRow.swift */,
+				101B90962458DA2D00EDDB90 /* WeatherRow.swift */,
 				10367D42230B126800D25885 /* ActivityImageCell.swift */,
 				26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */,
 				1024ABA823C1412200A5875D /* ActivitySubTypeCell.swift */,
@@ -1867,6 +1870,7 @@
 				4BAEE49621272C5E0045AB10 /* CurrentUserTableViewCell.swift in Sources */,
 				10196F0B24411B5600B6AFDF /* PhotosViewController.swift in Sources */,
 				4BAEE51921272D890045AB10 /* IncomingTextMessageCell.swift in Sources */,
+				101B90972458DA2D00EDDB90 /* WeatherRow.swift in Sources */,
 				105E12532447955500A278D0 /* ActivityDetailCellDelegates.swift in Sources */,
 				4BAEE4F421272D890045AB10 /* SelectGroupMembersController.swift in Sources */,
 				26E8EFE7237F393900B9067E /* MapActivitiesViewController.swift in Sources */,
