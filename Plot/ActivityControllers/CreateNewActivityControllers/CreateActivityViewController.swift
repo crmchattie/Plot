@@ -887,7 +887,7 @@ class CreateActivityViewController: FormViewController {
 
                                 form +++
                                     Section(header: "Balances",
-                                            footer: "Positive Balance = Receipt; Negative Balance = Payment") {
+                                            footer: "Positive Balance = Owe; Negative Balance = Owed") {
                                                 $0.tag = "Balances"
                                                 $0.hidden = "$sections != 'Purchases'"
                                 }

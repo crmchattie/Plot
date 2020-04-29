@@ -66,7 +66,6 @@
 		106D758B2442447C0039B534 /* ActivityActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106D758A2442447C0039B534 /* ActivityActions.swift */; };
 		106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
-		10796C8524411EEA004E8BF7 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10796C8424411EEA004E8BF7 /* PurchasesViewController.swift */; };
 		1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */; };
 		1092F2362414501D00E8CE16 /* MealDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2352414501D00E8CE16 /* MealDetailViewController.swift */; };
 		1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2372414503000E8CE16 /* EventDetailViewController.swift */; };
@@ -84,6 +83,7 @@
 		109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */; };
 		109FEB3D22A7003000621D2F /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3C22A7003000621D2F /* Schedule.swift */; };
 		109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB4122A9C3DD00621D2F /* Purchase.swift */; };
+		10A18D3A2458E1A5006990F2 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18D392458E1A5006990F2 /* PurchasesViewController.swift */; };
 		10C50F972274E21900111033 /* ActivityViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F962274E21900111033 /* ActivityViewController+SearchHandlers.swift */; };
 		10C50F9B2274E80500111033 /* ActivityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F9A2274E80500111033 /* ActivityCell.swift */; };
 		10C50FA22274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */; };
@@ -367,7 +367,6 @@
 		106D758A2442447C0039B534 /* ActivityActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityActions.swift; sourceTree = "<group>"; };
 		106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTypeViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
-		10796C8424411EEA004E8BF7 /* PurchasesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PurchasesViewController.swift; path = ../../../../../.Trash/PurchasesViewController.swift; sourceTree = "<group>"; };
 		1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCell.swift; sourceTree = "<group>"; };
 		1092F2352414501D00E8CE16 /* MealDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetailViewController.swift; sourceTree = "<group>"; };
 		1092F2372414503000E8CE16 /* EventDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailViewController.swift; sourceTree = "<group>"; };
@@ -385,6 +384,7 @@
 		109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleRow.swift; sourceTree = "<group>"; };
 		109FEB3C22A7003000621D2F /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		109FEB4122A9C3DD00621D2F /* Purchase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Purchase.swift; sourceTree = "<group>"; };
+		10A18D392458E1A5006990F2 /* PurchasesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchasesViewController.swift; sourceTree = "<group>"; };
 		10C50F962274E21900111033 /* ActivityViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C50F9A2274E80500111033 /* ActivityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCell.swift; sourceTree = "<group>"; };
 		10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
@@ -767,7 +767,7 @@
 				10196EEF24411B5500B6AFDF /* LocationFinderTableViewController.swift */,
 				10196EF724411B5600B6AFDF /* SelectActivityMembersViewController.swift */,
 				10196EF324411B5600B6AFDF /* ScheduleViewController.swift */,
-				10796C8424411EEA004E8BF7 /* PurchasesViewController.swift */,
+				10A18D392458E1A5006990F2 /* PurchasesViewController.swift */,
 				10196EF224411B5500B6AFDF /* MapViewController.swift */,
 				10196EFB24411B5600B6AFDF /* PhotosViewController.swift */,
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
@@ -1859,6 +1859,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10A18D3A2458E1A5006990F2 /* PurchasesViewController.swift in Sources */,
 				4BAEE5C1212735E50045AB10 /* FalconTextView.swift in Sources */,
 				4BAEE49521272C5E0045AB10 /* ContactsTableViewCell.swift in Sources */,
 				4BAEE5DD212735E50045AB10 /* ImagePickerAction.swift in Sources */,
@@ -2075,7 +2076,6 @@
 				4BAEE4ED21272D890045AB10 /* LeaveGroupAndChangeAdminController.swift in Sources */,
 				1092F23C2414580E00E8CE16 /* MealDetailCell.swift in Sources */,
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,
-				10796C8524411EEA004E8BF7 /* PurchasesViewController.swift in Sources */,
 				4BAEE51421272D890045AB10 /* VoiceRecordingViewController.swift in Sources */,
 				4BAEE51121272D890045AB10 /* BaseMediaMessageCell.swift in Sources */,
 				1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */,

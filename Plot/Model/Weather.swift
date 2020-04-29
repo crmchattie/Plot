@@ -76,7 +76,7 @@ extension DailyWeatherElement {
 }
 
 // MARK: - ObservationTime
-struct ObservationTime: Codable {
+struct ObservationTime: Codable, Equatable {
     let value: String?
 }
 
@@ -116,9 +116,17 @@ extension ObservationTime {
 }
 
 // MARK: - PrecipitationProbability
-struct PrecipitationProbability: Codable {
+struct PrecipitationProbability: Codable, Equatable {
     let value: Double?
     let units: WeatherUnits?
+    
+    static func == (lhs: PrecipitationProbability, rhs: PrecipitationProbability) -> Bool {
+        if lhs.value == rhs.value && lhs.units == rhs.units {
+            return true
+        } else {
+            return false
+        }
+    }
 }
 
 // MARK: PrecipitationProbability convenience initializers and mutators
