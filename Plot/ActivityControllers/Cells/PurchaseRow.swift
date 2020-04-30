@@ -79,7 +79,6 @@ final class PurchaseCell: Cell<Purchase>, CellType {
         
         guard let purchase = row.value else { return }
         
-
         // set the texts to the labels
         nameLabel.text = purchase.name
         costLabel.text = String(format: "$%.02f", purchase.cost!)

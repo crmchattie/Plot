@@ -161,7 +161,7 @@ class Service {
         }()
         
         let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*"]
-        var parameters = ["size":"\(size)", "id": "\(id)", "keyword": "\(keyword)", "classificationName": "\(classificationName)", "classificationId": "\(classificationId)"].merging(defaultParameters, uniquingKeysWith: +)
+        var parameters = ["size":"\(size)", "id": "\(id)", "keyword": "\(keyword)", "classificationName": "\(classificationName)", "classificationId": "\(classificationId)"]
 //        if classificationName.isEmpty {
 //            parameters["classificationName"] = nil
 //        }
@@ -183,7 +183,7 @@ class Service {
         }()
         
         let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*"]
-        var parameters = ["size":"\(size)", "id": "\(id)", "keyword": "\(keyword)", "classificationName": "\(classificationName)", "classificationId": "\(classificationId)", "latlong": "\(lat),\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+        var parameters = ["size":"\(size)", "id": "\(id)", "keyword": "\(keyword)", "classificationName": "\(classificationName)", "classificationId": "\(classificationId)", "latlong": "\(lat),\(long)"]
         if classificationName.isEmpty {
             parameters["classificationName"] = nil
         }
@@ -207,8 +207,7 @@ class Service {
 //        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
 //        var parameters = ["lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
 //       
-//        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-//        
+//
 //        let urlRequest = URLRequest(url: baseURL)
 //        let encodedURLRequest = urlRequest.encode(with: parameters)
 //        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
@@ -224,8 +223,7 @@ class Service {
 //        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
 //        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
 //       
-//        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-//        
+//
 //        let urlRequest = URLRequest(url: baseURL)
 //        let encodedURLRequest = urlRequest.encode(with: parameters)
 //        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
@@ -241,27 +239,25 @@ class Service {
 //        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
 //        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
 //       
-//        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-//        
+//
 //        let urlRequest = URLRequest(url: baseURL)
 //        let encodedURLRequest = urlRequest.encode(with: parameters)
 //        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
 //        
 //    }
     
-    func fetchWeatherDaily(startDateTime: String, endDateTime: String, lat: Double, long: Double, completion: @escaping ((DailyWeatherElement?), Error?) -> ()) {
-        
+    func fetchWeatherDaily(startDateTime: String, endDateTime: String, lat: Double, long: Double, unit: String, completion: @escaping (([DailyWeatherElement]?), Error?) -> ()) {
+                
         let baseURL: URL = {
             return URL(string: ClimaCellAPI.dailyUrlString)!
         }()
         
-        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "unit_system":"us"]
-        var parameters = ["start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
-       
-        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-        
+        let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "fields":"temp,weather_code,precipitation_probability"]
+        let parameters = ["unit_system":"\(unit)", "start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
+               
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
+                
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
         
     }
@@ -279,7 +275,6 @@ class Service {
                 let objects = try JSONDecoder().decode(T.self, from: data!)
                 // success
                 print("completion")
-//                print(objects)
                 completion(objects, nil)
             } catch {
                 print("error \(error)")

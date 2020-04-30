@@ -366,6 +366,7 @@ class CreateActivityViewController: FormViewController {
                 }.onCellSelection({ _,_ in
                     self.openLocationFinder()
                 }).cellUpdate { cell, row in
+                    self.weatherRow()
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textAlignment = .left
                     if row.title == "Location" {
@@ -381,6 +382,7 @@ class CreateActivityViewController: FormViewController {
                     }
                 }
             
+        
             <<< ButtonRow("Participants") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
@@ -509,6 +511,7 @@ class CreateActivityViewController: FormViewController {
                     if self!.active {
                         self!.scheduleReminder()
                     }
+                    self!.weatherRow()
                 }
                 .onExpandInlineRow { [weak self] cell, row, inlineRow in
                     inlineRow.cellUpdate() { cell, row in
@@ -576,6 +579,7 @@ class CreateActivityViewController: FormViewController {
                     }
                     self!.activity.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.endDateTime = row.value
+                    self!.weatherRow()
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                         inlineRow.cellUpdate() { cell, row in
                             row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -1099,9 +1103,69 @@ class CreateActivityViewController: FormViewController {
                     self!.updateDecimalRow()
                 }
                 self!.updateLists(type: "purchases")
-            } else {
+            } else if rowType is SplitRow<TextRow, CheckRow> {
                 self!.updateLists(type: "lists")
             }
+        }
+    }
+    
+    fileprivate func weatherRow() {
+        if let localName = activity.locationName, localName != "locationName", Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval) > Date(), Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval) < Date().addingTimeInterval(1296000) {
+            print("updating weather row")
+            if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
+                print("weather row exists")
+                let startDate = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
+                let endDate = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
+                let startDateString = startDate.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'")
+                let endDateString = endDate.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'")
+                print("startDateString \(startDateString)")
+                print("endDateString \(endDateString)")
+                let dispatchGroup = DispatchGroup()
+                dispatchGroup.enter()
+                Service.shared.fetchWeatherDaily(startDateTime: startDateString, endDateTime: endDateString, lat: latitude, long: longitude, unit: "us") { (search, err) in
+                    if let weather = search {
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            weatherRow.value = weather
+                            weatherRow.reload()
+                        }
+                    } else if let index = weatherRow.indexPath?.item {
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            let section = self.form.allSections[0]
+                            section.remove(at: index)
+                        }
+                    }
+                }
+            } else if let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
+                print("weather row exists")
+                let startDate = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
+                let endDate = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
+                let startDateString = startDate.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'")
+                let endDateString = endDate.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'")
+                print("startDateString \(startDateString)")
+                print("endDateString \(endDateString)")
+                let dispatchGroup = DispatchGroup()
+                dispatchGroup.enter()
+                Service.shared.fetchWeatherDaily(startDateTime: startDateString, endDateTime: endDateString, lat: latitude, long: longitude, unit: "us") { (search, err) in
+                    if let weather = search {
+                        print("weather \(weather)")
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                        var section = self.form.allSections[0]
+                        if let locationRow: ButtonRow = self.form.rowBy(tag: "Location"), let index = locationRow.indexPath?.item {
+                            section.insert(WeatherRow("Weather") { row in
+                                    row.value = weather
+                                    row.reload()
+                                }, at: index+1)
+                            }
+                        }
+                    }
+                }
+            }
+        } else if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let index = weatherRow.indexPath?.item {
+            let section = self.form.allSections[0]
+            section.remove(at: index)
         }
     }
     
@@ -1529,10 +1593,17 @@ class CreateActivityViewController: FormViewController {
             let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
             createActivity.createNewActivity()
             hideActivityIndicator()
-            if self.conversation == nil {
-               self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+            if active {
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
             } else {
-               self.navigationController?.backToViewController(viewController: ChatLogController.self)
+                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                if nav.topViewController is MasterActivityContainerController {
+                    let homeTab = nav.topViewController as! MasterActivityContainerController
+                    homeTab.customSegmented.setIndex(index: 2)
+                    homeTab.changeToIndex(index: 2)
+                }
+                self.tabBarController?.selectedIndex = 1
+                self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
             }
         }
     }

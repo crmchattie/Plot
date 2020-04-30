@@ -6,11 +6,12 @@
 import Foundation
 
 // MARK: - DailyWeatherElement
-struct DailyWeatherElement: Codable {
+struct DailyWeatherElement: Codable, Equatable {
     
     let temp: [Temp]?
-    let precipitationProbability: PrecipitationProbability?
-    let weatherCode, observationTime: ObservationTime?
+    let precipitationProbability: ValueUnits?
+    let weatherCode: WeatherCodeDict?
+    let observationTime: Val?
     let lat, lon: Double?
 
     enum CodingKeys: String, CodingKey {
@@ -50,9 +51,9 @@ extension DailyWeatherElement {
 
     func with(
         temp: [Temp]?? = nil,
-        precipitationProbability: PrecipitationProbability?? = nil,
-        weatherCode: ObservationTime?? = nil,
-        observationTime: ObservationTime?? = nil,
+        precipitationProbability: ValueUnits?? = nil,
+        weatherCode: WeatherCodeDict?? = nil,
+        observationTime: Val?? = nil,
         lat: Double?? = nil,
         lon: Double?? = nil
     ) -> DailyWeatherElement {
@@ -76,93 +77,20 @@ extension DailyWeatherElement {
 }
 
 // MARK: - ObservationTime
-struct ObservationTime: Codable, Equatable {
+struct Val: Codable, Equatable {
     let value: String?
 }
 
-// MARK: ObservationTime convenience initializers and mutators
-
-extension ObservationTime {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(ObservationTime.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        value: String?? = nil
-    ) -> ObservationTime {
-        return ObservationTime(
-            value: value ?? self.value
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
-// MARK: - PrecipitationProbability
-struct PrecipitationProbability: Codable, Equatable {
+struct ValueUnits: Codable, Equatable {
     let value: Double?
     let units: WeatherUnits?
     
-    static func == (lhs: PrecipitationProbability, rhs: PrecipitationProbability) -> Bool {
+    static func == (lhs: ValueUnits, rhs: ValueUnits) -> Bool {
         if lhs.value == rhs.value && lhs.units == rhs.units {
             return true
         } else {
             return false
         }
-    }
-}
-
-// MARK: PrecipitationProbability convenience initializers and mutators
-
-extension PrecipitationProbability {
-    init(data: Data) throws {
-        self = try newJSONDecoder().decode(PrecipitationProbability.self, from: data)
-    }
-
-    init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        value: Double?? = nil,
-        units: WeatherUnits?? = nil
-    ) -> PrecipitationProbability {
-        return PrecipitationProbability(
-            value: value ?? self.value,
-            units: units ?? self.units
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
     }
 }
 
@@ -173,8 +101,8 @@ enum WeatherUnits: String, Codable {
 
 // MARK: - Temp
 struct Temp: Codable, Equatable {
-    let observationTime: Date?
-    let min, max: PrecipitationProbability?
+    let observationTime: String?
+    let min, max: ValueUnits?
 
     enum CodingKeys: String, CodingKey {
         case observationTime = "observation_time"
@@ -209,9 +137,9 @@ extension Temp {
     }
 
     func with(
-        observationTime: Date?? = nil,
-        min: PrecipitationProbability?? = nil,
-        max: PrecipitationProbability?? = nil
+        observationTime: String?? = nil,
+        min: ValueUnits?? = nil,
+        max: ValueUnits?? = nil
     ) -> Temp {
         return Temp(
             observationTime: observationTime ?? self.observationTime,
@@ -272,4 +200,67 @@ func newJSONEncoder() -> JSONEncoder {
         encoder.dateEncodingStrategy = .iso8601
     }
     return encoder
+}
+
+struct WeatherCodeDict: Codable, Equatable {
+    let value: WeatherCode?
+}
+
+enum WeatherCode: String, Codable {
+    case rain_heavy, rain, rain_light, freezing_rain_heavy, freezing_rain, freezing_rain_light, freezing_drizzle, drizzle, ice_pellets_heavy, ice_pellets, ice_pellets_light, snow_heavy, snow, snow_light, flurries, tstorm, fog_light, fog, cloudy, mostly_cloudy, partly_cloudy, mostly_clear, clear
+    
+    var description: String {
+        switch self {
+        case .rain_heavy: return "Substantial Rain"
+        case .rain: return "Rain"
+        case .rain_light: return "Light Rain"
+        case .freezing_rain_heavy: return "Substantial Freezing Rain"
+        case .freezing_rain: return "Freezing Rain"
+        case .freezing_rain_light: return "Light Freezing Rain"
+        case .freezing_drizzle: return "Freezing Drizzle"
+        case .drizzle: return "Drizzle"
+        case .ice_pellets_heavy: return "Substantial Ice Pellets"
+        case .ice_pellets: return "Ice Pellets"
+        case .ice_pellets_light: return "Light Ice Pellets"
+        case .snow_heavy: return "Substantial Snow"
+        case .snow: return "Snow"
+        case .snow_light: return "Light Snow"
+        case .flurries: return "Flurries"
+        case .tstorm: return "Thunderstorm Conditions"
+        case .fog_light: return "Light Fog"
+        case .fog: return "Fog"
+        case .cloudy: return "Cloudy"
+        case .mostly_cloudy: return "Mostly Cloudy"
+        case .partly_cloudy: return "Partly Cloudy"
+        case .mostly_clear: return "Mostly Clear"
+        case .clear: return "Clear"
+        }
+    }
+    var image: String {
+        switch self {
+        case .rain_heavy: return "icons8-torrential_rain"
+        case .rain: return "icons8-heavy_rain"
+        case .rain_light: return "icons8-moderate_rain"
+        case .freezing_rain_heavy: return "icons8-sleet"
+        case .freezing_rain: return "icons8-sleet"
+        case .freezing_rain_light: return "icons8-sleet"
+        case .freezing_drizzle: return "icons8-sleet"
+        case .drizzle: return "icons8-light_rain"
+        case .ice_pellets_heavy: return "icons8-hail"
+        case .ice_pellets: return "icons8-hail"
+        case .ice_pellets_light: return "icons8-hail"
+        case .snow_heavy: return "icons8-snow_storm"
+        case .snow: return "icons8-snow"
+        case .snow_light: return "icons8-light_snow"
+        case .flurries: return "icons8-light_snow"
+        case .tstorm: return "icons8-storm"
+        case .fog_light: return "icons8-haze"
+        case .fog: return "icons8-haze"
+        case .cloudy: return "icons8-clouds"
+        case .mostly_cloudy: return "icons8-clouds"
+        case .partly_cloudy: return "icons8-partly_cloudy_day"
+        case .mostly_clear: return "icons8-partly_cloudy_day"
+        case .clear: return "icons8-smiling_sun"
+        }
+    }
 }
