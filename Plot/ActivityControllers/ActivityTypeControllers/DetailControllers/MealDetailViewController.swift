@@ -25,16 +25,13 @@ class MealDetailViewController: ActivityDetailViewController {
     var instructions = [String]()
     var equipment = [String]()
         
+    var screenWidth: CGFloat = 0
     var firstHeight: CGFloat = 0
     var secondHeight: CGFloat = 0
     var thirdHeight: CGFloat = 0
     var heightArray = [CGFloat]()
     
-    var detailedRecipe: Recipe? {
-        didSet {
-            fetchDetails()
-        }
-    }
+    var detailedRecipe: Recipe?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,10 +40,16 @@ class MealDetailViewController: ActivityDetailViewController {
         
         if !active {
             setMoreActivity()
+        } else {
+            if let activityServings = activity.servings {
+                recipe?.servings = activityServings
+            }
         }
         
         if detailedRecipe == nil {
             fetchData()
+        } else {
+            fetchDetails()
         }
         
         title = "Meal"
@@ -109,24 +112,45 @@ class MealDetailViewController: ActivityDetailViewController {
         if let recipe = recipe {
             Service.shared.fetchRecipesInfo(id: recipe.id) { (search, err) in
                 self.detailedRecipe = search
+                self.fetchDetails()
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
+                    self.screenWidth = self.view.frame.width
                     self.collectionView.reloadData()
                 }
             }
         }
     }
     
-    fileprivate func fetchDetails() {
+    func fetchDetails() {
         let dispatchGroup = DispatchGroup()
         
         if let recipe = detailedRecipe {
-            if let extendedIngredients = recipe.extendedIngredients {
-                self.ingredients = extendedIngredients
-                for ingredient in self.ingredients {
+            firstHeight = 0
+            secondHeight = 0
+            thirdHeight = 0
+            if recipe.extendedIngredients != nil {
+                var extendedIngredients = recipe.extendedIngredients
+                for index in 0...extendedIngredients!.count - 1 {
                     dispatchGroup.enter()
-                    firstHeight += estimateFrameForText(width: view.frame.width - 30, text: ingredient.original?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
+                    if let activityServings = activity.servings {
+                        if extendedIngredients![index].amount != nil {
+                            extendedIngredients![index].amount = extendedIngredients![index].amount! * Double(activityServings) / Double(detailedRecipe!.servings!)
+                        }
+                        if extendedIngredients![index].measures?.us?.amount != nil {
+                            extendedIngredients![index].measures!.metric!.amount! = (extendedIngredients![index].measures?.metric?.amount!)! * Double(activityServings) / Double(detailedRecipe!.servings!)
+                        }
+                        if extendedIngredients![index].measures?.us?.amount != nil {
+                            extendedIngredients![index].measures!.us!.amount! = (extendedIngredients![index].measures?.us?.amount!)! * Double(activityServings) / Double(detailedRecipe!.servings!)
+                        }
+                    }
+                    self.firstHeight += self.estimateFrameForText(width: self.screenWidth - 30, text: extendedIngredients![index].original?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
                     dispatchGroup.leave()
+                }
+                self.ingredients = extendedIngredients!
+                if activity.servings != nil {
+                    detailedRecipe?.extendedIngredients = extendedIngredients!
+                    detailedRecipe?.servings = activity.servings
                 }
             }
             if let analyzedInstructions = recipe.analyzedInstructions {
@@ -136,7 +160,7 @@ class MealDetailViewController: ActivityDetailViewController {
                             dispatchGroup.enter()
                             if !self.equipment.contains(equipment.name ?? "") {
                                 self.equipment.append(equipment.name ?? "")
-                                secondHeight += estimateFrameForText(width: view.frame.width - 30, text: equipment.name?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
+                                secondHeight += estimateFrameForText(width: self.screenWidth - 30, text: equipment.name?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
                             }
                             dispatchGroup.leave()
                         }
@@ -149,26 +173,12 @@ class MealDetailViewController: ActivityDetailViewController {
                         for step in steps {
                             dispatchGroup.enter()
                             self.instructions.append(step.step ?? "")
-                            thirdHeight += estimateFrameForText(width: view.frame.width - 57, text: step.step ?? "", font: UIFont.preferredFont(forTextStyle: .callout)).height + 12
+                            thirdHeight += estimateFrameForText(width: self.screenWidth - 57, text: step.step ?? "", font: UIFont.preferredFont(forTextStyle: .callout)).height + 12
                             dispatchGroup.leave()
                         }
                     }
                 }
             }
-            
-//            if let recipeInstructions = recipe.instructions {
-//                dispatchGroup.enter()
-//                instructions = recipeInstructions
-//                instructions = instructions.replacingOccurrences(of: "<ol>", with: "")
-//                instructions = instructions.replacingOccurrences(of: "</ol>", with: "")
-//                instructions = instructions.replacingOccurrences(of: "<li>", with: "")
-//                instructions = instructions.replacingOccurrences(of: "</li>", with: "")
-//                instructions = instructions.replacingOccurrences(of: "<p>", with: "")
-//                instructions = instructions.replacingOccurrences(of: "</p>", with: "")
-//                instructions = instructions.replacingOccurrences(of: ".", with: ". ")
-//                thirdHeight = estimateFrameForText(width: 400 - 30, text: instructions, font: UIFont.preferredFont(forTextStyle: .callout)).height + 12
-//                dispatchGroup.leave()
-//            }
         }
         dispatchGroup.notify(queue: .main) {
             self.updateHeight()
@@ -265,9 +275,10 @@ class MealDetailViewController: ActivityDetailViewController {
     }
     
     func updateHeight() {
-        heightArray += [firstHeight, secondHeight, thirdHeight]
+        heightArray = [firstHeight, secondHeight, thirdHeight]
         DispatchQueue.main.async {
-            self.collectionView.reloadData()
+            let indexPath = IndexPath(item: 2, section: 0)
+            self.collectionView.reloadItems(at: [indexPath])
         }
     }
     

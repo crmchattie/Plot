@@ -40,6 +40,7 @@ class Activity: NSObject, NSCopying, Codable {
     var conversationID: String?
     var calendarExport: Bool?
     var recipeID: String?
+    var servings: Int?
     var workoutID: String?
     var eventID: String?
     var attractionID: String?
@@ -65,6 +66,7 @@ class Activity: NSObject, NSCopying, Codable {
         case grocerylist
         case calendarExport
         case recipeID
+        case servings
         case workoutID
         case eventID
         case attractionID
@@ -149,6 +151,7 @@ class Activity: NSObject, NSCopying, Codable {
         conversationID = dictionary?["conversationID"] as? String
         calendarExport = dictionary?["calendarExport"] as? Bool
         recipeID = dictionary?["recipeID"] as? String
+        servings = dictionary?["servings"] as? Int
         workoutID = dictionary?["workoutID"] as? String
         eventID = dictionary?["eventID"] as? String
         attractionID = dictionary?["attractionID"] as? String
@@ -276,6 +279,10 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["recipeID"] = value
         }
         
+        if let value = self.servings as AnyObject? {
+            dictionary["servings"] = value
+        }
+        
         if let value = self.workoutID as AnyObject? {
             dictionary["workoutID"] = value
         }
@@ -346,12 +353,21 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["reminder"] = value
         }
         
-        if let value = self.checklist as AnyObject? {
-            dictionary["checklist"] = value
+        if let value = self.checklist {
+            var firebaseChecklistList = [[String: AnyObject?]]()
+            for checklist in value {
+                let firebaseChecklist = checklist.toAnyObject()
+                firebaseChecklistList.append(firebaseChecklist)
+            }
+            dictionary["checklist"] = firebaseChecklistList as AnyObject
         }
         
         if let value = self.recipeID as AnyObject? {
             dictionary["recipeID"] = value
+        }
+        
+        if let value = self.servings as AnyObject? {
+            dictionary["servings"] = value
         }
         
         if let value = self.workoutID as AnyObject? {

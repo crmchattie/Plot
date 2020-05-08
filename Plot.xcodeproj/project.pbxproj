@@ -91,6 +91,7 @@
 		10C50FA42274EF9100111033 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA32274EF9000111033 /* Activity.swift */; };
 		10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */; };
 		10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */; };
+		10DA3A222465C74500E6B491 /* IngredientDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */; };
 		10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */; };
 		10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */; };
 		10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EE245C5B8000C80AAF /* Checklist.swift */; };
@@ -399,6 +400,7 @@
 		10C50FA32274EF9000111033 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityCell+ConfigureCell.swift"; sourceTree = "<group>"; };
 		10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistViewController.swift; sourceTree = "<group>"; };
+		10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientDetailViewController.swift; sourceTree = "<group>"; };
 		10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsDetailCell.swift; sourceTree = "<group>"; };
 		10ED542C22CAEA41003797CF /* Plot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Plot.entitlements; sourceTree = "<group>"; };
 		10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistViewController.swift; sourceTree = "<group>"; };
@@ -786,6 +788,7 @@
 				10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */,
 				10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */,
 				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
+				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
 				10196EF224411B5500B6AFDF /* MapViewController.swift */,
 				10196EFB24411B5600B6AFDF /* PhotosViewController.swift */,
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
@@ -1938,6 +1941,7 @@
 				4BAEE49B21272C5E0045AB10 /* ContactsDetailController.swift in Sources */,
 				26A5DDD82394CB2400771DC1 /* RecipeSearchResult.swift in Sources */,
 				4BAEE46B21272B380045AB10 /* SwitchTableViewController.swift in Sources */,
+				10DA3A222465C74500E6B491 /* IngredientDetailViewController.swift in Sources */,
 				102BE8C4243CB7EF00722E7B /* CustomUIPickers.swift in Sources */,
 				26B975E72363F9C6003BFBE3 /* InvitationsViewController.swift in Sources */,
 				4BAEE48421272C4F0045AB10 /* AuthPhoneNumberController.swift in Sources */,

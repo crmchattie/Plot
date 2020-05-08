@@ -41,7 +41,7 @@ class CreateActivityViewController: FormViewController {
     var scheduleIndex: Int = 0
     var purchaseIndex: Int = 0
     var listIndex: Int = 0
-    var groceryListIndex: Int = -1
+    var grocerylistIndex: Int = -1
     var startDateTime: Date?
     var endDateTime: Date?
     var userNames : [String] = []
@@ -108,6 +108,7 @@ class CreateActivityViewController: FormViewController {
             }
             if let grocerylist = activity.grocerylist {
                 listList.append(grocerylist)
+                grocerylistIndex = listList.count - 1
             }
             if activity.packinglist != nil {
                 for packinglist in activity.packinglist! {
@@ -830,7 +831,7 @@ class CreateActivityViewController: FormViewController {
                                         row.cell.textLabel?.textAlignment = .left
                                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                         row.title = groceryList.name
-                                        self.groceryListIndex = row.indexPath!.row
+                                        self.grocerylistIndex = row.indexPath!.row
                                         }.onCellSelection({ cell, row in
                                             self.listIndex = row.indexPath!.row
                                             self.openList()
@@ -1131,6 +1132,9 @@ class CreateActivityViewController: FormViewController {
             } else if rowType is ButtonRow {
                 if self!.listList.indices.contains(self!.listIndex) {
                     self!.listList.remove(at: rowNumber)
+                }
+                if rowNumber == self!.grocerylistIndex {
+                    self!.grocerylistIndex = -1
                 }
                 self!.updateLists(type: "lists")
             }
@@ -1600,13 +1604,12 @@ class CreateActivityViewController: FormViewController {
             return
         }
         
-        if listIndex == groceryListIndex {
+        if listIndex == grocerylistIndex, let grocerylist = listList[listIndex] as? Grocerylist {
             let destination = GrocerylistViewController()
-//            destination.checklist = checklist
-//            destination.delegate = self
+            destination.grocerylist = grocerylist
+            destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
-        }
-        else if listList.indices.contains(listIndex), let checklist = listList[listIndex] as? Checklist {
+        } else if listList.indices.contains(listIndex), let checklist = listList[listIndex] as? Checklist {
             let destination = ChecklistViewController()
             destination.checklist = checklist
             destination.delegate = self
@@ -1620,13 +1623,12 @@ class CreateActivityViewController: FormViewController {
             }
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
-            
             let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
             let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
+                self.grocerylistIndex = self.listIndex
                 let destination = GrocerylistViewController()
-//                destination.delegate = self
+                destination.delegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
-                
             }
             let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
                 let destination = PackinglistViewController()
@@ -1945,16 +1947,16 @@ class CreateActivityViewController: FormViewController {
             dispatchGroup.notify(queue: .main) {
                 if let recipe = search {
                     if add {
-                        self.updateGroceryList(recipe: recipe, add: true)
+                        self.updateGrocerylist(recipe: recipe, add: true)
                     } else {
-                        self.updateGroceryList(recipe: recipe, add: false)
+                        self.updateGrocerylist(recipe: recipe, add: false)
                     }
                 }
             }
         }
     }
     
-    fileprivate func updateGroceryList(recipe: Recipe, add: Bool) {
+    fileprivate func updateGrocerylist(recipe: Recipe, add: Bool) {
         if let groceryList = self.activity.grocerylist, let activityIngredients = groceryList.ingredients, let recipeIngredients = recipe.extendedIngredients {
             for recipeIngredient in recipeIngredients {
                 if let index = activityIngredients.firstIndex(where: {$0 == recipeIngredient}) {
@@ -1973,14 +1975,14 @@ class CreateActivityViewController: FormViewController {
                             self.activity.grocerylist!.ingredients![index].amount! -= recipeIngredient.amount ?? 0.0
                             if self.activity.grocerylist!.ingredients![index].amount! == 0 {
                                 self.activity.grocerylist!.ingredients!.remove(at: index)
-                                break
+                                continue
                             }
                         }
                         if activityIngredients[index].measures?.metric?.amount != nil {
                             self.activity.grocerylist!.ingredients![index].measures?.metric?.amount! -= recipeIngredient.measures?.metric?.amount ?? 0.0
                             if self.activity.grocerylist!.ingredients![index].measures?.metric?.amount! == 0 {
                                 self.activity.grocerylist!.ingredients!.remove(at: index)
-                                break
+                                continue
                             }
                         }
                         if activityIngredients[index].measures?.us?.amount != nil {
@@ -2000,6 +2002,11 @@ class CreateActivityViewController: FormViewController {
                     }
                 }
             }
+            if self.activity.grocerylist!.ingredients!.isEmpty {
+                let mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
+                mvs.remove(at: grocerylistIndex)
+                self.activity.grocerylist = nil
+            }
         } else if let recipeIngredients = recipe.extendedIngredients {
             let groceryList = Grocerylist(dictionary: ["name" : "Grocery List"] as [String: AnyObject])
             groceryList.ingredients = recipeIngredients
@@ -2011,7 +2018,7 @@ class CreateActivityViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.title = groceryList.name
-                self.groceryListIndex = row.indexPath!.row
+                self.grocerylistIndex = row.indexPath!.row
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
@@ -2179,7 +2186,7 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
     }
     func updateIngredients(recipe: Recipe?, recipeID: String?) {
         if let recipe = recipe {
-            updateGroceryList(recipe: recipe, add: true)
+            updateGrocerylist(recipe: recipe, add: true)
         } else if let recipeID = recipeID {
             lookupRecipe(recipeID: Int(recipeID)!, add: true)
         }
@@ -2247,6 +2254,22 @@ extension CreateActivityViewController: UpdatePackinglistDelegate {
             else {
                 mvs.remove(at: purchaseIndex)
             }
+        }
+    }
+}
+
+extension CreateActivityViewController: UpdateGrocerylistDelegate {
+    func updateGrocerylist(grocerylist: Grocerylist) {
+        if let mvs = self.form.sectionBy(tag: "listfields") as? MultivaluedSection {
+            let listRow = mvs.allRows[grocerylistIndex]
+            listRow.baseValue = grocerylist
+            listRow.updateCell()
+            if listList.indices.contains(grocerylistIndex) {
+                listList[grocerylistIndex] = grocerylist
+            } else {
+                listList.append(grocerylist)
+            }
+            updateLists(type: "lists")
         }
     }
 }

@@ -13,6 +13,7 @@ protocol ActivityDetailCellDelegate: class {
     func shareButtonTapped(activityObject: ActivityObject)
     func heartButtonTapped(type: Any)
     func dotsButtonTapped()
+    func servingsUpdated(servings: Int)
 }
 
 class ActivityDetailCell: UICollectionViewCell {
@@ -28,7 +29,8 @@ class ActivityDetailCell: UICollectionViewCell {
                 nameLabel.text = recipe.title
                 if let category = recipe.readyInMinutes, let subcategory = recipe.servings {
                     categoryLabel.text = "Preparation time: \(category) mins"
-                    subcategoryLabel.text = "Servings: \(subcategory)"
+                    subcategoryLabel.text = "Servings: "
+                    subcategoryTextField.text = "\(subcategory)"
                 }
                 let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
                 imageView.sd_setImage(with: URL(string: recipeImage))
@@ -158,6 +160,12 @@ class ActivityDetailCell: UICollectionViewCell {
         label.numberOfLines = 0
         return label
     }()
+    
+    let subcategoryView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
 
     let subcategoryLabel: UILabel = {
         let label = UILabel()
@@ -167,9 +175,23 @@ class ActivityDetailCell: UICollectionViewCell {
         return label
     }()
     
+    let subcategoryTextField: UITextField = {
+        let textField = UITextField()
+        textField.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        textField.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        textField.isUserInteractionEnabled = true
+        textField.keyboardType = .numberPad
+        textField.returnKeyType = .done
+        textField.keyboardAppearance = .default
+        textField.addDoneButtonOnKeyboard()
+        return textField
+    }()
+    
     let imageView = UIImageView(cornerRadius: 0)
     
     func setupViews() {
+        
+        subcategoryTextField.delegate = self
         
         if let heartImage = heartButtonImage {
             heartButton.setImage(UIImage(named: heartImage), for: .normal)
@@ -192,11 +214,18 @@ class ActivityDetailCell: UICollectionViewCell {
 
         imageView.constrainHeight(constant: 231)
         
+        subcategoryView.constrainHeight(constant: 17)
+        
+        subcategoryView.addSubview(subcategoryLabel)
+        subcategoryView.addSubview(subcategoryTextField)
+        subcategoryLabel.anchor(top: subcategoryView.topAnchor, leading: subcategoryView.leadingAnchor, bottom: subcategoryView.bottomAnchor, trailing: nil, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        subcategoryTextField.anchor(top: subcategoryView.topAnchor, leading: subcategoryLabel.trailingAnchor, bottom: subcategoryView.bottomAnchor, trailing: nil, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        
         let buttonStack = UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView(), dotsButton])
         buttonStack.isLayoutMarginsRelativeArrangement = true
-        buttonStack.layoutMargins = UIEdgeInsets(top: 0, left: 10, bottom: 5, right: 15)
+        buttonStack.layoutMargins = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 15)
         
-        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel], spacing: 2)
+        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryView], spacing: 2)
         labelStackView.isLayoutMarginsRelativeArrangement = true
         labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
         
@@ -212,6 +241,9 @@ class ActivityDetailCell: UICollectionViewCell {
         shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
         heartButton.addTarget(self, action: #selector(heartButtonTapped), for: .touchUpInside)
         dotsButton.addTarget(self, action: #selector(dotsButtonTapped), for: .touchUpInside)
+        
+        let subcategoryViewTapped = UITapGestureRecognizer(target: self, action: #selector(ActivityDetailCell.subcategoryViewTapped(_:)))
+        subcategoryView.addGestureRecognizer(subcategoryViewTapped)
 
     }
         
@@ -340,4 +372,21 @@ class ActivityDetailCell: UICollectionViewCell {
         self.delegate?.dotsButtonTapped()
     }
     
+    @objc func subcategoryViewTapped(_ sender: UITapGestureRecognizer) {
+        subcategoryTextField.becomeFirstResponder()
+    }
+    
+}
+
+extension ActivityDetailCell: UITextFieldDelegate {
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if textField.text == "" || textField.text == nil {
+            return false
+        }
+        return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        self.delegate?.servingsUpdated(servings: Int(subcategoryTextField.text!)!)
+    }
 }

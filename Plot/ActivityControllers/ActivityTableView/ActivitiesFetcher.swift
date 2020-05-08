@@ -153,6 +153,7 @@ class ActivitiesFetcher: NSObject {
             activity.schedule = metaInfo.schedule
             activity.purchases = metaInfo.purchases
             activity.recipeID = metaInfo.recipeID
+            activity.servings = metaInfo.servings
             activity.workoutID = metaInfo.workoutID
             activity.eventID = metaInfo.eventID
             
@@ -250,6 +251,7 @@ class ActivitiesFetcher: NSObject {
                                        grocerylistKey: "grocerylist",
                                        conversationKey: "conversationID",
                                        recipeKey: "recipeID",
+                                       servingsKey: "servings",
                                        workoutKey: "workoutID",
                                        eventKey: "eventID")
         })
@@ -288,6 +290,7 @@ class ActivitiesFetcher: NSObject {
                                        grocerylistKey: "grocerylist",
                                        conversationKey: "conversationID",
                                        recipeKey: "recipeID",
+                                       servingsKey: "servings",
                                        workoutKey: "workoutID",
                                        eventKey: "eventID")
         })
@@ -326,6 +329,7 @@ class ActivitiesFetcher: NSObject {
                                        grocerylistKey: "grocerylist",
                                        conversationKey: "conversationID",
                                        recipeKey: "recipeID",
+                                       servingsKey: "servings",
                                        workoutKey: "workoutID",
                                        eventKey: "eventID")
         })
@@ -354,6 +358,7 @@ class ActivitiesFetcher: NSObject {
                                            grocerylistKey: String,
                                            conversationKey: String,
                                            recipeKey: String,
+                                           servingsKey: String,
                                            workoutKey: String,
                                            eventKey: String) {
         
@@ -486,6 +491,11 @@ class ActivitiesFetcher: NSObject {
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
+        if snapshot.key == servingsKey {
+            activities[index].servings = snapshot.value as? Int
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
         if snapshot.key == workoutKey {
             activities[index].workoutID = snapshot.value as? String
             delegate?.activities(update: activities[index], reloadNeeded: true)
@@ -521,6 +531,7 @@ class ActivitiesFetcher: NSObject {
                                            grocerylistKey: String,
                                            conversationKey: String,
                                            recipeKey: String,
+                                           servingsKey: String,
                                            workoutKey: String,
                                            eventKey: String) {
         
@@ -605,6 +616,11 @@ class ActivitiesFetcher: NSObject {
         
         if snapshot.key == recipeKey {
             activities[index].recipeID = String()
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == servingsKey {
+            activities[index].servings = Int()
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         

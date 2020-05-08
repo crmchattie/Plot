@@ -70,7 +70,7 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
         if segment == 0, let ingredients = ingredients {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kMealDetailViewCell, for: indexPath) as! MealDetailViewCell
             self.activityIndicatorView.stopAnimating()
-            cell.titleLabel.text = ingredients[indexPath.item].original!.capitalized
+            cell.titleLabel.text = "\(ingredients[indexPath.item].measures?.us?.amount ?? 0.0) \(ingredients[indexPath.item].measures?.us?.unitShort ?? "") of \(ingredients[indexPath.item].name?.capitalized ?? "")"
             return cell
         } else if segment == 1, let equipment = equipment {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kMealDetailViewCell, for: indexPath) as! MealDetailViewCell

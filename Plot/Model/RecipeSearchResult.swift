@@ -9,7 +9,7 @@
 import Foundation
 
 struct RecipeSearchResult: Codable {
-    let recipes: [Recipe]
+    var recipes: [Recipe]
     let baseURI: String?
     let offset, number, totalResults, processingTimeMS: Int?
     let expires: Int?
@@ -26,7 +26,7 @@ struct RecipeSearchResult: Codable {
 struct Recipe: Codable {
     let id: Int
     let title: String
-    let readyInMinutes, servings: Int?
+    var readyInMinutes, servings: Int?
     let image: String
     let imageType: String?
     let imageUrls: [String]?
@@ -40,7 +40,7 @@ struct Recipe: Codable {
     let aggregateLikes, spoonacularScore, healthScore: Int?
     let creditsText, license, sourceName: String?
     let pricePerServing: Double?
-    let extendedIngredients: [ExtendedIngredient]?
+    var extendedIngredients: [ExtendedIngredient]?
     let nutrition: Nutrition?
     let summary: String?
     let cuisines, dishTypes: [String]?
@@ -94,6 +94,7 @@ struct ExtendedIngredient: Codable, Equatable {
     let meta, metaInformation: [String]?
     var measures: Measures?
     var recipeID: [String]?
+    var bool: Bool?
     
     func toAnyObject() -> [String: AnyObject?] {
         var dictionary = [String: AnyObject?]()
@@ -149,6 +150,10 @@ struct ExtendedIngredient: Codable, Equatable {
         
         if let value = self.recipeID as AnyObject? {
             dictionary["recipeID"] = value
+        }
+        
+        if let value = self.bool as AnyObject? {
+            dictionary["bool"] = value
         }
                         
         return dictionary

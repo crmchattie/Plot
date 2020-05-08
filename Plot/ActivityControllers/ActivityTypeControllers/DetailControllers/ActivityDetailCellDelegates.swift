@@ -10,6 +10,16 @@ import UIKit
 import Firebase
 
 extension MealDetailViewController: ActivityDetailCellDelegate {
+    func servingsUpdated(servings: Int) {
+        if let activity = activity {
+            if servings != detailedRecipe?.servings {
+                print("servings \(servings)")
+                activity.servings = servings
+                fetchDetails()
+            }
+        }
+    }
+    
     func plusButtonTapped() {
         if active, schedule, let activity = activity {
             
@@ -281,13 +291,13 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
-            if activity.conversationID == nil {
+            if active, activity.conversationID == nil {
                 alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
                     print("User click Approve button")
                     self.goToChat()
 
                 }))
-            } else {
+            } else if active {
                 alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
                     print("User click Approve button")
                     self.goToChat()
@@ -446,6 +456,10 @@ extension MealDetailViewController: ChooseActivityDelegate {
 }
 
 extension WorkoutDetailViewController: ActivityDetailCellDelegate {
+    func servingsUpdated(servings: Int) {
+        
+    }
+    
     func plusButtonTapped() {
         if active, schedule, let activity = activity {
             
@@ -712,13 +726,13 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
     
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if activity.conversationID == nil {
+        if active, activity.conversationID == nil {
             alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.goToChat()
 
             }))
-        } else {
+        } else if active {
             alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.goToChat()
@@ -877,6 +891,9 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
 }
 
 extension EventDetailViewController: ActivityDetailCellDelegate {
+    func servingsUpdated(servings: Int) {
+        
+    }
     
     func plusButtonTapped() {
         if active, schedule, let activity = activity {
@@ -1164,13 +1181,13 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
     
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if activity.conversationID == nil {
+        if active, activity.conversationID == nil {
             alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.goToChat()
 
             }))
-        } else {
+        } else if active {
             alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.goToChat()

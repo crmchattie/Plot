@@ -112,14 +112,12 @@ class ChecklistViewController: FormViewController {
         }
         
         form +++
-        MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
-                               header: "Checklist",
-                               footer: "Add a checklist") {
+        MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder]) {
             $0.tag = "checklistfields"
             $0.addButtonProvider = { section in
                 return ButtonRow(){
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    $0.title = "Add New item"
+                    $0.title = "Add New Item"
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.textLabel?.textAlignment = .left
@@ -165,44 +163,45 @@ class ChecklistViewController: FormViewController {
             }
             
         }
-                if let items = self.checklist.items {
-                    for item in items {
-                        var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
-                        mvs.insert(SplitRow<TextRow, CheckRow>() {
-                            $0.rowLeftPercentage = 0.75
-                            $0.rowLeft = TextRow(){
-                                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                $0.value = item.key
-                                }.cellUpdate { cell, row in
-                                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                            }
-                            $0.rowRight = CheckRow() {
-                                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                $0.cell.tintColor = FalconPalette.defaultBlue
-                                $0.value = item.value
-                                $0.cell.accessoryType = .checkmark
-                                $0.cell.tintAdjustmentMode = .dimmed
-                                }.cellUpdate { cell, row in
-                                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                    cell.tintColor = FalconPalette.defaultBlue
-                                    if row.value == false {
-                                        cell.accessoryType = .checkmark
-                                        cell.tintAdjustmentMode = .dimmed
-                                    } else {
-                                        cell.tintAdjustmentMode = .automatic
-                                    }
-                            }
-                            }.cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            }.onChange() { _ in
-                                self.updateLists()
-                        } , at: mvs.count - 1)
+        
+        if let items = self.checklist.items {
+            for item in items {
+                var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
+                mvs.insert(SplitRow<TextRow, CheckRow>() {
+                    $0.rowLeftPercentage = 0.75
+                    $0.rowLeft = TextRow(){
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.value = item.key
+                        }.cellUpdate { cell, row in
+                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                            row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                     }
-                }
+                    $0.rowRight = CheckRow() {
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.tintColor = FalconPalette.defaultBlue
+                        $0.value = item.value
+                        $0.cell.accessoryType = .checkmark
+                        $0.cell.tintAdjustmentMode = .dimmed
+                        }.cellUpdate { cell, row in
+                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.tintColor = FalconPalette.defaultBlue
+                            if row.value == false {
+                                cell.accessoryType = .checkmark
+                                cell.tintAdjustmentMode = .dimmed
+                            } else {
+                                cell.tintAdjustmentMode = .automatic
+                            }
+                    }
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    }.onChange() { _ in
+                        self.updateLists()
+                } , at: mvs.count - 1)
+            }
+        }
     }
     
     fileprivate func updateLists() {
