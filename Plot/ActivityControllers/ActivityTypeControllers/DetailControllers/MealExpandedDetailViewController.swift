@@ -11,11 +11,12 @@ import UIKit
 class MealExpandedDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     private let kMealDetailViewCell = "MealDetailViewCell"
+    private let kInstructionsDetailCell = "InstructionsDetailCell"
     
     var segment: Int = 0
     
     var ingredients: [ExtendedIngredient]?
-    var instructions: String?
+    var instructions: [String]?
     var equipment: [String]?
     
     init() {
@@ -34,6 +35,7 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
         collectionView.register(MealDetailViewCell.self, forCellWithReuseIdentifier: kMealDetailViewCell)
+        collectionView.register(InstructionsDetailCell.self, forCellWithReuseIdentifier: kInstructionsDetailCell)
         
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
@@ -57,27 +59,34 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
             return ingredients.count
         } else if segment == 1, let equipment = equipment {
             return equipment.count
+        } else if segment == 2, let instructions = instructions {
+            return instructions.count
         } else {
             return 1
         }
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kMealDetailViewCell, for: indexPath) as! MealDetailViewCell
         if segment == 0, let ingredients = ingredients {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kMealDetailViewCell, for: indexPath) as! MealDetailViewCell
             self.activityIndicatorView.stopAnimating()
             cell.titleLabel.text = ingredients[indexPath.item].original!.capitalized
-            cell.instructionsLabel.text = nil
+            return cell
         } else if segment == 1, let equipment = equipment {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kMealDetailViewCell, for: indexPath) as! MealDetailViewCell
             self.activityIndicatorView.stopAnimating()
             cell.titleLabel.text = equipment[indexPath.item].capitalized
-            cell.instructionsLabel.text = nil
-        } else if let instructions = instructions {
-            self.activityIndicatorView.stopAnimating()
-            cell.instructionsLabel.text = instructions
-            cell.titleLabel.text = nil
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kInstructionsDetailCell, for: indexPath) as! InstructionsDetailCell
+            if let instructions = instructions {
+                self.activityIndicatorView.stopAnimating()
+                cell.instructionsLabel.text = instructions[indexPath.item]
+                cell.numberLabel.text = "\(indexPath.item + 1)"
+            }
+            return cell
         }
-        return cell
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -91,7 +100,8 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
         } else if segment == 1, let equipment = equipment {
             height = estimateFrameForText(width: view.frame.width - 30, text: equipment[indexPath.item].capitalized, font: UIFont.preferredFont(forTextStyle: .body)).height
         } else if let instructions = instructions {
-            height = estimateFrameForText(width: view.frame.width - 30, text: instructions, font: UIFont.preferredFont(forTextStyle: .callout)).height
+            height = estimateFrameForText(width: view.frame.width - 57, text: instructions[indexPath.item], font: UIFont.preferredFont(forTextStyle: .callout)).height
+            print("height \(height)")
         }
         return CGSize(width: view.frame.width, height: height)
     }

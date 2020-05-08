@@ -19,15 +19,6 @@ class MealDetailViewCell: UICollectionViewCell {
         return label
     }()
 
-    let instructionsLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Activity Type"
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.numberOfLines = 0
-        label.font = UIFont.preferredFont(forTextStyle: .callout)
-        return label
-    }()
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -40,10 +31,8 @@ class MealDetailViewCell: UICollectionViewCell {
     func setupViews() {
         
         addSubview(titleLabel)
-        addSubview(instructionsLabel)
         
         titleLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 2, left: 15, bottom: 0, right: 15))
-        instructionsLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 2, left: 15, bottom: 0, right: 15))
      
     }
  

@@ -8,7 +8,6 @@
 
 import UIKit
 import Firebase
-import LinkPresentation
 
 class HorizontalController: HorizontalSnappingController, UICollectionViewDelegateFlowLayout {
     
@@ -403,6 +402,9 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
                 print("User click Approve button")
                                 
                 self.delegate?.updateSchedule(schedule: self.activity)
+                if let recipeID = self.activity.recipeID {
+                    self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
+                }
                 self.removeControllerHandler?("schedule", self.activity)
             }))
             

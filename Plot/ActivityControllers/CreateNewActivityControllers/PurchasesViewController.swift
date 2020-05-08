@@ -32,7 +32,6 @@ class PurchasesViewController: FormViewController {
     
     fileprivate var active: Bool = false
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupMainView()

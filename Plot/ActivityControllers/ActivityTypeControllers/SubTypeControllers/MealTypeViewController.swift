@@ -170,7 +170,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         let dispatchGroup = DispatchGroup()
         
         dispatchGroup.enter()
-        Service.shared.fetchRecipesSimple(query: "", cuisine: "\(self.sections[1])") { (search, err) in
+        Service.shared.fetchRecipesComplex(query: "", cuisine: ["\(self.sections[1])"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
             recipes2 = search?.recipes
             dispatchGroup.leave()
             
@@ -184,8 +184,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 self.collectionView.reloadData()
                 
                 dispatchGroup.enter()
-                Service.shared.fetchRecipesSimple(query: "\(self.sections[2])", cuisine: "") { (search, err) in
-//                Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "\(self.sections[2])", intolerances: [""], type: "") { (search, err) in
                     recipes3 = search?.recipes
                     dispatchGroup.leave()
                     
@@ -199,8 +198,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                         self.collectionView.reloadData()
                             
                         dispatchGroup.enter()
-                        Service.shared.fetchRecipesSimple(query: "", cuisine: "\(self.sections[3])") { (search, err) in
-//                        Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                        Service.shared.fetchRecipesComplex(query: "", cuisine: ["\(self.sections[3])"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
                         recipes4 = search?.recipes
                         dispatchGroup.leave()
                         
@@ -214,8 +212,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                             self.collectionView.reloadData()
                             
                             dispatchGroup.enter()
-                            Service.shared.fetchRecipesSimple(query: "\(self.sections[4])", cuisine: "") { (search, err) in
-    //                        Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                            Service.shared.fetchRecipesComplex(query: "\(self.sections[4])", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
                                 recipes5 = search?.recipes
                                 dispatchGroup.leave()
                                 
@@ -229,8 +226,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                                     self.collectionView.reloadData()
                                     
                                     dispatchGroup.enter()
-                                    Service.shared.fetchRecipesSimple(query: "\(self.sections[5])", cuisine: "") { (search, err) in
-            //                        Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                                    Service.shared.fetchRecipesComplex(query: "\(self.sections[5])", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
                                         recipes6 = search?.recipes
                                         dispatchGroup.leave()
                                         

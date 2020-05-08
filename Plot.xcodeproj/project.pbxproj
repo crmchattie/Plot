@@ -67,6 +67,7 @@
 		106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */; };
+		10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10868D6C246314C700D6BB4F /* Grocerylist.swift */; };
 		1092F2362414501D00E8CE16 /* MealDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2352414501D00E8CE16 /* MealDetailViewController.swift */; };
 		1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2372414503000E8CE16 /* EventDetailViewController.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
@@ -89,6 +90,12 @@
 		10C50FA22274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */; };
 		10C50FA42274EF9100111033 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA32274EF9000111033 /* Activity.swift */; };
 		10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */; };
+		10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */; };
+		10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */; };
+		10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */; };
+		10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EE245C5B8000C80AAF /* Checklist.swift */; };
+		10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27F0245C6B6400C80AAF /* Packinglist.swift */; };
+		10EE27F3245DFA8E00C80AAF /* PackinglistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */; };
 		10F8C19024401FA80085ECB0 /* ActivityExpandedDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C18F24401FA80085ECB0 /* ActivityExpandedDetailCell.swift */; };
 		10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */; };
 		26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */; };
@@ -368,6 +375,7 @@
 		106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTypeViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCell.swift; sourceTree = "<group>"; };
+		10868D6C246314C700D6BB4F /* Grocerylist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grocerylist.swift; sourceTree = "<group>"; };
 		1092F2352414501D00E8CE16 /* MealDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetailViewController.swift; sourceTree = "<group>"; };
 		1092F2372414503000E8CE16 /* EventDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailViewController.swift; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
@@ -390,7 +398,13 @@
 		10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
 		10C50FA32274EF9000111033 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityCell+ConfigureCell.swift"; sourceTree = "<group>"; };
+		10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistViewController.swift; sourceTree = "<group>"; };
+		10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsDetailCell.swift; sourceTree = "<group>"; };
 		10ED542C22CAEA41003797CF /* Plot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Plot.entitlements; sourceTree = "<group>"; };
+		10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistViewController.swift; sourceTree = "<group>"; };
+		10EE27EE245C5B8000C80AAF /* Checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checklist.swift; sourceTree = "<group>"; };
+		10EE27F0245C6B6400C80AAF /* Packinglist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packinglist.swift; sourceTree = "<group>"; };
+		10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackinglistViewController.swift; sourceTree = "<group>"; };
 		10F8C18F24401FA80085ECB0 /* ActivityExpandedDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityExpandedDetailCell.swift; sourceTree = "<group>"; };
 		10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailViewController.swift; sourceTree = "<group>"; };
 		26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
@@ -745,6 +759,7 @@
 				10F8C18F24401FA80085ECB0 /* ActivityExpandedDetailCell.swift */,
 				1092F23B2414580E00E8CE16 /* MealDetailCell.swift */,
 				1092F23F241482C600E8CE16 /* MealDetailViewCell.swift */,
+				10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */,
 				105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */,
 				105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */,
 				105F66E824149DC600F6EDB6 /* EventDetailCell.swift */,
@@ -768,6 +783,9 @@
 				10196EF724411B5600B6AFDF /* SelectActivityMembersViewController.swift */,
 				10196EF324411B5600B6AFDF /* ScheduleViewController.swift */,
 				10A18D392458E1A5006990F2 /* PurchasesViewController.swift */,
+				10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */,
+				10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */,
+				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
 				10196EF224411B5500B6AFDF /* MapViewController.swift */,
 				10196EFB24411B5600B6AFDF /* PhotosViewController.swift */,
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
@@ -1339,6 +1357,9 @@
 				10C50FA32274EF9000111033 /* Activity.swift */,
 				109FEB3C22A7003000621D2F /* Schedule.swift */,
 				109FEB4122A9C3DD00621D2F /* Purchase.swift */,
+				10EE27EE245C5B8000C80AAF /* Checklist.swift */,
+				10EE27F0245C6B6400C80AAF /* Packinglist.swift */,
+				10868D6C246314C700D6BB4F /* Grocerylist.swift */,
 				2680A0332360C0BD00C4C287 /* Invitation.swift */,
 				26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */,
 				102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */,
@@ -1863,6 +1884,7 @@
 				4BAEE5C1212735E50045AB10 /* FalconTextView.swift in Sources */,
 				4BAEE49521272C5E0045AB10 /* ContactsTableViewCell.swift in Sources */,
 				4BAEE5DD212735E50045AB10 /* ImagePickerAction.swift in Sources */,
+				10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */,
 				1024ABAD23C29ACF00A5875D /* BetterSnappingLayout.swift in Sources */,
 				105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */,
 				4BAEE51F21272D890045AB10 /* ChatsTableViewController+SearchHandlers.swift in Sources */,
@@ -1911,6 +1933,7 @@
 				4BAEE49721272C5E0045AB10 /* FalconUsersFetcher.swift in Sources */,
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
 				4BA1E7832152582F00391BCB /* ChatLogController+DataSource.swift in Sources */,
+				10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */,
 				4BAEE5E5212735E50045AB10 /* EnterVerificationCodeController.swift in Sources */,
 				4BAEE49B21272C5E0045AB10 /* ContactsDetailController.swift in Sources */,
 				26A5DDD82394CB2400771DC1 /* RecipeSearchResult.swift in Sources */,
@@ -1929,6 +1952,7 @@
 				4BAEE5F3212735E50045AB10 /* SwiftSiriWaveformView.swift in Sources */,
 				109F849323D671D6002C0044 /* SearchHeaderCell.swift in Sources */,
 				4BAEE4FF21272D890045AB10 /* VoiceRecordingContainerView.swift in Sources */,
+				10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */,
 				10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */,
 				4BAEE5EC212735E50045AB10 /* SelectNewAdminTableViewController.swift in Sources */,
 				4BAEE550212735880045AB10 /* MediaObject.swift in Sources */,
@@ -1951,6 +1975,7 @@
 				102076CC23C2D3B5009AEAA4 /* Service.swift in Sources */,
 				4BAEE4F521272D890045AB10 /* GroupProfileTableViewController.swift in Sources */,
 				4BAEE5E6212735E50045AB10 /* EnterVerificationContainerView.swift in Sources */,
+				10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */,
 				4BAEE52021272D890045AB10 /* GroupAdminControlsPictureAvatarOpenerDelegate.swift in Sources */,
 				4BAEE5F2212735E50045AB10 /* UserDefaultsManager.swift in Sources */,
 				4BAEE50721272D890045AB10 /* ContactDataTableViewCell.swift in Sources */,
@@ -2019,11 +2044,13 @@
 				4BAEE5D6212735E50045AB10 /* Announcement.swift in Sources */,
 				10196F0724411B5600B6AFDF /* SelectActivityMembersViewController.swift in Sources */,
 				4BAEE5E4212735E50045AB10 /* EnterVerificationContainerView+timerHandlers.swift in Sources */,
+				10EE27F3245DFA8E00C80AAF /* PackinglistViewController.swift in Sources */,
 				4BAEE5DE212735E50045AB10 /* TransitionController.swift in Sources */,
 				4BAEE4F721272D890045AB10 /* SelectChatTableViewController+SearchHandlers.swift in Sources */,
 				4BAEE5D0212735E50045AB10 /* SelectParticipantsViewController.swift in Sources */,
 				4BAEE51621272D890045AB10 /* GroupAdminControlsTableViewCell.swift in Sources */,
 				10196F0324411B5600B6AFDF /* ScheduleViewController.swift in Sources */,
+				10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */,
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,
 				106D758B2442447C0039B534 /* ActivityActions.swift in Sources */,
 				4BAEE50D21272D890045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift in Sources */,
@@ -2078,6 +2105,7 @@
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,
 				4BAEE51421272D890045AB10 /* VoiceRecordingViewController.swift in Sources */,
 				4BAEE51121272D890045AB10 /* BaseMediaMessageCell.swift in Sources */,
+				10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */,
 				1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */,
 				4BAEE47F21272C4F0045AB10 /* UserProfileContainerView.swift in Sources */,
 				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,

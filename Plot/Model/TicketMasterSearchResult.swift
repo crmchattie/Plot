@@ -361,14 +361,6 @@ struct TicketMasterSearchResult: Codable {
         let size, totalElements, totalPages, number: Int?
     }
 
-
-
-//    func sortEvents(events: [Event]) -> [Event] {
-//        return events.sorted {(
-//            ($0.dates?.start?.dateTime!.toDate())! < ($1.dates?.start?.dateTime!.toDate())!
-//        )}
-//    }
-
     func sortEvents(events: [Event]) -> [Event] {
         return events.sorted { (event1, event2) -> Bool in
             if let firstDateString = event1.dates?.start?.localDate, let firstDate = firstDateString.toDate(), let secondDateString = event2.dates?.start?.localDate, let secondDate = secondDateString.toDate() {

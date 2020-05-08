@@ -51,6 +51,7 @@ final class WeatherCell: Cell<[DailyWeatherElement]>, CellType, UICollectionView
         contentView.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
         
+        
     }
     
     override func update() {
@@ -61,9 +62,7 @@ final class WeatherCell: Cell<[DailyWeatherElement]>, CellType, UICollectionView
 
         if let weather = row.value {
             activityIndicatorView.stopAnimating()
-            print("weather update")
             self.weather = weather
-            reload()
         }
         
     }
@@ -133,7 +132,6 @@ class WeatherCollectionViewCell: UICollectionViewCell {
     
     var weather: DailyWeatherElement! {
         didSet {
-            print("did set weather")
             if let dateString = weather.observationTime?.value, let date = dateString.toDate() {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "EEE"
@@ -202,7 +200,6 @@ class WeatherCollectionViewCell: UICollectionViewCell {
     func setupViews() {
         
         weatherImageView.constrainHeight(constant: 40)
-        weatherImageView.constrainWidth(constant: 40)
         
         let stackView = VerticalStackView(arrangedSubviews: [
             dayLabel,

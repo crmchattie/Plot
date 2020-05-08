@@ -84,31 +84,128 @@ struct Length: Codable {
 }
 
 // MARK: - ExtendedIngredient
-struct ExtendedIngredient: Codable {
+struct ExtendedIngredient: Codable, Equatable {
     let id: Int?
     let aisle, image: String?
-    let consitency: Consitency?
+    let consitency: String?
     let name, original, originalString, originalName: String?
-    let amount: Double?
+    var amount: Double?
     let unit: String?
     let meta, metaInformation: [String]?
-    let measures: Measures?
-}
-
-enum Consitency: String, Codable {
-    case liquid = "liquid"
-    case solid = "solid"
+    var measures: Measures?
+    var recipeID: [String]?
+    
+    func toAnyObject() -> [String: AnyObject?] {
+        var dictionary = [String: AnyObject?]()
+        
+        if let value = self.id as AnyObject? {
+            dictionary["id"] = value
+        }
+        
+        if let value = self.aisle as AnyObject? {
+            dictionary["aisle"] = value
+        }
+        
+        if let value = self.image as AnyObject? {
+            dictionary["image"] = value
+        }
+        
+        if let value = self.name as AnyObject? {
+            dictionary["name"] = value
+        }
+        
+        if let value = self.original as AnyObject? {
+            dictionary["original"] = value
+        }
+        
+        if let value = self.originalString as AnyObject? {
+            dictionary["originalString"] = value
+        }
+        
+        if let value = self.originalName as AnyObject? {
+            dictionary["originalName"] = value
+        }
+        
+        if let value = self.amount as AnyObject? {
+            dictionary["amount"] = value
+        }
+        
+        if let value = self.unit as AnyObject? {
+            dictionary["unit"] = value
+        }
+        
+        if let value = self.meta as AnyObject? {
+            dictionary["meta"] = value
+        }
+        
+        if let value = self.metaInformation as AnyObject? {
+            dictionary["metaInformation"] = value
+        }
+        
+        if let value = self.measures {
+            let firebase = value.toAnyObject()
+            dictionary["measures"] = firebase as AnyObject
+        }
+        
+        if let value = self.recipeID as AnyObject? {
+            dictionary["recipeID"] = value
+        }
+                        
+        return dictionary
+    }
+    
+    static func == (lhs: ExtendedIngredient, rhs: ExtendedIngredient) -> Bool {
+        if lhs.id == rhs.id {
+            return true
+        } else {
+            return false
+        }
+    }
 }
 
 // MARK: - Measures
 struct Measures: Codable {
-    let us, metric: Metric?
+    var us, metric: Metric?
+    
+    func toAnyObject() -> [String: AnyObject?] {
+        var dictionary = [String: AnyObject?]()
+        
+        if let value = self.us {
+            let firebase = value.toAnyObject()
+            dictionary["us"] = firebase as AnyObject
+        }
+        
+        if let value = self.metric {
+            let firebase = value.toAnyObject()
+            dictionary["metric"] = firebase as AnyObject
+        }
+        
+        return dictionary
+    }
 }
 
 // MARK: - Metric
 struct Metric: Codable {
-    let amount: Double?
+    var amount: Double?
     let unitShort, unitLong: String?
+    
+    func toAnyObject() -> [String: AnyObject?] {
+        var dictionary = [String: AnyObject?]()
+        
+        if let value = self.amount as AnyObject? {
+            dictionary["amount"] = value
+        }
+        
+        if let value = self.unitShort as AnyObject? {
+            dictionary["unitShort"] = value
+        }
+                
+        if let value = self.unitLong as AnyObject? {
+            dictionary["unitLong"] = value
+        }
+        
+        return dictionary
+    }
 }
 
 // MARK: - Nutrition

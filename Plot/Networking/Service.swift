@@ -18,7 +18,7 @@ class Service {
             return URL(string: SpoonacularAPI.baseUrlString)!
         }()
         
-        let defaultParameters = ["diet": "", "excludeIngredients": "", "offset": "0", "number": "20", "limitLicense": "true", "instructionsRequired": "true", "apiKey": "\(SpoonacularAPI.apiKey)"]
+        let defaultParameters = ["diet": "", "excludeIngredients": "snails", "offset": "0", "number": "20", "limitLicense": "true", "instructionsRequired": "true", "apiKey": "\(SpoonacularAPI.apiKey)"]
         let parameters = ["query": "\(query)", "cuisine": "\(cuisine)"].merging(defaultParameters, uniquingKeysWith: +)
     
         

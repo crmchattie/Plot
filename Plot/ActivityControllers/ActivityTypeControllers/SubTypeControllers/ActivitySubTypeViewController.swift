@@ -141,5 +141,12 @@ extension ActivitySubTypeViewController: UpdateScheduleDelegate {
     func updateSchedule(schedule: Activity) {
         delegate?.updateSchedule(schedule: schedule)
     }
+    func updateIngredients(recipe: Recipe?, recipeID: String?) {
+        if let recipeID = recipeID {
+            self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
+        } else if let recipe = recipe {
+            self.delegate?.updateIngredients(recipe: recipe, recipeID: nil)
+        }
+    }
 }
 

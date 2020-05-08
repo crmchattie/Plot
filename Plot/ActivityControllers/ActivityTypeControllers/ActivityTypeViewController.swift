@@ -145,7 +145,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         let dispatchGroup = DispatchGroup()
         
         dispatchGroup.enter()
-        Service.shared.fetchRecipesSimple(query: "healthy", cuisine: "American") { (search, err) in
+        Service.shared.fetchRecipesComplex(query: "", cuisine: ["American"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
             self.recipes = search?.recipes
             dispatchGroup.leave()
             
@@ -629,7 +629,13 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
 
 extension ActivityTypeViewController: UpdateScheduleDelegate {
     func updateSchedule(schedule: Activity) {
-        print("updating schedule")
         delegate?.updateSchedule(schedule: schedule)
+    }
+    func updateIngredients(recipe: Recipe?, recipeID: String?) {
+        if let recipeID = recipeID {
+            self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
+        } else if let recipe = recipe {
+            self.delegate?.updateIngredients(recipe: recipe, recipeID: nil)
+        }
     }
 }

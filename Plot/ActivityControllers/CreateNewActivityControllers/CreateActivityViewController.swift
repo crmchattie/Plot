@@ -37,24 +37,27 @@ class CreateActivityViewController: FormViewController {
     var scheduleList = [Activity]()
     var purchaseList = [Purchase]()
     var purchaseDict = [User: Double]()
-    var checklistDict = [String: [String : Bool]]()
+    var listList = [Any]()
     var scheduleIndex: Int = 0
     var purchaseIndex: Int = 0
+    var listIndex: Int = 0
+    var groceryListIndex: Int = -1
     var startDateTime: Date?
     var endDateTime: Date?
     var userNames : [String] = []
     var userNamesString: String = ""
     var thumbnailImage: String = ""
+    var segmentRowValue: String = "Schedule"
     var activityID = String()
     let dispatchGroup = DispatchGroup()
     let informationMessageSender = InformationMessageSender()
     // Participants with accepted invites
     var acceptedParticipant: [User] = []
+    var weather: [DailyWeatherElement]!
     
     fileprivate var reminderDate: Date?
     
     var active = false
-    var includeSubSections = true
     var sentActivity = false
     
     
@@ -84,6 +87,7 @@ class CreateActivityViewController: FormViewController {
             if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
                 locationName = localName
                 locationAddress = localAddress
+                self.weatherRow()
             }
             if activity.schedule != nil {
                 for schedule in activity.schedule! {
@@ -102,8 +106,20 @@ class CreateActivityViewController: FormViewController {
                     purchaseList.append(purchase)
                 }
             }
-            if activity.checklist != nil && activity.checklist!["name"] == nil {
-                checklistDict = activity.checklist!
+            if let grocerylist = activity.grocerylist {
+                listList.append(grocerylist)
+            }
+            if activity.packinglist != nil {
+                for packinglist in activity.packinglist! {
+                    if packinglist.name == "nothing" { continue }
+                    listList.append(packinglist)
+                }
+            }
+            if activity.checklist != nil {
+                for checklist in activity.checklist! {
+                    if checklist.name == "nothing" { continue }
+                    listList.append(checklist)
+                }
             }
             setupRightBarButton(with: "Update")
             resetBadgeForSelf()
@@ -366,7 +382,6 @@ class CreateActivityViewController: FormViewController {
                 }.onCellSelection({ _,_ in
                     self.openLocationFinder()
                 }).cellUpdate { cell, row in
-                    self.weatherRow()
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textAlignment = .left
                     if row.title == "Location" {
@@ -511,6 +526,7 @@ class CreateActivityViewController: FormViewController {
                     if self!.active {
                         self!.scheduleReminder()
                     }
+                    print("startdate update")
                     self!.weatherRow()
                 }
                 .onExpandInlineRow { [weak self] cell, row, inlineRow in
@@ -579,6 +595,7 @@ class CreateActivityViewController: FormViewController {
                     }
                     self!.activity.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.endDateTime = row.value
+                    print("startdate update")
                     self!.weatherRow()
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                         inlineRow.cellUpdate() { cell, row in
@@ -685,31 +702,49 @@ class CreateActivityViewController: FormViewController {
 //                        row.value = "Exported"
 //                    }
 //                })
+        
+        <<< SwitchRow("showExtras") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.title = "Show Schedule, Lists, Purchases"
+                if let showExtras = activity.showExtras {
+                    row.value = showExtras
+                } else {
+                    row.value = true
+                    self.activity.showExtras = true
+                }
+            }.onChange { [weak self] row in
+                self!.activity.showExtras = row.value
+                if !row.value!, let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
+                    self!.segmentRowValue = segmentRow.value!
+                    segmentRow.value = "Hidden"
+                } else if let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
+                    segmentRow.value = self!.segmentRowValue
+                    if let indexPath = self!.form.last?.last?.indexPath {
+                        self!.tableView?.scrollToRow(at: indexPath, at: .none, animated: true)
+                    }
+                }
+            }
             
-            <<< SegmentedRow<String>("sections"){
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    $0.hidden = Condition.init(booleanLiteral: !includeSubSections)
-                    if #available(iOS 13.0, *) {
-                        $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-                    } else {
-                        // Fallback on earlier versions
+        <<< SegmentedRow<String>("sections"){
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.hidden = "$showExtras == false"
+                if #available(iOS 13.0, *) {
+                    $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+                } else {
+                    // Fallback on earlier versions
+                }
+                $0.options = ["Schedule", "Lists", "Purchases"]
+                $0.value = "Schedule"
+                }.onChange({ row  in
+                    if let indexPath = self.form.last?.last?.indexPath {
+                        self.tableView?.scrollToRow(at: indexPath, at: .none, animated: true)
                     }
-                    $0.options = ["Schedule", "Lists", "Purchases"]
-                    if includeSubSections {
-                        $0.value = "Schedule"
-                    } else {
-                        $0.value = "Hidden"
-                    }
-                    }
-                    .onCellSelection({_,_  in
-                        if let indexPath = self.form.allRows.last?.indexPath {
-                            self.tableView?.scrollToRow(at: indexPath, at: .none, animated: true)
-                        }
-                    })
-            addSubSections()
-    }
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
     
-    func addSubSections() {
         //            add in schedule that will be a MultivaluedSection that will lead to another VC with a form that includes item name, start/end time, location, transportation and notes sections - sorted by date/time
         //            or add in a custom row that shows/hides point options (name, start/end time, location and notes sections)
         form +++
@@ -717,7 +752,7 @@ class CreateActivityViewController: FormViewController {
                                header: "Schedule",
                                footer: "Add a new point in the schedule") {
                                 $0.tag = "schedulefields"
-                                $0.hidden = "$sections != 'Schedule'"
+                                $0.hidden = "!$sections == 'Schedule'"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -740,7 +775,7 @@ class CreateActivityViewController: FormViewController {
                                     }
                                 }
                                 
-            }
+                            }
                                 for schedule in scheduleList {
                                     var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
                                     mvs.insert(ScheduleRow() {
@@ -757,7 +792,7 @@ class CreateActivityViewController: FormViewController {
     form +++
         MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
                            header: "Lists",
-                           footer: "Add a checklist, recipe list and/or a packing list") {
+                           footer: "Add a checklist and/or recipe list") {
                             $0.tag = "listsfields"
                             $0.hidden = "$sections != 'Lists'"
                             $0.addButtonProvider = { section in
@@ -771,81 +806,68 @@ class CreateActivityViewController: FormViewController {
                                 }
                             }
                             $0.multivaluedRowToInsertAt = { index in
-                                return SplitRow<TextRow, CheckRow>(){
-                                    $0.rowLeftPercentage = 0.75
-                                    $0.rowLeft = TextRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                        $0.placeholder = "List"
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                    }
-                                    
-                                    $0.rowRight = CheckRow() {
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        $0.cell.tintColor = FalconPalette.defaultBlue
-                                        $0.value = false
-                                        $0.cell.accessoryType = .checkmark
-                                        $0.cell.tintAdjustmentMode = .dimmed
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            cell.tintColor = FalconPalette.defaultBlue
-                                            if row.value == false {
-                                                cell.accessoryType = .checkmark
-                                                cell.tintAdjustmentMode = .dimmed
-                                            } else {
-                                                cell.tintAdjustmentMode = .automatic
-                                            }
-                                    }
-                                    }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                    }.onChange() { _ in
-                                        self.updateLists(type: "lists")
+                                self.listIndex = index
+                                self.openList()
+                                return ButtonRow() { row in
+                                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                row.cell.textLabel?.textAlignment = .left
+                                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                }.onCellSelection({ _,_ in
+                                    self.listIndex = index
+                                    self.openList()
+                                }).cellUpdate { cell, row in
+                                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                    cell.textLabel?.textAlignment = .left
                                 }
-                                
                             }
                             
     }
-                                for (_, value) in checklistDict {
+                            for list in listList {
+                                if let groceryList = list as? Grocerylist {
                                     var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-                                    mvs.insert(SplitRow<TextRow, CheckRow>() {
-                                        $0.rowLeftPercentage = 0.75
-                                        $0.rowLeft = TextRow(){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                            $0.value = value.keys.first
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                        }
-                                        $0.rowRight = CheckRow() {
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            $0.cell.tintColor = FalconPalette.defaultBlue
-                                            $0.value = value.values.first
-                                            $0.cell.accessoryType = .checkmark
-                                            $0.cell.tintAdjustmentMode = .dimmed
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                                cell.tintColor = FalconPalette.defaultBlue
-                                                if row.value == false {
-                                                    cell.accessoryType = .checkmark
-                                                    cell.tintAdjustmentMode = .dimmed
-                                                } else {
-                                                    cell.tintAdjustmentMode = .automatic
-                                                }
-                                        }
-                                        }.cellUpdate { cell, row in
+                                    mvs.insert(ButtonRow() { row in
+                                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        row.cell.textLabel?.textAlignment = .left
+                                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                        row.title = groceryList.name
+                                        self.groceryListIndex = row.indexPath!.row
+                                        }.onCellSelection({ cell, row in
+                                            self.listIndex = row.indexPath!.row
+                                            self.openList()
+                                        }).cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        }.onChange() { _ in
-                                            self.updateLists(type: "lists")
-                                    } , at: mvs.count - 1)
-                                    
+                                            cell.textLabel?.textAlignment = .left
+                                        }, at: mvs.count - 1)
+                                } else if let checklist = list as? Checklist {
+                                    var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
+                                    mvs.insert(ButtonRow() { row in
+                                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        row.cell.textLabel?.textAlignment = .left
+                                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                        row.title = checklist.name
+                                        }.onCellSelection({ cell, row in
+                                            self.listIndex = row.indexPath!.row
+                                            self.openList()
+                                        }).cellUpdate { cell, row in
+                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.textLabel?.textAlignment = .left
+                                        }, at: mvs.count - 1)
+                                } else if let packinglist = list as? Packinglist {
+                                    var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
+                                    mvs.insert(ButtonRow() { row in
+                                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        row.cell.textLabel?.textAlignment = .left
+                                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                        row.title = packinglist.name
+                                        }.onCellSelection({ cell, row in
+                                            self.listIndex = row.indexPath!.row
+                                            self.openList()
+                                        }).cellUpdate { cell, row in
+                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.textLabel?.textAlignment = .left
+                                        }, at: mvs.count - 1)
                                 }
+                            }
 
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
@@ -1014,7 +1036,7 @@ class CreateActivityViewController: FormViewController {
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
+        guard indexPath.row == 5, let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
             return
         }
         
@@ -1092,6 +1114,9 @@ class CreateActivityViewController: FormViewController {
                             self!.locationAddress[key] = nil
                         }
                     }
+                    if let recipeID = self!.scheduleList[rowNumber].recipeID {
+                        self!.lookupRecipe(recipeID: Int(recipeID)!, add: false)
+                    }
                     self!.scheduleList.remove(at: rowNumber)
                     self!.sortSchedule()
                     self!.updateLists(type: "schedule")
@@ -1103,7 +1128,10 @@ class CreateActivityViewController: FormViewController {
                     self!.updateDecimalRow()
                 }
                 self!.updateLists(type: "purchases")
-            } else if rowType is SplitRow<TextRow, CheckRow> {
+            } else if rowType is ButtonRow {
+                if self!.listList.indices.contains(self!.listIndex) {
+                    self!.listList.remove(at: rowNumber)
+                }
                 self!.updateLists(type: "lists")
             }
         }
@@ -1127,7 +1155,9 @@ class CreateActivityViewController: FormViewController {
                         dispatchGroup.leave()
                         dispatchGroup.notify(queue: .main) {
                             weatherRow.value = weather
-                            weatherRow.reload()
+                            weatherRow.updateCell()
+                            weatherRow.cell.collectionView.reloadData()
+                            self.weather = weather
                         }
                     } else if let index = weatherRow.indexPath?.item {
                         dispatchGroup.leave()
@@ -1149,14 +1179,15 @@ class CreateActivityViewController: FormViewController {
                 dispatchGroup.enter()
                 Service.shared.fetchWeatherDaily(startDateTime: startDateString, endDateTime: endDateString, lat: latitude, long: longitude, unit: "us") { (search, err) in
                     if let weather = search {
-                        print("weather \(weather)")
                         dispatchGroup.leave()
                         dispatchGroup.notify(queue: .main) {
                         var section = self.form.allSections[0]
                         if let locationRow: ButtonRow = self.form.rowBy(tag: "Location"), let index = locationRow.indexPath?.item {
                             section.insert(WeatherRow("Weather") { row in
                                     row.value = weather
-                                    row.reload()
+                                    row.updateCell()
+                                    row.cell.collectionView.reloadData()
+                                    self.weather = weather
                                 }, at: index+1)
                             }
                         }
@@ -1166,6 +1197,7 @@ class CreateActivityViewController: FormViewController {
         } else if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let index = weatherRow.indexPath?.item {
             let section = self.form.allSections[0]
             section.remove(at: index)
+            self.weather = [DailyWeatherElement]()
         }
     }
     
@@ -1229,27 +1261,38 @@ class CreateActivityViewController: FormViewController {
             }
         } else {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-            if let mvs = (form.values()["listsfields"] as? [Any?])?.compactMap({ $0 }) {
-                if !mvs.isEmpty {
-                    checklistDict = [String: [String : Bool]]()
-                    var index = 1
-                    for element in mvs {
-                        let value = element as! SplitRowValue<Swift.String, Swift.Bool>
-                        if let text = value.left, let state = value.right {
-                            checklistDict["lists_\(index)"] = [text : state]
-                        }
-                        index += 1
+            if listList.isEmpty {
+                activity.checklist = [Checklist]()
+                groupActivityReference.child("checklist").removeValue()
+            } else {
+                var firebaseChecklistList = [[String: AnyObject?]]()
+                var checklistList = [Checklist]()
+                var firebasePackinglistList = [[String: AnyObject?]]()
+                var packinglistList = [Packinglist]()
+                var firebaseGrocerylistList = [String: AnyObject?]()
+                var grocerylistList: Grocerylist!
+                for list in listList {
+                    if let checklist = list as? Checklist {
+                        checklistList.append(checklist)
+                        let firebaseChecklist = checklist.toAnyObject()
+                        firebaseChecklistList.append(firebaseChecklist)
+                    } else if let packinglist = list as? Packinglist {
+                        packinglistList.append(packinglist)
+                        let firebasePackinglist = packinglist.toAnyObject()
+                        firebasePackinglistList.append(firebasePackinglist)
+                    } else if let grocerylist = list as? Grocerylist {
+                        grocerylistList = grocerylist
+                        firebaseGrocerylistList = grocerylist.toAnyObject()
                     }
-                    activity.checklist = checklistDict
-                    groupActivityReference.updateChildValues(["checklist": checklistDict as AnyObject])
-                } else {
-                    activity.checklist = [String: [String : Bool]]()
-                    groupActivityReference.child("checklist").removeValue()
                 }
+                activity.checklist = checklistList
+                groupActivityReference.updateChildValues(["checklist": firebaseChecklistList as AnyObject])
+                activity.packinglist = packinglistList
+                groupActivityReference.updateChildValues(["packinglist": firebasePackinglistList as AnyObject])
+                activity.grocerylist = grocerylistList
+                groupActivityReference.updateChildValues(["grocerylist": firebaseGrocerylistList as AnyObject])
             }
         }
-        let membersIDs = fetchMembersIDs()
-        incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
     }
     
     func addEventToiCal(completion: ((_ success: Bool, _ error: NSError?) -> Void)? = nil) {
@@ -1551,6 +1594,66 @@ class CreateActivityViewController: FormViewController {
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
+    @objc fileprivate func openList() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        if listIndex == groceryListIndex {
+            let destination = GrocerylistViewController()
+//            destination.checklist = checklist
+//            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+        else if listList.indices.contains(listIndex), let checklist = listList[listIndex] as? Checklist {
+            let destination = ChecklistViewController()
+            destination.checklist = checklist
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if listList.indices.contains(listIndex), let packinglist = listList[listIndex] as? Packinglist {
+            let destination = PackinglistViewController()
+            destination.packinglist = packinglist
+            destination.delegate = self
+            if let weather = self.weather {
+                destination.weather = weather
+            }
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else {
+            
+            let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
+            let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
+                let destination = GrocerylistViewController()
+//                destination.delegate = self
+                self.navigationController?.pushViewController(destination, animated: true)
+                
+            }
+            let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
+                let destination = PackinglistViewController()
+                destination.delegate = self
+                if let weather = self.weather {
+                    destination.weather = weather
+                }
+                
+            }
+            let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
+                let destination = ChecklistViewController()
+                destination.delegate = self
+                self.navigationController?.pushViewController(destination, animated: true)
+            }
+            let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
+                print("You've pressed cancel")
+            }
+            if activity.grocerylist == nil {
+                alertController.addAction(groceryList)
+            }
+            alertController.addAction(packingList)
+            alertController.addAction(checkList)
+            alertController.addAction(cancelAlert)
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
+    
     @objc func createNewActivity() {
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -1829,6 +1932,100 @@ class CreateActivityViewController: FormViewController {
         }
     }
     
+    fileprivate func lookupRecipe(recipeID: Int, add: Bool) {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
+        Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
+            dispatchGroup.leave()
+            dispatchGroup.notify(queue: .main) {
+                if let recipe = search {
+                    if add {
+                        self.updateGroceryList(recipe: recipe, add: true)
+                    } else {
+                        self.updateGroceryList(recipe: recipe, add: false)
+                    }
+                }
+            }
+        }
+    }
+    
+    fileprivate func updateGroceryList(recipe: Recipe, add: Bool) {
+        if let groceryList = self.activity.grocerylist, let activityIngredients = groceryList.ingredients, let recipeIngredients = recipe.extendedIngredients {
+            for recipeIngredient in recipeIngredients {
+                if let index = activityIngredients.firstIndex(where: {$0 == recipeIngredient}) {
+                    if add {
+                        if activityIngredients[index].amount != nil {
+                            self.activity.grocerylist!.ingredients![index].amount! += recipeIngredient.amount ?? 0.0
+                        }
+                        if activityIngredients[index].measures?.metric?.amount != nil {
+                            self.activity.grocerylist!.ingredients![index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
+                        }
+                        if activityIngredients[index].measures?.us?.amount != nil {
+                            self.activity.grocerylist!.ingredients![index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
+                        }
+                    } else {
+                        if activityIngredients[index].amount != nil {
+                            self.activity.grocerylist!.ingredients![index].amount! -= recipeIngredient.amount ?? 0.0
+                            if self.activity.grocerylist!.ingredients![index].amount! == 0 {
+                                self.activity.grocerylist!.ingredients!.remove(at: index)
+                                break
+                            }
+                        }
+                        if activityIngredients[index].measures?.metric?.amount != nil {
+                            self.activity.grocerylist!.ingredients![index].measures?.metric?.amount! -= recipeIngredient.measures?.metric?.amount ?? 0.0
+                            if self.activity.grocerylist!.ingredients![index].measures?.metric?.amount! == 0 {
+                                self.activity.grocerylist!.ingredients!.remove(at: index)
+                                break
+                            }
+                        }
+                        if activityIngredients[index].measures?.us?.amount != nil {
+                            self.activity.grocerylist!.ingredients![index].measures?.us?.amount! -= recipeIngredient.measures?.us?.amount ?? 0.0
+                            if self.activity.grocerylist!.ingredients![index].measures?.us?.amount! == 0 {
+                                self.activity.grocerylist!.ingredients!.remove(at: index)
+                            }
+                        }
+                    }
+                } else {
+                    if add {
+                        self.activity.grocerylist?.ingredients!.append(recipeIngredient)
+                    } else {
+                        if let index = activityIngredients.firstIndex(where: {$0 == recipeIngredient}) {
+                            self.activity.grocerylist!.ingredients!.remove(at: index)
+                        }
+                    }
+                }
+            }
+        } else if let recipeIngredients = recipe.extendedIngredients {
+            let groceryList = Grocerylist(dictionary: ["name" : "Grocery List"] as [String: AnyObject])
+            groceryList.ingredients = recipeIngredients
+            groceryList.recipes?["\(recipe.id)"] = recipe.title
+            
+            var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
+            mvs.insert(ButtonRow() { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.title = groceryList.name
+                self.groceryListIndex = row.indexPath!.row
+                }.onCellSelection({ cell, row in
+                    self.listIndex = row.indexPath!.row
+                    self.openList()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textAlignment = .left
+                }, at: mvs.count - 1)
+            
+            self.activity.grocerylist? = groceryList
+            listList.append(groceryList)
+            self.updateLists(type: "lists")
+        }
+    }
+    
     fileprivate func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         let badgeRef = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
@@ -1949,6 +2146,7 @@ extension CreateActivityViewController: UpdateLocationDelegate {
                 } else {
                     self.activity.locationAddress![newLocationName] = value
                 }
+                self.weatherRow()
             }
         }
     }
@@ -1979,6 +2177,13 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
             }
         }
     }
+    func updateIngredients(recipe: Recipe?, recipeID: String?) {
+        if let recipe = recipe {
+            updateGroceryList(recipe: recipe, add: true)
+        } else if let recipeID = recipeID {
+            lookupRecipe(recipeID: Int(recipeID)!, add: true)
+        }
+    }
 }
 
 extension CreateActivityViewController: UpdatePurchasesDelegate {
@@ -2000,6 +2205,48 @@ extension CreateActivityViewController: UpdatePurchasesDelegate {
             }
             purchaseBreakdown()
             updateDecimalRow()
+        }
+    }
+}
+
+extension CreateActivityViewController: UpdateChecklistDelegate {
+    func updateChecklist(checklist: Checklist) {
+        if let mvs = self.form.sectionBy(tag: "listfields") as? MultivaluedSection {
+            let listRow = mvs.allRows[listIndex]
+            if checklist.name != "Checklist Name" {
+                listRow.baseValue = checklist
+                listRow.updateCell()
+                if listList.indices.contains(listIndex) {
+                    listList[listIndex] = checklist
+                } else {
+                    listList.append(checklist)
+                }
+                updateLists(type: "lists")
+            }
+            else {
+                mvs.remove(at: purchaseIndex)
+            }
+        }
+    }
+}
+
+extension CreateActivityViewController: UpdatePackinglistDelegate {
+    func updatePackinglist(packinglist: Packinglist) {
+        if let mvs = self.form.sectionBy(tag: "listfields") as? MultivaluedSection {
+            let listRow = mvs.allRows[listIndex]
+            if packinglist.name != "Packing List Name" {
+                listRow.baseValue = packinglist
+                listRow.updateCell()
+                if listList.indices.contains(listIndex) {
+                    listList[listIndex] = packinglist
+                } else {
+                    listList.append(packinglist)
+                }
+                updateLists(type: "lists")
+            }
+            else {
+                mvs.remove(at: purchaseIndex)
+            }
         }
     }
 }

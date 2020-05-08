@@ -36,7 +36,8 @@ class EventDetailCell: UICollectionViewCell {
 //        label.textColor = FalconPalette.ticketmaster
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.text = "Go to Ticketmaster"
+        label.attributedText = NSAttributedString(string: "Go to Ticketmaster", attributes:
+        [.underlineStyle: NSUnderlineStyle.single.rawValue])
         label.numberOfLines = 1
         return label
     }()

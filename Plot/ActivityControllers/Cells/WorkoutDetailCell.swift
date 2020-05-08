@@ -53,7 +53,8 @@ class WorkoutDetailCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.text = "Go to Workout"
+        label.attributedText = NSAttributedString(string: "Go to Workout", attributes:
+        [.underlineStyle: NSUnderlineStyle.single.rawValue])
         label.numberOfLines = 1
         return label
     }()

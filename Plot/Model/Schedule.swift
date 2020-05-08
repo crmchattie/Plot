@@ -44,7 +44,7 @@ class Schedule: NSObject, Codable {
             case eventID
         }
         
-        init(dictionary: [String: AnyObject]?){
+        init(dictionary: [String: AnyObject]?) {
             super.init()
             
             name = dictionary?["name"] as? String
@@ -67,73 +67,73 @@ class Schedule: NSObject, Codable {
         }
     
     func toAnyObject() -> [String: AnyObject] {
-        var scheduleDict = [String: AnyObject]()
+        var dictionary = [String: AnyObject]()
                 
         if let value = self.name as AnyObject? {
-            scheduleDict["name"] = value
+            dictionary["name"] = value
         }
         
         if let value = self.scheduleID as AnyObject? {
-            scheduleDict["scheduleID"] = value
+            dictionary["scheduleID"] = value
         }
         
         if let value = self.scheduleType as AnyObject? {
-            scheduleDict["scheduleType"] = value
+            dictionary["scheduleType"] = value
         }
         
         if let value = self.scheduleDescription as AnyObject? {
-            scheduleDict["scheduleDescription"] = value
+            dictionary["scheduleDescription"] = value
         }
         
         if let value = self.locationName as AnyObject? {
-            scheduleDict["locationName"] = value
+            dictionary["locationName"] = value
         }
         
         if let value = self.locationAddress as AnyObject? {
-            scheduleDict["locationAddress"] = value
+            dictionary["locationAddress"] = value
         }
         
         if let value = self.participantsIDs as AnyObject? {
-            scheduleDict["participantsIDs"] = value
+            dictionary["participantsIDs"] = value
         }
         
         if let value = self.transportation as AnyObject? {
-            scheduleDict["transportation"] = value
+            dictionary["transportation"] = value
         }
         
         if let value = self.allDay as AnyObject? {
-            scheduleDict["allDay"] = value
+            dictionary["allDay"] = value
         }
         
         if let value = self.startDateTime as AnyObject? {
-            scheduleDict["startDateTime"] = value
+            dictionary["startDateTime"] = value
         }
         
         if let value = self.endDateTime as AnyObject? {
-            scheduleDict["endDateTime"] = value
+            dictionary["endDateTime"] = value
         }
         
         if let value = self.reminder as AnyObject? {
-            scheduleDict["reminder"] = value
+            dictionary["reminder"] = value
         }
         
         if let value = self.checklist as AnyObject? {
-            scheduleDict["checklist"] = value
+            dictionary["checklist"] = value
         }
         
         if let value = self.recipeID as AnyObject? {
-            scheduleDict["recipeID"] = value
+            dictionary["recipeID"] = value
         }
         
         if let value = self.workoutID as AnyObject? {
-            scheduleDict["workoutID"] = value
+            dictionary["workoutID"] = value
         }
         
         if let value = self.eventID as AnyObject? {
-            scheduleDict["eventID"] = value
+            dictionary["eventID"] = value
         }
         
-        return scheduleDict
+        return dictionary
     }
 }
 

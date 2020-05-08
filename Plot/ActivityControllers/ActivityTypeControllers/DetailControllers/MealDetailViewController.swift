@@ -22,7 +22,7 @@ class MealDetailViewController: ActivityDetailViewController {
     var segment: Int = 0
     
     var ingredients = [ExtendedIngredient]()
-    var instructions = String()
+    var instructions = [String]()
     var equipment = [String]()
         
     var firstHeight: CGFloat = 0
@@ -121,14 +121,12 @@ class MealDetailViewController: ActivityDetailViewController {
         let dispatchGroup = DispatchGroup()
         
         if let recipe = detailedRecipe {
-            var i = 1
             if let extendedIngredients = recipe.extendedIngredients {
                 self.ingredients = extendedIngredients
                 for ingredient in self.ingredients {
                     dispatchGroup.enter()
-                    firstHeight += estimateFrameForText(width: 400 - 30, text: ingredient.original?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
+                    firstHeight += estimateFrameForText(width: view.frame.width - 30, text: ingredient.original?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
                     dispatchGroup.leave()
-                    i += 1
                 }
             }
             if let analyzedInstructions = recipe.analyzedInstructions {
@@ -138,26 +136,39 @@ class MealDetailViewController: ActivityDetailViewController {
                             dispatchGroup.enter()
                             if !self.equipment.contains(equipment.name ?? "") {
                                 self.equipment.append(equipment.name ?? "")
-                                secondHeight += estimateFrameForText(width: 400 - 30, text: equipment.name?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
+                                secondHeight += estimateFrameForText(width: view.frame.width - 30, text: equipment.name?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
                             }
                             dispatchGroup.leave()
                         }
                     }
                 }
             }
-            if let recipeInstructions = recipe.instructions {
-                dispatchGroup.enter()
-                instructions = recipeInstructions
-                instructions = instructions.replacingOccurrences(of: "<ol>", with: "")
-                instructions = instructions.replacingOccurrences(of: "</ol>", with: "")
-                instructions = instructions.replacingOccurrences(of: "<li>", with: "")
-                instructions = instructions.replacingOccurrences(of: "</li>", with: "")
-                instructions = instructions.replacingOccurrences(of: "<p>", with: "")
-                instructions = instructions.replacingOccurrences(of: "</p>", with: "")
-                instructions = instructions.replacingOccurrences(of: ".", with: ". ")
-                thirdHeight = estimateFrameForText(width: 400 - 30, text: instructions, font: UIFont.preferredFont(forTextStyle: .callout)).height + 12
-                dispatchGroup.leave()
+            if let analyzedInstructions = recipe.analyzedInstructions {
+                for instruction in analyzedInstructions {
+                    if let steps = instruction.steps {
+                        for step in steps {
+                            dispatchGroup.enter()
+                            self.instructions.append(step.step ?? "")
+                            thirdHeight += estimateFrameForText(width: view.frame.width - 57, text: step.step ?? "", font: UIFont.preferredFont(forTextStyle: .callout)).height + 12
+                            dispatchGroup.leave()
+                        }
+                    }
+                }
             }
+            
+//            if let recipeInstructions = recipe.instructions {
+//                dispatchGroup.enter()
+//                instructions = recipeInstructions
+//                instructions = instructions.replacingOccurrences(of: "<ol>", with: "")
+//                instructions = instructions.replacingOccurrences(of: "</ol>", with: "")
+//                instructions = instructions.replacingOccurrences(of: "<li>", with: "")
+//                instructions = instructions.replacingOccurrences(of: "</li>", with: "")
+//                instructions = instructions.replacingOccurrences(of: "<p>", with: "")
+//                instructions = instructions.replacingOccurrences(of: "</p>", with: "")
+//                instructions = instructions.replacingOccurrences(of: ".", with: ". ")
+//                thirdHeight = estimateFrameForText(width: 400 - 30, text: instructions, font: UIFont.preferredFont(forTextStyle: .callout)).height + 12
+//                dispatchGroup.leave()
+//            }
         }
         dispatchGroup.notify(queue: .main) {
             self.updateHeight()

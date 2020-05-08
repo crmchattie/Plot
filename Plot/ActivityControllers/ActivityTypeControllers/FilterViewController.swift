@@ -9,26 +9,6 @@
 import UIKit
 import Eureka
 
-fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
-}
-
-fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l > r
-  default:
-    return rhs < lhs
-  }
-}
-
 protocol UpdateFilter: class {
     func updateFilter(filterDictionary : [String: [String]])
 }
@@ -63,7 +43,6 @@ class FilterViewController: FormViewController {
         initializeForm()
         
     }
-
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle

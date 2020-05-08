@@ -16,6 +16,7 @@ import EventKit
 
 protocol UpdateScheduleDelegate: class {
     func updateSchedule(schedule: Activity)
+    func updateIngredients(recipe: Recipe?, recipeID: String?)
 }
 
 class ScheduleViewController: FormViewController {
@@ -29,7 +30,7 @@ class ScheduleViewController: FormViewController {
     var selectedFalconUsers = [User]()
     var locationName: String = "locationName"
     var locationAddress = [String : [Double]]()
-    var checklistDict = [String: [String : Bool]]()
+    var checklist = [Checklist]()
     var startDateTime: Date?
     var endDateTime: Date?
     var userNames : [String] = []
@@ -61,8 +62,8 @@ class ScheduleViewController: FormViewController {
                 locationName = localName
                 locationAddress = localAddress
             }
-            if schedule.checklist != nil && schedule.checklist!["name"] == nil {
-                checklistDict = schedule.checklist!
+            if schedule.checklist != nil {
+                checklist = schedule.checklist!
             }
         } else {
             scheduleID = UUID().uuidString
@@ -85,19 +86,22 @@ class ScheduleViewController: FormViewController {
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
 //        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: nil, action: nil)
         
-        let mapsImage = UIImage(named: "map")
+        let dotsImage = UIImage(named: "dots")
         if #available(iOS 11.0, *) {
-            let addBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
             
-            let mapBarButton = UIButton(type: .system)
-            mapBarButton.setImage(mapsImage, for: .normal)
-            mapBarButton.addTarget(self, action: #selector(goToMap), for: .touchUpInside)            
-            navigationItem.rightBarButtonItems = [addBarButton, UIBarButtonItem(customView: mapBarButton)]
+            let dotsBarButton = UIButton(type: .system)
+            dotsBarButton.setImage(dotsImage, for: .normal)
+            dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
+                            
+            navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
         } else {
-            let addBarButton = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(rightBarButtonTapped))
-            let mapBarButton = UIBarButtonItem(image: mapsImage, style: .plain, target: self, action: #selector(goToMap))
-            navigationItem.rightBarButtonItems = [addBarButton, mapBarButton]
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
+            let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+            navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
         }
+        navigationItem.rightBarButtonItem?.isEnabled = true
+        
         
     }
     
@@ -471,8 +475,8 @@ class ScheduleViewController: FormViewController {
                                 }
                                 
         }
-        
-                                for (_, value) in checklistDict {
+                            if let items = checklist[0].items {
+                                for item in items {
                                     var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
                                     mvs.insert(SplitRow<TextRow, CheckRow>() {
                                         $0.rowLeftPercentage = 0.75
@@ -480,7 +484,7 @@ class ScheduleViewController: FormViewController {
                                             $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                             $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                                             $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                            $0.value = value.keys.first
+                                            $0.value = item.key
                                             }.cellUpdate { cell, row in
                                                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -489,7 +493,7 @@ class ScheduleViewController: FormViewController {
                                         $0.rowRight = CheckRow() {
                                             $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                             $0.cell.tintColor = FalconPalette.defaultBlue
-                                            $0.value = value.values.first
+                                            $0.value = item.value
                                             $0.cell.accessoryType = .checkmark
                                             $0.cell.tintAdjustmentMode = .dimmed
                                             }.cellUpdate { cell, row in
@@ -507,24 +511,22 @@ class ScheduleViewController: FormViewController {
                                     }, at: mvs.count - 1)
                                     
                                 }
+                            }
 
     }
     
     @objc fileprivate func rightBarButtonTapped() {
         let mvs = (form.values()["checklistfields"] as! [Any?]).compactMap { $0 }
         if !mvs.isEmpty {
-            checklistDict = [String: [String : Bool]]()
-            var index = 1
+            var checklistDict = [String : Bool]()
             for element in mvs {
-                let value = element as! SplitRowValue<Swift.String, Swift.Bool>
-                if let text = value.left, let state = value.right {
-                    checklistDict["checklist_\(index)"] = [text : state]
+                if let value = element as? SplitRowValue<Swift.String, Swift.Bool>, let text = value.left, let state = value.right {
+                    checklistDict[text] = state
                 }
-                index += 1
             }
-            schedule.checklist = checklistDict
+            schedule.checklist![0].items = checklistDict
         } else {
-            checklistDict["name"] = ["name" : false]
+            schedule.checklist = nil
         }
         
         let valuesDictionary = form.values()
@@ -623,6 +625,25 @@ class ScheduleViewController: FormViewController {
         }
         destination.delegate = self
         self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    @objc func goToExtras() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+        alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
+            print("User click Edit button")
+            self.goToMap()
+        }))
+
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        print("shareButtonTapped")
+        
     }
     
     @objc func goToMap() {

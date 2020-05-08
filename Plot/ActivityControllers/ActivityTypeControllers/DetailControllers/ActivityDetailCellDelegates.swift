@@ -17,6 +17,9 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
             activity.participantsIDs = membersIDs.0
             
             self.delegate?.updateSchedule(schedule: activity)
+//            if let recipe = self.detailedRecipe {
+//                self.delegate?.updateIngredients(recipe: recipe, recipeID: nil)
+//            }
             self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
                 
         }
@@ -126,6 +129,9 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
                     activity.participantsIDs = membersIDs.0
                     
                     self.delegate?.updateSchedule(schedule: activity)
+                    if let recipe = self.detailedRecipe {
+                        self.delegate?.updateIngredients(recipe: recipe, recipeID: nil)
+                    }
                     
                     self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
                 }

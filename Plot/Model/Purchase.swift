@@ -28,7 +28,7 @@ class Purchase: NSObject, Codable {
         case purchaseRowCount
     }
 
-    init(dictionary: [String: AnyObject]?){
+    init(dictionary: [String: AnyObject]?) {
         super.init()
         
         name = dictionary?["name"] as? String
@@ -42,36 +42,36 @@ class Purchase: NSObject, Codable {
     }
     
     func toAnyObject() -> [String: AnyObject?] {
-        var purchaseDict = [String: AnyObject?]()
+        var dictionary = [String: AnyObject?]()
         
         if let value = self.name as AnyObject? {
-            purchaseDict["name"] = value
+            dictionary["name"] = value
         }
                 
         if let value = self.purchaseType as AnyObject? {
-            purchaseDict["purchaseType"] = value
+            dictionary["purchaseType"] = value
         }
         
         if let value = self.purchaseDescription as AnyObject? {
-            purchaseDict["purchaseDescription"] = value
+            dictionary["purchaseDescription"] = value
         }
         
         if let value = self.cost as AnyObject? {
-            purchaseDict["cost"] = value
+            dictionary["cost"] = value
         }
         
         if let value = self.participantsIDs as AnyObject? {
-            purchaseDict["participantsIDs"] = value
+            dictionary["participantsIDs"] = value
         }
         
         if let value = self.purchaser as AnyObject? {
-            purchaseDict["purchaser"] = value
+            dictionary["purchaser"] = value
         }
                 
         if let value = self.purchaseRowCount as AnyObject? {
-            purchaseDict["purchaseRowCount"] = value
+            dictionary["purchaseRowCount"] = value
         }
         
-        return purchaseDict
+        return dictionary
     }
 }
