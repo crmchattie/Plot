@@ -19,7 +19,7 @@ class IngredientDetailViewController: FormViewController {
           
     var ingredient: ExtendedIngredient!
 
-    fileprivate var active: Bool = false
+    var active: Bool = false
     fileprivate var movingBackwards: Bool = true
               
     override func viewDidLoad() {
