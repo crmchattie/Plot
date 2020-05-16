@@ -33,7 +33,9 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     var umbrellaActivity: Activity!
     var activity: Activity!
     weak var delegate : UpdateScheduleDelegate?
+    weak var recipeDelegate : UpdateRecipeDelegate?
     var schedule: Bool = false
+    var activeRecipe: Bool = false
     
     var startDateTime: Date?
     var endDateTime: Date?
@@ -83,6 +85,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     var didSelectHandler: ((Any, [String: [String]]) -> ())?
     var removeControllerHandler: ((String, Activity) -> ())?
     var favActHandler: (([String: [String]]) -> ())?
+    var recipeUpdate: ((Recipe) -> ())?
         
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("item selected")
@@ -239,6 +242,14 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
     
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
+        
+        if activeRecipe {
+            if let recipe = type as? Recipe {
+//                self.recipeDelegate?.updateRecipe(recipe: recipe)
+                self.recipeUpdate?(recipe)
+            }
+            return
+        }
         
         if schedule {
             let activityID = UUID().uuidString
@@ -401,10 +412,10 @@ extension HorizontalController: ActivitySubTypeCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
                                 
-                self.delegate?.updateSchedule(schedule: self.activity)
-                if let recipeID = self.activity.recipeID {
-                    self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
-                }
+//                self.delegate?.updateSchedule(schedule: self.activity)
+//                if let recipeID = self.activity.recipeID {
+//                    self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
+//                }
                 self.removeControllerHandler?("schedule", self.activity)
             }))
             

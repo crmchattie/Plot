@@ -7,13 +7,14 @@
 //
 
 import UIKit
+import CodableFirebase
 
 class Grocerylist: NSObject, Codable {
     
     var name: String?
     var recipes: [String: String]?
     var ingredients: [ExtendedIngredient]?
-    var servings: Int?
+    var servings: [String: Int]?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -27,8 +28,16 @@ class Grocerylist: NSObject, Codable {
         
         name = dictionary?["name"] as? String
         recipes = dictionary?["recipes"] as? [String: String]
-        ingredients = dictionary?["ingredients"] as? [ExtendedIngredient]
-        servings = dictionary?["servings"] as? Int
+        if let ingredientsFirebaseList = dictionary?["ingredients"] as? [AnyObject] {
+            var ingredientsList = [ExtendedIngredient]()
+            for ingredients in ingredientsFirebaseList {
+                if let ingre = try? FirebaseDecoder().decode(ExtendedIngredient.self, from: ingredients) {
+                    ingredientsList.append(ingre)
+                }
+            }
+            ingredients = ingredientsList
+        }
+        servings = dictionary?["servings"] as? [String: Int]
         
     }
     
@@ -55,7 +64,7 @@ class Grocerylist: NSObject, Codable {
         if let value = self.servings as AnyObject? {
             dictionary["servings"] = value
         }
-                        
+                                
         return dictionary
     }
 }

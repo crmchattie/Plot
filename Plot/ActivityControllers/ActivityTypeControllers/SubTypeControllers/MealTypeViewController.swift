@@ -13,10 +13,14 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
     
     var groups = [[Recipe]]()
     var searchActivities = [Recipe]()
+    var activeRecipe: Bool = false
+    fileprivate var movingBackwards: Bool = true
 
     var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .recipeType]
     var filterDictionary = [String: [String]]()
     var sections: [String] = ["American", "Italian", "Vegetarian", "Mexican", "Breakfast", "Dessert"]
+    
+    weak var recipeDelegate : UpdateRecipeDelegate?
     
         
     override func viewDidLoad() {
@@ -31,6 +35,14 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         
         fetchData()
         
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if self.movingBackwards {
+            self.recipeDelegate?.updateRecipe(recipe: nil)
+        }
     }
     
     fileprivate func setupSearchBar() {
@@ -159,7 +171,8 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 
         headerheight = 0
         cellheight = 397
-            
+        
+        var recipes1: [Recipe]?
         var recipes2: [Recipe]?
         var recipes3: [Recipe]?
         var recipes4: [Recipe]?
@@ -169,8 +182,28 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         // help you sync your data fetches together
         let dispatchGroup = DispatchGroup()
         
+        if self.groups.isEmpty {
+            self.sections.removeAll{ $0 == "American"}
+            
+//            dispatchGroup.enter()
+//            Service.shared.fetchRecipesComplex(query: "", cuisine: ["American"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+//                recipes1 = search?.recipes
+//                dispatchGroup.leave()
+//
+//                dispatchGroup.notify(queue: .main) {
+//                    if let group = recipes1 {
+//                        self.groups.append(group)
+//                    } else {
+//                        self.sections.removeAll{ $0 == "American"}
+//                    }
+//
+//                    self.collectionView.reloadData()
+//                }
+//            }
+        }
+        
         dispatchGroup.enter()
-        Service.shared.fetchRecipesComplex(query: "", cuisine: ["\(self.sections[1])"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+        Service.shared.fetchRecipesComplex(query: "", cuisine: ["Italian"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
             recipes2 = search?.recipes
             dispatchGroup.leave()
             
@@ -179,12 +212,12 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 if let group = recipes2 {
                     self.groups.append(group)
                 } else {
-                    self.sections.removeAll{ $0 == self.sections[1]}
+                    self.sections.removeAll{ $0 == "Italian"}
                 }
                 self.collectionView.reloadData()
                 
                 dispatchGroup.enter()
-                Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "\(self.sections[2])", intolerances: [""], type: "") { (search, err) in
+                Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
                     recipes3 = search?.recipes
                     dispatchGroup.leave()
                     
@@ -193,12 +226,12 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                         if let group = recipes3 {
                             self.groups.append(group)
                         } else {
-                            self.sections.removeAll{ $0 == self.sections[2]}
+                            self.sections.removeAll{ $0 == "Vegetarian"}
                         }
                         self.collectionView.reloadData()
                             
                         dispatchGroup.enter()
-                        Service.shared.fetchRecipesComplex(query: "", cuisine: ["\(self.sections[3])"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                        Service.shared.fetchRecipesComplex(query: "", cuisine: ["Mexican"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
                         recipes4 = search?.recipes
                         dispatchGroup.leave()
                         
@@ -207,12 +240,12 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                             if let group = recipes4 {
                                 self.groups.append(group)
                             } else {
-                                self.sections.removeAll{ $0 == self.sections[3]}
+                                self.sections.removeAll{ $0 == "Mexican"}
                             }
                             self.collectionView.reloadData()
                             
                             dispatchGroup.enter()
-                            Service.shared.fetchRecipesComplex(query: "\(self.sections[4])", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                            Service.shared.fetchRecipesComplex(query: "Breakfast", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
                                 recipes5 = search?.recipes
                                 dispatchGroup.leave()
                                 
@@ -221,12 +254,12 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                                     if let group = recipes5 {
                                         self.groups.append(group)
                                     } else {
-                                        self.sections.removeAll{ $0 == self.sections[4]}
+                                        self.sections.removeAll{ $0 == "Breakfast"}
                                     }
                                     self.collectionView.reloadData()
                                     
                                     dispatchGroup.enter()
-                                    Service.shared.fetchRecipesComplex(query: "\(self.sections[5])", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                                    Service.shared.fetchRecipesComplex(query: "Dessert", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
                                         recipes6 = search?.recipes
                                         dispatchGroup.leave()
                                         
@@ -235,7 +268,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                                             if let group = recipes6 {
                                                 self.groups.append(group)
                                             } else {
-                                                self.sections.removeAll{ $0 == self.sections[5]}
+                                                self.sections.removeAll{ $0 == "Dessert"}
                                             }
                                             self.collectionView.reloadData()
                                                 
@@ -274,6 +307,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         cell.horizontalController.favAct = favAct
         cell.horizontalController.conversation = conversation
         cell.horizontalController.schedule = schedule
+        cell.horizontalController.activeRecipe = activeRecipe
         cell.horizontalController.umbrellaActivity = umbrellaActivity
         cell.arrowView.isHidden = true
         cell.delegate = self
@@ -296,11 +330,14 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                         destination.conversation = self!.conversation
                         destination.schedule = self!.schedule
                         destination.umbrellaActivity = self!.umbrellaActivity
+                        destination.activeRecipe = self!.activeRecipe
                         destination.delegate = self!
+                        destination.recipeDelegate = self!
                         self?.navigationController?.pushViewController(destination, animated: true)
                     }
                 }
                 cell.horizontalController.removeControllerHandler = { [weak self] type, activity in
+                    self!.movingBackwards = false
                     if type == "activity" {
                         let nav = self?.tabBarController!.viewControllers![1] as! UINavigationController
                         if nav.topViewController is MasterActivityContainerController {
@@ -312,11 +349,19 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                         self!.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
                     } else if type == "schedule" {
                         self!.updateSchedule(schedule: activity)
+                        if let recipeID = activity.recipeID {
+                            self!.updateIngredients(recipe: nil, recipeID: recipeID)
+                        }
                         self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
                     }
                 }
                 cell.horizontalController.favActHandler = { [weak self] favAct in
                     self!.favAct = favAct
+                }
+                cell.horizontalController.recipeUpdate = { [weak self] recipe in
+                    self!.movingBackwards = false
+                    self!.recipeDelegate!.updateRecipe(recipe: recipe)
+                    self!.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
                 }
             }
         }
@@ -340,6 +385,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         header.verticalController.favAct = favAct
         header.verticalController.conversation = conversation
         header.verticalController.schedule = schedule
+        header.verticalController.activeRecipe = activeRecipe
         header.verticalController.umbrellaActivity = umbrellaActivity
         header.verticalController.didSelectHandler = { [weak self] recipe, favAct in
             if let recipe = recipe as? Recipe {
@@ -354,11 +400,14 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 destination.conversation = self!.conversation
                 destination.schedule = self!.schedule
                 destination.umbrellaActivity = self!.umbrellaActivity
+                destination.activeRecipe = self!.activeRecipe
                 destination.delegate = self!
+                destination.recipeDelegate = self!
                 self?.navigationController?.pushViewController(destination, animated: true)
             }
         }
         header.verticalController.removeControllerHandler = { [weak self] type, activity in
+            self!.movingBackwards = false
             if type == "activity" {
                 self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
             } else if type == "schedule" {
@@ -368,6 +417,11 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         }
         header.verticalController.favActHandler = { [weak self] favAct in
             self!.favAct = favAct
+        }
+        header.verticalController.recipeUpdate = { [weak self] recipe in
+            self!.movingBackwards = false
+            self!.recipeDelegate!.updateRecipe(recipe: recipe)
+            self!.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
         }
         return header
     }
@@ -418,4 +472,10 @@ extension MealTypeViewController: UpdateFilter {
         }
     }
         
+}
+
+extension MealTypeViewController: UpdateRecipeDelegate {
+    func updateRecipe(recipe: Recipe?) {
+        self.recipeDelegate?.updateRecipe(recipe: recipe)
+    }
 }

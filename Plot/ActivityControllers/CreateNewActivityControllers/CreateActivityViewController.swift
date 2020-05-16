@@ -721,9 +721,7 @@ class CreateActivityViewController: FormViewController {
                     segmentRow.value = "Hidden"
                 } else if let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
                     segmentRow.value = self!.segmentRowValue
-                    if let indexPath = self!.form.last?.last?.indexPath {
-                        self!.tableView?.scrollToRow(at: indexPath, at: .none, animated: true)
-                    }
+                    
                 }
             }
             
@@ -737,17 +735,11 @@ class CreateActivityViewController: FormViewController {
                 }
                 $0.options = ["Schedule", "Lists", "Purchases"]
                 $0.value = "Schedule"
-                }.onChange({ row  in
-                    if let indexPath = self.form.last?.last?.indexPath {
-                        self.tableView?.scrollToRow(at: indexPath, at: .none, animated: true)
-                    }
-                }).cellUpdate { cell, row in
+                }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
-    
-        //            add in schedule that will be a MultivaluedSection that will lead to another VC with a form that includes item name, start/end time, location, transportation and notes sections - sorted by date/time
-        //            or add in a custom row that shows/hides point options (name, start/end time, location and notes sections)
+
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Schedule",
@@ -791,7 +783,7 @@ class CreateActivityViewController: FormViewController {
                                 }
 
     form +++
-        MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
+        MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                            header: "Lists",
                            footer: "Add a checklist and/or recipe list") {
                             $0.tag = "listsfields"
@@ -803,8 +795,7 @@ class CreateActivityViewController: FormViewController {
                                     }.cellUpdate { cell, row in
                                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                         cell.textLabel?.textAlignment = .left
-                                        
-                                }
+                                    }
                             }
                             $0.multivaluedRowToInsertAt = { index in
                                 self.listIndex = index
@@ -813,12 +804,14 @@ class CreateActivityViewController: FormViewController {
                                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                 row.cell.textLabel?.textAlignment = .left
                                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                row.title = "List"
                                 }.onCellSelection({ _,_ in
                                     self.listIndex = index
                                     self.openList()
                                 }).cellUpdate { cell, row in
                                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                     cell.textLabel?.textAlignment = .left
+                                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                 }
                             }
                             
@@ -831,12 +824,15 @@ class CreateActivityViewController: FormViewController {
                                         row.cell.textLabel?.textAlignment = .left
                                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                         row.title = groceryList.name
-                                        self.grocerylistIndex = row.indexPath!.row
+                                        self.grocerylistIndex = mvs.count - 1
+                                        print("grocerylistIndex \(self.grocerylistIndex)")
                                         }.onCellSelection({ cell, row in
                                             self.listIndex = row.indexPath!.row
+                                            print("listIndex \(self.listIndex)")
                                             self.openList()
                                         }).cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                             cell.textLabel?.textAlignment = .left
                                         }, at: mvs.count - 1)
                                 } else if let checklist = list as? Checklist {
@@ -851,6 +847,7 @@ class CreateActivityViewController: FormViewController {
                                             self.openList()
                                         }).cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                             cell.textLabel?.textAlignment = .left
                                         }, at: mvs.count - 1)
                                 } else if let packinglist = list as? Packinglist {
@@ -865,6 +862,7 @@ class CreateActivityViewController: FormViewController {
                                             self.openList()
                                         }).cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                             cell.textLabel?.textAlignment = .left
                                         }, at: mvs.count - 1)
                                 }
@@ -1267,7 +1265,9 @@ class CreateActivityViewController: FormViewController {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             if listList.isEmpty {
                 activity.checklist = [Checklist]()
+                activity.grocerylist = nil
                 groupActivityReference.child("checklist").removeValue()
+                groupActivityReference.child("grocerylist").removeValue()
             } else {
                 var firebaseChecklistList = [[String: AnyObject?]]()
                 var checklistList = [Checklist]()
@@ -1395,8 +1395,8 @@ class CreateActivityViewController: FormViewController {
         let destination = LocationFinderTableViewController()
         destination.delegate = self
         self.navigationController?.pushViewController(destination, animated: true)
-//        let navigationViewController = UINavigationController(rootViewController: destination)
-//        self.present(navigationViewController, animated: true, completion: nil)
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     //update so existing invitees are shown as selected
@@ -1636,7 +1636,7 @@ class CreateActivityViewController: FormViewController {
                 if let weather = self.weather {
                     destination.weather = weather
                 }
-                
+
             }
             let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
                 let destination = ChecklistViewController()
@@ -1645,14 +1645,23 @@ class CreateActivityViewController: FormViewController {
             }
             let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
                 print("You've pressed cancel")
+                if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+                    print("listsfields")
+                    mvs.remove(at: self.listIndex)
+                }
             }
+            
             if activity.grocerylist == nil {
                 alertController.addAction(groceryList)
+//                alertController.addAction(packingList)
+                alertController.addAction(checkList)
+                alertController.addAction(cancelAlert)
+                self.present(alertController, animated: true, completion: nil)
+            } else {
+                let destination = ChecklistViewController()
+                destination.delegate = self
+                self.navigationController?.pushViewController(destination, animated: true)
             }
-            alertController.addAction(packingList)
-            alertController.addAction(checkList)
-            alertController.addAction(cancelAlert)
-            self.present(alertController, animated: true, completion: nil)
         }
     }
     
@@ -1957,75 +1966,120 @@ class CreateActivityViewController: FormViewController {
     }
     
     fileprivate func updateGrocerylist(recipe: Recipe, add: Bool) {
-        if let groceryList = self.activity.grocerylist, let activityIngredients = groceryList.ingredients, let recipeIngredients = recipe.extendedIngredients {
-            for recipeIngredient in recipeIngredients {
-                if let index = activityIngredients.firstIndex(where: {$0 == recipeIngredient}) {
-                    if add {
-                        if activityIngredients[index].amount != nil {
-                            self.activity.grocerylist!.ingredients![index].amount! += recipeIngredient.amount ?? 0.0
-                        }
-                        if activityIngredients[index].measures?.metric?.amount != nil {
-                            self.activity.grocerylist!.ingredients![index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
-                        }
-                        if activityIngredients[index].measures?.us?.amount != nil {
-                            self.activity.grocerylist!.ingredients![index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
-                        }
-                    } else {
-                        if activityIngredients[index].amount != nil {
-                            self.activity.grocerylist!.ingredients![index].amount! -= recipeIngredient.amount ?? 0.0
-                            if self.activity.grocerylist!.ingredients![index].amount! == 0 {
-                                self.activity.grocerylist!.ingredients!.remove(at: index)
-                                continue
+        print("updating grocery list")
+        if self.activity.grocerylist != nil, self.activity.grocerylist?.ingredients != nil, let recipeIngredients = recipe.extendedIngredients {
+            var glIngredients = self.activity.grocerylist!.ingredients!
+            if let grocerylistServings = activity.grocerylist!.servings!["\(recipe.id)"], grocerylistServings != recipe.servings {
+                activity.grocerylist!.servings!["\(recipe.id)"] = recipe.servings
+                for recipeIngredient in recipeIngredients {
+                    if let index = self.activity.grocerylist?.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
+                        glIngredients[index].recipe![recipe.title] = recipeIngredient.amount ?? 0.0
+                            if glIngredients[index].amount != nil && recipeIngredient.amount != nil  {
+                                glIngredients[index].amount! +=  recipeIngredient.amount! - recipeIngredient.amount! * Double(grocerylistServings) / Double(recipe.servings!)
                             }
-                        }
-                        if activityIngredients[index].measures?.metric?.amount != nil {
-                            self.activity.grocerylist!.ingredients![index].measures?.metric?.amount! -= recipeIngredient.measures?.metric?.amount ?? 0.0
-                            if self.activity.grocerylist!.ingredients![index].measures?.metric?.amount! == 0 {
-                                self.activity.grocerylist!.ingredients!.remove(at: index)
-                                continue
+                            if glIngredients[index].measures?.metric?.amount != nil && recipeIngredient.measures?.metric?.amount! != nil {
+                                glIngredients[index].measures!.metric!.amount! +=  recipeIngredient.measures!.metric!.amount! - recipeIngredient.measures!.metric!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
                             }
-                        }
-                        if activityIngredients[index].measures?.us?.amount != nil {
-                            self.activity.grocerylist!.ingredients![index].measures?.us?.amount! -= recipeIngredient.measures?.us?.amount ?? 0.0
-                            if self.activity.grocerylist!.ingredients![index].measures?.us?.amount! == 0 {
-                                self.activity.grocerylist!.ingredients!.remove(at: index)
+                            if glIngredients[index].measures?.us?.amount != nil && recipeIngredient.measures?.us?.amount! != nil {
+                                glIngredients[index].measures!.us!.amount! +=  recipeIngredient.measures!.us!.amount! - recipeIngredient.measures!.us!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
                             }
-                        }
                     }
+                }
+            } else if activity.grocerylist!.recipes!["\(recipe.id)"] != nil && add {
+                return
+            } else {
+                if add {
+                    activity.grocerylist!.recipes!["\(recipe.id)"] = recipe.title
+                    activity.grocerylist!.servings!["\(recipe.id)"] = recipe.servings
                 } else {
-                    if add {
-                        self.activity.grocerylist?.ingredients!.append(recipeIngredient)
+                    activity.grocerylist!.recipes!["\(recipe.id)"] = nil
+                    activity.grocerylist!.servings!["\(recipe.id)"] = nil
+                }
+                for recipeIngredient in recipeIngredients {
+                    if let index = self.activity.grocerylist?.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
+                        if add {
+                            glIngredients[index].recipe![recipe.title] = recipeIngredient.amount ?? 0.0
+                            if glIngredients[index].amount != nil {
+                                glIngredients[index].amount! += recipeIngredient.amount ?? 0.0
+                            }
+                            if glIngredients[index].measures?.metric?.amount != nil {
+                                glIngredients[index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
+                            }
+                            if glIngredients[index].measures?.us?.amount != nil {
+                                glIngredients[index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
+                            }
+                        } else {
+                            if glIngredients[index].amount != nil {
+                                glIngredients[index].amount! -= recipeIngredient.amount ?? 0.0
+                                if glIngredients[index].amount! == 0 {
+                                    glIngredients.remove(at: index)
+                                    continue
+                                } else {
+                                    glIngredients[index].recipe![recipe.title] = nil
+                                }
+                            }
+                            if glIngredients[index].measures?.metric?.amount != nil {
+                                glIngredients[index].measures?.metric?.amount! -= recipeIngredient.measures?.metric?.amount ?? 0.0
+                                if glIngredients[index].measures?.metric?.amount! == 0 {
+                                    glIngredients.remove(at: index)
+                                    continue
+                                } else {
+                                    glIngredients[index].recipe![recipe.title] = nil
+                                }
+                            }
+                            if glIngredients[index].measures?.us?.amount != nil {
+                                glIngredients[index].measures?.us?.amount! -= recipeIngredient.measures?.us?.amount ?? 0.0
+                                if glIngredients[index].measures?.us?.amount! == 0 {
+                                    glIngredients.remove(at: index)
+                                } else {
+                                    glIngredients[index].recipe![recipe.title] = nil
+                                }
+                            }
+                        }
                     } else {
-                        if let index = activityIngredients.firstIndex(where: {$0 == recipeIngredient}) {
-                            self.activity.grocerylist!.ingredients!.remove(at: index)
+                        if add {
+                            var recIngredient = recipeIngredient
+                            recIngredient.recipe = [recipe.title: recIngredient.amount ?? 0.0]
+                            glIngredients.append(recIngredient)
                         }
                     }
                 }
             }
-            if self.activity.grocerylist!.ingredients!.isEmpty {
+            if glIngredients.isEmpty {
                 let mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.remove(at: grocerylistIndex)
                 self.activity.grocerylist = nil
+            } else {
+                self.activity.grocerylist?.ingredients = glIngredients
             }
-        } else if let recipeIngredients = recipe.extendedIngredients {
+            if listList.indices.contains(grocerylistIndex) {
+                listList[grocerylistIndex] = self.activity.grocerylist as Any
+            }
+            print("updated grocery list")
+        } else if let recipeIngredients = recipe.extendedIngredients, add {
             let groceryList = Grocerylist(dictionary: ["name" : "Grocery List"] as [String: AnyObject])
-            groceryList.ingredients = recipeIngredients
-            groceryList.recipes?["\(recipe.id)"] = recipe.title
-            
             var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
             mvs.insert(ButtonRow() { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.title = groceryList.name
-                self.grocerylistIndex = row.indexPath!.row
+                self.grocerylistIndex = mvs.count - 1
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.textLabel?.textAlignment = .left
                 }, at: mvs.count - 1)
+            
+            groceryList.ingredients = recipeIngredients
+            for index in 0...groceryList.ingredients!.count - 1 {
+                groceryList.ingredients![index].recipe = [recipe.title: groceryList.ingredients![index].amount ?? 0.0]
+            }
+            groceryList.recipes = ["\(recipe.id)": recipe.title]
+            groceryList.servings = ["\(recipe.id)": recipe.servings!]
             
             self.activity.grocerylist? = groceryList
             listList.append(groceryList)
@@ -2185,6 +2239,7 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
         }
     }
     func updateIngredients(recipe: Recipe?, recipeID: String?) {
+        print("updating Ingredients")
         if let recipe = recipe {
             updateGrocerylist(recipe: recipe, add: true)
         } else if let recipeID = recipeID {
@@ -2218,10 +2273,11 @@ extension CreateActivityViewController: UpdatePurchasesDelegate {
 
 extension CreateActivityViewController: UpdateChecklistDelegate {
     func updateChecklist(checklist: Checklist) {
-        if let mvs = self.form.sectionBy(tag: "listfields") as? MultivaluedSection {
+        if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
             let listRow = mvs.allRows[listIndex]
-            if checklist.name != "Checklist Name" {
+            if checklist.name != "CheckListName" {
                 listRow.baseValue = checklist
+                listRow.title = checklist.name
                 listRow.updateCell()
                 if listList.indices.contains(listIndex) {
                     listList[listIndex] = checklist
@@ -2231,7 +2287,7 @@ extension CreateActivityViewController: UpdateChecklistDelegate {
                 updateLists(type: "lists")
             }
             else {
-                mvs.remove(at: purchaseIndex)
+                mvs.remove(at: listIndex)
             }
         }
     }
@@ -2239,9 +2295,10 @@ extension CreateActivityViewController: UpdateChecklistDelegate {
 
 extension CreateActivityViewController: UpdatePackinglistDelegate {
     func updatePackinglist(packinglist: Packinglist) {
-        if let mvs = self.form.sectionBy(tag: "listfields") as? MultivaluedSection {
+        if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
             let listRow = mvs.allRows[listIndex]
-            if packinglist.name != "Packing List Name" {
+            if packinglist.name != "PackingListName" {
+                listRow.title = packinglist.name
                 listRow.baseValue = packinglist
                 listRow.updateCell()
                 if listList.indices.contains(listIndex) {
@@ -2250,9 +2307,8 @@ extension CreateActivityViewController: UpdatePackinglistDelegate {
                     listList.append(packinglist)
                 }
                 updateLists(type: "lists")
-            }
-            else {
-                mvs.remove(at: purchaseIndex)
+            } else {
+                mvs.remove(at: listIndex)
             }
         }
     }
@@ -2260,16 +2316,22 @@ extension CreateActivityViewController: UpdatePackinglistDelegate {
 
 extension CreateActivityViewController: UpdateGrocerylistDelegate {
     func updateGrocerylist(grocerylist: Grocerylist) {
-        if let mvs = self.form.sectionBy(tag: "listfields") as? MultivaluedSection {
-            let listRow = mvs.allRows[grocerylistIndex]
-            listRow.baseValue = grocerylist
-            listRow.updateCell()
-            if listList.indices.contains(grocerylistIndex) {
-                listList[grocerylistIndex] = grocerylist
+        if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+            if grocerylist.name != "GroceryListName" {
+                let listRow = mvs.allRows[grocerylistIndex]
+                listRow.baseValue = grocerylist
+                listRow.title = grocerylist.name
+                listRow.updateCell()
+                if listList.indices.contains(grocerylistIndex) {
+                    listList[grocerylistIndex] = grocerylist
+                } else {
+                    listList.append(grocerylist)
+                }
+                updateLists(type: "lists")
             } else {
-                listList.append(grocerylist)
+                mvs.remove(at: grocerylistIndex)
+                activity.grocerylist = nil
             }
-            updateLists(type: "lists")
         }
     }
 }

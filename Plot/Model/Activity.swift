@@ -120,6 +120,14 @@ class Activity: NSObject, NSCopying, Codable {
                 checklistList.append(check)
             }
             checklist = checklistList
+        } else if let items = dictionary?["checklist"] as? [String : [String : Bool]] {
+            let check = Checklist(dictionary: ["name": "Checklist" as AnyObject])
+            var checklistItems = [String: Bool]()
+            for item in items.values {
+                checklistItems[item.keys.first!] = item.values.first
+            }
+            check.items = checklistItems
+            checklist = [check]
         }
         
         if let packinglistFirebaseList = dictionary?["packinglist"] as? [AnyObject] {
@@ -131,8 +139,10 @@ class Activity: NSObject, NSCopying, Codable {
             }
             packinglist = packinglistList
         }
-        
-        grocerylist = dictionary?["groceryList"] as? Grocerylist
+                
+        if let groceryList = dictionary?["grocerylist"] as? [String : AnyObject] {
+            grocerylist = Grocerylist(dictionary: groceryList)
+        }
         
         transportation = dictionary?["transportation"] as? String
         activityOriginalPhotoURL = dictionary?["activityOriginalPhotoURL"] as? String

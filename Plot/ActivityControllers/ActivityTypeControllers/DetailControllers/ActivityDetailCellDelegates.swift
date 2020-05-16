@@ -11,27 +11,34 @@ import Firebase
 
 extension MealDetailViewController: ActivityDetailCellDelegate {
     func servingsUpdated(servings: Int) {
-        if let activity = activity {
-            if servings != detailedRecipe?.servings {
-                print("servings \(servings)")
-                activity.servings = servings
-                fetchDetails()
-            }
+        if let activity = activity, servings != detailedRecipe?.servings {
+            activity.servings = servings
+            fetchDetails()
+        } else if self.servings != nil, servings != detailedRecipe?.servings {
+            self.servings = servings
+            fetchDetails()
         }
     }
     
     func plusButtonTapped() {
+        if activeRecipe {
+            if let recipe = self.detailedRecipe {
+                self.recipeDelegate?.updateRecipe(recipe: recipe)
+                self.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
+                return
+            }
+        }
         if active, schedule, let activity = activity {
             
             let membersIDs = self.fetchMembersIDs()
             activity.participantsIDs = membersIDs.0
             
             self.delegate?.updateSchedule(schedule: activity)
-//            if let recipe = self.detailedRecipe {
-//                self.delegate?.updateIngredients(recipe: recipe, recipeID: nil)
-//            }
-            self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
-                
+            if let recipe = self.detailedRecipe {
+                self.delegate?.updateIngredients(recipe: recipe, recipeID: nil)
+                self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+                return
+            }
         }
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -46,7 +53,7 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
                 createActivity.createNewActivity()
                 self.hideActivityIndicator()
                 
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 
             }))
             
@@ -81,7 +88,7 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                     
-                    self.navigationController?.backToViewController(viewController: ActivityViewController.self)
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 }
                 
 
@@ -468,6 +475,7 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
             
             self.delegate?.updateSchedule(schedule: activity)
             self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+            return
                 
         }
         
@@ -903,6 +911,7 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
             
             self.delegate?.updateSchedule(schedule: activity)
             self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+            return
                 
         }
         

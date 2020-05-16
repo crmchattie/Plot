@@ -10,6 +10,10 @@ import UIKit
 import Firebase
 import MapKit
 
+protocol UpdateRecipeDelegate: class {
+    func updateRecipe(recipe: Recipe?)
+}
+
 
 class MealDetailViewController: ActivityDetailViewController {
     
@@ -17,9 +21,14 @@ class MealDetailViewController: ActivityDetailViewController {
     private let kActivityExpandedDetailCell = "ActivityExpandedDetailCell"
     private let kMealDetailCell = "MealDetailCell"
     
+    weak var recipeDelegate : UpdateRecipeDelegate?
+    
     var recipe: Recipe?
     
     var segment: Int = 0
+    var servings: Int?
+    //for grocery list
+    var activeRecipe: Bool = false
     
     var ingredients = [ExtendedIngredient]()
     var instructions = [String]()
@@ -38,11 +47,13 @@ class MealDetailViewController: ActivityDetailViewController {
         
         setActivity()
         
-        if !active {
+        if !active || !activeRecipe {
             setMoreActivity()
         } else {
             if let activityServings = activity.servings {
                 recipe?.servings = activityServings
+            } else if servings != nil {
+                recipe?.servings = servings
             }
         }
         
@@ -133,7 +144,7 @@ class MealDetailViewController: ActivityDetailViewController {
                 var extendedIngredients = recipe.extendedIngredients
                 for index in 0...extendedIngredients!.count - 1 {
                     dispatchGroup.enter()
-                    if let activityServings = activity.servings {
+                    if let activityServings = activity.servings ?? servings {
                         if extendedIngredients![index].amount != nil {
                             extendedIngredients![index].amount = extendedIngredients![index].amount! * Double(activityServings) / Double(detailedRecipe!.servings!)
                         }
@@ -151,6 +162,11 @@ class MealDetailViewController: ActivityDetailViewController {
                 if activity.servings != nil {
                     detailedRecipe?.extendedIngredients = extendedIngredients!
                     detailedRecipe?.servings = activity.servings
+                    self.recipe?.servings = activity.servings
+                } else if servings != nil {
+                    detailedRecipe?.extendedIngredients = extendedIngredients!
+                    detailedRecipe?.servings = servings
+                    self.recipe?.servings = servings
                 }
             }
             if let analyzedInstructions = recipe.analyzedInstructions {
@@ -187,7 +203,11 @@ class MealDetailViewController: ActivityDetailViewController {
     
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        if !activeRecipe {
+            return 3
+        } else {
+            return 2
+        }
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -207,7 +227,7 @@ class MealDetailViewController: ActivityDetailViewController {
             } else {
                 return cell
             }
-        } else if indexPath.item == 1 {
+        } else if indexPath.item == 1 && !activeRecipe {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
             cell.delegate = self
             if let recipe = recipe {
@@ -245,7 +265,7 @@ class MealDetailViewController: ActivityDetailViewController {
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.item == 1 {
+        } else if indexPath.item == 1 && !activeRecipe {
             if secondSectionHeight == 0 {
                 let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
                 dummyCell.recipe = recipe
@@ -277,8 +297,7 @@ class MealDetailViewController: ActivityDetailViewController {
     func updateHeight() {
         heightArray = [firstHeight, secondHeight, thirdHeight]
         DispatchQueue.main.async {
-            let indexPath = IndexPath(item: 2, section: 0)
-            self.collectionView.reloadItems(at: [indexPath])
+            self.collectionView.reloadData()
         }
     }
     

@@ -453,6 +453,9 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if type == "schedule" {
                     self!.movingBackwards = false
                     self!.updateSchedule(schedule: activity)
+                    if let recipeID = activity.recipeID {
+                        self!.updateIngredients(recipe: nil, recipeID: recipeID)
+                    }
                     self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
                 }
             }

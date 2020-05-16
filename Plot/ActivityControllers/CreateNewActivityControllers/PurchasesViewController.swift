@@ -67,9 +67,7 @@ class PurchasesViewController: FormViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        //when try to re-select location will default to nothing
         if self.movingBackwards {
-            
             delegate?.updatePurchases(purchase: purchase)
         }
     }

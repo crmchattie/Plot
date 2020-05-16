@@ -84,7 +84,6 @@ class ScheduleViewController: FormViewController {
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: nil, action: nil)
         
         let dotsImage = UIImage(named: "dots")
         if #available(iOS 11.0, *) {

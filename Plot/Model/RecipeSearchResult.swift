@@ -93,7 +93,7 @@ struct ExtendedIngredient: Codable, Equatable {
     let unit: String?
     let meta, metaInformation: [String]?
     var measures: Measures?
-    var recipeID: [String]?
+    var recipe: [String: Double]?
     var bool: Bool?
     
     func toAnyObject() -> [String: AnyObject?] {
@@ -148,8 +148,8 @@ struct ExtendedIngredient: Codable, Equatable {
             dictionary["measures"] = firebase as AnyObject
         }
         
-        if let value = self.recipeID as AnyObject? {
-            dictionary["recipeID"] = value
+        if let value = self.recipe as AnyObject? {
+            dictionary["recipe"] = value
         }
         
         if let value = self.bool as AnyObject? {

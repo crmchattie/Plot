@@ -21,6 +21,7 @@ class ChecklistViewController: FormViewController {
     var checklist: Checklist!
     
     fileprivate var active: Bool = false
+    fileprivate var movingBackwards: Bool = true
                 
     override func viewDidLoad() {
     super.viewDidLoad()
@@ -31,11 +32,20 @@ class ChecklistViewController: FormViewController {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
         } else {
-            checklist = Checklist(dictionary: ["name" : "Checklist Name" as AnyObject])
+            checklist = Checklist(dictionary: ["name" : "CheckListName" as AnyObject])
+            self.navigationItem.rightBarButtonItem?.isEnabled = false
         }
         
         initializeForm()
         
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if self.movingBackwards {
+            delegate?.updateChecklist(checklist: checklist)
+        }
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -54,15 +64,7 @@ class ChecklistViewController: FormViewController {
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelChecklist))
-
-        let rightBarButton = UIButton(type: .system)
-        rightBarButton.setTitle("Update", for: .normal)
-        rightBarButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        rightBarButton.titleLabel?.adjustsFontForContentSizeCategory = true
-        rightBarButton.addTarget(self, action: #selector(closeChecklist), for: .touchUpInside)
-
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightBarButton)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
@@ -70,11 +72,8 @@ class ChecklistViewController: FormViewController {
         navigationItem.title = "Checklist"
     }
     
-    @objc fileprivate func cancelChecklist() {
-        self.navigationController?.popViewController(animated: true)
-    }
-    
-    @objc fileprivate func closeChecklist() {
+    @objc fileprivate func close() {
+        movingBackwards = false
         delegate?.updateChecklist(checklist: checklist)
         self.navigationController?.popViewController(animated: true)
         
@@ -84,14 +83,13 @@ class ChecklistViewController: FormViewController {
         form +++
         Section()
             
-        <<< TextRow("Checklist Name") {
+        <<< TextRow("Name") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.placeholder = $0.tag
             if active, let checklist = checklist {
                 $0.value = checklist.name
-                self.navigationItem.title = $0.value
             } else {
                 $0.cell.textField.becomeFirstResponder()
             }
@@ -102,7 +100,6 @@ class ChecklistViewController: FormViewController {
                 if row.value == nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                 } else {
-                    self.navigationItem.title = row.value
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, row in
@@ -112,7 +109,9 @@ class ChecklistViewController: FormViewController {
         }
         
         form +++
-        MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder]) {
+        MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+            header: "Checklist",
+            footer: "Add a checklist item") {
             $0.tag = "checklistfields"
             $0.addButtonProvider = { section in
                 return ButtonRow(){
