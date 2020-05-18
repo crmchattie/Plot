@@ -133,9 +133,15 @@ class WeatherCollectionViewCell: UICollectionViewCell {
     var weather: DailyWeatherElement! {
         didSet {
             if let dateString = weather.observationTime?.value, let date = dateString.toDate() {
-                let formatter = DateFormatter()
-                formatter.dateFormat = "EEE"
-                dayLabel.text = formatter.string(from: date)
+                if Calendar.current.isDateInToday(date) {
+                    dayLabel.text = "Today"
+                } else if Calendar.current.isDateInTomorrow(date) {
+                    dayLabel.text = "Tomorrow"
+                } else {
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "EEE"
+                    dayLabel.text = formatter.string(from: date)
+                }
             }
             if let temp = weather.temp {
                 if let min = temp[0].min, let minValue = min.value {
