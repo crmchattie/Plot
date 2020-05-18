@@ -97,6 +97,7 @@
 		10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EE245C5B8000C80AAF /* Checklist.swift */; };
 		10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27F0245C6B6400C80AAF /* Packinglist.swift */; };
 		10EE27F3245DFA8E00C80AAF /* PackinglistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */; };
+		10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */; };
 		10F8C19024401FA80085ECB0 /* ActivityExpandedDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C18F24401FA80085ECB0 /* ActivityExpandedDetailCell.swift */; };
 		10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */; };
 		26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */; };
@@ -407,6 +408,7 @@
 		10EE27EE245C5B8000C80AAF /* Checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checklist.swift; sourceTree = "<group>"; };
 		10EE27F0245C6B6400C80AAF /* Packinglist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packinglist.swift; sourceTree = "<group>"; };
 		10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackinglistViewController.swift; sourceTree = "<group>"; };
+		10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientSearchViewController.swift; sourceTree = "<group>"; };
 		10F8C18F24401FA80085ECB0 /* ActivityExpandedDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityExpandedDetailCell.swift; sourceTree = "<group>"; };
 		10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailViewController.swift; sourceTree = "<group>"; };
 		26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
@@ -789,6 +791,7 @@
 				10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */,
 				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
 				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
+				10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */,
 				10196EF224411B5500B6AFDF /* MapViewController.swift */,
 				10196EFB24411B5600B6AFDF /* PhotosViewController.swift */,
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
@@ -2070,6 +2073,7 @@
 				4BAEE5E2212735E50045AB10 /* Public.swift in Sources */,
 				10C50FA22274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift in Sources */,
 				26E3179B2379FB72007D1F21 /* ActivityTypeViewController.swift in Sources */,
+				10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */,
 				4BAEE46F21272B380045AB10 /* NotificationsTableViewController.swift in Sources */,
 				4BAEE50421272D890045AB10 /* AutoSizingCollectionViewFlowLayout.swift in Sources */,
 				10196F0524411B5600B6AFDF /* CreateActivityViewController.swift in Sources */,

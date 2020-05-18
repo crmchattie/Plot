@@ -183,108 +183,107 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         let dispatchGroup = DispatchGroup()
         
         if self.groups.isEmpty {
-            self.sections.removeAll{ $0 == "American"}
-            
-//            dispatchGroup.enter()
-//            Service.shared.fetchRecipesComplex(query: "", cuisine: ["American"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-//                recipes1 = search?.recipes
-//                dispatchGroup.leave()
-//
-//                dispatchGroup.notify(queue: .main) {
-//                    if let group = recipes1 {
-//                        self.groups.append(group)
-//                    } else {
-//                        self.sections.removeAll{ $0 == "American"}
-//                    }
-//
-//                    self.collectionView.reloadData()
-//                }
-//            }
+            dispatchGroup.enter()
+            Service.shared.fetchRecipesComplex(query: "", cuisine: ["American"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                recipes1 = search?.recipes
+                dispatchGroup.leave()
+
+                dispatchGroup.notify(queue: .main) {
+                    if let group = recipes1 {
+                        self.groups.append(group)
+                    } else {
+                        self.sections.removeAll{ $0 == "American"}
+                    }
+
+                    self.collectionView.reloadData()
+                }
+            }
         }
         
-        dispatchGroup.enter()
-        Service.shared.fetchRecipesComplex(query: "", cuisine: ["Italian"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-            recipes2 = search?.recipes
-            dispatchGroup.leave()
-            
-            dispatchGroup.notify(queue: .main) {
-                self.removeSpinner()
-                if let group = recipes2 {
-                    self.groups.append(group)
-                } else {
-                    self.sections.removeAll{ $0 == "Italian"}
-                }
-                self.collectionView.reloadData()
+        dispatchGroup.notify(queue: .main) {
+            dispatchGroup.enter()
+            Service.shared.fetchRecipesComplex(query: "", cuisine: ["Italian"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                recipes2 = search?.recipes
+                dispatchGroup.leave()
                 
-                dispatchGroup.enter()
-                Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
-                    recipes3 = search?.recipes
-                    dispatchGroup.leave()
+                dispatchGroup.notify(queue: .main) {
+                    self.removeSpinner()
+                    if let group = recipes2 {
+                        self.groups.append(group)
+                    } else {
+                        self.sections.removeAll{ $0 == "Italian"}
+                    }
+                    self.collectionView.reloadData()
                     
-                    dispatchGroup.notify(queue: .main) {
-                        self.removeSpinner()
-                        if let group = recipes3 {
-                            self.groups.append(group)
-                        } else {
-                            self.sections.removeAll{ $0 == "Vegetarian"}
-                        }
-                        self.collectionView.reloadData()
-                            
-                        dispatchGroup.enter()
-                        Service.shared.fetchRecipesComplex(query: "", cuisine: ["Mexican"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-                        recipes4 = search?.recipes
+                    dispatchGroup.enter()
+                    Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: "Vegetarian", intolerances: [""], type: "") { (search, err) in
+                        recipes3 = search?.recipes
                         dispatchGroup.leave()
                         
                         dispatchGroup.notify(queue: .main) {
                             self.removeSpinner()
-                            if let group = recipes4 {
+                            if let group = recipes3 {
                                 self.groups.append(group)
                             } else {
-                                self.sections.removeAll{ $0 == "Mexican"}
+                                self.sections.removeAll{ $0 == "Vegetarian"}
                             }
                             self.collectionView.reloadData()
-                            
+                                
                             dispatchGroup.enter()
-                            Service.shared.fetchRecipesComplex(query: "Breakfast", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-                                recipes5 = search?.recipes
-                                dispatchGroup.leave()
-                                
-                                dispatchGroup.notify(queue: .main) {
-                                    self.removeSpinner()
-                                    if let group = recipes5 {
-                                        self.groups.append(group)
-                                    } else {
-                                        self.sections.removeAll{ $0 == "Breakfast"}
-                                    }
-                                    self.collectionView.reloadData()
-                                    
-                                    dispatchGroup.enter()
-                                    Service.shared.fetchRecipesComplex(query: "Dessert", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-                                        recipes6 = search?.recipes
-                                        dispatchGroup.leave()
-                                        
-                                        dispatchGroup.notify(queue: .main) {
-                                            self.removeSpinner()
-                                            if let group = recipes6 {
-                                                self.groups.append(group)
-                                            } else {
-                                                self.sections.removeAll{ $0 == "Dessert"}
-                                            }
-                                            self.collectionView.reloadData()
-                                                
-                                        }
-                                    }
-                                        
+                            Service.shared.fetchRecipesComplex(query: "", cuisine: ["Mexican"], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                            recipes4 = search?.recipes
+                            dispatchGroup.leave()
+                            
+                            dispatchGroup.notify(queue: .main) {
+                                self.removeSpinner()
+                                if let group = recipes4 {
+                                    self.groups.append(group)
+                                } else {
+                                    self.sections.removeAll{ $0 == "Mexican"}
                                 }
-                            }
+                                self.collectionView.reloadData()
                                 
+                                dispatchGroup.enter()
+                                Service.shared.fetchRecipesComplex(query: "Breakfast", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                                    recipes5 = search?.recipes
+                                    dispatchGroup.leave()
+                                    
+                                    dispatchGroup.notify(queue: .main) {
+                                        self.removeSpinner()
+                                        if let group = recipes5 {
+                                            self.groups.append(group)
+                                        } else {
+                                            self.sections.removeAll{ $0 == "Breakfast"}
+                                        }
+                                        self.collectionView.reloadData()
+                                        
+                                        dispatchGroup.enter()
+                                        Service.shared.fetchRecipesComplex(query: "Dessert", cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                                            recipes6 = search?.recipes
+                                            dispatchGroup.leave()
+                                            
+                                            dispatchGroup.notify(queue: .main) {
+                                                self.removeSpinner()
+                                                if let group = recipes6 {
+                                                    self.groups.append(group)
+                                                } else {
+                                                    self.sections.removeAll{ $0 == "Dessert"}
+                                                }
+                                                self.collectionView.reloadData()
+                                                    
+                                            }
+                                        }
+                                            
+                                    }
+                                }
+                                    
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        
     }
     
     

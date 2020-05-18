@@ -571,6 +571,25 @@ extension Dictionary {
     }
 }
 
+extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
+    func filterDictionaryUsingRegex(withRegex regex: String) -> Dictionary<Key, Value> {
+        return self.filter({($0.key as! String).range(of: ".*\(regex.lowercased()).*", options: .regularExpression) != nil}).toDictionary(byTransforming: {$0})
+    }
+}
+
+extension Array
+{
+  func toDictionary<H:Hashable, T>(byTransforming transformer: (Element) -> (H, T)) -> Dictionary<H, T>
+  {
+    var result = Dictionary<H,T>()
+    self.forEach({ element in
+      let (key,value) = transformer(element)
+      result[key] = value
+    })
+    return result
+  }
+}
+
 extension UITableViewCell {
   var selectionColor: UIColor {
     set {

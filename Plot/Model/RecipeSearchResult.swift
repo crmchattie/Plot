@@ -90,11 +90,14 @@ struct ExtendedIngredient: Codable, Equatable {
     let consitency: String?
     let name, original, originalString, originalName: String?
     var amount: Double?
-    let unit: String?
+    var unit: String?
     let meta, metaInformation: [String]?
     var measures: Measures?
     var recipe: [String: Double]?
     var bool: Bool?
+    var unitLong: String?
+    var unitShort: String?
+    var possibleUnits: [String]?
     
     func toAnyObject() -> [String: AnyObject?] {
         var dictionary = [String: AnyObject?]()
@@ -155,6 +158,18 @@ struct ExtendedIngredient: Codable, Equatable {
         if let value = self.bool as AnyObject? {
             dictionary["bool"] = value
         }
+        
+        if let value = self.unitLong as AnyObject? {
+            dictionary["unitLong"] = value
+        }
+        
+        if let value = self.unitShort as AnyObject? {
+            dictionary["unitShort"] = value
+        }
+        
+        if let value = self.possibleUnits as AnyObject? {
+            dictionary["possibleUnits"] = value
+        }
                         
         return dictionary
     }
@@ -192,7 +207,7 @@ struct Measures: Codable {
 // MARK: - Metric
 struct Metric: Codable {
     var amount: Double?
-    let unitShort, unitLong: String?
+    var unitShort, unitLong: String?
     
     func toAnyObject() -> [String: AnyObject?] {
         var dictionary = [String: AnyObject?]()

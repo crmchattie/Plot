@@ -33,6 +33,7 @@ enum ViewPlaceholderTitle: String {
     case emptyNotifications = "You don't have any notifications yet"
     case emptyInvitedActivities = "You have not yet been invited to any activities"
     case emptyLists = "You don't have any lists yet"
+    case emptyIngredients = "Please search for ingredients above"
 }
 
 enum ViewPlaceholderSubtitle: String {

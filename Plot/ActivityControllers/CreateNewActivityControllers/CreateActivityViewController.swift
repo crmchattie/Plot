@@ -1989,11 +1989,16 @@ class CreateActivityViewController: FormViewController {
                 return
             } else {
                 if add {
-                    activity.grocerylist!.recipes!["\(recipe.id)"] = recipe.title
-                    activity.grocerylist!.servings!["\(recipe.id)"] = recipe.servings
+                    if self.activity.grocerylist!.recipes != nil {
+                        self.activity.grocerylist!.recipes!["\(recipe.id)"] = recipe.title
+                        self.activity.grocerylist!.servings!["\(recipe.id)"] = recipe.servings
+                    } else {
+                        self.activity.grocerylist!.recipes = ["\(recipe.id)": recipe.title]
+                        self.activity.grocerylist!.servings = ["\(recipe.id)": recipe.servings!]
+                    }
                 } else {
-                    activity.grocerylist!.recipes!["\(recipe.id)"] = nil
-                    activity.grocerylist!.servings!["\(recipe.id)"] = nil
+                    self.activity.grocerylist!.recipes!["\(recipe.id)"] = nil
+                    self.activity.grocerylist!.servings!["\(recipe.id)"] = nil
                 }
                 for recipeIngredient in recipeIngredients {
                     if let index = self.activity.grocerylist?.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
