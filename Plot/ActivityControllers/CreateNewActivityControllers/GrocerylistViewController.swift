@@ -132,7 +132,6 @@ class GrocerylistViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }.onCellSelection({ _,_ in
-                    print("index \(index)")
                     self.recipeIndex = index
                     self.openRecipe()
                 }).cellUpdate { cell, row in
@@ -145,7 +144,6 @@ class GrocerylistViewController: FormViewController {
             }
         if let recipes = self.grocerylist.recipes {
             for (_, title) in recipes {
-                print("recipe title \(title)")
                 var mvs = (form.sectionBy(tag: "recipefields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
                     row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -168,71 +166,41 @@ class GrocerylistViewController: FormViewController {
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                 header: "Ingredient(s)") {
                 $0.tag = "ingredientfields"
-                $0.addButtonProvider = { section in
-                    return ButtonRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.title = "Add New Ingredient"
-                        }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.textLabel?.textAlignment = .left
-                        }
-                }
-                $0.multivaluedRowToInsertAt = { index in
-                    self.ingredientIndex = -1
-                    self.openIngredient()
-                    return SplitRow<ButtonRow, CheckRow>(){
-                        $0.rowLeftPercentage = 0.75
-                        $0.rowLeft = ButtonRow(){ row in
-                            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            row.cell.textLabel?.textAlignment = .left
-                            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            }.cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                cell.textLabel?.textAlignment = .left
-                            }
-                        
-                        $0.rowRight = CheckRow() {
+                    $0.addButtonProvider = { section in
+                        return ButtonRow(){
                             $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            $0.cell.tintColor = FalconPalette.defaultBlue
-                            $0.value = false
-                            $0.cell.accessoryType = .checkmark
-                            $0.cell.tintAdjustmentMode = .dimmed
+                            $0.title = "Add New Ingredient"
                             }.cellUpdate { cell, row in
                                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                cell.tintColor = FalconPalette.defaultBlue
-                                if row.value == false {
-                                    cell.accessoryType = .checkmark
-                                    cell.tintAdjustmentMode = .dimmed
-                                } else {
-                                    cell.tintAdjustmentMode = .automatic
-                                }
+                                cell.textLabel?.textAlignment = .left
                         }
-                        }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    }
+                    $0.multivaluedRowToInsertAt = { index in
+                        self.ingredientIndex = -1
+                        self.openIngredient()
+                        return LabelRow(){ row in
+                            
                         }
-                    
+                    }
                 }
-                
-            }
         
         addIngredients()
     }
     
     fileprivate func addIngredients() {
         if let items = self.grocerylist.ingredients {
-            print("addIngredients items count \(items.count)")
             for index in 0...items.count - 1 {
                 var aisle = items[index].aisle!.capitalized
                 aisle = aisle.replacingOccurrences(of: ";", with: "; ")
                 if form.sectionBy(tag: "\(aisle)") != nil {
-                    var section = form.sectionBy(tag: "\(aisle)")
+                    var section = form.sectionBy(tag: "\(aisle)") as? MultivaluedSection
                     section!.insert(SplitRow<ButtonRow, CheckRow>("\(items[index].name!)"){
                     $0.rowLeftPercentage = 0.75
                     $0.rowLeft = ButtonRow(){ row in
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.textLabel?.textAlignment = .left
                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        row.cell.textLabel?.numberOfLines = 0
                         row.title = "\(items[index].amount ?? 0.0) \(items[index].unit ?? "") of \(items[index].name?.capitalized ?? "")"
                         }.onCellSelection({ cell, row in
                             self.ingredientIndex = index
@@ -241,6 +209,7 @@ class GrocerylistViewController: FormViewController {
                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                             cell.textLabel?.textAlignment = .left
+                            cell.textLabel?.numberOfLines = 0
                         }
                     
                     $0.rowRight = CheckRow() {
@@ -267,16 +236,21 @@ class GrocerylistViewController: FormViewController {
                 } else {
                     var aisle = items[index].aisle!.capitalized
                     aisle = aisle.replacingOccurrences(of: ";", with: "; ")
+                    
                     form +++
-                    Section("\(aisle)") {
+                    MultivaluedSection(multivaluedOptions: [.Delete],
+                        header: "\(aisle)") {
                         $0.tag = "\(aisle)"
                     }
-                    <<< SplitRow<ButtonRow, CheckRow>("\(items[index].name!)"){
+                    
+                    var section = form.sectionBy(tag: "\(aisle)") as? MultivaluedSection
+                    section!.insert(SplitRow<ButtonRow, CheckRow>("\(items[index].name!)"){
                     $0.rowLeftPercentage = 0.75
                     $0.rowLeft = ButtonRow(){ row in
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.textLabel?.textAlignment = .left
                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        row.cell.textLabel?.numberOfLines = 0
                         row.title = "\(items[index].amount ?? 0.0) \(items[index].unit ?? "") of \(items[index].name?.capitalized ?? "")"
                         }.onCellSelection({ cell, row in
                             self.ingredientIndex = index
@@ -285,8 +259,9 @@ class GrocerylistViewController: FormViewController {
                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                             cell.textLabel?.textAlignment = .left
+                            cell.textLabel?.numberOfLines = 0
                         }
-                    
+
                     $0.rowRight = CheckRow() {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         $0.cell.tintColor = FalconPalette.defaultBlue
@@ -307,10 +282,10 @@ class GrocerylistViewController: FormViewController {
                         })
                         }.cellUpdate { cell, row in
                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        }
-                    }
+                        } , at: 0)
                 }
             }
+        }
     }
     
     fileprivate func openIngredient() {
@@ -367,8 +342,10 @@ class GrocerylistViewController: FormViewController {
                     let id = Array<String>(recipes.keys)[rowNumber]
                     self!.lookupRecipe(recipeID: Int(id)!, add: false)
                 }
-            } else if let ingredient = self!.grocerylist.ingredients?[rowNumber], rows[0].title == "\(ingredient.amount ?? 0.0) \(ingredient.unit ?? "") of \(ingredient.name?.capitalized ?? "")" {
-                self!.grocerylist.ingredients!.remove(at: rowNumber)
+            } else if rowType is SplitRow<ButtonRow, CheckRow>, let ingredients = self!.grocerylist.ingredients, let rowTag = rows[0].tag {
+                if let index = ingredients.firstIndex(where: {$0.name == rowTag}) {
+                    self!.grocerylist.ingredients!.remove(at: index)
+                }
             }
         }
     }
@@ -536,7 +513,7 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
                 print("active ingredient")
                 self.grocerylist.ingredients![ingredientIndex] = ingredient
                 if let ingredientRow: SplitRow<ButtonRow, CheckRow> = form.rowBy(tag: "\(ingredient.name!)") {
-                    ingredientRow.title = "\(ingredient.amount ?? 0.0) \(ingredient.unit ?? "") of \(ingredient.name?.capitalized ?? "")"
+                    ingredientRow.rowLeft!.title = "\(ingredient.amount ?? 0.0) \(ingredient.unit ?? "") of \(ingredient.name?.capitalized ?? "")"
                     ingredientRow.updateCell()
                     return
                 }
