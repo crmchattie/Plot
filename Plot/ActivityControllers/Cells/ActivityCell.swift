@@ -21,10 +21,10 @@ class ActivityCell: UITableViewCell {
     var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
     let invitationSegmentedControlTopAnchorShowAvatar: CGFloat = 46
     let invitationSegmentedControlTopAnchorRegular: CGFloat = 8
-    let invitationSegmentHeightConstant: CGFloat = 30
+    let invitationSegmentHeightConstant: CGFloat = 29
     var invitation: Invitation?
     var participants: [User] = []
-    let thumbnailsCount = 10
+    let thumbnailsCount = 9
     weak var updateInvitationDelegate: UpdateInvitationDelegate?
     weak var activityViewControllerDataStore: ActivityViewControllerDataStore?
     weak var delegate: ActivityCellDelegate?
@@ -184,6 +184,13 @@ class ActivityCell: UITableViewCell {
         return button
     }()
     
+    let listButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "list"), for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         
@@ -202,6 +209,7 @@ class ActivityCell: UITableViewCell {
         activityImageView.addSubview(badgeLabel)
         activityImageView.addSubview(activityTypeButton)
         activityImageView.addSubview(chatButton)
+        activityImageView.addSubview(listButton)
         activityImageView.addSubview(mapButton)
         
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4).isActive = true
@@ -218,21 +226,26 @@ class ActivityCell: UITableViewCell {
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         
-        activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
+        activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 5).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        activityTypeButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
+        activityTypeButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
         
-        chatButton.topAnchor.constraint(equalTo: activityTypeButton.bottomAnchor, constant: 10).isActive = true
+        chatButton.topAnchor.constraint(equalTo: activityTypeButton.bottomAnchor, constant: 5).isActive = true
         chatButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        chatButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        chatButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        chatButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
+        chatButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
         
-        mapButton.topAnchor.constraint(equalTo: chatButton.bottomAnchor, constant: 10).isActive = true
+        listButton.topAnchor.constraint(equalTo: chatButton.bottomAnchor, constant: 5).isActive = true
+        listButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -2).isActive = true
+        listButton.widthAnchor.constraint(equalToConstant: 35).isActive = true
+        listButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
+        
+        mapButton.topAnchor.constraint(equalTo: listButton.bottomAnchor, constant: 5).isActive = true
         mapButton.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
         mapButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        mapButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        mapButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        mapButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
+        mapButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
 
         startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true

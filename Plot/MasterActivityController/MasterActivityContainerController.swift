@@ -52,6 +52,8 @@ class MasterActivityContainerController: UIViewController {
             notificationsVC.activityViewController = activitiesVC
             mapVC.activities = activities
             mapVC.activityViewController = activitiesVC
+            listsVC.activities = activities
+            listsVC.activityViewController = activitiesVC
             
             let nav = self.tabBarController!.viewControllers![0] as! UINavigationController
             
@@ -210,20 +212,22 @@ class MasterActivityContainerController: UIViewController {
     func setNavBar() {
         if index == 1 {
             navigationItem.title = titles[index]
-            
             let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
             navigationItem.leftBarButtonItem = editButtonItem
             navigationItem.rightBarButtonItem = newChatBarButton
-            
         } else if index == 2 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMMM yyyy"
             let dateString = dateFormatter.string(from: selectedDate)
             navigationItem.title = dateString
-            
             let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
             navigationItem.leftBarButtonItem = editButtonItem
             navigationItem.rightBarButtonItem = newActivityBarButton
+        } else if index == 3 {
+            navigationItem.title = titles[index]
+            let newListBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))
+            navigationItem.leftBarButtonItem = editButtonItem
+            navigationItem.rightBarButtonItem = newListBarButton
         } else {
             navigationItem.title = titles[index]
             navigationItem.leftBarButtonItem = nil
@@ -292,6 +296,16 @@ extension MasterActivityContainerController {
                sender.style = .done
                sender.title = "Done"
             }
+        } else if index == 3 {
+            if listsVC.tableView.isEditing == true {
+               listsVC.tableView.setEditing(false, animated: true)
+               sender.style = .plain
+               sender.title = "Edit"
+            } else {
+               listsVC.tableView.setEditing(true, animated: true)
+               sender.style = .done
+               sender.title = "Done"
+            }
         }
     }
     
@@ -311,6 +325,35 @@ extension MasterActivityContainerController {
           destination.conversations = conversations
       }
       navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    @objc fileprivate func newList() {
+      let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
+          let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
+              let destination = GrocerylistViewController()
+//              destination.delegate = self
+              self.navigationController?.pushViewController(destination, animated: true)
+          }
+          let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
+              let destination = PackinglistViewController()
+//              destination.delegate = self
+              self.navigationController?.pushViewController(destination, animated: true)
+          }
+          let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
+              let destination = ChecklistViewController()
+//              destination.delegate = self
+              self.navigationController?.pushViewController(destination, animated: true)
+          }
+          let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
+              print("You've pressed cancel")
+              
+          }
+          
+          alertController.addAction(groceryList)
+//                alertController.addAction(packingList)
+          alertController.addAction(checkList)
+          alertController.addAction(cancelAlert)
+          self.present(alertController, animated: true, completion: nil)
     }
 }
 

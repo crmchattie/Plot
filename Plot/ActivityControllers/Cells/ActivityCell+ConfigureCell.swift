@@ -164,6 +164,13 @@ extension ActivityCell {
         } else {
             chatButton.tintColor = .systemBlue
         }
+        
+        if activity.grocerylist == nil && activity.checklist == nil && activity.packinglist == nil {
+            listButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        } else {
+            listButton.tintColor = .systemBlue
+        }
+        
     }
     
     func loadParticipantsThumbnail(activity: Activity) {
@@ -176,7 +183,7 @@ extension ActivityCell {
                         continue
                     }
                     
-                    if i > 9 {
+                    if i > 8 {
                         return
                     }
                     

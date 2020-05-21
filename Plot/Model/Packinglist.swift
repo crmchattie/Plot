@@ -11,21 +11,49 @@ import UIKit
 class Packinglist: NSObject, Codable {
     
     var name: String?
+    var ID: String?
     var activities: [String: Bool]?
     var items: [String: [Int: Bool]]?
+    var participantsIDs: [String]?
+    var activity: Activity?
+    var admin: String?
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
     
     enum CodingKeys: String, CodingKey {
         case name
+        case ID
         case activities
         case items
+        case participantsIDs
+        case activity
+        case admin
+        case badge
+        case pinned
+        case muted
     }
 
     init(dictionary: [String: AnyObject]?) {
         super.init()
         
         name = dictionary?["name"] as? String
+        ID = dictionary?["ID"] as? String
         activities = dictionary?["activities"] as? [String: Bool]
         items = dictionary?["items"] as? [String: [Int: Bool]]
+        admin = dictionary?["admin"] as? String
+        badge = dictionary?["badge"] as? Int
+        pinned = dictionary?["pinned"] as? Bool
+        muted = dictionary?["muted"] as? Bool
+        
+        if let participantsIDsDict = dictionary?["participantsIDs"] as? [String: String] {
+            participantsIDs = Array(participantsIDsDict.keys)
+        }
+        else if let participantsIDsArray = dictionary?["participantsIDs"] as? [String] {
+            participantsIDs = participantsIDsArray
+        } else {
+            participantsIDs = []
+        }
         
     }
     
@@ -36,12 +64,24 @@ class Packinglist: NSObject, Codable {
             dictionary["name"] = value
         }
         
+        if let value = self.ID as AnyObject? {
+            dictionary["ID"] = value
+        }
+        
         if let value = self.activities as AnyObject? {
             dictionary["activities"] = value
         }
                 
         if let value = self.items as AnyObject? {
             dictionary["items"] = value
+        }
+        
+        if let value = self.admin as AnyObject? {
+            dictionary["admin"] = value
+        }
+        
+        if let value = self.participantsIDs as AnyObject? {
+            dictionary["participantsIDs"] = value
         }
         
         return dictionary

@@ -12,21 +12,36 @@ import CodableFirebase
 class Grocerylist: NSObject, Codable {
     
     var name: String?
+    var ID: String?
     var recipes: [String: String]?
     var ingredients: [ExtendedIngredient]?
     var servings: [String: Int]?
+    var participantsIDs: [String]?
+    var activity: Activity?
+    var admin: String?
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
     
     enum CodingKeys: String, CodingKey {
         case name
+        case ID
         case recipes
         case ingredients
         case servings
+        case participantsIDs
+        case activity
+        case admin
+        case badge
+        case pinned
+        case muted
     }
 
     init(dictionary: [String: AnyObject]?) {
         super.init()
         
         name = dictionary?["name"] as? String
+        ID = dictionary?["ID"] as? String
         recipes = dictionary?["recipes"] as? [String: String]
         if let ingredientsFirebaseList = dictionary?["ingredients"] as? [AnyObject] {
             var ingredientsList = [ExtendedIngredient]()
@@ -39,6 +54,20 @@ class Grocerylist: NSObject, Codable {
         }
         servings = dictionary?["servings"] as? [String: Int]
         
+        admin = dictionary?["admin"] as? String
+        badge = dictionary?["badge"] as? Int
+        pinned = dictionary?["pinned"] as? Bool
+        muted = dictionary?["muted"] as? Bool
+        
+        if let participantsIDsDict = dictionary?["participantsIDs"] as? [String: String] {
+            participantsIDs = Array(participantsIDsDict.keys)
+        }
+        else if let participantsIDsArray = dictionary?["participantsIDs"] as? [String] {
+            participantsIDs = participantsIDsArray
+        } else {
+            participantsIDs = []
+        }
+        
     }
     
     func toAnyObject() -> [String: AnyObject?] {
@@ -46,6 +75,10 @@ class Grocerylist: NSObject, Codable {
         
         if let value = self.name as AnyObject? {
             dictionary["name"] = value
+        }
+        
+        if let value = self.ID as AnyObject? {
+            dictionary["ID"] = value
         }
         
         if let value = self.recipes as AnyObject? {
@@ -63,6 +96,14 @@ class Grocerylist: NSObject, Codable {
         
         if let value = self.servings as AnyObject? {
             dictionary["servings"] = value
+        }
+        
+        if let value = self.admin as AnyObject? {
+            dictionary["admin"] = value
+        }
+        
+        if let value = self.participantsIDs as AnyObject? {
+            dictionary["participantsIDs"] = value
         }
                                 
         return dictionary

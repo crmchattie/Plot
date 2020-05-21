@@ -1392,11 +1392,12 @@ class CreateActivityViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
+        print("openLocation")
         let destination = LocationFinderTableViewController()
         destination.delegate = self
         self.navigationController?.pushViewController(destination, animated: true)
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+//        let navigationViewController = UINavigationController(rootViewController: destination)
+//        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     //update so existing invitees are shown as selected

@@ -26,9 +26,9 @@ class GroupAdminControlsTableViewController: UITableViewController {
   var membersAddingReference: DatabaseReference!
   var membersAddingHandle: DatabaseHandle!
   var membersRemovingHandle: DatabaseHandle!
-    var activitiesAddingReference: DatabaseReference!
-    var activitiesAddingHandle: DatabaseHandle!
-    var activitiesRemovingHandle: DatabaseHandle!
+  var activitiesAddingReference: DatabaseReference!
+  var activitiesAddingHandle: DatabaseHandle!
+  var activitiesRemovingHandle: DatabaseHandle!
   
   let informationMessageSender = InformationMessageSender()
   
@@ -147,8 +147,8 @@ class GroupAdminControlsTableViewController: UITableViewController {
   
   fileprivate func setupMainView() {
     if #available(iOS 11.0, *) {
-      navigationItem.largeTitleDisplayMode = .always
-      navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     navigationItem.title = "Group Info"
     extendedLayoutIncludesOpaqueBars = true
@@ -380,7 +380,6 @@ class GroupAdminControlsTableViewController: UITableViewController {
     view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
     if let headerTitle = view as? UITableViewHeaderFooterView {
       headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//      headerTitle.textLabel?.font = UIFont.systemFont(ofSize: 14)
         headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
         headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
     }
