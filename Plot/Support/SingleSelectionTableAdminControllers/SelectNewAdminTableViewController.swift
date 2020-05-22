@@ -9,7 +9,6 @@
 import UIKit
 import Firebase
 import SDWebImage
-import ARSLineProgress
 
 class SelectNewAdminTableViewController: UITableViewController {
   
@@ -27,7 +26,8 @@ class SelectNewAdminTableViewController: UITableViewController {
   var sortedFirstLetters = [String]()
   var sections = [[User]]()
   var selectedFalconUsers = [User]()
-  var chatID = String()
+  var chatID: String!
+  var listID: String!
   var currentUserName = String()
   var searchBar: UISearchBar?
   let informationMessageSender = InformationMessageSender()
@@ -65,8 +65,8 @@ class SelectNewAdminTableViewController: UITableViewController {
   func setupMainView() {
     navigationItem.title = "New admin"
     if #available(iOS 11.0, *) {
-      navigationItem.largeTitleDisplayMode = .always
-      navigationController?.navigationBar.prefersLargeTitles = true
+      navigationItem.largeTitleDisplayMode = .never
+      navigationController?.navigationBar.prefersLargeTitles = false
     }
     extendedLayoutIncludesOpaqueBars = true
     definesPresentationContext = true
@@ -87,7 +87,6 @@ class SelectNewAdminTableViewController: UITableViewController {
     if #available(iOS 11.0, *) {
       let rightBarButton = UIButton(type: .system)
       rightBarButton.setTitle(title, for: .normal)
-//      rightBarButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         rightBarButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         rightBarButton.titleLabel?.adjustsFontForContentSizeCategory = true
       rightBarButton.addTarget(self, action: #selector(rightBarButtonTapped), for: .touchUpInside)
@@ -99,7 +98,6 @@ class SelectNewAdminTableViewController: UITableViewController {
   }
   
   @objc func rightBarButtonTapped() {
-//    ARSLineProgress.ars_showOnView(self.view)
        if let navController = self.navigationController {
          self.showSpinner(onView: navController.view)
      } else {
@@ -112,21 +110,36 @@ class SelectNewAdminTableViewController: UITableViewController {
   func leaveTheGroupAndSetAdmin() {
     guard let uid = Auth.auth().currentUser?.uid else { return }
     let membersIDs = getMembersIDs()
-    let reference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("chatParticipantsIDs").child(uid)
-    reference.removeValue { (_, _) in
-      let referenceText = "Administrator \(self.currentUserName) left the group"
-      self.informationMessageSender.sendInformatoinMessage(chatID: self.chatID, membersIDs: membersIDs, text: referenceText)
-      self.setNewAdmin(membersIDs: membersIDs)
+    if chatID != nil {
+        let reference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("chatParticipantsIDs").child(uid)
+        reference.removeValue { (_, _) in
+          let referenceText = "Administrator \(self.currentUserName) left the group"
+          self.informationMessageSender.sendInformatoinMessage(chatID: self.chatID, membersIDs: membersIDs, text: referenceText)
+          self.setNewAdminChat(membersIDs: membersIDs)
+        }
+    } else if listID != nil {
+        let reference = Database.database().reference().child("lists").child(listID).child(messageMetaDataFirebaseFolder).child("participantsIDs").child(uid)
+        reference.removeValue { (_, _) in
+          self.setNewAdminChat(membersIDs: membersIDs)
+        }
     }
   }
   
-  func setNewAdmin(membersIDs: [String]) {
+  func setNewAdminChat(membersIDs: [String]) {
     guard let newAdminID = selectedFalconUsers[0].id, let newAdminName = selectedFalconUsers[0].name else { return }
     let adminReference = Database.database().reference().child("groupChats").child(self.chatID).child(messageMetaDataFirebaseFolder)
     adminReference.updateChildValues(["admin": newAdminID]) { (_, _) in
       let newAdminText = "\(newAdminName) is new group administrator"
       self.informationMessageSender.sendInformatoinMessage(chatID: self.chatID, membersIDs: membersIDs, text: newAdminText)
-//      ARSLineProgress.hide()
+        self.removeSpinner()
+      self.navigationController?.backToViewController(viewController: ChatLogController.self)
+    }
+  }
+    
+  func setNewAdminList(membersIDs: [String]) {
+    guard let newAdminID = selectedFalconUsers[0].id else { return }
+    let adminReference = Database.database().reference().child("groupChats").child(self.chatID).child(messageMetaDataFirebaseFolder)
+    adminReference.updateChildValues(["admin": newAdminID]) { (_, _) in
         self.removeSpinner()
       self.navigationController?.backToViewController(viewController: ChatLogController.self)
     }
@@ -173,7 +186,6 @@ class SelectNewAdminTableViewController: UITableViewController {
     view.tintColor = ThemeManager.currentTheme().inputTextViewColor
     if let headerTitle = view as? UITableViewHeaderFooterView {
       headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//      headerTitle.textLabel?.font = UIFont.systemFont(ofSize: 10)
         headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)
         headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
     }

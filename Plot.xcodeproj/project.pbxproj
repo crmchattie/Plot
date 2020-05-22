@@ -95,7 +95,7 @@
 		10DE97352475737500D4A7E8 /* ListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97342475737500D4A7E8 /* ListCell.swift */; };
 		10DE97372475801400D4A7E8 /* ListCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */; };
 		10DE97392475837B00D4A7E8 /* ListContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97382475837B00D4A7E8 /* ListContainer.swift */; };
-		10DE973B2475E4E600D4A7E8 /* ListsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE973A2475E4E600D4A7E8 /* ListsFetcher.swift */; };
+		10DE973B2475E4E600D4A7E8 /* ChecklistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */; };
 		10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */; };
 		10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */; };
 		10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EE245C5B8000C80AAF /* Checklist.swift */; };
@@ -409,7 +409,7 @@
 		10DE97342475737500D4A7E8 /* ListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCell.swift; sourceTree = "<group>"; };
 		10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListCell+ConfigureCell.swift"; sourceTree = "<group>"; };
 		10DE97382475837B00D4A7E8 /* ListContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListContainer.swift; sourceTree = "<group>"; };
-		10DE973A2475E4E600D4A7E8 /* ListsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsFetcher.swift; sourceTree = "<group>"; };
+		10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistFetcher.swift; sourceTree = "<group>"; };
 		10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsDetailCell.swift; sourceTree = "<group>"; };
 		10ED542C22CAEA41003797CF /* Plot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Plot.entitlements; sourceTree = "<group>"; };
 		10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistViewController.swift; sourceTree = "<group>"; };
@@ -710,9 +710,14 @@
 			isa = PBXGroup;
 			children = (
 				1051AC9A244F8C5F0066761C /* ListsViewController.swift */,
+				10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */,
+				10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */,
+				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
+				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
+				10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */,
+				10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */,
 				10DE97342475737500D4A7E8 /* ListCell.swift */,
 				10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */,
-				10DE973A2475E4E600D4A7E8 /* ListsFetcher.swift */,
 			);
 			path = ListViewController;
 			sourceTree = "<group>";
@@ -798,11 +803,6 @@
 				10196EF724411B5600B6AFDF /* SelectActivityMembersViewController.swift */,
 				10196EF324411B5600B6AFDF /* ScheduleViewController.swift */,
 				10A18D392458E1A5006990F2 /* PurchasesViewController.swift */,
-				10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */,
-				10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */,
-				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
-				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
-				10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */,
 				10196EF224411B5500B6AFDF /* MapViewController.swift */,
 				10196EFB24411B5600B6AFDF /* PhotosViewController.swift */,
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
@@ -2112,7 +2112,7 @@
 				4BAEE51521272D890045AB10 /* ChatLogController.swift in Sources */,
 				4BAEE4EE21272D890045AB10 /* ChatInputContainer+AttachedImagesCollectionConfig.swift in Sources */,
 				10196F0624411B5600B6AFDF /* CreateActivityViewController+UpdateInvitees.swift in Sources */,
-				10DE973B2475E4E600D4A7E8 /* ListsFetcher.swift in Sources */,
+				10DE973B2475E4E600D4A7E8 /* ChecklistFetcher.swift in Sources */,
 				10196F0D24411C2800B6AFDF /* ChooseActivityTableViewController.swift in Sources */,
 				4BAEE47021272B380045AB10 /* AccountSettingsController+nameEditing.swift in Sources */,
 				4BAEE5DA212735E50045AB10 /* CameraCell.swift in Sources */,

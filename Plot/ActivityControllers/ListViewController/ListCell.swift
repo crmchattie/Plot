@@ -9,7 +9,6 @@
 import UIKit
 
 protocol ListCellDelegate: class {
-    func getInfo(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?)
     func openActivity(activity: Activity)
 }
 
@@ -124,8 +123,9 @@ class ListCell: UITableViewCell {
     
     let infoButton: UIButton = {
         let button = UIButton(type: .infoLight)
-        button.tintColor = .systemBlue
+        button.tintColor = .clear
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.isUserInteractionEnabled = false
         return button
     }()
     
@@ -190,8 +190,7 @@ class ListCell: UITableViewCell {
         infoButton.bottomAnchor.constraint(equalTo: listImageView.bottomAnchor, constant: -12).isActive = true
         infoButton.rightAnchor.constraint(equalTo: listImageView.rightAnchor, constant: -5).isActive = true
         infoButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        infoButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        infoButton.addTarget(self, action: #selector(ListCell.getInfoAction), for: .touchUpInside)
+        infoButton.heightAnchor.constraint(equalToConstant: 10).isActive = true
         
         var x: CGFloat = 10
         for _ in 0..<thumbnailsCount {
@@ -225,16 +224,6 @@ class ListCell: UITableViewCell {
         muteIndicator.isHidden = true
         newMessageIndicator.isHidden = true
         nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-    }
-    
-    @objc func getInfoAction() {
-        if let grocerylist = grocerylist {
-            self.delegate?.getInfo(grocerylist: grocerylist, checklist: nil, packinglist: nil)
-        } else if let checklist = checklist {
-            self.delegate?.getInfo(grocerylist: nil, checklist: checklist, packinglist: nil)
-        } else if let packinglist = packinglist {
-            self.delegate?.getInfo(grocerylist: nil, checklist: nil, packinglist: packinglist)
-        }
     }
     
     @objc func activityButtonTapped() {

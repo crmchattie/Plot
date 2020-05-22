@@ -223,16 +223,19 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         if let grocerylist = list as? Grocerylist {
             let destination = GrocerylistViewController()
             destination.grocerylist = grocerylist
+            destination.connectedToAct = grocerylist.activity != nil
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let checklist = list as? Checklist {
             let destination = ChecklistViewController()
             destination.checklist = checklist
+            destination.connectedToAct = checklist.activity != nil
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let packinglist = list as? Packinglist {
             let destination = PackinglistViewController()
             destination.packinglist = packinglist
+            destination.connectedToAct = packinglist.activity != nil
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         }

@@ -224,7 +224,7 @@ class InvitationsFetcher: NSObject {
             }
         }
         
-        // grab every existing invitation to see if invitation was already created - this will need to be removed given it's unrealistic to cross reference every invitation ever created
+        // grab every existing invitation to see if invitation was already created
         let ref = Database.database().reference()
         ref.child(invitationsEntity).observeSingleEvent(of: .value, with: { snapshot in
             do {

@@ -110,7 +110,7 @@ extension ListCell {
     }
     
     func loadParticipantsThumbnailGL(grocerylist: Grocerylist) {
-      self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
+        self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
                 

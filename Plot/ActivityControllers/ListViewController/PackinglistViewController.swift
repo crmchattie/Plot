@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import SplitRow
+import Firebase
 
 protocol UpdatePackinglistDelegate: class {
     func updatePackinglist(packinglist: Packinglist)
@@ -18,6 +19,14 @@ class PackinglistViewController: FormViewController {
     weak var delegate : UpdatePackinglistDelegate?
           
     var packinglist: Packinglist!
+        var connectedToAct = true
+    
+    var users = [User]()
+    var filteredUsers = [User]()
+    var selectedFalconUsers = [User]()
+    
+    var userNames : [String] = []
+    var userNamesString: String = ""
 
     fileprivate var active: Bool = false
     fileprivate var movingBackwards: Bool = true
@@ -33,6 +42,26 @@ class PackinglistViewController: FormViewController {
         if packinglist != nil {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
+            if !connectedToAct {
+                var participantCount = self.selectedFalconUsers.count
+                
+                // If user is creating this activity (admin)
+                if packinglist.admin == nil || packinglist.admin == Auth.auth().currentUser?.uid {
+                    participantCount += 1
+                }
+                
+                if participantCount > 1 {
+                    self.userNamesString = "\(participantCount) participants"
+                } else {
+                    self.userNamesString = "1 participant"
+                }
+                
+                if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
+                    inviteesRow.title = self.userNamesString
+                    inviteesRow.updateCell()
+                }
+            }
+            
         } else {
             packinglist = Packinglist(dictionary: ["name" : "PackingListName" as AnyObject])
             self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -108,6 +137,31 @@ class PackinglistViewController: FormViewController {
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
+        if !connectedToAct {
+            form.last!
+            <<< ButtonRow("Participants") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            row.cell.textLabel?.textAlignment = .left
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.title = row.tag
+            if self.selectedFalconUsers.count > 0 {
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.title = self.userNamesString
+            }
+            }.onCellSelection({ _,_ in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textLabel?.textAlignment = .left
+                if row.title == "Participants" {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                } else {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+            }
+        }
     }
     
     fileprivate func weatherRow() {
@@ -123,6 +177,60 @@ class PackinglistViewController: FormViewController {
         } else if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let index = weatherRow.indexPath?.item {
             let section = self.form.allSections[0]
             section.remove(at: index)
+        }
+    }
+    
+    @objc fileprivate func openParticipantsInviter() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = SelectActivityMembersViewController()
+        destination.users = users
+        destination.filteredUsers = filteredUsers
+        if !selectedFalconUsers.isEmpty{
+            destination.priorSelectedUsers = selectedFalconUsers
+        }
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+}
+
+extension PackinglistViewController: UpdateInvitees {
+    func updateInvitees(selectedFalconUsers: [User]) {
+        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
+            if !selectedFalconUsers.isEmpty {
+                self.selectedFalconUsers = selectedFalconUsers
+                
+                var participantCount = self.selectedFalconUsers.count
+                // If user is creating this activity (admin)
+                if packinglist.admin == nil || packinglist.admin == Auth.auth().currentUser?.uid {
+                    participantCount += 1
+                }
+                
+                if participantCount > 1 {
+                    self.userNamesString = "\(participantCount) participants"
+                } else {
+                    self.userNamesString = "1 participant"
+                }
+                
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
+                
+            } else {
+                self.selectedFalconUsers = selectedFalconUsers
+                inviteesRow.title = "1 participant"
+                inviteesRow.updateCell()
+            }
+            
+//            if active {
+//                showActivityIndicator()
+//                let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+//                createActivity.updateActivityParticipants()
+//                hideActivityIndicator()
+//
+//            }
+            
         }
     }
 }

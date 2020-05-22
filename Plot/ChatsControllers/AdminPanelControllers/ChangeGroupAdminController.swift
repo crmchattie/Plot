@@ -17,6 +17,6 @@ class ChangeGroupAdminController: SelectNewAdminTableViewController {
   
   override func rightBarButtonTapped() {
     super.rightBarButtonTapped()
-    setNewAdmin(membersIDs: getMembersIDs())
+    setNewAdminChat(membersIDs: getMembersIDs())
   }
 }
