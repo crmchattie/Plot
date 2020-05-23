@@ -11,9 +11,6 @@ import Eureka
 import Firebase
 import CodableFirebase
 
-let invitationsEntity = "invitations"
-let userInvitationsEntity = "user-invitations"
-
 extension CreateActivityViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {

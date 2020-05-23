@@ -9,6 +9,9 @@
 import UIKit
 import CodableFirebase
 
+let grocerylistsEntity = "grocerylists"
+let userGrocerylistsEntity = "user-grocerylists"
+
 class Grocerylist: NSObject, Codable {
     
     var name: String?

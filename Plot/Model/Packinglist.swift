@@ -8,6 +8,9 @@
 
 import UIKit
 
+let packinglistsEntity = "packinglists"
+let userPackinglistsEntity = "user-packinglists"
+
 class Packinglist: NSObject, Codable {
     
     var name: String?

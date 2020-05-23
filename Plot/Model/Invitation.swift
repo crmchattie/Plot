@@ -27,6 +27,9 @@ enum Status: Int, Codable {
     }
 }
 
+let invitationsEntity = "invitations"
+let userInvitationsEntity = "user-invitations"
+
 struct Invitation: Codable, Equatable {
     let invitationID: String
     let activityID: String

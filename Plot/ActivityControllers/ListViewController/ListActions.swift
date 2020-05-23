@@ -1,15 +1,16 @@
 //
-//  CreateActivity.swift
+//  ListActions.swift
 //  Plot
 //
-//  Created by Cory McHattie on 4/11/20.
+//  Created by Cory McHattie on 5/22/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import UIKit
 import Firebase
+import CodableFirebase
 
-class ActivityActions: NSObject {
+class ListActions: NSObject {
     
     var activity: Activity?
     var activityID: String?

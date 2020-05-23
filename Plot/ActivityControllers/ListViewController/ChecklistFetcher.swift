@@ -12,112 +12,113 @@ import CodableFirebase
 
 class ChecklistFetcher: NSObject {
         
-    fileprivate var userInvitationsDatabaseRef: DatabaseReference!
-    fileprivate var currentUserInvitationsAddHandle = DatabaseHandle()
-    fileprivate var currentUserInvitationsRemoveHandle = DatabaseHandle()
+    fileprivate var userChecklistsDatabaseRef: DatabaseReference!
+    fileprivate var currentUserChecklistsAddHandle = DatabaseHandle()
+    fileprivate var currentUserChecklistsRemoveHandle = DatabaseHandle()
     
-    var invitationsAdded: (([Invitation])->())?
-    var invitationsRemoved: (([Invitation])->())?
+    var checklistsAdded: (([Checklist])->())?
+    var checklistsRemoved: (([Checklist])->())?
     
-    func fetchInvitations(completion: @escaping ([String: Invitation], [Activity])->()) {
+    func fetchChecklists(completion: @escaping ([Checklist])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
-            completion([:], [])
+            completion([])
             return
         }
         
         let ref = Database.database().reference()
-        userInvitationsDatabaseRef = Database.database().reference().child(userInvitationsEntity).child(currentUserID)
-
-        userInvitationsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
-            if snapshot.exists(), let invitationIDs = snapshot.value as? [String: Int] {
-                var invitations: [String: Invitation] = [:]
-                var activiitiesForInvitations: [Activity] = []
+        userChecklistsDatabaseRef = Database.database().reference().child(userChecklistsEntity).child(currentUserID)
+        userChecklistsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let checklistIDs = snapshot.value as? [String: AnyObject] {
+                var checklists: [Checklist] = []
                 let group = DispatchGroup()
-                for (invitationID, _) in invitationIDs {
-                    group.enter()
-                    ref.child(invitationsEntity).child(invitationID).observeSingleEvent(of: .value, with: { invitationSnapshot in
-                        if invitationSnapshot.exists(), let invitationSnapshotValue = invitationSnapshot.value {
-                            if let invitation = try? FirebaseDecoder().decode(Invitation.self, from: invitationSnapshotValue) {
-                                invitations[invitation.activityID] = invitation
-                                
-                                group.enter()
-                                ref.child("activities").child(invitation.activityID).observeSingleEvent(of: .value, with: { activitySnapshot in
-                                    if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject], let meta = activitySnapshotValue["metaData"] as? [String: AnyObject] {
-                                        let activity = Activity(dictionary: meta)
-                                        activiitiesForInvitations.append(activity)
-                                    }
-                                    
-                                    group.leave()
-                                })
+                for (checklistID, userChecklistInfo) in checklistIDs {
+                    if let userChecklist = try? FirebaseDecoder().decode(Checklist.self, from: userChecklistInfo) {
+                        group.enter()
+                        ref.child(checklistsEntity).child(checklistID).observeSingleEvent(of: .value, with: { checklistSnapshot in
+                            if checklistSnapshot.exists(), let checklistSnapshotValue = checklistSnapshot.value {
+                                if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                                    checklist.badge = userChecklist.badge
+                                    checklist.muted = userChecklist.muted
+                                    checklist.pinned = userChecklist.pinned
+                                    checklists.append(checklist)
+                                }
                             }
-                        }
-                        group.leave()
-                    })
+                            group.leave()
+                        })
+                    } else {
+                        group.enter()
+                        ref.child(checklistsEntity).child(checklistID).observeSingleEvent(of: .value, with: { checklistSnapshot in
+                            if checklistSnapshot.exists(), let checklistSnapshotValue = checklistSnapshot.value {
+                                if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                                    checklists.append(checklist)
+                                }
+                            }
+                            group.leave()
+                        })
+                    }
                 }
-                
                 group.notify(queue: .main) {
-                    completion(invitations, activiitiesForInvitations)
+                    completion(checklists)
                 }
             } else {
-                completion([:], [])
+                completion([])
             }
         })
     }
     
-    func observeInvitationForCurrentUser(invitationsAdded: @escaping ([Invitation])->(), invitationsRemoved: @escaping ([Invitation])->()) {
-        self.invitationsAdded = invitationsAdded
-        self.invitationsRemoved = invitationsRemoved
-        currentUserInvitationsAddHandle = userInvitationsDatabaseRef.observe(.childAdded, with: { snapshot in
-            if let completion = self.invitationsAdded {
-                let invitationID = snapshot.key
+    func observeChecklistForCurrentUser(checklistsAdded: @escaping ([Checklist])->(), checklistsRemoved: @escaping ([Checklist])->()) {
+        self.checklistsAdded = checklistsAdded
+        self.checklistsRemoved = checklistsRemoved
+        currentUserChecklistsAddHandle = userChecklistsDatabaseRef.observe(.childAdded, with: { snapshot in
+            if let completion = self.checklistsAdded {
+                let checklistID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(invitationsEntity).child(invitationID).observe(.childAdded) { _ in
+                handle = ref.child(checklistsEntity).child(checklistID).observe(.childAdded) { _ in
                     ref.removeObserver(withHandle: handle)
-                    self.getInvitationsFromSnapshot(snapshot: snapshot, completion: completion)
+                    self.getChecklistsFromSnapshot(snapshot: snapshot, completion: completion)
                 }
             }
         })
         
-        currentUserInvitationsRemoveHandle = userInvitationsDatabaseRef.observe(.childRemoved, with: { snapshot in
-            if let completion = self.invitationsRemoved {
-                self.getInvitationsFromSnapshot(snapshot: snapshot, completion: completion)
+        currentUserChecklistsRemoveHandle = userChecklistsDatabaseRef.observe(.childRemoved, with: { snapshot in
+            if let completion = self.checklistsRemoved {
+                self.getChecklistsFromSnapshot(snapshot: snapshot, completion: completion)
             }
         })
     }
     
-    func getInvitationsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Invitation])->()) {
+    func getChecklistsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Checklist])->()) {
         if snapshot.exists() {
-            let invitationID = snapshot.key
+            let checklistID = snapshot.key
             let ref = Database.database().reference()
-            var invitations: [Invitation] = []
+            var checklists: [Checklist] = []
             let group = DispatchGroup()
             group.enter()
-            ref.child(invitationsEntity).child(invitationID).observeSingleEvent(of: .value, with: { invitationSnapshot in
-                if invitationSnapshot.exists(), let invitationSnapshotValue = invitationSnapshot.value {
-                    if let invitation = try? FirebaseDecoder().decode(Invitation.self, from: invitationSnapshotValue) {
-                        invitations.append(invitation)
+            ref.child(checklistsEntity).child(checklistID).observeSingleEvent(of: .value, with: { checklistSnapshot in
+                if checklistSnapshot.exists(), let checklistSnapshotValue = checklistSnapshot.value {
+                    if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                        checklists.append(checklist)
                     }
                 }
                 group.leave()
             })
             
             group.notify(queue: .main) {
-                completion(invitations)
+                completion(checklists)
             }
         } else {
             completion([])
         }
     }
     
-    class func update(invitation: Invitation, completion: @escaping (Bool)->()) {
+    class func update(checklist: Checklist, completion: @escaping (Bool)->()) {
         let ref = Database.database().reference()
-        ref.child(invitationsEntity).child(invitation.invitationID).observeSingleEvent(of: .value, with: { invitationSnapshot in
-            // first check if invitation exists
-            if invitationSnapshot.exists(), let _ = invitationSnapshot.value {
+        ref.child(checklistsEntity).child(checklist.ID!).observeSingleEvent(of: .value, with: { checklistSnapshot in
+            if checklistSnapshot.exists(), let _ = checklistSnapshot.value {
                 do {
-                    let value = try FirebaseEncoder().encode(invitation)
-                    ref.child(invitationsEntity).child(invitation.invitationID).setValue(value)
+                    let value = try FirebaseEncoder().encode(checklist)
+                    ref.child(checklistsEntity).child(checklist.ID!).setValue(value)
                     completion(true)
                 } catch let error {
                     print(error)
@@ -129,13 +130,13 @@ class ChecklistFetcher: NSObject {
         })
     }
     
-    class func remove(invitation: Invitation) {
+    class func remove(checklist: Checklist) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         
         let ref = Database.database().reference()
-        ref.child(invitationsEntity).child(invitation.invitationID).removeValue()
-        ref.child(userInvitationsEntity).child(currentUserID).child(invitation.invitationID).removeValue()
+        ref.child(checklistsEntity).child(checklist.ID!).removeValue()
+        ref.child(userChecklistsEntity).child(currentUserID).child(checklist.ID!).removeValue()
     }
 }

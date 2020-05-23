@@ -113,7 +113,6 @@ class InvitationsFetcher: NSObject {
     class func update(invitation: Invitation, completion: @escaping (Bool)->()) {
         let ref = Database.database().reference()
         ref.child(invitationsEntity).child(invitation.invitationID).observeSingleEvent(of: .value, with: { invitationSnapshot in
-            // first check if invitation exists
             if invitationSnapshot.exists(), let _ = invitationSnapshot.value {
                 do {
                     let value = try FirebaseEncoder().encode(invitation)

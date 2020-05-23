@@ -8,6 +8,9 @@
 
 import UIKit
 
+let checklistsEntity = "checklists"
+let userChecklistsEntity = "user-checklists"
+
 class Checklist: NSObject, Codable {
     
     var name: String?

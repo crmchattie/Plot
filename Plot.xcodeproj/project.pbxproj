@@ -91,6 +91,8 @@
 		10C50FA42274EF9100111033 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA32274EF9000111033 /* Activity.swift */; };
 		10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */; };
 		10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */; };
+		10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */; };
+		10D420AD24787AD500CBAFA7 /* ListActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AC24787AD500CBAFA7 /* ListActions.swift */; };
 		10DA3A222465C74500E6B491 /* IngredientDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */; };
 		10DE97352475737500D4A7E8 /* ListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97342475737500D4A7E8 /* ListCell.swift */; };
 		10DE97372475801400D4A7E8 /* ListCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */; };
@@ -405,6 +407,8 @@
 		10C50FA32274EF9000111033 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityCell+ConfigureCell.swift"; sourceTree = "<group>"; };
 		10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistViewController.swift; sourceTree = "<group>"; };
+		10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistFetcher.swift; sourceTree = "<group>"; };
+		10D420AC24787AD500CBAFA7 /* ListActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListActions.swift; sourceTree = "<group>"; };
 		10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientDetailViewController.swift; sourceTree = "<group>"; };
 		10DE97342475737500D4A7E8 /* ListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCell.swift; sourceTree = "<group>"; };
 		10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListCell+ConfigureCell.swift"; sourceTree = "<group>"; };
@@ -716,8 +720,10 @@
 				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
 				10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */,
 				10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */,
+				10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */,
 				10DE97342475737500D4A7E8 /* ListCell.swift */,
 				10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */,
+				10D420AC24787AD500CBAFA7 /* ListActions.swift */,
 			);
 			path = ListViewController;
 			sourceTree = "<group>";
@@ -2072,6 +2078,7 @@
 				10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */,
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,
 				106D758B2442447C0039B534 /* ActivityActions.swift in Sources */,
+				10D420AD24787AD500CBAFA7 /* ListActions.swift in Sources */,
 				4BAEE50D21272D890045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift in Sources */,
 				109F849723D67A85002C0044 /* SearchHeader.swift in Sources */,
 				1069B2D4243115950048244C /* ActivityObject.swift in Sources */,
@@ -2141,6 +2148,7 @@
 				4B5E99E0212CC0D5001F067F /* ConversationsFetcher.swift in Sources */,
 				4BAEE547212735200045AB10 /* SplashScreenContainer.swift in Sources */,
 				10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */,
+				10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */,
 				4BAEE50321272D890045AB10 /* ChatInputContainerView.swift in Sources */,
 				4BAEE5E9212735E50045AB10 /* EnterPhoneNumberContainerView.swift in Sources */,
 				4BAEE4F821272D890045AB10 /* MessagesFetcher.swift in Sources */,

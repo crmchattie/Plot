@@ -96,7 +96,8 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var height: CGFloat = 30
         if segment == 0, let ingredients = ingredients {
-            height = estimateFrameForText(width: view.frame.width - 30, text: ingredients[indexPath.item].original!.capitalized, font: UIFont.preferredFont(forTextStyle: .body)).height
+            let ingredient = "\(ingredients[indexPath.item].measures?.us?.amount ?? 0.0) \(ingredients[indexPath.item].measures?.us?.unitShort ?? "") of \(ingredients[indexPath.item].name?.capitalized ?? "")"
+            height = estimateFrameForText(width: view.frame.width - 30, text: ingredient, font: UIFont.preferredFont(forTextStyle: .body)).height
         } else if segment == 1, let equipment = equipment {
             height = estimateFrameForText(width: view.frame.width - 30, text: equipment[indexPath.item].capitalized, font: UIFont.preferredFont(forTextStyle: .body)).height
         } else if let instructions = instructions {
@@ -107,10 +108,10 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
     }
     
     func estimateFrameForText(width: CGFloat, text: String, font: UIFont) -> CGRect {
-      let size = CGSize(width: width, height: 10000)
-      let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
-      let attributes = [NSAttributedString.Key.font: font]
-      return text.boundingRect(with: size, options: options, attributes: attributes, context: nil).integral
+        let size = CGSize(width: width, height: 10000)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        let attributes = [NSAttributedString.Key.font: font]
+        return text.boundingRect(with: size, options: options, attributes: attributes, context: nil).integral
     }
 
 }
