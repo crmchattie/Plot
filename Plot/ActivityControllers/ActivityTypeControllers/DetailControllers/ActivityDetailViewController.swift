@@ -339,7 +339,6 @@ extension ActivityDetailViewController: MessagesDelegate {
         chatLogController?.messagesFetcher = messagesFetcher
         chatLogController?.messages = messages
         chatLogController?.conversation = conversation
-        chatLogController?.activityID = activityID
         
         if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
             chatLogController?.observeTypingIndicator()

@@ -199,10 +199,10 @@ class ActivityCell: UITableViewCell {
         
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
+        activityImageView.addSubview(startLabel)
         activityImageView.addSubview(activityTypeLabel)
         activityImageView.addSubview(activityParticipantsLabel)
         activityImageView.addSubview(activityAddressLabel)
-        activityImageView.addSubview(startLabel)
         activityImageView.addSubview(muteIndicator)
         activityImageView.addSubview(newActivityIndicator)
         activityImageView.addSubview(invitationSegmentedControl)
@@ -226,6 +226,18 @@ class ActivityCell: UITableViewCell {
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         
+        startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
+        startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        startLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
+        
+        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
+        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        activityTypeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
+        
+        activityAddressLabel.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: 2).isActive = true
+        activityAddressLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        activityAddressLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
+        
         activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 5).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
@@ -247,18 +259,6 @@ class ActivityCell: UITableViewCell {
         mapButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
         mapButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
 
-        startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
-        startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        startLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        
-        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
-        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        activityTypeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        
-        activityAddressLabel.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: 2).isActive = true
-        activityAddressLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        activityAddressLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        
         var x: CGFloat = 10
         for _ in 0..<thumbnailsCount {
             let icon = UIImageView()
@@ -270,6 +270,7 @@ class ActivityCell: UITableViewCell {
             icon.layer.masksToBounds = true
             icon.image = UIImage(named: "UserpicIcon")
             icon.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: 8).isActive = true
+//            icon.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
             icon.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: x).isActive = true
             icon.widthAnchor.constraint(equalToConstant: 30).isActive = true
             icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
@@ -351,8 +352,6 @@ class ActivityCell: UITableViewCell {
             self.delegate?.openChat(forConversation: conversationID, activityID: activity.activityID)
         } else if let activity = activity {
             self.delegate?.openChat(forConversation: nil, activityID: activity.activityID)
-        } else {
-            return
         }
     }
 }

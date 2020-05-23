@@ -11,85 +11,110 @@ import Firebase
 import SDWebImage
 
 extension ListCell {
-  
-  func configureCell(for indexPath: IndexPath, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activity: Activity?) {
     
-    backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-    contentView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-    listImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-    
-    if let grocerylist = grocerylist {
-        self.grocerylist = grocerylist
-        nameLabel.text = grocerylist.name
-        listTypeLabel.text = "Grocery List"
-        muteIndicator.isHidden = !(grocerylist.muted ?? false)
+    func configureCell(for indexPath: IndexPath, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activity: Activity?) {
         
-        let badgeString = grocerylist.badge?.toString()
-        let badgeInt = grocerylist.badge ?? 0
+        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        contentView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        listImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
-        if badgeInt > 0  {
-            badgeLabel.text = badgeString
-            badgeLabel.isHidden = false
-            newMessageIndicator.isHidden = true
-        } else {
-          newMessageIndicator.isHidden = true
-          badgeLabel.isHidden = true
+        if let grocerylist = grocerylist {
+            self.grocerylist = grocerylist
+            nameLabel.text = grocerylist.name
+            listTypeLabel.text = "Grocery List"
+            muteIndicator.isHidden = !(grocerylist.muted ?? false)
+            
+            let badgeString = grocerylist.badge?.toString()
+            let badgeInt = grocerylist.badge ?? 0
+            
+            if badgeInt > 0  {
+                badgeLabel.text = badgeString
+                badgeLabel.isHidden = false
+                newMessageIndicator.isHidden = true
+            } else {
+                newMessageIndicator.isHidden = true
+                badgeLabel.isHidden = true
+            }
+            
+            if grocerylist.conversationID == nil {
+                chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+            } else {
+                chatButton.tintColor = .systemBlue
+            }
+        } else if let checklist = checklist {
+            self.checklist = checklist
+            nameLabel.text = checklist.name
+            listTypeLabel.text = "Checklist"
+            muteIndicator.isHidden = !(checklist.muted ?? false)
+            
+            let badgeString = checklist.badge?.toString()
+            let badgeInt = checklist.badge ?? 0
+            
+            if badgeInt > 0  {
+                badgeLabel.text = badgeString
+                badgeLabel.isHidden = false
+                newMessageIndicator.isHidden = true
+            } else {
+                newMessageIndicator.isHidden = true
+                badgeLabel.isHidden = true
+            }
+            
+            if checklist.conversationID == nil {
+                chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+            } else {
+                chatButton.tintColor = .systemBlue
+            }
+        } else if let packinglist = packinglist {
+            self.packinglist = packinglist
+            nameLabel.text = packinglist.name
+            listTypeLabel.text = "Packing List"
+            muteIndicator.isHidden = !(packinglist.muted ?? false)
+            
+            let badgeString = packinglist.badge?.toString()
+            let badgeInt = packinglist.badge ?? 0
+            
+            if badgeInt > 0  {
+                badgeLabel.text = badgeString
+                badgeLabel.isHidden = false
+                newMessageIndicator.isHidden = true
+            } else {
+                newMessageIndicator.isHidden = true
+                badgeLabel.isHidden = true
+            }
+            
+            if packinglist.conversationID == nil {
+                chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+            } else {
+                chatButton.tintColor = .systemBlue
+            }
         }
-    } else if let checklist = checklist {
-        self.checklist = checklist
-        nameLabel.text = checklist.name
-        listTypeLabel.text = "Checklist"
-        muteIndicator.isHidden = !(checklist.muted ?? false)
         
-        let badgeString = checklist.badge?.toString()
-        let badgeInt = checklist.badge ?? 0
-        
-        if badgeInt > 0  {
-            badgeLabel.text = badgeString
-            badgeLabel.isHidden = false
-            newMessageIndicator.isHidden = true
+        if let activity = activity {
+            activityLabel.text = activity.name
+            activityButton.tintColor = .systemBlue
+            
+            if activity.conversationID == nil {
+                chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+            } else {
+                chatButton.tintColor = .systemBlue
+            }
+            
         } else {
-          newMessageIndicator.isHidden = true
-          badgeLabel.isHidden = true
+            activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
         }
-    } else if let packinglist = packinglist {
-        self.packinglist = packinglist
-        nameLabel.text = packinglist.name
-        listTypeLabel.text = "Packing List"
-        muteIndicator.isHidden = !(packinglist.muted ?? false)
         
-        let badgeString = packinglist.badge?.toString()
-        let badgeInt = packinglist.badge ?? 0
-        
-        if badgeInt > 0  {
-            badgeLabel.text = badgeString
-            badgeLabel.isHidden = false
-            newMessageIndicator.isHidden = true
-        } else {
-          newMessageIndicator.isHidden = true
-          badgeLabel.isHidden = true
+        if let activity = activity {
+            loadParticipantsThumbnailAct(activity: activity)
+        } else if let grocerylist = grocerylist {
+            updateParticipantsThumbnailGL(grocerylist: grocerylist)
+        } else if let checklist = checklist {
+            updateParticipantsThumbnailCL(checklist: checklist)
+        } else if let packinglist = packinglist {
+            updateParticipantsThumbnailPL(packinglist: packinglist)
         }
+        
     }
     
-    if let activity = activity {
-        activityLabel.text = activity.name
-        activityButton.tintColor = .systemBlue
-    } else {
-        activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-    }
-    
-    if let activity = activity {
-        loadParticipantsThumbnailAct(activity: activity)
-    } else if let grocerylist = grocerylist {
-        updateParticipantsThumbnailGL(grocerylist: grocerylist)
-    } else if let checklist = checklist {
-        updateParticipantsThumbnailCL(checklist: checklist)
-    } else if let packinglist = packinglist {
-        updateParticipantsThumbnailPL(packinglist: packinglist)
-    }
-    
-  }
-          
     func updateParticipantsThumbnailGL(grocerylist: Grocerylist) {
         let participantsIDs = grocerylist.participantsIDs ?? []
         var participantsCount = 0
@@ -121,7 +146,7 @@ extension ListCell {
                 guard let icon = self?.thumbnails[i], let url = user.thumbnailPhotoURL else {
                     continue
                 }
-            
+                
                 
                 icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in
                     guard image != nil else { return }
@@ -134,6 +159,7 @@ extension ListCell {
     }
     
     func updateParticipantsThumbnailCL(checklist: Checklist) {
+        print("updateParticipantsThumbnailCL")
         let participantsIDs = checklist.participantsIDs ?? []
         var participantsCount = 0
         if participantsIDs.count > 1 {
@@ -153,7 +179,8 @@ extension ListCell {
     }
     
     func loadParticipantsThumbnailCL(checklist: Checklist) {
-      self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
+        self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
+            print("loadParticipantsThumbnailCL")
             for i in 0..<users.count {
                 let user = users[i]
                 
@@ -164,7 +191,7 @@ extension ListCell {
                 guard let icon = self?.thumbnails[i], let url = user.thumbnailPhotoURL else {
                     continue
                 }
-            
+                
                 
                 icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in
                     guard image != nil else { return }
@@ -196,7 +223,7 @@ extension ListCell {
     }
     
     func loadParticipantsThumbnailPL(packinglist: Packinglist) {
-      self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
+        self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
                 
@@ -207,7 +234,7 @@ extension ListCell {
                 guard let icon = self?.thumbnails[i], let url = user.thumbnailPhotoURL else {
                     continue
                 }
-            
+                
                 
                 icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in
                     guard image != nil else { return }
@@ -218,7 +245,7 @@ extension ListCell {
             }
         })
     }
-
+    
     
     func loadParticipantsThumbnailAct(activity: Activity) {
         self.activityViewControllerDataStore?.getParticipants(forActivity: activity, completion: { [weak self] (participants) in
@@ -229,15 +256,15 @@ extension ListCell {
                     if Auth.auth().currentUser?.uid == user.id {
                         continue
                     }
-                    
+
                     if i > 8 {
                         return
                     }
-                    
+
                     guard let icon = self?.thumbnails[i], let url = user.thumbnailPhotoURL else {
                         continue
                     }
-                    
+
                     icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in
                         guard image != nil else { return }
                         guard cacheType != SDImageCacheType.memory, cacheType != SDImageCacheType.disk else {
@@ -248,7 +275,7 @@ extension ListCell {
             }
         })
     }
-    
+
     func updateParticipantsThumbnailAct(activity: Activity, acceptedParticipants: [User]) {
         let participants = acceptedParticipants.filter({$0.id != Auth.auth().currentUser?.uid})
         let participantsCount = participants.count

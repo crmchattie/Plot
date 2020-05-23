@@ -741,20 +741,21 @@ extension EventDetailViewController: UpdateLocationDelegate {
 }
 
 extension EventDetailViewController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?) {
-        if let conversation = conversations.first(where: {$0.chatID == chatID}) {
-            if conversation.activities != nil {
-                   var activities = conversation.activities!
-                   activities.append(activityID!)
-                   let updatedActivities = ["activities": activities as AnyObject]
-                   Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-               } else {
-                   let updatedActivities = ["activities": [activityID!] as AnyObject]
-                   Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
+        if let activityID = activityID {
+            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+                if conversation.activities != nil {
+                       var activities = conversation.activities!
+                       activities.append(activityID)
+                       let updatedActivities = ["activities": activities as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                   } else {
+                       let updatedActivities = ["activities": [activityID] as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                   }
                }
-           }
-        let updatedConversationID = ["conversationID": chatID as AnyObject]
-        Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-        activity.conversationID = chatID
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+        }
     }
 }

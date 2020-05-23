@@ -19,17 +19,22 @@ class GrocerylistViewController: FormViewController {
     weak var delegate : UpdateGrocerylistDelegate?
           
     var grocerylist: Grocerylist!
-        var connectedToAct = true
     
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
+    
+    var activities = [Activity]()
+    var conversations = [Conversation]()
     
     var userNames : [String] = []
     var userNamesString: String = ""
 
     fileprivate var active: Bool = false
     fileprivate var movingBackwards: Bool = true
+    var connectedToAct = true
+    var comingFromLists = false
+    
     fileprivate var ingredientIndex: Int = 0
     fileprivate var recipeIndex: Int = 0
               
@@ -42,6 +47,7 @@ class GrocerylistViewController: FormViewController {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
             if !connectedToAct {
+                connectedToAct = false
                 var participantCount = self.selectedFalconUsers.count
                 
                 // If user is creating this activity (admin)
@@ -64,7 +70,9 @@ class GrocerylistViewController: FormViewController {
             grocerylist = Grocerylist(dictionary: ["name" : "GroceryListName" as AnyObject])
             self.navigationItem.rightBarButtonItem?.isEnabled = false
         }
-      
+        
+        setupRightBarButton()
+        
         initializeForm()
       
     }
@@ -93,18 +101,176 @@ class GrocerylistViewController: FormViewController {
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationItem.title = "Grocery List"
     }
+    
+    func setupRightBarButton() {
+        if !comingFromLists {
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = plusBarButton
+        } else {
+            let dotsImage = UIImage(named: "dots")
+            if #available(iOS 11.0, *) {
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+                
+                let dotsBarButton = UIButton(type: .system)
+                dotsBarButton.setImage(dotsImage, for: .normal)
+                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
+                                
+                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
+            } else {
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
+            }
+        }
+    }
 
     @objc fileprivate func close() {
         movingBackwards = false
         delegate?.updateGrocerylist(grocerylist: grocerylist)
         self.navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func goToExtras() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if connectedToAct {
+            if grocerylist.activity?.conversationID == nil {
+                alert.addAction(UIAlertAction(title: "Connect Grocery List/Activity to a Chat", style: .default, handler: { (_) in
+                    print("User click Approve button")
+                    self.goToChat()
+
+                }))
+            } else {
+                alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+                    print("User click Approve button")
+                    self.goToChat()
+
+                    
+                }))
+            }
+        } else if grocerylist.conversationID == nil {
+            alert.addAction(UIAlertAction(title: "Connect Grocery List to a Chat", style: .default, handler: { (_) in
+                print("User click Approve button")
+                self.goToChat()
+
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+                print("User click Approve button")
+                self.goToChat()
+
+                
+            }))
+        }
+        
+        alert.addAction(UIAlertAction(title: "Share Grocery List", style: .default, handler: { (_) in
+            print("User click Edit button")
+            self.share()
+        }))
+
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        print("shareButtonTapped")
+        
+    }
+        
+        @objc func goToChat() {
+    //        if checklist.conversationID != nil {
+    //            if let convo = conversations.first(where: {$0.chatID == activity!.conversationID}) {
+    //                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+    //                self.messagesFetcher = MessagesFetcher()
+    //                self.messagesFetcher?.delegate = self
+    //                self.messagesFetcher?.loadMessagesData(for: convo)
+    //            }
+    //        } else {
+    //            let destination = ChooseChatTableViewController()
+    //            let navController = UINavigationController(rootViewController: destination)
+    //            destination.delegate = self
+    //            destination.activity = activity
+    //            destination.conversations = conversations
+    //            destination.pinnedConversations = conversations
+    //            destination.filteredConversations = conversations
+    //            destination.filteredPinnedConversations = conversations
+    //            present(navController, animated: true, completion: nil)
+    //        }
+        }
+        
+        func share() {
+    //        if let activity = activity, let name = activity.name {
+    //            let imageName = "activityLarge"
+    //            if let image = UIImage(named: imageName) {
+    //                let data = compressImage(image: image)
+    //                let aO = ["activityName": "\(name)",
+    //                            "activityID": activityID,
+    //                            "activityImageURL": "\(imageName)",
+    //                            "object": data] as [String: AnyObject]
+    //                let activityObject = ActivityObject(dictionary: aO)
+    //
+    //                let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
+    //
+    //                alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+    //                    print("User click Approve button")
+    //                    let destination = ChooseChatTableViewController()
+    //                    let navController = UINavigationController(rootViewController: destination)
+    //                    destination.activityObject = activityObject
+    //                    destination.users = self.users
+    //                    destination.filteredUsers = self.filteredUsers
+    //                    destination.conversations = self.conversations
+    //                    destination.filteredConversations = self.conversations
+    //                    destination.filteredPinnedConversations = self.conversations
+    //                    self.present(navController, animated: true, completion: nil)
+    //
+    //                }))
+    //
+    //                alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+    //                    print("User click Edit button")
+    //                        // Fallback on earlier versions
+    //                    let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+    //                    guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+    //                        else { return }
+    //                    let shareContent: [Any] = [shareText, url]
+    //                    let activityController = UIActivityViewController(activityItems: shareContent,
+    //                                                                      applicationActivities: nil)
+    //                    self.present(activityController, animated: true, completion: nil)
+    //                    activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+    //                    Bool, arrayReturnedItems: [Any]?, error: Error?) in
+    //                        if completed {
+    //                            print("share completed")
+    //                            return
+    //                        } else {
+    //                            print("cancel")
+    //                        }
+    //                        if let shareError = error {
+    //                            print("error while sharing: \(shareError.localizedDescription)")
+    //                        }
+    //                    }
+    //
+    //                }))
+    //
+    //
+    //                alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+    //                    print("User click Dismiss button")
+    //                }))
+    //
+    //                self.present(alert, animated: true, completion: {
+    //                    print("completion block")
+    //                })
+    //                print("shareButtonTapped")
+    //            }
+    //
+    //
+    //        }
     }
 
     func initializeForm() {

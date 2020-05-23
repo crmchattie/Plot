@@ -298,6 +298,7 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
+        if !schedule {
             if active, activity.conversationID == nil {
                 alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
                     print("User click Approve button")
@@ -311,29 +312,34 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
 
                 }))
             }
-                
-            if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
-                alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
-                    print("User click Edit button")
-                    self.goToMap(locationAddress: localAddress)
-                }))
-            }
-               
-
-           alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-               print("User click Dismiss button")
-           }))
-
-           self.present(alert, animated: true, completion: {
-               print("completion block")
-           })
-            print("shareButtonTapped")
-            
         }
+                
+        if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
+            alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
+                print("User click Edit button")
+                self.goToMap(locationAddress: localAddress)
+            }))
+        }
+           
+
+       alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+           print("User click Dismiss button")
+       }))
+
+       self.present(alert, animated: true, completion: {
+           print("completion block")
+       })
+        print("shareButtonTapped")
+        
+    }
 
 }
 
 extension MealDetailViewController: ChooseActivityDelegate {
+    func chosenList(finished: Bool) {
+        
+    }
+    
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
@@ -733,19 +739,20 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
     func dotsButtonTapped() {
     
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        if active, activity.conversationID == nil {
-            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
-                print("User click Approve button")
-                self.goToChat()
+        if !schedule {
+            if active, activity.conversationID == nil {
+                alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
+                    print("User click Approve button")
+                    self.goToChat()
 
-            }))
-        } else if active {
-            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
-                print("User click Approve button")
-                self.goToChat()
+                }))
+            } else if active {
+                alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+                    print("User click Approve button")
+                    self.goToChat()
 
-            }))
+                }))
+            }
         }
             
         if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
@@ -770,6 +777,10 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
 }
 
 extension WorkoutDetailViewController: ChooseActivityDelegate {
+    func chosenList(finished: Bool) {
+        
+    }
+    
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
@@ -1190,18 +1201,20 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
     
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if active, activity.conversationID == nil {
-            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
-                print("User click Approve button")
-                self.goToChat()
+        if !schedule {
+            if active, activity.conversationID == nil {
+                alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
+                    print("User click Approve button")
+                    self.goToChat()
 
-            }))
-        } else if active {
-            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
-                print("User click Approve button")
-                self.goToChat()
+                }))
+            } else if active {
+                alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+                    print("User click Approve button")
+                    self.goToChat()
 
-            }))
+                }))
+            }
         }
             
         if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
@@ -1226,6 +1239,10 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
 }
 
 extension EventDetailViewController: ChooseActivityDelegate {
+    func chosenList(finished: Bool) {
+        
+    }
+    
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()

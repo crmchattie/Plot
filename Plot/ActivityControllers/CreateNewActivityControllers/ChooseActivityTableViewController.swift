@@ -33,6 +33,7 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 
 protocol ChooseActivityDelegate: class {
     func chosenActivity(mergeActivity: Activity)
+    func chosenList(finished: Bool)
 }
 
 
@@ -49,6 +50,9 @@ class ChooseActivityTableViewController: UITableViewController {
     var filteredActivities = [Activity]()
     
     var activity: Activity?
+    var grocerylist: Grocerylist?
+    var checklist: Checklist?
+    var packinglist: Packinglist?
     var users = [User]()
     var filteredUsers = [User]()
 
@@ -198,9 +202,54 @@ class ChooseActivityTableViewController: UITableViewController {
   
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.navigationItem.searchController?.isActive = false
-        let activity = filteredActivities[indexPath.row]
-        delegate?.chosenActivity(mergeActivity: activity)
-        self.dismiss(animated: true, completion: nil)
+        if activity != nil {
+            let activity = filteredActivities[indexPath.row]
+            delegate?.chosenActivity(mergeActivity: activity)
+            self.dismiss(animated: true, completion: nil)
+        } else if let grocerylist = grocerylist {
+            let activity = filteredActivities[indexPath.row]
+            if let grocerylist = activity.grocerylist {
+                
+            } else {
+                let groupActivityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder)
+                let firebaseGrocerylist = grocerylist.toAnyObject()
+                groupActivityReference.updateChildValues(["grocerylist": firebaseGrocerylist as AnyObject])
+            }
+            delegate?.chosenList(finished: true)
+            self.dismiss(animated: true, completion: nil)
+        } else if let checklist = checklist {
+            let activity = filteredActivities[indexPath.row]
+            let groupActivityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder)
+            var firebaseChecklistList = [[String: AnyObject?]]()
+            if let checklists = activity.checklist {
+                for checklist in checklists {
+                    let firebaseChecklist = checklist.toAnyObject()
+                    firebaseChecklistList.append(firebaseChecklist)
+                }
+            } else {
+                let firebaseChecklist = checklist.toAnyObject()
+                firebaseChecklistList.append(firebaseChecklist)
+            }
+            groupActivityReference.updateChildValues(["checklist": firebaseChecklistList as AnyObject])
+            delegate?.chosenList(finished: true)
+            self.dismiss(animated: true, completion: nil)
+        } else if let packinglist = packinglist {
+            let activity = filteredActivities[indexPath.row]
+            let groupActivityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder)
+            var firebasePackinglistList = [[String: AnyObject?]]()
+            if let packinglists = activity.packinglist {
+                for packinglist in packinglists {
+                    let firebasePackinglist = packinglist.toAnyObject()
+                    firebasePackinglistList.append(firebasePackinglist)
+                }
+            } else {
+                let firebasePackinglist = packinglist.toAnyObject()
+                firebasePackinglistList.append(firebasePackinglist)
+            }
+            groupActivityReference.updateChildValues(["packinglist": firebasePackinglistList as AnyObject])
+            delegate?.chosenList(finished: true)
+            self.dismiss(animated: true, completion: nil)
+        }
     }
 }
 

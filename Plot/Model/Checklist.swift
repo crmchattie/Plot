@@ -18,44 +18,39 @@ class Checklist: NSObject, Codable {
     var items: [String: Bool]?
     var participantsIDs: [String]?
     var activity: Activity?
+    var conversationID: String?
     var admin: String?
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
-    
-    enum CodingKeys: String, CodingKey {
-        case name
-        case ID
-        case items
-        case participantsIDs
-        case activity
-        case admin
-        case badge
-        case pinned
-        case muted
-    }
 
     init(dictionary: [String: AnyObject]?) {
         super.init()
         name = dictionary?["name"] as? String
+        items = dictionary?["items"] as? [String: Bool]
         ID = dictionary?["ID"] as? String
         admin = dictionary?["admin"] as? String
         badge = dictionary?["badge"] as? Int
         pinned = dictionary?["pinned"] as? Bool
         muted = dictionary?["muted"] as? Bool
+        conversationID = dictionary?["conversationID"] as? String
         
         if let participantsIDsDict = dictionary?["participantsIDs"] as? [String: String] {
             participantsIDs = Array(participantsIDsDict.keys)
-        }
-        else if let participantsIDsArray = dictionary?["participantsIDs"] as? [String] {
+        } else if let participantsIDsArray = dictionary?["participantsIDs"] as? [String] {
             participantsIDs = participantsIDsArray
         } else {
             participantsIDs = []
         }
     }
     
-    func toAnyObject() -> [String: AnyObject?] {
-        var dictionary = [String: AnyObject?]()
+    func copy(with zone: NSZone? = nil) -> Any {
+        let copy = Checklist(dictionary: self.toAnyObject())
+        return copy
+    }
+    
+    func toAnyObject() -> [String: AnyObject] {
+        var dictionary = [String: AnyObject]()
         
         if let value = self.name as AnyObject? {
             dictionary["name"] = value
@@ -75,6 +70,10 @@ class Checklist: NSObject, Codable {
         
         if let value = self.participantsIDs as AnyObject? {
             dictionary["participantsIDs"] = value
+        }
+        
+        if let value = self.conversationID as AnyObject? {
+            dictionary["conversationID"] = value
         }
         
         return dictionary

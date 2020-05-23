@@ -608,7 +608,6 @@ extension SelectActivityTableViewController: ActivityCellDelegate {
             }
             
             self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-            self.chatLogController?.activityID = activityID ?? ""
             self.messagesFetcher = MessagesFetcher()
             self.messagesFetcher?.delegate = self
             self.messagesFetcher?.loadMessagesData(for: conversation)

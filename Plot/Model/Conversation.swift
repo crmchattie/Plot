@@ -24,6 +24,9 @@ class Conversation: NSObject {
   var pinned: Bool?
   var muted: Bool?
   var activities: [String]?
+  var checklists: [String]?
+  var grocerylists: [String]?
+  var packinglists: [String]?
   
   func messageText() -> String {
     
@@ -57,6 +60,9 @@ class Conversation: NSObject {
     pinned = dictionary?["pinned"] as? Bool
     muted = dictionary?["muted"] as? Bool
     activities = dictionary?["activities"] as? [String]
+    checklists = dictionary?["checklists"] as? [String]
+    grocerylists = dictionary?["grocerylists"] as? [String]
+    packinglists = dictionary?["packinglists"] as? [String]
   }
     
     func toAnyObject() -> [String: AnyObject] {
@@ -94,8 +100,20 @@ class Conversation: NSObject {
             conversationDict["activities"] = value
         }
         
-        if let value = self.adminNeeded as AnyObject? {
-            conversationDict["adminNeeded"] = value
+        if let value = self.activities as AnyObject? {
+            conversationDict["activities"] = value
+        }
+        
+        if let value = self.checklists as AnyObject? {
+            conversationDict["checklists"] = value
+        }
+        
+        if let value = self.grocerylists as AnyObject? {
+            conversationDict["grocerylists"] = value
+        }
+        
+        if let value = self.packinglists as AnyObject? {
+            conversationDict["packinglists"] = value
         }
         
         return conversationDict

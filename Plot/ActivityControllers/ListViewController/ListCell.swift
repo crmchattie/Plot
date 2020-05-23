@@ -10,6 +10,7 @@ import UIKit
 
 protocol ListCellDelegate: class {
     func openActivity(activity: Activity)
+    func openChat(forConversation conversationID: String?, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activity: Activity?)
 }
 
 class ListCell: UITableViewCell {
@@ -121,11 +122,10 @@ class ListCell: UITableViewCell {
         return button
     }()
     
-    let infoButton: UIButton = {
-        let button = UIButton(type: .infoLight)
-        button.tintColor = .clear
+    let chatButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "chat"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.isUserInteractionEnabled = false
         return button
     }()
     
@@ -142,7 +142,7 @@ class ListCell: UITableViewCell {
         listImageView.addSubview(newMessageIndicator)
         listImageView.addSubview(listButton)
         listImageView.addSubview(activityButton)
-        listImageView.addSubview(infoButton)
+        listImageView.addSubview(chatButton)
         
         listImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4).isActive = true
         listImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4).isActive = true
@@ -175,7 +175,7 @@ class ListCell: UITableViewCell {
         badgeLabel.centerYAnchor.constraint(equalTo: activityButton.centerYAnchor).isActive = true
         badgeLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
-        listButton.topAnchor.constraint(equalTo: listImageView.topAnchor, constant: 4).isActive = true
+        listButton.topAnchor.constraint(equalTo: listImageView.topAnchor, constant: 2).isActive = true
         listButton.rightAnchor.constraint(equalTo: listImageView.rightAnchor, constant: -2).isActive = true
         listButton.widthAnchor.constraint(equalToConstant: 36).isActive = true
         listButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
@@ -186,11 +186,12 @@ class ListCell: UITableViewCell {
         activityButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         activityButton.addTarget(self, action: #selector(ListCell.activityButtonTapped), for: .touchUpInside)
         
-        infoButton.topAnchor.constraint(equalTo: activityButton.bottomAnchor, constant: 10).isActive = true
-        infoButton.bottomAnchor.constraint(equalTo: listImageView.bottomAnchor, constant: -12).isActive = true
-        infoButton.rightAnchor.constraint(equalTo: listImageView.rightAnchor, constant: -5).isActive = true
-        infoButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        infoButton.heightAnchor.constraint(equalToConstant: 10).isActive = true
+        chatButton.topAnchor.constraint(equalTo: activityButton.bottomAnchor, constant: 10).isActive = true
+        chatButton.bottomAnchor.constraint(equalTo: listImageView.bottomAnchor, constant: -12).isActive = true
+        chatButton.rightAnchor.constraint(equalTo: listImageView.rightAnchor, constant: -5).isActive = true
+        chatButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        chatButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        chatButton.addTarget(self, action: #selector(ListCell.chatButtonTapped), for: .touchUpInside)
         
         var x: CGFloat = 10
         for _ in 0..<thumbnailsCount {
@@ -233,6 +234,52 @@ class ListCell: UITableViewCell {
             self.delegate?.openActivity(activity: activity)
         } else if let packinglist = packinglist, let activity = packinglist.activity {
             self.delegate?.openActivity(activity: activity)
+        }
+    }
+    
+    @objc func chatButtonTapped() {
+        if let grocerylist = grocerylist {
+            if let activity = grocerylist.activity {
+                if let conversationID = activity.conversationID {
+                    self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: nil, packinglist: nil, activity: activity)
+                } else {
+                    self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: nil, packinglist: nil, activity: activity)
+                }
+            } else {
+                if let conversationID = grocerylist.conversationID {
+                    self.delegate?.openChat(forConversation: conversationID, grocerylist: grocerylist, checklist: nil, packinglist: nil, activity: nil)
+                } else {
+                    self.delegate?.openChat(forConversation: nil, grocerylist: grocerylist, checklist: nil, packinglist: nil, activity: nil)
+                }
+            }
+        } else if let checklist = checklist {
+            if let activity = checklist.activity {
+                if let conversationID = activity.conversationID {
+                    self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: nil, packinglist: nil, activity: activity)
+                } else {
+                    self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: nil, packinglist: nil, activity: activity)
+                }
+            } else {
+                if let conversationID = checklist.conversationID {
+                    self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: checklist, packinglist: nil, activity: nil)
+                } else {
+                    self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: checklist, packinglist: nil, activity: nil)
+                }
+            }
+        } else if let packinglist = packinglist {
+            if let activity = packinglist.activity {
+                if let conversationID = activity.conversationID {
+                    self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: nil, packinglist: nil, activity: activity)
+                } else {
+                    self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: nil, packinglist: nil, activity: activity)
+                }
+            } else {
+                if let conversationID = packinglist.conversationID {
+                    self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: nil, packinglist: packinglist, activity: nil)
+                } else {
+                    self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: nil, packinglist: packinglist, activity: nil)
+                }
+            }
         }
     }
 }

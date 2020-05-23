@@ -1191,7 +1191,6 @@ enum EventAlert : String, CustomStringConvertible {
 public func runUserBadgeUpdate(firstChild: String) {
     var ref = Database.database().reference().child("users").child(firstChild)
     ref.observeSingleEvent(of: .value, with: { (snapshot) in
-        
         guard snapshot.hasChild("badge") else {
             ref.updateChildValues(["badge": 1])
             return

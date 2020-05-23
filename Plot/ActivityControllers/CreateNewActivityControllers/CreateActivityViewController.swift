@@ -1148,7 +1148,6 @@ class CreateActivityViewController: FormViewController {
             let endDate = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
             let startDateString = startDate.toString(dateFormat: "YYYY-MM-dd") + "T24:00:00Z"
             let endDateString = endDate.toString(dateFormat: "YYYY-MM-dd") + "T00:00:00Z"
-            
             print("updating weather row")
             if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
                 print("weather row exists")
@@ -1484,6 +1483,7 @@ class CreateActivityViewController: FormViewController {
                         destination.detailedRecipe = detailedRecipe
                         destination.users = self.acceptedParticipant
                         destination.filteredUsers = self.acceptedParticipant
+                        destination.conversations = self.conversations
                         destination.umbrellaActivity = self.activity
                         destination.schedule = true
                         destination.delegate = self
@@ -1503,6 +1503,7 @@ class CreateActivityViewController: FormViewController {
                             destination.event = event
                             destination.users = self.acceptedParticipant
                             destination.filteredUsers = self.acceptedParticipant
+                            destination.conversations = self.conversations
                             destination.umbrellaActivity = self.activity
                             destination.schedule = true
                             destination.delegate = self
@@ -1525,6 +1526,7 @@ class CreateActivityViewController: FormViewController {
                             destination.intColor = 0
                             destination.users = self.acceptedParticipant
                             destination.filteredUsers = self.acceptedParticipant
+                            destination.conversations = self.conversations
                             destination.umbrellaActivity = self.activity
                             destination.schedule = true
                             destination.delegate = self
@@ -1796,7 +1798,7 @@ class CreateActivityViewController: FormViewController {
         
         alert.addAction(UIAlertAction(title: "Share Activity", style: .default, handler: { (_) in
             print("User click Edit button")
-            self.shareActivity()
+            self.share()
         }))
 
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
@@ -1841,7 +1843,7 @@ class CreateActivityViewController: FormViewController {
         navigationController?.pushViewController(destination, animated: true)
     }
     
-    func shareActivity() {
+    func share() {
         if let activity = activity, let name = activity.name {
             let imageName = "activityLarge"
             if let image = UIImage(named: imageName) {                
@@ -2356,21 +2358,22 @@ extension CreateActivityViewController: UpdateActivityPhotosDelegate {
 }
 
 extension CreateActivityViewController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?) {
-        if let conversation = conversations.first(where: {$0.chatID == chatID}) {
-            if conversation.activities != nil {
-                   var activities = conversation.activities!
-                   activities.append(activityID!)
-                   let updatedActivities = ["activities": activities as AnyObject]
-                   Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-               } else {
-                   let updatedActivities = ["activities": [activityID!] as AnyObject]
-                   Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
+        if let activityID = activityID {
+            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+                if conversation.activities != nil {
+                       var activities = conversation.activities!
+                       activities.append(activityID)
+                       let updatedActivities = ["activities": activities as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                   } else {
+                       let updatedActivities = ["activities": [activityID] as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                   }
                }
-           }
-        let updatedConversationID = ["conversationID": chatID as AnyObject]
-        Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-        activity.conversationID = chatID
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+        }
     }
 }
 
@@ -2386,7 +2389,6 @@ extension CreateActivityViewController: MessagesDelegate {
         chatLogController?.messagesFetcher = messagesFetcher
         chatLogController?.messages = messages
         chatLogController?.conversation = conversation
-        chatLogController?.activityID = activityID
         
         if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
             chatLogController?.observeTypingIndicator()

@@ -20,17 +20,21 @@ class ChecklistViewController: FormViewController {
     weak var delegate : UpdateChecklistDelegate?
         
     var checklist: Checklist!
-    var connectedToAct = true
     
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
+    
+    var activities = [Activity]()
+    var conversations = [Conversation]()
     
     var userNames : [String] = []
     var userNamesString: String = ""
     
     fileprivate var active: Bool = false
     fileprivate var movingBackwards: Bool = true
+    var connectedToAct = true
+    var comingFromLists = false
                 
     override func viewDidLoad() {
     super.viewDidLoad()
@@ -64,6 +68,7 @@ class ChecklistViewController: FormViewController {
             self.navigationItem.rightBarButtonItem?.isEnabled = false
         }
         
+        setupRightBarButton()
         
         initializeForm()
         
@@ -73,6 +78,7 @@ class ChecklistViewController: FormViewController {
         super.viewWillDisappear(animated)
         
         if self.movingBackwards {
+            updateLists()
             delegate?.updateChecklist(checklist: checklist)
         }
     }
@@ -93,7 +99,6 @@ class ChecklistViewController: FormViewController {
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
@@ -101,10 +106,346 @@ class ChecklistViewController: FormViewController {
         navigationItem.title = "Checklist"
     }
     
+    func setupRightBarButton() {
+        if !comingFromLists {
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = plusBarButton
+        } else {
+            let dotsImage = UIImage(named: "dots")
+            if #available(iOS 11.0, *) {
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+                
+                let dotsBarButton = UIButton(type: .system)
+                dotsBarButton.setImage(dotsImage, for: .normal)
+                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
+                                
+                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
+            } else {
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
+            }
+        }
+    }
+    
     @objc fileprivate func close() {
-        movingBackwards = false
-        delegate?.updateChecklist(checklist: checklist)
-        self.navigationController?.popViewController(animated: true)
+        updateLists()
+        if !comingFromLists {
+            movingBackwards = false
+            delegate?.updateChecklist(checklist: checklist)
+            self.navigationController?.popViewController(animated: true)
+        }
+        
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if active, !connectedToAct {
+            alert.addAction(UIAlertAction(title: "Update Checklist", style: .default, handler: { (_) in
+                print("User click Approve button")
+                                
+                // update
+                self.showActivityIndicator()
+                let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createChecklist.createNewChecklist()
+                self.hideActivityIndicator()
+                
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Duplicate Checklist", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new checklist with updated time
+                guard self.currentReachabilityStatus != .notReachable else {
+                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+                    return
+                }
+                            
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    //duplicate checklist
+                    let newChecklistID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    let newChecklist = self.checklist.copy() as! Checklist
+                    newChecklist.ID = newChecklistID
+                    newChecklist.admin = currentUserID
+                    newChecklist.participantsIDs = nil
+                    newChecklist.conversationID = nil
+                    
+                    self.showActivityIndicator()
+                    let createChecklist = ChecklistActions(checklist: newChecklist, active: false, selectedFalconUsers: [])
+                    createChecklist.createNewChecklist()
+                    self.hideActivityIndicator()
+                    
+                    
+                    
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                }
+                
+
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Add to Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                                    
+                // ChooseActivityTableViewController
+                let destination = ChooseActivityTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.delegate = self
+                destination.checklist = self.checklist
+                destination.activities = self.activities
+                destination.filteredActivities = self.activities
+                self.present(navController, animated: true, completion: nil)
+            
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Duplicate & Add to Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                                            
+                    //duplicate activity as if it never was deleted aka leave admin and participants intact
+                    let newChecklistID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    let newChecklist = self.checklist.copy() as! Checklist
+                    newChecklist.ID = newChecklistID
+                    
+                    self.showActivityIndicator()
+                    let createChecklist = ChecklistActions(checklist: newChecklist, active: false, selectedFalconUsers: [])
+                    createChecklist.createNewChecklist()
+                    self.hideActivityIndicator()
+                    
+                    // ChooseActivityTableViewController
+                    let destination = ChooseActivityTableViewController()
+                    let navController = UINavigationController(rootViewController: destination)
+                    destination.delegate = self
+                    destination.checklist = self.checklist
+                    destination.activities = self.activities
+                    destination.filteredActivities = self.activities
+                    self.present(navController, animated: true, completion: nil)
+                }
+            
+            }))
+            
+        } else if connectedToAct {
+            alert.addAction(UIAlertAction(title: "Update Checklist", style: .default, handler: { (_) in
+                print("User click Approve button")
+                if let activity = self.checklist.activity {
+                    let groupActivityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder)
+                    var firebaseChecklistList = [[String: AnyObject?]]()
+                    if let checklists = activity.checklist {
+                        for checklist in checklists {
+                            let firebaseChecklist = checklist.toAnyObject()
+                            firebaseChecklistList.append(firebaseChecklist)
+                        }
+                    } else {
+                        let firebaseChecklist = self.checklist.toAnyObject()
+                        firebaseChecklistList.append(firebaseChecklist)
+                    }
+                    groupActivityReference.updateChildValues(["checklist": firebaseChecklistList as AnyObject])
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Duplicate Checklist", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new checklist with updated time
+                guard self.currentReachabilityStatus != .notReachable else {
+                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+                    return
+                }
+                            
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    //duplicate checklist
+                    let newChecklistID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    let newChecklist = self.checklist.copy() as! Checklist
+                    newChecklist.ID = newChecklistID
+                    newChecklist.admin = currentUserID
+                    newChecklist.participantsIDs = nil
+                    newChecklist.conversationID = nil
+                    
+                    self.showActivityIndicator()
+                    let createChecklist = ChecklistActions(checklist: newChecklist, active: false, selectedFalconUsers: [])
+                    createChecklist.createNewChecklist()
+                    self.hideActivityIndicator()
+                    
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                }
+                
+
+            }))
+            
+        } else if !connectedToAct {
+            alert.addAction(UIAlertAction(title: "Create New Checklist", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new activity
+                                                        
+                self.showActivityIndicator()
+                let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createChecklist.createNewChecklist()
+                self.hideActivityIndicator()
+                
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Add to Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                                    
+                // ChooseActivityTableViewController
+                let destination = ChooseActivityTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.delegate = self
+                destination.checklist = self.checklist
+                destination.activities = self.activities
+                destination.filteredActivities = self.activities
+                self.present(navController, animated: true, completion: nil)
+            
+            }))
+
+        }
+        
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        
+    }
+    
+    @objc func goToExtras() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if connectedToAct {
+            if checklist.activity?.conversationID == nil {
+                alert.addAction(UIAlertAction(title: "Connect Checklist/Activity to a Chat", style: .default, handler: { (_) in
+                    print("User click Approve button")
+                    self.goToChat()
+
+                }))
+            } else {
+                alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+                    print("User click Approve button")
+                    self.goToChat()
+
+                    
+                }))
+            }
+        } else if checklist.conversationID == nil {
+            alert.addAction(UIAlertAction(title: "Connect Checklist to a Chat", style: .default, handler: { (_) in
+                print("User click Approve button")
+                self.goToChat()
+
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+                print("User click Approve button")
+                self.goToChat()
+
+                
+            }))
+        }
+        
+        alert.addAction(UIAlertAction(title: "Share Checklist", style: .default, handler: { (_) in
+            print("User click Edit button")
+            self.share()
+        }))
+
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        print("shareButtonTapped")
+        
+    }
+    
+    @objc func goToChat() {
+//        if checklist.conversationID != nil {
+//            if let convo = conversations.first(where: {$0.chatID == activity!.conversationID}) {
+//                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+//                self.messagesFetcher = MessagesFetcher()
+//                self.messagesFetcher?.delegate = self
+//                self.messagesFetcher?.loadMessagesData(for: convo)
+//            }
+//        } else {
+//            let destination = ChooseChatTableViewController()
+//            let navController = UINavigationController(rootViewController: destination)
+//            destination.delegate = self
+//            destination.activity = activity
+//            destination.conversations = conversations
+//            destination.pinnedConversations = conversations
+//            destination.filteredConversations = conversations
+//            destination.filteredPinnedConversations = conversations
+//            present(navController, animated: true, completion: nil)
+//        }
+    }
+    
+    func share() {
+//        if let activity = activity, let name = activity.name {
+//            let imageName = "activityLarge"
+//            if let image = UIImage(named: imageName) {
+//                let data = compressImage(image: image)
+//                let aO = ["activityName": "\(name)",
+//                            "activityID": activityID,
+//                            "activityImageURL": "\(imageName)",
+//                            "object": data] as [String: AnyObject]
+//                let activityObject = ActivityObject(dictionary: aO)
+//
+//                let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
+//
+//                alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+//                    print("User click Approve button")
+//                    let destination = ChooseChatTableViewController()
+//                    let navController = UINavigationController(rootViewController: destination)
+//                    destination.activityObject = activityObject
+//                    destination.users = self.users
+//                    destination.filteredUsers = self.filteredUsers
+//                    destination.conversations = self.conversations
+//                    destination.filteredConversations = self.conversations
+//                    destination.filteredPinnedConversations = self.conversations
+//                    self.present(navController, animated: true, completion: nil)
+//
+//                }))
+//
+//                alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+//                    print("User click Edit button")
+//                        // Fallback on earlier versions
+//                    let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+//                    guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+//                        else { return }
+//                    let shareContent: [Any] = [shareText, url]
+//                    let activityController = UIActivityViewController(activityItems: shareContent,
+//                                                                      applicationActivities: nil)
+//                    self.present(activityController, animated: true, completion: nil)
+//                    activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+//                    Bool, arrayReturnedItems: [Any]?, error: Error?) in
+//                        if completed {
+//                            print("share completed")
+//                            return
+//                        } else {
+//                            print("cancel")
+//                        }
+//                        if let shareError = error {
+//                            print("error while sharing: \(shareError.localizedDescription)")
+//                        }
+//                    }
+//
+//                }))
+//
+//
+//                alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+//                    print("User click Dismiss button")
+//                }))
+//
+//                self.present(alert, animated: true, completion: {
+//                    print("completion block")
+//                })
+//                print("shareButtonTapped")
+//            }
+//
+//
+//        }
         
     }
     
@@ -289,6 +630,18 @@ class ChecklistViewController: FormViewController {
         destination.delegate = self
         self.navigationController?.pushViewController(destination, animated: true)
     }
+    
+    func showActivityIndicator() {
+        if let tabController = self.tabBarController {
+            self.showSpinner(onView: tabController.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
 }
 
 extension ChecklistViewController: UpdateInvitees {
@@ -329,3 +682,137 @@ extension ChecklistViewController: UpdateInvitees {
         }
     }
 }
+
+extension ChecklistViewController: ChooseActivityDelegate {
+    func chosenList(finished: Bool) {
+        
+    }
+    
+    func chosenActivity(mergeActivity: Activity) {
+//        if let activity = activity {
+//            let dispatchGroup = DispatchGroup()
+//            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
+//                if let currentUserID = Auth.auth().currentUser?.uid {
+//                    
+//                    let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+//                    let newActivity = mergeActivity.copy() as! Activity
+//                    newActivity.activityID = newActivityID
+//                    newActivity.recipeID = nil
+//                    newActivity.workoutID = nil
+//                    newActivity.eventID = nil
+//                    
+//                    if let oldParticipantsIDs = activity.participantsIDs {
+//                        if let newParticipantsIDs = newActivity.participantsIDs {
+//                            for id in oldParticipantsIDs {
+//                                if !newParticipantsIDs.contains(id) {
+//                                    newActivity.participantsIDs!.append(id)
+//                                }
+//                            }
+//                        } else {
+//                            newActivity.participantsIDs = activity.participantsIDs
+//                        }
+//                    }
+//                    mergeActivity.participantsIDs = newActivity.participantsIDs
+//                    activity.participantsIDs = newActivity.participantsIDs
+//                    
+//                    let scheduleList = [mergeActivity, activity]
+//                    newActivity.schedule = scheduleList
+//                                       
+//                    self.showActivityIndicator()
+//                    
+//                    // need to delete current activity and merge activity
+//                    if active {
+//                        dispatchGroup.enter()
+//                        self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
+//                            let deleteFirstActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
+//                            deleteFirstActivity.deleteActivity()
+//                            dispatchGroup.leave()
+//                        }
+//                        dispatchGroup.enter()
+//                        self.getSelectedFalconUsers(forActivity: activity) { (participants) in
+//                            let deleteSecondActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
+//                            deleteSecondActivity.deleteActivity()
+//                            dispatchGroup.leave()
+//                        }
+//                        
+//                    // need to delete merge activity
+//                    } else {
+//                        dispatchGroup.enter()
+//                        self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
+//                            let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
+//                            deleteActivity.deleteActivity()
+//                            dispatchGroup.leave()
+//                        }
+//                    }
+//                    
+//                    dispatchGroup.enter()
+//                    self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
+//                        let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
+//                        createActivity.createNewActivity()
+//                        dispatchGroup.leave()
+//                    }
+//                    
+//                    self.hideActivityIndicator()
+//                }
+//            } else {
+//                if mergeActivity.schedule != nil {
+//                    var scheduleList = mergeActivity.schedule!
+//                    scheduleList.append(activity)
+//                    mergeActivity.schedule = scheduleList
+//                } else {
+//                    let scheduleList = [activity]
+//                    mergeActivity.schedule = scheduleList
+//                }
+//                
+//                if let oldParticipantsIDs = activity.participantsIDs {
+//                    if let newParticipantsIDs = mergeActivity.participantsIDs {
+//                        for id in oldParticipantsIDs {
+//                            if !newParticipantsIDs.contains(id) {
+//                                mergeActivity.participantsIDs!.append(id)
+//                            }
+//                        }
+//                    } else {
+//                        mergeActivity.participantsIDs = activity.participantsIDs
+//                    }
+//                }
+//                
+//                self.showActivityIndicator()
+//                
+//                // need to delete current activity
+//                if active {
+//                    dispatchGroup.enter()
+//                    self.getSelectedFalconUsers(forActivity: activity) { (participants) in
+//                        let deleteActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
+//                        deleteActivity.deleteActivity()
+//                        dispatchGroup.leave()
+//                    }
+//                }
+//                
+//                dispatchGroup.enter()
+//                self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
+//                    let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
+//                    createActivity.createNewActivity()
+//                    dispatchGroup.leave()
+//                    self.hideActivityIndicator()
+//                }
+//            
+//            }
+//            
+//            dispatchGroup.notify(queue: .main) {
+//                if self.active {
+//                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+//                } else {
+//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                    if nav.topViewController is MasterActivityContainerController {
+//                        let homeTab = nav.topViewController as! MasterActivityContainerController
+//                        homeTab.customSegmented.setIndex(index: 2)
+//                        homeTab.changeToIndex(index: 2)
+//                    }
+//                    self.tabBarController?.selectedIndex = 1
+//                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+//                }
+//            }
+//        }
+    }
+}
+

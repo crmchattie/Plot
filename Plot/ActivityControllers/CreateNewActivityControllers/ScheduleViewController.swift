@@ -474,7 +474,7 @@ class ScheduleViewController: FormViewController {
                                 }
                                 
         }
-                            if let items = checklist[0].items {
+                            if !checklist.isEmpty, let items = checklist[0].items {
                                 for item in items {
                                     var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
                                     mvs.insert(SplitRow<TextRow, CheckRow>() {
@@ -523,7 +523,13 @@ class ScheduleViewController: FormViewController {
                     checklistDict[text] = state
                 }
             }
-            schedule.checklist![0].items = checklistDict
+            if schedule.checklist != nil {
+                schedule.checklist![0].items = checklistDict
+            } else {
+                let check = Checklist(dictionary: ["name" : "ScheduleChecklist" as AnyObject])
+                check.items = checklistDict
+                schedule.checklist = [check]
+            }
         } else {
             schedule.checklist = nil
         }

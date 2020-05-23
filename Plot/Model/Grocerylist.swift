@@ -21,24 +21,11 @@ class Grocerylist: NSObject, Codable {
     var servings: [String: Int]?
     var participantsIDs: [String]?
     var activity: Activity?
+    var conversationID: String?
     var admin: String?
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
-    
-    enum CodingKeys: String, CodingKey {
-        case name
-        case ID
-        case recipes
-        case ingredients
-        case servings
-        case participantsIDs
-        case activity
-        case admin
-        case badge
-        case pinned
-        case muted
-    }
 
     init(dictionary: [String: AnyObject]?) {
         super.init()
@@ -57,6 +44,7 @@ class Grocerylist: NSObject, Codable {
         }
         servings = dictionary?["servings"] as? [String: Int]
         
+        conversationID = dictionary?["conversationID"] as? String
         admin = dictionary?["admin"] as? String
         badge = dictionary?["badge"] as? Int
         pinned = dictionary?["pinned"] as? Bool
@@ -73,8 +61,13 @@ class Grocerylist: NSObject, Codable {
         
     }
     
-    func toAnyObject() -> [String: AnyObject?] {
-        var dictionary = [String: AnyObject?]()
+    func copy(with zone: NSZone? = nil) -> Any {
+        let copy = Grocerylist(dictionary: self.toAnyObject())
+        return copy
+    }
+    
+    func toAnyObject() -> [String: AnyObject] {
+        var dictionary = [String: AnyObject]()
         
         if let value = self.name as AnyObject? {
             dictionary["name"] = value
@@ -107,6 +100,10 @@ class Grocerylist: NSObject, Codable {
         
         if let value = self.participantsIDs as AnyObject? {
             dictionary["participantsIDs"] = value
+        }
+        
+        if let value = self.conversationID as AnyObject? {
+            dictionary["conversationID"] = value
         }
                                 
         return dictionary

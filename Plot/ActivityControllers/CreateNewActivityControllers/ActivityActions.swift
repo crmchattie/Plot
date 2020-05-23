@@ -20,9 +20,7 @@ class ActivityActions: NSObject {
     var endDateTime: Date?
     
     let dispatchGroup = DispatchGroup()
-    
-//    weak var delegate: ActivityActionsDelegate?
-    
+        
     init(activity: Activity, active: Bool?, selectedFalconUsers: [User]) {
         super.init()
         self.activity = activity
@@ -223,17 +221,6 @@ class ActivityActions: NSObject {
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
             })
-        }
-    }
-    
-    func createGroupChatNode(reference: DatabaseReference, childValues: [String: Any], noImagesToUpload: Bool) {
-        let nodeCreationGroup = DispatchGroup()
-        nodeCreationGroup.enter()
-        nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
-            self.dispatchGroup.leave()
-        })
-        reference.updateChildValues(childValues) { (error, reference) in
-            nodeCreationGroup.leave()
         }
     }
     

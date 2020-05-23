@@ -38,6 +38,7 @@ class MasterActivityContainerController: UIViewController {
             activitiesVC.conversations = conversations
             notificationsVC.conversations = conversations
             mapVC.conversations = conversations
+            listsVC.conversations = conversations
             let nav = self.tabBarController!.viewControllers![0] as! UINavigationController
             
             if nav.topViewController is ActivityTypeViewController {

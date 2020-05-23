@@ -18,24 +18,12 @@ class Packinglist: NSObject, Codable {
     var activities: [String: Bool]?
     var items: [String: [Int: Bool]]?
     var participantsIDs: [String]?
+    var conversationID: String?
     var activity: Activity?
     var admin: String?
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
-    
-    enum CodingKeys: String, CodingKey {
-        case name
-        case ID
-        case activities
-        case items
-        case participantsIDs
-        case activity
-        case admin
-        case badge
-        case pinned
-        case muted
-    }
 
     init(dictionary: [String: AnyObject]?) {
         super.init()
@@ -49,6 +37,8 @@ class Packinglist: NSObject, Codable {
         pinned = dictionary?["pinned"] as? Bool
         muted = dictionary?["muted"] as? Bool
         
+        conversationID = dictionary?["conversationID"] as? String
+        
         if let participantsIDsDict = dictionary?["participantsIDs"] as? [String: String] {
             participantsIDs = Array(participantsIDsDict.keys)
         }
@@ -60,8 +50,13 @@ class Packinglist: NSObject, Codable {
         
     }
     
-    func toAnyObject() -> [String: AnyObject?] {
-        var dictionary = [String: AnyObject?]()
+    func copy(with zone: NSZone? = nil) -> Any {
+        let copy = Packinglist(dictionary: self.toAnyObject())
+        return copy
+    }
+    
+    func toAnyObject() -> [String: AnyObject] {
+        var dictionary = [String: AnyObject]()
         
         if let value = self.name as AnyObject? {
             dictionary["name"] = value
@@ -85,6 +80,10 @@ class Packinglist: NSObject, Codable {
         
         if let value = self.participantsIDs as AnyObject? {
             dictionary["participantsIDs"] = value
+        }
+        
+        if let value = self.conversationID as AnyObject? {
+            dictionary["conversationID"] = value
         }
         
         return dictionary

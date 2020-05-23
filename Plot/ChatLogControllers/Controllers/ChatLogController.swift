@@ -38,7 +38,6 @@ class ChatLogController: UICollectionViewController {
   var filteredUsers = [User]()
   var conversations = [Conversation]()
   var activities = [Activity]()
-  var activityID: String = ""
   var chatExists: Bool = true
   
   let messagesToLoad = 50
@@ -612,7 +611,7 @@ class ChatLogController: UICollectionViewController {
   }
 
   func setRightBarButtonItem () {
-    if let isGroupChat = conversation?.isGroupChat, isGroupChat && activityID == "" && chatExists {
+    if let isGroupChat = conversation?.isGroupChat, isGroupChat && chatExists {
         let infoButton = UIButton(type: .infoLight)
         infoButton.addTarget(self, action: #selector(getInfoAction), for: .touchUpInside)
         let infoBarButtonItem = UIBarButtonItem(customView: infoButton)
