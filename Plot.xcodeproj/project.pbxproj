@@ -87,6 +87,8 @@
 		109FEB3D22A7003000621D2F /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3C22A7003000621D2F /* Schedule.swift */; };
 		109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB4122A9C3DD00621D2F /* Purchase.swift */; };
 		10A18D3A2458E1A5006990F2 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18D392458E1A5006990F2 /* PurchasesViewController.swift */; };
+		10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */; };
+		10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */; };
 		10C50F972274E21900111033 /* ActivityViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F962274E21900111033 /* ActivityViewController+SearchHandlers.swift */; };
 		10C50F9B2274E80500111033 /* ActivityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F9A2274E80500111033 /* ActivityCell.swift */; };
 		10C50FA22274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */; };
@@ -405,6 +407,8 @@
 		109FEB3C22A7003000621D2F /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		109FEB4122A9C3DD00621D2F /* Purchase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Purchase.swift; sourceTree = "<group>"; };
 		10A18D392458E1A5006990F2 /* PurchasesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchasesViewController.swift; sourceTree = "<group>"; };
+		10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
+		10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
 		10C50F962274E21900111033 /* ActivityViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C50F9A2274E80500111033 /* ActivityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCell.swift; sourceTree = "<group>"; };
 		10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
@@ -718,6 +722,8 @@
 			isa = PBXGroup;
 			children = (
 				1051AC9A244F8C5F0066761C /* ListsViewController.swift */,
+				10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */,
+				10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */,
 				10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */,
 				10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */,
 				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
@@ -1939,6 +1945,7 @@
 				10196F0224411B5600B6AFDF /* MapViewController.swift in Sources */,
 				109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */,
 				4BAEE5B5212735E50045AB10 /* INSPhotosDataSource.swift in Sources */,
+				10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */,
 				4BAEE4FA21272D890045AB10 /* ChatLogController+MediaPickerHandlers.swift in Sources */,
 				26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */,
 				4BAEE50621272D890045AB10 /* SelectedMediaCollectionCell.swift in Sources */,
@@ -2046,6 +2053,7 @@
 				4B6521FA219B3A4400FF655E /* GroupMembersManager.swift in Sources */,
 				4BAEE46521272B380045AB10 /* AccountSettingsController.swift in Sources */,
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
+				10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */,
 				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
 				4BAEE5CD212735E50045AB10 /* SelectParticipantsTableView.swift in Sources */,
 				10196F0424411B5600B6AFDF /* ActivityAvatarOpenerDelegate.swift in Sources */,

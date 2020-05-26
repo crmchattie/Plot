@@ -639,10 +639,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         
         let delete = setupDeleteAction(at: indexPath)
-        let pin = setupPinAction(at: indexPath)
+//        let pin = setupPinAction(at: indexPath)
         let mute = setupMuteAction(at: indexPath)
         
-        return [delete, pin, mute]
+        return [delete, mute]
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -1178,6 +1178,7 @@ extension ActivityViewController: MessagesDelegate {
         chatLogController?.messagesFetcher = messagesFetcher
         chatLogController?.messages = messages
         chatLogController?.conversation = conversation
+        chatLogController?.deleteAndExitDelegate = self
         //chatLogController?.activityID = activityID
         
         if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {

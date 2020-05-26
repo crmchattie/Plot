@@ -26,6 +26,30 @@ struct ListContainer: Codable {
     var createdDate: Date {
         return grocerylist?.createdDate ?? checklist?.createdDate ?? packinglist?.createdDate ?? Date.distantPast
     }
+    
+    var badge: Int {
+        return grocerylist?.badge ?? checklist?.badge ?? packinglist?.badge ?? 0
+    }
+    
+    var muted: Bool {
+        return grocerylist?.muted ?? checklist?.muted ?? packinglist?.muted ?? false
+    }
+    
+    var pinned: Bool {
+        return grocerylist?.pinned ?? checklist?.pinned ?? packinglist?.pinned ?? false
+    }
+    
+    var type: String {
+        if grocerylist != nil {
+            return "grocerylist"
+        } else if checklist != nil {
+            return "checklist"
+        } else if packinglist != nil {
+            return "packinglist"
+        } else {
+            return "none"
+        }
+    }
 
 }
 

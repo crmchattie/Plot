@@ -13,14 +13,11 @@ import CodableFirebase
 class ChecklistFetcher: NSObject {
         
     fileprivate var userChecklistsDatabaseRef: DatabaseReference!
-    fileprivate var checklistsDatabaseRef: DatabaseReference!
     fileprivate var currentUserChecklistsAddHandle = DatabaseHandle()
     fileprivate var currentUserChecklistsRemoveHandle = DatabaseHandle()
-    fileprivate var checklistsChangedHandle = DatabaseHandle()
     
     var checklistsAdded: (([Checklist])->())?
     var checklistsRemoved: (([Checklist])->())?
-    var checklistsChanged: (([Checklist])->())?
     
     fileprivate var isGroupAlreadyFinished = false
     
@@ -95,18 +92,6 @@ class ChecklistFetcher: NSObject {
             }
         })
         
-//        checklistsChangedHandle = checklistsDatabaseRef.observe(.value, with: { snapshot in
-//            print("checklistsChangedHandle")
-//            if let completion = self.checklistsAdded {
-//                let checklistID = snapshot.key
-//                let ref = Database.database().reference()
-//                var handle = UInt.max
-//                handle = ref.child(checklistsEntity).child(checklistID).observe(.childAdded) { _ in
-//                    ref.removeObserver(withHandle: handle)
-//                    self.getChecklistsFromSnapshot(snapshot: snapshot, completion: completion)
-//                }
-//            }
-//        })
     }
     
     func getChecklistsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Checklist])->()) {

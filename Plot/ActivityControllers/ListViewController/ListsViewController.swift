@@ -189,13 +189,11 @@ class ListsViewController: UIViewController {
         self.checklistFetcher.observeChecklistForCurrentUser(checklistsAdded: { [weak self] checklistsAdded in
             for checklist in checklistsAdded {
                 if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
-                    print("observeChecklistsForCurrentUser \(checklist.name)")
                     self!.checklists[index] = checklist
                     if let ID = checklist.ID {
                         self!.updateCellForCLID(ID: ID, checklist: checklist)
                     }
                 } else {
-                    print("observeChecklistsForCurrentUser \(checklist.name)")
                     self!.checklists.append(checklist)
                     self!.sortandreload()
                 }
@@ -294,9 +292,52 @@ class ListsViewController: UIViewController {
         tableView.reloadData()
     }
     
+    func configureTabBarBadge() {
+        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
+        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
+        var badge = 0
+        
+        for list in listList {
+            badge += list.badge
+        }
+        
+        guard badge > 0 else {
+            tabItem.badgeValue = nil
+            setApplicationBadge()
+            return
+        }
+        tabItem.badgeValue = badge.toString()
+        setApplicationBadge()
+    }
+    
+    func setApplicationBadge() {
+        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
+        var badge = 0
+        
+        for tab in 0...tabItems.count - 1 {
+            guard let tabItem = tabItems[tab] as? UITabBarItem else { return }
+            if let tabBadge = tabItem.badgeValue?.toInt() {
+                badge += tabBadge
+            }
+        }
+        UIApplication.shared.applicationIconBadgeNumber = badge
+        if let uid = Auth.auth().currentUser?.uid {
+            let ref = Database.database().reference().child("users").child(uid)
+            ref.updateChildValues(["badge": badge])
+        }
+    }
+    
 }
 
 extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        
+        let delete = setupDeleteAction(at: indexPath)
+        let mute = setupMuteAction(at: indexPath)
+
+        return [delete, mute]
+    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -398,65 +439,6 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
 
-}
-
-extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
-    
-    func updateSearchResults(for searchController: UISearchController) {}
-    
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.text = nil
-        guard #available(iOS 11.0, *) else {
-            searchBar.setShowsCancelButton(false, animated: true)
-            searchBar.resignFirstResponder()
-            return
-        }
-        
-        handleReloadTableAftersearchBarCancelButtonClicked()
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
-//        filteredLists = searchText.isEmpty ? activities :
-//            lists.filter({ (list) -> Bool in
-//                if let name = list.name {
-//                    return name.lowercased().contains(searchText.lowercased())
-//                }
-//                return ("").lowercased().contains(searchText.lowercased())
-//            })
-        
-        handleReloadTableAfterSearch()
-    }
-    
-    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        guard #available(iOS 11.0, *) else {
-            searchBar.setShowsCancelButton(true, animated: true)
-            return true
-        }
-        return true
-    }
-}
-
-extension ListsViewController { /* hiding keyboard */
-    
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        
-        if #available(iOS 11.0, *) {
-            searchController?.searchBar.endEditing(true)
-        } else {
-            self.searchBar?.endEditing(true)
-        }
-    }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        setNeedsStatusBarAppearanceUpdate()
-        if #available(iOS 11.0, *) {
-            searchController?.searchBar.endEditing(true)
-        } else {
-            self.searchBar?.endEditing(true)
-        }
-    }
 }
 
 extension ListsViewController: ListViewControllerDataStore {

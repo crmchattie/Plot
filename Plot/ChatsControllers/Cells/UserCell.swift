@@ -162,14 +162,10 @@ class UserCell: UITableViewCell {
         chatImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4).isActive = true
         chatImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
         chatImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
-        newMessageIndicator.rightAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 11).isActive = true
-        newMessageIndicator.centerYAnchor.constraint(equalTo: activityButton.centerYAnchor).isActive = true
-        newMessageIndicator.widthAnchor.constraint(equalToConstant: 10).isActive = true
-        newMessageIndicator.heightAnchor.constraint(equalToConstant: 10).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: chatImageView.topAnchor, constant: 2).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -5).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -20).isActive = true
         
         messageLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4).isActive = true
         messageLabel.leftAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 10).isActive = true
@@ -178,11 +174,16 @@ class UserCell: UITableViewCell {
         timeLabel.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 4).isActive = true
         timeLabel.leftAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 10).isActive = true
         timeLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -5).isActive = true
-        
+    
         muteIndicator.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 3).isActive = true
-        muteIndicator.centerYAnchor.constraint(equalTo: timeLabel.centerYAnchor, constant: 1).isActive = true
+        muteIndicator.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor, constant: 1).isActive = true
         muteIndicator.widthAnchor.constraint(equalToConstant: 12).isActive = true
         muteIndicator.heightAnchor.constraint(equalToConstant: 12).isActive = true
+        
+        newMessageIndicator.rightAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 11).isActive = true
+        newMessageIndicator.centerYAnchor.constraint(equalTo: chatImageView.centerYAnchor).isActive = true
+        newMessageIndicator.widthAnchor.constraint(equalToConstant: 10).isActive = true
+        newMessageIndicator.heightAnchor.constraint(equalToConstant: 10).isActive = true
         
         badgeLabel.rightAnchor.constraint(equalTo: chatImageView.rightAnchor, constant: -50).isActive = true
         badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true

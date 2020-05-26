@@ -158,6 +158,7 @@ class ListCell: UITableViewCell {
         listImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4).isActive = true
         listImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
         listImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
+        
         newMessageIndicator.rightAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 11).isActive = true
         newMessageIndicator.centerYAnchor.constraint(equalTo: activityButton.centerYAnchor).isActive = true
         newMessageIndicator.widthAnchor.constraint(equalToConstant: 10).isActive = true
@@ -165,7 +166,7 @@ class ListCell: UITableViewCell {
         
         nameLabel.topAnchor.constraint(equalTo: listImageView.topAnchor, constant: 2).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -5).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -20).isActive = true
         
         listTypeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4).isActive = true
         listTypeLabel.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 10).isActive = true
@@ -180,7 +181,7 @@ class ListCell: UITableViewCell {
         activityLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -5).isActive = true
         
         muteIndicator.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 3).isActive = true
-        muteIndicator.centerYAnchor.constraint(equalTo: activityLabel.centerYAnchor, constant: 1).isActive = true
+        muteIndicator.centerYAnchor.constraint(equalTo: listImageView.centerYAnchor, constant: 1).isActive = true
         muteIndicator.widthAnchor.constraint(equalToConstant: 12).isActive = true
         muteIndicator.heightAnchor.constraint(equalToConstant: 12).isActive = true
         

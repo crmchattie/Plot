@@ -254,6 +254,12 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
                 editButtonItem.style = .plain
                 editButtonItem.title = "Edit"
             }
+        } else if self.index == 3 {
+            if listsVC.tableView.isEditing == true {
+                listsVC.tableView.setEditing(false, animated: true)
+                editButtonItem.style = .plain
+                editButtonItem.title = "Edit"
+            }
         }
         notificationsVC.view.isHidden = !(index == 0)
         if index == 0 {

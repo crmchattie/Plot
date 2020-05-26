@@ -359,10 +359,10 @@ class ChatsTableViewController: UITableViewController {
   override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
     
     let delete = setupDeleteAction(at: indexPath)
-    let pin = setupPinAction(at: indexPath)
+//    let pin = setupPinAction(at: indexPath)
     let mute = setupMuteAction(at: indexPath)
  
-    return [delete, pin, mute]
+    return [delete, mute]
   }
   
   override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

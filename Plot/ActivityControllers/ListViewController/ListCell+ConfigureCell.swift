@@ -23,7 +23,6 @@ extension ListCell {
             nameLabel.text = grocerylist.name
             listTypeLabel.text = "Grocery List"
             if let date = grocerylist.lastModifiedDate {
-                print("lastModifiedDate")
                 timeLabel.text = date.formatRelativeString()
             }
             muteIndicator.isHidden = !(grocerylist.muted ?? false)
@@ -50,7 +49,6 @@ extension ListCell {
             nameLabel.text = checklist.name
             listTypeLabel.text = "Checklist"
             if let date = checklist.lastModifiedDate {
-                print("lastModifiedDate")
                 timeLabel.text = date.formatRelativeString()
             }
             muteIndicator.isHidden = !(checklist.muted ?? false)
@@ -77,7 +75,6 @@ extension ListCell {
             nameLabel.text = packinglist.name
             listTypeLabel.text = "Packing List"
             if let date = packinglist.lastModifiedDate {
-                print("lastModifiedDate")
                 timeLabel.text = date.formatRelativeString()
             }
             muteIndicator.isHidden = !(packinglist.muted ?? false)
