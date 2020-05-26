@@ -186,9 +186,10 @@ class GeneralTabBarController: UITabBarController {
         }
     }
     
-    fileprivate func addSampleActivityForNewUser() {
+    fileprivate func addNewUserItems() {
         if let isNewUser = appDelegate.additionalUserInfo?.isNewUser, isNewUser {
             createNewUserActivities()
+//            addPlotUser()
         }
     }
     
@@ -308,6 +309,10 @@ class GeneralTabBarController: UITabBarController {
             print(error)
         }
     }
+    
+    func addPlotUser() {
+        
+    }
 }
 
 extension GeneralTabBarController: ManageAppearanceHome {
@@ -325,6 +330,7 @@ extension GeneralTabBarController: ManageAppearanceHome {
             self.splashContainer.showSecuredData()
         }
         grabContacts()
+        addNewUserItems()
 //        appDelegate.registerForPushNotifications(application: UIApplication.shared)
 
     }

@@ -49,7 +49,6 @@ class ConversationsFetcher: NSObject {
             
             self.group.notify(queue: .main, execute: {
                 self.isGroupAlreadyFinished = true
-                //            print("isGroupAlreadyFinished \(self.isGroupAlreadyFinished)")
                 self.delegate?.conversations(didFinishFetching: true, conversations: self.conversations)
             })
             

@@ -189,7 +189,11 @@ class ActivityDetailCell: UICollectionViewCell {
     
     let imageView = UIImageView(cornerRadius: 0)
     
+    var active: Bool = false
+    
     func setupViews() {
+        
+        dotsButton.isHidden = !active
         
         subcategoryTextField.delegate = self
         

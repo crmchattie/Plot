@@ -25,6 +25,8 @@ class GrocerylistFetcher: NSObject {
             return
         }
         
+        print("fetching grocerylists")
+        
         let ref = Database.database().reference()
         userGrocerylistsDatabaseRef = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID)
         userGrocerylistsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
@@ -74,7 +76,7 @@ class GrocerylistFetcher: NSObject {
                 let grocerylistID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(grocerylistsEntity).child(grocerylistID).observe(.childAdded) { _ in
+                handle = ref.child(grocerylistsEntity).child(grocerylistID).observe(.value) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getGrocerylistsFromSnapshot(snapshot: snapshot, completion: completion)
                 }
@@ -110,33 +112,5 @@ class GrocerylistFetcher: NSObject {
         } else {
             completion([])
         }
-    }
-    
-    class func update(grocerylist: Grocerylist, completion: @escaping (Bool)->()) {
-        let ref = Database.database().reference()
-        ref.child(grocerylistsEntity).child(grocerylist.ID!).observeSingleEvent(of: .value, with: { grocerylistSnapshot in
-            if grocerylistSnapshot.exists(), let _ = grocerylistSnapshot.value {
-                do {
-                    let value = try FirebaseEncoder().encode(grocerylist)
-                    ref.child(grocerylistsEntity).child(grocerylist.ID!).setValue(value)
-                    completion(true)
-                } catch let error {
-                    print(error)
-                    completion(false)
-                }
-            } else {
-                completion(false)
-            }
-        })
-    }
-    
-    class func remove(grocerylist: Grocerylist) {
-        guard let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        let ref = Database.database().reference()
-        ref.child(grocerylistsEntity).child(grocerylist.ID!).removeValue()
-        ref.child(userGrocerylistsEntity).child(currentUserID).child(grocerylist.ID!).removeValue()
     }
 }

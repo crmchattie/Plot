@@ -21,6 +21,7 @@ class MasterActivityContainerController: UIViewController {
         didSet {
             activitiesVC.users = users
             chatsVC.users = users
+            listsVC.users = users
             notificationsVC.users = users
             mapVC.searchVC.users = users
         }
@@ -29,6 +30,7 @@ class MasterActivityContainerController: UIViewController {
         didSet {
             activitiesVC.filteredUsers = filteredUsers
             chatsVC.filteredUsers = filteredUsers
+            listsVC.filteredUsers = filteredUsers
             notificationsVC.filteredUsers = filteredUsers
             mapVC.searchVC.filteredUsers = filteredUsers
         }
@@ -85,7 +87,7 @@ class MasterActivityContainerController: UIViewController {
     let containerView = UIView()
     
     weak var delegate: ManageAppearanceHome?
-        
+    
     lazy var activitiesVC: ActivityViewController = {
         let vc = ActivityViewController()
         self.addAsChildVC(childVC: vc)
@@ -115,7 +117,7 @@ class MasterActivityContainerController: UIViewController {
         self.addAsChildVC(childVC: vc)
         return vc
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print("viewDidLoad")
@@ -150,7 +152,7 @@ class MasterActivityContainerController: UIViewController {
         childVC.view.removeFromSuperview()
         childVC.removeFromParent()
     }
-        
+    
     func setupViews() {
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
@@ -165,9 +167,9 @@ class MasterActivityContainerController: UIViewController {
         
         tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
         tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
-                        
+        
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-
+        
         customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         customSegmented.delegate = self
         
@@ -178,7 +180,7 @@ class MasterActivityContainerController: UIViewController {
         
         customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         containerView.anchor(top: customSegmented.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-                
+        
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -279,33 +281,33 @@ extension MasterActivityContainerController {
     @objc func editButtonAction(sender: UIBarButtonItem) {
         if index == 1 {
             if chatsVC.tableView.isEditing == true {
-               chatsVC.tableView.setEditing(false, animated: true)
-               sender.style = .plain
-               sender.title = "Edit"
+                chatsVC.tableView.setEditing(false, animated: true)
+                sender.style = .plain
+                sender.title = "Edit"
             } else {
-               chatsVC.tableView.setEditing(true, animated: true)
-               sender.style = .done
-               sender.title = "Done"
+                chatsVC.tableView.setEditing(true, animated: true)
+                sender.style = .done
+                sender.title = "Done"
             }
         } else if index == 2 {
             if activitiesVC.activityView.tableView.isEditing == true {
-               activitiesVC.activityView.tableView.setEditing(false, animated: true)
-               sender.style = .plain
-               sender.title = "Edit"
+                activitiesVC.activityView.tableView.setEditing(false, animated: true)
+                sender.style = .plain
+                sender.title = "Edit"
             } else {
-               activitiesVC.activityView.tableView.setEditing(true, animated: true)
-               sender.style = .done
-               sender.title = "Done"
+                activitiesVC.activityView.tableView.setEditing(true, animated: true)
+                sender.style = .done
+                sender.title = "Done"
             }
         } else if index == 3 {
             if listsVC.tableView.isEditing == true {
-               listsVC.tableView.setEditing(false, animated: true)
-               sender.style = .plain
-               sender.title = "Edit"
+                listsVC.tableView.setEditing(false, animated: true)
+                sender.style = .plain
+                sender.title = "Edit"
             } else {
-               listsVC.tableView.setEditing(true, animated: true)
-               sender.style = .done
-               sender.title = "Done"
+                listsVC.tableView.setEditing(true, animated: true)
+                sender.style = .done
+                sender.title = "Done"
             }
         }
     }
@@ -315,46 +317,55 @@ extension MasterActivityContainerController {
     }
     
     @objc fileprivate func newChat() {
-      let destination = ContactsController()
-      destination.hidesBottomBarWhenPushed = true
-      let isContactsAccessGranted = destination.checkContactsAuthorizationStatus()
-      if isContactsAccessGranted {
-          destination.users = users
-          destination.filteredUsers = filteredUsers
-          destination.contacts = contacts
-          destination.filteredContacts = filteredContacts
-          destination.conversations = conversations
-      }
-      navigationController?.pushViewController(destination, animated: true)
+        let destination = ContactsController()
+        destination.hidesBottomBarWhenPushed = true
+        let isContactsAccessGranted = destination.checkContactsAuthorizationStatus()
+        if isContactsAccessGranted {
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.contacts = contacts
+            destination.filteredContacts = filteredContacts
+            destination.conversations = conversations
+        }
+        navigationController?.pushViewController(destination, animated: true)
     }
     
     @objc fileprivate func newList() {
-      let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
-          let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
-              let destination = GrocerylistViewController()
-//              destination.delegate = self
-              self.navigationController?.pushViewController(destination, animated: true)
-          }
-          let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
-              let destination = PackinglistViewController()
-//              destination.delegate = self
-              self.navigationController?.pushViewController(destination, animated: true)
-          }
-          let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
-              let destination = ChecklistViewController()
-//              destination.delegate = self
-              self.navigationController?.pushViewController(destination, animated: true)
-          }
-          let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
-              print("You've pressed cancel")
-              
-          }
-          
-          alertController.addAction(groceryList)
-//                alertController.addAction(packingList)
-          alertController.addAction(checkList)
-          alertController.addAction(cancelAlert)
-          self.present(alertController, animated: true, completion: nil)
+        let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
+        let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
+            let destination = GrocerylistViewController()
+            destination.connectedToAct = false
+            destination.comingFromLists = true
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+        let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
+            let destination = PackinglistViewController()
+            destination.connectedToAct = false
+            destination.comingFromLists = true
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+        let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
+            let destination = ChecklistViewController()
+            destination.connectedToAct = false
+            destination.comingFromLists = true
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+        let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
+            print("You've pressed cancel")
+            
+        }
+        
+        alertController.addAction(groceryList)
+        //                alertController.addAction(packingList)
+        alertController.addAction(checkList)
+        alertController.addAction(cancelAlert)
+        self.present(alertController, animated: true, completion: nil)
     }
 }
 
@@ -368,7 +379,7 @@ extension MasterActivityContainerController: HomeBaseActivities {
         self.invitedActivities = invitedActivities
         self.invitations = invitations
     }
-
+    
     
     func sendDate(selectedDate: Date) {
         self.selectedDate = selectedDate

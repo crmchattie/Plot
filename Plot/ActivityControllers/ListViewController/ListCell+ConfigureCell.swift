@@ -22,6 +22,10 @@ extension ListCell {
             self.grocerylist = grocerylist
             nameLabel.text = grocerylist.name
             listTypeLabel.text = "Grocery List"
+            if let date = grocerylist.lastModifiedDate {
+                print("lastModifiedDate")
+                timeLabel.text = date.formatRelativeString()
+            }
             muteIndicator.isHidden = !(grocerylist.muted ?? false)
             
             let badgeString = grocerylist.badge?.toString()
@@ -45,6 +49,10 @@ extension ListCell {
             self.checklist = checklist
             nameLabel.text = checklist.name
             listTypeLabel.text = "Checklist"
+            if let date = checklist.lastModifiedDate {
+                print("lastModifiedDate")
+                timeLabel.text = date.formatRelativeString()
+            }
             muteIndicator.isHidden = !(checklist.muted ?? false)
             
             let badgeString = checklist.badge?.toString()
@@ -68,6 +76,10 @@ extension ListCell {
             self.packinglist = packinglist
             nameLabel.text = packinglist.name
             listTypeLabel.text = "Packing List"
+            if let date = packinglist.lastModifiedDate {
+                print("lastModifiedDate")
+                timeLabel.text = date.formatRelativeString()
+            }
             muteIndicator.isHidden = !(packinglist.muted ?? false)
             
             let badgeString = packinglist.badge?.toString()
@@ -159,7 +171,6 @@ extension ListCell {
     }
     
     func updateParticipantsThumbnailCL(checklist: Checklist) {
-        print("updateParticipantsThumbnailCL")
         let participantsIDs = checklist.participantsIDs ?? []
         var participantsCount = 0
         if participantsIDs.count > 1 {
@@ -179,8 +190,7 @@ extension ListCell {
     }
     
     func loadParticipantsThumbnailCL(checklist: Checklist) {
-        self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
-            print("loadParticipantsThumbnailCL")
+        self.listViewControllerDataStore?.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
                 
@@ -223,7 +233,7 @@ extension ListCell {
     }
     
     func loadParticipantsThumbnailPL(packinglist: Packinglist) {
-        self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
+        self.listViewControllerDataStore?.getParticipants(grocerylist: nil, checklist: nil, packinglist: packinglist, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
                 

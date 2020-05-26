@@ -35,18 +35,27 @@ class ChecklistViewController: FormViewController {
     fileprivate var movingBackwards: Bool = true
     var connectedToAct = true
     var comingFromLists = false
+    
+    var chatLogController: ChatLogController? = nil
+    var messagesFetcher: MessagesFetcher? = nil
                 
     override func viewDidLoad() {
     super.viewDidLoad()
         
         configureTableView()
-                
+        
+        setupRightBarButton()
+        
+        print("first active \(active)")
         if checklist != nil {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
+            if checklist.ID == nil {
+                let ID = UUID().uuidString
+                checklist.ID = ID
+            }
             if !connectedToAct {
                 var participantCount = self.selectedFalconUsers.count
-                
                 // If user is creating this activity (admin)
                 if checklist.admin == nil || checklist.admin == Auth.auth().currentUser?.uid {
                     participantCount += 1
@@ -64,11 +73,20 @@ class ChecklistViewController: FormViewController {
                 }
             }
         } else {
-            checklist = Checklist(dictionary: ["name" : "CheckListName" as AnyObject])
             self.navigationItem.rightBarButtonItem?.isEnabled = false
+            if !connectedToAct, let currentUserID = Auth.auth().currentUser?.uid {
+                let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                checklist = Checklist(dictionary: ["ID": ID as AnyObject])
+            } else {
+                let ID = UUID().uuidString
+                checklist = Checklist(dictionary: ["ID": ID as AnyObject])
+            }
+            checklist.name = "CheckListName"
+            if checklist.createdDate == nil {
+                checklist.createdDate = Date()
+            }
         }
-        
-        setupRightBarButton()
+        print("second active \(active)")
         
         initializeForm()
         
@@ -77,7 +95,7 @@ class ChecklistViewController: FormViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        if self.movingBackwards {
+        if self.movingBackwards && !comingFromLists {
             updateLists()
             delegate?.updateChecklist(checklist: checklist)
         }
@@ -107,7 +125,7 @@ class ChecklistViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if !comingFromLists {
+        if !comingFromLists || !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
             navigationItem.rightBarButtonItem = plusBarButton
         } else {
@@ -129,13 +147,14 @@ class ChecklistViewController: FormViewController {
     }
     
     @objc fileprivate func close() {
+        movingBackwards = false
         updateLists()
         if !comingFromLists {
-            movingBackwards = false
+            checklist.lastModifiedDate = Date()
             delegate?.updateChecklist(checklist: checklist)
             self.navigationController?.popViewController(animated: true)
         }
-        
+                
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         if active, !connectedToAct {
@@ -271,6 +290,22 @@ class ChecklistViewController: FormViewController {
 
             }))
             
+            alert.addAction(UIAlertAction(title: "Copy to Another Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                                    
+                // ChooseActivityTableViewController
+                let destination = ChooseActivityTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.delegate = self
+                destination.checklist = self.checklist
+                destination.activity = self.checklist.activity
+                destination.activities = self.activities
+                destination.filteredActivities = self.activities
+                self.present(navController, animated: true, completion: nil)
+            
+            }))
+            
+            
         } else if !connectedToAct {
             alert.addAction(UIAlertAction(title: "Create New Checklist", style: .default, handler: { (_) in
                 print("User click Approve button")
@@ -344,10 +379,11 @@ class ChecklistViewController: FormViewController {
             }))
         }
         
-        alert.addAction(UIAlertAction(title: "Share Checklist", style: .default, handler: { (_) in
-            print("User click Edit button")
-            self.share()
-        }))
+        
+//        alert.addAction(UIAlertAction(title: "Share Checklist", style: .default, handler: { (_) in
+//            print("User click Edit button")
+//            self.share()
+//        }))
 
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -361,24 +397,34 @@ class ChecklistViewController: FormViewController {
     }
     
     @objc func goToChat() {
-//        if checklist.conversationID != nil {
-//            if let convo = conversations.first(where: {$0.chatID == activity!.conversationID}) {
-//                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-//                self.messagesFetcher = MessagesFetcher()
-//                self.messagesFetcher?.delegate = self
-//                self.messagesFetcher?.loadMessagesData(for: convo)
-//            }
-//        } else {
-//            let destination = ChooseChatTableViewController()
-//            let navController = UINavigationController(rootViewController: destination)
-//            destination.delegate = self
-//            destination.activity = activity
-//            destination.conversations = conversations
-//            destination.pinnedConversations = conversations
-//            destination.filteredConversations = conversations
-//            destination.filteredPinnedConversations = conversations
-//            present(navController, animated: true, completion: nil)
-//        }
+        if let conversationID = checklist.conversationID {
+            if let convo = conversations.first(where: {$0.chatID == conversationID}) {
+                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+                self.messagesFetcher = MessagesFetcher()
+                self.messagesFetcher?.delegate = self
+                self.messagesFetcher?.loadMessagesData(for: convo)
+            }
+        } else if let activity = checklist.activity, let conversationID = activity.conversationID {
+            if let convo = conversations.first(where: {$0.chatID == conversationID}) {
+                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+                self.messagesFetcher = MessagesFetcher()
+                self.messagesFetcher?.delegate = self
+                self.messagesFetcher?.loadMessagesData(for: convo)
+            }
+        } else {
+            let destination = ChooseChatTableViewController()
+            let navController = UINavigationController(rootViewController: destination)
+            destination.delegate = self
+            if let activity = checklist.activity {
+                destination.activity = activity
+            }
+            destination.checklist = checklist
+            destination.conversations = conversations
+            destination.pinnedConversations = conversations
+            destination.filteredConversations = conversations
+            destination.filteredPinnedConversations = conversations
+            present(navController, animated: true, completion: nil)
+        }
     }
     
     func share() {
@@ -486,7 +532,7 @@ class ChecklistViewController: FormViewController {
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
-            if self.selectedFalconUsers.count > 0 {
+            if active {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.title = self.userNamesString
             }
@@ -622,9 +668,18 @@ class ChecklistViewController: FormViewController {
             return
         }
         let destination = SelectActivityMembersViewController()
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        if !selectedFalconUsers.isEmpty{
+        var uniqueUsers = users
+        for participant in selectedFalconUsers {
+            if let userIndex = users.firstIndex(where: { (user) -> Bool in
+                return user.id == participant.id }) {
+                uniqueUsers[userIndex] = participant
+            } else {
+                uniqueUsers.append(participant)
+            }
+        }        
+        destination.users = uniqueUsers
+        destination.filteredUsers = uniqueUsers
+        if !selectedFalconUsers.isEmpty {
             destination.priorSelectedUsers = selectedFalconUsers
         }
         destination.delegate = self
@@ -671,148 +726,124 @@ extension ChecklistViewController: UpdateInvitees {
                 inviteesRow.updateCell()
             }
             
-//            if active {
-//                showActivityIndicator()
-//                let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
-//                createActivity.updateActivityParticipants()
-//                hideActivityIndicator()
-//
-//            }
+            if active {
+                showActivityIndicator()
+                let createChecklist = ChecklistActions(checklist: checklist, active: active, selectedFalconUsers: selectedFalconUsers)
+                createChecklist.updateChecklistParticipants()
+                hideActivityIndicator()
+
+            }
             
         }
     }
 }
 
 extension ChecklistViewController: ChooseActivityDelegate {
-    func chosenList(finished: Bool) {
+    func chosenActivity(mergeActivity: Activity) {
+        let groupActivityReference = Database.database().reference().child("activities").child(mergeActivity.activityID!).child(messageMetaDataFirebaseFolder)
+        var firebaseChecklistList = [[String: AnyObject?]]()
+        //remove participants and admin when adding
+        checklist.participantsIDs = nil
+        checklist.admin = nil
+        if let checklists = mergeActivity.checklist {
+            let firebaseChecklist = checklist.toAnyObject()
+            firebaseChecklistList.append(firebaseChecklist)
+            for checklist in checklists {
+                let firebaseChecklist = checklist.toAnyObject()
+                firebaseChecklistList.append(firebaseChecklist)
+            }
+        } else {
+            let firebaseChecklist = checklist.toAnyObject()
+            firebaseChecklistList.append(firebaseChecklist)
+        }
+        groupActivityReference.updateChildValues(["checklist": firebaseChecklistList as AnyObject])
         
+        if !connectedToAct {
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            if let checklist = checklist {
+                showActivityIndicator()
+                let deleteChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: self.selectedFalconUsers)
+               deleteChecklist.deleteChecklist()
+               dispatchGroup.leave()
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                hideActivityIndicator()
+            }
+        }
+    }
+}
+
+extension ChecklistViewController: ChooseChatDelegate {
+    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
+        if let activityID = activityID {
+            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+                if conversation.activities != nil {
+                       var activities = conversation.activities!
+                       activities.append(activityID)
+                       let updatedActivities = ["activities": activities as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                   } else {
+                       let updatedActivities = ["activities": [activityID] as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                   }
+               }
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+            checklist.activity!.conversationID = chatID
+        } else if let checklistID = checklistID {
+            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+                if conversation.checklists != nil {
+                       var checklists = conversation.checklists!
+                       checklists.append(checklistID)
+                       let updatedChecklists = [checklistsEntity: checklists as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                   } else {
+                       let updatedChecklists = [checklistsEntity: [checklistID] as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                   }
+               }
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child(checklistsEntity).child(checklistID).updateChildValues(updatedConversationID)
+            checklist.conversationID = chatID
+        }
+    }
+}
+
+extension ChecklistViewController: MessagesDelegate {
+    
+    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
+        chatLogController?.updateMessageStatus(messageRef: reference)
     }
     
-    func chosenActivity(mergeActivity: Activity) {
-//        if let activity = activity {
-//            let dispatchGroup = DispatchGroup()
-//            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
-//                if let currentUserID = Auth.auth().currentUser?.uid {
-//                    
-//                    let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
-//                    let newActivity = mergeActivity.copy() as! Activity
-//                    newActivity.activityID = newActivityID
-//                    newActivity.recipeID = nil
-//                    newActivity.workoutID = nil
-//                    newActivity.eventID = nil
-//                    
-//                    if let oldParticipantsIDs = activity.participantsIDs {
-//                        if let newParticipantsIDs = newActivity.participantsIDs {
-//                            for id in oldParticipantsIDs {
-//                                if !newParticipantsIDs.contains(id) {
-//                                    newActivity.participantsIDs!.append(id)
-//                                }
-//                            }
-//                        } else {
-//                            newActivity.participantsIDs = activity.participantsIDs
-//                        }
-//                    }
-//                    mergeActivity.participantsIDs = newActivity.participantsIDs
-//                    activity.participantsIDs = newActivity.participantsIDs
-//                    
-//                    let scheduleList = [mergeActivity, activity]
-//                    newActivity.schedule = scheduleList
-//                                       
-//                    self.showActivityIndicator()
-//                    
-//                    // need to delete current activity and merge activity
-//                    if active {
-//                        dispatchGroup.enter()
-//                        self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-//                            let deleteFirstActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
-//                            deleteFirstActivity.deleteActivity()
-//                            dispatchGroup.leave()
-//                        }
-//                        dispatchGroup.enter()
-//                        self.getSelectedFalconUsers(forActivity: activity) { (participants) in
-//                            let deleteSecondActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
-//                            deleteSecondActivity.deleteActivity()
-//                            dispatchGroup.leave()
-//                        }
-//                        
-//                    // need to delete merge activity
-//                    } else {
-//                        dispatchGroup.enter()
-//                        self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-//                            let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
-//                            deleteActivity.deleteActivity()
-//                            dispatchGroup.leave()
-//                        }
-//                    }
-//                    
-//                    dispatchGroup.enter()
-//                    self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
-//                        let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
-//                        createActivity.createNewActivity()
-//                        dispatchGroup.leave()
-//                    }
-//                    
-//                    self.hideActivityIndicator()
-//                }
-//            } else {
-//                if mergeActivity.schedule != nil {
-//                    var scheduleList = mergeActivity.schedule!
-//                    scheduleList.append(activity)
-//                    mergeActivity.schedule = scheduleList
-//                } else {
-//                    let scheduleList = [activity]
-//                    mergeActivity.schedule = scheduleList
-//                }
-//                
-//                if let oldParticipantsIDs = activity.participantsIDs {
-//                    if let newParticipantsIDs = mergeActivity.participantsIDs {
-//                        for id in oldParticipantsIDs {
-//                            if !newParticipantsIDs.contains(id) {
-//                                mergeActivity.participantsIDs!.append(id)
-//                            }
-//                        }
-//                    } else {
-//                        mergeActivity.participantsIDs = activity.participantsIDs
-//                    }
-//                }
-//                
-//                self.showActivityIndicator()
-//                
-//                // need to delete current activity
-//                if active {
-//                    dispatchGroup.enter()
-//                    self.getSelectedFalconUsers(forActivity: activity) { (participants) in
-//                        let deleteActivity = ActivityActions(activity: activity, active: true, selectedFalconUsers: participants)
-//                        deleteActivity.deleteActivity()
-//                        dispatchGroup.leave()
-//                    }
-//                }
-//                
-//                dispatchGroup.enter()
-//                self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-//                    let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
-//                    createActivity.createNewActivity()
-//                    dispatchGroup.leave()
-//                    self.hideActivityIndicator()
-//                }
-//            
-//            }
-//            
-//            dispatchGroup.notify(queue: .main) {
-//                if self.active {
-//                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
-//                } else {
-//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-//                    if nav.topViewController is MasterActivityContainerController {
-//                        let homeTab = nav.topViewController as! MasterActivityContainerController
-//                        homeTab.customSegmented.setIndex(index: 2)
-//                        homeTab.changeToIndex(index: 2)
-//                    }
-//                    self.tabBarController?.selectedIndex = 1
-//                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
-//                }
-//            }
-//        }
+    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
+        
+        chatLogController?.hidesBottomBarWhenPushed = true
+        chatLogController?.messagesFetcher = messagesFetcher
+        chatLogController?.messages = messages
+        chatLogController?.conversation = conversation
+        //chatLogController?.activityID = activityID
+        
+        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
+            chatLogController?.observeTypingIndicator()
+            chatLogController?.configureTitleViewWithOnlineStatus()
+        }
+        
+        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
+        guard let destination = chatLogController else { return }
+        
+        self.chatLogController?.startCollectionViewAtBottom()
+        
+        
+        // If we're presenting a modal sheet
+        if let presentedViewController = presentedViewController as? UINavigationController {
+            presentedViewController.pushViewController(destination, animated: true)
+        } else {
+            navigationController?.pushViewController(destination, animated: true)
+        }
+        
+        chatLogController = nil
+        messagesFetcher?.delegate = nil
+        messagesFetcher = nil
     }
 }
 

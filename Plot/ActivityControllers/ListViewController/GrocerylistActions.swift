@@ -40,7 +40,7 @@ class GrocerylistActions: NSObject {
         let membersIDs = fetchMembersIDs()
         
         for memberID in membersIDs.0 {
-        Database.database().reference().child(userGrocerylistsEntity).child(memberID).child(ID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+        Database.database().reference().child(userGrocerylistsEntity).child(memberID).child(ID).removeAllObservers()
         Database.database().reference().child(userGrocerylistsEntity).child(memberID).child(ID).removeValue()
         }
                 
@@ -56,21 +56,30 @@ class GrocerylistActions: NSObject {
         }
         
         if !active {
+            if grocerylist.createdDate == nil {
+                grocerylist.createdDate = Date()
+            }
             grocerylist.admin = Auth.auth().currentUser?.uid
         }
         
         let membersIDs = fetchMembersIDs()
         grocerylist.participantsIDs = membersIDs.0
-            
-        var firebaseDictionary = grocerylist.toAnyObject()
+        grocerylist.lastModifiedDate = Date()
+        
+        let groupGrocerylistReference = Database.database().reference().child(grocerylistsEntity).child(ID)
+
+        do {
+            let value = try FirebaseEncoder().encode(grocerylist)
+            groupGrocerylistReference.setValue(value)
+        } catch let error {
+            print(error)
+        }
         
         incrementBadgeForReciever(ID: ID, participantsIDs: membersIDs.0)
         
-        if active {
-            updateGrocerylist(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
-        } else {
-            firebaseDictionary["participantsIDs"] = membersIDs.1 as AnyObject
-            newGrocerylist(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
+        if !active {
+            dispatchGroup.enter()
+            connectMembersToGroupGrocerylist(memberIDs: membersIDs.0, ID: ID)
         }
     }
     
@@ -80,37 +89,39 @@ class GrocerylistActions: NSObject {
         }
         let membersIDs = fetchMembersIDs()
         if Set(grocerylist.participantsIDs!) != Set(membersIDs.0) {
-            let groupGrocerylistReference = Database.database().reference().child(grocerylistsEntity).child(ID).child(messageMetaDataFirebaseFolder)
+            let groupGrocerylistReference = Database.database().reference().child(grocerylistsEntity).child(ID)
             updateParticipants(membersIDs: membersIDs)
-            groupGrocerylistReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
+            groupGrocerylistReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
+            let date = Date().timeIntervalSinceReferenceDate
+            groupGrocerylistReference.updateChildValues(["lastModifiedDate": date as AnyObject])
         }
         
     }
     
-    func updateGrocerylist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-        guard let _ = grocerylist, let ID = ID else {
-            return
-        }
-        
-        let groupGrocerylistReference = Database.database().reference().child(grocerylistsEntity).child(ID).child(messageMetaDataFirebaseFolder)
-        groupGrocerylistReference.updateChildValues(firebaseDictionary)
-        
-        
-    }
-    
-    func newGrocerylist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-        guard let _ = grocerylist, let ID = ID else {
-            return
-        }
-                                
-        let groupGrocerylistReference = Database.database().reference().child(grocerylistsEntity).child(ID).child(messageMetaDataFirebaseFolder)
-                
-        self.dispatchGroup.enter()
-        self.dispatchGroup.enter()
-        createGroupGrocerylistNode(reference: groupGrocerylistReference, childValues: firebaseDictionary)
-        connectMembersToGroupGrocerylist(memberIDs: membersIDs.0, ID: ID)
-
-    }
+//    func updateGrocerylist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
+//        guard let _ = grocerylist, let ID = ID else {
+//            return
+//        }
+//
+//        let groupGrocerylistReference = Database.database().reference().child(grocerylistsEntity).child(ID)
+//        groupGrocerylistReference.updateChildValues(firebaseDictionary)
+//
+//
+//    }
+//
+//    func newGrocerylist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
+//        guard let _ = grocerylist, let ID = ID else {
+//            return
+//        }
+//
+//        let groupGrocerylistReference = Database.database().reference().child(grocerylistsEntity).child(ID)
+//
+//        self.dispatchGroup.enter()
+//        self.dispatchGroup.enter()
+//        createGroupGrocerylistNode(reference: groupGrocerylistReference, childValues: firebaseDictionary)
+//        connectMembersToGroupGrocerylist(memberIDs: membersIDs.0, ID: ID)
+//
+//    }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
@@ -146,7 +157,7 @@ class GrocerylistActions: NSObject {
             self.dispatchGroup.leave()
         })
         for memberID in memberIDs {
-            let userReference = Database.database().reference().child(userGrocerylistsEntity).child(memberID).child(ID).child(messageMetaDataFirebaseFolder)
+            let userReference = Database.database().reference().child(userGrocerylistsEntity).child(memberID).child(ID)
             let values:[String : Any] = ["isGroupGrocerylist": true]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
@@ -220,12 +231,11 @@ class GrocerylistActions: NSObject {
         var ref = Database.database().reference().child(userGrocerylistsEntity).child(firstChild).child(secondChild)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             
-            guard snapshot.hasChild(messageMetaDataFirebaseFolder) else {
-                ref = ref.child(messageMetaDataFirebaseFolder)
+            guard snapshot.hasChild("badge") else {
                 ref.updateChildValues(["badge": 1])
                 return
             }
-            ref = ref.child(messageMetaDataFirebaseFolder).child("badge")
+            ref = ref.child("badge")
             ref.runTransactionBlock({ (mutableData) -> TransactionResult in
                 var value = mutableData.value as? Int
                 if value == nil { value = 0 }

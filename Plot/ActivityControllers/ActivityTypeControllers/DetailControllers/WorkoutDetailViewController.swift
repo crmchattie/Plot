@@ -118,6 +118,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                 } else {
                     cell.heartButtonImage = "heart"
                 }
+                cell.active = active
                 cell.intColor = intColor
                 cell.workout = workout
             }

@@ -87,20 +87,16 @@ extension ActivityCell {
         
         let isActivityMuted = activity.muted != nil && activity.muted!
         let activityName = activity.name
-
+        
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
-        
+                
         if activity.activityType != "nothing" && activity.activityType != nil {
             activityTypeLabel.text = activity.activityType?.capitalized
-        } else {
-            activityTypeLabel.text = ""
         }
         
         if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
             activityAddressLabel.text = activity.locationName
-        } else {
-            activityAddressLabel.text = ""
         }
         
         let dateTimeValueArray = dateTimeValue(forActivity: activity)

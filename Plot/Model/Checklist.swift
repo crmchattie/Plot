@@ -11,7 +11,7 @@ import UIKit
 let checklistsEntity = "checklists"
 let userChecklistsEntity = "user-checklists"
 
-class Checklist: NSObject, Codable {
+class Checklist: NSObject, NSCopying, Codable {
     
     var name: String?
     var ID: String?
@@ -23,6 +23,8 @@ class Checklist: NSObject, Codable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var lastModifiedDate: Date?
+    var createdDate: Date?
 
     init(dictionary: [String: AnyObject]?) {
         super.init()
@@ -34,6 +36,8 @@ class Checklist: NSObject, Codable {
         pinned = dictionary?["pinned"] as? Bool
         muted = dictionary?["muted"] as? Bool
         conversationID = dictionary?["conversationID"] as? String
+        lastModifiedDate = dictionary?["lastModifiedDate"] as? Date
+        createdDate = dictionary?["lastModifiedDate"] as? Date
         
         if let participantsIDsDict = dictionary?["participantsIDs"] as? [String: String] {
             participantsIDs = Array(participantsIDsDict.keys)
@@ -76,6 +80,20 @@ class Checklist: NSObject, Codable {
             dictionary["conversationID"] = value
         }
         
+        if let value = self.lastModifiedDate {
+            let date = value.timeIntervalSinceReferenceDate as AnyObject?
+            dictionary["lastModifiedDate"] = date
+        }
+        
+        if let value = self.createdDate {
+            let date = value.timeIntervalSinceReferenceDate as AnyObject?
+            dictionary["createdDate"] = date
+        }
+        
         return dictionary
     }
+}
+
+func ==(lhs: Checklist, rhs: Checklist) -> Bool {
+    return lhs.ID == rhs.ID
 }

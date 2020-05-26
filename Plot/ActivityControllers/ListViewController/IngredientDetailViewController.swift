@@ -76,10 +76,11 @@ class IngredientDetailViewController: FormViewController {
 
     @objc fileprivate func close() {
         movingBackwards = false
-        delegate?.updateIngredient(ingredient: ingredient, close: true)
         if active {
+            delegate?.updateIngredient(ingredient: ingredient, close: true)
             self.navigationController?.popViewController(animated: true)
         } else {
+            delegate?.updateIngredient(ingredient: ingredient, close: true)
             self.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
         }
     }
@@ -194,7 +195,7 @@ class IngredientDetailViewController: FormViewController {
         
         form +++
         Section("Recipes"){
-            if self.active, let recipe = self.ingredient.recipe, (recipe.keys.count == 1 && !recipe.keys.contains("No recipe")) {
+            if self.active, let _ = self.ingredient.recipe {
                 $0.hidden = false
             } else {
                 $0.hidden = true

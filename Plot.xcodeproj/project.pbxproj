@@ -67,6 +67,7 @@
 		106D758B2442447C0039B534 /* ActivityActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106D758A2442447C0039B534 /* ActivityActions.swift */; };
 		106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
+		107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */; };
 		1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */; };
 		10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10868D6C246314C700D6BB4F /* Grocerylist.swift */; };
 		1092F2362414501D00E8CE16 /* MealDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2352414501D00E8CE16 /* MealDetailViewController.swift */; };
@@ -384,6 +385,7 @@
 		106D758A2442447C0039B534 /* ActivityActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityActions.swift; sourceTree = "<group>"; };
 		106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTypeViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
+		107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListTableViewCell.swift; sourceTree = "<group>"; };
 		1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCell.swift; sourceTree = "<group>"; };
 		10868D6C246314C700D6BB4F /* Grocerylist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grocerylist.swift; sourceTree = "<group>"; };
 		1092F2352414501D00E8CE16 /* MealDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetailViewController.swift; sourceTree = "<group>"; };
@@ -721,11 +723,11 @@
 				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
 				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
 				10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */,
-				10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */,
-				10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */,
 				10DE97342475737500D4A7E8 /* ListCell.swift */,
 				10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */,
+				10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */,
 				10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */,
+				10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */,
 				10323D5D2479A58500749706 /* GrocerylistActions.swift */,
 			);
 			path = ListViewController;
@@ -1094,6 +1096,7 @@
 				4BAEE48B21272C5E0045AB10 /* ContactsTableViewCell.swift */,
 				4BAEE48C21272C5E0045AB10 /* CurrentUserTableViewCell.swift */,
 				102523EA2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift */,
+				107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -2043,6 +2046,7 @@
 				4B6521FA219B3A4400FF655E /* GroupMembersManager.swift in Sources */,
 				4BAEE46521272B380045AB10 /* AccountSettingsController.swift in Sources */,
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
+				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
 				4BAEE5CD212735E50045AB10 /* SelectParticipantsTableView.swift in Sources */,
 				10196F0424411B5600B6AFDF /* ActivityAvatarOpenerDelegate.swift in Sources */,
 				4BAEE50221272D890045AB10 /* ChatsTableViewController.swift in Sources */,

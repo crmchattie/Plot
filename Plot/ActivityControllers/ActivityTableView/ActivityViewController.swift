@@ -430,6 +430,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         if !isAppLoaded {
             activityView.tableView.reloadDataWithCompletion() {
                 self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, animated: false)
+                
             }
             configureTabBarBadge()
         } else {
@@ -501,7 +502,9 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             if index < numberOfRows {
                 let indexPath = IndexPath(row: index, section: 1)
                 self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
-                
+                if !animated {
+                    self.activityView.tableView.reloadRows(at: [indexPath], with: .none)
+                }
             }
         } else if !activityFound {
             let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)

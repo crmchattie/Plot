@@ -223,6 +223,7 @@ class MealDetailViewController: ActivityDetailViewController {
                     cell.heartButtonImage = "heart"
                 }
                 cell.recipe = recipe
+                cell.active = active
                 return cell
             } else {
                 return cell

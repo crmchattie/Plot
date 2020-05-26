@@ -40,7 +40,7 @@ class ChecklistActions: NSObject {
         let membersIDs = fetchMembersIDs()
         
         for memberID in membersIDs.0 {
-        Database.database().reference().child(userChecklistsEntity).child(memberID).child(ID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+        Database.database().reference().child(userChecklistsEntity).child(memberID).child(ID).removeAllObservers()
         Database.database().reference().child(userChecklistsEntity).child(memberID).child(ID).removeValue()
         }
                 
@@ -56,21 +56,30 @@ class ChecklistActions: NSObject {
         }
         
         if !active {
+            if checklist.createdDate == nil {
+                checklist.createdDate = Date()
+            }
             checklist.admin = Auth.auth().currentUser?.uid
         }
         
         let membersIDs = fetchMembersIDs()
         checklist.participantsIDs = membersIDs.0
-            
-        var firebaseDictionary = checklist.toAnyObject()
+        checklist.lastModifiedDate = Date()
+        
+        let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
+
+        do {
+            let value = try FirebaseEncoder().encode(checklist)
+            groupChecklistReference.setValue(value)
+        } catch let error {
+            print(error)
+        }
         
         incrementBadgeForReciever(ID: ID, participantsIDs: membersIDs.0)
         
-        if active {
-            updateChecklist(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
-        } else {
-            firebaseDictionary["participantsIDs"] = membersIDs.1 as AnyObject
-            newChecklist(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
+        if !active {
+            dispatchGroup.enter()
+            connectMembersToGroupChecklist(memberIDs: membersIDs.0, ID: ID)
         }
     }
     
@@ -80,37 +89,42 @@ class ChecklistActions: NSObject {
         }
         let membersIDs = fetchMembersIDs()
         if Set(checklist.participantsIDs!) != Set(membersIDs.0) {
-            let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID).child(messageMetaDataFirebaseFolder)
+            print("does not equal")
+            print("Set(checklist.participantsIDs!) \(Set(checklist.participantsIDs!))")
+            print("Set(checklist.participantsIDs!) \(Set(membersIDs.0))")
+            let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
             updateParticipants(membersIDs: membersIDs)
-            groupChecklistReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
+            groupChecklistReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
+            let date = Date().timeIntervalSinceReferenceDate
+            groupChecklistReference.updateChildValues(["lastModifiedDate": date as AnyObject])
         }
         
     }
     
-    func updateChecklist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-        guard let _ = checklist, let ID = ID else {
-            return
-        }
-        
-        let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID).child(messageMetaDataFirebaseFolder)
-        groupChecklistReference.updateChildValues(firebaseDictionary)
-        
-        
-    }
-    
-    func newChecklist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-        guard let _ = checklist, let ID = ID else {
-            return
-        }
-                                
-        let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID).child(messageMetaDataFirebaseFolder)
-                
-        self.dispatchGroup.enter()
-        self.dispatchGroup.enter()
-        createGroupChecklistNode(reference: groupChecklistReference, childValues: firebaseDictionary)
-        connectMembersToGroupChecklist(memberIDs: membersIDs.0, ID: ID)
-
-    }
+//    func updateChecklist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
+//        guard let _ = checklist, let ID = ID else {
+//            return
+//        }
+//
+//        let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
+//        groupChecklistReference.updateChildValues(firebaseDictionary)
+//
+//
+//    }
+//
+//    func newChecklist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
+//        guard let _ = checklist, let ID = ID else {
+//            return
+//        }
+//
+//        let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
+//
+//        self.dispatchGroup.enter()
+//        self.dispatchGroup.enter()
+//        createGroupChecklistNode(reference: groupChecklistReference, childValues: firebaseDictionary)
+//        connectMembersToGroupChecklist(memberIDs: membersIDs.0, ID: ID)
+//
+//    }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
@@ -146,7 +160,7 @@ class ChecklistActions: NSObject {
             self.dispatchGroup.leave()
         })
         for memberID in memberIDs {
-            let userReference = Database.database().reference().child(userChecklistsEntity).child(memberID).child(ID).child(messageMetaDataFirebaseFolder)
+            let userReference = Database.database().reference().child(userChecklistsEntity).child(memberID).child(ID)
             let values:[String : Any] = ["isGroupChecklist": true]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
@@ -220,12 +234,11 @@ class ChecklistActions: NSObject {
         var ref = Database.database().reference().child(userChecklistsEntity).child(firstChild).child(secondChild)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             
-            guard snapshot.hasChild(messageMetaDataFirebaseFolder) else {
-                ref = ref.child(messageMetaDataFirebaseFolder)
+            guard snapshot.hasChild("badge") else {
                 ref.updateChildValues(["badge": 1])
                 return
             }
-            ref = ref.child(messageMetaDataFirebaseFolder).child("badge")
+            ref = ref.child("badge")
             ref.runTransactionBlock({ (mutableData) -> TransactionResult in
                 var value = mutableData.value as? Int
                 if value == nil { value = 0 }

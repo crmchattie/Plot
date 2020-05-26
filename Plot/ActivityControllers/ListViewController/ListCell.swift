@@ -79,6 +79,15 @@ class ListCell: UITableViewCell {
         return label
     }()
     
+    let timeLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.sizeToFit()
+        return label
+    }()
+    
     let activityLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
@@ -136,6 +145,7 @@ class ListCell: UITableViewCell {
         contentView.addSubview(listImageView)
         listImageView.addSubview(nameLabel)
         listImageView.addSubview(listTypeLabel)
+        listImageView.addSubview(timeLabel)
         listImageView.addSubview(activityLabel)
         listImageView.addSubview(muteIndicator)
         listImageView.addSubview(badgeLabel)
@@ -161,7 +171,11 @@ class ListCell: UITableViewCell {
         listTypeLabel.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 10).isActive = true
         listTypeLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -5).isActive = true
         
-        activityLabel.topAnchor.constraint(equalTo: listTypeLabel.bottomAnchor, constant: 4).isActive = true
+        timeLabel.topAnchor.constraint(equalTo: listTypeLabel.bottomAnchor, constant: 4).isActive = true
+        timeLabel.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 10).isActive = true
+        timeLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -5).isActive = true
+        
+        activityLabel.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 4).isActive = true
         activityLabel.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 10).isActive = true
         activityLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -5).isActive = true
         
@@ -221,6 +235,7 @@ class ListCell: UITableViewCell {
         nameLabel.text = ""
         listTypeLabel.text = nil
         activityLabel.text = nil
+        timeLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         newMessageIndicator.isHidden = true

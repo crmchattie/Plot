@@ -37,15 +37,24 @@ class GrocerylistViewController: FormViewController {
     
     fileprivate var ingredientIndex: Int = 0
     fileprivate var recipeIndex: Int = 0
+    
+    var chatLogController: ChatLogController? = nil
+    var messagesFetcher: MessagesFetcher? = nil
               
     override func viewDidLoad() {
         super.viewDidLoad()
               
         configureTableView()
+        
+        setupRightBarButton()
       
         if grocerylist != nil {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
+            if grocerylist.ID == nil {
+                let ID = UUID().uuidString
+                grocerylist.ID = ID
+            }
             if !connectedToAct {
                 connectedToAct = false
                 var participantCount = self.selectedFalconUsers.count
@@ -67,12 +76,20 @@ class GrocerylistViewController: FormViewController {
                 }
             }
         } else {
-            grocerylist = Grocerylist(dictionary: ["name" : "GroceryListName" as AnyObject])
             self.navigationItem.rightBarButtonItem?.isEnabled = false
+            if !connectedToAct, let currentUserID = Auth.auth().currentUser?.uid {
+                let ID = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                grocerylist = Grocerylist(dictionary: ["ID": ID as AnyObject])
+            } else {
+                let ID = UUID().uuidString
+                grocerylist = Grocerylist(dictionary: ["ID": ID as AnyObject])
+            }
+            grocerylist.name = "GroceryListName"
+            if grocerylist.createdDate == nil {
+                grocerylist.createdDate = Date()
+            }
         }
-        
-        setupRightBarButton()
-        
+                
         initializeForm()
       
     }
@@ -80,7 +97,7 @@ class GrocerylistViewController: FormViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        if self.movingBackwards {
+        if self.movingBackwards && !comingFromLists {
             delegate?.updateGrocerylist(grocerylist: grocerylist)
         }
     }
@@ -109,7 +126,7 @@ class GrocerylistViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if !comingFromLists {
+        if !comingFromLists || !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
             navigationItem.rightBarButtonItem = plusBarButton
         } else {
@@ -130,14 +147,203 @@ class GrocerylistViewController: FormViewController {
         }
     }
 
+//    @objc fileprivate func close() {
+//        movingBackwards = false
+//        delegate?.updateGrocerylist(grocerylist: grocerylist)
+//        self.navigationController?.popViewController(animated: true)
+//    }
+    
     @objc fileprivate func close() {
         movingBackwards = false
-        delegate?.updateGrocerylist(grocerylist: grocerylist)
-        self.navigationController?.popViewController(animated: true)
+        if !comingFromLists {
+            grocerylist.lastModifiedDate = Date()
+            delegate?.updateGrocerylist(grocerylist: grocerylist)
+            self.navigationController?.popViewController(animated: true)
+        }
+        
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if active, !connectedToAct {
+            alert.addAction(UIAlertAction(title: "Update Grocery List", style: .default, handler: { (_) in
+                print("User click Approve button")
+                                
+                // update
+                self.showActivityIndicator()
+                let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createGrocerylist.createNewGrocerylist()
+                self.hideActivityIndicator()
+                
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Duplicate Grocery List", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new grocerylist with updated time
+                guard self.currentReachabilityStatus != .notReachable else {
+                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+                    return
+                }
+                            
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    //duplicate grocerylist
+                    let newGrocerylistID = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    let newGrocerylist = self.grocerylist.copy() as! Grocerylist
+                    newGrocerylist.ID = newGrocerylistID
+                    newGrocerylist.admin = currentUserID
+                    newGrocerylist.participantsIDs = nil
+                    newGrocerylist.conversationID = nil
+                    
+                    self.showActivityIndicator()
+                    let createGrocerylist = GrocerylistActions(grocerylist: newGrocerylist, active: false, selectedFalconUsers: [])
+                    createGrocerylist.createNewGrocerylist()
+                    self.hideActivityIndicator()
+                    
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                }
+                
+
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Add to Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                                    
+                // ChooseActivityTableViewController
+                let destination = ChooseActivityTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.delegate = self
+                destination.grocerylist = self.grocerylist
+                destination.activities = self.activities
+                destination.filteredActivities = self.activities
+                self.present(navController, animated: true, completion: nil)
+            
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Duplicate & Add to Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                                            
+                    //duplicate activity as if it never was deleted aka leave admin and participants intact
+                    let newGrocerylistID = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    let newGrocerylist = self.grocerylist.copy() as! Grocerylist
+                    newGrocerylist.ID = newGrocerylistID
+                    
+                    self.showActivityIndicator()
+                    let createGrocerylist = GrocerylistActions(grocerylist: newGrocerylist, active: false, selectedFalconUsers: [])
+                    createGrocerylist.createNewGrocerylist()
+                    self.hideActivityIndicator()
+                    
+                    // ChooseActivityTableViewController
+                    let destination = ChooseActivityTableViewController()
+                    let navController = UINavigationController(rootViewController: destination)
+                    destination.delegate = self
+                    destination.grocerylist = self.grocerylist
+                    destination.activities = self.activities
+                    destination.filteredActivities = self.activities
+                    self.present(navController, animated: true, completion: nil)
+                }
+            
+            }))
+            
+        } else if connectedToAct {
+            alert.addAction(UIAlertAction(title: "Update Grocerylist", style: .default, handler: { (_) in
+                print("User click Approve button")
+                if let activity = self.grocerylist.activity {
+                    let groupActivityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder)
+                    let firebaseGrocerylist = self.grocerylist.toAnyObject()
+                    groupActivityReference.updateChildValues(["grocerylist": firebaseGrocerylist as AnyObject])
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Duplicate Grocerylist", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new grocerylist with updated time
+                guard self.currentReachabilityStatus != .notReachable else {
+                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+                    return
+                }
+                            
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    //duplicate grocerylist
+                    let newGrocerylistID = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    let newGrocerylist = self.grocerylist.copy() as! Grocerylist
+                    newGrocerylist.ID = newGrocerylistID
+                    newGrocerylist.admin = currentUserID
+                    newGrocerylist.participantsIDs = nil
+                    newGrocerylist.conversationID = nil
+                    
+                    self.showActivityIndicator()
+                    let createGrocerylist = GrocerylistActions(grocerylist: newGrocerylist, active: false, selectedFalconUsers: [])
+                    createGrocerylist.createNewGrocerylist()
+                    self.hideActivityIndicator()
+                    
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                }
+                
+
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Copy to Another Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                                    
+                // ChooseActivityTableViewController
+                let destination = ChooseActivityTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.delegate = self
+                destination.grocerylist = self.grocerylist
+                destination.activity = self.grocerylist.activity
+                destination.activities = self.activities
+                destination.filteredActivities = self.activities
+                self.present(navController, animated: true, completion: nil)
+            
+            }))
+            
+            
+        } else if !connectedToAct {
+            alert.addAction(UIAlertAction(title: "Create New Grocerylist", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new activity
+                                                        
+                self.showActivityIndicator()
+                let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createGrocerylist.createNewGrocerylist()
+                self.hideActivityIndicator()
+                
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Add to Activity", style: .default, handler: { (_) in
+                print("User click Edit button")
+                                    
+                // ChooseActivityTableViewController
+                let destination = ChooseActivityTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.delegate = self
+                destination.grocerylist = self.grocerylist
+                destination.activities = self.activities
+                destination.filteredActivities = self.activities
+                self.present(navController, animated: true, completion: nil)
+            
+            }))
+
+        }
+        
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        
     }
     
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
         
         if connectedToAct {
             if grocerylist.activity?.conversationID == nil {
@@ -169,10 +375,10 @@ class GrocerylistViewController: FormViewController {
             }))
         }
         
-        alert.addAction(UIAlertAction(title: "Share Grocery List", style: .default, handler: { (_) in
-            print("User click Edit button")
-            self.share()
-        }))
+//        alert.addAction(UIAlertAction(title: "Share Grocery List", style: .default, handler: { (_) in
+//            print("User click Edit button")
+//            self.share()
+//        }))
 
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -186,24 +392,34 @@ class GrocerylistViewController: FormViewController {
     }
         
         @objc func goToChat() {
-    //        if checklist.conversationID != nil {
-    //            if let convo = conversations.first(where: {$0.chatID == activity!.conversationID}) {
-    //                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-    //                self.messagesFetcher = MessagesFetcher()
-    //                self.messagesFetcher?.delegate = self
-    //                self.messagesFetcher?.loadMessagesData(for: convo)
-    //            }
-    //        } else {
-    //            let destination = ChooseChatTableViewController()
-    //            let navController = UINavigationController(rootViewController: destination)
-    //            destination.delegate = self
-    //            destination.activity = activity
-    //            destination.conversations = conversations
-    //            destination.pinnedConversations = conversations
-    //            destination.filteredConversations = conversations
-    //            destination.filteredPinnedConversations = conversations
-    //            present(navController, animated: true, completion: nil)
-    //        }
+            if let conversationID = grocerylist.conversationID {
+                if let convo = conversations.first(where: {$0.chatID == conversationID}) {
+                    self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+                    self.messagesFetcher = MessagesFetcher()
+                    self.messagesFetcher?.delegate = self
+                    self.messagesFetcher?.loadMessagesData(for: convo)
+                }
+            } else if let activity = grocerylist.activity, let conversationID = activity.conversationID {
+                if let convo = conversations.first(where: {$0.chatID == conversationID}) {
+                    self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+                    self.messagesFetcher = MessagesFetcher()
+                    self.messagesFetcher?.delegate = self
+                    self.messagesFetcher?.loadMessagesData(for: convo)
+                }
+            } else {
+                let destination = ChooseChatTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.delegate = self
+                if let activity = grocerylist.activity {
+                    destination.activity = activity
+                }
+                destination.grocerylist = grocerylist
+                destination.conversations = conversations
+                destination.pinnedConversations = conversations
+                destination.filteredConversations = conversations
+                destination.filteredPinnedConversations = conversations
+                present(navController, animated: true, completion: nil)
+            }
         }
         
         func share() {
@@ -311,7 +527,7 @@ class GrocerylistViewController: FormViewController {
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
-            if self.selectedFalconUsers.count > 0 {
+            if active {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.title = self.userNamesString
             }
@@ -707,9 +923,19 @@ class GrocerylistViewController: FormViewController {
             return
         }
         let destination = SelectActivityMembersViewController()
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        if !selectedFalconUsers.isEmpty{
+        var uniqueUsers = users
+        for participant in selectedFalconUsers {
+            if let userIndex = users.firstIndex(where: { (user) -> Bool in
+                return user.id == participant.id }) {
+                uniqueUsers[userIndex] = participant
+            } else {
+                uniqueUsers.append(participant)
+            }
+        }
+        
+        destination.users = uniqueUsers
+        destination.filteredUsers = uniqueUsers
+        if !selectedFalconUsers.isEmpty {
             destination.priorSelectedUsers = selectedFalconUsers
         }
         destination.delegate = self
@@ -826,14 +1052,166 @@ extension GrocerylistViewController: UpdateInvitees {
                 inviteesRow.updateCell()
             }
             
-//            if active {
-//                showActivityIndicator()
-//                let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
-//                createActivity.updateActivityParticipants()
-//                hideActivityIndicator()
-//
-//            }
+            if active {
+                showActivityIndicator()
+                let createGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: active, selectedFalconUsers: selectedFalconUsers)
+                createGrocerylist.updateGrocerylistParticipants()
+                hideActivityIndicator()
+
+            }
             
         }
+    }
+}
+
+extension GrocerylistViewController: ChooseActivityDelegate {
+    func chosenActivity(mergeActivity: Activity) {
+        let groupActivityReference = Database.database().reference().child("activities").child(mergeActivity.activityID!).child(messageMetaDataFirebaseFolder)
+        if let activityGrocerylist = mergeActivity.grocerylist {
+            if let recipes = grocerylist.recipes {
+                for recipe in recipes {
+                    if let activityRecipes = activityGrocerylist.recipes {
+                        if let _ = activityRecipes.firstIndex(where: {$0 == recipe}) {
+                            continue
+                        } else {
+                            if mergeActivity.grocerylist!.recipes != nil {
+                                mergeActivity.grocerylist!.recipes!["\(recipe.key)"] = recipe.value
+                                mergeActivity.grocerylist!.servings!["\(recipe.key)"] = grocerylist.servings!["\(recipe.key)"]
+                            } else {
+                                mergeActivity.grocerylist!.recipes = ["\(recipe.key)": recipe.value]
+                                mergeActivity.grocerylist!.servings = ["\(recipe.key)": grocerylist.servings!["\(recipe.key)"]!]
+                            }
+                            for recipeIngredient in grocerylist.ingredients! {
+                                if let index = mergeActivity.grocerylist?.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
+                                    mergeActivity.grocerylist?.ingredients![index].recipe![recipe.value] = recipeIngredient.amount ?? 0.0
+                                        if mergeActivity.grocerylist?.ingredients![index].amount != nil {
+                                            mergeActivity.grocerylist?.ingredients![index].amount! += recipeIngredient.amount ?? 0.0
+                                        }
+                                        if mergeActivity.grocerylist?.ingredients![index].measures?.metric?.amount != nil {
+                                            mergeActivity.grocerylist?.ingredients![index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
+                                        }
+                                        if mergeActivity.grocerylist?.ingredients![index].measures?.us?.amount != nil {
+                                            mergeActivity.grocerylist?.ingredients![index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
+                                        }
+                                } else {
+                                    var recIngredient = recipeIngredient
+                                    recIngredient.recipe = [recipe.value: recIngredient.amount ?? 0.0]
+                                    mergeActivity.grocerylist?.ingredients!.append(recIngredient)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if let ingredients = grocerylist.ingredients {
+                for ingredient in ingredients {
+                    if let _ = ingredient.recipe {
+                        continue
+                    } else if let index = mergeActivity.grocerylist?.ingredients!.firstIndex(where: {$0 == ingredient}) {
+                        if mergeActivity.grocerylist?.ingredients![index].amount != nil {
+                            mergeActivity.grocerylist?.ingredients![index].amount! += ingredient.amount ?? 0.0
+                        }
+                        if mergeActivity.grocerylist?.ingredients![index].measures?.metric?.amount != nil {
+                            mergeActivity.grocerylist?.ingredients![index].measures?.metric?.amount! += ingredient.measures?.metric?.amount ?? 0.0
+                        }
+                        if mergeActivity.grocerylist?.ingredients![index].measures?.us?.amount != nil {
+                            mergeActivity.grocerylist?.ingredients![index].measures?.us?.amount! += ingredient.measures?.us?.amount ?? 0.0
+                        }
+                    } else {
+                        mergeActivity.grocerylist?.ingredients!.append(ingredient)
+                    }
+                }
+            }
+            let firebaseGrocerylist = mergeActivity.grocerylist!.toAnyObject()
+            groupActivityReference.updateChildValues(["grocerylist": firebaseGrocerylist as AnyObject])
+        } else {
+            let firebaseGrocerylist = grocerylist.toAnyObject()
+            groupActivityReference.updateChildValues(["grocerylist": firebaseGrocerylist as AnyObject])
+        }
+        if !connectedToAct {
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            if let grocerylist = grocerylist {
+                showActivityIndicator()
+                let deleteGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: true, selectedFalconUsers: self.selectedFalconUsers)
+               deleteGrocerylist.deleteGrocerylist()
+               dispatchGroup.leave()
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                hideActivityIndicator()
+            }
+        }
+    }
+}
+
+extension GrocerylistViewController: ChooseChatDelegate {
+    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
+        if let activityID = activityID {
+            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+                if conversation.activities != nil {
+                       var activities = conversation.activities!
+                       activities.append(activityID)
+                       let updatedActivities = ["activities": activities as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                   } else {
+                       let updatedActivities = ["activities": [activityID] as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                   }
+               }
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+            grocerylist.activity!.conversationID = chatID
+        } else if let grocerylistID = grocerylistID {
+            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+                if conversation.grocerylists != nil {
+                       var grocerylists = conversation.grocerylists!
+                       grocerylists.append(grocerylistID)
+                       let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                   } else {
+                       let updatedGrocerylists = [grocerylistsEntity: [grocerylistID] as AnyObject]
+                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                   }
+               }
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child(grocerylistsEntity).child(grocerylistID).updateChildValues(updatedConversationID)
+            grocerylist.conversationID = chatID
+        }
+    }
+}
+
+extension GrocerylistViewController: MessagesDelegate {
+    
+    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
+        chatLogController?.updateMessageStatus(messageRef: reference)
+    }
+    
+    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
+        
+        chatLogController?.hidesBottomBarWhenPushed = true
+        chatLogController?.messagesFetcher = messagesFetcher
+        chatLogController?.messages = messages
+        chatLogController?.conversation = conversation
+        
+        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
+            chatLogController?.observeTypingIndicator()
+            chatLogController?.configureTitleViewWithOnlineStatus()
+        }
+        
+        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
+        guard let destination = chatLogController else { return }
+        
+        self.chatLogController?.startCollectionViewAtBottom()
+        
+        
+        // If we're presenting a modal sheet
+        if let presentedViewController = presentedViewController as? UINavigationController {
+            presentedViewController.pushViewController(destination, animated: true)
+        } else {
+            navigationController?.pushViewController(destination, animated: true)
+        }
+        
+        chatLogController = nil
+        messagesFetcher?.delegate = nil
+        messagesFetcher = nil
     }
 }

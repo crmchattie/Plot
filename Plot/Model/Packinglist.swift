@@ -11,7 +11,7 @@ import UIKit
 let packinglistsEntity = "packinglists"
 let userPackinglistsEntity = "user-packinglists"
 
-class Packinglist: NSObject, Codable {
+class Packinglist: NSObject, NSCopying, Codable {
     
     var name: String?
     var ID: String?
@@ -24,6 +24,8 @@ class Packinglist: NSObject, Codable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var lastModifiedDate: Date?
+    var createdDate: Date?
 
     init(dictionary: [String: AnyObject]?) {
         super.init()
@@ -36,8 +38,9 @@ class Packinglist: NSObject, Codable {
         badge = dictionary?["badge"] as? Int
         pinned = dictionary?["pinned"] as? Bool
         muted = dictionary?["muted"] as? Bool
-        
         conversationID = dictionary?["conversationID"] as? String
+        lastModifiedDate = dictionary?["lastModifiedDate"] as? Date
+        createdDate = dictionary?["lastModifiedDate"] as? Date
         
         if let participantsIDsDict = dictionary?["participantsIDs"] as? [String: String] {
             participantsIDs = Array(participantsIDsDict.keys)
@@ -86,6 +89,20 @@ class Packinglist: NSObject, Codable {
             dictionary["conversationID"] = value
         }
         
+        if let value = self.lastModifiedDate {
+            let date = value.timeIntervalSinceReferenceDate as AnyObject?
+            dictionary["lastModifiedDate"] = date
+        }
+        
+        if let value = self.createdDate {
+            let date = value.timeIntervalSinceReferenceDate as AnyObject?
+            dictionary["createdDate"] = date
+        }
+        
         return dictionary
     }
+}
+
+func ==(lhs: Packinglist, rhs: Packinglist) -> Bool {
+    return lhs.ID == rhs.ID
 }

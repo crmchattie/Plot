@@ -623,9 +623,18 @@ class ScheduleViewController: FormViewController {
             return
         }
         let destination = SelectActivityMembersViewController()
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        if !selectedFalconUsers.isEmpty{
+        var uniqueUsers = users
+        for participant in selectedFalconUsers {
+            if let userIndex = users.firstIndex(where: { (user) -> Bool in
+                return user.id == participant.id }) {
+                uniqueUsers[userIndex] = participant
+            } else {
+                uniqueUsers.append(participant)
+            }
+        }
+        destination.users = uniqueUsers
+        destination.filteredUsers = uniqueUsers
+        if !selectedFalconUsers.isEmpty {
             destination.priorSelectedUsers = selectedFalconUsers
         }
         destination.delegate = self

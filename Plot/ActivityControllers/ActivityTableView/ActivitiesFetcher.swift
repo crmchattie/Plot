@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import SDWebImage
+import CodableFirebase
 
 protocol ActivityUpdatesDelegate: class {
     func activities(didStartFetching: Bool)
@@ -462,23 +463,23 @@ class ActivitiesFetcher: NSObject {
         }
         
         if snapshot.key == checklistKey {
-            guard let checklistFirebaseList = snapshot.value as? [AnyObject] else { return }
+            guard let checklistFirebaseList = snapshot.value as? [Any] else { return }
             var checklistList = [Checklist]()
             for checklist in checklistFirebaseList {
-                let check = Checklist(dictionary: checklist as? [String : AnyObject])
-                if check.name == "nothing" { continue }
-                checklistList.append(check)
+                if let check = try? FirebaseDecoder().decode(Checklist.self, from: checklist) {
+                    if check.name == "nothing" { continue }
+                    checklistList.append(check)
+                }
             }
             activities[index].checklist = checklistList
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
         if snapshot.key == grocerylistKey {
-            guard let grocerylistFirebase = snapshot.value as? [String : AnyObject] else { return }
-            var grocerylist: Grocerylist!
-            grocerylist = Grocerylist(dictionary: grocerylistFirebase)
-            activities[index].grocerylist = grocerylist
-            delegate?.activities(update: activities[index], reloadNeeded: true)
+            if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: snapshot.value as Any) {
+                activities[index].grocerylist = grocerylist
+                delegate?.activities(update: activities[index], reloadNeeded: true)
+            }
         }
         
         if snapshot.key == conversationKey {

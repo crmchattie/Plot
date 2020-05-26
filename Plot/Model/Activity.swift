@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import CodableFirebase
 
 class Activity: NSObject, NSCopying, Codable {
     
@@ -112,12 +113,13 @@ class Activity: NSObject, NSCopying, Codable {
             purchases = purchasesList
         }
         
-        if let checklistFirebaseList = dictionary?["checklist"] as? [AnyObject] {
+        if let checklistFirebaseList = dictionary?["checklist"] as? [Any] {
             var checklistList = [Checklist]()
             for checklist in checklistFirebaseList {
-                let check = Checklist(dictionary: checklist as? [String : AnyObject])
-                if check.name == "nothing" { continue }
-                checklistList.append(check)
+                if let check = try? FirebaseDecoder().decode(Checklist.self, from: checklist) {
+                    if check.name == "nothing" { continue }
+                    checklistList.append(check)
+                }
             }
             checklist = checklistList
         } else if let items = dictionary?["checklist"] as? [String : [String : Bool]] {
@@ -130,18 +132,19 @@ class Activity: NSObject, NSCopying, Codable {
             checklist = [check]
         }
         
-        if let packinglistFirebaseList = dictionary?["packinglist"] as? [AnyObject] {
+        if let packinglistFirebaseList = dictionary?["packinglist"] as? [Any] {
             var packinglistList = [Packinglist]()
             for packinglist in packinglistFirebaseList {
-                let pack = Packinglist(dictionary: packinglist as? [String : AnyObject])
-                if pack.name == "nothing" { continue }
-                packinglistList.append(pack)
+                if let pack = try? FirebaseDecoder().decode(Packinglist.self, from: packinglist) {
+                    if pack.name == "nothing" { continue }
+                    packinglistList.append(pack)
+                }
             }
             packinglist = packinglistList
         }
-                
-        if let groceryList = dictionary?["grocerylist"] as? [String : AnyObject] {
-            grocerylist = Grocerylist(dictionary: groceryList)
+        
+        if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: dictionary?["grocerylist"] as Any) {
+            self.grocerylist = grocerylist
         }
         
         transportation = dictionary?["transportation"] as? String

@@ -71,14 +71,13 @@ class ActivityActions: NSObject {
         
         storeReminder()
     
-        var firebaseDictionary = activity.toAnyObject()
+        let firebaseDictionary = activity.toAnyObject()
         
         incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
         
         if active {
             updateActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
         } else {
-            firebaseDictionary["participantsIDs"] = membersIDs.1 as AnyObject
             newActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
         }
     }
@@ -91,7 +90,7 @@ class ActivityActions: NSObject {
         if Set(activity.participantsIDs!) != Set(membersIDs.0) {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             updateParticipants(membersIDs: membersIDs)
-            groupActivityReference.updateChildValues(["participantsIDs": membersIDs.1 as AnyObject])
+            groupActivityReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
         }
         
         dispatchGroup.notify(queue: DispatchQueue.main, execute: {

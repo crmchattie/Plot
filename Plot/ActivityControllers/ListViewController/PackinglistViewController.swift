@@ -38,11 +38,16 @@ class PackinglistViewController: FormViewController {
     var weather: [DailyWeatherElement]!
     var startDateTime: Date?
     var endDateTime: Date?
+    
+    var chatLogController: ChatLogController? = nil
+    var messagesFetcher: MessagesFetcher? = nil
               
     override func viewDidLoad() {
         super.viewDidLoad()
       
         configureTableView()
+        
+        setupRightBarButton()
 
         if packinglist != nil {
             active = true
@@ -71,8 +76,6 @@ class PackinglistViewController: FormViewController {
             packinglist = Packinglist(dictionary: ["name" : "PackingListName" as AnyObject])
             self.navigationItem.rightBarButtonItem?.isEnabled = false
         }
-
-        setupRightBarButton()
         
         initializeForm()
       
@@ -81,7 +84,7 @@ class PackinglistViewController: FormViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        if self.movingBackwards {
+        if self.movingBackwards && !comingFromLists {
             delegate?.updatePackinglist(packinglist: packinglist)
         }
     }
@@ -110,7 +113,7 @@ class PackinglistViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if !comingFromLists {
+        if !comingFromLists || !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
             navigationItem.rightBarButtonItem = plusBarButton
         } else {
@@ -187,24 +190,34 @@ class PackinglistViewController: FormViewController {
     }
         
         @objc func goToChat() {
-    //        if checklist.conversationID != nil {
-    //            if let convo = conversations.first(where: {$0.chatID == activity!.conversationID}) {
-    //                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-    //                self.messagesFetcher = MessagesFetcher()
-    //                self.messagesFetcher?.delegate = self
-    //                self.messagesFetcher?.loadMessagesData(for: convo)
-    //            }
-    //        } else {
-    //            let destination = ChooseChatTableViewController()
-    //            let navController = UINavigationController(rootViewController: destination)
-    //            destination.delegate = self
-    //            destination.activity = activity
-    //            destination.conversations = conversations
-    //            destination.pinnedConversations = conversations
-    //            destination.filteredConversations = conversations
-    //            destination.filteredPinnedConversations = conversations
-    //            present(navController, animated: true, completion: nil)
-    //        }
+//            if let conversationID = packinglist.conversationID {
+//                if let convo = conversations.first(where: {$0.chatID == conversationID}) {
+//                    self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+//                    self.messagesFetcher = MessagesFetcher()
+//                    self.messagesFetcher?.delegate = self
+//                    self.messagesFetcher?.loadMessagesData(for: convo)
+//                }
+//            } else if let activity = packinglist.activity, let conversationID = activity.conversationID {
+//                if let convo = conversations.first(where: {$0.chatID == conversationID}) {
+//                    self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+//                    self.messagesFetcher = MessagesFetcher()
+//                    self.messagesFetcher?.delegate = self
+//                    self.messagesFetcher?.loadMessagesData(for: convo)
+//                }
+//            } else {
+//                let destination = ChooseChatTableViewController()
+//                let navController = UINavigationController(rootViewController: destination)
+//                destination.delegate = self
+//                if let activity = packinglist.activity {
+//                    destination.activity = activity
+//                }
+//                destination.packinglist = packinglist
+//                destination.conversations = conversations
+//                destination.pinnedConversations = conversations
+//                destination.filteredConversations = conversations
+//                destination.filteredPinnedConversations = conversations
+//                present(navController, animated: true, completion: nil)
+//            }
         }
         
         func share() {

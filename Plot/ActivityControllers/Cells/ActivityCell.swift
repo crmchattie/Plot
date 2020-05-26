@@ -201,7 +201,6 @@ class ActivityCell: UITableViewCell {
         activityImageView.addSubview(nameLabel)
         activityImageView.addSubview(startLabel)
         activityImageView.addSubview(activityTypeLabel)
-        activityImageView.addSubview(activityParticipantsLabel)
         activityImageView.addSubview(activityAddressLabel)
         activityImageView.addSubview(muteIndicator)
         activityImageView.addSubview(newActivityIndicator)
@@ -269,8 +268,8 @@ class ActivityCell: UITableViewCell {
             icon.layer.cornerRadius = 15
             icon.layer.masksToBounds = true
             icon.image = UIImage(named: "UserpicIcon")
-            icon.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: 8).isActive = true
-//            icon.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
+//            icon.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: 8).isActive = true
+            icon.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
             icon.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: x).isActive = true
             icon.widthAnchor.constraint(equalToConstant: 30).isActive = true
             icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
@@ -306,14 +305,12 @@ class ActivityCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
         activityImageView.image = nil
         activityImageView.sd_cancelCurrentImageLoad()
         nameLabel.text = ""
-        activityTypeLabel.text = nil
-        activityParticipantsLabel.text = nil
-        activityAddressLabel.text = nil
         startLabel.text = nil
+        activityTypeLabel.text = nil
+        activityAddressLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         newActivityIndicator.isHidden = true

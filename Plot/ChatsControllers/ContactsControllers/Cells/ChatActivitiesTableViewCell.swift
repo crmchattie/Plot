@@ -6,7 +6,7 @@
 //  Copyright © 2019 Immature Creations. All rights reserved.
 //
 
-import Eureka
+import UIKit
 
 class ChatActivitiesTableViewCell: UITableViewCell {
     
@@ -16,11 +16,7 @@ class ChatActivitiesTableViewCell: UITableViewCell {
     lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        //        label.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
         label.font = UIFont.preferredFont(forTextStyle: .headline)
-        label.adjustsFontForContentSizeCategory = true
-        label.minimumScaleFactor = 0.1
-        label.adjustsFontSizeToFitWidth = true
         label.translatesAutoresizingMaskIntoConstraints = false
         label.sizeToFit()
         
@@ -32,9 +28,6 @@ class ChatActivitiesTableViewCell: UITableViewCell {
         let label = UILabel()
         //        label.font = UIFont.systemFont(ofSize: 13)
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.adjustsFontForContentSizeCategory = true
-        label.minimumScaleFactor = 0.1
-        label.adjustsFontSizeToFitWidth = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -48,7 +41,6 @@ class ChatActivitiesTableViewCell: UITableViewCell {
         let label = UILabel()
         //        label.font = UIFont.systemFont(ofSize: 13)
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false

@@ -225,6 +225,7 @@ class EventDetailViewController: ActivityDetailViewController {
                 } else {
                     cell.heartButtonImage = "heart"
                 }
+                cell.active = active
                 cell.event = event
                 return cell
             } else if let attraction = attraction {
