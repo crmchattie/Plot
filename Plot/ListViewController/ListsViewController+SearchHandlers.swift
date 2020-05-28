@@ -1,59 +1,48 @@
 //
-//  ActivityViewController+SearchHandlers.swift
-//  Pigeon-project
+//  ListViewController+SearchHandlers.swift
+//  Plot
 //
-//  Created by Cory McHattie on 4/27/19.
-//  Copyright © 2019 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 5/26/20.
+//  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import UIKit
 
-
-extension ActivityViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {}
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.text = nil
+        print("searchBarCancelButtonClicked")
+        tableView.tableHeaderView = nil
         searchBar.setShowsCancelButton(false, animated: true)
         searchBar.resignFirstResponder()
-        activityView.tableView.tableHeaderView = nil
-        handleReloadTableAftersearchBarCancelButtonClicked()
+        sortandreload()
         return
-        
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
-        filteredActivities = searchText.isEmpty ? activities :
-            activities.filter({ (activity) -> Bool in
-                if let name = activity.name {
-                    return name.lowercased().contains(searchText.lowercased())
-                }
-                return ("").lowercased().contains(searchText.lowercased())
-            })
-
-        filteredPinnedActivities = searchText.isEmpty ? pinnedActivities :
-            pinnedActivities.filter({ (activity) -> Bool in
-                if let name = activity.name {
-                    return name.lowercased().contains(searchText.lowercased())
-                }
-                return ("").lowercased().contains(searchText.lowercased())
+        print("textDidChange")
+        filteredlistList = searchText.isEmpty ? listListCopy :
+            listListCopy.filter({ (list) -> Bool in
+                return list.name.lowercased().contains(searchText.lowercased())
             })
         
         handleReloadTableAfterSearch()
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        print("searchBarShouldBeginEditing")
         searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         searchBar.setShowsCancelButton(true, animated: true)
         return true
     }
 }
 
-extension ActivityViewController { /* hiding keyboard */
+extension ListsViewController { /* hiding keyboard */
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        print("scrollViewWillBeginDragging")
         self.searchBar?.endEditing(true)
         if let cancelButton : UIButton = searchBar?.value(forKey: "cancelButton") as? UIButton {
             cancelButton.isEnabled = true
@@ -61,6 +50,7 @@ extension ActivityViewController { /* hiding keyboard */
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        print("searchBarSearchButtonClicked")
         setNeedsStatusBarAppearanceUpdate()
         self.searchBar?.endEditing(true)
         if let cancelButton : UIButton = searchBar.value(forKey: "cancelButton") as? UIButton {

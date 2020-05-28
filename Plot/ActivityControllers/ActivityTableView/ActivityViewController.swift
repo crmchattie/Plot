@@ -59,7 +59,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     weak var delegate: HomeBaseActivities?
     
     var searchBar: UISearchBar?
-    var searchActivityController: UISearchController?
+    var searchController: UISearchController?
     
     var activities = [Activity]()
     var filteredActivities = [Activity]()
@@ -116,7 +116,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activitiesFetcher.delegate = self
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
-        setupSearchController()
         addObservers()
                 
     }
@@ -213,14 +212,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         activityView.arrowButton.addTarget(self, action: #selector(arrowButtonTapped), for: .touchUpInside)
         
-//        navigationItem.leftBarButtonItem = editButtonItem
-//        let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
-//
-//        let mapBarButton = UIBarButtonItem(image: UIImage(named: "map")!, style: .plain, target: self, action: #selector(showMappedActivities))
-//
-//        let notificaionBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell")!, style: .plain, target: self, action: #selector(showNotifications))
-        
-//        navigationItem.rightBarButtonItems = [newActivityBarButton, notificaionBarButton, mapBarButton]
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         activityView.tableView.separatorStyle = .none
@@ -255,33 +246,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     // MARK:- action: Selectors
-    
-//    @objc fileprivate func newActivity() {
-//        let destination = ActivityTypeViewController()
-//        destination.hidesBottomBarWhenPushed = true
-//        destination.users = users
-//        destination.filteredUsers = filteredUsers
-//        destination.activities = activities + pinnedActivities
-//        destination.conversations = conversations
-//        navigationController?.pushViewController(destination, animated: true)
-//    }
-//    
-//    @objc fileprivate func showMappedActivities() {
-//        let mapActivitiesViewController = MapActivitiesViewController()
-//        mapActivitiesViewController.activityViewController = self
-//        let navigationViewController = UINavigationController(rootViewController: mapActivitiesViewController)
-//        navigationViewController.modalPresentationStyle = .fullScreen
-//        self.present(navigationViewController, animated: true, completion: nil)
-//    }
-//    
-//    @objc fileprivate func showNotifications() {
-//        let notificationsViewController = NotificationsViewController()
-//        notificationsViewController.invitedActivities = self.invitedActivities
-//        notificationsViewController.notificationActivities = self.activities + self.pinnedActivities
-//        notificationsViewController.activityViewController = self
-//        let navigationViewController = UINavigationController(rootViewController: notificationsViewController)
-//        self.present(navigationViewController, animated: true, completion: nil)
-//    }
     
     @objc fileprivate func arrowButtonTapped() {
         if activityView.calendar.scope == .month {
@@ -322,24 +286,16 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    fileprivate func setupSearchController() {
-        
-        if #available(iOS 11.0, *) {
-            searchActivityController = UISearchController(searchResultsController: nil)
-            searchActivityController?.searchResultsUpdater = self
-            searchActivityController?.obscuresBackgroundDuringPresentation = false
-            searchActivityController?.searchBar.delegate = self
-            searchActivityController?.definesPresentationContext = true
-            navigationItem.searchController = searchActivityController
-            navigationItem.hidesSearchBarWhenScrolling = true
-        } else {
-            searchBar = UISearchBar()
-            searchBar?.delegate = self
-            searchBar?.placeholder = "Search"
-            searchBar?.searchBarStyle = .minimal
-            searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
-            activityView.tableView.tableHeaderView = searchBar
-        }
+    func setupSearchController() {
+        activityView.tableView.setContentOffset(.zero, animated: false)
+        searchBar = UISearchBar()
+        searchBar?.delegate = self
+        searchBar?.placeholder = "Search"
+        searchBar?.searchBarStyle = .minimal
+        searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
+        searchBar?.becomeFirstResponder()
+        searchBar?.showsCancelButton = true
+        activityView.tableView.tableHeaderView = searchBar
     }
     
     fileprivate func managePresense() {
@@ -538,7 +494,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         if canTransitionToLarge && scrollView.contentOffset.y <= 0 {
 //            UIView.animate(withDuration: 0.5) {
 //                if #available(iOS 11.0, *) {
-//                    self.navigationItem.largeTitleDisplayMode = .always
+//                    self.navigationItem.largeTitleDisplayMode = .never
 //                }
 //            }
             canTransitionToLarge = false
@@ -853,7 +809,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             let destination = CreateActivityViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.activity = activity
-            destination.invitation = invitations[activity.activityID!]
+            destination.invitation = invitations[activity.activityID ?? ""]
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.activities = filteredActivities + filteredPinnedActivities

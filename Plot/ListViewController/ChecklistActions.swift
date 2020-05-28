@@ -59,7 +59,9 @@ class ChecklistActions: NSObject {
             if checklist.createdDate == nil {
                 checklist.createdDate = Date()
             }
-            checklist.admin = Auth.auth().currentUser?.uid
+            if checklist.admin == nil {
+                checklist.admin = Auth.auth().currentUser?.uid
+            }
         }
         
         let membersIDs = fetchMembersIDs()

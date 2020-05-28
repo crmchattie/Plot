@@ -167,11 +167,11 @@ class UserCell: UITableViewCell {
         nameLabel.leftAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -20).isActive = true
         
-        messageLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4).isActive = true
+        messageLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         messageLabel.leftAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 10).isActive = true
         messageLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -5).isActive = true
         
-        timeLabel.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 4).isActive = true
+        timeLabel.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 2).isActive = true
         timeLabel.leftAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 10).isActive = true
         timeLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -5).isActive = true
     

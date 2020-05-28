@@ -53,7 +53,7 @@ class UserInfoTableViewController: UITableViewController {
     extendedLayoutIncludesOpaqueBars = true
     view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     if #available(iOS 11.0, *) {
-      navigationItem.largeTitleDisplayMode = .always
+      navigationItem.largeTitleDisplayMode = .never
     }
   }
   

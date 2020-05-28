@@ -164,24 +164,24 @@ class ListCell: UITableViewCell {
         newMessageIndicator.widthAnchor.constraint(equalToConstant: 10).isActive = true
         newMessageIndicator.heightAnchor.constraint(equalToConstant: 10).isActive = true
         
-        nameLabel.topAnchor.constraint(equalTo: listImageView.topAnchor, constant: 2).isActive = true
+        nameLabel.topAnchor.constraint(equalTo: listImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -20).isActive = true
         
-        listTypeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4).isActive = true
+        listTypeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         listTypeLabel.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 10).isActive = true
         listTypeLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -5).isActive = true
         
-        timeLabel.topAnchor.constraint(equalTo: listTypeLabel.bottomAnchor, constant: 4).isActive = true
+        timeLabel.topAnchor.constraint(equalTo: listTypeLabel.bottomAnchor, constant: 2).isActive = true
         timeLabel.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 10).isActive = true
         timeLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -5).isActive = true
         
-        activityLabel.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 4).isActive = true
+        activityLabel.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 2).isActive = true
         activityLabel.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: 10).isActive = true
         activityLabel.rightAnchor.constraint(equalTo: listButton.leftAnchor, constant: -5).isActive = true
         
         muteIndicator.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 3).isActive = true
-        muteIndicator.centerYAnchor.constraint(equalTo: listImageView.centerYAnchor, constant: 1).isActive = true
+        muteIndicator.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor, constant: 1).isActive = true
         muteIndicator.widthAnchor.constraint(equalToConstant: 12).isActive = true
         muteIndicator.heightAnchor.constraint(equalToConstant: 12).isActive = true
         

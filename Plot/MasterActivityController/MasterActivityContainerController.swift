@@ -154,6 +154,7 @@ class MasterActivityContainerController: UIViewController {
     }
     
     func setupViews() {
+        navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
@@ -180,7 +181,7 @@ class MasterActivityContainerController: UIViewController {
         
         customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         containerView.anchor(top: customSegmented.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        
+                
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -216,25 +217,28 @@ class MasterActivityContainerController: UIViewController {
         if index == 1 {
             navigationItem.title = titles[index]
             let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
+            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.leftBarButtonItem = editButtonItem
-            navigationItem.rightBarButtonItem = newChatBarButton
+            navigationItem.rightBarButtonItems = [newChatBarButton, searchBarButton]
         } else if index == 2 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMMM yyyy"
             let dateString = dateFormatter.string(from: selectedDate)
             navigationItem.title = dateString
             let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
+            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.leftBarButtonItem = editButtonItem
-            navigationItem.rightBarButtonItem = newActivityBarButton
+            navigationItem.rightBarButtonItems = [newActivityBarButton, searchBarButton]
         } else if index == 3 {
             navigationItem.title = titles[index]
             let newListBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))
+            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.leftBarButtonItem = editButtonItem
-            navigationItem.rightBarButtonItem = newListBarButton
+            navigationItem.rightBarButtonItems = [newListBarButton, searchBarButton]
         } else {
             navigationItem.title = titles[index]
             navigationItem.leftBarButtonItem = nil
-            navigationItem.rightBarButtonItem = nil
+            navigationItem.rightBarButtonItems = nil
         }
     }
 }
@@ -248,17 +252,35 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
                 editButtonItem.style = .plain
                 editButtonItem.title = "Edit"
             }
+            if let searchBar = chatsVC.searchBar, searchBar.isFirstResponder {
+                chatsVC.searchBar!.endEditing(true)
+                if let cancelButton : UIButton = chatsVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
+                    cancelButton.isEnabled = true
+                }
+            }
         } else if self.index == 2 {
             if activitiesVC.activityView.tableView.isEditing == true {
                 activitiesVC.activityView.tableView.setEditing(false, animated: true)
                 editButtonItem.style = .plain
                 editButtonItem.title = "Edit"
             }
+            if let searchBar = activitiesVC.searchBar, searchBar.isFirstResponder {
+                activitiesVC.searchBar!.endEditing(true)
+                if let cancelButton : UIButton = activitiesVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
+                    cancelButton.isEnabled = true
+                }
+            }
         } else if self.index == 3 {
             if listsVC.tableView.isEditing == true {
                 listsVC.tableView.setEditing(false, animated: true)
                 editButtonItem.style = .plain
                 editButtonItem.title = "Edit"
+            }
+            if let searchBar = listsVC.searchBar, searchBar.isFirstResponder {
+                listsVC.searchBar!.endEditing(true)
+                if let cancelButton : UIButton = listsVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
+                    cancelButton.isEnabled = true
+                }
             }
         }
         notificationsVC.view.isHidden = !(index == 0)
@@ -372,6 +394,16 @@ extension MasterActivityContainerController {
         alertController.addAction(checkList)
         alertController.addAction(cancelAlert)
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc fileprivate func search() {
+        if self.index == 1 {
+            chatsVC.setupSearchController()
+        } else if self.index == 2 {
+            activitiesVC.setupSearchController()
+        } else if self.index == 3 {
+            listsVC.setupSearchController()
+        }
     }
 }
 

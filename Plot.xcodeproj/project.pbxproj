@@ -755,7 +755,6 @@
 		10C50F932273818D00111033 /* ActivityControllers */ = {
 			isa = PBXGroup;
 			children = (
-				1051AC99244F8C470066761C /* ListViewController */,
 				26E8E3A4238B2C81000F30C8 /* Notfications */,
 				26E8EFE5237F38D500B9067E /* Map */,
 				10C50F982274E7C300111033 /* ActivityTableView */,
@@ -911,6 +910,7 @@
 				4BE9F1DE219B457C00C6768F /* Pigeon-project.entitlements */,
 				4BAEE47221272C4F0045AB10 /* AuthenticationControllers */,
 				1051AC94244F8AF80066761C /* MasterActivityController */,
+				1051AC99244F8C470066761C /* ListViewController */,
 				10C50F932273818D00111033 /* ActivityControllers */,
 				4BAEE4A421272D880045AB10 /* ChatsControllers */,
 				4BAEE4AB21272D880045AB10 /* ChatLogControllers */,

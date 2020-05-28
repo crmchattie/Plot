@@ -27,7 +27,7 @@ class GrocerylistFetcher: NSObject {
         
         print("fetching grocerylists")
         
-        let ref = Database.database().reference()
+        let ref = Database.database().reference()        
         userGrocerylistsDatabaseRef = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID)
         userGrocerylistsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let grocerylistIDs = snapshot.value as? [String: AnyObject] {

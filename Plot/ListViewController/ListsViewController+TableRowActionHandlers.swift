@@ -90,7 +90,6 @@ extension ListsViewController {
 
                 tableView.deleteRows(at: [indexPath], with: .left)
                 tableView.endUpdates()
-
             Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
             Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).child(list.ID).removeValue()
 

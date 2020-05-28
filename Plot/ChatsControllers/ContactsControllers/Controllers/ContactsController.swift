@@ -74,8 +74,8 @@ class ContactsController: UITableViewController {
       navigationItem.title = "New Chat"
         
       if #available(iOS 11.0, *) {
-        navigationItem.largeTitleDisplayMode = .always
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
       }
       extendedLayoutIncludesOpaqueBars = true
       definesPresentationContext = true

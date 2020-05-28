@@ -54,7 +54,7 @@ class ChatsTableViewController: UITableViewController {
     weak var delegate: HomeBaseChats?
 
     var searchBar: UISearchBar?
-    var searchChatsController: UISearchController?
+    var searchController: UISearchController?
 
     var conversations = [Conversation]()
     var filteredConversations = [Conversation]()
@@ -84,16 +84,11 @@ class ChatsTableViewController: UITableViewController {
    
     print("chat view did load")
     configureTableView()
-    setupSearchController()
     addObservers()
     if !isAppLoaded {
         managePresense()
         conversationsFetcher.fetchConversations()
     }
-    
-    
-    tableView.rowHeight = UITableView.automaticDimension
-    tableView.estimatedRowHeight = 105
   }
   
     override func viewWillAppear(_ animated: Bool) {
@@ -144,6 +139,8 @@ class ChatsTableViewController: UITableViewController {
     view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
     tableView.backgroundColor = view.backgroundColor
+    tableView.rowHeight = UITableView.automaticDimension
+    tableView.estimatedRowHeight = 105
     navigationItem.leftBarButtonItem = editButtonItem
     let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
     navigationItem.rightBarButtonItem = newChatBarButton
@@ -152,6 +149,7 @@ class ChatsTableViewController: UITableViewController {
     tableView.separatorStyle = .none
     definesPresentationContext = true
     conversationsFetcher.delegate = self
+    
 
 //    falconUsersFetcher.delegate = self
 //    contactsFetcher.delegate = self
@@ -172,23 +170,16 @@ class ChatsTableViewController: UITableViewController {
     navigationController?.pushViewController(destination, animated: true)
   }
 
-  fileprivate func setupSearchController() {
-    
-    if #available(iOS 11.0, *) {
-      searchChatsController = UISearchController(searchResultsController: nil)
-      searchChatsController?.searchResultsUpdater = self
-      searchChatsController?.obscuresBackgroundDuringPresentation = false
-      searchChatsController?.searchBar.delegate = self
-      searchChatsController?.definesPresentationContext = true
-      navigationItem.searchController = searchChatsController
-    } else {
-      searchBar = UISearchBar()
-      searchBar?.delegate = self
-      searchBar?.placeholder = "Search"
-      searchBar?.searchBarStyle = .minimal
-      searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
-      tableView.tableHeaderView = searchBar
-    }
+  func setupSearchController() {
+    tableView.setContentOffset(.zero, animated: false)
+    searchBar = UISearchBar()
+    searchBar?.delegate = self
+    searchBar?.placeholder = "Search"
+    searchBar?.searchBarStyle = .minimal
+    searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
+    searchBar?.becomeFirstResponder()
+    searchBar?.showsCancelButton = true
+    tableView.tableHeaderView = searchBar
   }
   
   fileprivate func managePresense() {

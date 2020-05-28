@@ -18,11 +18,10 @@ extension ChatsTableViewController: UISearchBarDelegate, UISearchControllerDeleg
     filteredConversations = conversations
     filteredPinnedConversations = pinnedConversations
     handleReloadTable()
-    guard #available(iOS 11.0, *) else {
-      searchBar.setShowsCancelButton(false, animated: true)
-      searchBar.resignFirstResponder()
-      return
-    }
+    searchBar.setShowsCancelButton(false, animated: true)
+    searchBar.resignFirstResponder()
+    tableView.tableHeaderView = nil
+    return
   }
   
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -48,10 +47,7 @@ extension ChatsTableViewController: UISearchBarDelegate, UISearchControllerDeleg
   
   func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
     searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-    guard #available(iOS 11.0, *) else {
-      searchBar.setShowsCancelButton(true, animated: true)
-      return true
-    }
+    searchBar.setShowsCancelButton(true, animated: true)
     return true
   }
 }
@@ -59,20 +55,17 @@ extension ChatsTableViewController: UISearchBarDelegate, UISearchControllerDeleg
 extension ChatsTableViewController { /* hiding keyboard */
   
   override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-    
-    if #available(iOS 11.0, *) {
-      searchChatsController?.searchBar.endEditing(true)
-    } else {
       self.searchBar?.endEditing(true)
-    }
+      if let cancelButton : UIButton = searchBar?.value(forKey: "cancelButton") as? UIButton {
+          cancelButton.isEnabled = true
+      }
   }
   
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    setNeedsStatusBarAppearanceUpdate()
-    if #available(iOS 11.0, *) {
-      searchChatsController?.searchBar.endEditing(true)
-    } else {
+      setNeedsStatusBarAppearanceUpdate()
       self.searchBar?.endEditing(true)
-    }
+      if let cancelButton : UIButton = searchBar.value(forKey: "cancelButton") as? UIButton {
+          cancelButton.isEnabled = true
+      }
   }
 }

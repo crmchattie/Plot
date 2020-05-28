@@ -51,7 +51,9 @@ class ListsViewController: UIViewController {
     
     let listCellID = "listCellID"
     
+    var listListCopy = [ListContainer]()
     var listList = [ListContainer]()
+    var filteredlistList = [ListContainer]()
     var checklists = [Checklist]()
     var grocerylists = [Grocerylist]()
     var packinglists = [Packinglist]()
@@ -105,7 +107,6 @@ class ListsViewController: UIViewController {
         
         setupMainView()
         setupTableView()
-        setupSearchController()
 
         addObservers()
                 
@@ -132,8 +133,9 @@ class ListsViewController: UIViewController {
     fileprivate func setupMainView() {
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
+            navigationController?.navigationBar.prefersLargeTitles = false
         }
-        navigationItem.title = "Ingredient"
+        navigationItem.title = "Lists"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     }
     
@@ -161,27 +163,21 @@ class ListsViewController: UIViewController {
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         tableView.keyboardDismissMode = .onDrag
-
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 100
+        
     }
     
-    fileprivate func setupSearchController() {
-        
-        if #available(iOS 11.0, *) {
-            searchController = UISearchController(searchResultsController: nil)
-            searchController?.searchResultsUpdater = self
-            searchController?.obscuresBackgroundDuringPresentation = false
-            searchController?.searchBar.delegate = self
-            searchController?.definesPresentationContext = true
-            navigationItem.searchController = searchController
-            navigationItem.hidesSearchBarWhenScrolling = true
-        } else {
-            searchBar = UISearchBar()
-            searchBar?.delegate = self
-            searchBar?.placeholder = "Search"
-            searchBar?.searchBarStyle = .minimal
-            searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
-            tableView.tableHeaderView = searchBar
-        }
+    func setupSearchController() {
+        tableView.setContentOffset(.zero, animated: false)
+        searchBar = UISearchBar()
+        searchBar?.delegate = self
+        searchBar?.placeholder = "Search"
+        searchBar?.searchBarStyle = .minimal
+        searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
+        searchBar?.becomeFirstResponder()
+        searchBar?.showsCancelButton = true
+        tableView.tableHeaderView = searchBar
     }
     
     func observeChecklistsForCurrentUser() {
@@ -235,7 +231,6 @@ class ListsViewController: UIViewController {
     
     func updateCellForCLID(ID: String, checklist: Checklist) {
         if let index = listList.firstIndex(where: {$0.ID == ID}) {
-            print("index \(index)")
             listList[index].checklist = checklist
             let indexPath = IndexPath(row: index, section: 0)
             updateCell(at: indexPath)
@@ -244,7 +239,6 @@ class ListsViewController: UIViewController {
     
     func updateCellForGLID(ID: String, grocerylist: Grocerylist) {
         if let index = listList.firstIndex(where: {$0.ID == ID}) {
-            print("index \(index)")
             listList[index].grocerylist = grocerylist
             let indexPath = IndexPath(row: index, section: 0)
             updateCell(at: indexPath)
@@ -272,24 +266,20 @@ class ListsViewController: UIViewController {
     }
     
     func sortandreload() {
-        let sortedArray = (checklists.map { ListContainer(grocerylist: nil, checklist: $0, packinglist: nil) } + grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
-        listList = sortedArray
-        tableView.reloadData()
-        
-                
-    }
-    
-    func handleReloadTableAftersearchBarCancelButtonClicked() {
-//        handleReloadActivities()
+        print("sortandreload")
+        listList = (checklists.map { ListContainer(grocerylist: nil, checklist: $0, packinglist: nil) } + grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
+        listListCopy = listList
         tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
-//        filteredActivities.sort { (activity1, activity2) -> Bool in
-//            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
-//        }
-        
+        print("handleReloadTableAfterSearch")
+        filteredlistList.sort { (list1, list2) -> Bool in
+            return list1.lastModifiedDate > list2.lastModifiedDate
+        }
+        listList = filteredlistList
         tableView.reloadData()
+        
     }
     
     func configureTabBarBadge() {

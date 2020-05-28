@@ -19,6 +19,10 @@ struct ListContainer: Codable {
         return grocerylist?.ID ?? checklist?.ID ?? packinglist?.ID ?? ""
     }
     
+    var name: String {
+        return grocerylist?.name ?? checklist?.name ?? packinglist?.name ?? ""
+    }
+    
     var lastModifiedDate: Date {
         return grocerylist?.lastModifiedDate ?? checklist?.lastModifiedDate ?? packinglist?.lastModifiedDate ?? Date.distantPast
     }

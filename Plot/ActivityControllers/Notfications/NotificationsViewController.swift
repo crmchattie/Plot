@@ -116,7 +116,7 @@ class NotificationsViewController: UIViewController {
             return invitation1.dateInvited > invitation2.dateInvited
         }
         let invitationActivityIDs = invitationValues.map({ $0.activityID})
-        invitedActivities = invitedActivities.sorted { invitationActivityIDs.firstIndex(of: $0.activityID!)! < invitationActivityIDs.firstIndex(of: $1.activityID!)! }
+        invitedActivities = invitedActivities.sorted { invitationActivityIDs.firstIndex(of: $0.activityID ?? "") ?? 0 < invitationActivityIDs.firstIndex(of: $1.activityID ?? "") ?? 0 }
         tableView.reloadData()
     }
     

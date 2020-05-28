@@ -14,9 +14,12 @@ import CodableFirebase
 enum Identifiers {
     static let viewChatsAction = "VIEW_CHAT_IDENTIFIER"
     static let viewActivitiesAction = "VIEW_ACTIVITIES_IDENTIFIER"
+    static let viewListsAction = "VIEW_LISTS_IDENTIFIER"
     static let replyAction = "REPLY_ACTION"
     static let chatCategory = "CHAT_CATEGORY"
     static let activityCategory = "ACTIVITY_CATEGORY"
+    static let checklistCategory = "CHECKLIST_CATEGORY"
+    static let grocerylistCategory = "GROCERYLIST_CATEGORY"
 }
 
 @UIApplicationMain
@@ -90,6 +93,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 identifier: Identifiers.viewChatsAction, title: "View Chats",
                 options: [.foreground])
             
+            let viewListAction = UNNotificationAction(
+                identifier: Identifiers.viewListsAction, title: "View Lists",
+                options: [.foreground])
+            
             //                let replyChatAction = UNTextInputNotificationAction(
             //                    identifier: Identifiers.viewAction, title: "Reply to Message",
             //                    options: [.foreground])
@@ -103,9 +110,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 identifier: Identifiers.chatCategory, actions: [viewChatAction],
                 intentIdentifiers: [], options: [])
             
+            let checklistCategory = UNNotificationCategory(
+                identifier: Identifiers.checklistCategory, actions: [viewListAction],
+                intentIdentifiers: [], options: [])
+            
+            let grocerylistCategory = UNNotificationCategory(
+                identifier: Identifiers.grocerylistCategory, actions: [viewListAction],
+                intentIdentifiers: [], options: [])
+            
             
             // 3
-            UNUserNotificationCenter.current().setNotificationCategories([chatCategory, activityCategory])
+            UNUserNotificationCenter.current().setNotificationCategories([chatCategory, activityCategory, checklistCategory, grocerylistCategory])
             
             //get application instance ID
             InstanceID.instanceID().instanceID { (result, error) in
@@ -256,12 +271,16 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             print(aps)
             switch response.actionIdentifier {
             case Identifiers.viewChatsAction:
-                (window?.rootViewController as? UITabBarController)?.selectedIndex = 0
+                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 1)
+                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             case Identifiers.viewActivitiesAction:
+                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
+                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
+            case Identifiers.viewListsAction:
+                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 3)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
                 if let chatID = userInfo["chatID"] as? String {
-                    
                     let groupChatDataReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
                     groupChatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                         guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
@@ -282,9 +301,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         self.messagesFetcher?.delegate = self
                         self.messagesFetcher?.loadMessagesData(for: conversation)
                     })
-                } else {
-                    let activityID = userInfo["activityID"] as? String
-                    let groupChatDataReference = Database.database().reference().child("activities").child(activityID!).child(messageMetaDataFirebaseFolder)
+                } else if let activityID = userInfo["activityID"] as? String {
+                    let groupChatDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
                     groupChatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                         guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
                         dictionary.updateValue(activityID as AnyObject, forKey: "id")
@@ -407,6 +425,49 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                             
                         }
                         
+                    })
+                } else if let checklistID = userInfo["checklistID"] as? String {
+                    let ref = Database.database().reference()
+                    ref.child(checklistsEntity).child(checklistID).observeSingleEvent(of: .value, with: { checklistSnapshot in
+                        if checklistSnapshot.exists(), let checklistSnapshotValue = checklistSnapshot.value {
+                            if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                                let destination = ChecklistViewController()
+                                destination.checklist = checklist
+                                destination.comingFromLists = true
+                                destination.connectedToAct = false
+                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                    tabBarController.selectedIndex = 1
+                                    tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                    if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                        homeNavigationController.pushViewController(destination, animated: true)
+                                        
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    })
+                } else if let grocerylistID = userInfo["grocerylistID"] as? String {
+                    let ref = Database.database().reference()
+                    ref.child(grocerylistsEntity).child(grocerylistID).observeSingleEvent(of: .value, with: { grocerylistSnapshot in
+                        if grocerylistSnapshot.exists(), let grocerylistSnapshotValue = grocerylistSnapshot.value {
+                            if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
+                                    let destination = GrocerylistViewController()
+                                    destination.grocerylist = grocerylist
+                                    destination.comingFromLists = true
+                                    destination.connectedToAct = false
+                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                        tabBarController.selectedIndex = 1
+                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                            homeNavigationController.pushViewController(destination, animated: true)
+                                            
+                                        }
+                                        
+                                    }
+                                    
+                            }
+                        }
                     })
                 }
             }

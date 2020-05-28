@@ -624,7 +624,7 @@ class GrocerylistViewController: FormViewController {
     }
     
     fileprivate func addIngredients() {
-        if let items = self.grocerylist.ingredients {
+        if let items = self.grocerylist.ingredients, items.count > 0 {
             for index in 0...items.count - 1 {
                 var aisle = items[index].aisle!.capitalized
                 aisle = aisle.replacingOccurrences(of: ";", with: "; ")
@@ -781,6 +781,15 @@ class GrocerylistViewController: FormViewController {
             } else if rowType is SplitRow<ButtonRow, CheckRow>, let ingredients = self!.grocerylist.ingredients, let rowTag = rows[0].tag {
                 if let index = ingredients.firstIndex(where: {$0.name == rowTag}) {
                     self!.grocerylist.ingredients!.remove(at: index)
+                    if ingredients.count == 1 {
+                        if let ingredientSection = self!.form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
+                            if self!.form.allSections.count > 3 {
+                                for _ in 0...self!.form.allSections.count - 2 - ingredientSection.index! {
+                                    self!.form.remove(at: ingredientSection.index! + 1)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -907,8 +916,10 @@ class GrocerylistViewController: FormViewController {
             }
         }
         if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
-            for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
-                form.remove(at: ingredientSection.index! + 1)
+            if form.allSections.count > 3 {
+                for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
+                    form.remove(at: ingredientSection.index! + 1)
+                }
             }
             addIngredients()
         } else {
@@ -996,11 +1007,16 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
             
             
             if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
-                for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
-                    form.remove(at: ingredientSection.index! + 1)
+                if form.allSections.count > 3 {
+                    for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
+                        form.remove(at: ingredientSection.index! + 1)
+                    }
                 }
                 addIngredients()
             }
+        } else if self.grocerylist.ingredients == nil {
+            self.grocerylist.ingredients = [ingredient]
+            addIngredients()
         }
     }
 }
