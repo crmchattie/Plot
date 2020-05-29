@@ -69,6 +69,9 @@ class GrocerylistFetcher: NSObject {
     }
     
     func observeGrocerylistForCurrentUser(grocerylistsAdded: @escaping ([Grocerylist])->(), grocerylistsRemoved: @escaping ([Grocerylist])->()) {
+        guard let _ = Auth.auth().currentUser?.uid else {
+            return
+        }
         self.grocerylistsAdded = grocerylistsAdded
         self.grocerylistsRemoved = grocerylistsRemoved
         currentUserGrocerylistsAddHandle = userGrocerylistsDatabaseRef.observe(.childAdded, with: { snapshot in

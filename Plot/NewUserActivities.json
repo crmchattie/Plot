@@ -10,26 +10,6 @@
         },
         "locationName" : "locationName",
         "isGroupActivity": true,
-        "checklist" : {
-          "checklist_1" : {
-            "Book Airbnbs" : true
-          },
-          "checklist_2" : {
-            "Dinner reservations" : true
-          },
-          "checklist_3" : {
-            "Book flights" : true
-          },
-          "checklist_4" : {
-            "Vatican tour" : false
-          },
-          "checklist_5" : {
-            "Car rental" : true
-          },
-          "checklist_6" : {
-            "Remember passport" : true
-          }
-        },
         "notes" : "nothing",
         "reminder" : "None",
         "schedule" : [ {
@@ -75,14 +55,6 @@
           "reminder" : "None",
           "scheduleType" : "Dinner",
         }, {
-          "checklist" : {
-            "checklist_1" : {
-              "Rental car reservation" : false
-            },
-            "checklist_2" : {
-              "Dinner reservation" : false
-            }
-          },
           "locationAddress" : {
             "Hotel Du Vin, St Andrews" : [ 56.3427936186478, -2.79940545558929 ]
           },

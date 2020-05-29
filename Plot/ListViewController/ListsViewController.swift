@@ -14,34 +14,34 @@ protocol ListViewControllerDataStore: class {
 }
 
 class ListsViewController: UIViewController {
-        
+    
     var activities = [Activity]() {
         didSet {
-            for activity in activities {
-                if let grocerylist = activity.grocerylist {
-                    grocerylist.activity = activity
-                    grocerylist.participantsIDs = activity.participantsIDs
-                    self.grocerylists.append(grocerylist)
-                }
-                if activity.packinglist != nil {
-                    for packinglist in activity.packinglist! {
-                        if packinglist.name == "nothing" { continue }
-                        packinglist.activity = activity
-                        packinglist.participantsIDs = activity.participantsIDs
-                        self.packinglists.append(packinglist)
-                    }
-                }
-                if activity.checklist != nil {
-                    for checklist in activity.checklist! {
-                        if checklist.name == "nothing" { continue }
-                        if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
-                        checklist.activity = activity
-                        checklist.participantsIDs = activity.participantsIDs
-                        self.checklists.append(checklist)
-                    }
-                }
-            }
-            sortandreload()
+//            for activity in activities {
+//                if let grocerylist = activity.grocerylist {
+//                    grocerylist.activity = activity
+//                    grocerylist.participantsIDs = activity.participantsIDs
+//                    self.grocerylists.append(grocerylist)
+//                }
+//                if activity.packinglist != nil {
+//                    for packinglist in activity.packinglist! {
+//                        if packinglist.name == "nothing" { continue }
+//                        packinglist.activity = activity
+//                        packinglist.participantsIDs = activity.participantsIDs
+//                        self.packinglists.append(packinglist)
+//                    }
+//                }
+//                if activity.checklist != nil {
+//                    for checklist in activity.checklist! {
+//                        if checklist.name == "nothing" { continue }
+//                        if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
+//                        checklist.activity = activity
+//                        checklist.participantsIDs = activity.participantsIDs
+//                        self.checklists.append(checklist)
+//                    }
+//                }
+//            }
+//            sortandreload()
         }
     }
     
@@ -63,7 +63,7 @@ class ListsViewController: UIViewController {
     
     let checklistFetcher = ChecklistFetcher()
     let grocerylistFetcher = GrocerylistFetcher()
-//    let packinglistFetcher = PackinglistFetcher()
+    //    let packinglistFetcher = PackinglistFetcher()
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -101,15 +101,15 @@ class ListsViewController: UIViewController {
                 self.observeGrocerylistsForCurrentUser()
             }
         }
-                
+        
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
         
         setupMainView()
         setupTableView()
-
+        
         addObservers()
-                
+        
     }
     
     deinit {
@@ -127,7 +127,7 @@ class ListsViewController: UIViewController {
         tableView.sectionIndexBackgroundColor = theme.generalBackgroundColor
         tableView.backgroundColor = theme.generalBackgroundColor
         tableView.reloadData()
-
+        
     }
     
     fileprivate func setupMainView() {
@@ -140,7 +140,7 @@ class ListsViewController: UIViewController {
     }
     
     fileprivate func setupTableView() {
-
+        
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -158,7 +158,7 @@ class ListsViewController: UIViewController {
         tableView.dataSource = self
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.register(ListCell.self, forCellReuseIdentifier: listCellID)
-
+        
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
@@ -181,7 +181,6 @@ class ListsViewController: UIViewController {
     }
     
     func observeChecklistsForCurrentUser() {
-        print("observeChecklistsForCurrentUser")
         self.checklistFetcher.observeChecklistForCurrentUser(checklistsAdded: { [weak self] checklistsAdded in
             for checklist in checklistsAdded {
                 if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
@@ -194,7 +193,7 @@ class ListsViewController: UIViewController {
                     self!.sortandreload()
                 }
             }
-        }, checklistsRemoved: { [weak self] checklistsRemoved in
+            }) { [weak self] checklistsRemoved in
                 for checklist in checklistsRemoved {
                     if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
                         self!.checklists.remove(at: index)
@@ -202,7 +201,6 @@ class ListsViewController: UIViewController {
                     }
                 }
             }
-        )
     }
     
     func observeGrocerylistsForCurrentUser() {
@@ -218,7 +216,7 @@ class ListsViewController: UIViewController {
                     self!.sortandreload()
                 }
             }
-        }, grocerylistsRemoved: { [weak self] grocerylistsRemoved in
+            }) { [weak self] grocerylistsRemoved in
                 for grocerylist in grocerylistsRemoved {
                     if let index = self!.grocerylists.firstIndex(where: {$0 == grocerylist}) {
                         self!.grocerylists.remove(at: index)
@@ -226,7 +224,6 @@ class ListsViewController: UIViewController {
                     }
                 }
             }
-        )
     }
     
     func updateCellForCLID(ID: String, checklist: Checklist) {
@@ -262,7 +259,7 @@ class ListsViewController: UIViewController {
             viewPlaceholder.remove(from: tableView, priority: .medium)
             return
         }
-        viewPlaceholder.add(for: tableView, title: .emptyLists, subtitle: .empty, priority: .medium, position: .top)
+        viewPlaceholder.add(for: tableView, title: .emptyLists, subtitle: .emptyLists, priority: .medium, position: .top)
     }
     
     func sortandreload() {
@@ -325,7 +322,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         
         let delete = setupDeleteAction(at: indexPath)
         let mute = setupMuteAction(at: indexPath)
-
+        
         return [delete, mute]
     }
     
@@ -345,28 +342,15 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ListCell ?? ListCell()
         cell.delegate = self
-        cell.activityViewControllerDataStore = self
         cell.listViewControllerDataStore = self
         cell.selectionStyle = .none
         let list = listList[indexPath.row]
         if let grocerylist = list.grocerylist {
-            if let activity = grocerylist.activity {
-                cell.configureCell(for: indexPath, grocerylist: grocerylist, checklist: nil, packinglist: nil, activity: activity)
-            } else {
-                cell.configureCell(for: indexPath, grocerylist: grocerylist, checklist: nil, packinglist: nil, activity: nil)
-            }
+            cell.configureCell(for: indexPath, grocerylist: grocerylist, checklist: nil, packinglist: nil)
         } else if let checklist = list.checklist {
-            if let activity = checklist.activity {
-                cell.configureCell(for: indexPath, grocerylist: nil, checklist: checklist, packinglist: nil, activity: activity)
-            } else {
-                cell.configureCell(for: indexPath, grocerylist: nil, checklist: checklist, packinglist: nil, activity: nil)
-            }
+            cell.configureCell(for: indexPath, grocerylist: nil, checklist: checklist, packinglist: nil)
         } else if let packinglist = list.packinglist {
-            if let activity = packinglist.activity {
-                cell.configureCell(for: indexPath, grocerylist: nil, checklist: nil, packinglist: packinglist, activity: activity)
-            } else {
-                cell.configureCell(for: indexPath, grocerylist: nil, checklist: nil, packinglist: packinglist, activity: nil)
-            }
+            cell.configureCell(for: indexPath, grocerylist: nil, checklist: nil, packinglist: packinglist)
         }
         return cell
     }
@@ -378,12 +362,12 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             let destination = GrocerylistViewController()
             destination.grocerylist = grocerylist
             destination.comingFromLists = true
-            destination.connectedToAct = grocerylist.activity != nil
+            destination.connectedToAct = grocerylist.activityID != nil
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.activities = self.activities
             destination.conversations = self.conversations
-            if grocerylist.activity == nil {
+            if grocerylist.activityID == nil {
                 self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
@@ -395,12 +379,12 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             let destination = ChecklistViewController()
             destination.checklist = checklist
             destination.comingFromLists = true
-            destination.connectedToAct = checklist.activity != nil
+            destination.connectedToAct = checklist.activityID != nil
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.activities = self.activities
             destination.conversations = self.conversations
-            if checklist.activity == nil {
+            if checklist.activityID == nil {
                 self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
@@ -412,12 +396,12 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             let destination = PackinglistViewController()
             destination.packinglist = packinglist
             destination.comingFromLists = true
-            destination.connectedToAct = packinglist.activity != nil
+            destination.connectedToAct = packinglist.activityID != nil
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.activities = self.activities
             destination.conversations = self.conversations
-            if packinglist.activity == nil {
+            if packinglist.activityID == nil {
                 self.getParticipants(grocerylist: nil, checklist: nil, packinglist: packinglist) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
@@ -428,7 +412,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-
+    
 }
 
 extension ListsViewController: ListViewControllerDataStore {
@@ -532,60 +516,19 @@ extension ListsViewController: ListViewControllerDataStore {
     }
 }
 
-extension ListsViewController: ActivityViewControllerDataStore {
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        
-        let group = DispatchGroup()
-        let olderParticipants = self.participants[activityID]
-        var participants: [User] = []
-        for id in participantsIDs {
-            // Only if the current user is created this activity
-            if activity.admin == currentUserID && id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.participants[activityID] = participants
-            completion(participants)
-        }
-    }
-}
-
 extension ListsViewController: ListCellDelegate {
-    func openActivity(activity: Activity) {
-        activityViewController!.loadActivity(activity: activity)
+    func openActivity(activityID: String) {
+        if let index = self.activities.firstIndex(where: {$0.activityID == activityID}) {
+            activityViewController!.loadActivity(activity: activities[index])
+        }
     }
     
-    func openChat(forConversation conversationID: String?, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activity: Activity?) {
+    func openChat(forConversation conversationID: String?, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?) {
         if conversationID == nil {
             let destination = ChooseChatTableViewController()
             let navController = UINavigationController(rootViewController: destination)
             destination.delegate = self
-            if let activity = activity {
-                destination.activity = activity
-            } else if let grocerylist = grocerylist {
+            if let grocerylist = grocerylist {
                 destination.grocerylist = grocerylist
             } else if let checklist = checklist {
                 destination.checklist = checklist
@@ -683,61 +626,83 @@ extension ListsViewController: MessagesDelegate {
 
 extension ListsViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
-        if let activityID = activityID {
-            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
-                if conversation.activities != nil {
-                       var activities = conversation.activities!
-                       activities.append(activityID)
-                       let updatedActivities = ["activities": activities as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   } else {
-                       let updatedActivities = ["activities": [activityID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   }
-               }
+        if let grocerylistID = grocerylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-        } else if let grocerylistID = grocerylistID {
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.grocerylists != nil {
-                       var grocerylists = conversation.grocerylists!
-                       grocerylists.append(grocerylistID)
-                       let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                   } else {
-                       let updatedGrocerylists = [grocerylistsEntity: [grocerylistID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                   }
-               }
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
+                    var grocerylists = conversation.grocerylists!
+                    grocerylists.append(grocerylistID)
+                    let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                } else {
+                    let updatedGrocerylists = [grocerylistsEntity: [grocerylistID] as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                }
+                if activityID != nil {
+                    if conversation.activities != nil {
+                        var activities = conversation.activities!
+                        activities.append(activityID!)
+                        let updatedActivities = ["activities": activities as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    } else {
+                        let updatedActivities = ["activities": [activityID!] as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    }
+                    Database.database().reference().child("activities").child(activityID!).updateChildValues(updatedConversationID)
+                }
+            }
             Database.database().reference().child(grocerylistsEntity).child(grocerylistID).updateChildValues(updatedConversationID)
         } else if let checklistID = checklistID {
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.checklists != nil {
-                       var checklists = conversation.checklists!
-                       checklists.append(checklistID)
-                       let updatedChecklists = [checklistsEntity: checklists as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                   } else {
-                       let updatedChecklists = [checklistsEntity: [checklistID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                   }
-               }
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
+                    var checklists = conversation.checklists!
+                    checklists.append(checklistID)
+                    let updatedChecklists = [checklistsEntity: checklists as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                } else {
+                    let updatedChecklists = [checklistsEntity: [checklistID] as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                }
+                if activityID != nil {
+                    if conversation.activities != nil {
+                        var activities = conversation.activities!
+                        activities.append(activityID!)
+                        let updatedActivities = ["activities": activities as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    } else {
+                        let updatedActivities = ["activities": [activityID!] as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    }
+                    Database.database().reference().child("activities").child(activityID!).updateChildValues(updatedConversationID)
+                }
+            }
             Database.database().reference().child(checklistsEntity).child(checklistID).updateChildValues(updatedConversationID)
         } else if let packinglistID = packinglistID {
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.packinglists != nil {
-                       var packinglists = conversation.packinglists!
-                       packinglists.append(packinglistID)
-                       let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                   } else {
-                       let updatedPackinglists = [packinglistsEntity: [packinglistID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                   }
-               }
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
+                    var packinglists = conversation.packinglists!
+                    packinglists.append(packinglistID)
+                    let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
+                } else {
+                    let updatedPackinglists = [packinglistsEntity: [packinglistID] as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
+                }
+                if activityID != nil {
+                    if conversation.activities != nil {
+                        var activities = conversation.activities!
+                        activities.append(activityID!)
+                        let updatedActivities = ["activities": activities as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    } else {
+                        let updatedActivities = ["activities": [activityID!] as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    }
+                    Database.database().reference().child("activities").child(activityID!).updateChildValues(updatedConversationID)
+                }
+            }
             Database.database().reference().child(packinglistsEntity).child(packinglistID).updateChildValues(updatedConversationID)
         }
     }

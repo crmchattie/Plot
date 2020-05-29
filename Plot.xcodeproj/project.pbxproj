@@ -417,6 +417,7 @@
 		10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistViewController.swift; sourceTree = "<group>"; };
 		10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistFetcher.swift; sourceTree = "<group>"; };
 		10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistActions.swift; sourceTree = "<group>"; };
+		10D5DA7A24818D0A00E8FB2A /* NewUserChecklists.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = NewUserChecklists.json; sourceTree = "<group>"; };
 		10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientDetailViewController.swift; sourceTree = "<group>"; };
 		10DE97342475737500D4A7E8 /* ListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCell.swift; sourceTree = "<group>"; };
 		10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListCell+ConfigureCell.swift"; sourceTree = "<group>"; };
@@ -922,6 +923,7 @@
 				4B4F45421F32246000A6FF96 /* GeneralTabBarController.swift */,
 				4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */,
 				26CDFB21239E278200567666 /* NewUserActivities.json */,
+				10D5DA7A24818D0A00E8FB2A /* NewUserChecklists.json */,
 				4B4F45371F32230C00A6FF96 /* Assets.xcassets */,
 				4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */,
 				4B4F453C1F32230C00A6FF96 /* Info.plist */,

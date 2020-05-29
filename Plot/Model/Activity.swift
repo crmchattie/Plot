@@ -33,6 +33,9 @@ class Activity: NSObject, NSCopying, Codable {
     var checklist: [Checklist]?
     var packinglist: [Packinglist]?
     var grocerylist: Grocerylist?
+    var checklistIDs: [String]?
+    var packinglistIDs: [String]?
+    var grocerylistID: String?
     var isGroupActivity: Bool?
     var admin: String?
     var badge: Int?
@@ -65,6 +68,9 @@ class Activity: NSObject, NSCopying, Codable {
         case checklist
         case packinglist
         case grocerylist
+        case checklistIDs
+        case packinglistIDs
+        case grocerylistID
         case calendarExport
         case recipeID
         case servings
@@ -162,6 +168,9 @@ class Activity: NSObject, NSCopying, Codable {
         pinned = dictionary?["pinned"] as? Bool
         muted = dictionary?["muted"] as? Bool
         conversationID = dictionary?["conversationID"] as? String
+        grocerylistID = dictionary?["grocerylistID"] as? String
+        checklistIDs = dictionary?["checklistIDs"] as? [String]
+        packinglistIDs = dictionary?["packinglistIDs"] as? [String]
         calendarExport = dictionary?["calendarExport"] as? Bool
         recipeID = dictionary?["recipeID"] as? String
         servings = dictionary?["servings"] as? Int
@@ -286,6 +295,18 @@ class Activity: NSObject, NSCopying, Codable {
         if let value = self.grocerylist {
             let firebase = value.toAnyObject()
             dictionary["grocerylist"] = firebase as AnyObject
+        }
+        
+        if let value = self.grocerylistID as AnyObject? {
+            dictionary["grocerylistID"] = value
+        }
+        
+        if let value = self.checklistIDs as AnyObject? {
+            dictionary["checklistIDs"] = value
+        }
+        
+        if let value = self.packinglistIDs as AnyObject? {
+            dictionary["packinglistIDs"] = value
         }
         
         if let value = self.recipeID as AnyObject? {

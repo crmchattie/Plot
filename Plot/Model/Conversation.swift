@@ -100,10 +100,6 @@ class Conversation: NSObject {
             conversationDict["activities"] = value
         }
         
-        if let value = self.activities as AnyObject? {
-            conversationDict["activities"] = value
-        }
-        
         if let value = self.checklists as AnyObject? {
             conversationDict["checklists"] = value
         }

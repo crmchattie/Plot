@@ -23,6 +23,7 @@ class ChecklistFetcher: NSObject {
     
     func fetchChecklists(completion: @escaping ([Checklist])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
+            print("currentUser failed")
             completion([])
             return
         }
@@ -69,6 +70,9 @@ class ChecklistFetcher: NSObject {
     }
     
     func observeChecklistForCurrentUser(checklistsAdded: @escaping ([Checklist])->(), checklistsRemoved: @escaping ([Checklist])->()) {
+        guard let _ = Auth.auth().currentUser?.uid else {
+            return
+        }
         print("observeChecklistForCurrentUser")
         self.checklistsAdded = checklistsAdded
         self.checklistsRemoved = checklistsRemoved

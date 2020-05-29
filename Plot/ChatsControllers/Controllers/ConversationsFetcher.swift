@@ -93,7 +93,6 @@ class ConversationsFetcher: NSObject {
     func observeConversationAdded() {
         currentUserConversationsAddingHandle = currentUserConversationsReference.observe(.childAdded, with: { (snapshot) in
             let chatID = snapshot.key
-            //        print("conversation ID #1 \(chatID)")
             self.observeChangesForDefaultConversation(with: chatID)
             self.observeChangesForGroupConversation(with: chatID)
             self.observeAdditionsForGroupConversation(with: chatID)
@@ -105,7 +104,6 @@ class ConversationsFetcher: NSObject {
     fileprivate var conversationReferenceHandle = [(handle: DatabaseHandle, currentUserID: String, chatID: String)]()
     
     fileprivate func loadConversation(for chatID: String) {
-        //      print("conversation ID #2 \(chatID)")
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         
         conversationReference = Database.database().reference().child("user-messages").child(currentUserID).child(chatID).child(messageMetaDataFirebaseFolder)
@@ -160,11 +158,9 @@ class ConversationsFetcher: NSObject {
         //      })
         
         let groupChatDataReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-        //        print("conversation ID #3 \(chatID)")
         groupChatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
             guard var dictionary = snapshot.value as? [String: AnyObject]
                 else {
-                    //            print("conversation ID returning \(chatID)")
                     Database.database().reference().child("user-messages").child(currentUserID).child(chatID).removeAllObservers()
                     Database.database().reference().child("user-messages").child(currentUserID).child(chatID).removeValue()
                     return
@@ -182,14 +178,10 @@ class ConversationsFetcher: NSObject {
                 conversation.chatPhotoURL = metaInfo.chatPhotoURL
                 conversation.chatThumbnailPhotoURL = metaInfo.chatThumbnailPhotoURL
             } else {
-                //            self.group.enter()
                 var otherUserID: String!
                 if let membersIDs = metaInfo.chatParticipantsIDs, let index = membersIDs.firstIndex(of: currentUserID) {
                     otherUserID = membersIDs[membersIDs.count - index - 1]
                 }
-                //            if let user = users.firstIndex(of: otherUserID) {
-                //                otherUserID = membersIDs[membersIDs.count - index - 1]
-                //            }
                 let userDataReference = Database.database().reference().child("users").child(otherUserID)
                 userDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                     guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
@@ -199,7 +191,6 @@ class ConversationsFetcher: NSObject {
                     conversation.chatName = user.name
                     conversation.chatPhotoURL = user.photoURL
                     conversation.chatThumbnailPhotoURL = user.thumbnailPhotoURL
-                    //                self.group.leave()
                 })
             }
             conversation.chatParticipantsIDs =  metaInfo.chatParticipantsIDs
@@ -211,13 +202,6 @@ class ConversationsFetcher: NSObject {
             conversation.checklists = metaInfo.checklists
             conversation.grocerylists = metaInfo.grocerylists
             conversation.packinglists = metaInfo.packinglists
-            
-            //        print("conversation ID #4 \(chatID)")
-            //        print("conversation ID #5 \(String(describing: conversation.chatID))")
-            //        print("conversation name \(String(describing: conversation.chatName))")
-            
-            
-            
             self.prefetchThumbnail(from: conversation.chatThumbnailPhotoURL)
             self.updateConversationArrays(with: conversation)
         })
@@ -231,14 +215,11 @@ class ConversationsFetcher: NSObject {
     
     fileprivate func updateConversationArrays(with conversation: Conversation) {
         guard let userID = conversation.chatID else { return }
-        //      print("conversation ID #6 \(conversation.chatID)")
         if let index = conversations.firstIndex(where: { (conversation) -> Bool in
             return conversation.chatID == userID
         }) {
-            //        print("update")
             update(conversation: conversation, at: index)
         } else {
-            //        print("update else")
             conversations.append(conversation)
             handleGroupOrReloadTable()
         }
@@ -263,16 +244,12 @@ class ConversationsFetcher: NSObject {
     fileprivate func handleGroupOrReloadTable() {
         guard isGroupAlreadyFinished else {
             guard group != nil else {
-                //            print("handleGroupOrReloadTable: group does not equal nil")
                 delegate?.conversations(didFinishFetching: true, conversations: conversations)
                 return
             }
-            //        print("handleGroupOrReloadTable: group does equal nil")
             group.leave()
             return
         }
-        //        print("handleGroupOrReloadTable: didFinishFetching")
-        
         delegate?.conversations(didFinishFetching: true, conversations: conversations)
     }
     

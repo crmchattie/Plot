@@ -20,6 +20,7 @@ class Packinglist: NSObject, NSCopying, Codable {
     var participantsIDs: [String]?
     var conversationID: String?
     var activity: Activity?
+    var activityID: String?
     var admin: String?
     var badge: Int?
     var pinned: Bool?
@@ -39,6 +40,7 @@ class Packinglist: NSObject, NSCopying, Codable {
         pinned = dictionary?["pinned"] as? Bool
         muted = dictionary?["muted"] as? Bool
         conversationID = dictionary?["conversationID"] as? String
+        activityID = dictionary?["activityID"] as? String
         lastModifiedDate = dictionary?["lastModifiedDate"] as? Date
         createdDate = dictionary?["lastModifiedDate"] as? Date
         
@@ -87,6 +89,10 @@ class Packinglist: NSObject, NSCopying, Codable {
         
         if let value = self.conversationID as AnyObject? {
             dictionary["conversationID"] = value
+        }
+        
+        if let value = self.activityID as AnyObject? {
+            dictionary["activityID"] = value
         }
         
         if let value = self.lastModifiedDate {

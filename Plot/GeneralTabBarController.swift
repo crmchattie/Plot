@@ -37,7 +37,7 @@ class GeneralTabBarController: UITabBarController {
     let viewPlaceholder = ViewPlaceholder()
     
     fileprivate let appDelegate = UIApplication.shared.delegate as! AppDelegate
-
+    
     fileprivate var isAppLoaded = false
     
     let homeController = MasterActivityContainerController()
@@ -48,7 +48,6 @@ class GeneralTabBarController: UITabBarController {
     let splashContainer: SplashScreenContainer = {
         let splashContainer = SplashScreenContainer()
         splashContainer.translatesAutoresizingMaskIntoConstraints = false
-        
         return splashContainer
     }()
     
@@ -66,16 +65,17 @@ class GeneralTabBarController: UITabBarController {
         } else {
             // Fallback on earlier versions
         }
-                        
+        
         appDelegate.loadNotifications()
-
+        
         homeController.delegate = self
         setOnlineStatus()
         configureTabBar()
         
     }
     
-    fileprivate func configureTabBar() {
+    fileprivate func configureTabBar(){
+        print("configureTabBar")
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor], for: .normal)
         tabBar.unselectedItemTintColor = ThemeManager.currentTheme().generalSubtitleColor
         tabBar.isTranslucent = false
@@ -90,8 +90,9 @@ class GeneralTabBarController: UITabBarController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-                        
+        
         if onceToken == 0 {
+            print("token equals 0")
             splashContainer.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             splashContainer.navigationBar.barTintColor = ThemeManager.currentTheme().generalBackgroundColor
             splashContainer.viewForSatausbarSafeArea.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -101,7 +102,7 @@ class GeneralTabBarController: UITabBarController {
             splashContainer.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
             splashContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
-        
+        print("token equals 1")
         onceToken = 1
     }
     
@@ -110,7 +111,7 @@ class GeneralTabBarController: UITabBarController {
         guard UIApplication.shared.applicationState == .inactive else {
             return
         }
-
+        
         if #available(iOS 12.0, *) {
             if self.traitCollection.userInterfaceStyle == .dark {
                 let theme = Theme.Dark
@@ -125,6 +126,7 @@ class GeneralTabBarController: UITabBarController {
     }
     
     fileprivate func setTabs() {
+        print("setTabs")
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM yyyy"
         let dateString = dateFormatter.string(from: Date())
@@ -194,25 +196,28 @@ class GeneralTabBarController: UITabBarController {
     }
     
     func createNewUserActivities() {
-        guard let mainUrl = Bundle.main.url(forResource: "NewUserActivities", withExtension: "json") else { return }
+        repeat {} while Auth.auth().currentUser?.uid == nil
+                
+        let currentUserID = Auth.auth().currentUser?.uid
+        
+        let activityID = Database.database().reference().child("user-activities").child(currentUserID!).childByAutoId().key ?? ""
+        let checklistID = Database.database().reference().child(userChecklistsEntity).child(currentUserID!).childByAutoId().key ?? ""
+        
+        let dispatchGroup = DispatchGroup()
+        guard let mainActivitiesUrl = Bundle.main.url(forResource: "NewUserActivities", withExtension: "json") else { return }
+        
         do {
-            let jsonData = try Data(contentsOf: mainUrl)
+            let jsonData = try Data(contentsOf: mainActivitiesUrl)
             let decoder = JSONDecoder()
             let activities = try decoder.decode([Activity].self, from: jsonData)
-
             
-            let dispatchGroup = DispatchGroup()
             for activity in activities {
-                guard let currentUserID = Auth.auth().currentUser?.uid else {
-                    continue
-                }
-                
-                let activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
-                
+                print("creating activity")
                 activity.activityID = activityID
+                activity.checklistIDs = [checklistID]
                 activity.admin = currentUserID
-                activity.participantsIDs = [currentUserID]
-                                
+                activity.participantsIDs = [currentUserID!]
+                
                 var dateComponents = DateComponents()
                 dateComponents.year = Date.yearNumber(Date())()
                 dateComponents.month = Date.monthNumber(Date())()
@@ -220,11 +225,11 @@ class GeneralTabBarController: UITabBarController {
                 dateComponents.timeZone = TimeZone.current
                 dateComponents.hour = 17
                 dateComponents.minute = 20
-
+                
                 // Create date from components
                 let userCalendar = Calendar.current
                 let someDateTime = userCalendar.date(from: dateComponents)!
-
+                
                 
                 let timezone = TimeZone.current
                 let seconds = TimeInterval(timezone.secondsFromGMT(for: someDateTime))
@@ -241,52 +246,52 @@ class GeneralTabBarController: UITabBarController {
                         schedule.startDateTime = activity.startDateTime
                         schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(41400)).timeIntervalSince1970))
                         schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID]
+                        schedule.participantsIDs = [currentUserID!]
                     case "Flight from DUB to EDI":
                         schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(79500)).timeIntervalSince1970))
                         schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(84300)).timeIntervalSince1970))
                         schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID]
+                        schedule.participantsIDs = [currentUserID!]
                     case "Edinburgh":
                         schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(172800)).timeIntervalSince1970))
                         schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(345600)).timeIntervalSince1970))
                         schedule.allDay = true
-                        schedule.participantsIDs = [currentUserID]
+                        schedule.participantsIDs = [currentUserID!]
                     case "Aizle Reservation":
                         schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(182400)).timeIntervalSince1970))
                         schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(189600)).timeIntervalSince1970))
                         schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID]
+                        schedule.participantsIDs = [currentUserID!]
                     case "Kitchin Reservation":
                         schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(268800)).timeIntervalSince1970))
                         schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(276000)).timeIntervalSince1970))
                         schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID]
+                        schedule.participantsIDs = [currentUserID!]
                     case "St. Andrews":
                         schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(353400)).timeIntervalSince1970))
                         schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(526200)).timeIntervalSince1970))
                         schedule.allDay = true
-                        schedule.participantsIDs = [currentUserID]
+                        schedule.participantsIDs = [currentUserID!]
                     case "Flight from EDI to DUB":
                         schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(490200)).timeIntervalSince1970))
                         schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(495000)).timeIntervalSince1970))
                         schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID]
+                        schedule.participantsIDs = [currentUserID!]
                     case "Flight from DUB to EWR":
                         schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(502800)).timeIntervalSince1970))
                         schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(512100)).timeIntervalSince1970))
                         schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID]
+                        schedule.participantsIDs = [currentUserID!]
                     default:
                         schedule.startDateTime = activity.startDateTime
                         schedule.endDateTime = activity.endDateTime
                         schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID]
+                        schedule.participantsIDs = [currentUserID!]
                     }
                     dispatchGroup.leave()
                 }
                 
-                                
+                
                 let activityDict = activity.toAnyObject()
                 let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
                 dispatchGroup.enter()
@@ -294,7 +299,7 @@ class GeneralTabBarController: UITabBarController {
                     dispatchGroup.leave()
                 }
                 
-                let userReference = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
+                let userReference = Database.database().reference().child("user-activities").child(currentUserID!).child(activityID).child(messageMetaDataFirebaseFolder)
                 let values:[String : Any] = ["isGroupActivity": true]
                 dispatchGroup.enter()
                 userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
@@ -302,11 +307,47 @@ class GeneralTabBarController: UITabBarController {
                 })
             }
             
-            dispatchGroup.notify(queue: .main) {
-                self.homeController.activitiesVC.handleReloadTable()
+        } catch {
+            print("new user error")
+            print(error)
+        }
+        
+        guard let mainChecklistsUrl = Bundle.main.url(forResource: "NewUserChecklists", withExtension: "json") else { return }
+        
+        do {
+            let jsonData = try Data(contentsOf: mainChecklistsUrl)
+            let decoder = JSONDecoder()
+            let checklists = try decoder.decode([Checklist].self, from: jsonData)
+            
+            for checklist in checklists {
+                checklist.ID = checklistID
+                checklist.activityID = activityID
+                checklist.admin = currentUserID
+                checklist.participantsIDs = [currentUserID!]
+                
+                let checklistDict = checklist.toAnyObject()
+                let checklistReference = Database.database().reference().child(checklistsEntity).child(checklistID)
+                dispatchGroup.enter()
+                checklistReference.updateChildValues(checklistDict) { (error, reference) in
+                    dispatchGroup.leave()
+                }
+                
+                let userReference = Database.database().reference().child(userChecklistsEntity).child(currentUserID!).child(checklistID)
+                let values:[String : Any] = ["isGroupChecklist": true]
+                dispatchGroup.enter()
+                userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                    dispatchGroup.leave()
+                })
+                
             }
         } catch {
+            print("new user error")
             print(error)
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.homeController.activitiesVC.handleReloadTable()
+            self.homeController.listsVC.sortandreload()
         }
     }
     
@@ -331,8 +372,8 @@ extension GeneralTabBarController: ManageAppearanceHome {
         }
         grabContacts()
         addNewUserItems()
-//        appDelegate.registerForPushNotifications(application: UIApplication.shared)
-
+        //        appDelegate.registerForPushNotifications(application: UIApplication.shared)
+        
     }
 }
 

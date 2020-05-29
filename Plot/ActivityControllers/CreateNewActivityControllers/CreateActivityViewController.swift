@@ -2360,18 +2360,58 @@ extension CreateActivityViewController: UpdateActivityPhotosDelegate {
 extension CreateActivityViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
         if let activityID = activityID {
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activities != nil {
-                       var activities = conversation.activities!
-                       activities.append(activityID)
-                       let updatedActivities = ["activities": activities as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   } else {
-                       let updatedActivities = ["activities": [activityID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   }
-               }
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
+                    var activities = conversation.activities!
+                    activities.append(activityID)
+                    let updatedActivities = ["activities": activities as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                } else {
+                    let updatedActivities = ["activities": [activityID] as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                }
+                if activity.grocerylistID != nil {
+                    if conversation.grocerylists != nil {
+                        var grocerylists = conversation.grocerylists!
+                        grocerylists.append(activity.grocerylistID!)
+                        let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                    } else {
+                        let updatedGrocerylists = [grocerylistsEntity: [activity.grocerylistID!] as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                    }
+                    Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!).updateChildValues(updatedConversationID)
+                }
+                if activity.checklistIDs != nil {
+                    if conversation.checklists != nil {
+                        let checklists = conversation.checklists! + activity.checklistIDs!
+                        let updatedChecklists = [checklistsEntity: checklists as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                    } else {
+                        let updatedChecklists = [checklistsEntity: activity.checklistIDs! as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                    }
+                    for ID in activity.checklistIDs! {
+                        Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
+
+                    }
+                }
+                if activity.packinglistIDs != nil {
+                    if conversation.packinglists != nil {
+                        let packinglists = conversation.packinglists! + activity.packinglistIDs!
+                        let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
+                    } else {
+                        let updatedPackinglists = [packinglistsEntity: activity.packinglistIDs! as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
+                    }
+                   for ID in activity.packinglistIDs! {
+                        Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
+
+                    }
+                }
+            }
             Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
         }
     }

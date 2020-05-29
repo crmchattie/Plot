@@ -775,36 +775,32 @@ extension ChecklistViewController: ChooseActivityDelegate {
 
 extension ChecklistViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
-        if let activityID = activityID {
-            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
-                if conversation.activities != nil {
-                       var activities = conversation.activities!
-                       activities.append(activityID)
-                       let updatedActivities = ["activities": activities as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   } else {
-                       let updatedActivities = ["activities": [activityID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   }
-               }
+        if let checklistID = checklistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-            checklist.activity!.conversationID = chatID
-        } else if let checklistID = checklistID {
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.checklists != nil {
-                       var checklists = conversation.checklists!
-                       checklists.append(checklistID)
-                       let updatedChecklists = [checklistsEntity: checklists as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                   } else {
-                       let updatedChecklists = [checklistsEntity: [checklistID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                   }
-               }
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
+                    var checklists = conversation.checklists!
+                    checklists.append(checklistID)
+                    let updatedChecklists = [checklistsEntity: checklists as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                } else {
+                    let updatedChecklists = [checklistsEntity: [checklistID] as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                }
+                if activityID != nil {
+                    if conversation.activities != nil {
+                        var activities = conversation.activities!
+                        activities.append(activityID!)
+                        let updatedActivities = ["activities": activities as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    } else {
+                        let updatedActivities = ["activities": [activityID!] as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    }
+                    Database.database().reference().child("activities").child(activityID!).updateChildValues(updatedConversationID)
+                }
+            }
             Database.database().reference().child(checklistsEntity).child(checklistID).updateChildValues(updatedConversationID)
-            checklist.conversationID = chatID
         }
     }
 }

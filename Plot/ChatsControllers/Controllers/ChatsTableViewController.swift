@@ -365,7 +365,11 @@ class ChatsTableViewController: UITableViewController {
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
+    if filteredPinnedConversations.count == 0 && filteredConversations.count == 0 {
+        checkIfThereAnyActiveChats(isEmpty: true)
+    } else {
+        checkIfThereAnyActiveChats(isEmpty: false)
+    }
     if section == 0 {
       return filteredPinnedConversations.count
     } else {

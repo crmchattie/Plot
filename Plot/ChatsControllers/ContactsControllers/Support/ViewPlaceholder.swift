@@ -47,6 +47,7 @@ enum ViewPlaceholderSubtitle: String {
     case emptyWorkouts = "You can update the search by adjusting filters in the upper right corner"
     case emptyInvitedActivities = "Once you are invited to an activity it will appear here"
     case emptyMap = "Activities will appear here and on the map as pins"
+    case emptyLists = "You can add a list with the plus button in the upper right corner"
 }
 
 class ViewPlaceholder: UIView {

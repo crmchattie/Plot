@@ -65,38 +65,55 @@ extension ActivityViewController {
     }
     
     func createChecklists(forActivities activities: [Activity]) {
-        for activity in activities {
-            if activity.checklist != nil {
-                for checklist in activity.checklist! {
-                    if checklist.name == "nothing" {
-                        activity.checklist = nil
-                        continue
-                    }
-                    if let items = checklist.items, Array(items.keys)[0] == "name" {
-                        activity.checklist = nil
-                        continue
-                    }
-                    if let currentUserID = Auth.auth().currentUser?.uid {
-                        let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
-                        checklist.ID = ID
-                        checklist.name = "\(activity.name ?? "") Checklist"
-                        checklist.activity = activity
-                        checklist.participantsIDs = activity.participantsIDs
-                        
-                        let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
-
-                        do {
-                            let value = try FirebaseEncoder().encode(checklist)
-                            groupChecklistReference.setValue(value)
-                        } catch let error {
-                            print(error)
+        if !appLoaded {
+            appLoaded = true
+            let dispatchGroup = DispatchGroup()
+            var remainingActivities = activities
+            if let activity = remainingActivities.first {
+                remainingActivities.remove(at: 0)
+                if activity.checklist != nil {
+                    for checklist in activity.checklist! {
+                        if checklist.name == "nothing" {
+                            let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder).child("checklist")
+                            activityReference.removeValue()
+                            continue
                         }
-                        
-                        if let participantsIDs = checklist.participantsIDs {
-                            for participantsID in participantsIDs {
-                                let userReference = Database.database().reference().child(userChecklistsEntity).child(participantsID).child(ID)
-                                let values:[String : Any] = ["isGroupChecklist": true]
-                                userReference.updateChildValues(values)
+                        if let items = checklist.items, Array(items.keys)[0] == "name" {
+                            let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder).child("checklist")
+                            activityReference.removeValue()
+                            continue
+                        }
+                        if let currentUserID = Auth.auth().currentUser?.uid {
+                            dispatchGroup.enter()
+                            let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                            checklist.ID = ID
+                            checklist.name = "\(activity.name ?? "") Checklist"
+                            checklist.activityID = activity.activityID
+                            checklist.participantsIDs = activity.participantsIDs
+                            checklist.conversationID = activity.conversationID
+                            
+                            let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
+                            
+                            let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder).child("checklistIDs")
+                            
+                            do {
+                                let value = try FirebaseEncoder().encode(checklist)
+                                groupChecklistReference.setValue(value)
+                                activityReference.setValue(ID)
+                                dispatchGroup.leave()
+                                
+                                if let participantsIDs = checklist.participantsIDs {
+                                    for participantsID in participantsIDs {
+                                        dispatchGroup.enter()
+                                        let userReference = Database.database().reference().child(userChecklistsEntity).child(participantsID).child(ID)
+                                        let values:[String : Any] = ["isGroupChecklist": true]
+                                        userReference.updateChildValues(values)
+                                        dispatchGroup.leave()
+                                    }
+                                }
+                            } catch let error {
+                                print(error)
+                                dispatchGroup.leave()
                             }
                         }
                     }

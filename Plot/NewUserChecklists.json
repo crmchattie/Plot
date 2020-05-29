@@ -1,0 +1,12 @@
+[
+    {
+    "name": "Trip Checklist",
+    "items" : {
+    "Book Airbnbs" : true,
+    "Dinner reservations" : true,
+    "Book flights" : true,
+    "Vatican tour" : false,
+    "Car rental" : true,
+    "Remember passport" : true }
+    }
+]

@@ -55,7 +55,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     let activityView = ActivityView()
     
-//    weak var delegate: ManageAppearanceActivity?
     weak var delegate: HomeBaseActivities?
     
     var searchBar: UISearchBar?
@@ -108,22 +107,24 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         super.viewDidLoad()
         print("activities view did load")
         
-        if !isAppLoaded {
-            managePresense()
-            activitiesFetcher.fetchActivities()
-        }
-
+//        if !isAppLoaded {
+//            managePresense()
+//            activitiesFetcher.fetchActivities()
+//        }
+        
         activitiesFetcher.delegate = self
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
         addObservers()
-                
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        if isAppLoaded {
+        if !isAppLoaded {
+            managePresense()
+            activitiesFetcher.fetchActivities()
             configureTabBarBadge()
         }
     }
@@ -177,11 +178,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.endEditing(true)
         activityView.tableView.reloadData()
     }
-
+    
     override var editButtonItem: UIBarButtonItem {
         let editButton = super.editButtonItem
         editButton.action = #selector(editButtonAction)
-         return editButton
+        return editButton
     }
     
     @objc func editButtonAction(sender: UIBarButtonItem) {
@@ -190,12 +191,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             //activityView.tableView.isEditing = false
             sender.style = .plain
             sender.title = "Edit"
-         } else {
+        } else {
             //activityView.tableView.isEditing = true
             activityView.tableView.setEditing(true, animated: true)
             sender.style = .done
             sender.title = "Done"
-         }
+        }
     }
     
     fileprivate func configureView() {
@@ -240,7 +241,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.backgroundColor = view.backgroundColor
         activityView.tableView.rowHeight = UITableView.automaticDimension
         activityView.tableView.estimatedRowHeight = 105
-  
+        
         // apply theme
         applyCalendarTheme()
     }
@@ -382,7 +383,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
         delegate?.sendActivities(activities: allActivities, invitedActivities: invitedActivities, invitations: invitations)
-
+        
         if !isAppLoaded {
             activityView.tableView.reloadDataWithCompletion() {
                 self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, animated: false)
@@ -401,10 +402,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         
         guard !isAppLoaded else { return }
+        print("delegate.manageAppearanceActivity")
         delegate?.manageAppearanceActivity(self, didFinishLoadingWith: true)
         isAppLoaded = true
         
-//        compileActivityDates(activities: allActivities)
+        //        compileActivityDates(activities: allActivities)
         
     }
     
@@ -448,7 +450,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                     break
                 }
                 index += 1
-
+                
             }
         }
         
@@ -464,9 +466,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             }
         } else if !activityFound {
             let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
-            let indexPath = IndexPath(row: numberOfRows - 1, section: 1)
-            self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
-                
+            if numberOfRows > 0 {
+                let indexPath = IndexPath(row: numberOfRows - 1, section: 1)
+                self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
+            }
         }
     }
     
@@ -492,20 +495,20 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     func scrollViewDidScroll(_ scrollView: UIScrollView)
     {
         if canTransitionToLarge && scrollView.contentOffset.y <= 0 {
-//            UIView.animate(withDuration: 0.5) {
-//                if #available(iOS 11.0, *) {
-//                    self.navigationItem.largeTitleDisplayMode = .never
-//                }
-//            }
+            //            UIView.animate(withDuration: 0.5) {
+            //                if #available(iOS 11.0, *) {
+            //                    self.navigationItem.largeTitleDisplayMode = .never
+            //                }
+            //            }
             canTransitionToLarge = false
             canTransitionToSmall = true
         }
         else if canTransitionToSmall && scrollView.contentOffset.y > 0 {
-//            UIView.animate(withDuration: 0.5) {
-//                if #available(iOS 11.0, *) {
-//                    self.navigationItem.largeTitleDisplayMode = .never
-//                }
-//            }
+            //            UIView.animate(withDuration: 0.5) {
+            //                if #available(iOS 11.0, *) {
+            //                    self.navigationItem.largeTitleDisplayMode = .never
+            //                }
+            //            }
             canTransitionToLarge = true
             canTransitionToSmall = false
         }
@@ -543,16 +546,16 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-//    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
-//        print("date \(date)")
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "yyyy/MM/dd"
-//        let dateString = dateFormatter.string(from: date)
-//        if self.activityDates.contains(dateString) {
-//            return 1
-//        }
-//        return 0
-//    }
+    //    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
+    //        print("date \(date)")
+    //        let dateFormatter = DateFormatter()
+    //        dateFormatter.dateFormat = "yyyy/MM/dd"
+    //        let dateString = dateFormatter.string(from: date)
+    //        if self.activityDates.contains(dateString) {
+    //            return 1
+    //        }
+    //        return 0
+    //    }
     
     // MARK: - Table view data source
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -595,7 +598,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         
         let delete = setupDeleteAction(at: indexPath)
-//        let pin = setupPinAction(at: indexPath)
+        //        let pin = setupPinAction(at: indexPath)
         let mute = setupMuteAction(at: indexPath)
         
         return [delete, mute]
@@ -630,7 +633,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 invitation = value
             }
             cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
-
+            
         } else {
             let activity = filteredActivities[indexPath.row]
             var invitation: Invitation? = nil
@@ -765,7 +768,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                         }
                     }
                 }
-              })
+            })
             { (error) in
                 print(error.localizedDescription)
             }
@@ -866,7 +869,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         self.navigationController?.view.isUserInteractionEnabled = false
     }
-
+    
     func hideActivityIndicator() {
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
@@ -954,7 +957,7 @@ extension ActivityViewController: ActivityUpdatesDelegate {
         if let index = pinnedActivities.firstIndex(where: {$0.activityID == activityID}) {
             pinnedActivities.remove(at: index)
         }
-
+        
         if let index = filteredActivities.firstIndex(where: {$0.activityID == activityID}) {
             filteredActivities.remove(at: index)
             let indexPath = IndexPath(row: index, section: 1)
@@ -971,9 +974,11 @@ extension ActivityViewController: ActivityUpdatesDelegate {
 // For invitations update
 extension ActivityViewController {
     func fetchInvitations() {
+        print("fetchInvitations")
         invitationsFetcher.fetchInvitations { (invitations, activitiesForInvitations) in
             self.invitations = invitations
             self.invitedActivities = activitiesForInvitations
+            print("handleReloadTable")
             self.handleReloadTable()
             self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .mediumHigh)
             self.observeInvitationForCurrentUser()
@@ -1164,34 +1169,78 @@ extension ActivityViewController: MessagesDelegate {
 extension ActivityViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
         if let activityID = activityID {
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activities != nil {
-                       var activities = conversation.activities!
-                       activities.append(activityID)
-                       let updatedActivities = ["activities": activities as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   } else {
-                       let updatedActivities = ["activities": [activityID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   }
-               }
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+                    var activities = conversation.activities!
+                    activities.append(activityID)
+                    let updatedActivities = ["activities": activities as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                } else {
+                    let updatedActivities = ["activities": [activityID] as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                }
+                Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+
+                if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
+                    let activity = activities[index]
+                    if activity.grocerylistID != nil {
+                        if conversation.grocerylists != nil {
+                            var grocerylists = conversation.grocerylists!
+                            grocerylists.append(activity.grocerylistID!)
+                            let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                        } else {
+                            let updatedGrocerylists = [grocerylistsEntity: [activity.grocerylistID!] as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                        }
+                        Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!).updateChildValues(updatedConversationID)
+                    }
+                    if activity.checklistIDs != nil {
+                        if conversation.checklists != nil {
+                            let checklists = conversation.checklists! + activity.checklistIDs!
+                            let updatedChecklists = [checklistsEntity: checklists as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                        } else {
+                            let updatedChecklists = [checklistsEntity: activity.checklistIDs! as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                        }
+                        for ID in activity.checklistIDs! {
+                            Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
+
+                        }
+                    }
+                    if activity.packinglistIDs != nil {
+                        if conversation.packinglists != nil {
+                            let packinglists = conversation.packinglists! + activity.packinglistIDs!
+                            let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
+                        } else {
+                            let updatedPackinglists = [packinglistsEntity: activity.packinglistIDs! as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
+                        }
+                       for ID in activity.packinglistIDs! {
+                            Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
+
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 class UITableViewWithReloadCompletion: UITableView {
-
+    
     var reloadDataCompletionBlock: (() -> Void)?
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
-
+        
         self.reloadDataCompletionBlock?()
         self.reloadDataCompletionBlock = nil
     }
-
+    
     func reloadDataWithCompletion(completion:@escaping () -> Void) {
         reloadDataCompletionBlock = completion
         self.reloadData()

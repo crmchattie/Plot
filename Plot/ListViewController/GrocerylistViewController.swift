@@ -1161,36 +1161,32 @@ extension GrocerylistViewController: ChooseActivityDelegate {
 
 extension GrocerylistViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
-        if let activityID = activityID {
-            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
-                if conversation.activities != nil {
-                       var activities = conversation.activities!
-                       activities.append(activityID)
-                       let updatedActivities = ["activities": activities as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   } else {
-                       let updatedActivities = ["activities": [activityID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                   }
-               }
+        if let grocerylistID = grocerylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-            grocerylist.activity!.conversationID = chatID
-        } else if let grocerylistID = grocerylistID {
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.grocerylists != nil {
-                       var grocerylists = conversation.grocerylists!
-                       grocerylists.append(grocerylistID)
-                       let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                   } else {
-                       let updatedGrocerylists = [grocerylistsEntity: [grocerylistID] as AnyObject]
-                       Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                   }
-               }
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
+                    var grocerylists = conversation.grocerylists!
+                    grocerylists.append(grocerylistID)
+                    let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                } else {
+                    let updatedGrocerylists = [grocerylistsEntity: [grocerylistID] as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                }
+                if activityID != nil {
+                    if conversation.activities != nil {
+                        var activities = conversation.activities!
+                        activities.append(activityID!)
+                        let updatedActivities = ["activities": activities as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    } else {
+                        let updatedActivities = ["activities": [activityID!] as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    }
+                    Database.database().reference().child("activities").child(activityID!).updateChildValues(updatedConversationID)
+                }
+            }
             Database.database().reference().child(grocerylistsEntity).child(grocerylistID).updateChildValues(updatedConversationID)
-            grocerylist.conversationID = chatID
         }
     }
 }

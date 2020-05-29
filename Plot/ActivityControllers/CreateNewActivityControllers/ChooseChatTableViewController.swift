@@ -127,7 +127,7 @@ class ChooseChatTableViewController: UITableViewController {
                 let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
                 let membersIDs = fetchMembersIDs(grocerylist: nil, checklist: checklist, packinglist: nil, activity: nil)
                 createChatwCL(chatID: chatID, membersIDs: membersIDs, checklist: checklist)
-                delegate?.chosenChat(chatID: chatID, activityID: checklist.ID!, grocerylistID: nil, checklistID: nil, packinglistID: nil)
+                delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: checklist.ID, packinglistID: nil)
             } else if let packinglist = packinglist {
                 let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
                 let membersIDs = fetchMembersIDs(grocerylist: nil, checklist: nil, packinglist: packinglist, activity: nil)
@@ -152,7 +152,7 @@ class ChooseChatTableViewController: UITableViewController {
         if let currentUserID = Auth.auth().currentUser?.uid {
             let activities: [String] = [activity.activityID!]
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "activities": activities as AnyObject, "chatName": activity.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject]
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "activities": activities as AnyObject, "chatName": activity.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "grocerylists": activity.grocerylistID as AnyObject, "checklists": activity.checklistIDs as AnyObject, "packinglists": activity.packinglistIDs as AnyObject]
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
@@ -165,9 +165,8 @@ class ChooseChatTableViewController: UITableViewController {
     
     func createChatwGL(chatID: String, membersIDs: ([String], [String:AnyObject]), grocerylist: Grocerylist) {
         if let currentUserID = Auth.auth().currentUser?.uid {
-            let grocerylists: [String] = [grocerylist.ID!]
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "grocerylists": grocerylists as AnyObject, "chatName": grocerylist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject]
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "packinglists": [grocerylist.ID!] as AnyObject, "chatName": grocerylist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "activities": [grocerylist.activityID] as AnyObject]
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
@@ -180,9 +179,8 @@ class ChooseChatTableViewController: UITableViewController {
     
     func createChatwCL(chatID: String, membersIDs: ([String], [String:AnyObject]), checklist: Checklist) {
         if let currentUserID = Auth.auth().currentUser?.uid {
-            let checklists: [String] = [checklist.ID!]
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "checklists": checklists as AnyObject, "chatName": checklist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject]
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "packinglists": [checklist.ID!] as AnyObject, "chatName": checklist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "activities": [checklist.activityID] as AnyObject]
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
@@ -195,9 +193,8 @@ class ChooseChatTableViewController: UITableViewController {
     
     func createChatwPL(chatID: String, membersIDs: ([String], [String:AnyObject]), packinglist: Packinglist) {
         if let currentUserID = Auth.auth().currentUser?.uid {
-            let packinglists: [String] = [packinglist.ID!]
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "packinglists": packinglists as AnyObject, "chatName": packinglist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject]
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "packinglists": [packinglist.ID!] as AnyObject, "chatName": packinglist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "activities": [packinglist.activityID] as AnyObject]
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
@@ -366,17 +363,17 @@ class ChooseChatTableViewController: UITableViewController {
     } else if let chatID = conversation.chatID, let grocerylist = grocerylist, let listName = grocerylist.name?.trimmingCharacters(in: .whitespaces) {
         let text = "The \(listName) list was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: grocerylist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: grocerylist.ID, checklistID: nil, packinglistID: nil)
+        delegate?.chosenChat(chatID: chatID, activityID: grocerylist.activityID, grocerylistID: grocerylist.ID, checklistID: nil, packinglistID: nil)
         dismiss(animated: true, completion: nil)
     } else if let chatID = conversation.chatID, let checklist = checklist, let listName = checklist.name?.trimmingCharacters(in: .whitespaces) {
         let text = "The \(listName) list was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: checklist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: checklist.ID, packinglistID: nil)
+        delegate?.chosenChat(chatID: chatID, activityID: checklist.activityID, grocerylistID: nil, checklistID: checklist.ID, packinglistID: nil)
         dismiss(animated: true, completion: nil)
     } else if let chatID = conversation.chatID, let packinglist = packinglist, let listName = packinglist.name?.trimmingCharacters(in: .whitespaces) {
         let text = "The \(listName) list was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: packinglist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: nil, packinglistID: packinglist.ID)
+        delegate?.chosenChat(chatID: chatID, activityID: packinglist.activityID, grocerylistID: nil, checklistID: nil, packinglistID: packinglist.ID)
         dismiss(animated: true, completion: nil)
     } else if let activityObject = activityObject {
         let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
