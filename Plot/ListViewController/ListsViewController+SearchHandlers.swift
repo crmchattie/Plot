@@ -13,7 +13,6 @@ extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
     func updateSearchResults(for searchController: UISearchController) {}
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        print("searchBarCancelButtonClicked")
         tableView.tableHeaderView = nil
         searchBar.setShowsCancelButton(false, animated: true)
         searchBar.resignFirstResponder()
@@ -22,7 +21,6 @@ extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print("textDidChange")
         filteredlistList = searchText.isEmpty ? listListCopy :
             listListCopy.filter({ (list) -> Bool in
                 return list.name.lowercased().contains(searchText.lowercased())
@@ -32,7 +30,6 @@ extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        print("searchBarShouldBeginEditing")
         searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         searchBar.setShowsCancelButton(true, animated: true)
         return true
@@ -42,7 +39,6 @@ extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
 extension ListsViewController { /* hiding keyboard */
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        print("scrollViewWillBeginDragging")
         self.searchBar?.endEditing(true)
         if let cancelButton : UIButton = searchBar?.value(forKey: "cancelButton") as? UIButton {
             cancelButton.isEnabled = true
@@ -50,7 +46,6 @@ extension ListsViewController { /* hiding keyboard */
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        print("searchBarSearchButtonClicked")
         setNeedsStatusBarAppearanceUpdate()
         self.searchBar?.endEditing(true)
         if let cancelButton : UIButton = searchBar.value(forKey: "cancelButton") as? UIButton {

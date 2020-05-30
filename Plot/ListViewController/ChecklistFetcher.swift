@@ -23,7 +23,6 @@ class ChecklistFetcher: NSObject {
     
     func fetchChecklists(completion: @escaping ([Checklist])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
-            print("currentUser failed")
             completion([])
             return
         }
@@ -73,11 +72,9 @@ class ChecklistFetcher: NSObject {
         guard let _ = Auth.auth().currentUser?.uid else {
             return
         }
-        print("observeChecklistForCurrentUser")
         self.checklistsAdded = checklistsAdded
         self.checklistsRemoved = checklistsRemoved
         currentUserChecklistsAddHandle = userChecklistsDatabaseRef.observe(.childAdded, with: { snapshot in
-            print("observeChecklistForAdded")
             if let completion = self.checklistsAdded {
                 let checklistID = snapshot.key
                 let ref = Database.database().reference()
@@ -90,7 +87,6 @@ class ChecklistFetcher: NSObject {
         })
         
         currentUserChecklistsRemoveHandle = userChecklistsDatabaseRef.observe(.childRemoved, with: { snapshot in
-            print("observeChecklistForRemoved")
             if let completion = self.checklistsRemoved {
                 self.getChecklistsFromSnapshot(snapshot: snapshot, completion: completion)
             }

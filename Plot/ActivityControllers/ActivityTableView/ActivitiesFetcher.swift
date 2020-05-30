@@ -150,7 +150,6 @@ class ActivitiesFetcher: NSObject {
             activity.endDateTime =  metaInfo.endDateTime
             activity.notes =  metaInfo.notes
             activity.checklist =  metaInfo.checklist
-            activity.grocerylist =  metaInfo.grocerylist
             activity.activityID = metaInfo.activityID
             activity.conversationID = metaInfo.conversationID
             activity.checklistIDs = metaInfo.checklistIDs

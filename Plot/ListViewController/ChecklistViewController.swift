@@ -46,14 +46,9 @@ class ChecklistViewController: FormViewController {
         
         setupRightBarButton()
         
-        print("first active \(active)")
         if checklist != nil {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
-            if checklist.ID == nil {
-                let ID = UUID().uuidString
-                checklist.ID = ID
-            }
             if !connectedToAct {
                 var participantCount = self.selectedFalconUsers.count
                 // If user is creating this activity (admin)
@@ -73,20 +68,14 @@ class ChecklistViewController: FormViewController {
                 }
             }
         } else {
-            self.navigationItem.rightBarButtonItem?.isEnabled = false
-            if !connectedToAct, let currentUserID = Auth.auth().currentUser?.uid {
+            if let currentUserID = Auth.auth().currentUser?.uid {
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
                 let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
                 checklist = Checklist(dictionary: ["ID": ID as AnyObject])
-            } else {
-                let ID = UUID().uuidString
-                checklist = Checklist(dictionary: ["ID": ID as AnyObject])
-            }
-            checklist.name = "CheckListName"
-            if checklist.createdDate == nil {
+                checklist.name = "CheckListName"
                 checklist.createdDate = Date()
             }
         }
-        print("second active \(active)")
         
         initializeForm()
         
@@ -150,7 +139,10 @@ class ChecklistViewController: FormViewController {
         movingBackwards = false
         updateLists()
         if !comingFromLists {
-            checklist.lastModifiedDate = Date()
+            self.showActivityIndicator()
+            let createChecklist = ChecklistActions(checklist: checklist, active: active, selectedFalconUsers: selectedFalconUsers)
+            createChecklist.createNewChecklist()
+            self.hideActivityIndicator()
             delegate?.updateChecklist(checklist: checklist)
             self.navigationController?.popViewController(animated: true)
         }
@@ -178,8 +170,13 @@ class ChecklistViewController: FormViewController {
                     basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
                     return
                 }
+                
                             
                 if let currentUserID = Auth.auth().currentUser?.uid {
+                    self.showActivityIndicator()
+                    let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: [])
+                    createChecklist.createNewChecklist()
+                    
                     //duplicate checklist
                     let newChecklistID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
                     let newChecklist = self.checklist.copy() as! Checklist
@@ -188,12 +185,9 @@ class ChecklistViewController: FormViewController {
                     newChecklist.participantsIDs = nil
                     newChecklist.conversationID = nil
                     
-                    self.showActivityIndicator()
-                    let createChecklist = ChecklistActions(checklist: newChecklist, active: false, selectedFalconUsers: [])
-                    createChecklist.createNewChecklist()
+                    let createNewChecklist = ChecklistActions(checklist: newChecklist, active: false, selectedFalconUsers: [])
+                    createNewChecklist.createNewChecklist()
                     self.hideActivityIndicator()
-                    
-                    
                     
                     self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 }
@@ -245,21 +239,13 @@ class ChecklistViewController: FormViewController {
         } else if connectedToAct {
             alert.addAction(UIAlertAction(title: "Update Checklist", style: .default, handler: { (_) in
                 print("User click Approve button")
-                if let activity = self.checklist.activity {
-                    let groupActivityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder)
-                    var firebaseChecklistList = [[String: AnyObject?]]()
-                    if let checklists = activity.checklist {
-                        for checklist in checklists {
-                            let firebaseChecklist = checklist.toAnyObject()
-                            firebaseChecklistList.append(firebaseChecklist)
-                        }
-                    } else {
-                        let firebaseChecklist = self.checklist.toAnyObject()
-                        firebaseChecklistList.append(firebaseChecklist)
-                    }
-                    groupActivityReference.updateChildValues(["checklist": firebaseChecklistList as AnyObject])
+                
+                    self.showActivityIndicator()
+                    let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    createChecklist.createNewChecklist()
+                    self.hideActivityIndicator()
+                    
                     self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
-                }
             }))
             
             alert.addAction(UIAlertAction(title: "Duplicate Checklist", style: .default, handler: { (_) in
@@ -271,6 +257,10 @@ class ChecklistViewController: FormViewController {
                 }
                             
                 if let currentUserID = Auth.auth().currentUser?.uid {
+                    self.showActivityIndicator()
+                    let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    createChecklist.createNewChecklist()
+                    
                     //duplicate checklist
                     let newChecklistID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
                     let newChecklist = self.checklist.copy() as! Checklist
@@ -279,9 +269,8 @@ class ChecklistViewController: FormViewController {
                     newChecklist.participantsIDs = nil
                     newChecklist.conversationID = nil
                     
-                    self.showActivityIndicator()
-                    let createChecklist = ChecklistActions(checklist: newChecklist, active: false, selectedFalconUsers: [])
-                    createChecklist.createNewChecklist()
+                    let createNewChecklist = ChecklistActions(checklist: newChecklist, active: false, selectedFalconUsers: [])
+                    createNewChecklist.createNewChecklist()
                     self.hideActivityIndicator()
                     
                     self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
@@ -298,7 +287,7 @@ class ChecklistViewController: FormViewController {
                 let navController = UINavigationController(rootViewController: destination)
                 destination.delegate = self
                 destination.checklist = self.checklist
-                destination.activity = self.checklist.activity
+                destination.activityID = self.checklist.activityID
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
                 self.present(navController, animated: true, completion: nil)
@@ -350,7 +339,7 @@ class ChecklistViewController: FormViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         if connectedToAct {
-            if checklist.activity?.conversationID == nil {
+            if checklist.conversationID == nil {
                 alert.addAction(UIAlertAction(title: "Connect Checklist/Activity to a Chat", style: .default, handler: { (_) in
                     print("User click Approve button")
                     self.goToChat()
@@ -404,20 +393,10 @@ class ChecklistViewController: FormViewController {
                 self.messagesFetcher?.delegate = self
                 self.messagesFetcher?.loadMessagesData(for: convo)
             }
-        } else if let activity = checklist.activity, let conversationID = activity.conversationID {
-            if let convo = conversations.first(where: {$0.chatID == conversationID}) {
-                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-                self.messagesFetcher = MessagesFetcher()
-                self.messagesFetcher?.delegate = self
-                self.messagesFetcher?.loadMessagesData(for: convo)
-            }
         } else {
             let destination = ChooseChatTableViewController()
             let navController = UINavigationController(rootViewController: destination)
             destination.delegate = self
-            if let activity = checklist.activity {
-                destination.activity = activity
-            }
             destination.checklist = checklist
             destination.conversations = conversations
             destination.pinnedConversations = conversations
@@ -740,36 +719,26 @@ extension ChecklistViewController: UpdateInvitees {
 
 extension ChecklistViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
+        self.showActivityIndicator()
         let groupActivityReference = Database.database().reference().child("activities").child(mergeActivity.activityID!).child(messageMetaDataFirebaseFolder)
-        var firebaseChecklistList = [[String: AnyObject?]]()
+        if mergeActivity.checklistIDs != nil {
+            var checklistIDs = mergeActivity.checklistIDs!
+            checklistIDs.append(checklist.ID!)
+            groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
+        } else {
+            groupActivityReference.updateChildValues(["checklistIDs": [checklist.ID!] as AnyObject])
+        }
+
         //remove participants and admin when adding
         checklist.participantsIDs = nil
         checklist.admin = nil
-        if let checklists = mergeActivity.checklist {
-            let firebaseChecklist = checklist.toAnyObject()
-            firebaseChecklistList.append(firebaseChecklist)
-            for checklist in checklists {
-                let firebaseChecklist = checklist.toAnyObject()
-                firebaseChecklistList.append(firebaseChecklist)
-            }
-        } else {
-            let firebaseChecklist = checklist.toAnyObject()
-            firebaseChecklistList.append(firebaseChecklist)
-        }
-        groupActivityReference.updateChildValues(["checklist": firebaseChecklistList as AnyObject])
+        checklist.activityID = mergeActivity.activityID
         
-        if !connectedToAct {
-            let dispatchGroup = DispatchGroup()
-            dispatchGroup.enter()
-            if let checklist = checklist {
-                showActivityIndicator()
-                let deleteChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: self.selectedFalconUsers)
-               deleteChecklist.deleteChecklist()
-               dispatchGroup.leave()
-                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
-                hideActivityIndicator()
-            }
-        }
+        let createChecklist = ChecklistActions(checklist: checklist, active: active, selectedFalconUsers: selectedFalconUsers)
+        createChecklist.createNewChecklist()
+        self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+        hideActivityIndicator()
+        
     }
 }
 
@@ -777,6 +746,8 @@ extension ChecklistViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
         if let checklistID = checklistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child(checklistsEntity).child(checklistID).updateChildValues(updatedConversationID)
+
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.checklists != nil {
                     var checklists = conversation.checklists!
@@ -787,20 +758,20 @@ extension ChecklistViewController: ChooseChatDelegate {
                     let updatedChecklists = [checklistsEntity: [checklistID] as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
                 }
-                if activityID != nil {
+                if let activityID = activityID {
+                    Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
                     if conversation.activities != nil {
                         var activities = conversation.activities!
-                        activities.append(activityID!)
+                        activities.append(activityID)
                         let updatedActivities = ["activities": activities as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     } else {
-                        let updatedActivities = ["activities": [activityID!] as AnyObject]
+                        let updatedActivities = ["activities": [activityID] as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     }
-                    Database.database().reference().child("activities").child(activityID!).updateChildValues(updatedConversationID)
+                    Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
             }
-            Database.database().reference().child(checklistsEntity).child(checklistID).updateChildValues(updatedConversationID)
         }
     }
 }

@@ -49,6 +49,7 @@ class ChooseActivityTableViewController: UITableViewController {
     var filteredActivities = [Activity]()
     
     var activity: Activity?
+    var activityID: String?
     var grocerylist: Grocerylist?
     var checklist: Checklist?
     var packinglist: Packinglist?
@@ -72,6 +73,11 @@ class ChooseActivityTableViewController: UITableViewController {
     
     if let activity = activity {
         if let index = activities.firstIndex(of: activity) {
+            activities.remove(at: index)
+            filteredActivities.remove(at: index)
+        }
+    } else if let activityID = activityID {
+        if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
             activities.remove(at: index)
             filteredActivities.remove(at: index)
         }

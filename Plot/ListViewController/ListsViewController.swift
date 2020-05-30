@@ -15,35 +15,7 @@ protocol ListViewControllerDataStore: class {
 
 class ListsViewController: UIViewController {
     
-    var activities = [Activity]() {
-        didSet {
-//            for activity in activities {
-//                if let grocerylist = activity.grocerylist {
-//                    grocerylist.activity = activity
-//                    grocerylist.participantsIDs = activity.participantsIDs
-//                    self.grocerylists.append(grocerylist)
-//                }
-//                if activity.packinglist != nil {
-//                    for packinglist in activity.packinglist! {
-//                        if packinglist.name == "nothing" { continue }
-//                        packinglist.activity = activity
-//                        packinglist.participantsIDs = activity.participantsIDs
-//                        self.packinglists.append(packinglist)
-//                    }
-//                }
-//                if activity.checklist != nil {
-//                    for checklist in activity.checklist! {
-//                        if checklist.name == "nothing" { continue }
-//                        if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
-//                        checklist.activity = activity
-//                        checklist.participantsIDs = activity.participantsIDs
-//                        self.checklists.append(checklist)
-//                    }
-//                }
-//            }
-//            sortandreload()
-        }
-    }
+    var activities = [Activity]()
     
     weak var activityViewController: ActivityViewController?
     
@@ -54,7 +26,7 @@ class ListsViewController: UIViewController {
     var listListCopy = [ListContainer]()
     var listList = [ListContainer]()
     var filteredlistList = [ListContainer]()
-    var checklists = [Checklist]()
+    var checklists = [Checklist]() 
     var grocerylists = [Grocerylist]()
     var packinglists = [Packinglist]()
     var users = [User]()
@@ -263,14 +235,12 @@ class ListsViewController: UIViewController {
     }
     
     func sortandreload() {
-        print("sortandreload")
         listList = (checklists.map { ListContainer(grocerylist: nil, checklist: $0, packinglist: nil) } + grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
         listListCopy = listList
         tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
-        print("handleReloadTableAfterSearch")
         filteredlistList.sort { (list1, list2) -> Bool in
             return list1.lastModifiedDate > list2.lastModifiedDate
         }
@@ -628,6 +598,8 @@ extension ListsViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
         if let grocerylistID = grocerylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child(grocerylistsEntity).child(grocerylistID).updateChildValues(updatedConversationID)
+
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.grocerylists != nil {
                     var grocerylists = conversation.grocerylists!
@@ -638,22 +610,24 @@ extension ListsViewController: ChooseChatDelegate {
                     let updatedGrocerylists = [grocerylistsEntity: [grocerylistID] as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
                 }
-                if activityID != nil {
+                if let activityID = activityID {
+                    Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
                     if conversation.activities != nil {
                         var activities = conversation.activities!
-                        activities.append(activityID!)
+                        activities.append(activityID)
                         let updatedActivities = ["activities": activities as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     } else {
-                        let updatedActivities = ["activities": [activityID!] as AnyObject]
+                        let updatedActivities = ["activities": [activityID] as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     }
-                    Database.database().reference().child("activities").child(activityID!).updateChildValues(updatedConversationID)
+                    Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
             }
-            Database.database().reference().child(grocerylistsEntity).child(grocerylistID).updateChildValues(updatedConversationID)
         } else if let checklistID = checklistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child(checklistsEntity).child(checklistID).updateChildValues(updatedConversationID)
+
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.checklists != nil {
                     var checklists = conversation.checklists!
@@ -664,22 +638,24 @@ extension ListsViewController: ChooseChatDelegate {
                     let updatedChecklists = [checklistsEntity: [checklistID] as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
                 }
-                if activityID != nil {
+                if let activityID = activityID {
+                    Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
                     if conversation.activities != nil {
                         var activities = conversation.activities!
-                        activities.append(activityID!)
+                        activities.append(activityID)
                         let updatedActivities = ["activities": activities as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     } else {
-                        let updatedActivities = ["activities": [activityID!] as AnyObject]
+                        let updatedActivities = ["activities": [activityID] as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     }
-                    Database.database().reference().child("activities").child(activityID!).updateChildValues(updatedConversationID)
+                    Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
             }
-            Database.database().reference().child(checklistsEntity).child(checklistID).updateChildValues(updatedConversationID)
         } else if let packinglistID = packinglistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child(packinglistsEntity).child(packinglistID).updateChildValues(updatedConversationID)
+
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.packinglists != nil {
                     var packinglists = conversation.packinglists!
@@ -690,20 +666,20 @@ extension ListsViewController: ChooseChatDelegate {
                     let updatedPackinglists = [packinglistsEntity: [packinglistID] as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
                 }
-                if activityID != nil {
+                if let activityID = activityID {
+                Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
                     if conversation.activities != nil {
                         var activities = conversation.activities!
-                        activities.append(activityID!)
+                        activities.append(activityID)
                         let updatedActivities = ["activities": activities as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     } else {
-                        let updatedActivities = ["activities": [activityID!] as AnyObject]
+                        let updatedActivities = ["activities": [activityID] as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     }
-                    Database.database().reference().child("activities").child(activityID!).updateChildValues(updatedConversationID)
+                    Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
             }
-            Database.database().reference().child(packinglistsEntity).child(packinglistID).updateChildValues(updatedConversationID)
         }
     }
 }

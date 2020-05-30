@@ -65,6 +65,9 @@ class InvitationsFetcher: NSObject {
     }
     
     func observeInvitationForCurrentUser(invitationsAdded: @escaping ([Invitation])->(), invitationsRemoved: @escaping ([Invitation])->()) {
+        guard (Auth.auth().currentUser?.uid) != nil else {
+            return
+        }
         self.invitationsAdded = invitationsAdded
         self.invitationsRemoved = invitationsRemoved
         currentUserInvitationsAddHandle = userInvitationsDatabaseRef.observe(.childAdded, with: { snapshot in

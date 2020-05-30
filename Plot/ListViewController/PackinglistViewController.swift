@@ -73,8 +73,13 @@ class PackinglistViewController: FormViewController {
             }
             
         } else {
-            packinglist = Packinglist(dictionary: ["name" : "PackingListName" as AnyObject])
-            self.navigationItem.rightBarButtonItem?.isEnabled = false
+            if let currentUserID = Auth.auth().currentUser?.uid {
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
+                let ID = Database.database().reference().child(packinglistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                packinglist = Packinglist(dictionary: ["ID": ID as AnyObject])
+                packinglist.name = "PackingListName"
+                packinglist.createdDate = Date()
+            }
         }
         
         initializeForm()
@@ -144,7 +149,7 @@ class PackinglistViewController: FormViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         if connectedToAct {
-            if packinglist.activity?.conversationID == nil {
+            if packinglist.conversationID == nil {
                 alert.addAction(UIAlertAction(title: "Connect Packing List/Activity to a Chat", style: .default, handler: { (_) in
                     print("User click Approve button")
                     self.goToChat()
@@ -191,13 +196,6 @@ class PackinglistViewController: FormViewController {
         
         @objc func goToChat() {
 //            if let conversationID = packinglist.conversationID {
-//                if let convo = conversations.first(where: {$0.chatID == conversationID}) {
-//                    self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-//                    self.messagesFetcher = MessagesFetcher()
-//                    self.messagesFetcher?.delegate = self
-//                    self.messagesFetcher?.loadMessagesData(for: convo)
-//                }
-//            } else if let activity = packinglist.activity, let conversationID = activity.conversationID {
 //                if let convo = conversations.first(where: {$0.chatID == conversationID}) {
 //                    self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
 //                    self.messagesFetcher = MessagesFetcher()

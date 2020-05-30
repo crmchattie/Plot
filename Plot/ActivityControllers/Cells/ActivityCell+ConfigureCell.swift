@@ -161,7 +161,7 @@ extension ActivityCell {
             chatButton.tintColor = .systemBlue
         }
         
-        if activity.grocerylist == nil && activity.checklist == nil && activity.packinglist == nil {
+        if activity.grocerylistID == nil && activity.checklistIDs == nil && activity.packinglistIDs == nil {
             listButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
         } else {
             listButton.tintColor = .systemBlue

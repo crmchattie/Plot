@@ -78,12 +78,8 @@ extension ListsViewController {
     func deleteList(at indexPath: IndexPath) {
         let list = listList[indexPath.row]
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        
         if list.type == "grocerylist" {
             if let index = self.grocerylists.firstIndex(where: {$0 == list.grocerylist}) {
-                if grocerylists[index].activity != nil {
-                    return
-                }
                 tableView.beginUpdates()
                 listList.remove(at: indexPath.row)
                 grocerylists.remove(at: index)
@@ -105,9 +101,6 @@ extension ListsViewController {
             }
         } else if list.type == "checklist" {
             if let index = self.checklists.firstIndex(where: {$0 == list.checklist}) {
-                if checklists[index].activity != nil {
-                    return
-                }
                 tableView.beginUpdates()
                 listList.remove(at: indexPath.row)
                 checklists.remove(at: index)
@@ -130,9 +123,6 @@ extension ListsViewController {
             }
         } else if list.type == "packinglist" {
             if let index = self.packinglists.firstIndex(where: {$0 == list.packinglist}) {
-                if packinglists[index].activity != nil {
-                    return
-                }
                 tableView.beginUpdates()
                 listList.remove(at: indexPath.row)
                 packinglists.remove(at: index)
@@ -165,44 +155,26 @@ extension ListsViewController {
 
     fileprivate func updateMutedDatabaseValue(to state: Bool, currentUserID: String, list: ListContainer) {
         if list.type == "grocerylist" {
-            if let index = self.grocerylists.firstIndex(where: {$0 == list.grocerylist}) {
-                if grocerylists[index].activity != nil {
-                    return
+            let metadataReference = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
+            metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
+                if error != nil {
+                    basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
                 }
-
-                let metadataReference = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
-                metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
-                    if error != nil {
-                        basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
-                    }
-                })
-            }
+            })
         } else if list.type == "checklist" {
-            if let index = self.checklists.firstIndex(where: {$0 == list.checklist}) {
-                if checklists[index].activity != nil {
-                    return
+            let metadataReference = Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
+            metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
+                if error != nil {
+                    basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
                 }
-                
-                let metadataReference = Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
-                metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
-                    if error != nil {
-                        basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
-                    }
-                })
-            }
+            })
         } else if list.type == "packinglist" {
-            if let index = self.packinglists.firstIndex(where: {$0 == list.packinglist}) {
-                if packinglists[index].activity != nil {
-                    return
+            let metadataReference = Database.database().reference().child(userPackinglistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
+            metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
+                if error != nil {
+                    basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
                 }
-
-                let metadataReference = Database.database().reference().child(userPackinglistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
-                metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
-                    if error != nil {
-                        basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
-                    }
-                })
-            }
+            })
         }
     }
 

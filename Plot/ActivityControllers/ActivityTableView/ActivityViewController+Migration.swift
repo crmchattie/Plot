@@ -65,64 +65,90 @@ extension ActivityViewController {
     }
     
     func createChecklists(forActivities activities: [Activity]) {
-        if !appLoaded {
-            appLoaded = true
-            let dispatchGroup = DispatchGroup()
-            var remainingActivities = activities
-            if let activity = remainingActivities.first {
-                remainingActivities.remove(at: 0)
-                if activity.checklist != nil {
-                    for checklist in activity.checklist! {
-                        if checklist.name == "nothing" {
-                            let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder).child("checklist")
-                            activityReference.removeValue()
-                            continue
+        print("createChecklists \(activities.count)")
+        let dispatchGroup = DispatchGroup()
+        var remainingActivities = activities
+        if let activity = remainingActivities.first {
+            remainingActivities.remove(at: 0)
+            if activity.checklist != nil {
+                for checklist in activity.checklist! {
+                    if checklist.name == "nothing" {
+                        continue
+                    }
+                    if let items = checklist.items, Array(items.keys)[0] == "name" {
+                        continue
+                    }
+                    if let currentUserID = Auth.auth().currentUser?.uid {
+                        dispatchGroup.enter()
+                        let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                        checklist.ID = ID
+                        checklist.name = "\(activity.name ?? "") Checklist"
+                        checklist.activityID = activity.activityID
+                        checklist.participantsIDs = activity.participantsIDs
+                        checklist.conversationID = activity.conversationID
+                        
+                        if activity.checklistIDs != nil {
+                            activity.checklistIDs!.append(ID)
+                        } else {
+                            activity.checklistIDs = [ID]
                         }
-                        if let items = checklist.items, Array(items.keys)[0] == "name" {
-                            let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder).child("checklist")
-                            activityReference.removeValue()
-                            continue
-                        }
-                        if let currentUserID = Auth.auth().currentUser?.uid {
-                            dispatchGroup.enter()
-                            let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
-                            checklist.ID = ID
-                            checklist.name = "\(activity.name ?? "") Checklist"
-                            checklist.activityID = activity.activityID
-                            checklist.participantsIDs = activity.participantsIDs
-                            checklist.conversationID = activity.conversationID
-                            
-                            let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
-                            
-                            let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder).child("checklistIDs")
-                            
-                            do {
-                                let value = try FirebaseEncoder().encode(checklist)
-                                groupChecklistReference.setValue(value)
-                                activityReference.setValue(ID)
-                                dispatchGroup.leave()
-                                
-                                if let participantsIDs = checklist.participantsIDs {
-                                    for participantsID in participantsIDs {
-                                        dispatchGroup.enter()
-                                        let userReference = Database.database().reference().child(userChecklistsEntity).child(participantsID).child(ID)
-                                        let values:[String : Any] = ["isGroupChecklist": true]
-                                        userReference.updateChildValues(values)
+                        
+                        let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
+
+                        let activityChecklistIDsReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder).child("checklistIDs")
+
+
+                        do {
+                            let value = try FirebaseEncoder().encode(checklist)
+                            groupChecklistReference.setValue(value)
+                            activityChecklistIDsReference.setValue(activity.checklistIDs as AnyObject)
+                            dispatchGroup.leave()
+
+                            if let chatID = checklist.conversationID {
+                                dispatchGroup.enter()
+                                let chatDataReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child(checklistsEntity)
+                                chatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                                    if snapshot.exists(), let checklistIDSnapshotValue = snapshot.value as? [String], !checklistIDSnapshotValue.contains(ID) {
+                                        var checklistIDs = checklistIDSnapshotValue
+                                        checklistIDs.append(ID)
+                                        chatDataReference.setValue(checklistIDs as AnyObject)
+                                        dispatchGroup.leave()
+                                    } else if !snapshot.exists() {
+                                        chatDataReference.setValue([ID] as AnyObject)
                                         dispatchGroup.leave()
                                     }
-                                }
-                            } catch let error {
-                                print(error)
-                                dispatchGroup.leave()
+                                })
                             }
+
+                            if let participantsIDs = checklist.participantsIDs {
+                                for participantsID in participantsIDs {
+                                    dispatchGroup.enter()
+                                    let userReference = Database.database().reference().child(userChecklistsEntity).child(participantsID).child(ID)
+                                    let values:[String : Any] = ["isGroupChecklist": true]
+                                    userReference.updateChildValues(values)
+                                    dispatchGroup.leave()
+                                }
+                            }
+                        } catch let error {
+                            print(error)
+                            dispatchGroup.leave()
                         }
                     }
                 }
             }
         }
+        
+        dispatchGroup.notify(queue: .main) {
+            if remainingActivities.count == 0 {
+                self.handleReloadTable()
+            } else {
+                self.createChecklists(forActivities: remainingActivities)
+            }
+        }
     }
     
     func checkForDataMigration(forActivities activities: [Activity]) {
+        print("checkForDataMigration")
         let defaults = UserDefaults.standard
         guard let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String else {
             return
@@ -130,22 +156,22 @@ extension ActivityViewController {
         
         let previousVersion = defaults.string(forKey: kAppVersionKey)
         let minVersion = "1.0.1"
-        let maxVersion = "1.0.5"
+        let maxVersion = "1.0.10"
+        //current app version is greater than min version and lesser than max version
         let firstCondition = (previousVersion == nil && currentAppVersion.compare(minVersion, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
+        //current app version is greater than previous version and lesser than max version
         let secondCondition = (previousVersion != nil && currentAppVersion.compare(previousVersion!, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
         if firstCondition || secondCondition {
             // first launch
             print("data migration")
-            createParticiapantsInvitations(forActivities: activities)
-            
+            createChecklists(forActivities: activities)
             defaults.setValue(currentAppVersion, forKey: kAppVersionKey)
         }
         else if currentAppVersion == previousVersion {
-            // samve version
+            // same version
         }
         else {
             // other version
-            
             defaults.setValue(currentAppVersion, forKey: kAppVersionKey)
         }
     }

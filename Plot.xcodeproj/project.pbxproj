@@ -53,6 +53,7 @@
 		1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */; };
 		1051AC9B244F8C5F0066761C /* ListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9A244F8C5F0066761C /* ListsViewController.swift */; };
 		1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */; };
+		105AA1372481B56B009DD09B /* NewUserChecklists.json in Resources */ = {isa = PBXBuildFile; fileRef = 105AA1362481B56B009DD09B /* NewUserChecklists.json */; };
 		105E12532447955500A278D0 /* ActivityDetailCellDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */; };
 		105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66E824149DC600F6EDB6 /* EventDetailCell.swift */; };
 		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
@@ -373,6 +374,7 @@
 		1051AC9A244F8C5F0066761C /* ListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsViewController.swift; sourceTree = "<group>"; };
 		1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSegmentedControl.swift; sourceTree = "<group>"; };
 		1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.release.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.release.xcconfig"; sourceTree = "<group>"; };
+		105AA1362481B56B009DD09B /* NewUserChecklists.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = NewUserChecklists.json; sourceTree = "<group>"; };
 		105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCellDelegates.swift; sourceTree = "<group>"; };
 		105F66E824149DC600F6EDB6 /* EventDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailCell.swift; sourceTree = "<group>"; };
 		105F66EA2415942B00F6EDB6 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
@@ -417,7 +419,6 @@
 		10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistViewController.swift; sourceTree = "<group>"; };
 		10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistFetcher.swift; sourceTree = "<group>"; };
 		10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistActions.swift; sourceTree = "<group>"; };
-		10D5DA7A24818D0A00E8FB2A /* NewUserChecklists.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = NewUserChecklists.json; sourceTree = "<group>"; };
 		10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientDetailViewController.swift; sourceTree = "<group>"; };
 		10DE97342475737500D4A7E8 /* ListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCell.swift; sourceTree = "<group>"; };
 		10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListCell+ConfigureCell.swift"; sourceTree = "<group>"; };
@@ -923,7 +924,7 @@
 				4B4F45421F32246000A6FF96 /* GeneralTabBarController.swift */,
 				4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */,
 				26CDFB21239E278200567666 /* NewUserActivities.json */,
-				10D5DA7A24818D0A00E8FB2A /* NewUserChecklists.json */,
+				105AA1362481B56B009DD09B /* NewUserChecklists.json */,
 				4B4F45371F32230C00A6FF96 /* Assets.xcassets */,
 				4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */,
 				4B4F453C1F32230C00A6FF96 /* Info.plist */,
@@ -1833,6 +1834,7 @@
 				26B915212383B9B0007536E0 /* LaunchScreen.storyboard in Resources */,
 				4BAEE52421272D890045AB10 /* typingIndicator.gif in Resources */,
 				4BAEE5BF212735E50045AB10 /* notification.caf in Resources */,
+				105AA1372481B56B009DD09B /* NewUserChecklists.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2228,7 +2230,7 @@
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.0.8;
+				MARKETING_VERSION = 1.0.9;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
@@ -2256,7 +2258,7 @@
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.0.8;
+				MARKETING_VERSION = 1.0.9;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2405,7 +2407,7 @@
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.8;
+				MARKETING_VERSION = 1.0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -2434,7 +2436,7 @@
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.8;
+				MARKETING_VERSION = 1.0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";

@@ -191,7 +191,6 @@ class GeneralTabBarController: UITabBarController {
     fileprivate func addNewUserItems() {
         if let isNewUser = appDelegate.additionalUserInfo?.isNewUser, isNewUser {
             createNewUserActivities()
-//            addPlotUser()
         }
     }
     
@@ -376,46 +375,6 @@ extension GeneralTabBarController: ManageAppearanceHome {
         
     }
 }
-
-//extension GeneralTabBarController: ManageAppearanceChat {
-//    func manageAppearanceChat(_ chatsController: ChatsTableViewController, didFinishLoadingWith state: Bool) {
-//        guard !isAppLoaded else { return }
-//        isAppLoaded = true
-//        print("manageAppearanceChat")
-//        let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
-//        _ = discoverController.view
-//        _ = settingsController.view
-//        guard state else { return }
-//        if isBiometricalAuthEnabled {
-//            splashContainer.authenticationWithTouchID()
-//        } else {
-//            self.splashContainer.showSecuredData()
-//        }
-//        grabContacts()
-////        appDelegate.registerForPushNotifications(application: UIApplication.shared)
-//
-//    }
-//}
-
-//extension GeneralTabBarController: ManageAppearanceActivity {
-//    func manageAppearanceActivity(_ activityController: ActivityViewController, didFinishLoadingWith state: Bool) {
-//        guard !isAppLoaded else { return }
-//        isAppLoaded = true
-//        print("manageAppearanceActivity")
-//        let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
-//        _ = discoverController.view
-//        _ = settingsController.view
-//        guard state else { return }
-//        if isBiometricalAuthEnabled {
-//            splashContainer.authenticationWithTouchID()
-//        } else {
-//            self.splashContainer.showSecuredData()
-//        }
-//        grabContacts()
-////        appDelegate.registerForPushNotifications(application: UIApplication.shared)
-//        addSampleActivityForNewUser()
-//    }
-//}
 
 extension GeneralTabBarController: ContactsUpdatesDelegate {
     func contacts(updateDatasource contacts: [CNContact]) {

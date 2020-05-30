@@ -37,7 +37,7 @@ class CreateActivityViewController: FormViewController {
     var scheduleList = [Activity]()
     var purchaseList = [Purchase]()
     var purchaseDict = [User: Double]()
-    var listList = [Any]()
+    var listList = [ListContainer]()
     var scheduleIndex: Int = 0
     var purchaseIndex: Int = 0
     var listIndex: Int = 0
@@ -100,26 +100,45 @@ class CreateActivityViewController: FormViewController {
                 }
                 sortSchedule()
             }
-            if activity.purchases != nil {
-                for purchase in activity.purchases! {
-                    if purchase.name == "nothing" { continue }
-                    purchaseList.append(purchase)
+            if activity.checklistIDs != nil {
+                for checklistID in activity.checklistIDs! {
+                    let checklistDataReference = Database.database().reference().child(checklistsEntity).child(checklistID)
+                    checklistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if snapshot.exists(), let checklistSnapshotValue = snapshot.value {
+                            if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                                var list = ListContainer()
+                                list.checklist = checklist
+                                self.listList.append(list)
+                            }
+                        }
+                    })
                 }
             }
-            if let grocerylist = activity.grocerylist {
-                listList.append(grocerylist)
-                grocerylistIndex = listList.count - 1
+            if activity.grocerylistID != nil {
+                let grocerylistDataReference = Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!)
+                grocerylistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let grocerylistSnapshotValue = snapshot.value {
+                        if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
+                            var list = ListContainer()
+                            list.grocerylist = grocerylist
+                            self.listList.append(list)
+                            self.grocerylistIndex = self.listList.count - 1
+                        }
+                    }
+                })
             }
-            if activity.packinglist != nil {
-                for packinglist in activity.packinglist! {
-                    if packinglist.name == "nothing" { continue }
-                    listList.append(packinglist)
-                }
-            }
-            if activity.checklist != nil {
-                for checklist in activity.checklist! {
-                    if checklist.name == "nothing" { continue }
-                    listList.append(checklist)
+            if activity.packinglistIDs != nil {
+                for packinglistID in activity.packinglistIDs! {
+                    let packinglistDataReference = Database.database().reference().child(packinglistsEntity).child(packinglistID)
+                    packinglistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if snapshot.exists(), let packinglistSnapshotValue = snapshot.value {
+                            if let packinglist = try? FirebaseDecoder().decode(Packinglist.self, from: packinglistSnapshotValue) {
+                                var list = ListContainer()
+                                list.packinglist = packinglist
+                                self.listList.append(list)
+                            }
+                        }
+                    })
                 }
             }
             setupRightBarButton(with: "Update")
@@ -817,7 +836,7 @@ class CreateActivityViewController: FormViewController {
                             
     }
                             for list in listList {
-                                if let groceryList = list as? Grocerylist {
+                                if let groceryList = list.grocerylist {
                                     var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                                     mvs.insert(ButtonRow() { row in
                                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -835,7 +854,7 @@ class CreateActivityViewController: FormViewController {
                                             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                             cell.textLabel?.textAlignment = .left
                                         }, at: mvs.count - 1)
-                                } else if let checklist = list as? Checklist {
+                                } else if let checklist = list.checklist {
                                     var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                                     mvs.insert(ButtonRow() { row in
                                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -850,7 +869,7 @@ class CreateActivityViewController: FormViewController {
                                             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                             cell.textLabel?.textAlignment = .left
                                         }, at: mvs.count - 1)
-                                } else if let packinglist = list as? Packinglist {
+                                } else if let packinglist = list.packinglist {
                                     var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                                     mvs.insert(ButtonRow() { row in
                                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -1263,37 +1282,29 @@ class CreateActivityViewController: FormViewController {
         } else {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             if listList.isEmpty {
-                activity.checklist = [Checklist]()
-                activity.grocerylist = nil
-                groupActivityReference.child("checklist").removeValue()
-                groupActivityReference.child("grocerylist").removeValue()
+                activity.checklistIDs = nil
+                activity.grocerylistID = nil
+                groupActivityReference.child("checklistIDs").removeValue()
+                groupActivityReference.child("grocerylistID").removeValue()
             } else {
-                var firebaseChecklistList = [[String: AnyObject?]]()
-                var checklistList = [Checklist]()
-                var firebasePackinglistList = [[String: AnyObject?]]()
-                var packinglistList = [Packinglist]()
-                var firebaseGrocerylistList = [String: AnyObject?]()
-                var grocerylistList: Grocerylist!
+                var checklistIDs = [String]()
+                var packinglistIDs = [String]()
+                var grocerylistID = String()
                 for list in listList {
-                    if let checklist = list as? Checklist {
-                        checklistList.append(checklist)
-                        let firebaseChecklist = checklist.toAnyObject()
-                        firebaseChecklistList.append(firebaseChecklist)
-                    } else if let packinglist = list as? Packinglist {
-                        packinglistList.append(packinglist)
-                        let firebasePackinglist = packinglist.toAnyObject()
-                        firebasePackinglistList.append(firebasePackinglist)
-                    } else if let grocerylist = list as? Grocerylist {
-                        grocerylistList = grocerylist
-                        firebaseGrocerylistList = grocerylist.toAnyObject()
+                    if let checklist = list.checklist {
+                        checklistIDs.append(checklist.ID!)
+                    } else if let packinglist = list.packinglist {
+                        packinglistIDs.append(packinglist.ID!)
+                    } else if let grocerylist = list.grocerylist {
+                        grocerylistID = grocerylist.ID!
                     }
                 }
-                activity.checklist = checklistList
-                groupActivityReference.updateChildValues(["checklist": firebaseChecklistList as AnyObject])
-                activity.packinglist = packinglistList
-                groupActivityReference.updateChildValues(["packinglist": firebasePackinglistList as AnyObject])
-                activity.grocerylist = grocerylistList
-                groupActivityReference.updateChildValues(["grocerylist": firebaseGrocerylistList as AnyObject])
+                activity.checklistIDs = checklistIDs
+                groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
+                activity.packinglistIDs = packinglistIDs
+                groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
+                activity.grocerylistID = grocerylistID
+                groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
             }
         }
     }
@@ -1607,17 +1618,17 @@ class CreateActivityViewController: FormViewController {
             return
         }
         
-        if listIndex == grocerylistIndex, let grocerylist = listList[listIndex] as? Grocerylist {
+        if listIndex == grocerylistIndex, let grocerylist = listList[listIndex].grocerylist {
             let destination = GrocerylistViewController()
             destination.grocerylist = grocerylist
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
-        } else if listList.indices.contains(listIndex), let checklist = listList[listIndex] as? Checklist {
+        } else if listList.indices.contains(listIndex), let checklist = listList[listIndex].checklist {
             let destination = ChecklistViewController()
             destination.checklist = checklist
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
-        } else if listList.indices.contains(listIndex), let packinglist = listList[listIndex] as? Packinglist {
+        } else if listList.indices.contains(listIndex), let packinglist = listList[listIndex].packinglist {
             let destination = PackinglistViewController()
             destination.packinglist = packinglist
             destination.delegate = self
@@ -1654,7 +1665,7 @@ class CreateActivityViewController: FormViewController {
                 }
             }
             
-            if activity.grocerylist == nil {
+            if activity.grocerylistID == nil {
                 alertController.addAction(groceryList)
 //                alertController.addAction(packingList)
                 alertController.addAction(checkList)
@@ -1970,12 +1981,12 @@ class CreateActivityViewController: FormViewController {
     
     fileprivate func updateGrocerylist(recipe: Recipe, add: Bool) {
         print("updating grocery list")
-        if self.activity.grocerylist != nil, self.activity.grocerylist?.ingredients != nil, let recipeIngredients = recipe.extendedIngredients {
-            var glIngredients = self.activity.grocerylist!.ingredients!
-            if let grocerylistServings = activity.grocerylist!.servings!["\(recipe.id)"], grocerylistServings != recipe.servings {
-                activity.grocerylist!.servings!["\(recipe.id)"] = recipe.servings
+        if self.activity.grocerylistID != nil, let grocerylist = listList[grocerylistIndex].grocerylist, grocerylist.ingredients != nil, let recipeIngredients = recipe.extendedIngredients {
+            var glIngredients = grocerylist.ingredients!
+            if let grocerylistServings = grocerylist.servings!["\(recipe.id)"], grocerylistServings != recipe.servings {
+                grocerylist.servings!["\(recipe.id)"] = recipe.servings
                 for recipeIngredient in recipeIngredients {
-                    if let index = self.activity.grocerylist?.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
+                    if let index = grocerylist.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
                         glIngredients[index].recipe![recipe.title] = recipeIngredient.amount ?? 0.0
                             if glIngredients[index].amount != nil && recipeIngredient.amount != nil  {
                                 glIngredients[index].amount! +=  recipeIngredient.amount! - recipeIngredient.amount! * Double(grocerylistServings) / Double(recipe.servings!)
@@ -1988,23 +1999,23 @@ class CreateActivityViewController: FormViewController {
                             }
                     }
                 }
-            } else if activity.grocerylist!.recipes!["\(recipe.id)"] != nil && add {
+            } else if grocerylist.recipes!["\(recipe.id)"] != nil && add {
                 return
             } else {
                 if add {
-                    if self.activity.grocerylist!.recipes != nil {
-                        self.activity.grocerylist!.recipes!["\(recipe.id)"] = recipe.title
-                        self.activity.grocerylist!.servings!["\(recipe.id)"] = recipe.servings
+                    if grocerylist.recipes != nil {
+                        grocerylist.recipes!["\(recipe.id)"] = recipe.title
+                        grocerylist.servings!["\(recipe.id)"] = recipe.servings
                     } else {
-                        self.activity.grocerylist!.recipes = ["\(recipe.id)": recipe.title]
-                        self.activity.grocerylist!.servings = ["\(recipe.id)": recipe.servings!]
+                        grocerylist.recipes = ["\(recipe.id)": recipe.title]
+                        grocerylist.servings = ["\(recipe.id)": recipe.servings!]
                     }
                 } else {
-                    self.activity.grocerylist!.recipes!["\(recipe.id)"] = nil
-                    self.activity.grocerylist!.servings!["\(recipe.id)"] = nil
+                    grocerylist.recipes!["\(recipe.id)"] = nil
+                    grocerylist.servings!["\(recipe.id)"] = nil
                 }
                 for recipeIngredient in recipeIngredients {
-                    if let index = self.activity.grocerylist?.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
+                    if let index = grocerylist.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
                         if add {
                             glIngredients[index].recipe![recipe.title] = recipeIngredient.amount ?? 0.0
                             if glIngredients[index].amount != nil {
@@ -2056,22 +2067,34 @@ class CreateActivityViewController: FormViewController {
             if glIngredients.isEmpty {
                 let mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.remove(at: grocerylistIndex)
-                self.activity.grocerylist = nil
+                listList.remove(at: grocerylistIndex)
+                grocerylistIndex = -1
+                self.activity.grocerylistID = nil
+                
+                let deleteGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: true, selectedFalconUsers: self.selectedFalconUsers)
+                deleteGrocerylist.deleteGrocerylist()
+                
             } else {
-                self.activity.grocerylist?.ingredients = glIngredients
-            }
-            if listList.indices.contains(grocerylistIndex) {
-                listList[grocerylistIndex] = self.activity.grocerylist as Any
+                grocerylist.ingredients = glIngredients
+                
+                let createGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: true, selectedFalconUsers: self.selectedFalconUsers)
+                createGrocerylist.createNewGrocerylist()
+                
+                if listList.indices.contains(grocerylistIndex) {
+                    listList[grocerylistIndex].grocerylist = grocerylist
+                }
             }
             print("updated grocery list")
-        } else if let recipeIngredients = recipe.extendedIngredients, add {
-            let groceryList = Grocerylist(dictionary: ["name" : "Grocery List"] as [String: AnyObject])
+        } else if let recipeIngredients = recipe.extendedIngredients, add, let currentUserID = Auth.auth().currentUser?.uid {
+            let ID = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).childByAutoId().key ?? ""
+            let grocerylist = Grocerylist(dictionary: ["name" : "Grocery List"] as [String: AnyObject])
+            grocerylist.ID = ID
             var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
             mvs.insert(ButtonRow() { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.title = groceryList.name
+                row.title = grocerylist.name
                 self.grocerylistIndex = mvs.count - 1
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
@@ -2082,15 +2105,23 @@ class CreateActivityViewController: FormViewController {
                     cell.textLabel?.textAlignment = .left
                 }, at: mvs.count - 1)
             
-            groceryList.ingredients = recipeIngredients
-            for index in 0...groceryList.ingredients!.count - 1 {
-                groceryList.ingredients![index].recipe = [recipe.title: groceryList.ingredients![index].amount ?? 0.0]
+            grocerylist.ingredients = recipeIngredients
+            for index in 0...grocerylist.ingredients!.count - 1 {
+                grocerylist.ingredients![index].recipe = [recipe.title: grocerylist.ingredients![index].amount ?? 0.0]
             }
-            groceryList.recipes = ["\(recipe.id)": recipe.title]
-            groceryList.servings = ["\(recipe.id)": recipe.servings!]
+            grocerylist.recipes = ["\(recipe.id)": recipe.title]
+            grocerylist.servings = ["\(recipe.id)": recipe.servings!]
             
-            self.activity.grocerylist? = groceryList
-            listList.append(groceryList)
+            let createGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: false, selectedFalconUsers: self.selectedFalconUsers)
+            createGrocerylist.createNewGrocerylist()
+            
+            self.activity.grocerylistID = grocerylist.ID
+            
+            var list = ListContainer()
+            list.grocerylist = grocerylist
+            listList.append(list)
+            
+            grocerylistIndex = listList.count - 1
             self.updateLists(type: "lists")
         }
     }
@@ -2288,9 +2319,11 @@ extension CreateActivityViewController: UpdateChecklistDelegate {
                 listRow.title = checklist.name
                 listRow.updateCell()
                 if listList.indices.contains(listIndex) {
-                    listList[listIndex] = checklist
+                    listList[listIndex].checklist = checklist
                 } else {
-                    listList.append(checklist)
+                    var list = ListContainer()
+                    list.checklist = checklist
+                    listList.append(list)
                 }
                 updateLists(type: "lists")
             }
@@ -2310,9 +2343,11 @@ extension CreateActivityViewController: UpdatePackinglistDelegate {
                 listRow.baseValue = packinglist
                 listRow.updateCell()
                 if listList.indices.contains(listIndex) {
-                    listList[listIndex] = packinglist
+                    listList[listIndex].packinglist = packinglist
                 } else {
-                    listList.append(packinglist)
+                    var list = ListContainer()
+                    list.packinglist = packinglist
+                    listList.append(list)
                 }
                 updateLists(type: "lists")
             } else {
@@ -2331,14 +2366,16 @@ extension CreateActivityViewController: UpdateGrocerylistDelegate {
                 listRow.title = grocerylist.name
                 listRow.updateCell()
                 if listList.indices.contains(grocerylistIndex) {
-                    listList[grocerylistIndex] = grocerylist
+                    listList[grocerylistIndex].grocerylist = grocerylist
                 } else {
-                    listList.append(grocerylist)
+                    var list = ListContainer()
+                    list.grocerylist = grocerylist
+                    listList.append(list)
                 }
                 updateLists(type: "lists")
             } else {
                 mvs.remove(at: grocerylistIndex)
-                activity.grocerylist = nil
+                activity.grocerylistID = nil
             }
         }
     }
@@ -2361,6 +2398,8 @@ extension CreateActivityViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
         if let activityID = activityID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activities != nil {
                     var activities = conversation.activities!
@@ -2412,7 +2451,6 @@ extension CreateActivityViewController: ChooseChatDelegate {
                     }
                 }
             }
-            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
         }
     }
 }

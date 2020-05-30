@@ -384,7 +384,7 @@ class ConversationsFetcher: NSObject {
         }
         
         if let checklistsKey = checklistsKey, snapshot.key == checklistsKey {
-            conversations[index].activities = nil
+            conversations[index].checklists = nil
             delegate?.conversations(update: conversations[index], reloadNeeded: true)
         }
         

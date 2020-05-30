@@ -107,11 +107,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         super.viewDidLoad()
         print("activities view did load")
         
-//        if !isAppLoaded {
-//            managePresense()
-//            activitiesFetcher.fetchActivities()
-//        }
-        
         activitiesFetcher.delegate = self
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
@@ -402,7 +397,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         
         guard !isAppLoaded else { return }
-        print("delegate.manageAppearanceActivity")
         delegate?.manageAppearanceActivity(self, didFinishLoadingWith: true)
         isAppLoaded = true
         
@@ -1170,6 +1164,8 @@ extension ActivityViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
         if let activityID = activityID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activities != nil {
                     var activities = conversation.activities!
@@ -1180,8 +1176,6 @@ extension ActivityViewController: ChooseChatDelegate {
                     let updatedActivities = ["activities": [activityID] as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                 }
-                Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-
                 if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
                     let activity = activities[index]
                     if activity.grocerylistID != nil {

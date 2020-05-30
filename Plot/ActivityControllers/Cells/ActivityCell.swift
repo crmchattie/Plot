@@ -263,8 +263,8 @@ class ActivityCell: UITableViewCell {
             icon.layer.cornerRadius = 15
             icon.layer.masksToBounds = true
             icon.image = UIImage(named: "UserpicIcon")
-//            icon.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: 8).isActive = true
-            icon.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
+            icon.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: 8).isActive = true
+//            icon.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
             icon.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: x).isActive = true
             icon.widthAnchor.constraint(equalToConstant: 30).isActive = true
             icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
