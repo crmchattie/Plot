@@ -318,6 +318,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 cell.horizontalController.collectionView.reloadData()
                 cell.horizontalController.didSelectHandler = { [weak self] recipe, favAct in
                     if let recipe = recipe as? Recipe {
+                        self!.movingBackwards = false
                         print("meal \(recipe.title)")
                         let destination = MealDetailViewController()
                         destination.favAct = favAct
@@ -358,7 +359,7 @@ class MealTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                     self!.favAct = favAct
                 }
                 cell.horizontalController.recipeUpdate = { [weak self] recipe in
-                    self!.movingBackwards = false
+                    self!.movingBackwards = false                    
                     self!.recipeDelegate!.updateRecipe(recipe: recipe)
                     self!.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
                 }

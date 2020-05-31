@@ -25,7 +25,7 @@ struct RecipeSearchResult: Codable {
 
 struct Recipe: Codable {
     let id: Int
-    let title: String
+    var title: String
     var readyInMinutes, servings: Int?
     let image: String
     let imageType: String?

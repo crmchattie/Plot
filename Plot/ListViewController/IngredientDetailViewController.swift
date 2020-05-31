@@ -80,6 +80,9 @@ class IngredientDetailViewController: FormViewController {
             delegate?.updateIngredient(ingredient: ingredient, close: true)
             self.navigationController?.popViewController(animated: true)
         } else {
+            if ingredient.recipe == nil {
+                ingredient.recipe = ["No Recipe": ingredient.amount ?? 0.0]
+            }
             delegate?.updateIngredient(ingredient: ingredient, close: true)
             self.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
         }
@@ -148,6 +151,25 @@ class IngredientDetailViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.textField.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange() { [unowned self] row in
+                print("row value \(row.value ?? 0.0)")
+                print("subtraction value \((row.value ?? 0.0) - (self.ingredient.amount ?? 0.0))")
+                if self.ingredient.recipe == nil {
+                    self.ingredient.recipe = ["No Recipe": self.ingredient.amount ?? 0.0]
+                } else if self.ingredient.recipe!.count == 1, self.ingredient.recipe!["No Recipe"] != nil {
+                    self.ingredient.recipe!["No Recipe"] = row.value
+                } else if (row.value ?? 0.0) - (self.ingredient.amount ?? 0.0) > 0 {
+                    var values: Double = 0.0
+                    for (key, value) in self.ingredient.recipe! {
+                        if key != "No recipe" {
+                            values += value
+                        }
+                    }
+                    if (row.value ?? 0.0) - values > 0 {
+                        self.ingredient.recipe!["No Recipe"] = (row.value ?? 0.0) - values
+                    } else {
+                        self.ingredient.recipe!["No Recipe"] = nil
+                    }
+                }
                 self.ingredient.amount = row.value
             }
         
@@ -211,7 +233,7 @@ class IngredientDetailViewController: FormViewController {
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = recipe.capitalized
-                    $0.value = "\(amount) \(ingredient.measures?.us?.unitShort ?? "")"
+                    $0.value = "\(amount) \(ingredient.unit ?? "")"
                     }.cellUpdate { cell, _ in
                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

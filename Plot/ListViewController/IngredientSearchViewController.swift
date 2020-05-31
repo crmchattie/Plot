@@ -118,8 +118,6 @@ class IngredientSearchViewController: UIViewController {
         reference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let snapshotValue = snapshot.value {
                 self.ingredientDictionary = snapshotValue as! [String: Int]
-                print("ingredientDictionary \(self.ingredientDictionary)")
-
             }
           })
         { (error) in

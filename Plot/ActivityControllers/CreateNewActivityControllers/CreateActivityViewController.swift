@@ -100,47 +100,7 @@ class CreateActivityViewController: FormViewController {
                 }
                 sortSchedule()
             }
-            if activity.checklistIDs != nil {
-                for checklistID in activity.checklistIDs! {
-                    let checklistDataReference = Database.database().reference().child(checklistsEntity).child(checklistID)
-                    checklistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if snapshot.exists(), let checklistSnapshotValue = snapshot.value {
-                            if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
-                                var list = ListContainer()
-                                list.checklist = checklist
-                                self.listList.append(list)
-                            }
-                        }
-                    })
-                }
-            }
-            if activity.grocerylistID != nil {
-                let grocerylistDataReference = Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!)
-                grocerylistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), let grocerylistSnapshotValue = snapshot.value {
-                        if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
-                            var list = ListContainer()
-                            list.grocerylist = grocerylist
-                            self.listList.append(list)
-                            self.grocerylistIndex = self.listList.count - 1
-                        }
-                    }
-                })
-            }
-            if activity.packinglistIDs != nil {
-                for packinglistID in activity.packinglistIDs! {
-                    let packinglistDataReference = Database.database().reference().child(packinglistsEntity).child(packinglistID)
-                    packinglistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if snapshot.exists(), let packinglistSnapshotValue = snapshot.value {
-                            if let packinglist = try? FirebaseDecoder().decode(Packinglist.self, from: packinglistSnapshotValue) {
-                                var list = ListContainer()
-                                list.packinglist = packinglist
-                                self.listList.append(list)
-                            }
-                        }
-                    })
-                }
-            }
+            setupLists()
             setupRightBarButton(with: "Update")
             resetBadgeForSelf()
         } else {
@@ -835,57 +795,6 @@ class CreateActivityViewController: FormViewController {
                             }
                             
     }
-                            for list in listList {
-                                if let groceryList = list.grocerylist {
-                                    var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-                                    mvs.insert(ButtonRow() { row in
-                                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        row.cell.textLabel?.textAlignment = .left
-                                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        row.title = groceryList.name
-                                        self.grocerylistIndex = mvs.count - 1
-                                        print("grocerylistIndex \(self.grocerylistIndex)")
-                                        }.onCellSelection({ cell, row in
-                                            self.listIndex = row.indexPath!.row
-                                            print("listIndex \(self.listIndex)")
-                                            self.openList()
-                                        }).cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            cell.textLabel?.textAlignment = .left
-                                        }, at: mvs.count - 1)
-                                } else if let checklist = list.checklist {
-                                    var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-                                    mvs.insert(ButtonRow() { row in
-                                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        row.cell.textLabel?.textAlignment = .left
-                                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        row.title = checklist.name
-                                        }.onCellSelection({ cell, row in
-                                            self.listIndex = row.indexPath!.row
-                                            self.openList()
-                                        }).cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            cell.textLabel?.textAlignment = .left
-                                        }, at: mvs.count - 1)
-                                } else if let packinglist = list.packinglist {
-                                    var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-                                    mvs.insert(ButtonRow() { row in
-                                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        row.cell.textLabel?.textAlignment = .left
-                                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        row.title = packinglist.name
-                                        }.onCellSelection({ cell, row in
-                                            self.listIndex = row.indexPath!.row
-                                            self.openList()
-                                        }).cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            cell.textLabel?.textAlignment = .left
-                                        }, at: mvs.count - 1)
-                                }
-                            }
 
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
@@ -1158,6 +1067,113 @@ class CreateActivityViewController: FormViewController {
         }
     }
     
+    fileprivate func setupLists() {
+        if activity.checklistIDs != nil {
+            for checklistID in activity.checklistIDs! {
+                dispatchGroup.enter()
+                let checklistDataReference = Database.database().reference().child(checklistsEntity).child(checklistID)
+                checklistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let checklistSnapshotValue = snapshot.value {
+                        if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                            var list = ListContainer()
+                            list.checklist = checklist
+                            self.listList.append(list)
+                        }
+                    }
+                    self.dispatchGroup.leave()
+                })
+            }
+        }
+        if activity.grocerylistID != nil {
+            dispatchGroup.enter()
+            let grocerylistDataReference = Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!)
+            grocerylistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let grocerylistSnapshotValue = snapshot.value {
+                    if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
+                        var list = ListContainer()
+                        list.grocerylist = grocerylist
+                        self.listList.append(list)
+                        self.grocerylistIndex = self.listList.count - 1
+                    }
+                }
+                self.dispatchGroup.leave()
+            })
+        }
+        if activity.packinglistIDs != nil {
+            for packinglistID in activity.packinglistIDs! {
+                dispatchGroup.enter()
+                let packinglistDataReference = Database.database().reference().child(packinglistsEntity).child(packinglistID)
+                packinglistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let packinglistSnapshotValue = snapshot.value {
+                        if let packinglist = try? FirebaseDecoder().decode(Packinglist.self, from: packinglistSnapshotValue) {
+                            var list = ListContainer()
+                            list.packinglist = packinglist
+                            self.listList.append(list)
+                        }
+                    }
+                    self.dispatchGroup.leave()
+                })
+            }
+        }
+         dispatchGroup.notify(queue: .main) {
+            self.listRow()
+        }
+    }
+    
+    fileprivate func listRow() {
+        for list in listList {
+            if let groceryList = list.grocerylist {
+                var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.title = groceryList.name
+                    self.grocerylistIndex = mvs.count - 1
+                    print("grocerylistIndex \(self.grocerylistIndex)")
+                    }.onCellSelection({ cell, row in
+                        self.listIndex = row.indexPath!.row
+                        print("listIndex \(self.listIndex)")
+                        self.openList()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: mvs.count - 1)
+            } else if let checklist = list.checklist {
+                var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.title = checklist.name
+                    }.onCellSelection({ cell, row in
+                        self.listIndex = row.indexPath!.row
+                        self.openList()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: mvs.count - 1)
+            } else if let packinglist = list.packinglist {
+                var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.title = packinglist.name
+                    }.onCellSelection({ cell, row in
+                        self.listIndex = row.indexPath!.row
+                        self.openList()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: mvs.count - 1)
+            }
+        }
+    }
+    
     fileprivate func weatherRow() {
         if let localName = activity.locationName, localName != "locationName", Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval) > Date(), Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval) < Date().addingTimeInterval(1296000) {
             var startDate = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
@@ -1167,11 +1183,7 @@ class CreateActivityViewController: FormViewController {
             let endDate = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
             let startDateString = startDate.toString(dateFormat: "YYYY-MM-dd") + "T24:00:00Z"
             let endDateString = endDate.toString(dateFormat: "YYYY-MM-dd") + "T00:00:00Z"
-            print("updating weather row")
             if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
-                print("weather row exists")
-                print("startDateString \(startDateString)")
-                print("endDateString \(endDateString)")
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
                 Service.shared.fetchWeatherDaily(startDateTime: startDateString, endDateTime: endDateString, lat: latitude, long: longitude, unit: "us") { (search, err) in
@@ -1192,9 +1204,6 @@ class CreateActivityViewController: FormViewController {
                     }
                 }
             } else if let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
-                print("weather row exists")
-                print("startDateString \(startDateString)")
-                print("endDateString \(endDateString)")
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
                 Service.shared.fetchWeatherDaily(startDateTime: startDateString, endDateTime: endDateString, lat: latitude, long: longitude, unit: "us") { (search, err) in
@@ -1283,13 +1292,15 @@ class CreateActivityViewController: FormViewController {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             if listList.isEmpty {
                 activity.checklistIDs = nil
-                activity.grocerylistID = nil
                 groupActivityReference.child("checklistIDs").removeValue()
+                activity.grocerylistID = nil
                 groupActivityReference.child("grocerylistID").removeValue()
+                activity.packinglistIDs = nil
+                groupActivityReference.child("packinglistIDs").removeValue()
             } else {
                 var checklistIDs = [String]()
                 var packinglistIDs = [String]()
-                var grocerylistID = String()
+                var grocerylistID = ""
                 for list in listList {
                     if let checklist = list.checklist {
                         checklistIDs.append(checklist.ID!)
@@ -1299,12 +1310,27 @@ class CreateActivityViewController: FormViewController {
                         grocerylistID = grocerylist.ID!
                     }
                 }
-                activity.checklistIDs = checklistIDs
-                groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
-                activity.packinglistIDs = packinglistIDs
-                groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
-                activity.grocerylistID = grocerylistID
-                groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
+                if !checklistIDs.isEmpty {
+                    activity.checklistIDs = checklistIDs
+                    groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
+                } else {
+                    activity.checklistIDs = nil
+                    groupActivityReference.child("checklistIDs").removeValue()
+                }
+                if grocerylistID != "" {
+                    activity.grocerylistID = grocerylistID
+                    groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
+                } else {
+                    activity.grocerylistID = nil
+                    groupActivityReference.child("grocerylistID").removeValue()
+                }
+                if !packinglistIDs.isEmpty {
+                    activity.packinglistIDs = packinglistIDs
+                    groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
+                } else {
+                    activity.packinglistIDs = nil
+                    groupActivityReference.child("packinglistIDs").removeValue()
+                }
             }
         }
     }
@@ -1991,12 +2017,12 @@ class CreateActivityViewController: FormViewController {
                             if glIngredients[index].amount != nil && recipeIngredient.amount != nil  {
                                 glIngredients[index].amount! +=  recipeIngredient.amount! - recipeIngredient.amount! * Double(grocerylistServings) / Double(recipe.servings!)
                             }
-                            if glIngredients[index].measures?.metric?.amount != nil && recipeIngredient.measures?.metric?.amount! != nil {
-                                glIngredients[index].measures!.metric!.amount! +=  recipeIngredient.measures!.metric!.amount! - recipeIngredient.measures!.metric!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
-                            }
-                            if glIngredients[index].measures?.us?.amount != nil && recipeIngredient.measures?.us?.amount! != nil {
-                                glIngredients[index].measures!.us!.amount! +=  recipeIngredient.measures!.us!.amount! - recipeIngredient.measures!.us!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
-                            }
+//                            if glIngredients[index].measures?.metric?.amount != nil && recipeIngredient.measures?.metric?.amount! != nil {
+//                                glIngredients[index].measures!.metric!.amount! +=  recipeIngredient.measures!.metric!.amount! - recipeIngredient.measures!.metric!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
+//                            }
+//                            if glIngredients[index].measures?.us?.amount != nil && recipeIngredient.measures?.us?.amount! != nil {
+//                                glIngredients[index].measures!.us!.amount! +=  recipeIngredient.measures!.us!.amount! - recipeIngredient.measures!.us!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
+//                            }
                     }
                 }
             } else if grocerylist.recipes!["\(recipe.id)"] != nil && add {
@@ -2021,12 +2047,12 @@ class CreateActivityViewController: FormViewController {
                             if glIngredients[index].amount != nil {
                                 glIngredients[index].amount! += recipeIngredient.amount ?? 0.0
                             }
-                            if glIngredients[index].measures?.metric?.amount != nil {
-                                glIngredients[index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
-                            }
-                            if glIngredients[index].measures?.us?.amount != nil {
-                                glIngredients[index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
-                            }
+//                            if glIngredients[index].measures?.metric?.amount != nil {
+//                                glIngredients[index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
+//                            }
+//                            if glIngredients[index].measures?.us?.amount != nil {
+//                                glIngredients[index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
+//                            }
                         } else {
                             if glIngredients[index].amount != nil {
                                 glIngredients[index].amount! -= recipeIngredient.amount ?? 0.0
@@ -2037,23 +2063,23 @@ class CreateActivityViewController: FormViewController {
                                     glIngredients[index].recipe![recipe.title] = nil
                                 }
                             }
-                            if glIngredients[index].measures?.metric?.amount != nil {
-                                glIngredients[index].measures?.metric?.amount! -= recipeIngredient.measures?.metric?.amount ?? 0.0
-                                if glIngredients[index].measures?.metric?.amount! == 0 {
-                                    glIngredients.remove(at: index)
-                                    continue
-                                } else {
-                                    glIngredients[index].recipe![recipe.title] = nil
-                                }
-                            }
-                            if glIngredients[index].measures?.us?.amount != nil {
-                                glIngredients[index].measures?.us?.amount! -= recipeIngredient.measures?.us?.amount ?? 0.0
-                                if glIngredients[index].measures?.us?.amount! == 0 {
-                                    glIngredients.remove(at: index)
-                                } else {
-                                    glIngredients[index].recipe![recipe.title] = nil
-                                }
-                            }
+//                            if glIngredients[index].measures?.metric?.amount != nil {
+//                                glIngredients[index].measures?.metric?.amount! -= recipeIngredient.measures?.metric?.amount ?? 0.0
+//                                if glIngredients[index].measures?.metric?.amount! == 0 {
+//                                    glIngredients.remove(at: index)
+//                                    continue
+//                                } else {
+//                                    glIngredients[index].recipe![recipe.title] = nil
+//                                }
+//                            }
+//                            if glIngredients[index].measures?.us?.amount != nil {
+//                                glIngredients[index].measures?.us?.amount! -= recipeIngredient.measures?.us?.amount ?? 0.0
+//                                if glIngredients[index].measures?.us?.amount! == 0 {
+//                                    glIngredients.remove(at: index)
+//                                } else {
+//                                    glIngredients[index].recipe![recipe.title] = nil
+//                                }
+//                            }
                         }
                     } else {
                         if add {

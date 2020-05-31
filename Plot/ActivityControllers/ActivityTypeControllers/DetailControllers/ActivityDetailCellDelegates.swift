@@ -23,7 +23,26 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
     func plusButtonTapped() {
         if activeRecipe {
             if let recipe = self.detailedRecipe {
-                self.recipeDelegate?.updateRecipe(recipe: recipe)
+                var updatedRecipe = recipe
+                if updatedRecipe.title.contains("/") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "/", with: "")
+                }
+                if updatedRecipe.title.contains(".") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: ".", with: "")
+                }
+                if updatedRecipe.title.contains("#") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "#", with: "")
+                }
+                if updatedRecipe.title.contains("$") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "$", with: "")
+                }
+                if updatedRecipe.title.contains("[") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "[", with: "")
+                }
+                if updatedRecipe.title.contains("]") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "]", with: "")
+                }
+                self.recipeDelegate?.updateRecipe(recipe: updatedRecipe)
                 self.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
                 return
             }

@@ -240,8 +240,26 @@ extension VerticalController: ActivitySubTypeCellDelegate {
         
         if activeRecipe {
             if let recipe = type as? Recipe {
-//                self.recipeDelegate?.updateRecipe(recipe: recipe)
-                self.recipeUpdate?(recipe)
+                var updatedRecipe = recipe
+                if updatedRecipe.title.contains("/") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "/", with: "")
+                }
+                if updatedRecipe.title.contains(".") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: ".", with: "")
+                }
+                if updatedRecipe.title.contains("#") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "#", with: "")
+                }
+                if updatedRecipe.title.contains("$") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "$", with: "")
+                }
+                if updatedRecipe.title.contains("[") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "[", with: "")
+                }
+                if updatedRecipe.title.contains("]") {
+                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "]", with: "")
+                }
+                self.recipeUpdate?(updatedRecipe)
             }
             return
         }

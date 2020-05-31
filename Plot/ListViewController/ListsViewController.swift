@@ -159,6 +159,7 @@ class ListsViewController: UIViewController {
                     self!.checklists[index] = checklist
                     if let ID = checklist.ID {
                         self!.updateCellForCLID(ID: ID, checklist: checklist)
+                        self!.sortandreload()
                     }
                 } else {
                     self!.checklists.append(checklist)
@@ -182,6 +183,7 @@ class ListsViewController: UIViewController {
                     self!.grocerylists[index] = grocerylist
                     if let ID = grocerylist.ID {
                         self!.updateCellForGLID(ID: ID, grocerylist: grocerylist)
+                        self!.sortandreload()
                     }
                 } else {
                     self!.grocerylists.append(grocerylist)
@@ -330,6 +332,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         let list = listList[indexPath.row]
         if let grocerylist = list.grocerylist {
             let destination = GrocerylistViewController()
+            destination.hidesBottomBarWhenPushed = true
             destination.grocerylist = grocerylist
             destination.comingFromLists = true
             destination.connectedToAct = grocerylist.activityID != nil
@@ -337,16 +340,13 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             destination.filteredUsers = self.filteredUsers
             destination.activities = self.activities
             destination.conversations = self.conversations
-            if grocerylist.activityID == nil {
-                self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil) { (participants) in
-                    destination.selectedFalconUsers = participants
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
-            } else {
+            self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil) { (participants) in
+                destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         } else if let checklist = list.checklist {
             let destination = ChecklistViewController()
+            destination.hidesBottomBarWhenPushed = true
             destination.checklist = checklist
             destination.comingFromLists = true
             destination.connectedToAct = checklist.activityID != nil
@@ -354,16 +354,13 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             destination.filteredUsers = self.filteredUsers
             destination.activities = self.activities
             destination.conversations = self.conversations
-            if checklist.activityID == nil {
-                self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil) { (participants) in
-                    destination.selectedFalconUsers = participants
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
-            } else {
+            self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil) { (participants) in
+                destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         } else if let packinglist = list.packinglist {
             let destination = PackinglistViewController()
+            destination.hidesBottomBarWhenPushed = true
             destination.packinglist = packinglist
             destination.comingFromLists = true
             destination.connectedToAct = packinglist.activityID != nil
@@ -371,12 +368,8 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             destination.filteredUsers = self.filteredUsers
             destination.activities = self.activities
             destination.conversations = self.conversations
-            if packinglist.activityID == nil {
-                self.getParticipants(grocerylist: nil, checklist: nil, packinglist: packinglist) { (participants) in
-                    destination.selectedFalconUsers = participants
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
-            } else {
+            self.getParticipants(grocerylist: nil, checklist: nil, packinglist: packinglist) { (participants) in
+                destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         }
@@ -392,7 +385,7 @@ extension ListsViewController: ListViewControllerDataStore {
             let olderParticipants = self.participants[ID]
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID {
+                if grocerylist.admin == currentUserID && id == currentUserID {
                     continue
                 }
                 
@@ -423,7 +416,7 @@ extension ListsViewController: ListViewControllerDataStore {
             let olderParticipants = self.participants[ID]
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID {
+                if checklist.admin == currentUserID && id == currentUserID {
                     continue
                 }
                 
@@ -454,7 +447,7 @@ extension ListsViewController: ListViewControllerDataStore {
             let olderParticipants = self.participants[ID]
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID {
+                if packinglist.admin == currentUserID && id == currentUserID {
                     continue
                 }
                 

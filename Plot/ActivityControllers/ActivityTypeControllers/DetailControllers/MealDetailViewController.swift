@@ -123,10 +123,10 @@ class MealDetailViewController: ActivityDetailViewController {
         if let recipe = recipe {
             Service.shared.fetchRecipesInfo(id: recipe.id) { (search, err) in
                 self.detailedRecipe = search
-                self.fetchDetails()
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
                     self.screenWidth = self.view.frame.width
+                    self.fetchDetails()
                     self.collectionView.reloadData()
                 }
             }

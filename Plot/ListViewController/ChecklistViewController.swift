@@ -43,29 +43,25 @@ class ChecklistViewController: FormViewController {
     super.viewDidLoad()
         
         configureTableView()
-        
-        setupRightBarButton()
-        
+                
         if checklist != nil {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
-            if !connectedToAct {
-                var participantCount = self.selectedFalconUsers.count
-                // If user is creating this activity (admin)
-                if checklist.admin == nil || checklist.admin == Auth.auth().currentUser?.uid {
-                    participantCount += 1
-                }
-                
-                if participantCount > 1 {
-                    self.userNamesString = "\(participantCount) participants"
-                } else {
-                    self.userNamesString = "1 participant"
-                }
-                
-                if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-                    inviteesRow.title = self.userNamesString
-                    inviteesRow.updateCell()
-                }
+            var participantCount = self.selectedFalconUsers.count
+            // If user is creating this activity (admin)
+            if checklist.admin == nil || checklist.admin == Auth.auth().currentUser?.uid {
+                participantCount += 1
+            }
+            
+            if participantCount > 1 {
+                self.userNamesString = "\(participantCount) participants"
+            } else {
+                self.userNamesString = "1 participant"
+            }
+            
+            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
             }
         } else {
             if let currentUserID = Auth.auth().currentUser?.uid {
@@ -76,7 +72,8 @@ class ChecklistViewController: FormViewController {
                 checklist.createdDate = Date()
             }
         }
-        
+        setupRightBarButton()
+
         initializeForm()
         
     }
@@ -114,7 +111,7 @@ class ChecklistViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if !comingFromLists || !active {
+        if !comingFromLists || !active || self.selectedFalconUsers.count == 0 {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
             navigationItem.rightBarButtonItem = plusBarButton
         } else {
@@ -174,7 +171,7 @@ class ChecklistViewController: FormViewController {
                             
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     self.showActivityIndicator()
-                    let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: [])
+                    let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     createChecklist.createNewChecklist()
                     
                     //duplicate checklist
@@ -184,6 +181,7 @@ class ChecklistViewController: FormViewController {
                     newChecklist.admin = currentUserID
                     newChecklist.participantsIDs = nil
                     newChecklist.conversationID = nil
+                    newChecklist.activityID = nil
                     
                     let createNewChecklist = ChecklistActions(checklist: newChecklist, active: false, selectedFalconUsers: [])
                     createNewChecklist.createNewChecklist()
@@ -676,6 +674,35 @@ class ChecklistViewController: FormViewController {
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
     }
+    
+    func getSelectedFalconUsers(forChecklist checklist: Checklist, completion: @escaping ([User])->()) {
+        guard let participantsIDs = checklist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        var selectedFalconUsers = [User]()
+        let group = DispatchGroup()
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if checklist.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    selectedFalconUsers.append(user)
+                }
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            completion(selectedFalconUsers)
+        }
+    }
 }
 
 extension ChecklistViewController: UpdateInvitees {
@@ -730,15 +757,17 @@ extension ChecklistViewController: ChooseActivityDelegate {
         }
 
         //remove participants and admin when adding
-        checklist.participantsIDs = nil
-        checklist.admin = nil
+        checklist.participantsIDs = mergeActivity.participantsIDs
+        checklist.admin = mergeActivity.admin
         checklist.activityID = mergeActivity.activityID
         
-        let createChecklist = ChecklistActions(checklist: checklist, active: active, selectedFalconUsers: selectedFalconUsers)
-        createChecklist.createNewChecklist()
-        self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
-        hideActivityIndicator()
-        
+        self.getSelectedFalconUsers(forChecklist: checklist) { (participants) in
+            self.showActivityIndicator()
+            let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: participants)
+            createChecklist.createNewChecklist()
+            self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+            self.hideActivityIndicator()
+        }
     }
 }
 

@@ -46,31 +46,33 @@ class GrocerylistViewController: FormViewController {
         super.viewDidLoad()
         
         configureTableView()
-        
-        setupRightBarButton()
-        
+                
         if grocerylist != nil {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
-            if !connectedToAct {
-                connectedToAct = false
-                var participantCount = self.selectedFalconUsers.count
-                
-                // If user is creating this activity (admin)
-                if grocerylist.admin == nil || grocerylist.admin == Auth.auth().currentUser?.uid {
-                    participantCount += 1
-                }
-                
-                if participantCount > 1 {
-                    self.userNamesString = "\(participantCount) participants"
-                } else {
-                    self.userNamesString = "1 participant"
-                }
-                
-                if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-                    inviteesRow.title = self.userNamesString
-                    inviteesRow.updateCell()
-                }
+            print("grocery list \(grocerylist.ID)")
+            print("user count \(self.selectedFalconUsers.count)")
+            for user in selectedFalconUsers {
+                print("users \(user.name)")
+            }
+            print("admin \(grocerylist.admin)")
+            
+            var participantCount = self.selectedFalconUsers.count
+            
+            // If user is creating this activity (admin)
+            if grocerylist.admin == nil || grocerylist.admin == Auth.auth().currentUser?.uid {
+                participantCount += 1
+            }
+            
+            if participantCount > 1 {
+                self.userNamesString = "\(participantCount) participants"
+            } else {
+                self.userNamesString = "1 participant"
+            }
+            
+            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
             }
         } else {
             if let currentUserID = Auth.auth().currentUser?.uid {
@@ -81,7 +83,7 @@ class GrocerylistViewController: FormViewController {
                 grocerylist.name = "GroceryListName"
             }
         }
-        
+        setupRightBarButton()
         initializeForm()
         
     }
@@ -118,7 +120,7 @@ class GrocerylistViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if !comingFromLists || !active {
+        if !comingFromLists || !active || self.selectedFalconUsers.count == 0 {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
             navigationItem.rightBarButtonItem = plusBarButton
         } else {
@@ -183,6 +185,7 @@ class GrocerylistViewController: FormViewController {
                     newGrocerylist.admin = currentUserID
                     newGrocerylist.participantsIDs = nil
                     newGrocerylist.conversationID = nil
+                    newGrocerylist.activityID = nil
                     
                     let createNewGrocerylist = GrocerylistActions(grocerylist: newGrocerylist, active: false, selectedFalconUsers: [])
                     createNewGrocerylist.createNewGrocerylist()
@@ -813,12 +816,12 @@ class GrocerylistViewController: FormViewController {
                         if glIngredients[index].amount != nil && recipeIngredient.amount != nil  {
                             glIngredients[index].amount! +=  recipeIngredient.amount! - recipeIngredient.amount! * Double(grocerylistServings) / Double(recipe.servings!)
                         }
-                        if glIngredients[index].measures?.metric?.amount != nil && recipeIngredient.measures?.metric?.amount! != nil {
-                            glIngredients[index].measures!.metric!.amount! +=  recipeIngredient.measures!.metric!.amount! - recipeIngredient.measures!.metric!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
-                        }
-                        if glIngredients[index].measures?.us?.amount != nil && recipeIngredient.measures?.us?.amount! != nil {
-                            glIngredients[index].measures!.us!.amount! +=  recipeIngredient.measures!.us!.amount! - recipeIngredient.measures!.us!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
-                        }
+//                        if glIngredients[index].measures?.metric?.amount != nil && recipeIngredient.measures?.metric?.amount! != nil {
+//                            glIngredients[index].measures!.metric!.amount! +=  recipeIngredient.measures!.metric!.amount! - recipeIngredient.measures!.metric!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
+//                        }
+//                        if glIngredients[index].measures?.us?.amount != nil && recipeIngredient.measures?.us?.amount! != nil {
+//                            glIngredients[index].measures!.us!.amount! +=  recipeIngredient.measures!.us!.amount! - recipeIngredient.measures!.us!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
+//                        }
                     }
                 }
             } else if let recipes = self.grocerylist.recipes, recipes["\(recipe.id)"] != nil && add {
@@ -845,12 +848,12 @@ class GrocerylistViewController: FormViewController {
                             if glIngredients[index].amount != nil {
                                 glIngredients[index].amount! += recipeIngredient.amount ?? 0.0
                             }
-                            if glIngredients[index].measures?.metric?.amount != nil {
-                                glIngredients[index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
-                            }
-                            if glIngredients[index].measures?.us?.amount != nil {
-                                glIngredients[index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
-                            }
+//                            if glIngredients[index].measures?.metric?.amount != nil {
+//                                glIngredients[index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
+//                            }
+//                            if glIngredients[index].measures?.us?.amount != nil {
+//                                glIngredients[index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
+//                            }
                         } else {
                             if glIngredients[index].amount != nil {
                                 glIngredients[index].amount! -= recipeIngredient.amount ?? 0.0
@@ -862,23 +865,23 @@ class GrocerylistViewController: FormViewController {
                                     glIngredients[index].recipe![recipe.title] = nil
                                 }
                             }
-                            if glIngredients[index].measures?.metric?.amount != nil {
-                                glIngredients[index].measures?.metric?.amount! -= recipeIngredient.measures?.metric?.amount ?? 0.0
-                                if glIngredients[index].measures?.metric?.amount! == 0 {
-                                    glIngredients.remove(at: index)
-                                    continue
-                                } else {
-                                    glIngredients[index].recipe![recipe.title] = nil
-                                }
-                            }
-                            if glIngredients[index].measures?.us?.amount != nil {
-                                glIngredients[index].measures?.us?.amount! -= recipeIngredient.measures?.us?.amount ?? 0.0
-                                if glIngredients[index].measures?.us?.amount! == 0 {
-                                    glIngredients.remove(at: index)
-                                } else {
-                                    glIngredients[index].recipe![recipe.title] = nil
-                                }
-                            }
+//                            if glIngredients[index].measures?.metric?.amount != nil {
+//                                glIngredients[index].measures?.metric?.amount! -= recipeIngredient.measures?.metric?.amount ?? 0.0
+//                                if glIngredients[index].measures?.metric?.amount! == 0 {
+//                                    glIngredients.remove(at: index)
+//                                    continue
+//                                } else {
+//                                    glIngredients[index].recipe![recipe.title] = nil
+//                                }
+//                            }
+//                            if glIngredients[index].measures?.us?.amount != nil {
+//                                glIngredients[index].measures?.us?.amount! -= recipeIngredient.measures?.us?.amount ?? 0.0
+//                                if glIngredients[index].measures?.us?.amount! == 0 {
+//                                    glIngredients.remove(at: index)
+//                                } else {
+//                                    glIngredients[index].recipe![recipe.title] = nil
+//                                }
+//                            }
                         }
                     } else {
                         if add {
@@ -950,6 +953,35 @@ class GrocerylistViewController: FormViewController {
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
     }
+    
+    func getSelectedFalconUsers(forGrocerylist grocerylist: Grocerylist, completion: @escaping ([User])->()) {
+        guard let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        var selectedFalconUsers = [User]()
+        let group = DispatchGroup()
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if grocerylist.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    selectedFalconUsers.append(user)
+                }
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            completion(selectedFalconUsers)
+        }
+    }
 }
 
 extension GrocerylistViewController: UpdateIngredientDelegate {
@@ -978,12 +1010,12 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
                 if items[index].amount != nil {
                     self.grocerylist.ingredients![index].amount! += ingredient.amount ?? 0.0
                 }
-                if items[index].measures?.metric?.amount != nil {
-                    self.grocerylist.ingredients![index].measures?.metric?.amount! += ingredient.measures?.metric?.amount ?? 0.0
-                }
-                if items[index].measures?.us?.amount != nil {
-                    self.grocerylist.ingredients![index].measures?.us?.amount! += ingredient.measures?.us?.amount ?? 0.0
-                }
+//                if items[index].measures?.metric?.amount != nil {
+//                    self.grocerylist.ingredients![index].measures?.metric?.amount! += ingredient.measures?.metric?.amount ?? 0.0
+//                }
+//                if items[index].measures?.us?.amount != nil {
+//                    self.grocerylist.ingredients![index].measures?.us?.amount! += ingredient.measures?.us?.amount ?? 0.0
+//                }
             } else {
                 print("appending ingredient")
                 self.grocerylist.ingredients!.append(ingredient)
@@ -1009,7 +1041,6 @@ extension GrocerylistViewController: UpdateRecipeDelegate {
     func updateRecipe(recipe: Recipe?) {
         if let mvs = self.form.sectionBy(tag: "recipefields") as? MultivaluedSection {
             if let recipe = recipe {
-                print("updating Ingredients via delegate")
                 let recipeRow = mvs.allRows[recipeIndex]
                 recipeRow.title = recipe.title
                 if let _ = recipe.extendedIngredients {
@@ -1018,7 +1049,6 @@ extension GrocerylistViewController: UpdateRecipeDelegate {
                     lookupRecipe(recipeID: recipe.id, add: true)
                 }
             } else {
-                print("remove")
                 mvs.remove(at: recipeIndex)
             }
         }
@@ -1030,13 +1060,11 @@ extension GrocerylistViewController: UpdateInvitees {
         if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
             if !selectedFalconUsers.isEmpty {
                 self.selectedFalconUsers = selectedFalconUsers
-                
                 var participantCount = self.selectedFalconUsers.count
                 // If user is creating this activity (admin)
                 if grocerylist.admin == nil || grocerylist.admin == Auth.auth().currentUser?.uid {
                     participantCount += 1
                 }
-                
                 if participantCount > 1 {
                     self.userNamesString = "\(participantCount) participants"
                 } else {
@@ -1075,6 +1103,7 @@ extension GrocerylistViewController: ChooseActivityDelegate {
                         if let recipes = self.grocerylist.recipes {
                             for recipe in recipes {
                                 if let activityRecipes = activityGrocerylist.recipes {
+                                    // do not double count recipes
                                     if let _ = activityRecipes.firstIndex(where: {$0 == recipe}) {
                                         continue
                                     } else {
@@ -1085,22 +1114,28 @@ extension GrocerylistViewController: ChooseActivityDelegate {
                                             activityGrocerylist.recipes = ["\(recipe.key)": recipe.value]
                                             activityGrocerylist.servings = ["\(recipe.key)": self.grocerylist.servings!["\(recipe.key)"]!]
                                         }
-                                        for recipeIngredient in self.grocerylist.ingredients! {
-                                            if let index = activityGrocerylist.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
-                                                activityGrocerylist.ingredients![index].recipe![recipe.value] = recipeIngredient.amount ?? 0.0
+                                        for ingredient in self.grocerylist.ingredients! {
+                                            // if ingredient does not belong to recipe, move to next
+                                            if ingredient.recipe![recipe.value] == nil {
+                                                continue
+                                            }
+                                            if let index = activityGrocerylist.ingredients!.firstIndex(where: {$0 == ingredient}) {
+                                                // if activity GL ingredient already includes recipe
+                                                if activityGrocerylist.ingredients![index].recipe![recipe.value] != nil {
+                                                    continue
+                                                }
+                                                activityGrocerylist.ingredients![index].recipe![recipe.value] = ingredient.recipe![recipe.value]
                                                 if activityGrocerylist.ingredients![index].amount != nil {
-                                                    activityGrocerylist.ingredients![index].amount! += recipeIngredient.amount ?? 0.0
+                                                    activityGrocerylist.ingredients![index].amount! += ingredient.recipe![recipe.value] ?? 0.0
                                                 }
-                                                if activityGrocerylist.ingredients![index].measures?.metric?.amount != nil {
-                                                    activityGrocerylist.ingredients![index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
-                                                }
-                                                if activityGrocerylist.ingredients![index].measures?.us?.amount != nil {
-                                                    activityGrocerylist.ingredients![index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
-                                                }
+//                                                if activityGrocerylist.ingredients![index].measures?.metric?.amount != nil {
+//                                                    activityGrocerylist.ingredients![index].measures?.metric?.amount! += ingredient.measures?.metric?.amount ?? 0.0
+//                                                }
+//                                                if activityGrocerylist.ingredients![index].measures?.us?.amount != nil {
+//                                                    activityGrocerylist.ingredients![index].measures?.us?.amount! += ingredient.measures?.us?.amount ?? 0.0
+//                                                }
                                             } else {
-                                                var recIngredient = recipeIngredient
-                                                recIngredient.recipe = [recipe.value: recIngredient.amount ?? 0.0]
-                                                activityGrocerylist.ingredients!.append(recIngredient)
+                                                activityGrocerylist.ingredients!.append(ingredient)
                                             }
                                         }
                                     }
@@ -1109,18 +1144,31 @@ extension GrocerylistViewController: ChooseActivityDelegate {
                         }
                         if let ingredients = self.grocerylist.ingredients {
                             for ingredient in ingredients {
-                                if let _ = ingredient.recipe {
+                                if let recipe = ingredient.recipe, recipe["No Recipe"] == nil {
                                     continue
+                                } else if let recipe = ingredient.recipe, recipe.count > 1 {
+                                    if let index = activityGrocerylist.ingredients!.firstIndex(where: {$0 == ingredient}) {
+                                        // if activity GL ingredient already includes recipe
+                                        if activityGrocerylist.ingredients![index].recipe!["No Recipe"] != nil {
+                                            continue
+                                        }
+                                        activityGrocerylist.ingredients![index].recipe!["No Recipe"] = ingredient.recipe!["No Recipe"]
+                                        if activityGrocerylist.ingredients![index].amount != nil {
+                                            activityGrocerylist.ingredients![index].amount! += ingredient.recipe!["No Recipe"] ?? 0.0
+                                        }
+                                    } else {
+                                        activityGrocerylist.ingredients!.append(ingredient)
+                                    }
                                 } else if let index = activityGrocerylist.ingredients!.firstIndex(where: {$0 == ingredient}) {
                                     if activityGrocerylist.ingredients![index].amount != nil {
                                         activityGrocerylist.ingredients![index].amount! += ingredient.amount ?? 0.0
                                     }
-                                    if activityGrocerylist.ingredients![index].measures?.metric?.amount != nil {
-                                        activityGrocerylist.ingredients![index].measures?.metric?.amount! += ingredient.measures?.metric?.amount ?? 0.0
-                                    }
-                                    if activityGrocerylist.ingredients![index].measures?.us?.amount != nil {
-                                        activityGrocerylist.ingredients![index].measures?.us?.amount! += ingredient.measures?.us?.amount ?? 0.0
-                                    }
+//                                    if activityGrocerylist.ingredients![index].measures?.metric?.amount != nil {
+//                                        activityGrocerylist.ingredients![index].measures?.metric?.amount! += ingredient.measures?.metric?.amount ?? 0.0
+//                                    }
+//                                    if activityGrocerylist.ingredients![index].measures?.us?.amount != nil {
+//                                        activityGrocerylist.ingredients![index].measures?.us?.amount! += ingredient.measures?.us?.amount ?? 0.0
+//                                    }
                                 } else {
                                     activityGrocerylist.ingredients!.append(ingredient)
                                 }
@@ -1147,7 +1195,19 @@ extension GrocerylistViewController: ChooseActivityDelegate {
                 }
             }
         } else {
-            groupActivityReference.updateChildValues(["grocerylistID": grocerylist.ID! as AnyObject])
+            groupActivityReference.updateChildValues(["grocerylistID": self.grocerylist.ID! as AnyObject])
+            //remove participants and admin when adding
+            grocerylist.participantsIDs = mergeActivity.participantsIDs
+            grocerylist.admin = mergeActivity.admin
+            grocerylist.activityID = mergeActivity.activityID
+            
+            self.getSelectedFalconUsers(forGrocerylist: grocerylist) { (participants) in
+                self.showActivityIndicator()
+                let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: participants)
+                createGrocerylist.createNewGrocerylist()
+                self.hideActivityIndicator()
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+            }
         }
     }
 }

@@ -39,7 +39,7 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
         
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
-                                                
+                                                        
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -102,7 +102,6 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
             height = estimateFrameForText(width: view.frame.width - 30, text: equipment[indexPath.item].capitalized, font: UIFont.preferredFont(forTextStyle: .body)).height
         } else if let instructions = instructions {
             height = estimateFrameForText(width: view.frame.width - 57, text: instructions[indexPath.item], font: UIFont.preferredFont(forTextStyle: .callout)).height
-            print("height \(height)")
         }
         return CGSize(width: view.frame.width, height: height)
     }

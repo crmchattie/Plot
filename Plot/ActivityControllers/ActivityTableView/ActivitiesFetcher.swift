@@ -261,7 +261,7 @@ class ActivitiesFetcher: NSObject {
                                        workoutKey: "workoutID",
                                        eventKey: "eventID",
                                        checklistIDsKey: "checklistIDs",
-                                       grocerylistIDsKey: "grocerylistIDs",
+                                       grocerylistIDKey: "grocerylistID",
                                        packinglistIDsKey: "packinglistIDs")
         })
     }
@@ -303,7 +303,7 @@ class ActivitiesFetcher: NSObject {
                                        workoutKey: "workoutID",
                                        eventKey: "eventID",
                                        checklistIDsKey: "checklistIDs",
-                                       grocerylistIDsKey: "grocerylistIDs",
+                                       grocerylistIDKey: "grocerylistID",
                                        packinglistIDsKey: "packinglistIDs")
         })
     }
@@ -345,7 +345,7 @@ class ActivitiesFetcher: NSObject {
                                        workoutKey: "workoutID",
                                        eventKey: "eventID",
                                        checklistIDsKey: "checklistIDs",
-                                       grocerylistIDsKey: "grocerylistIDs",
+                                       grocerylistIDKey: "grocerylistID",
                                        packinglistIDsKey: "packinglistIDs")
         })
     }
@@ -377,7 +377,7 @@ class ActivitiesFetcher: NSObject {
                                            workoutKey: String,
                                            eventKey: String,
                                            checklistIDsKey: String,
-                                           grocerylistIDsKey: String,
+                                           grocerylistIDKey: String,
                                            packinglistIDsKey: String) {
         
         guard let index = activities.firstIndex(where: { (activity) -> Bool in
@@ -529,7 +529,7 @@ class ActivitiesFetcher: NSObject {
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
-        if snapshot.key == grocerylistIDsKey {
+        if snapshot.key == grocerylistIDKey {
             activities[index].grocerylistID = snapshot.value as? String
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
@@ -568,7 +568,7 @@ class ActivitiesFetcher: NSObject {
                                            workoutKey: String,
                                            eventKey: String,
                                            checklistIDsKey: String,
-                                           grocerylistIDsKey: String,
+                                           grocerylistIDKey: String,
                                            packinglistIDsKey: String) {
         
         guard let index = activities.firstIndex(where: { (activity) -> Bool in
@@ -675,7 +675,7 @@ class ActivitiesFetcher: NSObject {
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
-        if snapshot.key == grocerylistIDsKey {
+        if snapshot.key == grocerylistIDKey {
             activities[index].grocerylistID = String()
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }

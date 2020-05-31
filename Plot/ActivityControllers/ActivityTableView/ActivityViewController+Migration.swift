@@ -65,12 +65,11 @@ extension ActivityViewController {
     }
     
     func createChecklists(forActivities activities: [Activity]) {
-        print("createChecklists \(activities.count)")
         let dispatchGroup = DispatchGroup()
         var remainingActivities = activities
         if let activity = remainingActivities.first {
             remainingActivities.remove(at: 0)
-            if activity.checklist != nil {
+            if activity.checklistIDs == nil && activity.checklist != nil {
                 for checklist in activity.checklist! {
                     if checklist.name == "nothing" {
                         continue
@@ -83,6 +82,7 @@ extension ActivityViewController {
                         let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
                         checklist.ID = ID
                         checklist.name = "\(activity.name ?? "") Checklist"
+                        checklist.admin = activity.admin
                         checklist.activityID = activity.activityID
                         checklist.participantsIDs = activity.participantsIDs
                         checklist.conversationID = activity.conversationID
@@ -96,7 +96,6 @@ extension ActivityViewController {
                         let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
 
                         let activityChecklistIDsReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder).child("checklistIDs")
-
 
                         do {
                             let value = try FirebaseEncoder().encode(checklist)

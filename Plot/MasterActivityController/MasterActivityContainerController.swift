@@ -366,6 +366,7 @@ extension MasterActivityContainerController {
             destination.comingFromLists = true
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
+            destination.activities = self.activities
             self.navigationController?.pushViewController(destination, animated: true)
         }
         let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
@@ -374,6 +375,7 @@ extension MasterActivityContainerController {
             destination.comingFromLists = true
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
+            destination.activities = self.activities
             self.navigationController?.pushViewController(destination, animated: true)
         }
         let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
@@ -382,6 +384,7 @@ extension MasterActivityContainerController {
             destination.comingFromLists = true
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
+            destination.activities = self.activities
             self.navigationController?.pushViewController(destination, animated: true)
         }
         let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in

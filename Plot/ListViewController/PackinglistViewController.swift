@@ -47,29 +47,25 @@ class PackinglistViewController: FormViewController {
       
         configureTableView()
         
-        setupRightBarButton()
-
         if packinglist != nil {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
-            if !connectedToAct {
-                var participantCount = self.selectedFalconUsers.count
-                
-                // If user is creating this activity (admin)
-                if packinglist.admin == nil || packinglist.admin == Auth.auth().currentUser?.uid {
-                    participantCount += 1
-                }
-                
-                if participantCount > 1 {
-                    self.userNamesString = "\(participantCount) participants"
-                } else {
-                    self.userNamesString = "1 participant"
-                }
-                
-                if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-                    inviteesRow.title = self.userNamesString
-                    inviteesRow.updateCell()
-                }
+            var participantCount = self.selectedFalconUsers.count
+            
+            // If user is creating this activity (admin)
+            if packinglist.admin == nil || packinglist.admin == Auth.auth().currentUser?.uid {
+                participantCount += 1
+            }
+            
+            if participantCount > 1 {
+                self.userNamesString = "\(participantCount) participants"
+            } else {
+                self.userNamesString = "1 participant"
+            }
+            
+            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
             }
             
         } else {
@@ -81,7 +77,8 @@ class PackinglistViewController: FormViewController {
                 packinglist.createdDate = Date()
             }
         }
-        
+        setupRightBarButton()
+
         initializeForm()
       
     }
