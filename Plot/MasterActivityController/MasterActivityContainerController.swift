@@ -94,6 +94,8 @@ class MasterActivityContainerController: UIViewController {
     let customSegmented = CustomSegmentedControl(buttonImages: ["notification-bell","chat","activity", "list", "map"])
     let containerView = UIView()
     
+    let navigationItemActivityIndicator = NavigationItemActivityIndicator()
+    
     weak var delegate: ManageAppearanceHome?
     
     lazy var activitiesVC: ActivityViewController = {
@@ -141,6 +143,7 @@ class MasterActivityContainerController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        managePresense()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -295,6 +298,24 @@ class MasterActivityContainerController: UIViewController {
             let ref = Database.database().reference().child("users").child(uid)
             ref.updateChildValues(["badge": badge])
         }
+    }
+    
+    fileprivate func managePresense() {
+        if currentReachabilityStatus == .notReachable {
+            navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .connecting,
+                                                                  activityPriority: .high,
+                                                                  color: ThemeManager.currentTheme().generalTitleColor)
+        }
+        
+        let connectedReference = Database.database().reference(withPath: ".info/connected")
+        connectedReference.observe(.value, with: { (snapshot) in
+            
+            if self.currentReachabilityStatus != .notReachable {
+                self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
+            } else {
+                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: ThemeManager.currentTheme().generalTitleColor)
+            }
+        })
     }
 }
 

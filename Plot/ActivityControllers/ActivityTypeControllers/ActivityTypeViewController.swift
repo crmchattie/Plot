@@ -48,6 +48,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     var locationManager = CLLocationManager()
     
+    let navigationItemActivityIndicator = NavigationItemActivityIndicator()
+    
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
@@ -87,6 +89,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        managePresense()
         if groups.isEmpty {
             fetchData()
         }
@@ -101,6 +104,24 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             delegate?.updateSchedule(schedule: activity)
         }
         
+    }
+    
+    fileprivate func managePresense() {
+        if currentReachabilityStatus == .notReachable {
+            navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .connecting,
+                                                                  activityPriority: .high,
+                                                                  color: ThemeManager.currentTheme().generalTitleColor)
+        }
+        
+        let connectedReference = Database.database().reference(withPath: ".info/connected")
+        connectedReference.observe(.value, with: { (snapshot) in
+            
+            if self.currentReachabilityStatus != .notReachable {
+                self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
+            } else {
+                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: ThemeManager.currentTheme().generalTitleColor)
+            }
+        })
     }
     
     deinit {
@@ -137,7 +158,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     fileprivate func fetchData() {
         
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         

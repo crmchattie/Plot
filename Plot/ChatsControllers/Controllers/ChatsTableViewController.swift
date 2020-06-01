@@ -85,7 +85,6 @@ class ChatsTableViewController: UITableViewController {
         configureTableView()
         addObservers()
         if !isAppLoaded {
-            managePresense()
             conversationsFetcher.fetchConversations()
         }
     }
@@ -93,10 +92,7 @@ class ChatsTableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        if appLoaded {
-//            configureTabBarBadge()
-        }
-        
+
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -182,24 +178,6 @@ class ChatsTableViewController: UITableViewController {
         tableView.tableHeaderView = searchBar
     }
     
-    fileprivate func managePresense() {
-        if currentReachabilityStatus == .notReachable {
-            navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .connecting,
-                                                                  activityPriority: .high,
-                                                                  color: ThemeManager.currentTheme().generalTitleColor)
-        }
-        
-        let connectedReference = Database.database().reference(withPath: ".info/connected")
-        connectedReference.observe(.value, with: { (snapshot) in
-            
-            if self.currentReachabilityStatus != .notReachable {
-                self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
-            } else {
-                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: ThemeManager.currentTheme().generalTitleColor)
-            }
-        })
-    }
-    
     func checkIfThereAnyActiveChats(isEmpty: Bool) {
         guard isEmpty else {
             viewPlaceholder.remove(from: view, priority: .medium)
@@ -207,50 +185,6 @@ class ChatsTableViewController: UITableViewController {
         }
         viewPlaceholder.add(for: view, title: .emptyChat, subtitle: .emptyChat, priority: .medium, position: .top)
     }
-    
-//    func configureTabBarBadge() {
-//
-//        guard let uid = Auth.auth().currentUser?.uid else { return }
-//
-//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-//        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
-//        var badge = 0
-//
-//        for conversation in filteredConversations {
-//            guard let lastMessage = conversation.lastMessage, let conversationBadge = conversation.badge, lastMessage.fromId != uid  else { continue }
-//            badge += conversationBadge
-//        }
-//
-//        for conversation in filteredPinnedConversations {
-//            guard let lastMessage = conversation.lastMessage, let conversationBadge = conversation.badge, lastMessage.fromId != uid  else { continue }
-//            badge += conversationBadge
-//        }
-//
-//        guard badge > 0 else {
-//            tabItem.badgeValue = nil
-//            setApplicationBadge()
-//            return
-//        }
-//        tabItem.badgeValue = badge.toString()
-//        setApplicationBadge()
-//    }
-//
-//    func setApplicationBadge() {
-//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-//        var badge = 0
-//
-//        for tab in 0...tabItems.count - 1 {
-//            guard let tabItem = tabItems[tab] as? UITabBarItem else { return }
-//            if let tabBadge = tabItem.badgeValue?.toInt() {
-//                badge += tabBadge
-//            }
-//        }
-//        UIApplication.shared.applicationIconBadgeNumber = badge
-//        if let uid = Auth.auth().currentUser?.uid {
-//            let ref = Database.database().reference().child("users").child(uid)
-//            ref.updateChildValues(["badge": badge])
-//        }
-//    }
     
     fileprivate func updateCell(at indexPath: IndexPath) {
         tableView.beginUpdates()

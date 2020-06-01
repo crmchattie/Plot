@@ -27,6 +27,8 @@ class PackinglistViewController: FormViewController {
     var activities = [Activity]()
     var conversations = [Conversation]()
     
+    var activity: Activity!
+    
     var userNames : [String] = []
     var userNamesString: String = ""
 
@@ -71,7 +73,7 @@ class PackinglistViewController: FormViewController {
         } else {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
-                let ID = Database.database().reference().child(packinglistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                let ID = Database.database().reference().child(userPackinglistsEntity).child(currentUserID).childByAutoId().key ?? ""
                 packinglist = Packinglist(dictionary: ["ID": ID as AnyObject])
                 packinglist.name = "PackingListName"
                 packinglist.createdDate = Date()

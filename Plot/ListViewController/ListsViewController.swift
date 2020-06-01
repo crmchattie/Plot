@@ -50,9 +50,7 @@ class ListsViewController: UIViewController {
     var searchController: UISearchController?
     
     let viewPlaceholder = ViewPlaceholder()
-    
-    fileprivate var isAppLoaded = false
-    
+        
     var listIndex: Int = 0
     
     var participants: [String: [User]] = [:]
@@ -60,24 +58,7 @@ class ListsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if !isAppLoaded {
-            appLoaded = true
-            checklistFetcher.fetchChecklists { (checklists) in
-                for checklist in checklists {
-                    if checklist.name == "nothing" { continue }
-                    if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
-                    self.checklists.append(checklist)
-                }
-                self.observeChecklistsForCurrentUser()
-            }
-            grocerylistFetcher.fetchGrocerylists { (grocerylists) in
-                for grocerylist in grocerylists {
-                    if grocerylist.name == "nothing" { continue }
-                    self.grocerylists.append(grocerylist)
-                }
-                self.observeGrocerylistsForCurrentUser()
-            }
-        }
+        fetchLists()
         
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
@@ -87,16 +68,11 @@ class ListsViewController: UIViewController {
         
         addObservers()
         
-        sortandreload()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-//        if appLoaded {
-//            configureTabBarBadge()
-//        }
     }
     
     deinit {
@@ -165,6 +141,26 @@ class ListsViewController: UIViewController {
         searchBar?.becomeFirstResponder()
         searchBar?.showsCancelButton = true
         tableView.tableHeaderView = searchBar
+    }
+    
+    func fetchLists() {
+        checklistFetcher.fetchChecklists { (checklists) in
+            for checklist in checklists {
+                if checklist.name == "nothing" { continue }
+                if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
+                self.checklists.append(checklist)
+            }
+            self.observeChecklistsForCurrentUser()
+        }
+        grocerylistFetcher.fetchGrocerylists { (grocerylists) in
+            for grocerylist in grocerylists {
+                if grocerylist.name == "nothing" { continue }
+                self.grocerylists.append(grocerylist)
+            }
+            self.observeGrocerylistsForCurrentUser()
+        }
+        
+        sortandreload()
     }
     
     func observeChecklistsForCurrentUser() {
@@ -278,6 +274,7 @@ class ListsViewController: UIViewController {
         delegate?.sendLists(lists: listList)
         listListCopy = listList
         tableView.reloadData()
+
     }
     
     func handleReloadTableAfterSearch() {
@@ -288,41 +285,6 @@ class ListsViewController: UIViewController {
         tableView.reloadData()
         
     }
-    
-//    func configureTabBarBadge() {
-//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-//        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
-//        var badge = 0
-//
-//        for list in listList {
-//            badge += list.badge
-//        }
-//
-//        guard badge > 0 else {
-//            tabItem.badgeValue = nil
-//            setApplicationBadge()
-//            return
-//        }
-//        tabItem.badgeValue = badge.toString()
-//        setApplicationBadge()
-//    }
-//
-//    func setApplicationBadge() {
-//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-//        var badge = 0
-//
-//        for tab in 0...tabItems.count - 1 {
-//            guard let tabItem = tabItems[tab] as? UITabBarItem else { return }
-//            if let tabBadge = tabItem.badgeValue?.toInt() {
-//                badge += tabBadge
-//            }
-//        }
-//        UIApplication.shared.applicationIconBadgeNumber = badge
-//        if let uid = Auth.auth().currentUser?.uid {
-//            let ref = Database.database().reference().child("users").child(uid)
-//            ref.updateChildValues(["badge": badge])
-//        }
-//    }
     
 }
 

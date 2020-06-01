@@ -116,12 +116,9 @@ class ChecklistFetcher: NSObject {
             group.enter()
             ref.child(userChecklistsEntity).child(currentUserID).child(checklistID).observeSingleEvent(of: .value, with: { snapshot in
                 if snapshot.exists(), let userChecklistInfo = snapshot.value {
-                    print("snapshot does exist")
                     if let userChecklist = try? FirebaseDecoder().decode(Checklist.self, from: userChecklistInfo) {
-                        print("userChecklist")
                         ref.child(checklistsEntity).child(checklistID).observeSingleEvent(of: .value, with: { checklistSnapshot in
                             if checklistSnapshot.exists(), let checklistSnapshotValue = checklistSnapshot.value {
-                                print("checklist")
                                 if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
                                     checklist.badge = userChecklist.badge
                                     checklist.muted = userChecklist.muted

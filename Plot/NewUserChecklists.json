@@ -3,10 +3,10 @@
     "name": "Trip Checklist",
     "items" : {
     "Book Airbnbs" : true,
-    "Dinner reservations" : true,
-    "Book flights" : true,
+    "Dinner reservations" : false,
+    "Book flights" : false,
     "Vatican tour" : false,
-    "Car rental" : true,
-    "Remember passport" : true }
+    "Car rental" : false,
+    "Remember passport" : false }
     }
 ]

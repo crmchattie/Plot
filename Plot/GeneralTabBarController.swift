@@ -346,7 +346,7 @@ class GeneralTabBarController: UITabBarController {
         
         dispatchGroup.notify(queue: .main) {
             self.homeController.activitiesVC.handleReloadTable()
-            self.homeController.listsVC.sortandreload()
+            self.homeController.listsVC.fetchLists()
         }
     }
     

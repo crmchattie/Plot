@@ -118,9 +118,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
         if !isAppLoaded {
-            managePresense()
             activitiesFetcher.fetchActivities()
-//            configureTabBarBadge()
         }
     }
     
@@ -294,24 +292,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.tableHeaderView = searchBar
     }
     
-    fileprivate func managePresense() {
-        if currentReachabilityStatus == .notReachable {
-            navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .connecting,
-                                                                  activityPriority: .high,
-                                                                  color: ThemeManager.currentTheme().generalTitleColor)
-        }
-        
-        let connectedReference = Database.database().reference(withPath: ".info/connected")
-        connectedReference.observe(.value, with: { (snapshot) in
-            
-            if self.currentReachabilityStatus != .notReachable {
-                self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
-            } else {
-                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: ThemeManager.currentTheme().generalTitleColor)
-            }
-        })
-    }
-    
     func checkIfThereAnyActivities(isEmpty: Bool) {
         guard isEmpty else {
             viewPlaceholder.remove(from: activityView.tableView, priority: .medium)
@@ -319,47 +299,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         viewPlaceholder.add(for: activityView.tableView, title: .emptyActivities, subtitle: .emptyActivities, priority: .medium, position: .top)
     }
-    
-//    func configureTabBarBadge() {
-//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-//        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
-//        var badge = 0
-//
-//        for activity in filteredActivities {
-//            guard let activityBadge = activity.badge else { continue }
-//            badge += activityBadge
-//        }
-//
-//        for activity in filteredPinnedActivities {
-//            guard let activityBadge = activity.badge else { continue }
-//            badge += activityBadge
-//        }
-//
-//        guard badge > 0 else {
-//            tabItem.badgeValue = nil
-//            setApplicationBadge()
-//            return
-//        }
-//        tabItem.badgeValue = badge.toString()
-//        setApplicationBadge()
-//    }
-//
-//    func setApplicationBadge() {
-//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-//        var badge = 0
-//
-//        for tab in 0...tabItems.count - 1 {
-//            guard let tabItem = tabItems[tab] as? UITabBarItem else { return }
-//            if let tabBadge = tabItem.badgeValue?.toInt() {
-//                badge += tabBadge
-//            }
-//        }
-//        UIApplication.shared.applicationIconBadgeNumber = badge
-//        if let uid = Auth.auth().currentUser?.uid {
-//            let ref = Database.database().reference().child("users").child(uid)
-//            ref.updateChildValues(["badge": badge])
-//        }
-//    }
     
     fileprivate func updateCell(at indexPath: IndexPath) {
         activityView.tableView.beginUpdates()

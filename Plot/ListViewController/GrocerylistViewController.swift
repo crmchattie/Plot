@@ -28,6 +28,8 @@ class GrocerylistViewController: FormViewController {
     var activities = [Activity]()
     var conversations = [Conversation]()
     
+    var activity: Activity!
+    
     var userNames : [String] = []
     var userNamesString: String = ""
     
@@ -139,6 +141,9 @@ class GrocerylistViewController: FormViewController {
     @objc fileprivate func close() {
         movingBackwards = false
         if !comingFromLists {
+            if let activity = activity {
+                grocerylist.activityID = activity.activityID
+            }
             grocerylist.lastModifiedDate = Date()
             delegate?.updateGrocerylist(grocerylist: grocerylist)
             self.navigationController?.popViewController(animated: true)
@@ -263,6 +268,7 @@ class GrocerylistViewController: FormViewController {
                     newGrocerylist.admin = currentUserID
                     newGrocerylist.participantsIDs = nil
                     newGrocerylist.conversationID = nil
+                    newGrocerylist.activityID = nil
                     
                     let createNewGrocerylist = GrocerylistActions(grocerylist: newGrocerylist, active: false, selectedFalconUsers: [])
                     createNewGrocerylist.createNewGrocerylist()
@@ -276,6 +282,8 @@ class GrocerylistViewController: FormViewController {
             
             alert.addAction(UIAlertAction(title: "Copy to Another Activity", style: .default, handler: { (_) in
                 print("User click Edit button")
+                let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createGrocerylist.createNewGrocerylist()
                 
                 // ChooseActivityTableViewController
                 let destination = ChooseActivityTableViewController()
@@ -608,6 +616,10 @@ class GrocerylistViewController: FormViewController {
     fileprivate func addIngredients() {
         if let items = self.grocerylist.ingredients, items.count > 0 {
             for index in 0...items.count - 1 {
+                if items[index].amount ?? 0.0 < 0.0 {
+                    self.grocerylist.ingredients?.remove(at: index)
+                    continue
+                }
                 var aisle = items[index].aisle!.capitalized
                 aisle = aisle.replacingOccurrences(of: ";", with: "; ")
                 if form.sectionBy(tag: "\(aisle)") != nil {
@@ -1199,20 +1211,45 @@ extension GrocerylistViewController: ChooseActivityDelegate {
                     dispatchGroup.leave()
                     self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 }
+            } else {
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
             }
         } else {
-            groupActivityReference.updateChildValues(["grocerylistID": self.grocerylist.ID! as AnyObject])
-            //remove participants and admin when adding
-            grocerylist.participantsIDs = mergeActivity.participantsIDs
-            grocerylist.admin = mergeActivity.admin
-            grocerylist.activityID = mergeActivity.activityID
-            
-            self.getSelectedFalconUsers(forGrocerylist: grocerylist) { (participants) in
-                self.showActivityIndicator()
-                let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: participants)
-                createGrocerylist.createNewGrocerylist()
-                self.hideActivityIndicator()
-                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+            if connectedToAct {
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    let newGrocerylistID = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    groupActivityReference.updateChildValues(["grocerylistID": newGrocerylistID as AnyObject])
+                    
+                    let newGrocerylist = self.grocerylist.copy() as! Grocerylist
+                    newGrocerylist.ID = newGrocerylistID
+                    newGrocerylist.admin = mergeActivity.admin
+                    newGrocerylist.participantsIDs = mergeActivity.participantsIDs
+                    newGrocerylist.conversationID = mergeActivity.conversationID
+                    newGrocerylist.activityID = mergeActivity.activityID
+                    
+                    self.getSelectedFalconUsers(forGrocerylist: grocerylist) { (participants) in
+                        self.showActivityIndicator()
+                        let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: participants)
+                        createGrocerylist.createNewGrocerylist()
+                        self.hideActivityIndicator()
+                        self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                    }
+                }
+            } else {
+                groupActivityReference.updateChildValues(["grocerylistID": self.grocerylist.ID! as AnyObject])
+                //remove participants and admin when adding
+                grocerylist.participantsIDs = mergeActivity.participantsIDs
+                grocerylist.admin = mergeActivity.admin
+                grocerylist.activityID = mergeActivity.activityID
+                grocerylist.conversationID = mergeActivity.conversationID
+                
+                self.getSelectedFalconUsers(forGrocerylist: grocerylist) { (participants) in
+                    self.showActivityIndicator()
+                    let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: participants)
+                    createGrocerylist.createNewGrocerylist()
+                    self.hideActivityIndicator()
+                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                }
             }
         }
     }

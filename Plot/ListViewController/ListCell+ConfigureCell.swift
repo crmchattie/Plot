@@ -74,7 +74,6 @@ extension ListCell {
                 
             }
             
-            
             if checklist.activityID == nil {
                 activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
             } else {

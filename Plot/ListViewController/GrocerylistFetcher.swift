@@ -88,14 +88,14 @@ class GrocerylistFetcher: NSObject {
             }
         })
         
-        currentUserGrocerylistsRemoveHandle = userGrocerylistsDatabaseRef.observe(.childRemoved, with: { snapshot in
-            if let completion = self.grocerylistsRemoved {
+        currentUserGrocerylistsChangeHandle = userGrocerylistsDatabaseRef.observe(.childChanged, with: { snapshot in
+            if let completion = self.grocerylistsChanged {
                 self.getGrocerylistsFromSnapshot(snapshot: snapshot, completion: completion)
             }
         })
         
-        currentUserGrocerylistsChangeHandle = userGrocerylistsDatabaseRef.observe(.childChanged, with: { snapshot in
-            if let completion = self.grocerylistsChanged {
+        currentUserGrocerylistsRemoveHandle = userGrocerylistsDatabaseRef.observe(.childRemoved, with: { snapshot in
+            if let completion = self.grocerylistsRemoved {
                 self.getGrocerylistsFromSnapshot(snapshot: snapshot, completion: completion)
             }
         })

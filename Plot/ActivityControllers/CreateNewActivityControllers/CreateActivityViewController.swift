@@ -2012,7 +2012,7 @@ class CreateActivityViewController: FormViewController {
             if let grocerylistServings = grocerylist.servings!["\(recipe.id)"], grocerylistServings != recipe.servings {
                 grocerylist.servings!["\(recipe.id)"] = recipe.servings
                 for recipeIngredient in recipeIngredients {
-                    if let index = grocerylist.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
+                    if let index = glIngredients.firstIndex(where: {$0 == recipeIngredient}) {
                         glIngredients[index].recipe![recipe.title] = recipeIngredient.amount ?? 0.0
                             if glIngredients[index].amount != nil && recipeIngredient.amount != nil  {
                                 glIngredients[index].amount! +=  recipeIngredient.amount! - recipeIngredient.amount! * Double(grocerylistServings) / Double(recipe.servings!)
@@ -2041,7 +2041,7 @@ class CreateActivityViewController: FormViewController {
                     grocerylist.servings!["\(recipe.id)"] = nil
                 }
                 for recipeIngredient in recipeIngredients {
-                    if let index = grocerylist.ingredients!.firstIndex(where: {$0 == recipeIngredient}) {
+                    if let index = glIngredients.firstIndex(where: {$0 == recipeIngredient}) {
                         if add {
                             glIngredients[index].recipe![recipe.title] = recipeIngredient.amount ?? 0.0
                             if glIngredients[index].amount != nil {
@@ -2102,19 +2102,16 @@ class CreateActivityViewController: FormViewController {
                 
             } else {
                 grocerylist.ingredients = glIngredients
-                
                 let createGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: true, selectedFalconUsers: self.selectedFalconUsers)
                 createGrocerylist.createNewGrocerylist()
-                
                 if listList.indices.contains(grocerylistIndex) {
                     listList[grocerylistIndex].grocerylist = grocerylist
                 }
             }
-            print("updated grocery list")
         } else if let recipeIngredients = recipe.extendedIngredients, add, let currentUserID = Auth.auth().currentUser?.uid {
             let ID = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).childByAutoId().key ?? ""
-            let grocerylist = Grocerylist(dictionary: ["name" : "Grocery List"] as [String: AnyObject])
-            grocerylist.ID = ID
+            let grocerylist = Grocerylist(dictionary: ["name" : "\(activity.name ?? "") Grocery List"] as [String: AnyObject])
+            
             var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
             mvs.insert(ButtonRow() { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -2131,6 +2128,9 @@ class CreateActivityViewController: FormViewController {
                     cell.textLabel?.textAlignment = .left
                 }, at: mvs.count - 1)
             
+            grocerylist.ID = ID
+            grocerylist.activityID = activityID
+            
             grocerylist.ingredients = recipeIngredients
             for index in 0...grocerylist.ingredients!.count - 1 {
                 grocerylist.ingredients![index].recipe = [recipe.title: grocerylist.ingredients![index].amount ?? 0.0]
@@ -2140,14 +2140,13 @@ class CreateActivityViewController: FormViewController {
             
             let createGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: false, selectedFalconUsers: self.selectedFalconUsers)
             createGrocerylist.createNewGrocerylist()
-            
-            self.activity.grocerylistID = grocerylist.ID
-            
+                        
             var list = ListContainer()
             list.grocerylist = grocerylist
             listList.append(list)
             
             grocerylistIndex = listList.count - 1
+            
             self.updateLists(type: "lists")
         }
     }

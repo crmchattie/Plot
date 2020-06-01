@@ -76,8 +76,8 @@ extension ListsViewController {
     }
 
     func deleteList(at indexPath: IndexPath) {
-        let list = listList[indexPath.row]
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        let list = listList[indexPath.row]
         if list.type == "grocerylist" {
             if let index = self.grocerylists.firstIndex(where: {$0 == list.grocerylist}) {
                 tableView.beginUpdates()
@@ -107,7 +107,6 @@ extension ListsViewController {
 
                 tableView.deleteRows(at: [indexPath], with: .left)
                 tableView.endUpdates()
-
             Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
             Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).removeValue()
 
@@ -129,7 +128,6 @@ extension ListsViewController {
 
                 tableView.deleteRows(at: [indexPath], with: .left)
                 tableView.endUpdates()
-
             Database.database().reference().child(userPackinglistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
             Database.database().reference().child(userPackinglistsEntity).child(currentUserID).child(list.ID).removeValue()
 
