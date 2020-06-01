@@ -215,7 +215,7 @@ extension ActivityViewController {
             }
         })
         
-        configureTabBarBadge()
+//        configureTabBarBadge()
         if activities.count <= 0 && pinnedActivities.count <= 0 {
             DispatchQueue.main.async {
                 self.checkIfThereAnyActivities(isEmpty: true)
@@ -255,7 +255,7 @@ extension ActivityViewController {
 
         })
         
-        configureTabBarBadge()
+//        configureTabBarBadge()
         if activities.count <= 0 && pinnedActivities.count <= 0 {
             DispatchQueue.main.async {
                 self.checkIfThereAnyActivities(isEmpty: true)

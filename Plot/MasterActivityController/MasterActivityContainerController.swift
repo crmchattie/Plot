@@ -8,6 +8,7 @@
 
 import UIKit
 import Contacts
+import Firebase
 
 protocol ManageAppearanceHome: class {
     func manageAppearanceHome(_ homeController: MasterActivityContainerController, didFinishLoadingWith state: Bool )
@@ -37,6 +38,7 @@ class MasterActivityContainerController: UIViewController {
     }
     var conversations = [Conversation]() {
         didSet {
+            configureTabBarBadge()
             activitiesVC.conversations = conversations
             notificationsVC.conversations = conversations
             mapVC.conversations = conversations
@@ -51,6 +53,7 @@ class MasterActivityContainerController: UIViewController {
     }
     var activities = [Activity]() {
         didSet {
+            configureTabBarBadge()
             notificationsVC.notificationActivities = activities
             notificationsVC.activityViewController = activitiesVC
             mapVC.activities = activities
@@ -76,6 +79,11 @@ class MasterActivityContainerController: UIViewController {
     var invitedActivities = [Activity]() {
         didSet {
             notificationsVC.invitedActivities = invitedActivities
+        }
+    }
+    var listList = [ListContainer]() {
+        didSet {
+            configureTabBarBadge()
         }
     }
     var selectedDate = Date()
@@ -125,6 +133,7 @@ class MasterActivityContainerController: UIViewController {
         setNavBar()
         activitiesVC.delegate = self
         chatsVC.delegate = self
+        listsVC.delegate = self
         changeToIndex(index: index)
         addObservers()
     }
@@ -239,6 +248,52 @@ class MasterActivityContainerController: UIViewController {
             navigationItem.title = titles[index]
             navigationItem.leftBarButtonItem = nil
             navigationItem.rightBarButtonItems = nil
+        }
+    }
+    
+    func configureTabBarBadge() {
+        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
+        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
+        guard !listList.isEmpty, !activities.isEmpty, !conversations.isEmpty, let uid = Auth.auth().currentUser?.uid else { return }
+        var badge = 0
+        
+        for activity in activities {
+            guard let activityBadge = activity.badge else { continue }
+            badge += activityBadge
+        }
+        
+        for conversation in conversations {
+            guard let lastMessage = conversation.lastMessage, let conversationBadge = conversation.badge, lastMessage.fromId != uid  else { continue }
+            badge += conversationBadge
+        }
+
+        for list in listList {
+            badge += list.badge
+        }
+        
+        guard badge > 0 else {
+            tabItem.badgeValue = nil
+            setApplicationBadge()
+            return
+        }
+        tabItem.badgeValue = badge.toString()
+        setApplicationBadge()
+    }
+    
+    func setApplicationBadge() {
+        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
+        var badge = 0
+        
+        for tab in 0...tabItems.count - 1 {
+            guard let tabItem = tabItems[tab] as? UITabBarItem else { return }
+            if let tabBadge = tabItem.badgeValue?.toInt() {
+                badge += tabBadge
+            }
+        }
+        UIApplication.shared.applicationIconBadgeNumber = badge
+        if let uid = Auth.auth().currentUser?.uid {
+            let ref = Database.database().reference().child("users").child(uid)
+            ref.updateChildValues(["badge": badge])
         }
     }
 }
@@ -431,5 +486,11 @@ extension MasterActivityContainerController: HomeBaseActivities {
 extension MasterActivityContainerController: HomeBaseChats {
     func sendChats(conversations: [Conversation]) {
         self.conversations = conversations
+    }
+}
+
+extension MasterActivityContainerController: HomeBaseLists {
+    func sendLists(lists: [ListContainer]) {
+        self.listList = lists
     }
 }

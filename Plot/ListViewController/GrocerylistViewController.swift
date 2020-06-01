@@ -50,13 +50,7 @@ class GrocerylistViewController: FormViewController {
         if grocerylist != nil {
             active = true
             self.navigationItem.rightBarButtonItem?.isEnabled = true
-            print("grocery list \(grocerylist.ID)")
-            print("user count \(self.selectedFalconUsers.count)")
-            for user in selectedFalconUsers {
-                print("users \(user.name)")
-            }
-            print("admin \(grocerylist.admin)")
-            
+                        
             var participantCount = self.selectedFalconUsers.count
             
             // If user is creating this activity (admin)
@@ -74,6 +68,7 @@ class GrocerylistViewController: FormViewController {
                 inviteesRow.title = self.userNamesString
                 inviteesRow.updateCell()
             }
+            resetBadgeForSelf()
         } else {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -981,6 +976,17 @@ class GrocerylistViewController: FormViewController {
         group.notify(queue: .main) {
             completion(selectedFalconUsers)
         }
+    }
+    
+    fileprivate func resetBadgeForSelf() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        let badgeRef = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).child(grocerylist.ID!).child("badge")
+        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+            var value = mutableData.value as? Int
+            value = 0
+            mutableData.value = value!
+            return TransactionResult.success(withValue: mutableData)
+        })
     }
 }
 

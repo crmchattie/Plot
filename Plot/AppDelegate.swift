@@ -472,12 +472,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                         
                                     }
                                     
+                                }
                             }
-                        }
-                    })
+                        })
+                    }
                 }
             }
-        }
         
         // 4
         completionHandler()

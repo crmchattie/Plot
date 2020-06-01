@@ -112,7 +112,6 @@ class UserCell: UITableViewCell {
         badgeLabel.textColor = .white
         badgeLabel.textAlignment = .center
         badgeLabel.layer.masksToBounds = true
-        //    badgeLabel.font = UIFont.systemFont(ofSize: 10)
         badgeLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         badgeLabel.adjustsFontForContentSizeCategory = true
         badgeLabel.minimumScaleFactor = 0.1

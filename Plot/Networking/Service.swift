@@ -288,7 +288,6 @@ class Service {
             do {
                 let objects = try JSONDecoder().decode(T.self, from: data!)
                 // success
-                print("completion")
                 completion(objects, nil)
             } catch {
                 print("error \(error)")

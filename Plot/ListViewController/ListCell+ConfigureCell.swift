@@ -61,15 +61,19 @@ extension ListCell {
             
             let badgeString = checklist.badge?.toString()
             let badgeInt = checklist.badge ?? 0
-            
+                                    
             if badgeInt > 0  {
+
                 badgeLabel.text = badgeString
                 badgeLabel.isHidden = false
                 newMessageIndicator.isHidden = true
+            
             } else {
                 newMessageIndicator.isHidden = true
                 badgeLabel.isHidden = true
+                
             }
+            
             
             if checklist.activityID == nil {
                 activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor

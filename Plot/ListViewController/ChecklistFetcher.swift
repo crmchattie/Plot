@@ -14,10 +14,13 @@ class ChecklistFetcher: NSObject {
         
     fileprivate var userChecklistsDatabaseRef: DatabaseReference!
     fileprivate var currentUserChecklistsAddHandle = DatabaseHandle()
+    fileprivate var currentUserChecklistsChangeHandle = DatabaseHandle()
     fileprivate var currentUserChecklistsRemoveHandle = DatabaseHandle()
+    
     
     var checklistsAdded: (([Checklist])->())?
     var checklistsRemoved: (([Checklist])->())?
+    var checklistsChanged: (([Checklist])->())?
     
     fileprivate var isGroupAlreadyFinished = false
     
@@ -68,12 +71,13 @@ class ChecklistFetcher: NSObject {
         })
     }
     
-    func observeChecklistForCurrentUser(checklistsAdded: @escaping ([Checklist])->(), checklistsRemoved: @escaping ([Checklist])->()) {
+    func observeChecklistForCurrentUser(checklistsAdded: @escaping ([Checklist])->(), checklistsRemoved: @escaping ([Checklist])->(), checklistsChanged: @escaping ([Checklist])->()) {
         guard let _ = Auth.auth().currentUser?.uid else {
             return
         }
         self.checklistsAdded = checklistsAdded
         self.checklistsRemoved = checklistsRemoved
+        self.checklistsChanged = checklistsChanged
         currentUserChecklistsAddHandle = userChecklistsDatabaseRef.observe(.childAdded, with: { snapshot in
             if let completion = self.checklistsAdded {
                 let checklistID = snapshot.key
@@ -83,6 +87,12 @@ class ChecklistFetcher: NSObject {
                     ref.removeObserver(withHandle: handle)
                     self.getChecklistsFromSnapshot(snapshot: snapshot, completion: completion)
                 }
+            }
+        })
+        
+        currentUserChecklistsChangeHandle = userChecklistsDatabaseRef.observe(.childChanged, with: { snapshot in
+            if let completion = self.checklistsChanged {
+                self.getChecklistsFromSnapshot(snapshot: snapshot, completion: completion)
             }
         })
         
@@ -96,19 +106,44 @@ class ChecklistFetcher: NSObject {
     
     func getChecklistsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Checklist])->()) {
         if snapshot.exists() {
+            guard let currentUserID = Auth.auth().currentUser?.uid else {
+                return
+            }
             let checklistID = snapshot.key
             let ref = Database.database().reference()
             var checklists: [Checklist] = []
             let group = DispatchGroup()
             group.enter()
-            ref.child(checklistsEntity).child(checklistID).observeSingleEvent(of: .value, with: { checklistSnapshot in
-                if checklistSnapshot.exists(), let checklistSnapshotValue = checklistSnapshot.value {
-                    if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
-                        checklists.append(checklist)
+            ref.child(userChecklistsEntity).child(currentUserID).child(checklistID).observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.exists(), let userChecklistInfo = snapshot.value {
+                    print("snapshot does exist")
+                    if let userChecklist = try? FirebaseDecoder().decode(Checklist.self, from: userChecklistInfo) {
+                        print("userChecklist")
+                        ref.child(checklistsEntity).child(checklistID).observeSingleEvent(of: .value, with: { checklistSnapshot in
+                            if checklistSnapshot.exists(), let checklistSnapshotValue = checklistSnapshot.value {
+                                print("checklist")
+                                if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                                    checklist.badge = userChecklist.badge
+                                    checklist.muted = userChecklist.muted
+                                    checklist.pinned = userChecklist.pinned
+                                    checklists.append(checklist)
+                                }
+                            }
+                            group.leave()
+                        })
                     }
+                } else {
+                    ref.child(checklistsEntity).child(checklistID).observeSingleEvent(of: .value, with: { checklistSnapshot in
+                        if checklistSnapshot.exists(), let checklistSnapshotValue = checklistSnapshot.value {
+                            if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                                checklists.append(checklist)
+                            }
+                        }
+                        group.leave()
+                    })
                 }
-                group.leave()
             })
+            
             group.notify(queue: .main) {
                 completion(checklists)
             }

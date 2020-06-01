@@ -314,7 +314,6 @@ extension PhotosViewController { // update
         }
         
         photoUpdatingGroup.notify(queue: DispatchQueue.main, execute: {
-            print("completion")
             completion(true)
         })
     }

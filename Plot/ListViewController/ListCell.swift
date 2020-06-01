@@ -107,12 +107,10 @@ class ListCell: UITableViewCell {
         badgeLabel.textColor = .white
         badgeLabel.textAlignment = .center
         badgeLabel.layer.masksToBounds = true
-        //    badgeLabel.font = UIFont.systemFont(ofSize: 10)
         badgeLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         badgeLabel.adjustsFontForContentSizeCategory = true
         badgeLabel.minimumScaleFactor = 0.1
         badgeLabel.adjustsFontSizeToFitWidth = true
-        
         return badgeLabel
     }()
     
@@ -189,7 +187,7 @@ class ListCell: UITableViewCell {
         badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         badgeLabel.centerYAnchor.constraint(equalTo: activityButton.centerYAnchor).isActive = true
         badgeLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
-        
+                
         listButton.topAnchor.constraint(equalTo: listImageView.topAnchor, constant: 2).isActive = true
         listButton.rightAnchor.constraint(equalTo: listImageView.rightAnchor, constant: -2).isActive = true
         listButton.widthAnchor.constraint(equalToConstant: 36).isActive = true

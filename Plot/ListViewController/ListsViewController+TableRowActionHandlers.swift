@@ -145,7 +145,7 @@ extension ListsViewController {
             }
         }
 
-        configureTabBarBadge()
+//        configureTabBarBadge()
         if listList.count <= 0 {
             DispatchQueue.main.async {
                 self.checkIfThereAreAnyResults(isEmpty: true)

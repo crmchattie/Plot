@@ -13,7 +13,13 @@ protocol ListViewControllerDataStore: class {
     func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, completion: @escaping ([User])->())
 }
 
+protocol HomeBaseLists: class {
+    func sendLists(lists: [ListContainer])
+}
+
 class ListsViewController: UIViewController {
+    
+    weak var delegate: HomeBaseLists?
     
     var activities = [Activity]()
     
@@ -55,13 +61,13 @@ class ListsViewController: UIViewController {
         super.viewDidLoad()
         
         if !isAppLoaded {
+            appLoaded = true
             checklistFetcher.fetchChecklists { (checklists) in
                 for checklist in checklists {
                     if checklist.name == "nothing" { continue }
                     if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
                     self.checklists.append(checklist)
                 }
-                self.sortandreload()
                 self.observeChecklistsForCurrentUser()
             }
             grocerylistFetcher.fetchGrocerylists { (grocerylists) in
@@ -69,7 +75,6 @@ class ListsViewController: UIViewController {
                     if grocerylist.name == "nothing" { continue }
                     self.grocerylists.append(grocerylist)
                 }
-                self.sortandreload()
                 self.observeGrocerylistsForCurrentUser()
             }
         }
@@ -82,6 +87,16 @@ class ListsViewController: UIViewController {
         
         addObservers()
         
+        sortandreload()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+//        if appLoaded {
+//            configureTabBarBadge()
+//        }
     }
     
     deinit {
@@ -154,26 +169,37 @@ class ListsViewController: UIViewController {
     
     func observeChecklistsForCurrentUser() {
         self.checklistFetcher.observeChecklistForCurrentUser(checklistsAdded: { [weak self] checklistsAdded in
-            for checklist in checklistsAdded {
-                if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
-                    self!.checklists[index] = checklist
-                    if let ID = checklist.ID {
-                        self!.updateCellForCLID(ID: ID, checklist: checklist)
+                for checklist in checklistsAdded {
+                    if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
+                        self!.checklists[index] = checklist
+                        if let ID = checklist.ID {
+                            self!.updateCellForCLID(ID: ID, checklist: checklist)
+                            self!.sortandreload()
+                        }
+                    } else {
+                        self!.checklists.append(checklist)
                         self!.sortandreload()
                     }
-                } else {
-                    self!.checklists.append(checklist)
-                    self!.sortandreload()
                 }
-            }
-            }) { [weak self] checklistsRemoved in
+            }, checklistsRemoved: { [weak self] checklistsRemoved in
                 for checklist in checklistsRemoved {
                     if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
                         self!.checklists.remove(at: index)
                         self!.sortandreload()
                     }
                 }
+            }, checklistsChanged: { [weak self] checklistsChanged in
+                for checklist in checklistsChanged {
+                    if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
+                        self!.checklists[index] = checklist
+                        if let ID = checklist.ID {
+                            self!.updateCellForCLID(ID: ID, checklist: checklist)
+                            self!.sortandreload()
+                        }
+                    }
+                }
             }
+        )
     }
     
     func observeGrocerylistsForCurrentUser() {
@@ -190,14 +216,25 @@ class ListsViewController: UIViewController {
                     self!.sortandreload()
                 }
             }
-            }) { [weak self] grocerylistsRemoved in
+            }, grocerylistsRemoved: { [weak self] grocerylistsRemoved in
                 for grocerylist in grocerylistsRemoved {
                     if let index = self!.grocerylists.firstIndex(where: {$0 == grocerylist}) {
                         self!.grocerylists.remove(at: index)
                         self!.sortandreload()
                     }
                 }
+            }, grocerylistsChanged: { [weak self] grocerylistsChanged in
+                for grocerylist in grocerylistsChanged {
+                    if let index = self!.grocerylists.firstIndex(where: {$0 == grocerylist}) {
+                        self!.grocerylists[index] = grocerylist
+                        if let ID = grocerylist.ID {
+                            self!.updateCellForGLID(ID: ID, grocerylist: grocerylist)
+                            self!.sortandreload()
+                        }
+                    }
+                }
             }
+        )
     }
     
     func updateCellForCLID(ID: String, checklist: Checklist) {
@@ -238,6 +275,7 @@ class ListsViewController: UIViewController {
     
     func sortandreload() {
         listList = (checklists.map { ListContainer(grocerylist: nil, checklist: $0, packinglist: nil) } + grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
+        delegate?.sendLists(lists: listList)
         listListCopy = listList
         tableView.reloadData()
     }
@@ -251,40 +289,40 @@ class ListsViewController: UIViewController {
         
     }
     
-    func configureTabBarBadge() {
-        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
-        var badge = 0
-        
-        for list in listList {
-            badge += list.badge
-        }
-        
-        guard badge > 0 else {
-            tabItem.badgeValue = nil
-            setApplicationBadge()
-            return
-        }
-        tabItem.badgeValue = badge.toString()
-        setApplicationBadge()
-    }
-    
-    func setApplicationBadge() {
-        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-        var badge = 0
-        
-        for tab in 0...tabItems.count - 1 {
-            guard let tabItem = tabItems[tab] as? UITabBarItem else { return }
-            if let tabBadge = tabItem.badgeValue?.toInt() {
-                badge += tabBadge
-            }
-        }
-        UIApplication.shared.applicationIconBadgeNumber = badge
-        if let uid = Auth.auth().currentUser?.uid {
-            let ref = Database.database().reference().child("users").child(uid)
-            ref.updateChildValues(["badge": badge])
-        }
-    }
+//    func configureTabBarBadge() {
+//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
+//        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
+//        var badge = 0
+//
+//        for list in listList {
+//            badge += list.badge
+//        }
+//
+//        guard badge > 0 else {
+//            tabItem.badgeValue = nil
+//            setApplicationBadge()
+//            return
+//        }
+//        tabItem.badgeValue = badge.toString()
+//        setApplicationBadge()
+//    }
+//
+//    func setApplicationBadge() {
+//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
+//        var badge = 0
+//
+//        for tab in 0...tabItems.count - 1 {
+//            guard let tabItem = tabItems[tab] as? UITabBarItem else { return }
+//            if let tabBadge = tabItem.badgeValue?.toInt() {
+//                badge += tabBadge
+//            }
+//        }
+//        UIApplication.shared.applicationIconBadgeNumber = badge
+//        if let uid = Auth.auth().currentUser?.uid {
+//            let ref = Database.database().reference().child("users").child(uid)
+//            ref.updateChildValues(["badge": badge])
+//        }
+//    }
     
 }
 

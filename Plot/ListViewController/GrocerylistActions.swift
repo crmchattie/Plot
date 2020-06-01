@@ -228,9 +228,10 @@ class GrocerylistActions: NSObject {
     }
 
     func runGrocerylistBadgeUpdate(firstChild: String, secondChild: String) {
+        print("runGrocerylistBadgeUpdate")
         var ref = Database.database().reference().child(userGrocerylistsEntity).child(firstChild).child(secondChild)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
-            
+            print("snapshot \(snapshot)")
             guard snapshot.hasChild("badge") else {
                 ref.updateChildValues(["badge": 1])
                 return

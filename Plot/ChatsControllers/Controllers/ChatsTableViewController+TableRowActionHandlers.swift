@@ -209,7 +209,7 @@ extension ChatsTableViewController {
             }
     })
     
-    configureTabBarBadge()
+//    configureTabBarBadge()
      if self.conversations.count <= 0 && self.pinnedConversations.count <= 0 {
       DispatchQueue.main.async {
         self.checkIfThereAnyActiveChats(isEmpty: true)
@@ -244,7 +244,7 @@ extension ChatsTableViewController {
             }
     })
    
-    configureTabBarBadge()
+//    configureTabBarBadge()
     if self.conversations.count <= 0 && self.pinnedConversations.count <= 0 {
       DispatchQueue.main.async {
          self.checkIfThereAnyActiveChats(isEmpty: true)

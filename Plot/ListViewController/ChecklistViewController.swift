@@ -63,6 +63,7 @@ class ChecklistViewController: FormViewController {
                 inviteesRow.title = self.userNamesString
                 inviteesRow.updateCell()
             }
+            resetBadgeForSelf()
         } else {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -702,6 +703,17 @@ class ChecklistViewController: FormViewController {
         group.notify(queue: .main) {
             completion(selectedFalconUsers)
         }
+    }
+    
+    fileprivate func resetBadgeForSelf() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        let badgeRef = Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(checklist.ID!).child("badge")
+        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+            var value = mutableData.value as? Int
+            value = 0
+            mutableData.value = value!
+            return TransactionResult.success(withValue: mutableData)
+        })
     }
 }
 

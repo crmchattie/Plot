@@ -14,10 +14,12 @@ class GrocerylistFetcher: NSObject {
         
     fileprivate var userGrocerylistsDatabaseRef: DatabaseReference!
     fileprivate var currentUserGrocerylistsAddHandle = DatabaseHandle()
+    fileprivate var currentUserGrocerylistsChangeHandle = DatabaseHandle()
     fileprivate var currentUserGrocerylistsRemoveHandle = DatabaseHandle()
     
     var grocerylistsAdded: (([Grocerylist])->())?
     var grocerylistsRemoved: (([Grocerylist])->())?
+    var grocerylistsChanged: (([Grocerylist])->())?
     
     func fetchGrocerylists(completion: @escaping ([Grocerylist])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
@@ -67,12 +69,13 @@ class GrocerylistFetcher: NSObject {
         })
     }
     
-    func observeGrocerylistForCurrentUser(grocerylistsAdded: @escaping ([Grocerylist])->(), grocerylistsRemoved: @escaping ([Grocerylist])->()) {
+    func observeGrocerylistForCurrentUser(grocerylistsAdded: @escaping ([Grocerylist])->(), grocerylistsRemoved: @escaping ([Grocerylist])->(), grocerylistsChanged: @escaping ([Grocerylist])->()) {
         guard let _ = Auth.auth().currentUser?.uid else {
             return
         }
         self.grocerylistsAdded = grocerylistsAdded
         self.grocerylistsRemoved = grocerylistsRemoved
+        self.grocerylistsChanged = grocerylistsChanged
         currentUserGrocerylistsAddHandle = userGrocerylistsDatabaseRef.observe(.childAdded, with: { snapshot in
             if let completion = self.grocerylistsAdded {
                 let grocerylistID = snapshot.key
@@ -90,22 +93,49 @@ class GrocerylistFetcher: NSObject {
                 self.getGrocerylistsFromSnapshot(snapshot: snapshot, completion: completion)
             }
         })
+        
+        currentUserGrocerylistsChangeHandle = userGrocerylistsDatabaseRef.observe(.childChanged, with: { snapshot in
+            if let completion = self.grocerylistsChanged {
+                self.getGrocerylistsFromSnapshot(snapshot: snapshot, completion: completion)
+            }
+        })
     }
     
     func getGrocerylistsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Grocerylist])->()) {
         if snapshot.exists() {
+            guard let currentUserID = Auth.auth().currentUser?.uid else {
+                return
+            }
             let grocerylistID = snapshot.key
             let ref = Database.database().reference()
             var grocerylists: [Grocerylist] = []
             let group = DispatchGroup()
             group.enter()
-            ref.child(grocerylistsEntity).child(grocerylistID).observeSingleEvent(of: .value, with: { grocerylistSnapshot in
-                if grocerylistSnapshot.exists(), let grocerylistSnapshotValue = grocerylistSnapshot.value {
-                    if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
-                        grocerylists.append(grocerylist)
+            ref.child(userGrocerylistsEntity).child(currentUserID).child(grocerylistID).observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.exists(), let userGrocerylistInfo = snapshot.value {
+                    if let userGrocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: userGrocerylistInfo) {
+                        ref.child(grocerylistsEntity).child(grocerylistID).observeSingleEvent(of: .value, with: { grocerylistSnapshot in
+                            if grocerylistSnapshot.exists(), let grocerylistSnapshotValue = grocerylistSnapshot.value {
+                                if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
+                                    grocerylist.badge = userGrocerylist.badge
+                                    grocerylist.muted = userGrocerylist.muted
+                                    grocerylist.pinned = userGrocerylist.pinned
+                                    grocerylists.append(grocerylist)
+                                }
+                            }
+                            group.leave()
+                        })
                     }
+                } else {
+                    ref.child(grocerylistsEntity).child(grocerylistID).observeSingleEvent(of: .value, with: { grocerylistSnapshot in
+                        if grocerylistSnapshot.exists(), let grocerylistSnapshotValue = grocerylistSnapshot.value {
+                            if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
+                                grocerylists.append(grocerylist)
+                            }
+                        }
+                        group.leave()
+                    })
                 }
-                group.leave()
             })
             
             group.notify(queue: .main) {
