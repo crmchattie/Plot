@@ -84,6 +84,7 @@ class MasterActivityContainerController: UIViewController {
     var listList = [ListContainer]() {
         didSet {
             configureTabBarBadge()
+            notificationsVC.listList = listList
         }
     }
     var selectedDate = Date()
