@@ -430,8 +430,8 @@ class CreateActivityViewController: FormViewController {
                 if self.active {
                     $0.value = self.activity.allDay
                 } else {
-                    $0.value = false
-                    self.activity.allDay = $0.value
+                    $0.value = true
+                    self.activity.allDay = true
                 }
                 }.onChange { [weak self] row in
                     self!.activity.allDay = row.value

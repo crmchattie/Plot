@@ -18,7 +18,6 @@ class SelectActivityMembersViewController: SelectParticipantsViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupRightBarButton(with: "Done")
         setupNavigationItemTitle(title: "Participants")
     }
@@ -26,14 +25,10 @@ class SelectActivityMembersViewController: SelectParticipantsViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        if self.movingBackwards {
-            delegate?.updateInvitees(selectedFalconUsers: priorSelectedUsers)
-        }
     }
     
     override func rightBarButtonTapped() {
         super.rightBarButtonTapped()
-        movingBackwards = false
         delegate?.updateInvitees(selectedFalconUsers: selectedFalconUsers)
         self.navigationController?.popViewController(animated: true)
     }

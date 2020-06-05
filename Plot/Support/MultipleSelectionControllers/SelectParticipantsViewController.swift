@@ -44,7 +44,6 @@ class SelectParticipantsViewController: UIViewController {
     var conversations = [Conversation]()
     var searchBar: UISearchBar?
     let tableView = UITableView()
-    var movingBackwards: Bool = true
     let viewPlaceholder = ViewPlaceholder()
     
     var activityObject: ActivityObject?
