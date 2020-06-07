@@ -45,7 +45,7 @@ class ActivityActions: NSObject {
         
         for memberID in membersIDs.0 {
         Database.database().reference().child("user-activities").child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
-            Database.database().reference().child("user-activities").child(memberID).child(activityID).removeValue()
+        Database.database().reference().child("user-activities").child(memberID).child(activityID).removeValue()
         }
                 
         let center = UNUserNotificationCenter.current()
@@ -76,8 +76,14 @@ class ActivityActions: NSObject {
         incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
         
         if active {
+            Analytics.logEvent("update_activity", parameters: [
+                "activity_type": activity.activityType ?? "basic" as NSObject
+            ])
             updateActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
         } else {
+            Analytics.logEvent("new_activity", parameters: [
+                "activity_type": activity.activityType ?? "basic" as NSObject
+            ])
             newActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
         }
     }

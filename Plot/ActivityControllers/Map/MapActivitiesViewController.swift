@@ -129,6 +129,7 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
     }
     
     func populateLocations() {
+        locationActivities = []
         for activity in activities {
             if let locationAddress = activity.locationAddress {
                 for (key, value) in locationAddress {

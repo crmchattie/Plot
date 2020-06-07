@@ -132,12 +132,14 @@ extension UserProfileController {
         userReference.updateChildValues(["name": userProfileContainerView.name.text!,
                                          "phoneNumber": userProfileContainerView.phone.text!,
                                          "bio": userProfileContainerView.bio.text!]) { (_, _) in
-                                            self.removeSpinner()
-                                            self.dismiss(animated: true) {
-                                                print("dismissed UserProfile Controller")
-                                                AppUtility.lockOrientation(.allButUpsideDown)
-                                                
-                                            }
+            self.removeSpinner()
+            Analytics.logEvent(AnalyticsEventSignUp, parameters: [
+                AnalyticsParameterMethod: self.method
+            ])
+            self.dismiss(animated: true) {
+                print("dismissed UserProfile Controller")
+                AppUtility.lockOrientation(.allButUpsideDown)
+            }
         }
     }
 }

@@ -90,6 +90,7 @@
 		10A18D3A2458E1A5006990F2 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18D392458E1A5006990F2 /* PurchasesViewController.swift */; };
 		10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */; };
 		10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */; };
+		10C32861248D8B9300E4475B /* ChatsTableViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */; };
 		10C50F972274E21900111033 /* ActivityViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F962274E21900111033 /* ActivityViewController+SearchHandlers.swift */; };
 		10C50F9B2274E80500111033 /* ActivityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F9A2274E80500111033 /* ActivityCell.swift */; };
 		10C50FA22274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */; };
@@ -412,6 +413,7 @@
 		10A18D392458E1A5006990F2 /* PurchasesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchasesViewController.swift; sourceTree = "<group>"; };
 		10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
+		10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatsTableViewController+Migration.swift"; sourceTree = "<group>"; };
 		10C50F962274E21900111033 /* ActivityViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C50F9A2274E80500111033 /* ActivityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCell.swift; sourceTree = "<group>"; };
 		10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
@@ -1318,6 +1320,7 @@
 			isa = PBXGroup;
 			children = (
 				4BAEE4C221272D880045AB10 /* ChatsTableViewController.swift */,
+				10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */,
 				4BAEE4E121272D880045AB10 /* ChatsTableViewController+SearchHandlers.swift */,
 				4BAEE4CD21272D880045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift */,
 				4B5E99DF212CC0D5001F067F /* ConversationsFetcher.swift */,
@@ -2066,6 +2069,7 @@
 				4BAEE5CD212735E50045AB10 /* SelectParticipantsTableView.swift in Sources */,
 				10196F0424411B5600B6AFDF /* ActivityAvatarOpenerDelegate.swift in Sources */,
 				4BAEE50221272D890045AB10 /* ChatsTableViewController.swift in Sources */,
+				10C32861248D8B9300E4475B /* ChatsTableViewController+Migration.swift in Sources */,
 				26B975E92364009C003BFBE3 /* InvitationCell.swift in Sources */,
 				4BAEE5EE212735E50045AB10 /* SelectNewAdminTableViewController+SearchHandlers.swift in Sources */,
 				100A53F323E3BDAC004AA952 /* Filter.swift in Sources */,
@@ -2234,7 +2238,7 @@
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.0.11;
+				MARKETING_VERSION = 1.0.12;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
@@ -2262,7 +2266,7 @@
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.0.11;
+				MARKETING_VERSION = 1.0.12;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2411,7 +2415,7 @@
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.11;
+				MARKETING_VERSION = 1.0.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -2440,7 +2444,7 @@
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.11;
+				MARKETING_VERSION = 1.0.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";

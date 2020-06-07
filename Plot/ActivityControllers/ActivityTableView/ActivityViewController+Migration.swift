@@ -147,7 +147,6 @@ extension ActivityViewController {
     }
     
     func checkForDataMigration(forActivities activities: [Activity]) {
-        print("checkForDataMigration")
         let defaults = UserDefaults.standard
         guard let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String else {
             return
@@ -155,7 +154,7 @@ extension ActivityViewController {
         
         let previousVersion = defaults.string(forKey: kAppVersionKey)
         let minVersion = "1.0.1"
-        let maxVersion = "1.0.12"
+        let maxVersion = "1.0.13"
         //current app version is greater than min version and lesser than max version
         let firstCondition = (previousVersion == nil && currentAppVersion.compare(minVersion, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
         //current app version is greater than previous version and lesser than max version

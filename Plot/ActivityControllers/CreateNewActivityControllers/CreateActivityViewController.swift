@@ -160,6 +160,15 @@ class CreateActivityViewController: FormViewController {
             self.purchaseBreakdown()
             self.updateDecimalRow()
         }
+        
+        if let showExtras = activity.showExtras {
+            if !showExtras, let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
+                self.segmentRowValue = segmentRow.value!
+                segmentRow.value = "Hidden"
+            } else if let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
+                segmentRow.value = self.segmentRowValue
+            }
+        }
     }
     
     fileprivate func setupMainView() {
@@ -1177,10 +1186,13 @@ class CreateActivityViewController: FormViewController {
     fileprivate func weatherRow() {
         if let localName = activity.locationName, localName != "locationName", Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval) > Date(), Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval) < Date().addingTimeInterval(1296000) {
             var startDate = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
+            var endDate = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
             if startDate < Date() {
                 startDate = Date().addingTimeInterval(3600)
             }
-            let endDate = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
+            if endDate > Date().addingTimeInterval(1209600) {
+                endDate = Date().addingTimeInterval(1209600)
+            }
             let startDateString = startDate.toString(dateFormat: "YYYY-MM-dd") + "T24:00:00Z"
             let endDateString = endDate.toString(dateFormat: "YYYY-MM-dd") + "T00:00:00Z"
             if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
@@ -1300,7 +1312,7 @@ class CreateActivityViewController: FormViewController {
             } else {
                 var checklistIDs = [String]()
                 var packinglistIDs = [String]()
-                var grocerylistID = ""
+                var grocerylistID = "nothing"
                 for list in listList {
                     if let checklist = list.checklist {
                         checklistIDs.append(checklist.ID!)
@@ -1317,7 +1329,7 @@ class CreateActivityViewController: FormViewController {
                     activity.checklistIDs = nil
                     groupActivityReference.child("checklistIDs").removeValue()
                 }
-                if grocerylistID != "" {
+                if grocerylistID != "nothing" {
                     activity.grocerylistID = grocerylistID
                     groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
                 } else {
@@ -2287,6 +2299,9 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
                 if scheduleList.indices.contains(scheduleIndex) {
                     scheduleList[scheduleIndex] = schedule
                 } else {
+                    Analytics.logEvent("new_schedule", parameters: [
+                        "activity_type": schedule.activityType ?? "basic" as NSObject
+                    ])
                     scheduleList.append(schedule)
                 }
                 sortSchedule()
@@ -2303,7 +2318,6 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
         }
     }
     func updateIngredients(recipe: Recipe?, recipeID: String?) {
-        print("updating Ingredients")
         if let recipe = recipe {
             updateGrocerylist(recipe: recipe, add: true)
         } else if let recipeID = recipeID {

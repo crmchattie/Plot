@@ -191,6 +191,7 @@ class GeneralTabBarController: UITabBarController {
     fileprivate func addNewUserItems() {
         if let isNewUser = appDelegate.additionalUserInfo?.isNewUser, isNewUser {
             createNewUserActivities()
+            sendWelcomeMessage()
         }
     }
     
@@ -211,7 +212,6 @@ class GeneralTabBarController: UITabBarController {
             let activities = try decoder.decode([Activity].self, from: jsonData)
             
             for activity in activities {
-                print("creating activity")
                 activity.activityID = activityID
                 activity.checklistIDs = [checklistID]
                 activity.admin = currentUserID
@@ -305,7 +305,6 @@ class GeneralTabBarController: UITabBarController {
                     dispatchGroup.leave()
                 })
             }
-            
         } catch {
             print("new user error")
             print(error)
@@ -337,7 +336,6 @@ class GeneralTabBarController: UITabBarController {
                 userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                     dispatchGroup.leave()
                 })
-                
             }
         } catch {
             print("new user error")
@@ -350,8 +348,57 @@ class GeneralTabBarController: UITabBarController {
         }
     }
     
-    func addPlotUser() {
+    func sendWelcomeMessage() {
+        repeat {} while Auth.auth().currentUser?.uid == nil
+        let dispatchGroup = DispatchGroup()
+        let currentUserID = Auth.auth().currentUser?.uid
+        let chatID = Database.database().reference().child("user-messages").child(currentUserID!).childByAutoId().key ?? ""
+        let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
+        let plotUser = "acdmpzhmDWaBdcEo17DRMt8gwCh1"
+        let memberIDs = [currentUserID!: currentUserID!, plotUser: plotUser]
+        let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "chatName": "Plot" as AnyObject, "chatParticipantsIDs": memberIDs as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject]
         
+        dispatchGroup.enter()
+        groupChatsReference.updateChildValues(childValues)
+        dispatchGroup.leave()
+        
+        for (key, _) in memberIDs {
+            dispatchGroup.enter()
+            let userReference = Database.database().reference().child("user-messages").child(key).child(chatID).child(messageMetaDataFirebaseFolder)
+            let values:[String : Any] = ["isGroupChat": true]
+            userReference.updateChildValues(values)
+            dispatchGroup.leave()
+        }
+        
+        let text = "Welcome to Plot! If you have any questions, thoughts and/or concerns, just send us a message here! Enjoy Plotting"
+        let messageReference = Database.database().reference().child("messages").childByAutoId()
+        guard let messageUID = messageReference.key else { return }
+        let messageStatus = messageStatusDelivered
+        let timestamp = NSNumber(value: Int(Date().timeIntervalSince1970))
+        let defaultData: [String: AnyObject] = ["messageUID": messageUID as AnyObject,
+                                                "toId": chatID as AnyObject,
+                                                "status": messageStatus as AnyObject,
+                                                "seen": false as AnyObject,
+                                                "fromId": plotUser as AnyObject,
+                                                "timestamp": timestamp,
+                                                "text": text as AnyObject]
+        dispatchGroup.enter()
+        messageReference.updateChildValues(defaultData)
+        dispatchGroup.leave()
+        
+        for (key, _) in memberIDs {
+            dispatchGroup.enter()
+            let userReference = Database.database().reference().child("user-messages").child(key).child(chatID).child(userMessagesFirebaseFolder)
+            userReference.updateChildValues([messageUID: 1])
+            
+            let ref = Database.database().reference().child("user-messages").child(key).child(chatID).child(messageMetaDataFirebaseFolder)
+            ref.updateChildValues(["lastMessageID": messageUID])
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.homeController.chatsVC.conversationsFetcher.fetchConversations()
+        }
     }
 }
 
@@ -386,6 +433,7 @@ extension GeneralTabBarController: ContactsUpdatesDelegate {
     }
     
     func contacts(handleAccessStatus: Bool) {
+        
     }
 }
 

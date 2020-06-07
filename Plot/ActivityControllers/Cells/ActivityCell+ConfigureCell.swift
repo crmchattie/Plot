@@ -91,18 +91,21 @@ extension ActivityCell {
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
                 
+        let dateTimeValueArray = dateTimeValue(forActivity: activity)
+        startLabel.numberOfLines = dateTimeValueArray.0
+        startLabel.text = dateTimeValueArray.1
+                
         if activity.activityType != "nothing" && activity.activityType != nil {
             activityTypeLabel.text = activity.activityType?.capitalized
+        } else {
+            activityTypeLabel.text = nil
         }
         
         if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
             activityAddressLabel.text = activity.locationName
+        } else {
+            activityAddressLabel.text = nil
         }
-        
-        let dateTimeValueArray = dateTimeValue(forActivity: activity)
-        startLabel.numberOfLines = dateTimeValueArray.0
-        startLabel.text = dateTimeValueArray.1
-        
         
         if let invitation = invitation {
             invitationSegmentedControl.isHidden = false

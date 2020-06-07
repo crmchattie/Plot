@@ -271,7 +271,7 @@ class Service {
                
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
-                
+                                
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
         
     }

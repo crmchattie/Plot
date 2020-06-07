@@ -313,6 +313,7 @@ extension GroupProfileTableViewController {
     let nodeCreationGroup = DispatchGroup()
     nodeCreationGroup.enter()
     nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
+        Analytics.logEvent("new_chat", parameters: [:])
       self.chatCreatingGroup.leave()
     })
     reference.updateChildValues(childValues) { (error, reference) in

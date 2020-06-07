@@ -260,6 +260,7 @@ class ChooseChatTableViewController: UITableViewController {
         let nodeCreationGroup = DispatchGroup()
         nodeCreationGroup.enter()
         nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
+            Analytics.logEvent("new_chat", parameters: [:])
             self.activityCreatingGroup.leave()
         })
         reference.updateChildValues(childValues) { (error, reference) in

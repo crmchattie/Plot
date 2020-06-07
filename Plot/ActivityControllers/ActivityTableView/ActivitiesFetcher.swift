@@ -37,9 +37,7 @@ class ActivitiesFetcher: NSObject {
     fileprivate var currentUserActivitiesAddingHandle = DatabaseHandle()
     
     func fetchActivities() {
-        print("fetchActivities")
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        print("fetchActivities")
         delegate?.activities(didStartFetching: true)
         currentUserActivitiesReference = Database.database().reference().child("user-activities").child(currentUserID)
         currentUserActivitiesReference.observeSingleEvent(of: .value) { (snapshot) in
@@ -162,7 +160,7 @@ class ActivitiesFetcher: NSObject {
             activity.servings = metaInfo.servings
             activity.workoutID = metaInfo.workoutID
             activity.eventID = metaInfo.eventID
-            
+                        
             self.prefetchThumbnail(from: activity.activityOriginalPhotoURL)
             
             self.updateActivityArrays(with: activity)

@@ -38,7 +38,6 @@ class ActivityCell: UITableViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
         label.numberOfLines = 0
         return label
     }()
@@ -50,7 +49,6 @@ class ActivityCell: UITableViewCell {
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
         imageView.isUserInteractionEnabled = true
-        
         return imageView
     }()
     
@@ -62,7 +60,6 @@ class ActivityCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.isHidden = true
         imageView.image = UIImage(named: "Oval")
-        
         return imageView
     }()
     
@@ -73,7 +70,6 @@ class ActivityCell: UITableViewCell {
         muteIndicator.contentMode = .scaleAspectFit
         muteIndicator.isHidden = true
         muteIndicator.image = UIImage(named: "mute")
-        
         return muteIndicator
     }()
     
@@ -86,7 +82,6 @@ class ActivityCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.sizeToFit()
         label.textAlignment = .left
-        
         return label
     }()
     
@@ -98,8 +93,6 @@ class ActivityCell: UITableViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        
         return label
     }()
     
@@ -111,8 +104,6 @@ class ActivityCell: UITableViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        
         return label
     }()
     
@@ -125,8 +116,6 @@ class ActivityCell: UITableViewCell {
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.isUserInteractionEnabled = true
-        label.sizeToFit()
-        
         return label
     }()
     

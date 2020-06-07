@@ -78,8 +78,15 @@ class GrocerylistActions: NSObject {
         incrementBadgeForReciever(ID: ID, participantsIDs: membersIDs.0)
         
         if !active {
+            Analytics.logEvent("new_grocerylist", parameters: [
+                "connected_to_activity": grocerylist.activityID ?? "none" as NSObject
+            ])
             dispatchGroup.enter()
             connectMembersToGroupGrocerylist(memberIDs: membersIDs.0, ID: ID)
+        } else {
+            Analytics.logEvent("update_grocerylist", parameters: [
+                "connected_to_activity": grocerylist.activityID ?? "none" as NSObject
+            ])
         }
     }
     

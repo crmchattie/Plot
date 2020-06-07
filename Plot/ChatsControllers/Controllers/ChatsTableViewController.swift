@@ -224,6 +224,7 @@ class ChatsTableViewController: UITableViewController {
         guard !isAppLoaded else { return }
         //    delegate?.manageAppearanceChat(self, didFinishLoadingWith: true)
         isAppLoaded = true
+        checkForDataMigration(forConversations: conversations)
     }
     
     func handleReloadTableAfterSearch() {
@@ -423,8 +424,6 @@ extension ChatsTableViewController: ConversationUpdatesDelegate {
     }
     
     func conversations(didFinishFetching: Bool, conversations: [Conversation]) {
-        //    notificationsManager.observersForNotificationsConversations(conversations: conversations)
-        
         let (pinned, unpinned) = conversations.stablePartition { (element) -> Bool in
             let isPinned = element.pinned ?? false
             return isPinned == true
