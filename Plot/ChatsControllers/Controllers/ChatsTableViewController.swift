@@ -224,7 +224,7 @@ class ChatsTableViewController: UITableViewController {
         guard !isAppLoaded else { return }
         //    delegate?.manageAppearanceChat(self, didFinishLoadingWith: true)
         isAppLoaded = true
-        checkForDataMigration(forConversations: conversations)
+        checkForDataMigration(forConversations: allConversations)
     }
     
     func handleReloadTableAfterSearch() {
