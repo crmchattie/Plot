@@ -152,6 +152,9 @@ extension ListCell {
         self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
+                if Auth.auth().currentUser?.uid == user.id {
+                    continue
+                }
                 
                 if i > 8 {
                     return
@@ -195,6 +198,9 @@ extension ListCell {
         self.listViewControllerDataStore?.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
+                if Auth.auth().currentUser?.uid == user.id {
+                    continue
+                }
                 
                 if i > 8 {
                     return
@@ -238,6 +244,9 @@ extension ListCell {
         self.listViewControllerDataStore?.getParticipants(grocerylist: nil, checklist: nil, packinglist: packinglist, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
+                if Auth.auth().currentUser?.uid == user.id {
+                    continue
+                }
                 
                 if i > 8 {
                     return

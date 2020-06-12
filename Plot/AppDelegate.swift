@@ -30,6 +30,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var messagesFetcher: MessagesFetcher? = nil
     var notifications: [PLNotification] = []
     var additionalUserInfo: AdditionalUserInfo?
+    var participants: [String: [User]] = [:]
+    let invitationsFetcher = InvitationsFetcher()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         ThemeManager.applyTheme(theme: ThemeManager.currentTheme())
@@ -332,14 +334,20 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                     destination.recipe = detailedRecipe
                                     destination.detailedRecipe = detailedRecipe
                                     destination.activity = activity
-                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                        tabBarController.selectedIndex = 1
-                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                            homeNavigationController.pushViewController(destination, animated: true)
-                                            
+                                    self.getParticipants(forActivity: activity) { (participants) in
+                                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                            destination.acceptedParticipant = acceptedParticipant
+                                            destination.selectedFalconUsers = participants
+                                            if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                                tabBarController.selectedIndex = 1
+                                                tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                                if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                                    homeNavigationController.pushViewController(destination, animated: true)
+                                                    
+                                                }
+                                                
+                                            }
                                         }
-                                        
                                     }
                                 }
                             }
@@ -354,14 +362,20 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                         destination.hidesBottomBarWhenPushed = true
                                         destination.event = event
                                         destination.activity = activity
-                                        if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                            tabBarController.selectedIndex = 1
-                                            tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                            if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                                homeNavigationController.pushViewController(destination, animated: true)
-                                                
+                                        self.getParticipants(forActivity: activity) { (participants) in
+                                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                                destination.acceptedParticipant = acceptedParticipant
+                                                destination.selectedFalconUsers = participants
+                                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                                    tabBarController.selectedIndex = 1
+                                                    tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                                    if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                                        homeNavigationController.pushViewController(destination, animated: true)
+                                                        
+                                                    }
+                                                    
+                                                }
                                             }
-                                            
                                         }
                                     }
                                 }
@@ -379,14 +393,20 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                         destination.workout = workout
                                         destination.intColor = 0
                                         destination.activity = activity
-                                        if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                            tabBarController.selectedIndex = 1
-                                            tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                            if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                                homeNavigationController.pushViewController(destination, animated: true)
-                                                
+                                        self.getParticipants(forActivity: activity) { (participants) in
+                                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                                destination.acceptedParticipant = acceptedParticipant
+                                                destination.selectedFalconUsers = participants
+                                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                                    tabBarController.selectedIndex = 1
+                                                    tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                                    if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                                        homeNavigationController.pushViewController(destination, animated: true)
+                                                        
+                                                    }
+                                                    
+                                                }
                                             }
-                                            
                                         }
                                     }
                                 }
@@ -404,6 +424,31 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                     destination.hidesBottomBarWhenPushed = true
                                     destination.attraction = attraction
                                     destination.activity = activity
+                                    self.getParticipants(forActivity: activity) { (participants) in
+                                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                            destination.acceptedParticipant = acceptedParticipant
+                                            destination.selectedFalconUsers = participants
+                                            if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                                tabBarController.selectedIndex = 1
+                                                tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                                if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                                    homeNavigationController.pushViewController(destination, animated: true)
+                                                    
+                                                }
+                                                
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            let destination = CreateActivityViewController()
+                            destination.hidesBottomBarWhenPushed = true
+                            destination.activity = activity
+                            self.getParticipants(forActivity: activity) { (participants) in
+                                InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                    destination.acceptedParticipant = acceptedParticipant
+                                    destination.selectedFalconUsers = participants
                                     if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
                                         tabBarController.selectedIndex = 1
                                         tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
@@ -414,19 +459,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                         
                                     }
                                 }
-                            }
-                        } else {
-                            let destination = CreateActivityViewController()
-                            destination.hidesBottomBarWhenPushed = true
-                            destination.activity = activity
-                            if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                tabBarController.selectedIndex = 1
-                                tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                    homeNavigationController.pushViewController(destination, animated: true)
-                                    
-                                }
-                                
                             }
                             
                         }
@@ -441,27 +473,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 destination.checklist = checklist
                                 destination.comingFromLists = true
                                 destination.connectedToAct = false
-                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                    tabBarController.selectedIndex = 1
-                                    tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                    if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                        homeNavigationController.pushViewController(destination, animated: true)
-                                        
-                                    }
-                                    
-                                }
-                            }
-                        }
-                    })
-                } else if let grocerylistID = userInfo["grocerylistID"] as? String {
-                    let ref = Database.database().reference()
-                    ref.child(grocerylistsEntity).child(grocerylistID).observeSingleEvent(of: .value, with: { grocerylistSnapshot in
-                        if grocerylistSnapshot.exists(), let grocerylistSnapshotValue = grocerylistSnapshot.value {
-                            if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
-                                    let destination = GrocerylistViewController()
-                                    destination.grocerylist = grocerylist
-                                    destination.comingFromLists = true
-                                    destination.connectedToAct = false
+                                self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil) { (participants) in
+                                    destination.selectedFalconUsers = participants
                                     if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
                                         tabBarController.selectedIndex = 1
                                         tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
@@ -471,16 +484,178 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                         }
                                         
                                     }
-                                    
                                 }
                             }
-                        })
-                    }
+                        }
+                    })
+                } else if let grocerylistID = userInfo["grocerylistID"] as? String {
+                    let ref = Database.database().reference()
+                    ref.child(grocerylistsEntity).child(grocerylistID).observeSingleEvent(of: .value, with: { grocerylistSnapshot in
+                        if grocerylistSnapshot.exists(), let grocerylistSnapshotValue = grocerylistSnapshot.value {
+                            if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
+                                let destination = GrocerylistViewController()
+                                destination.grocerylist = grocerylist
+                                destination.comingFromLists = true
+                                destination.connectedToAct = false
+                                self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil) { (participants) in
+                                    destination.selectedFalconUsers = participants
+                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                        tabBarController.selectedIndex = 1
+                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                            homeNavigationController.pushViewController(destination, animated: true)
+                                            
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    })
                 }
             }
+        }
         
         // 4
         completionHandler()
+    }
+    
+    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, completion: @escaping ([User])->()) {
+        if let grocerylist = grocerylist, let ID = grocerylist.ID, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if grocerylist.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let checklist = checklist, let ID = checklist.ID, let participantsIDs = checklist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if checklist.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let packinglist = packinglist, let ID = packinglist.ID, let participantsIDs = packinglist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if packinglist.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else {
+            return
+        }
+    }
+    
+    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
+        guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        
+        let group = DispatchGroup()
+        let olderParticipants = self.participants[activityID]
+        var participants: [User] = []
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if activity.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            if let first = olderParticipants?.filter({$0.id == id}).first {
+                participants.append(first)
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    participants.append(user)
+                }
+                
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            self.participants[activityID] = participants
+            completion(participants)
+        }
     }
 }
 

@@ -92,6 +92,7 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
                     newActivity.admin = currentUserID
                     newActivity.participantsIDs = nil
                     newActivity.activityPhotos = nil
+                    newActivity.activityFiles = nil
                     newActivity.activityOriginalPhotoURL = nil
                     newActivity.activityThumbnailPhotoURL = nil
                     newActivity.conversationID = nil
@@ -536,6 +537,7 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                     newActivity.admin = currentUserID
                     newActivity.participantsIDs = nil
                     newActivity.activityPhotos = nil
+                    newActivity.activityFiles = nil
                     newActivity.activityOriginalPhotoURL = nil
                     newActivity.activityThumbnailPhotoURL = nil
                     newActivity.conversationID = nil
@@ -977,6 +979,7 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                     newActivity.admin = currentUserID
                     newActivity.participantsIDs = nil
                     newActivity.activityPhotos = nil
+                    newActivity.activityFiles = nil
                     newActivity.activityOriginalPhotoURL = nil
                     newActivity.activityThumbnailPhotoURL = nil
                     newActivity.conversationID = nil

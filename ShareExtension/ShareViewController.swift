@@ -16,15 +16,11 @@ class ShareViewController: UIViewController {
     fileprivate var activitiesArray = [Activity]()
     fileprivate var filteredActivities = [Activity]()
     fileprivate var activity: Activity!
-    fileprivate var imageURLs = [String]()
     fileprivate let plotAppGroup = "group.immaturecreations.plot"
     private var sharedContainer : UserDefaults?
-    private var url: NSURL?
-    private var imageType = ""
     private var vSpinner : UIView?
-    let photoUpdatingGroup = DispatchGroup()
+    let dispatchGroup = DispatchGroup()
 
-    
     var searchExtensionController: UISearchController?
     var searchBar: UISearchBar?
     
@@ -88,44 +84,65 @@ class ShareViewController: UIViewController {
         }
     }
     
-    private func getImage(activity: Activity){
+    private func getItem(activity: Activity) {
+        var type = ""
+        var fileURL: URL!
+        var data: Data!
         if let item = self.extensionContext?.inputItems[0] as? NSExtensionItem {
             var images = [UIImage]()
             for ele in item.attachments! {
-                photoUpdatingGroup.enter()
-                print("item.attachments!======&gt;&gt;&gt; \(ele )")
+                dispatchGroup.enter()
+                print("item.attachments!======&gt;&gt;&gt; \(ele)")
                 let itemProvider = ele
                 print(itemProvider)
                 if itemProvider.hasItemConformingToTypeIdentifier("public.jpeg") {
-                    imageType = "public.jpeg"
-                }
-                if itemProvider.hasItemConformingToTypeIdentifier("public.png") {
-                    imageType = "public.png"
-                }
-                
-                if itemProvider.hasItemConformingToTypeIdentifier(imageType){
-                    itemProvider.loadItem(forTypeIdentifier: imageType, options: nil, completionHandler: { (item, error) in
-                        
+                    type = "public.jpeg"
+                    itemProvider.loadItem(forTypeIdentifier: type, options: nil, completionHandler: { (item, error) in
                         var imgData: Data!
                         if let url = item as? URL {
                             imgData = try! Data(contentsOf: url)
                             if let img = UIImage(data: imgData) {
                                 images.append(img)
-                                self.photoUpdatingGroup.leave()
+                                self.dispatchGroup.leave()
                             }
+                        }
+                    })
+                } else if itemProvider.hasItemConformingToTypeIdentifier("public.png") {
+                    type = "public.png"
+                    itemProvider.loadItem(forTypeIdentifier: type, options: nil, completionHandler: { (item, error) in
+                        var imgData: Data!
+                        if let url = item as? URL {
+                            imgData = try! Data(contentsOf: url)
+                            if let img = UIImage(data: imgData) {
+                                images.append(img)
+                                self.dispatchGroup.leave()
+                            }
+                        }
+                    })
+                } else if itemProvider.hasItemConformingToTypeIdentifier("public.file-url") {
+                    type = "public.file-url"
+                    itemProvider.loadItem(forTypeIdentifier: type, options: nil, completionHandler: { (item, error) in
+                        if let url = item as? URL {
+                            fileURL = url
+                            data = try! Data(contentsOf: url)
+                            self.dispatchGroup.leave()
                         }
                     })
                 }
             }
-            photoUpdatingGroup.notify(queue: DispatchQueue.main, execute: {
-                self.storeImages(images: images, activity: activity)
+            dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+                if type == "public.jpeg" || type == "public.png" {
+                    self.storeImages(images: images, activity: activity)
+                } else if type == "public.file-url" {
+                    self.storeFiles(data: data, url: fileURL, activity: activity)
+                }
             })
         }
     }
     
     private func storeImages(images: [UIImage], activity: Activity) {
         var imageList = [(image: UIImage, quality: CGFloat, key: String)]()
-        
+        var imageURLs = [String]()
         if activity.activityPhotos != nil {
             imageURLs = activity.activityPhotos!
         } else {
@@ -134,21 +151,20 @@ class ShareViewController: UIViewController {
         
         for image in images {
             imageList.append((image: image, quality: 0.5, key: "activityPhotos"))
-            photoUpdatingGroup.enter()
+            dispatchGroup.enter()
         }
     
         for imageElement in imageList {
             uploadAvatarForActivityToFirebaseStorageUsingImage(imageElement.image, quality: imageElement.quality) { (url) in
-                print("url \(url)")
-                self.imageURLs.append(url)
-                self.photoUpdatingGroup.leave()
+                imageURLs.append(url)
+                self.dispatchGroup.leave()
             }
         }
         
-        photoUpdatingGroup.notify(queue: DispatchQueue.main, execute: {
-            if !self.imageURLs.isEmpty {
+        dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+            if !imageURLs.isEmpty {
                 let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child("metaData")
-                activityReference.updateChildValues(["activityPhotos": self.imageURLs])
+                activityReference.updateChildValues(["activityPhotos": imageURLs])
             }
             self.hideActivityIndicator()
             self.extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
@@ -168,6 +184,47 @@ class ShareViewController: UIViewController {
                     completion(imageURL.absoluteString)
                 })
             }
+        }
+    }
+    
+    private func storeFiles(data: Data, url: URL, activity: Activity) {
+        dispatchGroup.enter()
+        var fileURLs = [String]()
+        if activity.activityFiles != nil {
+            fileURLs = activity.activityFiles!
+        } else {
+            fileURLs = [String]()
+        }
+        uploadDocToFirebaseStorage(data, contentType: mimeTypeForPath(pathExtension: url.pathExtension), type: url.pathExtension, name: url.deletingPathExtension().lastPathComponent) { (url) in
+            fileURLs.append(url)
+            self.dispatchGroup.leave()
+        }
+        dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+            if !fileURLs.isEmpty {
+                let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child("metaData")
+                activityReference.updateChildValues(["activityFiles": fileURLs])
+            }
+            self.hideActivityIndicator()
+            self.extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
+        })
+    }
+    
+    func uploadDocToFirebaseStorage(_ data: Data, contentType: String, type: String, name: String, completion: @escaping (_  url: String) -> ()) {
+        let fileName = UUID().uuidString
+        let ref = Storage.storage().reference().child("activityDocs").child(fileName)
+        
+        // Create the file metadata
+        let metadata = StorageMetadata()
+        metadata.contentType = contentType
+        metadata.customMetadata = ["name": name, "type": type]
+            
+        ref.putData(data, metadata: metadata) { (metadata, error) in
+            guard error == nil else { completion(""); return }
+            
+            ref.downloadURL(completion: { (url, error) in
+                guard error == nil, let imageURL = url else { completion(""); return }
+                completion(imageURL.absoluteString)
+            })
         }
     }
     
@@ -232,6 +289,15 @@ class ShareViewController: UIViewController {
             self.vSpinner = nil
         }
     }
+    
+    func mimeTypeForPath(pathExtension: String) -> String {
+        if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as NSString, nil)?.takeRetainedValue() {
+            if let mimetype = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() {
+                return mimetype as String
+            }
+        }
+        return "application/octet-stream"
+    }
 
 }
 
@@ -240,7 +306,8 @@ extension ShareViewController: UITableViewDataSource {
         return activitiesArray.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.ActivityCell, for: indexPath) as? ActivityCell ?? ActivityCell()        
+        let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.ActivityCell, for: indexPath) as? ActivityCell ?? ActivityCell()
+        cell.selectionStyle = .none
         let activity = activitiesArray[indexPath.row]
         cell.configureCell(for: indexPath, activity: activity)
         return cell
@@ -251,7 +318,7 @@ extension ShareViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let activity = activitiesArray[indexPath.item]
         showActivityIndicator()
-        getImage(activity: activity)
+        getItem(activity: activity)
     }
 }
 

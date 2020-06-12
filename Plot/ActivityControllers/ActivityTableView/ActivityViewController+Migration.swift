@@ -161,7 +161,6 @@ extension ActivityViewController {
         let secondCondition = (previousVersion != nil && currentAppVersion.compare(previousVersion!, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
         if firstCondition || secondCondition {
             // first launch
-            print("data migration")
             createChecklists(forActivities: activities)
             defaults.setValue(currentAppVersion, forKey: kAppVersionKey)
         }

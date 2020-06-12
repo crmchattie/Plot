@@ -203,7 +203,6 @@ extension ActivityCell {
     
     func updateParticipantsThumbnail(activity: Activity, acceptedParticipants: [User]) {
         let participants = acceptedParticipants.filter({$0.id != Auth.auth().currentUser?.uid})
-        
         let participantsCount = participants.count
         for i in 0..<thumbnails.count {
             if i < participantsCount {

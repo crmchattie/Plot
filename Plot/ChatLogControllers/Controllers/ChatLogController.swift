@@ -732,6 +732,7 @@ class ChatLogController: UICollectionViewController {
                     newActivity.admin = currentUserID
                     newActivity.participantsIDs = nil
                     newActivity.activityPhotos = nil
+                    newActivity.activityFiles = nil
                     newActivity.activityOriginalPhotoURL = nil
                     newActivity.activityThumbnailPhotoURL = nil
                     newActivity.conversationID = nil

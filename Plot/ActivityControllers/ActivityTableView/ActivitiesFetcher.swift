@@ -141,6 +141,8 @@ class ActivitiesFetcher: NSObject {
             activity.activityOriginalPhotoURL = metaInfo.activityOriginalPhotoURL
             activity.activityThumbnailPhotoURL = metaInfo.activityThumbnailPhotoURL
             activity.activityPhotos = metaInfo.activityPhotos
+            activity.activityFiles = metaInfo.activityFiles
+            activity.activityFiles = metaInfo.activityFiles
             activity.participantsIDs =  metaInfo.participantsIDs
             activity.transportation =  metaInfo.transportation
             activity.allDay =  metaInfo.allDay
@@ -245,6 +247,7 @@ class ActivitiesFetcher: NSObject {
                                        originalPhotoKey: "activityOriginalPhotoURL",
                                        thumbnailPhotoKey: "activityThumbnailPhotoURL",
                                        activityPhotosKey: "activityPhotos",
+                                       activityFilesKey: "activityFiles",
                                        allDayKey: "allDay",
                                        startDateTimeKey: "startDateTime",
                                        endDateTimeKey: "endDateTime",
@@ -287,6 +290,7 @@ class ActivitiesFetcher: NSObject {
                                        originalPhotoKey: "activityOriginalPhotoURL",
                                        thumbnailPhotoKey: "activityThumbnailPhotoURL",
                                        activityPhotosKey: "activityPhotos",
+                                       activityFilesKey: "activityFiles",
                                        allDayKey: "allDay",
                                        startDateTimeKey: "startDateTime",
                                        endDateTimeKey: "endDateTime",
@@ -329,6 +333,7 @@ class ActivitiesFetcher: NSObject {
                                        originalPhotoKey: "activityOriginalPhotoURL",
                                        thumbnailPhotoKey: "activityThumbnailPhotoURL",
                                        activityPhotosKey: "activityPhotos",
+                                       activityFilesKey: "activityFiles",
                                        allDayKey: "allDay",
                                        startDateTimeKey: "startDateTime",
                                        endDateTimeKey: "endDateTime",
@@ -361,6 +366,7 @@ class ActivitiesFetcher: NSObject {
                                            originalPhotoKey: String,
                                            thumbnailPhotoKey: String,
                                            activityPhotosKey: String,
+                                           activityFilesKey: String,
                                            allDayKey: String,
                                            startDateTimeKey: String,
                                            endDateTimeKey: String,
@@ -425,6 +431,11 @@ class ActivitiesFetcher: NSObject {
         
         if snapshot.key == activityPhotosKey {
             activities[index].activityPhotos = snapshot.value as? [String]
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == activityFilesKey {
+            activities[index].activityFiles = snapshot.value as? [String]
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
@@ -552,6 +563,7 @@ class ActivitiesFetcher: NSObject {
                                            originalPhotoKey: String,
                                            thumbnailPhotoKey: String,
                                            activityPhotosKey: String,
+                                           activityFilesKey: String,
                                            allDayKey: String,
                                            startDateTimeKey: String,
                                            endDateTimeKey: String,
@@ -610,6 +622,11 @@ class ActivitiesFetcher: NSObject {
         
         if snapshot.key == activityPhotosKey {
             activities[index].activityPhotos = [String]()
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == activityFilesKey {
+            activities[index].activityFiles = [String]()
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         

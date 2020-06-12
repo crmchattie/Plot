@@ -310,7 +310,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         header.activityHeaderHorizontalController.customActivities = self.types
         header.activityHeaderHorizontalController.collectionView.reloadData()
         header.activityHeaderHorizontalController.didSelectHandler = { [weak self] cellData in
-            
             if let activityType = cellData as? ActivityType {
                 let activityTypeName = activityType.rawValue
                     switch activityTypeName {
@@ -333,6 +332,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                             destination.conversations = self!.conversations
                             self?.navigationController?.pushViewController(destination, animated: true)
                         }
+                    case "flight":
+                        print("flight")
                     case "meal":
                         print("meal")
                     case "workout":

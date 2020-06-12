@@ -23,6 +23,7 @@ class Activity: NSObject, NSCopying, Codable {
     var activityOriginalPhotoURL: String?
     var activityThumbnailPhotoURL: String?
     var activityPhotos: [String]?
+    var activityFiles: [String]?
     var allDay: Bool?
     var startDateTime: NSNumber?
     var endDateTime: NSNumber?
@@ -157,6 +158,7 @@ class Activity: NSObject, NSCopying, Codable {
         activityOriginalPhotoURL = dictionary?["activityOriginalPhotoURL"] as? String
         activityThumbnailPhotoURL = dictionary?["activityThumbnailPhotoURL"] as? String
         activityPhotos = dictionary?["activityPhotos"] as? [String]
+        activityFiles = dictionary?["activityFiles"] as? [String]
         allDay = dictionary?["allDay"] as? Bool
         startDateTime = dictionary?["startDateTime"] as? NSNumber
         endDateTime = dictionary?["endDateTime"] as? NSNumber
@@ -234,6 +236,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.activityPhotos as AnyObject? {
             dictionary["activityPhotos"] = value
+        }
+        
+        if let value = self.activityFiles as AnyObject? {
+            dictionary["activityFiles"] = value
         }
         
         if let value = self.allDay as AnyObject? {
@@ -434,7 +440,7 @@ class Activity: NSObject, NSCopying, Codable {
 }
 
 enum ActivityType: String {
-    case basic, complex, recipe, workout, event
+    case basic, complex, recipe, workout, event, flight
     
     var activityCategoryText: String {
         switch self {
@@ -443,6 +449,7 @@ enum ActivityType: String {
             case .recipe: return "Build your own recipe"
             case .workout: return "Build your own workout"
             case .event: return "Build your own event"
+            case .flight: return "Look up your flight"
         }
     }
     
@@ -453,6 +460,7 @@ enum ActivityType: String {
             case .recipe: return "Includes sections for photo, name, ingredients, preparation and steps"
             case .workout: return "Able to pick and choose exercises, sets and weights"
             case .event: return ""
+            case .flight: return "Able to look up your flight details based on flight number, airline or airport"
         }
     }
     
@@ -463,6 +471,7 @@ enum ActivityType: String {
             case .recipe: return "meal"
             case .workout: return "workout"
             case .event: return "event"
+            case .flight: return "plane"
         }
     }
 }

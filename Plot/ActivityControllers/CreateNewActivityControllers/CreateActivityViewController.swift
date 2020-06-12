@@ -83,6 +83,7 @@ class CreateActivityViewController: FormViewController {
             active = true
             if activity.activityID != nil {
                 activityID = activity.activityID!
+                print("activityID \(activityID)")
             }
             if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
                 locationName = localName
@@ -337,20 +338,20 @@ class CreateActivityViewController: FormViewController {
                     self.activity.activityDescription = row.value
                 }
             
-            <<< ButtonRow("Photos") { row in
+            <<< ButtonRow("Media") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
                 }.onCellSelection({ _,_ in
-                    self.openPhotos()
+                    self.openMedia()
                 }).cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.accessoryType = .disclosureIndicator
                     cell.textLabel?.textAlignment = .left
-                    if self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty {
+                    if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     } else {
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -439,8 +440,8 @@ class CreateActivityViewController: FormViewController {
                 if self.active {
                     $0.value = self.activity.allDay
                 } else {
-                    $0.value = true
-                    self.activity.allDay = true
+                    $0.value = false
+                    self.activity.allDay = false
                 }
                 }.onChange { [weak self] row in
                     self!.activity.allDay = row.value
@@ -1418,16 +1419,19 @@ class CreateActivityViewController: FormViewController {
         })
     }
     
-    @objc fileprivate func openPhotos() {
+    @objc fileprivate func openMedia() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        let destination = PhotosViewController(collectionViewLayout: UICollectionViewFlowLayout())
+        let destination = MediaViewController()
         destination.delegate = self
         destination.activityID = activityID
         if let imageURLs = activity.activityPhotos {
             destination.imageURLs = imageURLs
+        }
+        if let fileURLs = activity.activityFiles {
+            destination.fileURLs = fileURLs
         }
 
         self.navigationController?.pushViewController(destination, animated: true)
@@ -1972,6 +1976,7 @@ class CreateActivityViewController: FormViewController {
             newActivity.admin = currentUserID
             newActivity.participantsIDs = nil
             newActivity.activityPhotos = nil
+            newActivity.activityFiles = nil
             newActivity.activityOriginalPhotoURL = nil
             newActivity.activityThumbnailPhotoURL = nil
             newActivity.conversationID = nil
@@ -2420,14 +2425,15 @@ extension CreateActivityViewController: UpdateGrocerylistDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateActivityPhotosDelegate {
-    func updateActivityPhotos(activityPhotos: [String]) {
+extension CreateActivityViewController: UpdateActivityMediaDelegate {
+    func updateActivityMedia(activityPhotos: [String], activityFiles: [String]) {
         activity.activityPhotos = activityPhotos
-        if let photosRow: ButtonRow = form.rowBy(tag: "Photos") {
-            if self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty {
-                photosRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        activity.activityFiles = activityFiles
+        if let mediaRow: ButtonRow = form.rowBy(tag: "Media") {
+            if self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty || self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty {
+                mediaRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             } else {
-                photosRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                mediaRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
         }
     }

@@ -21,6 +21,7 @@ class Activity: NSObject {
     var activityOriginalPhotoURL: String?
     var activityThumbnailPhotoURL: String?
     var activityPhotos: [String]?
+    var activityFiles: [String]?
     var allDay: Bool?
     var startDateTime: NSNumber?
     var endDateTime: NSNumber?
@@ -40,6 +41,9 @@ class Activity: NSObject {
     var workoutID: String?
     var eventID: String?
     var attractionID: String?
+    var checklistIDs: [String]?
+    var packinglistIDs: [String]?
+    var grocerylistID: String?
     
     init(dictionary: [String: AnyObject]?){
         super.init()
@@ -55,6 +59,7 @@ class Activity: NSObject {
         activityOriginalPhotoURL = dictionary?["activityOriginalPhotoURL"] as? String
         activityThumbnailPhotoURL = dictionary?["activityThumbnailPhotoURL"] as? String
         activityPhotos = dictionary?["activityPhotos"] as? [String]
+        activityFiles = dictionary?["activityFiles"] as? [String]
         allDay = dictionary?["allDay"] as? Bool
         startDateTime = dictionary?["startDateTime"] as? NSNumber
         endDateTime = dictionary?["endDateTime"] as? NSNumber
@@ -74,6 +79,9 @@ class Activity: NSObject {
         workoutID = dictionary?["workoutID"] as? String
         eventID = dictionary?["eventID"] as? String
         attractionID = dictionary?["attractionID"] as? String
+        grocerylistID = dictionary?["grocerylistID"] as? String
+        checklistIDs = dictionary?["checklistIDs"] as? [String]
+        packinglistIDs = dictionary?["packinglistIDs"] as? [String]
         
     }
     
@@ -122,6 +130,10 @@ class Activity: NSObject {
         
         if let value = self.activityPhotos as AnyObject? {
             activityDict["activityPhotos"] = value
+        }
+        
+        if let value = self.activityFiles as AnyObject? {
+            activityDict["activityFiles"] = value
         }
         
         activityDict["allDay"] = self.allDay as AnyObject
