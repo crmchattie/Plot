@@ -67,7 +67,7 @@ class EnterPhoneNumberController: UIViewController {
   }
   
   func setRightBarButtonStatus() {
-    if phoneNumberContainerView.phoneNumber.text!.count < 10 || phoneNumberContainerView.countryCode.text == " - " {
+    if phoneNumberContainerView.phoneNumber.text!.count < 4 || phoneNumberContainerView.phoneNumber.text!.count > 13 || phoneNumberContainerView.countryCode.text == " - " {
       self.navigationItem.rightBarButtonItem?.isEnabled = false
         phoneNumberContainerView.nextView.isEnabled = false
     } else {

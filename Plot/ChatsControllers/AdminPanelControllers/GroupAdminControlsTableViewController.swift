@@ -505,6 +505,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
                 if tableView.numberOfRows(inSection: indexPath.section) == 1 {
                     self.tableView.beginUpdates()
                     self.activities.remove(at: activityIndex)
+                    self.sections.removeAll(where: {$0 == "Activities"})
                     let indexSet = IndexSet(arrayLiteral: indexPath.section)
                     self.tableView.deleteSections(indexSet, with: .left)
                     self.tableView.endUpdates()
@@ -547,6 +548,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
                 if tableView.numberOfRows(inSection: indexPath.section) == 1 {
                     self.tableView.beginUpdates()
                     self.checklists.remove(at: checklistIndex)
+                    self.sections.removeAll(where: {$0 == "Checklists"})
                     let indexSet = IndexSet(arrayLiteral: indexPath.section)
                     self.tableView.deleteSections(indexSet, with: .left)
                     self.tableView.endUpdates()
@@ -589,6 +591,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
                 if tableView.numberOfRows(inSection: indexPath.section) == 1 {
                     self.tableView.beginUpdates()
                     self.grocerylists.remove(at: grocerylistIndex)
+                    self.sections.removeAll(where: {$0 == "Grocery Lists"})
                     let indexSet = IndexSet(arrayLiteral: indexPath.section)
                     self.tableView.deleteSections(indexSet, with: .left)
                     self.tableView.endUpdates()
@@ -631,6 +634,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
                 if tableView.numberOfRows(inSection: indexPath.section) == 1 {
                     self.tableView.beginUpdates()
                     self.packinglists.remove(at: packinglistIndex)
+                    self.sections.removeAll(where: {$0 == "Packing Lists"})
                     let indexSet = IndexSet(arrayLiteral: indexPath.section)
                     self.tableView.deleteSections(indexSet, with: .left)
                     self.tableView.endUpdates()
