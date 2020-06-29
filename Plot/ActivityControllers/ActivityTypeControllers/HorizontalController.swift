@@ -21,6 +21,8 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     var events: [Event]?
     var attractions: [Attraction]?
     var workouts: [Workout]?
+    var groupItems: [GroupItem]?
+    var sygicPlaces: [SygicPlace]?
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -105,6 +107,14 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             if let attraction = attractions?[indexPath.item] {
                 didSelectHandler?(attraction, favAct)
             }
+        } else if groupItems != nil {
+            if let groupItem = groupItems?[indexPath.item].venue {
+                didSelectHandler?(groupItem, favAct)
+            }
+        } else if sygicPlaces != nil {
+            if let place = sygicPlaces?[indexPath.item] {
+                didSelectHandler?(place, favAct)
+            }
         }
         else {
             
@@ -120,6 +130,10 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             return workouts!.count
         } else if attractions != nil {
             return attractions!.count
+        } else if groupItems != nil {
+            return groupItems!.count
+        } else if sygicPlaces != nil {
+            return sygicPlaces!.count
         }
         else {
             return 0
@@ -141,6 +155,8 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.event = nil
             cell.workout = nil
             cell.attraction = nil
+            cell.fsVenue = nil
+            cell.sygicPlace = nil
             return cell
         } else if events != nil {
             self.activityIndicatorView.stopAnimating()
@@ -154,6 +170,8 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.recipe = nil
             cell.workout = nil
             cell.attraction = nil
+            cell.fsVenue = nil
+            cell.sygicPlace = nil
             return cell
         } else if workouts != nil {
             self.activityIndicatorView.stopAnimating()
@@ -168,6 +186,8 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.event = nil
             cell.recipe = nil
             cell.attraction = nil
+            cell.fsVenue = nil
+            cell.sygicPlace = nil
             return cell
         } else if attractions != nil {
             self.activityIndicatorView.stopAnimating()
@@ -181,6 +201,40 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.event = nil
             cell.workout = nil
             cell.recipe = nil
+            cell.fsVenue = nil
+            cell.sygicPlace = nil
+            return cell
+        } else if groupItems != nil {
+            self.activityIndicatorView.stopAnimating()
+            let fsVenue = groupItems![indexPath.item].venue
+            cell.fsVenue = fsVenue
+            if let groupItems = favAct["groupItems"], groupItems.contains(fsVenue!.id) {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
+            cell.intColor = ((indexPath.item + indexPathItem % 5) % 5)
+            cell.event = nil
+            cell.workout = nil
+            cell.recipe = nil
+            cell.attraction = nil
+            cell.sygicPlace = nil
+            return cell
+        } else if sygicPlaces != nil {
+            self.activityIndicatorView.stopAnimating()
+            let sygicPlace = sygicPlaces![indexPath.item]
+            cell.sygicPlace = sygicPlace
+            if let sygicPlaces = favAct["sygicPlaces"], sygicPlaces.contains(sygicPlace.id) {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
+            cell.intColor = ((indexPath.item + indexPathItem % 5) % 5)
+            cell.event = nil
+            cell.workout = nil
+            cell.recipe = nil
+            cell.attraction = nil
+            cell.fsVenue = nil
             return cell
         }
         else {

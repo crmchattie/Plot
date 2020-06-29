@@ -106,80 +106,80 @@ extension ChatsTableViewController {
     return delete
   }
   func unpinConversation(at indexPath: IndexPath) {
-    let conversation = self.filteredPinnedConversations[indexPath.row]
-    guard let currentUserID = Auth.auth().currentUser?.uid, let conversationID = conversation.chatID else { return }
-    
-		guard let index = self.pinnedConversations.firstIndex(where: { (conversation) -> Bool in
-      return conversation.chatID == self.filteredPinnedConversations[indexPath.row].chatID
-    }) else { return }
-    
-    self.tableView.beginUpdates()
-    let pinnedElement = self.filteredPinnedConversations[indexPath.row]
-    
-    let filteredIndexToInsert = self.filteredConversations.insertionIndex(of: pinnedElement, using: { (conversation1, conversation2) -> Bool in
-      return conversation1.lastMessage?.timestamp?.int32Value > conversation2.lastMessage?.timestamp?.int32Value
-    })
-    
-    let unfilteredIndexToInsert = self.conversations.insertionIndex(of: pinnedElement, using: { (conversation1, conversation2) -> Bool in
-      return conversation1.lastMessage?.timestamp?.int32Value > conversation2.lastMessage?.timestamp?.int32Value
-    })
-    
-    self.filteredConversations.insert(pinnedElement, at: filteredIndexToInsert)
-    self.conversations.insert(pinnedElement, at: unfilteredIndexToInsert)
-    self.filteredPinnedConversations.remove(at: indexPath.row)
-    self.pinnedConversations.remove(at: index)
-    let destinationIndexPath = IndexPath(row: filteredIndexToInsert, section: 1)
-    
-    self.tableView.deleteRows(at: [indexPath], with: .bottom)
-    self.tableView.insertRows(at: [destinationIndexPath], with: .bottom)
-    self.tableView.endUpdates()
-    
-    let metadataRef = Database.database().reference().child("user-messages").child(currentUserID).child(conversationID).child(messageMetaDataFirebaseFolder)
-    metadataRef.updateChildValues(["pinned": false], withCompletionBlock: { (error, reference) in
-      if error != nil {
-        basicErrorAlertWith(title: pinErrorTitle , message: pinErrorMessage, controller: self)
-        return
-      }
-    })
+//    let conversation = self.filteredPinnedConversations[indexPath.row]
+//    guard let currentUserID = Auth.auth().currentUser?.uid, let conversationID = conversation.chatID else { return }
+//
+//		guard let index = self.pinnedConversations.firstIndex(where: { (conversation) -> Bool in
+//      return conversation.chatID == self.filteredPinnedConversations[indexPath.row].chatID
+//    }) else { return }
+//
+//    self.tableView.beginUpdates()
+//    let pinnedElement = self.filteredPinnedConversations[indexPath.row]
+//
+//    let filteredIndexToInsert = self.filteredConversations.insertionIndex(of: pinnedElement, using: { (conversation1, conversation2) -> Bool in
+//      return conversation1.lastMessage?.timestamp?.int32Value > conversation2.lastMessage?.timestamp?.int32Value
+//    })
+//
+//    let unfilteredIndexToInsert = self.conversations.insertionIndex(of: pinnedElement, using: { (conversation1, conversation2) -> Bool in
+//      return conversation1.lastMessage?.timestamp?.int32Value > conversation2.lastMessage?.timestamp?.int32Value
+//    })
+//
+//    self.filteredConversations.insert(pinnedElement, at: filteredIndexToInsert)
+//    self.conversations.insert(pinnedElement, at: unfilteredIndexToInsert)
+//    self.filteredPinnedConversations.remove(at: indexPath.row)
+//    self.pinnedConversations.remove(at: index)
+//    let destinationIndexPath = IndexPath(row: filteredIndexToInsert, section: 1)
+//
+//    self.tableView.deleteRows(at: [indexPath], with: .bottom)
+//    self.tableView.insertRows(at: [destinationIndexPath], with: .bottom)
+//    self.tableView.endUpdates()
+//
+//    let metadataRef = Database.database().reference().child("user-messages").child(currentUserID).child(conversationID).child(messageMetaDataFirebaseFolder)
+//    metadataRef.updateChildValues(["pinned": false], withCompletionBlock: { (error, reference) in
+//      if error != nil {
+//        basicErrorAlertWith(title: pinErrorTitle , message: pinErrorMessage, controller: self)
+//        return
+//      }
+//    })
   }
   
   func pinConversation(at indexPath: IndexPath) {
     
-    let conversation = self.filteredConversations[indexPath.row]
-    guard let currentUserID = Auth.auth().currentUser?.uid, let conversationID = conversation.chatID else { return }
-    
-		guard let index = self.conversations.firstIndex(where: { (conversation) -> Bool in
-      return conversation.chatID == self.filteredConversations[indexPath.row].chatID
-    }) else { return }
-    
-    self.tableView.beginUpdates()
-    let elementToPin = self.filteredConversations[indexPath.row]
-    
-    let filteredIndexToInsert = self.filteredPinnedConversations.insertionIndex(of: elementToPin, using: { (conversation1, conversation2) -> Bool in
-      return conversation1.lastMessage?.timestamp?.int32Value > conversation2.lastMessage?.timestamp?.int32Value
-    })
-    
-    let unfilteredIndexToInsert = self.pinnedConversations.insertionIndex(of: elementToPin, using: { (conversation1, conversation2) -> Bool in
-      return conversation1.lastMessage?.timestamp?.int32Value > conversation2.lastMessage?.timestamp?.int32Value
-    })
-    
-    self.filteredPinnedConversations.insert(elementToPin, at: filteredIndexToInsert)
-    self.pinnedConversations.insert(elementToPin, at: unfilteredIndexToInsert)
-    self.filteredConversations.remove(at: indexPath.row)
-    self.conversations.remove(at: index)
-    let destinationIndexPath = IndexPath(row: filteredIndexToInsert, section: 0)
-    
-    self.tableView.deleteRows(at: [indexPath], with: .top)
-    self.tableView.insertRows(at: [destinationIndexPath], with: .top)
-    self.tableView.endUpdates()
-    
-    let metadataReference = Database.database().reference().child("user-messages").child(currentUserID).child(conversationID).child(messageMetaDataFirebaseFolder)
-    metadataReference.updateChildValues(["pinned": true], withCompletionBlock: { (error, reference) in
-      if error != nil {
-        basicErrorAlertWith(title: pinErrorTitle, message: pinErrorMessage, controller: self)
-        return
-      }
-    })
+//    let conversation = self.filteredConversations[indexPath.row]
+//    guard let currentUserID = Auth.auth().currentUser?.uid, let conversationID = conversation.chatID else { return }
+//    
+//		guard let index = self.conversations.firstIndex(where: { (conversation) -> Bool in
+//      return conversation.chatID == self.filteredConversations[indexPath.row].chatID
+//    }) else { return }
+//    
+//    self.tableView.beginUpdates()
+//    let elementToPin = self.filteredConversations[indexPath.row]
+//    
+//    let filteredIndexToInsert = self.filteredPinnedConversations.insertionIndex(of: elementToPin, using: { (conversation1, conversation2) -> Bool in
+//      return conversation1.lastMessage?.timestamp?.int32Value > conversation2.lastMessage?.timestamp?.int32Value
+//    })
+//    
+//    let unfilteredIndexToInsert = self.pinnedConversations.insertionIndex(of: elementToPin, using: { (conversation1, conversation2) -> Bool in
+//      return conversation1.lastMessage?.timestamp?.int32Value > conversation2.lastMessage?.timestamp?.int32Value
+//    })
+//    
+//    self.filteredPinnedConversations.insert(elementToPin, at: filteredIndexToInsert)
+//    self.pinnedConversations.insert(elementToPin, at: unfilteredIndexToInsert)
+//    self.filteredConversations.remove(at: indexPath.row)
+//    self.conversations.remove(at: index)
+//    let destinationIndexPath = IndexPath(row: filteredIndexToInsert, section: 0)
+//    
+//    self.tableView.deleteRows(at: [indexPath], with: .top)
+//    self.tableView.insertRows(at: [destinationIndexPath], with: .top)
+//    self.tableView.endUpdates()
+//    
+//    let metadataReference = Database.database().reference().child("user-messages").child(currentUserID).child(conversationID).child(messageMetaDataFirebaseFolder)
+//    metadataReference.updateChildValues(["pinned": true], withCompletionBlock: { (error, reference) in
+//      if error != nil {
+//        basicErrorAlertWith(title: pinErrorTitle, message: pinErrorMessage, controller: self)
+//        return
+//      }
+//    })
   }
   
   func deletePinnedConversation(at indexPath: IndexPath) {

@@ -98,6 +98,40 @@ class ActivitySubTypeCell: UICollectionViewCell {
         }
     }
     
+    var fsVenue: FSVenue! {
+        didSet {
+            if let fsVenue = fsVenue {
+                nameLabel.text = fsVenue.name
+//                if let category = fsVenue.location?.address {
+//                    categoryLabel.text = category
+//                    subcategoryLabel.text = "Number of exercises: \(subcategory)"
+//                }
+                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
+                imageView.tintColor = UIColor.white
+                imageView.backgroundColor = colors[intColor]
+                imageURL = "workout"
+            }
+            setupViews()
+        }
+    }
+    
+    var sygicPlace: SygicPlace! {
+        didSet {
+            if let sygicPlace = sygicPlace {
+                nameLabel.text = sygicPlace.name
+//                if let category = workout.tagsStr, let subcategory = workout.exercises?.count {
+//                    categoryLabel.text = category
+//                    subcategoryLabel.text = "Number of exercises: \(subcategory)"
+//                }
+                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
+                imageView.tintColor = UIColor.white
+                imageView.backgroundColor = colors[intColor]
+                imageURL = "workout"
+            }
+            setupViews()
+        }
+    }
+    
     weak var delegate: ActivitySubTypeCellDelegate?
     
     override init(frame: CGRect) {

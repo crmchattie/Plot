@@ -18,6 +18,8 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     var events: [Event]?
     var workouts: [Workout]?
     var attractions: [Attraction]?
+    var groupItems: [GroupItem]?
+    var sygicPlaces: [SygicPlace]?
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -99,6 +101,14 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             if let attraction = attractions?[indexPath.item] {
                 didSelectHandler?(attraction, favAct)
             }
+        } else if groupItems != nil {
+            if let groupItem = groupItems?[indexPath.item].venue {
+                didSelectHandler?(groupItem, favAct)
+            }
+        } else if sygicPlaces != nil {
+            if let place = sygicPlaces?[indexPath.item] {
+                didSelectHandler?(place, favAct)
+            }
         }
         else {
             
@@ -116,6 +126,10 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             return workouts!.count
         } else if attractions != nil {
             return attractions!.count
+        } else if groupItems != nil {
+            return groupItems!.count
+        } else if sygicPlaces != nil {
+            return sygicPlaces!.count
         }
         else {
             return 0
@@ -136,6 +150,8 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             cell.event = nil
             cell.workout = nil
             cell.attraction = nil
+            cell.fsVenue = nil
+            cell.sygicPlace = nil
             return cell
         } else if events != nil {
             let event = events![indexPath.item]
@@ -148,6 +164,8 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             cell.recipe = nil
             cell.workout = nil
             cell.attraction = nil
+            cell.fsVenue = nil
+            cell.sygicPlace = nil
             return cell
         } else if workouts != nil {
             let workout = workouts![indexPath.item]
@@ -161,6 +179,8 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             cell.event = nil
             cell.recipe = nil
             cell.attraction = nil
+            cell.fsVenue = nil
+            cell.sygicPlace = nil
             return cell
         } else if attractions != nil {
             let attraction = attractions![indexPath.item]
@@ -173,6 +193,38 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             cell.event = nil
             cell.workout = nil
             cell.recipe = nil
+            cell.fsVenue = nil
+            cell.sygicPlace = nil
+            return cell
+        } else if groupItems != nil {
+            let fsVenue = groupItems![indexPath.item].venue
+            cell.fsVenue = fsVenue
+            if let groupItems = favAct["groupItems"], groupItems.contains(fsVenue!.id) {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
+            cell.intColor = (indexPath.item % 5)
+            cell.event = nil
+            cell.workout = nil
+            cell.recipe = nil
+            cell.sygicPlace = nil
+            cell.attraction = nil
+            return cell
+        } else if sygicPlaces != nil {
+            let sygicPlace = sygicPlaces![indexPath.item]
+            cell.sygicPlace = sygicPlace
+            if let sygicPlaces = favAct["sygicPlaces"], sygicPlaces.contains(sygicPlace.id) {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
+            cell.intColor = (indexPath.item % 5)
+            cell.event = nil
+            cell.workout = nil
+            cell.recipe = nil
+            cell.attraction = nil
+            cell.fsVenue = nil
             return cell
         }
         else {

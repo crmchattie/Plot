@@ -107,80 +107,80 @@ extension ActivityViewController {
         return delete
     }
     func unpinActivity(at indexPath: IndexPath) {
-        let activity = filteredPinnedActivities[indexPath.row]
-        guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activity.activityID else { return }
-        
-        guard let index = pinnedActivities.firstIndex(where: { (activity) -> Bool in
-            return activity.activityID == filteredPinnedActivities[indexPath.row].activityID
-        }) else { return }
-        
-        self.activityView.tableView.beginUpdates()
-        let pinnedElement = filteredPinnedActivities[indexPath.row]
-        
-        let filteredIndexToInsert = filteredActivities.insertionIndex(of: pinnedElement, using: { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int32Value < activity2.startDateTime?.int32Value
-        })
-        
-        let unfilteredIndexToInsert = activities.insertionIndex(of: pinnedElement, using: { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int32Value < activity2.startDateTime?.int32Value
-        })
-        
-        filteredActivities.insert(pinnedElement, at: filteredIndexToInsert)
-        activities.insert(pinnedElement, at: unfilteredIndexToInsert)
-        filteredPinnedActivities.remove(at: indexPath.row)
-        pinnedActivities.remove(at: index)
-        let destinationIndexPath = IndexPath(row: filteredIndexToInsert, section: 1)
-        
-        activityView.tableView.deleteRows(at: [indexPath], with: .bottom)
-        activityView.tableView.insertRows(at: [destinationIndexPath], with: .bottom)
-        activityView.tableView.endUpdates()
-        
-        let metadataRef = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
-        metadataRef.updateChildValues(["pinned": false], withCompletionBlock: { (error, reference) in
-            if error != nil {
-                basicErrorAlertWith(title: pinErrorTitle , message: pinErrorMessage, controller: self)
-                return
-            }
-        })
+//        let activity = filteredPinnedActivities[indexPath.row]
+//        guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activity.activityID else { return }
+//
+//        guard let index = pinnedActivities.firstIndex(where: { (activity) -> Bool in
+//            return activity.activityID == filteredPinnedActivities[indexPath.row].activityID
+//        }) else { return }
+//
+//        self.activityView.tableView.beginUpdates()
+//        let pinnedElement = filteredPinnedActivities[indexPath.row]
+//
+//        let filteredIndexToInsert = filteredActivities.insertionIndex(of: pinnedElement, using: { (activity1, activity2) -> Bool in
+//            return activity1.startDateTime?.int32Value < activity2.startDateTime?.int32Value
+//        })
+//
+//        let unfilteredIndexToInsert = activities.insertionIndex(of: pinnedElement, using: { (activity1, activity2) -> Bool in
+//            return activity1.startDateTime?.int32Value < activity2.startDateTime?.int32Value
+//        })
+//
+//        filteredActivities.insert(pinnedElement, at: filteredIndexToInsert)
+//        activities.insert(pinnedElement, at: unfilteredIndexToInsert)
+//        filteredPinnedActivities.remove(at: indexPath.row)
+//        pinnedActivities.remove(at: index)
+//        let destinationIndexPath = IndexPath(row: filteredIndexToInsert, section: 1)
+//
+//        activityView.tableView.deleteRows(at: [indexPath], with: .bottom)
+//        activityView.tableView.insertRows(at: [destinationIndexPath], with: .bottom)
+//        activityView.tableView.endUpdates()
+//
+//        let metadataRef = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
+//        metadataRef.updateChildValues(["pinned": false], withCompletionBlock: { (error, reference) in
+//            if error != nil {
+//                basicErrorAlertWith(title: pinErrorTitle , message: pinErrorMessage, controller: self)
+//                return
+//            }
+//        })
     }
     
     func pinActivity(at indexPath: IndexPath) {
         
-        let activity = self.filteredActivities[indexPath.row]
-        guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activity.activityID else { return }
-        
-        guard let index = activities.firstIndex(where: { (activity) -> Bool in
-            return activity.activityID == self.filteredActivities[indexPath.row].activityID
-        }) else { return }
-        
-        self.activityView.tableView.beginUpdates()
-        let elementToPin = filteredActivities[indexPath.row]
-        
-        let filteredIndexToInsert = filteredPinnedActivities.insertionIndex(of: elementToPin, using: { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int32Value < activity2.startDateTime?.int32Value
-        })
-        
-        let unfilteredIndexToInsert = pinnedActivities.insertionIndex(of: elementToPin, using: { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int32Value < activity2.startDateTime?.int32Value
-        })
-        
-        filteredPinnedActivities.insert(elementToPin, at: filteredIndexToInsert)
-        pinnedActivities.insert(elementToPin, at: unfilteredIndexToInsert)
-        filteredActivities.remove(at: indexPath.row)
-        activities.remove(at: index)
-        let destinationIndexPath = IndexPath(row: filteredIndexToInsert, section: 0)
-        
-        activityView.tableView.deleteRows(at: [indexPath], with: .top)
-        activityView.tableView.insertRows(at: [destinationIndexPath], with: .top)
-        activityView.tableView.endUpdates()
-        
-        let metadataReference = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
-        metadataReference.updateChildValues(["pinned": true], withCompletionBlock: { (error, reference) in
-            if error != nil {
-                basicErrorAlertWith(title: pinErrorTitle, message: pinErrorMessage, controller: self)
-                return
-            }
-        })
+//        let activity = self.filteredActivities[indexPath.row]
+//        guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activity.activityID else { return }
+//
+//        guard let index = activities.firstIndex(where: { (activity) -> Bool in
+//            return activity.activityID == self.filteredActivities[indexPath.row].activityID
+//        }) else { return }
+//
+//        self.activityView.tableView.beginUpdates()
+//        let elementToPin = filteredActivities[indexPath.row]
+//
+//        let filteredIndexToInsert = filteredPinnedActivities.insertionIndex(of: elementToPin, using: { (activity1, activity2) -> Bool in
+//            return activity1.startDateTime?.int32Value < activity2.startDateTime?.int32Value
+//        })
+//
+//        let unfilteredIndexToInsert = pinnedActivities.insertionIndex(of: elementToPin, using: { (activity1, activity2) -> Bool in
+//            return activity1.startDateTime?.int32Value < activity2.startDateTime?.int32Value
+//        })
+//
+//        filteredPinnedActivities.insert(elementToPin, at: filteredIndexToInsert)
+//        pinnedActivities.insert(elementToPin, at: unfilteredIndexToInsert)
+//        filteredActivities.remove(at: indexPath.row)
+//        activities.remove(at: index)
+//        let destinationIndexPath = IndexPath(row: filteredIndexToInsert, section: 0)
+//
+//        activityView.tableView.deleteRows(at: [indexPath], with: .top)
+//        activityView.tableView.insertRows(at: [destinationIndexPath], with: .top)
+//        activityView.tableView.endUpdates()
+//
+//        let metadataReference = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
+//        metadataReference.updateChildValues(["pinned": true], withCompletionBlock: { (error, reference) in
+//            if error != nil {
+//                basicErrorAlertWith(title: pinErrorTitle, message: pinErrorMessage, controller: self)
+//                return
+//            }
+//        })
     }
     
     func deletePinnedActivity(at indexPath: IndexPath) {

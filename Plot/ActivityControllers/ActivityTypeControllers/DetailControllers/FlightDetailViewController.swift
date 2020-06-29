@@ -1,8 +1,8 @@
 //
-//  MealDetailViewController.swift
+//  FlightDetailViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 3/7/20.
+//  Created by Cory McHattie on 6/25/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
@@ -10,75 +10,49 @@ import UIKit
 import Firebase
 import MapKit
 
-protocol UpdateRecipeDelegate: class {
-    func updateRecipe(recipe: Recipe?)
-}
 
-class MealDetailViewController: ActivityDetailViewController {
+class FlightDetailViewController: ActivityDetailViewController {
     
     private let kActivityDetailCell = "ActivityDetailCell"
     private let kActivityExpandedDetailCell = "ActivityExpandedDetailCell"
-    private let kMealDetailCell = "MealDetailCell"
-    
-    weak var recipeDelegate : UpdateRecipeDelegate?
-    
-    var recipe: Recipe?
-    
-    var segment: Int = 0
-    var servings: Int?
-    //for grocery list
-    var activeRecipe: Bool = false
-    
-    var ingredients = [ExtendedIngredient]()
-    var instructions = [String]()
-    var equipment = [String]()
+    private let kWorkoutDetailCell = "WorkoutDetailCell"
+    private let kExerciseDetailCell = "ExerciseDetailCell"
         
-    var screenWidth: CGFloat = 0
-    var firstHeight: CGFloat = 0
-    var secondHeight: CGFloat = 0
-    var thirdHeight: CGFloat = 0
-    var heightArray = [CGFloat]()
+    var workout: Workout?
+    var intColor: Int = 0
     
-    var detailedRecipe: Recipe?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setActivity()
         
-        if !active || !activeRecipe {
+        if !active {
             setMoreActivity()
-        } else {
-            if let activityServings = activity.servings {
-                recipe?.servings = activityServings
-            } else if servings != nil {
-                recipe?.servings = servings
-            }
         }
-        
-        if detailedRecipe == nil {
-            fetchData()
-        } else {
-            fetchDetails()
-        }
-        
-        title = "Meal"
+                    
+        title = "Flight"
         
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
-        collectionView.register(MealDetailCell.self, forCellWithReuseIdentifier: kMealDetailCell)
-        
+        collectionView.register(WorkoutDetailCell.self, forCellWithReuseIdentifier: kWorkoutDetailCell)
+        collectionView.register(ExerciseDetailCell.self, forCellWithReuseIdentifier: kExerciseDetailCell)
+
+                                        
     }
     
     fileprivate func setMoreActivity() {
-        if let recipe = recipe {
-            activity.recipeID = "\(recipe.id)"
-            activity.activityType = "recipe"
+        if let workout = workout {
+            activity.activityType = "flight"
+            activity.workoutID = "\(workout.identifier)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
-
                     startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
-                    endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+                    if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
+                        endDateTime = startDateTime!.addingTimeInterval(duration * 60)
+                    } else {
+                        endDateTime = startDateTime
+                    }
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
@@ -86,7 +60,11 @@ class MealDetailViewController: ActivityDetailViewController {
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
-                    endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+                    if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
+                        endDateTime = startDateTime!.addingTimeInterval(duration * 60)
+                    } else {
+                        endDateTime = startDateTime!
+                    }
                 }
                 if let localName = umbrellaActivity.locationName, localName != "locationName", let localAddress = umbrellaActivity.locationAddress {
                     locationName = localName
@@ -101,7 +79,11 @@ class MealDetailViewController: ActivityDetailViewController {
                 let timezone = TimeZone.current
                 let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                 startDateTime = rounded.addingTimeInterval(seconds)
-                endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
+                if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
+                    endDateTime = startDateTime!.addingTimeInterval(duration * 60)
+                } else {
+                    endDateTime = startDateTime!
+                }
             }
             self.collectionView.reloadData()
             activity.allDay = false
@@ -110,127 +92,48 @@ class MealDetailViewController: ActivityDetailViewController {
         }
     }
     
-    fileprivate func fetchData() {
-        
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        
-        let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-        if let recipe = recipe {
-            Service.shared.fetchRecipesInfo(id: recipe.id) { (search, err) in
-                self.detailedRecipe = search
-                dispatchGroup.leave()
-                dispatchGroup.notify(queue: .main) {
-                    self.screenWidth = self.view.frame.width
-                    self.fetchDetails()
-                    self.collectionView.reloadData()
-                }
-            }
-        }
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 4
     }
-    
-    func fetchDetails() {
-        let dispatchGroup = DispatchGroup()
-        
-        if let recipe = detailedRecipe {
-            firstHeight = 0
-            secondHeight = 0
-            thirdHeight = 0
-            if recipe.extendedIngredients != nil {
-                var extendedIngredients = recipe.extendedIngredients
-                for index in 0...extendedIngredients!.count - 1 {
-                    dispatchGroup.enter()
-                    if let activityServings = activity.servings ?? servings {
-                        if extendedIngredients![index].amount != nil {
-                            extendedIngredients![index].amount = extendedIngredients![index].amount! * Double(activityServings) / Double(detailedRecipe!.servings!)
-                        }
-                        if extendedIngredients![index].measures?.us?.amount != nil {
-                            extendedIngredients![index].measures!.metric!.amount! = (extendedIngredients![index].measures?.metric?.amount!)! * Double(activityServings) / Double(detailedRecipe!.servings!)
-                        }
-                        if extendedIngredients![index].measures?.us?.amount != nil {
-                            extendedIngredients![index].measures!.us!.amount! = (extendedIngredients![index].measures?.us?.amount!)! * Double(activityServings) / Double(detailedRecipe!.servings!)
-                        }
-                    }
-                    self.firstHeight += self.estimateFrameForText(width: self.screenWidth - 30, text: extendedIngredients![index].original?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
-                    dispatchGroup.leave()
-                }
-                self.ingredients = extendedIngredients!
-                if activity.servings != nil {
-                    detailedRecipe?.extendedIngredients = extendedIngredients!
-                    detailedRecipe?.servings = activity.servings
-                    self.recipe?.servings = activity.servings
-                } else if servings != nil {
-                    detailedRecipe?.extendedIngredients = extendedIngredients!
-                    detailedRecipe?.servings = servings
-                    self.recipe?.servings = servings
-                }
-            }
-            if let analyzedInstructions = recipe.analyzedInstructions {
-                for instruction in analyzedInstructions {
-                    for step in instruction.steps! {
-                        for equipment in step.equipment! {
-                            dispatchGroup.enter()
-                            if !self.equipment.contains(equipment.name ?? "") {
-                                self.equipment.append(equipment.name ?? "")
-                                secondHeight += estimateFrameForText(width: self.screenWidth - 30, text: equipment.name?.capitalized ?? "", font: UIFont.preferredFont(forTextStyle: .body)).height + 12
-                            }
-                            dispatchGroup.leave()
-                        }
-                    }
-                }
-            }
-            if let analyzedInstructions = recipe.analyzedInstructions {
-                for instruction in analyzedInstructions {
-                    if let steps = instruction.steps {
-                        for step in steps {
-                            dispatchGroup.enter()
-                            self.instructions.append(step.step ?? "")
-                            thirdHeight += estimateFrameForText(width: self.screenWidth - 57, text: step.step ?? "", font: UIFont.preferredFont(forTextStyle: .callout)).height + 12
-                            dispatchGroup.leave()
-                        }
-                    }
-                }
-            }
-        }
-        dispatchGroup.notify(queue: .main) {
-            self.updateHeight()
-        }
-    }
-    
-    
+
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if !activeRecipe {
-            return 3
+        if section == 3 {
+            if let exercises = workout?.exercises {
+                return exercises.count
+            } else {
+                return 0
+            }
         } else {
-            return 2
+            return 1
         }
     }
-    
+        
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if indexPath.item == 0 {
+        if indexPath.section == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
             cell.delegate = self
-            if let recipe = recipe {
-                if let recipes = favAct["recipes"], recipes.contains("\(recipe.id)") {
-                    print("heart filled")
+            if let workout = workout {
+                if let workouts = favAct["workouts"], workouts.contains(workout.identifier) {
                     cell.heartButtonImage = "heart-filled"
                 } else {
-                    print("heart")
                     cell.heartButtonImage = "heart"
                 }
-                cell.recipe = recipe
                 cell.active = active
-                return cell
-            } else {
-                return cell
+                cell.intColor = intColor
+                cell.workout = workout
             }
-        } else if indexPath.item == 1 && !activeRecipe {
+            return cell
+        } else if indexPath.section == 1 {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kWorkoutDetailCell, for: indexPath) as! WorkoutDetailCell
+            if let workout = workout {
+                cell.workout = workout
+                cell.delegate = self
+            }
+            return cell
+        } else if indexPath.section == 2 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
             cell.delegate = self
-            if let recipe = recipe {
+            if let workout = workout {
                 cell.locationLabel.text = locationName
                 cell.participantsLabel.text = userNamesString
                 cell.rightReminderLabel.text = reminder
@@ -241,36 +144,43 @@ class MealDetailViewController: ActivityDetailViewController {
                     cell.startDatePicker.date = startDateTime
                     cell.endDatePicker.date = endDateTime
                 }
-                cell.recipe = recipe
+                cell.workout = workout
                 return cell
             } else {
                 return cell
             }
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kMealDetailCell, for: indexPath) as! MealDetailCell
-            cell.mealExpandedDetailViewController.ingredients = ingredients
-            cell.mealExpandedDetailViewController.equipment = equipment
-            cell.mealExpandedDetailViewController.instructions = instructions
-            cell.mealExpandedDetailViewController.collectionView.reloadData()
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kExerciseDetailCell, for: indexPath) as! ExerciseDetailCell
+            if let workout = workout {
+                cell.count = indexPath.item + 1
+                cell.exercise = workout.exercises![indexPath.item]
+            }
             return cell
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var height: CGFloat = 0
-        if indexPath.item == 0 {
+        var height: CGFloat = 328
+        if indexPath.section == 0 {
             let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
-            dummyCell.recipe = recipe
+            dummyCell.workout = workout
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.item == 1 && !activeRecipe {
+        } else if indexPath.section == 1 {
+            let dummyCell = WorkoutDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
+            dummyCell.workout = workout
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
+            height = estimatedSize.height
+            return CGSize(width: view.frame.width, height: height)
+        } else if indexPath.section == 2 {
             if secondSectionHeight == 0 {
-                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
-                dummyCell.recipe = recipe
+                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 215))
+                dummyCell.workout = workout
                 dummyCell.layoutIfNeeded()
-                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 150))
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 215))
                 height = estimatedSize.height
                 secondSectionHeight = height
                 return CGSize(width: view.frame.width, height: height)
@@ -279,40 +189,36 @@ class MealDetailViewController: ActivityDetailViewController {
                 return CGSize(width: view.frame.width, height: secondSectionHeight)
             }
         } else {
-            if heightArray.count == 3, let maxHeight = heightArray.max() {
-                return CGSize(width: self.view.frame.width, height: maxHeight + 50)
-            } else {
-                return CGSize(width: self.view.frame.width, height: 150)
-            }
+            let dummyCell = ExerciseDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 30))
+            dummyCell.exercise = workout?.exercises![indexPath.item]
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 30))
+            height = estimatedSize.height
+            return CGSize(width: view.frame.width, height: height)
         }
-    }
-    
-    func estimateFrameForText(width: CGFloat, text: String, font: UIFont) -> CGRect {
-      let size = CGSize(width: width, height: 10000)
-      let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
-      let attributes = [NSAttributedString.Key.font: font]
-      return text.boundingRect(with: size, options: options, attributes: attributes, context: nil).integral
-    }
-    
-    func updateHeight() {
-        heightArray = [firstHeight, secondHeight, thirdHeight]
-        DispatchQueue.main.async {
-            self.collectionView.reloadData()
-        }
-    }
-    
-    @objc fileprivate func openLocationFinder() {
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        let destination = LocationFinderTableViewController()
-        destination.delegate = self
-        self.navigationController?.pushViewController(destination, animated: true)
-//        let navigationViewController = UINavigationController(rootViewController: destination)
-//        self.present(navigationViewController, animated: true, completion: nil)
-    }
         
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+    
+     @objc fileprivate func openLocationFinder() {
+            guard currentReachabilityStatus != .notReachable else {
+                basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+                return
+            }
+            let destination = LocationFinderTableViewController()
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+    //        let navigationViewController = UINavigationController(rootViewController: destination)
+    //        self.present(navigationViewController, animated: true, completion: nil)
+        }
+            
     //update so existing invitees are shown as selected
     @objc fileprivate func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
@@ -396,15 +302,14 @@ class MealDetailViewController: ActivityDetailViewController {
             present(navController, animated: true, completion: nil)
         }
     }
-    
 }
 
-extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
+extension FlightDetailViewController: ActivityExpandedDetailCellDelegate {
     func startDateChanged(startDate: Date) {
         startDateTime = startDate
         activity.startDateTime = NSNumber(value: Int((startDate).timeIntervalSince1970))
         collectionView.reloadData()
-        if active {
+        if self.active {
             self.scheduleReminder()
         }
     }
@@ -416,11 +321,13 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
     }
     
     func locationViewTapped(labelText: String) {
+        print("labelText \(labelText)")
         openLocationFinder()
         
     }
     
     func infoViewTapped() {
+        print("infoview")
         
         guard let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
             return
@@ -510,10 +417,12 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
     }
     
     func reminderViewTapped(labelText: String) {
+        print("labelText \(labelText)")
         
         let alertController = UIAlertController(title: "Reminder", message: nil, preferredStyle: .alert)
         
         let noneAddress = UIAlertAction(title: EventAlert.None.rawValue, style: .default) { (action:UIAlertAction) in
+            print("none")
             self.reminder = EventAlert.None.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.None.description
@@ -522,6 +431,7 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let atTimeAddress = UIAlertAction(title: EventAlert.At_time_of_event.rawValue, style: .default) { (action:UIAlertAction) in
+            print("atTimeAddress")
             self.reminder = EventAlert.At_time_of_event.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.At_time_of_event.description
@@ -531,6 +441,7 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
 
         }
         let fifteenAddress = UIAlertAction(title: EventAlert.Fifteen_Minutes.rawValue, style: .default) { (action:UIAlertAction) in
+            print("fifteenAddress")
             self.reminder = EventAlert.Fifteen_Minutes.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.Fifteen_Minutes.description
@@ -539,6 +450,7 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let halfHourAddress = UIAlertAction(title: EventAlert.Half_Hour.rawValue, style: .default) { (action:UIAlertAction) in
+            print("halfHourAddress")
             self.reminder = EventAlert.Half_Hour.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.Half_Hour.description
@@ -547,6 +459,7 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let oneHourAddress = UIAlertAction(title: EventAlert.One_Hour.rawValue, style: .default) { (action:UIAlertAction) in
+            print("oneHourAddress")
             self.reminder = EventAlert.One_Hour.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Hour.description
@@ -555,6 +468,7 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let oneDayAddress = UIAlertAction(title: EventAlert.One_Day.rawValue, style: .default) { (action:UIAlertAction) in
+            print("oneDayAddress")
             self.reminder = EventAlert.One_Day.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Day.description
@@ -563,6 +477,7 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let oneWeekAddress = UIAlertAction(title: EventAlert.One_Week.rawValue, style: .default) { (action:UIAlertAction) in
+            print("oneWeekAddress")
             self.reminder = EventAlert.One_Week.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Week.description
@@ -571,6 +486,7 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
             }
         }
         let oneMonthAddress = UIAlertAction(title: EventAlert.One_Month.rawValue, style: .default) { (action:UIAlertAction) in
+            print("oneMonthAddress")
             self.reminder = EventAlert.One_Month.description
             self.collectionView.reloadData()
             self.activity.reminder = EventAlert.One_Month.description
@@ -597,7 +513,27 @@ extension MealDetailViewController: ActivityExpandedDetailCellDelegate {
     
 }
 
-extension MealDetailViewController: UpdateInvitees {
+extension FlightDetailViewController: WorkoutDetailCellDelegate {
+    func viewTapped() {
+        
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        if let workout = workout {
+            print("view tapped")
+            let destination = WebViewController()
+            destination.urlString = "https://workoutlabs.com/fit/wkt/\(workout.identifier)/?app=plot"
+            destination.controllerTitle = "Workout"
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            navigationViewController.modalPresentationStyle = .fullScreen
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
+    }
+}
+
+extension FlightDetailViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if !schedule {
             if !selectedFalconUsers.isEmpty {
@@ -641,7 +577,7 @@ extension MealDetailViewController: UpdateInvitees {
     }
 }
 
-extension MealDetailViewController: UpdateLocationDelegate {
+extension FlightDetailViewController: UpdateLocationDelegate {
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
         self.locationAddress[self.locationName] = nil
         if self.activity.locationAddress != nil {
@@ -681,7 +617,7 @@ extension MealDetailViewController: UpdateLocationDelegate {
     }
 }
 
-extension MealDetailViewController: ChooseChatDelegate {
+extension FlightDetailViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
         if let activityID = activityID {
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
@@ -700,3 +636,4 @@ extension MealDetailViewController: ChooseChatDelegate {
         }
     }
 }
+

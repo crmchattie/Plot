@@ -45,7 +45,7 @@ class ActivityCell: UITableViewCell {
     let activityImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.layer.cornerRadius = 4
+        imageView.layer.cornerRadius = 10
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
         imageView.isUserInteractionEnabled = true
@@ -181,10 +181,7 @@ class ActivityCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
-        
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        contentView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        
+                
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
         activityImageView.addSubview(startLabel)
@@ -262,8 +259,8 @@ class ActivityCell: UITableViewCell {
         
         invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
         invitationSegmentedControlTopAnchor.isActive = true
-        invitationSegmentedControl.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 0).isActive = true
-        invitationSegmentedControl.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: 0).isActive = true
+        invitationSegmentedControl.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
+        invitationSegmentedControl.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
         invitationSegmentedControl.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -5).isActive = true
         invitationSegmentHeightConstraint = invitationSegmentedControl.heightAnchor.constraint(equalToConstant: invitationSegmentHeightConstant)
         invitationSegmentHeightConstraint.isActive = true

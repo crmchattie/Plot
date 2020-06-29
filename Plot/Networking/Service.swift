@@ -228,9 +228,247 @@ class Service {
         
     }
     
+    func fetchFSSearchLatLong(limit: String, query: String, radius: String, intent: String, city: String, stateCode: String, countryCode: String, categoryId: String, lat: Double, long: Double, completion: @escaping ((FoursquareVenueSearchResult?), Error?) -> ()) {
+            
+        let baseURL: URL = {
+            return URL(string: FoursquareAPI.searchUrlString)!
+        }()
+        
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        
+        var parameters = ["limit":"\(limit)", "query": "\(query)", "radius": "\(radius)", "intent": "\(intent)", "categoryId": "\(categoryId)", "ll": "\(lat),\(long)"]
+        
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchFSSearch(limit: String, query: String, radius: String, intent: String, city: String, stateCode: String, countryCode: String, categoryId: String, completion: @escaping ((FoursquareVenueSearchResult?), Error?) -> ()) {
+            
+        let baseURL: URL = {
+            return URL(string: FoursquareAPI.searchUrlString)!
+        }()
+        
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        
+        var parameters = ["limit":"\(limit)", "query": "\(query)", "radius": "\(radius)", "intent": "\(intent)", "categoryId": "\(categoryId)"]
+        
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchFSExploreLatLong(limit: String, offset: String, time: String, day: String, openNow: Int, sortByDistance: Int, sortByPopularity: Int, price: [Int], query: String, radius: String, city: String, stateCode: String, countryCode: String, categoryId: String, section: String, lat: Double, long: Double, completion: @escaping ((FoursquareRecVenueSearchResult?), Error?) -> ()) {
+            
+        let baseURL: URL = {
+            return URL(string: FoursquareAPI.exploreUrlString)!
+        }()
+        
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        
+        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "time":"\(time)", "day":"\(day)", "offset":"\(offset)", "openNow":"\(openNow)", "sortByDistance":"\(sortByDistance)", "sortByPopularity":"\(sortByPopularity)", "price":"\(price)", "query": "\(query)", "radius": "\(radius)", "categoryId": "\(categoryId)", "section": "\(section)", "ll": "\(lat),\(long)"]
+        
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchFSExplore(limit: String, offset: String, time: String, day: String, openNow: Int, sortByDistance: Int, sortByPopularity: Int, price: [Int], query: String, radius: String, city: String, stateCode: String, countryCode: String, categoryId: String, section: String, completion: @escaping ((FoursquareRecVenueSearchResult?), Error?) -> ()) {
+            
+        let baseURL: URL = {
+            return URL(string: FoursquareAPI.exploreUrlString)!
+        }()
+        
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        
+        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "time":"\(time)", "day":"\(day)", "offset":"\(offset)", "openNow":"\(openNow)", "sortByDistance":"\(sortByDistance)", "sortByPopularity":"\(sortByPopularity)", "price":"\(price)", "query": "\(query)", "radius": "\(radius)", "categoryId": "\(categoryId)", "section": "\(section)"]
+        
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchFSDetails(id: String, completion: @escaping ((FoursquareVenueSearchResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "\(FoursquareAPI.detailUrlString)/\(id)")!
+        }()
+        
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
+    func fetchSygicCollections(limit: String, query: String, parent_place_id: String, place_ids: String, tags: String, tags_not: String, prefer_unique: String, city: String, stateCode: String, countryCode: String, completion: @escaping ((SygicCollectionsSearchResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: SygicAPI.collectionsUrlString)!
+        }()
+        
+        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
+        
+        var parameters = ["limit":"\(limit)", "query": "\(query)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)"]
+        
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchSygicCollectionDetails(id: String, completion: @escaping ((SygicCollectionsSearchResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "\(SygicAPI.collectionsUrlString)/\(id)")!
+        }()
+        
+        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
+
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
+    func fetchSygicPlacesLatLong(limit: String, offset: String, query: String, categories: [String], categories_not: [String], parent_place_id: String, place_ids: String, tags: String, tags_not: String, prefer_unique: String, city: String, stateCode: String, countryCode: String, lat: Double, long: Double, radius: String, completion: @escaping ((SygicPlacesSearchResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: SygicAPI.placesUrlString)!
+        }()
+        
+        var categoryString = ""
+        for category in categories {
+            categoryString += category + "|"
+        }
+        
+        var notCategoryString = ""
+        for category in categories_not {
+            notCategoryString += category + "|"
+        }
+        
+        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
+        
+        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "query": "\(query)", "categories": "\(categoryString)", "categories_not": "\(notCategoryString)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)", "area": "\(lat),\(long),\(radius)", "location": "\(lat),\(long)"]
+        
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchSygicPlaces(limit: String, offset: String, query: String, categories: [String], categories_not: [String], parent_place_id: String, place_ids: String, tags: String, tags_not: String, prefer_unique: String, city: String, stateCode: String, countryCode: String, radius: String, completion: @escaping ((SygicPlacesSearchResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: SygicAPI.placesUrlString)!
+        }()
+        
+        var categoryString = ""
+        for category in categories {
+            categoryString += category + "|"
+        }
+        
+        var notCategoryString = ""
+        for category in categories_not {
+            notCategoryString += category + "|"
+        }
+        
+        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
+        
+        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "query": "\(query)", "categories": "\(categoryString)", "categories_not": "\(notCategoryString)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)"]
+        
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchSygicPlaceDetails(id: String, completion: @escaping ((SygicPlacesSearchResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "\(SygicAPI.placeDetailsUrlString)/\(id)")!
+        }()
+        
+        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
+
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
+    func fetchSygicTours(parent_place_id: String, completion: @escaping ((SygicToursSearchResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: SygicAPI.tripTemplatesUrlString)!
+        }()
+        
+        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
+        
+        var parameters = ["parent_place_id": "\(parent_place_id)"]
+        
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchSygicTourDetails(id: String, completion: @escaping ((SygicToursSearchResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "\(SygicAPI.tripDetailsUrlString)/\(id)")!
+        }()
+        
+        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
+
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
+    func fetchFlight(flight_date: String, flight_status: String, dep_iata: String, arr_iata: String, dep_icao: String, arr_icao: String, airline_name: String, airline_iata: String, airline_icao: String, flight_number: String, flight_iata: String, flight_icao: String, completion: @escaping ((FlightSearchResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: AviationAPI.flightsUrlString)!
+        }()
+        
+        let defaultParameters = ["access_key": "\(AviationAPI.apiKey)"]
+                
+        var parameters = ["flight_date":"\(flight_date)", "flight_status":"\(flight_status)", "dep_iata": "\(dep_iata)", "arr_iata": "\(arr_iata)", "dep_icao": "\(dep_icao)", "arr_icao": "\(arr_icao)", "airline_name": "\(airline_name)", "airline_iata": "\(airline_iata)", "airline_icao": "\(airline_icao)", "flight_number": "\(flight_number)", "flight_iata": "\(flight_iata)", "flight_icao": "\(flight_icao)"]
+        
+        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
     // declare my generic json function here
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
-        
+        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
             if let err = err {
                 print(err)
@@ -279,8 +517,25 @@ struct ClimaCellAPI {
 }
 
 struct AviationAPI {
-    static let baseUrlString = "https://api.aviationstack.com/v1/"
+    static let flightsUrlString = "https://api.aviationstack.com/v1/flights"
     static fileprivate let apiKey = "0688f6631e1872f04adea3f86b67e6c1"
+}
+
+struct FoursquareAPI {
+    static let exploreUrlString = "https://api.foursquare.com/v2/venues/explore"
+    static let searchUrlString = "https://api.foursquare.com/v2/venues/search"
+    static let detailUrlString = "https://api.foursquare.com/v2/venues"
+    static fileprivate let clientID = "DZCYSAUK2HVJECX4AIKHLUWBPOYDAEK5PDVTLEKWJVB1HT4F"
+    static fileprivate let clientSecret = "2KYITTACKGXAJZ3COBVRRCVTTLVGVF1UPWD2RLUJWRMGB2IA"
+}
+
+struct SygicAPI {
+    static let placesUrlString = "https://api.sygictravelapi.com/1.1/en/places/list"
+    static let placeDetailsUrlString = "https://api.sygictravelapi.com/1.1/en/places"
+    static let collectionsUrlString = "https://api.sygictravelapi.com/1.1/en/collections"
+    static let tripTemplatesUrlString = "https://api.sygictravelapi.com/1.1/en/trips/templates"
+    static let tripDetailsUrlString = "https://api.sygictravelapi.com/1.1/en/trips"
+    static fileprivate let apiKey = "gLr9XJrFQB3picSrsJoC1nSCUyIsMQQ8rr4meHN1"
 }
 
 extension URLRequest {

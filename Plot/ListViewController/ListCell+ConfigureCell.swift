@@ -14,8 +14,8 @@ extension ListCell {
     
     func configureCell(for indexPath: IndexPath, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?) {
         
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        contentView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         listImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
         if let grocerylist = grocerylist {
