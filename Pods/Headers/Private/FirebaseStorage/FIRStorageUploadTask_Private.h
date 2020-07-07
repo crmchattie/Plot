@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Private/FIRStorageUploadTask_Private.h
+../../../FirebaseStorage/FirebaseStorage/Sources/FIRStorageUploadTask_Private.h

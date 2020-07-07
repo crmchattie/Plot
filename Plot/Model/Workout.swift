@@ -9,7 +9,8 @@
 import Foundation
 
 // MARK: - Response
-struct Workout: Codable {
+struct Workout: Codable, Equatable, Hashable {
+    let uuid = UUID().uuidString
     let id, title, identifier: String
     let notes, workoutDuration, tagsStr: String?
     let equipment: [String]?
@@ -22,10 +23,18 @@ struct Workout: Codable {
         case tagsStr = "tags_str"
         case exercises
     }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(uuid)
+    }
+}
+
+func ==(lhs: Workout, rhs: Workout) -> Bool {
+    return lhs.uuid == rhs.uuid
 }
 
 // MARK: - Exercise
-struct Exercise: Codable {
+struct Exercise: Codable, Equatable, Hashable {
     let id, exerciseWpID, sets, reps: String?
     let repsType, rest, restType, notes: String?
     let ss, restBetween: String?
@@ -66,10 +75,18 @@ struct Exercise: Codable {
         case equipment
         case equipment_level
     }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
+
+func ==(lhs: Exercise, rhs: Exercise) -> Bool {
+    return lhs.id == rhs.id
 }
 
 // MARK: - Anim
-struct Anim: Codable {
+struct Anim: Codable, Equatable, Hashable {
     let female: String?
     let femaleID: String?
     let male: String?
@@ -84,7 +101,7 @@ struct Anim: Codable {
 }
 
 // MARK: - DiagramImgs
-struct DiagramImgs: Codable {
+struct DiagramImgs: Codable, Equatable, Hashable {
     let muscleGroups, muscleGroupsSecondary: [String]?
     let background: String?
 

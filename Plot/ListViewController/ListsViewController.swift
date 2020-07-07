@@ -274,7 +274,6 @@ class ListsViewController: UIViewController {
         delegate?.sendLists(lists: listList)
         listListCopy = listList
         tableView.reloadData()
-
     }
     
     func handleReloadTableAfterSearch() {

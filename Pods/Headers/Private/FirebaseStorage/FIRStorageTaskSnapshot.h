@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Public/FIRStorageTaskSnapshot.h
+../../../FirebaseStorage/FirebaseStorage/Sources/Public/FIRStorageTaskSnapshot.h

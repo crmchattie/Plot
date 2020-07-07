@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Private/FIRStorageGetMetadataTask.h
+../../../FirebaseStorage/FirebaseStorage/Sources/FIRStorageGetMetadataTask.h

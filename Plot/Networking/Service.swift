@@ -234,9 +234,12 @@ class Service {
             return URL(string: FoursquareAPI.searchUrlString)!
         }()
         
-        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)", "v": "20190425"]
         
         var parameters = ["limit":"\(limit)", "query": "\(query)", "radius": "\(radius)", "intent": "\(intent)", "categoryId": "\(categoryId)", "ll": "\(lat),\(long)"]
+        if radius == "" {
+            parameters["radius"] = nil
+        }
         
         parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
@@ -252,9 +255,13 @@ class Service {
             return URL(string: FoursquareAPI.searchUrlString)!
         }()
         
-        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)", "v": "20190425"]
         
         var parameters = ["limit":"\(limit)", "query": "\(query)", "radius": "\(radius)", "intent": "\(intent)", "categoryId": "\(categoryId)"]
+        
+        if radius == "" {
+            parameters["radius"] = nil
+        }
         
         parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
@@ -270,9 +277,19 @@ class Service {
             return URL(string: FoursquareAPI.exploreUrlString)!
         }()
         
-        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)", "v": "20190425"]
         
-        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "time":"\(time)", "day":"\(day)", "offset":"\(offset)", "openNow":"\(openNow)", "sortByDistance":"\(sortByDistance)", "sortByPopularity":"\(sortByPopularity)", "price":"\(price)", "query": "\(query)", "radius": "\(radius)", "categoryId": "\(categoryId)", "section": "\(section)", "ll": "\(lat),\(long)"]
+        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "time":"\(time)", "day":"\(day)", "openNow":"\(openNow)", "sortByDistance":"\(sortByDistance)", "sortByPopularity":"\(sortByPopularity)", "price":"\(price)", "query": "\(query)", "radius": "\(radius)", "categoryId": "\(categoryId)", "section": "\(section)", "ll": "\(lat),\(long)"]
+        
+        if radius == "" {
+            parameters["radius"] = nil
+        }
+        if offset == "" {
+            parameters["offset"] = nil
+        }
+        if price.isEmpty {
+            parameters["price"] = nil
+        }
         
         parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
@@ -288,9 +305,18 @@ class Service {
             return URL(string: FoursquareAPI.exploreUrlString)!
         }()
         
-        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)", "v": "20190425"]
         
-        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "time":"\(time)", "day":"\(day)", "offset":"\(offset)", "openNow":"\(openNow)", "sortByDistance":"\(sortByDistance)", "sortByPopularity":"\(sortByPopularity)", "price":"\(price)", "query": "\(query)", "radius": "\(radius)", "categoryId": "\(categoryId)", "section": "\(section)"]
+        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "time":"\(time)", "day":"\(day)", "openNow":"\(openNow)", "sortByDistance":"\(sortByDistance)", "sortByPopularity":"\(sortByPopularity)", "price":"\(price)", "query": "\(query)", "radius": "\(radius)", "categoryId": "\(categoryId)", "section": "\(section)"]
+        if radius == "" {
+            parameters["radius"] = nil
+        }
+        if offset == "" {
+            parameters["offset"] = nil
+        }
+        if price.isEmpty {
+            parameters["price"] = nil
+        }
         
         parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
@@ -306,7 +332,7 @@ class Service {
             return URL(string: "\(FoursquareAPI.detailUrlString)/\(id)")!
         }()
         
-        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)"]
+        let defaultParameters = ["client_id": "\(FoursquareAPI.clientID)", "client_secret":"\(FoursquareAPI.clientSecret)", "v": "20190425"]
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: defaultParameters)
@@ -319,15 +345,15 @@ class Service {
         let baseURL: URL = {
             return URL(string: SygicAPI.collectionsUrlString)!
         }()
-        
-        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
-        
+                
         var parameters = ["limit":"\(limit)", "query": "\(query)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)"]
-        
-        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-        
+        if query == "" {
+            parameters["query"] = nil
+        }
+                
         let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: parameters)
+        var encodedURLRequest = urlRequest.encode(with: parameters)
+        encodedURLRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
         
     }
@@ -338,11 +364,9 @@ class Service {
             return URL(string: "\(SygicAPI.collectionsUrlString)/\(id)")!
         }()
         
-        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
-
-        let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
-        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
                         
     }
     
@@ -353,23 +377,43 @@ class Service {
         }()
         
         var categoryString = ""
-        for category in categories {
-            categoryString += category + "|"
+        if categories.count > 1 {
+            for x in 0...categories.count - 1 {
+                if x == 0 {
+                    categoryString = categories[x]
+                    continue
+                }
+                categoryString += "|" + categories[x]
+            }
+        } else if categories.count == 1 {
+            categoryString = categories[0]
         }
         
         var notCategoryString = ""
-        for category in categories_not {
-            notCategoryString += category + "|"
+        if categories_not.count > 1 {
+            for x in 0...categories_not.count - 1 {
+                if x == 0 {
+                    notCategoryString = categories_not[x]
+                    continue
+                }
+                notCategoryString += "|" + categories_not[x]
+            }
+        } else if categories_not.count == 1 {
+            notCategoryString = categories_not[0]
+        }
+                
+        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "query": "\(query)", "categories": "\(categoryString)", "categories_not": "\(notCategoryString)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)", "area": "\(lat),\(long),\(radius)", "location": "\(lat),\(long)"]
+        if query == "" {
+            parameters["query"] = nil
+        }
+        if offset == "" {
+            parameters["offset"] = nil
         }
         
-        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
-        
-        var parameters = ["limit":"\(limit)", "offset":"\(offset)", "query": "\(query)", "categories": "\(categoryString)", "categories_not": "\(notCategoryString)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)", "area": "\(lat),\(long),\(radius)", "location": "\(lat),\(long)"]
-        
-        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: parameters)
+        var encodedURLRequest = urlRequest.encode(with: parameters)
+        encodedURLRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
         
     }
@@ -381,23 +425,42 @@ class Service {
         }()
         
         var categoryString = ""
-        for category in categories {
-            categoryString += category + "|"
+        if categories.count > 1 {
+            for x in 0...categories.count - 1 {
+                if x == 0 {
+                    categoryString = categories[x]
+                    continue
+                }
+                categoryString += "|" + categories[x]
+            }
+        } else if categories.count == 1 {
+            categoryString = categories[0]
         }
         
         var notCategoryString = ""
-        for category in categories_not {
-            notCategoryString += category + "|"
+        if categories_not.count > 1 {
+            for x in 0...categories_not.count - 1 {
+                if x == 0 {
+                    notCategoryString = categories_not[x]
+                    continue
+                }
+                notCategoryString += "|" + categories_not[x]
+            }
+        } else if categories_not.count == 1 {
+            notCategoryString = categories_not[0]
         }
-        
-        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
-        
+                
         var parameters = ["limit":"\(limit)", "offset":"\(offset)", "query": "\(query)", "categories": "\(categoryString)", "categories_not": "\(notCategoryString)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)"]
-        
-        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-        
+        if query == "" {
+            parameters["query"] = nil
+        }
+        if offset == "" {
+            parameters["offset"] = nil
+        }
+                
         let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: parameters)
+        var encodedURLRequest = urlRequest.encode(with: parameters)
+        encodedURLRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
         
     }
@@ -408,11 +471,9 @@ class Service {
             return URL(string: "\(SygicAPI.placeDetailsUrlString)/\(id)")!
         }()
         
-        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
-
-        let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
-        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
                         
     }
     
@@ -421,15 +482,12 @@ class Service {
         let baseURL: URL = {
             return URL(string: SygicAPI.tripTemplatesUrlString)!
         }()
-        
-        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
-        
-        var parameters = ["parent_place_id": "\(parent_place_id)"]
-        
-        parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
-        
+                
+        let parameters = ["parent_place_id": "\(parent_place_id)"]
+                
         let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: parameters)
+        var encodedURLRequest = urlRequest.encode(with: parameters)
+        encodedURLRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
         
     }
@@ -440,11 +498,9 @@ class Service {
             return URL(string: "\(SygicAPI.tripDetailsUrlString)/\(id)")!
         }()
         
-        let defaultParameters = ["x-api-key": "\(SygicAPI.apiKey)"]
-
-        let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
-        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
                         
     }
     
@@ -468,16 +524,17 @@ class Service {
     
     // declare my generic json function here
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
-        print("encodedURLRequest \(encodedURLRequest)")
+//        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
             if let err = err {
-                print(err)
+                print("err \(err)")
                 completion(nil, err)
                 return
             }
             do {
                 let objects = try JSONDecoder().decode(T.self, from: data!)
                 // success
+//                print("objects \(objects)")
                 completion(objects, nil)
             } catch {
                 print("error \(error)")

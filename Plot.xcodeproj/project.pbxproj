@@ -89,6 +89,8 @@
 		109FEB3D22A7003000621D2F /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3C22A7003000621D2F /* Schedule.swift */; };
 		109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB4122A9C3DD00621D2F /* Purchase.swift */; };
 		10A18D3A2458E1A5006990F2 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18D392458E1A5006990F2 /* PurchasesViewController.swift */; };
+		10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CB24AF761F006686FA /* CompositionalHeader.swift */; };
+		10B656CE24AFB0E7006686FA /* ActivitySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CD24AFB0E7006686FA /* ActivitySection.swift */; };
 		10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */; };
 		10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */; };
 		10C32861248D8B9300E4475B /* ChatsTableViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */; };
@@ -107,6 +109,7 @@
 		10C8334E24A520580037F638 /* FlightSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C8334D24A520580037F638 /* FlightSearchViewController.swift */; };
 		10CD68792486AEE400DC02E0 /* PLNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CD68782486AEE400DC02E0 /* PLNotification.swift */; };
 		10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */; };
+		10D3410024ABD741009269B7 /* ActivityContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D340FF24ABD741009269B7 /* ActivityContainer.swift */; };
 		10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */; };
 		10D420AD24787AD500CBAFA7 /* ChecklistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */; };
 		10DA3A222465C74500E6B491 /* IngredientDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */; };
@@ -421,6 +424,8 @@
 		109FEB3C22A7003000621D2F /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		109FEB4122A9C3DD00621D2F /* Purchase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Purchase.swift; sourceTree = "<group>"; };
 		10A18D392458E1A5006990F2 /* PurchasesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchasesViewController.swift; sourceTree = "<group>"; };
+		10B656CB24AF761F006686FA /* CompositionalHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionalHeader.swift; sourceTree = "<group>"; };
+		10B656CD24AFB0E7006686FA /* ActivitySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySection.swift; sourceTree = "<group>"; };
 		10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
 		10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatsTableViewController+Migration.swift"; sourceTree = "<group>"; };
@@ -439,6 +444,7 @@
 		10C8334D24A520580037F638 /* FlightSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightSearchViewController.swift; sourceTree = "<group>"; };
 		10CD68782486AEE400DC02E0 /* PLNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PLNotification.swift; sourceTree = "<group>"; };
 		10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistViewController.swift; sourceTree = "<group>"; };
+		10D340FF24ABD741009269B7 /* ActivityContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityContainer.swift; sourceTree = "<group>"; };
 		10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistFetcher.swift; sourceTree = "<group>"; };
 		10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistActions.swift; sourceTree = "<group>"; };
 		10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientDetailViewController.swift; sourceTree = "<group>"; };
@@ -815,6 +821,7 @@
 				103E968922C2B309007D6668 /* PurchaseRow.swift */,
 				101B90962458DA2D00EDDB90 /* WeatherRow.swift */,
 				10367D42230B126800D25885 /* ActivityImageCell.swift */,
+				10B656CB24AF761F006686FA /* CompositionalHeader.swift */,
 				26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */,
 				1024ABA823C1412200A5875D /* ActivitySubTypeCell.swift */,
 				1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */,
@@ -1426,6 +1433,7 @@
 				10DE97382475837B00D4A7E8 /* ListContainer.swift */,
 				2680A0332360C0BD00C4C287 /* Invitation.swift */,
 				10CD68782486AEE400DC02E0 /* PLNotification.swift */,
+				10D340FF24ABD741009269B7 /* ActivityContainer.swift */,
 				26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */,
 				102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */,
 				10C8333F249AC2F00037F638 /* SygicPlacesSearchResult.swift */,
@@ -1438,6 +1446,7 @@
 				101B908F2457999600EDDB90 /* Weather.swift */,
 				100A53F223E3BDAC004AA952 /* Filter.swift */,
 				10737F8424912BDD00D146D6 /* Preview.swift */,
+				10B656CD24AFB0E7006686FA /* ActivitySection.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1922,13 +1931,11 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Plot/Pods-Plot-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/CropViewController/TOCropViewControllerBundle.bundle",
-				"${PODS_ROOT}/Eureka/Source/Resources/Eureka.bundle",
 				"${PODS_ROOT}/PhoneNumberKit/PhoneNumberKit/Resources/PhoneNumberMetadata.json",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Eureka.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PhoneNumberMetadata.json",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1975,6 +1982,7 @@
 				4BAEE54D212735880045AB10 /* Conversation.swift in Sources */,
 				4B4F45431F32246000A6FF96 /* GeneralTabBarController.swift in Sources */,
 				1024ABA923C1412200A5875D /* ActivitySubTypeCell.swift in Sources */,
+				10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */,
 				4BAEE46E21272B380045AB10 /* Biometrics.swift in Sources */,
 				4BAEE4F221272D890045AB10 /* SelectChatTableViewController.swift in Sources */,
 				4BAEE50521272D890045AB10 /* MediaPicerControllerNew+ImagePicker.swift in Sources */,
@@ -2010,6 +2018,7 @@
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
 				4BA1E7832152582F00391BCB /* ChatLogController+DataSource.swift in Sources */,
 				10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */,
+				10D3410024ABD741009269B7 /* ActivityContainer.swift in Sources */,
 				4BAEE5E5212735E50045AB10 /* EnterVerificationCodeController.swift in Sources */,
 				4BAEE49B21272C5E0045AB10 /* ContactsDetailController.swift in Sources */,
 				26A5DDD82394CB2400771DC1 /* RecipeSearchResult.swift in Sources */,
@@ -2147,6 +2156,7 @@
 				1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */,
 				1024ABA423C1225D00A5875D /* UIView+Layout.swift in Sources */,
 				4BAEE54F212735880045AB10 /* User.swift in Sources */,
+				10B656CE24AFB0E7006686FA /* ActivitySection.swift in Sources */,
 				4BAEE5E0212735E50045AB10 /* UIImageExtensions.swift in Sources */,
 				10DE97372475801400D4A7E8 /* ListCell+ConfigureCell.swift in Sources */,
 				4BAEE4F121272D890045AB10 /* UserinfoHeaderTableViewCell.swift in Sources */,
@@ -2272,7 +2282,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MARKETING_VERSION = 1.0.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -2300,7 +2310,7 @@
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MARKETING_VERSION = 1.0.13;
 				MTL_FAST_MATH = YES;
@@ -2450,6 +2460,7 @@
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
@@ -2479,6 +2490,7 @@
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;

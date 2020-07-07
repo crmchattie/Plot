@@ -9,7 +9,6 @@
 import UIKit
 import LinkPresentation
 
-@available(iOS 13.0, *)
 class MessageViewController: UIViewController, UIActivityItemSource {
     var metadata: LPLinkMetadata?
     

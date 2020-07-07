@@ -93,8 +93,8 @@ class ActivitySubTypeCell: UICollectionViewCell {
                 imageView.tintColor = UIColor.white
                 imageView.backgroundColor = colors[intColor]
                 imageURL = "workout"
+                setupViews()
             }
-            setupViews()
         }
     }
     
@@ -102,16 +102,16 @@ class ActivitySubTypeCell: UICollectionViewCell {
         didSet {
             if let fsVenue = fsVenue {
                 nameLabel.text = fsVenue.name
-//                if let category = fsVenue.location?.address {
-//                    categoryLabel.text = category
-//                    subcategoryLabel.text = "Number of exercises: \(subcategory)"
-//                }
+                if let category = fsVenue.location?.formattedAddress?[0], let subcategory = fsVenue.categories?[0].shortName {
+                    categoryLabel.text = category
+                    subcategoryLabel.text = subcategory
+                }
                 imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
                 imageView.tintColor = UIColor.white
                 imageView.backgroundColor = colors[intColor]
                 imageURL = "workout"
+                setupViews()
             }
-            setupViews()
         }
     }
     
@@ -119,16 +119,17 @@ class ActivitySubTypeCell: UICollectionViewCell {
         didSet {
             if let sygicPlace = sygicPlace {
                 nameLabel.text = sygicPlace.name
-//                if let category = workout.tagsStr, let subcategory = workout.exercises?.count {
-//                    categoryLabel.text = category
-//                    subcategoryLabel.text = "Number of exercises: \(subcategory)"
-//                }
+                if let category = sygicPlace.nameSuffix, let subcategoryArray = sygicPlace.categories {
+                    let subcategory = subcategoryArray.map({ String($0).capitalized }).joined(separator: ", ")
+                    categoryLabel.text = category
+                    subcategoryLabel.text = subcategory
+                }
                 imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
                 imageView.tintColor = UIColor.white
                 imageView.backgroundColor = colors[intColor]
                 imageURL = "workout"
+                setupViews()
             }
-            setupViews()
         }
     }
     
@@ -150,11 +151,12 @@ class ActivitySubTypeCell: UICollectionViewCell {
     
     let heartButton: UIButton = {
         let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "heart"), for: .normal)
         button.tintColor = ThemeManager.currentTheme().generalTitleColor
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
+
     let shareButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "share"), for: .normal)
@@ -162,7 +164,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
+
     let plusButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "plus"), for: .normal)
@@ -196,39 +198,54 @@ class ActivitySubTypeCell: UICollectionViewCell {
     }()
     
     let imageView = UIImageView(cornerRadius: 8)
+
     
     func setupViews() {
-        
-        if let heartImage = heartButtonImage {
-            heartButton.setImage(UIImage(named: heartImage), for: .normal)
-            heartButton.isHidden = false
-        } else {
-            heartButton.isHidden = true
-        }
+                
+//        if let heartImage = heartButtonImage {
+//            heartButton.setImage(UIImage(named: heartImage), for: .normal)
+//            heartButton.isHidden = false
+//        } else {
+//            heartButton.isHidden = true
+//        }
         
         heartButton.constrainWidth(constant: 40)
         heartButton.constrainHeight(constant: 40)
-        
+
         shareButton.constrainWidth(constant: 40)
         shareButton.constrainHeight(constant: 40)
-        
+
         plusButton.constrainWidth(constant: 40)
         plusButton.constrainHeight(constant: 40)
-
-        imageView.constrainHeight(constant: 231)
         
-
-        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, UIView()], spacing: 0)
-        labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
-        labelStackView.isLayoutMarginsRelativeArrangement = true
+        imageView.constrainWidth(constant: 75)
+        imageView.constrainHeight(constant: 75)
         
-        let stackView = VerticalStackView(arrangedSubviews: [
-            imageView,
-            UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()]),
-            labelStackView
-            ], spacing: 2)
+        let buttonStackView = UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()])
+        buttonStackView.spacing = 2
+        
+        let stackView = UIStackView(arrangedSubviews: [imageView, VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, buttonStackView], spacing: 2)])
+        stackView.spacing = 16
+        
+        stackView.alignment = .center
+        
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 10, left: 0, bottom: 0, right: 0))
+        stackView.fillSuperview()
+
+//        imageView.constrainHeight(constant: 231)
+        
+
+//        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, UIView()], spacing: 0)
+//        labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+//        labelStackView.isLayoutMarginsRelativeArrangement = true
+//
+//        let stackView = VerticalStackView(arrangedSubviews: [
+//            imageView,
+//            UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()]),
+//            labelStackView
+//            ], spacing: 2)
+//        addSubview(stackView)
+//        stackView.fillSuperview(padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
@@ -243,7 +260,6 @@ class ActivitySubTypeCell: UICollectionViewCell {
         plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-
     }
 
     
@@ -353,8 +369,8 @@ class ActivitySubTypeCell: UICollectionViewCell {
     }
 
     @objc func heartButtonTapped() {
-        heartButtonImage = (heartButtonImage == "heart") ? "heart-filled" : "heart"
-        heartButton.setImage(UIImage(named: heartButtonImage!), for: .normal)
+//        heartButtonImage = (heartButtonImage == "heart") ? "heart-filled" : "heart"
+//        heartButton.setImage(UIImage(named: heartButtonImage!), for: .normal)
         if let recipe = recipe {
             self.delegate?.heartButtonTapped(type: recipe)
         } else if let workout = workout {

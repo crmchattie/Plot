@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Private/FIRStorageGetDownloadURLTask.h
+../../../FirebaseStorage/FirebaseStorage/Sources/FIRStorageGetDownloadURLTask.h

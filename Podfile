@@ -2,7 +2,7 @@
 # platform :ios, '10.0'
 
 target 'Plot' do
-  platform :ios, '10.0'
+  platform :ios, '13.0'
   inhibit_all_warnings!
 
   pod 'Firebase/Core'
@@ -29,7 +29,7 @@ target 'Plot' do
 end
 
 target 'ShareExtension' do
-  platform :ios, '10.0'
+  platform :ios, '13.0'
   inhibit_all_warnings!
 
   pod 'Firebase/Core'

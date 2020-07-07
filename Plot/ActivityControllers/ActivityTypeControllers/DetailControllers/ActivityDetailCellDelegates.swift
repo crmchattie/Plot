@@ -194,7 +194,11 @@ extension MealDetailViewController: ActivityDetailCellDelegate {
                         homeTab.changeToIndex(index: 2)
                     }
                     self.tabBarController?.selectedIndex = 1
-                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    if #available(iOS 13.0, *) {
+                        self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
                 
             }))
@@ -481,7 +485,11 @@ extension MealDetailViewController: ChooseActivityDelegate {
                         homeTab.changeToIndex(index: 2)
                     }
                     self.tabBarController?.selectedIndex = 1
-                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    if #available(iOS 13.0, *) {
+                        self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
             }
         }
@@ -637,7 +645,11 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                         homeTab.changeToIndex(index: 2)
                     }
                     self.tabBarController?.selectedIndex = 1
-                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    if #available(iOS 13.0, *) {
+                        self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
                 
             }))
@@ -923,7 +935,11 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
                         homeTab.changeToIndex(index: 2)
                     }
                     self.tabBarController?.selectedIndex = 1
-                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    if #available(iOS 13.0, *) {
+                        self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
             }
         }
@@ -1079,7 +1095,11 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                         homeTab.changeToIndex(index: 2)
                     }
                     self.tabBarController?.selectedIndex = 1
-                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    if #available(iOS 13.0, *) {
+                        self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
                 
             }))
@@ -1386,7 +1406,11 @@ extension EventDetailViewController: ChooseActivityDelegate {
                         homeTab.changeToIndex(index: 2)
                     }
                     self.tabBarController?.selectedIndex = 1
-                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    if #available(iOS 13.0, *) {
+                        self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
             }
         }
@@ -1542,7 +1566,11 @@ extension FlightDetailViewController: ActivityDetailCellDelegate {
                         homeTab.changeToIndex(index: 2)
                     }
                     self.tabBarController?.selectedIndex = 1
-                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    if #available(iOS 13.0, *) {
+                        self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
                 
             }))
@@ -1828,7 +1856,11 @@ extension FlightDetailViewController: ChooseActivityDelegate {
                         homeTab.changeToIndex(index: 2)
                     }
                     self.tabBarController?.selectedIndex = 1
-                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    if #available(iOS 13.0, *) {
+                        self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
             }
         }

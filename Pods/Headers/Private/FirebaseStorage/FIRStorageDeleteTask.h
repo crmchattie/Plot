@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Private/FIRStorageDeleteTask.h
+../../../FirebaseStorage/FirebaseStorage/Sources/FIRStorageDeleteTask.h

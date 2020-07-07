@@ -1017,10 +1017,10 @@ private var backgroundView: UIView = {
 }()
 
 private var activityIndicator: UIActivityIndicatorView = {
-    var activityIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
+    var activityIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
     activityIndicator.hidesWhenStopped = true
     activityIndicator.frame = CGRect(x: 0.0, y: 0.0, width: 40.0, height: 40.0);
-    activityIndicator.style = UIActivityIndicatorView.Style.whiteLarge
+    activityIndicator.style = UIActivityIndicatorView.Style.large
     activityIndicator.autoresizingMask = [.flexibleLeftMargin , .flexibleRightMargin , .flexibleTopMargin , .flexibleBottomMargin]
     activityIndicator.isUserInteractionEnabled = false
     
@@ -1034,7 +1034,7 @@ extension UIImageView {
         
         self.addSubview(backgroundView)
         self.addSubview(activityIndicator)
-        activityIndicator.style = .white
+        activityIndicator.style = UIActivityIndicatorView.Style.medium
         activityIndicator.center = CGPoint(x: self.frame.size.width / 2, y: self.frame.size.height / 2)
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         backgroundView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
@@ -1231,12 +1231,19 @@ extension Array where Element: Comparable {
     }
 }
 
+let activityIndicatorView: UIActivityIndicatorView = {
+    let aiv = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
+    aiv.color = .darkGray
+    aiv.startAnimating()
+    aiv.hidesWhenStopped = true
+    return aiv
+}()
 
 extension UIViewController {
     func showSpinner(onView : UIView) {
         let spinnerView = UIView.init(frame: onView.bounds)
         spinnerView.backgroundColor = UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 0.25)
-        let ai = UIActivityIndicatorView.init(style: .whiteLarge)
+        let ai = UIActivityIndicatorView.init(style: UIActivityIndicatorView.Style.large)
         ai.startAnimating()
         ai.center = spinnerView.center
         

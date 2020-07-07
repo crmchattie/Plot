@@ -10,6 +10,19 @@ import UIKit
 
 class ActivityHeaderCell: UICollectionViewCell {
     
+    var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
+    var intColor: Int = 0
+    
+    var activityType: ActivityType! {
+        didSet {
+            nameLabel.text = activityType.rawValue.capitalized
+            imageView.contentMode = .scaleAspectFit
+            imageView.image = UIImage(named: activityType.activityTypeImage)!.withRenderingMode(.alwaysTemplate)
+            imageView.tintColor = UIColor.white
+            imageView.backgroundColor = colors[intColor]
+        }
+    }
+    
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor

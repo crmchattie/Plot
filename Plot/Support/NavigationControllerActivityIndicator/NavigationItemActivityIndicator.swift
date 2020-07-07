@@ -38,7 +38,7 @@ class NavigationItemActivityIndicator: NSObject {
     currentPriority = activityPriority
     isActive = true
     
-		let activityIndicatorView = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.white)
+    let activityIndicatorView = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
     let titleLabel = UILabel()
     
     activityIndicatorView.frame = CGRect(x: 0, y: 0, width: 14, height: 14)

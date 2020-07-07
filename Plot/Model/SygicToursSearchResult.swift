@@ -14,11 +14,11 @@
 import Foundation
 
 // MARK: - SygicToursSearchResult
-class SygicToursSearchResult: Codable {
+struct SygicToursSearchResult: Codable, Equatable, Hashable {
     
     let statusCode: Int?
     let data: TourData?
-    let serverTimestamp: Date?
+    let serverTimestamp: String?
     
     enum CodingKeys: String, CodingKey {
         case statusCode = "status_code"
@@ -26,55 +26,15 @@ class SygicToursSearchResult: Codable {
         case serverTimestamp = "server_timestamp"
     }
     
-    init(statusCode: Int?, data: TourData?, serverTimestamp: Date?) {
+    init(statusCode: Int?, data: TourData?, serverTimestamp: String?) {
         self.statusCode = statusCode
         self.data = data
         self.serverTimestamp = serverTimestamp
     }
 }
 
-// MARK: SygicTour convenience initializers and mutators
-
-extension SygicToursSearchResult {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(SygicToursSearchResult.self, from: data)
-        self.init(statusCode: me.statusCode, data: me.data, serverTimestamp: me.serverTimestamp)
-    }
-    
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-    
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-    
-    func with(
-        statusCode: Int?? = nil,
-        data: TourData?? = nil,
-        serverTimestamp: Date?? = nil
-    ) -> SygicToursSearchResult {
-        return SygicToursSearchResult(
-            statusCode: statusCode ?? self.statusCode,
-            data: data ?? self.data,
-            serverTimestamp: serverTimestamp ?? self.serverTimestamp
-        )
-    }
-    
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-    
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
 // MARK: - TourData
-class TourData: Codable {
+struct TourData: Codable, Equatable, Hashable {
     let trip: Trip?
     
     init(trip: Trip?) {
@@ -82,44 +42,8 @@ class TourData: Codable {
     }
 }
 
-// MARK: TourData convenience initializers and mutators
-
-extension TourData {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(TourData.self, from: data)
-        self.init(trip: me.trip)
-    }
-    
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-    
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-    
-    func with(
-        trip: Trip?? = nil
-    ) -> TourData {
-        return TourData(
-            trip: trip ?? self.trip
-        )
-    }
-    
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-    
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
 // MARK: - Trip
-class Trip: Codable {
+struct Trip: Codable, Equatable, Hashable {
     let id: String
     let ownerID, name: String?
     let version: Int?
@@ -171,126 +95,27 @@ class Trip: Codable {
     }
 }
 
-// MARK: Trip convenience initializers and mutators
-
-extension Trip {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(Trip.self, from: data)
-        self.init(id: me.id, ownerID: me.ownerID, name: me.name, version: me.version, url: me.url, updatedAt: me.updatedAt, isDeleted: me.isDeleted, privacyLevel: me.privacyLevel, privileges: me.privileges, startsOn: me.startsOn, endsOn: me.endsOn, media: me.media, dayCount: me.dayCount, userIsSubscribed: me.userIsSubscribed, days: me.days, destinations: me.destinations)
-    }
-    
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-    
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-    
-    func with(
-        id: String,
-        ownerID: String?? = nil,
-        name: String?? = nil,
-        version: Int?? = nil,
-        url: String?? = nil,
-        updatedAt: Date?? = nil,
-        isDeleted: Bool?? = nil,
-        privacyLevel: String?? = nil,
-        privileges: Privileges?? = nil,
-        startsOn: String?? = nil,
-        endsOn: String?? = nil,
-        media: TourMedia?? = nil,
-        dayCount: Int?? = nil,
-        userIsSubscribed: Bool?? = nil,
-        days: [Day]?? = nil,
-        destinations: [String]?? = nil
-    ) -> Trip {
-        return Trip(
-            id: id,
-            ownerID: ownerID ?? self.ownerID,
-            name: name ?? self.name,
-            version: version ?? self.version,
-            url: url ?? self.url,
-            updatedAt: updatedAt ?? self.updatedAt,
-            isDeleted: isDeleted ?? self.isDeleted,
-            privacyLevel: privacyLevel ?? self.privacyLevel,
-            privileges: privileges ?? self.privileges,
-            startsOn: startsOn ?? self.startsOn,
-            endsOn: endsOn ?? self.endsOn,
-            media: media ?? self.media,
-            dayCount: dayCount ?? self.dayCount,
-            userIsSubscribed: userIsSubscribed ?? self.userIsSubscribed,
-            days: days ?? self.days,
-            destinations: destinations ?? self.destinations
-        )
-    }
-    
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-    
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
+func ==(lhs: Trip, rhs: Trip) -> Bool {
+    return lhs.id == rhs.id
 }
 
 // MARK: - Day
-class Day: Codable {
+struct Day: Codable, Equatable, Hashable {
     let itinerary: [Itinerary]?
-    let note: JSONNull?
+    let note: String?
     
-    init(itinerary: [Itinerary]?, note: JSONNull?) {
+    init(itinerary: [Itinerary]?, note: String?) {
         self.itinerary = itinerary
         self.note = note
     }
 }
 
-// MARK: Day convenience initializers and mutators
-
-extension Day {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(Day.self, from: data)
-        self.init(itinerary: me.itinerary, note: me.note)
-    }
-    
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-    
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-    
-    func with(
-        itinerary: [Itinerary]?? = nil,
-        note: JSONNull?? = nil
-    ) -> Day {
-        return Day(
-            itinerary: itinerary ?? self.itinerary,
-            note: note ?? self.note
-        )
-    }
-    
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-    
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
 // MARK: - Itinerary
-class Itinerary: Codable {
+struct Itinerary: Codable, Equatable, Hashable {
     let placeID: String?
     let startTime, duration: Int?
-    let note, transportFromPrevious: JSONNull?
+    let note: String?
+    let transportFromPrevious: TransportFromPrevious?
     
     enum CodingKeys: String, CodingKey {
         case placeID = "place_id"
@@ -299,7 +124,7 @@ class Itinerary: Codable {
         case transportFromPrevious = "transport_from_previous"
     }
     
-    init(placeID: String?, startTime: Int?, duration: Int?, note: JSONNull?, transportFromPrevious: JSONNull?) {
+    init(placeID: String?, startTime: Int?, duration: Int?, note: String?, transportFromPrevious: TransportFromPrevious?) {
         self.placeID = placeID
         self.startTime = startTime
         self.duration = duration
@@ -308,112 +133,52 @@ class Itinerary: Codable {
     }
 }
 
-// MARK: Itinerary convenience initializers and mutators
+// MARK: - TransportFromPrevious
+struct TransportFromPrevious: Codable, Equatable, Hashable {
+    let mode: [String]?
+    let avoid: [String]?
+    let startTime, duration: Int?
+    let note: String?
+    let waypoints: [Waypoint]?
+    let routeID: String?
 
-extension Itinerary {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(Itinerary.self, from: data)
-        self.init(placeID: me.placeID, startTime: me.startTime, duration: me.duration, note: me.note, transportFromPrevious: me.transportFromPrevious)
+    enum CodingKeys: String, CodingKey {
+        case mode, avoid
+        case startTime = "start_time"
+        case duration, note, waypoints
+        case routeID = "route_id"
     }
-    
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-    
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-    
-    func with(
-        placeID: String?? = nil,
-        startTime: Int?? = nil,
-        duration: Int?? = nil,
-        note: JSONNull?? = nil,
-        transportFromPrevious: JSONNull?? = nil
-    ) -> Itinerary {
-        return Itinerary(
-            placeID: placeID ?? self.placeID,
-            startTime: startTime ?? self.startTime,
-            duration: duration ?? self.duration,
-            note: note ?? self.note,
-            transportFromPrevious: transportFromPrevious ?? self.transportFromPrevious
-        )
-    }
-    
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-    
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
+}
+
+// MARK: - Waypoint
+struct Waypoint: Codable, Equatable, Hashable {
+    let place_id: String?
+    let location: TripLocation?
+}
+
+// MARK: - TripLocation
+struct TripLocation: Codable, Equatable, Hashable {
+    let lat: Double?
+    let lng: Double?
 }
 
 // MARK: - TourMedia
-class TourMedia: Codable {
+struct TourMedia: Codable, Equatable, Hashable {
     let square, landscape, portrait: Landscape?
-    let videoPreview: JSONNull?
     
     enum CodingKeys: String, CodingKey {
         case square, landscape, portrait
-        case videoPreview = "video_preview"
     }
     
-    init(square: Landscape?, landscape: Landscape?, portrait: Landscape?, videoPreview: JSONNull?) {
+    init(square: Landscape?, landscape: Landscape?, portrait: Landscape?) {
         self.square = square
         self.landscape = landscape
         self.portrait = portrait
-        self.videoPreview = videoPreview
-    }
-}
-
-// MARK: TourMedia convenience initializers and mutators
-
-extension TourMedia {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(TourMedia.self, from: data)
-        self.init(square: me.square, landscape: me.landscape, portrait: me.portrait, videoPreview: me.videoPreview)
-    }
-    
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-    
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-    
-    func with(
-        square: Landscape?? = nil,
-        landscape: Landscape?? = nil,
-        portrait: Landscape?? = nil,
-        videoPreview: JSONNull?? = nil
-    ) -> TourMedia {
-        return TourMedia(
-            square: square ?? self.square,
-            landscape: landscape ?? self.landscape,
-            portrait: portrait ?? self.portrait,
-            videoPreview: videoPreview ?? self.videoPreview
-        )
-    }
-    
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-    
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
     }
 }
 
 // MARK: - Landscape
-class Landscape: Codable {
+struct Landscape: Codable, Equatable, Hashable {
     let id, urlTemplate: String?
     
     enum CodingKeys: String, CodingKey {
@@ -427,46 +192,8 @@ class Landscape: Codable {
     }
 }
 
-// MARK: Landscape convenience initializers and mutators
-
-extension Landscape {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(Landscape.self, from: data)
-        self.init(id: me.id, urlTemplate: me.urlTemplate)
-    }
-    
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-    
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-    
-    func with(
-        id: String?? = nil,
-        urlTemplate: String?? = nil
-    ) -> Landscape {
-        return Landscape(
-            id: id ?? self.id,
-            urlTemplate: urlTemplate ?? self.urlTemplate
-        )
-    }
-    
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-    
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
 // MARK: - Privileges
-class Privileges: Codable {
+struct Privileges: Codable, Equatable, Hashable {
     let edit, manage, delete, join: Bool?
     
     init(edit: Bool?, manage: Bool?, delete: Bool?, join: Bool?) {
@@ -474,47 +201,5 @@ class Privileges: Codable {
         self.manage = manage
         self.delete = delete
         self.join = join
-    }
-}
-
-// MARK: Privileges convenience initializers and mutators
-
-extension Privileges {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(Privileges.self, from: data)
-        self.init(edit: me.edit, manage: me.manage, delete: me.delete, join: me.join)
-    }
-    
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-    
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-    
-    func with(
-        edit: Bool?? = nil,
-        manage: Bool?? = nil,
-        delete: Bool?? = nil,
-        join: Bool?? = nil
-    ) -> Privileges {
-        return Privileges(
-            edit: edit ?? self.edit,
-            manage: manage ?? self.manage,
-            delete: delete ?? self.delete,
-            join: join ?? self.join
-        )
-    }
-    
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-    
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
     }
 }

@@ -6,8 +6,7 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-import UIKit
-import CodableFirebase
+import Foundation
 
 struct ListContainer: Codable {
     

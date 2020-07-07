@@ -67,7 +67,8 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
   
   func setupOverlay(isEditButonEnabled: Bool, title: AvatarOverlayTitle) {
     overlay.setOverlayTitle(title: title)
-    overlay.navigationBar.barStyle = .blackTranslucent
+    overlay.navigationBar.barStyle = .black
+    overlay.navigationBar.isTranslucent = true
     overlay.navigationBar.barTintColor = .black
     let item = UIBarButtonItem(image: UIImage(named: "ShareExternalIcon"), style: .plain, target: self, action: #selector(toolbarTouchHandler))
     overlay.toolbar.setItems([item], animated: true)

@@ -43,14 +43,6 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
     var endDateTime: Date?
     
     lazy var indexPathItem: Int = 0
-            
-    let activityIndicatorView: UIActivityIndicatorView = {
-        let aiv = UIActivityIndicatorView(style: .whiteLarge)
-        aiv.color = .darkGray
-        aiv.startAnimating()
-        aiv.hidesWhenStopped = true
-        return aiv
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -144,7 +136,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
         cell.delegate = self
         if recipes != nil {
-            self.activityIndicatorView.stopAnimating()
+            activityIndicatorView.stopAnimating()
             let recipe = recipes![indexPath.item]
             if let recipes = favAct["recipes"], recipes.contains("\(recipe.id)") {
                 cell.heartButtonImage = "heart-filled"
@@ -159,7 +151,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.sygicPlace = nil
             return cell
         } else if events != nil {
-            self.activityIndicatorView.stopAnimating()
+            activityIndicatorView.stopAnimating()
             let event = events![indexPath.item]
             if let events = favAct["events"], events.contains(event.id) {
                 cell.heartButtonImage = "heart-filled"
@@ -174,7 +166,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.sygicPlace = nil
             return cell
         } else if workouts != nil {
-            self.activityIndicatorView.stopAnimating()
+            activityIndicatorView.stopAnimating()
             let workout = workouts![indexPath.item]
             if let workouts = favAct["workouts"], workouts.contains(workout.identifier) {
                 cell.heartButtonImage = "heart-filled"
@@ -190,7 +182,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.sygicPlace = nil
             return cell
         } else if attractions != nil {
-            self.activityIndicatorView.stopAnimating()
+            activityIndicatorView.stopAnimating()
             let attraction = attractions![indexPath.item]
             cell.attraction = attraction
             if let attractions = favAct["attractions"], attractions.contains(attraction.id) {
@@ -205,7 +197,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.sygicPlace = nil
             return cell
         } else if groupItems != nil {
-            self.activityIndicatorView.stopAnimating()
+            activityIndicatorView.stopAnimating()
             let fsVenue = groupItems![indexPath.item].venue
             cell.fsVenue = fsVenue
             if let groupItems = favAct["groupItems"], groupItems.contains(fsVenue!.id) {
@@ -221,7 +213,7 @@ class HorizontalController: HorizontalSnappingController, UICollectionViewDelega
             cell.sygicPlace = nil
             return cell
         } else if sygicPlaces != nil {
-            self.activityIndicatorView.stopAnimating()
+            activityIndicatorView.stopAnimating()
             let sygicPlace = sygicPlaces![indexPath.item]
             cell.sygicPlace = sygicPlace
             if let sygicPlaces = favAct["sygicPlaces"], sygicPlaces.contains(sygicPlace.id) {

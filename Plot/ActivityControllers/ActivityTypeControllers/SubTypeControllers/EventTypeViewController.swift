@@ -12,7 +12,8 @@ import Eureka
 
 class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
     
-    var groups = [[Event]]()
+    var sections: [ActivitySection] = [.music, .sports, .artstheatre, .family, .film, .miscellaneous]
+    var groups = [ActivitySection: [Event]]()
     var searchActivities = [Event]()
     
     private let musicSegmentID = "KZFzniwnSyZfZ7v7nJ"
@@ -21,9 +22,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
 
     var filters: [filter] = [.eventType, .eventStartDate, .eventEndDate, .location]
     var filterDictionary = [String: [String]]()
-    var sections: [String] = ["Music", "Sports", "Arts & Theatre", "Family", "Film", "Miscellaneous"]
     
-
     var attractions = [String]()
     
     var locationManager = CLLocationManager()
@@ -36,20 +35,12 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         let doneBarButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItem = doneBarButton
 
-        setupSearchBar()
+        searchController.searchBar.delegate = self
+                
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         
         fetchData()
         
-        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        
-    }
-    
-    fileprivate func setupSearchBar() {
-        definesPresentationContext = true
-        navigationItem.searchController = self.searchController
-        navigationItem.hidesSearchBarWhenScrolling = false
-        searchController.dimsBackgroundDuringPresentation = false
-        searchController.searchBar.delegate = self
     }
         
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -74,14 +65,16 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-
-        self.searchActivities = [Event]()
+        
+        var snapshot = diffableDataSource.snapshot()
+        snapshot.deleteAllItems()
+        self.diffableDataSource.apply(snapshot)
+        collectionView.collectionViewLayout = ActivitySubTypeViewController.searchLayout()
+        
+        activityIndicatorView.startAnimating()
+        
+        searchActivities = []
         showGroups = false
-        self.headerheight = view.frame.height
-        self.cellheight = 0
-        self.collectionView.reloadData()
-
-        self.showSpinner(onView: self.view)
 
         let dispatchGroup = DispatchGroup()
         
@@ -90,58 +83,70 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 for event in events {
                     if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(size: "50", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                            self.removeSpinner()
+                        Service.shared.fetchEventsSegmentLatLong(size: "30", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                            activityIndicatorView.stopAnimating()
                             dispatchGroup.leave()
                             if let events = search?.embedded?.events {
                                 self.searchActivities = sortEvents(events: events)
                                 dispatchGroup.notify(queue: .main) {
                                     self.checkIfThereAnyActivities()
+                                    snapshot.appendSections([.search])
+                                    snapshot.appendItems(self.searchActivities, toSection: .search)
+                                    self.diffableDataSource.apply(snapshot)
                                 }
                             }
                         }
                     } else {
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(size: "50", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
-                            self.removeSpinner()
+                        Service.shared.fetchEventsSegment(size: "30", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
+                            activityIndicatorView.stopAnimating()
                             dispatchGroup.leave()
                             if let events = search?.embedded?.events {
                                 self.searchActivities = sortEvents(events: events)
                                 dispatchGroup.notify(queue: .main) {
                                     self.checkIfThereAnyActivities()
+                                    snapshot.appendSections([.search])
+                                    snapshot.appendItems(self.searchActivities, toSection: .search)
+                                    self.diffableDataSource.apply(snapshot)
                                 }
                             }
                         }
                     }
                 }
-                self.removeSpinner()
+                activityIndicatorView.stopAnimating()
                 self.checkIfThereAnyActivities()
             } else {
-                self.removeSpinner()
+                activityIndicatorView.stopAnimating()
                 self.checkIfThereAnyActivities()
             }
         } else {
             if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegmentLatLong(size: "50", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                    self.removeSpinner()
+                Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                    activityIndicatorView.stopAnimating()
                     dispatchGroup.leave()
                     if let events = search?.embedded?.events {
                         self.searchActivities = sortEvents(events: events)
                         dispatchGroup.notify(queue: .main) {
                             self.checkIfThereAnyActivities()
+                            snapshot.appendSections([.search])
+                            snapshot.appendItems(self.searchActivities, toSection: .search)
+                            self.diffableDataSource.apply(snapshot)
                         }
                     }
                 }
             } else {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegment(size: "50", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
-                    self.removeSpinner()
+                Service.shared.fetchEventsSegment(size: "30", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
+                    activityIndicatorView.stopAnimating()
                     dispatchGroup.leave()
                     if let events = search?.embedded?.events {
                         self.searchActivities = sortEvents(events: events)
                         dispatchGroup.notify(queue: .main) {
                             self.checkIfThereAnyActivities()
+                            snapshot.appendSections([.search])
+                            snapshot.appendItems(self.searchActivities, toSection: .search)
+                            self.diffableDataSource.apply(snapshot)
                         }
                     }
                 }
@@ -150,11 +155,20 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchActivities = [Event]()
+        searchActivities = []
+        
+        collectionView.collectionViewLayout = ActivitySubTypeViewController.initialLayout()
+        var snapshot = diffableDataSource.snapshot()
+        snapshot.deleteSections([.search])
+        for section in sections {
+            if let object = groups[section] {
+                snapshot.appendSections([section])
+                snapshot.appendItems(object, toSection: section)
+                diffableDataSource.apply(snapshot)
+            }
+        }
         showGroups = true
-        headerheight = 0
-        cellheight = 405
-        self.checkIfThereAnyActivities()
+        checkIfThereAnyActivities()
     }
     
     fileprivate func fetchData() {
@@ -163,350 +177,67 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-                
-        headerheight = 0
-        cellheight = 405
+        
+        activityIndicatorView.startAnimating()
+        
+        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
+            let snapshot = self.diffableDataSource.snapshot()
+            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
+                header.titleLabel.text = section.name
+                header.subTitleLabel.isHidden = true
+            }
             
-        var musicEvents: [Event]?
-        var sportsEvents: [Event]?
-        var arttheatreEvents: [Event]?
-        var familyEvents: [Event]?
-        var filmEvents: [Event]?
-        var miscEvents: [Event]?
+            return header
+        })
+        
+        var snapshot = self.diffableDataSource.snapshot()
         
         // help you sync your data fetches together
+        let dispatchQueue = DispatchQueue.global(qos: .background)
         let dispatchGroup = DispatchGroup()
+        let semaphore = DispatchSemaphore(value: 0)
         
-        if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
-                dispatchGroup.enter()
-                Service.shared.fetchEventsSegmentLatLong(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[0])", classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                    musicEvents = search?.embedded?.events
-                    dispatchGroup.leave()
-                    dispatchGroup.notify(queue: .main) {
-                        if let group = musicEvents {
-                            let finalEvents = sortEvents(events: group)
-                            self.groups.append(finalEvents)
-                        } else {
-                            self.sections.removeAll{ $0 == "Music" }
+        dispatchQueue.async {
+            for section in self.sections {
+                if let object = self.groups[section] {
+                    activityIndicatorView.stopAnimating()
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(object, toSection: section)
+                    self.diffableDataSource.apply(snapshot)
+                    continue
+                } else if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+                    dispatchGroup.enter()
+                    Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        dispatchGroup.leave()
+                        semaphore.signal()
+                        if let object = search?.embedded?.events {
+                            self.groups[section] = object
                         }
+                    }
+                } else {
+                    dispatchGroup.enter()
+                    Service.shared.fetchEventsSegment(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "") { (search, err) in
+                        dispatchGroup.leave()
+                        semaphore.signal()
+                        if let object = search?.embedded?.events {
+                            self.groups[section] = object
+                        }
+                    }
+                }
+                
+                semaphore.wait()
                         
-                        self.collectionView.reloadData()
-                        dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[1])", classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                            sportsEvents = search?.embedded?.events
-                            dispatchGroup.leave()
-                    
-                            dispatchGroup.notify(queue: .main) {
-                                self.removeSpinner()
-                                if let group = sportsEvents {
-                                    let finalEvents = sortEvents(events: group)
-                                    self.groups.append(finalEvents)
-                                } else {
-                                    self.sections.removeAll{ $0 == "Sports" }
-                                }
-                                self.collectionView.reloadData()
-                                dispatchGroup.enter()
-                                Service.shared.fetchEventsSegmentLatLong(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[2])", classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                                    arttheatreEvents = search?.embedded?.events
-                                    dispatchGroup.leave()
-                                    
-                                    dispatchGroup.notify(queue: .main) {
-                                        self.removeSpinner()
-                                        if let group = arttheatreEvents {
-                                            let finalEvents = sortEvents(events: group)
-                                            self.groups.append(finalEvents)
-                                        } else {
-                                            self.sections.removeAll{ $0 == "Arts & Theatre" }
-                                        }
-                                    
-                                        self.collectionView.reloadData()
-                                        
-                                        dispatchGroup.enter()
-                                        Service.shared.fetchEventsSegmentLatLong(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[3])", classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                                            familyEvents = search?.embedded?.events
-                                            dispatchGroup.leave()
-                                            
-                                            dispatchGroup.notify(queue: .main) {
-                                                self.removeSpinner()
-                                                if let group = familyEvents {
-                                                    let finalEvents = sortEvents(events: group)
-                                                    self.groups.append(finalEvents)
-                                                } else {
-                                                    self.sections.removeAll{ $0 == "Family" }
-                                                }
-                                            
-                                                self.collectionView.reloadData()
-                                                
-                                                dispatchGroup.enter()
-                                                Service.shared.fetchEventsSegmentLatLong(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[4])", classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                                                    filmEvents = search?.embedded?.events
-                                                    dispatchGroup.leave()
-                                                    
-                                                    dispatchGroup.notify(queue: .main) {
-                                                        self.removeSpinner()
-                                                        if let group = filmEvents {
-                                                            let finalEvents = sortEvents(events: group)
-                                                            self.groups.append(finalEvents)
-                                                        } else {
-                                                            self.sections.removeAll{ $0 == "Film" }
-                                                        }
-                                                    
-                                                        self.collectionView.reloadData()
-                                                        
-                                                        dispatchGroup.enter()
-                                                        Service.shared.fetchEventsSegmentLatLong(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[5])", classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                                                            miscEvents = search?.embedded?.events
-                                                            dispatchGroup.leave()
-                                                            
-                                                            dispatchGroup.notify(queue: .main) {
-                                                                self.removeSpinner()
-                                                                if let group = miscEvents {
-                                                                    let finalEvents = sortEvents(events: group)
-                                                                    self.groups.append(finalEvents)
-                                                                } else {
-                                                                    self.sections.removeAll{ $0 == "Miscellaneous" }
-                                                                }
-                                                            
-                                                                self.collectionView.reloadData()
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                dispatchGroup.enter()
-                Service.shared.fetchEventsSegment(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[0])", classificationId: "") { (search, err) in
-                    musicEvents = search?.embedded?.events
-                    dispatchGroup.leave()
-                    dispatchGroup.notify(queue: .main) {
-                        if let group = musicEvents {
-                            let finalEvents = sortEvents(events: group)
-                            self.groups.append(finalEvents)
-                        } else {
-                            self.sections.removeAll{ $0 == "Music" }
-                        }
-        
-                        self.collectionView.reloadData()
-                            
-                        dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[1])", classificationId: "") { (search, err) in
-                            sportsEvents = search?.embedded?.events
-                            dispatchGroup.leave()
-                            
-                            dispatchGroup.notify(queue: .main) {
-                                if let group = sportsEvents {
-                                    let finalEvents = sortEvents(events: group)
-                                    self.groups.append(finalEvents)
-                                } else {
-                                    self.sections.removeAll{ $0 == "Sports" }
-                                }
-                            
-                                self.collectionView.reloadData()
-                                dispatchGroup.enter()
-                                Service.shared.fetchEventsSegment(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[2])", classificationId: "") { (search, err) in
-                                    arttheatreEvents = search?.embedded?.events
-                                    dispatchGroup.leave()
-                                    
-                                    dispatchGroup.notify(queue: .main) {
-                                        if let group = arttheatreEvents {
-                                            let finalEvents = sortEvents(events: group)
-                                            self.groups.append(finalEvents)
-                                        } else {
-                                            self.sections.removeAll{ $0 == "Arts & Theatre" }
-                                        }
-                                    
-                                        self.collectionView.reloadData()
-                                        
-                                        dispatchGroup.enter()
-                                        Service.shared.fetchEventsSegment(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[3])", classificationId: "") { (search, err) in
-                                            familyEvents = search?.embedded?.events
-                                            dispatchGroup.leave()
-                                            
-                                            dispatchGroup.notify(queue: .main) {
-                                                if let group = familyEvents {
-                                                    let finalEvents = sortEvents(events: group)
-                                                    self.groups.append(finalEvents)
-                                                } else {
-                                                    self.sections.removeAll{ $0 == "Family" }
-                                                }
-                                            
-                                                self.collectionView.reloadData()
-                                                
-                                                dispatchGroup.enter()
-                                                Service.shared.fetchEventsSegment(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[4])", classificationId: "") { (search, err) in
-                                                    filmEvents = search?.embedded?.events
-                                                    dispatchGroup.leave()
-                                                    
-                                                    dispatchGroup.notify(queue: .main) {
-                                                        if let group = filmEvents {
-                                                            let finalEvents = sortEvents(events: group)
-                                                            self.groups.append(finalEvents)
-                                                        } else {
-                                                            self.sections.removeAll{ $0 == "Film" }
-                                                        }
-                                                    
-                                                        self.collectionView.reloadData()
-                                                        
-                                                        dispatchGroup.enter()
-                                                        Service.shared.fetchEventsSegment(size: "20", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "\(self.sections[5])", classificationId: "") { (search, err) in
-                                                            miscEvents = search?.embedded?.events
-                                                            dispatchGroup.leave()
-                                                            
-                                                            dispatchGroup.notify(queue: .main) {
-                                                                if let group = miscEvents {
-                                                                    let finalEvents = sortEvents(events: group)
-                                                                    self.groups.append(finalEvents)
-                                                                } else {
-                                                                    self.sections.removeAll{ $0 == "Miscellaneous" }
-                                                                }
-                                                            
-                                                                self.collectionView.reloadData()
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                dispatchGroup.notify(queue: .main) {
+                    if let object = self.groups[section] {
+                        activityIndicatorView.stopAnimating()
+                        snapshot.appendSections([section])
+                        snapshot.appendItems(object, toSection: section)
+                        self.diffableDataSource.apply(snapshot)
                     }
                 }
             }
-    }
-    
-    
-    // MARK: UICollectionViewDataSource
-    
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if showGroups {
-            return sections.count
-        } else {
-            return 0
         }
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityTypeCell, for: indexPath) as! ActivityTypeCell
-        cell.horizontalController.conversations = conversations
-        cell.horizontalController.activities = activities
-        cell.horizontalController.users = users
-        cell.horizontalController.filteredUsers = filteredUsers
-        cell.horizontalController.favAct = favAct
-        cell.horizontalController.conversation = conversation
-        cell.horizontalController.schedule = schedule
-        cell.horizontalController.umbrellaActivity = umbrellaActivity
-        cell.arrowView.isHidden = true
-        cell.delegate = self
-        if showGroups {
-            cell.titleLabel.text = sections[indexPath.item]
-            if indexPath.item < groups.count {
-                let events = groups[indexPath.item]
-                cell.horizontalController.events = events
-                cell.horizontalController.collectionView.reloadData()
-                cell.horizontalController.didSelectHandler = { [weak self] event, favAct in
-                    if let event = event as? Event {
-                        print("event \(String(describing: event.name))")
-                        let destination = EventDetailViewController()
-                        destination.favAct = favAct
-                        destination.event = event
-                        destination.users = self!.users
-                        destination.filteredUsers = self!.filteredUsers
-                        destination.conversations = self!.conversations
-                        destination.activities = self!.activities
-                        destination.conversation = self!.conversation
-                        destination.schedule = self!.schedule
-                        destination.umbrellaActivity = self!.umbrellaActivity
-                        destination.delegate = self!
-                        self?.navigationController?.pushViewController(destination, animated: true)
-                    }
-                }
-                cell.horizontalController.removeControllerHandler = { [weak self] type, activity in
-                    if type == "activity" {
-                        let nav = self?.tabBarController!.viewControllers![1] as! UINavigationController
-                        if nav.topViewController is MasterActivityContainerController {
-                            let homeTab = nav.topViewController as! MasterActivityContainerController
-                            homeTab.customSegmented.setIndex(index: 2)
-                            homeTab.changeToIndex(index: 2)
-                        }
-                        self!.tabBarController?.selectedIndex = 1
-                        self!.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
-                    } else if type == "schedule" {
-                        self!.updateSchedule(schedule: activity)
-                        self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
-                    }
-                }
-                cell.horizontalController.favActHandler = { [weak self] favAct in
-                    print("fav Act \(favAct)")
-                    self!.favAct = favAct
-                }
-            }
-        }
-        return cell
-    }
-    
-    
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: cellheight)
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerId, for: indexPath) as! SearchHeader
-        let events = searchActivities
-        header.verticalController.favAct = favAct
-        header.verticalController.events = events
-        header.verticalController.conversations = conversations
-        header.verticalController.activities = activities
-        header.verticalController.users = users
-        header.verticalController.filteredUsers = filteredUsers
-        header.verticalController.favAct = favAct
-        header.verticalController.conversation = conversation
-        header.verticalController.schedule = schedule
-        header.verticalController.umbrellaActivity = umbrellaActivity
-        header.verticalController.collectionView.reloadData()
-        header.verticalController.didSelectHandler = { [weak self] event, favAct in
-            if let event = event as? Event {
-                print("event \(String(describing: event.name))")
-                let destination = EventDetailViewController()
-                destination.favAct = favAct
-                destination.event = event
-                destination.users = self!.users
-                destination.filteredUsers = self!.filteredUsers
-                destination.conversations = self!.conversations
-                destination.activities = self!.activities
-                destination.conversation = self!.conversation
-                destination.schedule = self!.schedule
-                destination.umbrellaActivity = self!.umbrellaActivity
-                destination.delegate = self!
-                self?.navigationController?.pushViewController(destination, animated: true)
-            }
-        }
-        header.verticalController.removeControllerHandler = { [weak self] type, activity in
-            if type == "activity" {
-                self!.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else if type == "schedule" {
-                self!.updateSchedule(schedule: activity)
-                self!.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
-            }
-        }
-        header.verticalController.favActHandler = { [weak self] favAct in
-            print("fav Act \(favAct)")
-            self!.favAct = favAct
-        }
-        return header
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return .init(width: view.frame.width, height: headerheight)
     }
     
     func checkIfThereAnyActivities() {
@@ -543,11 +274,9 @@ extension EventTypeViewController: UpdateFilter {
             self.filterDictionary = filterDictionary
             complexSearch(query: "", eventType: filterDictionary["eventType"]?[0] ?? "", eventStartDate: filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: filterDictionary["eventEndDate"]?[0] ?? "", zipcode: filterDictionary["zipcode"]?[0] ?? "", city: filterDictionary["city"]?[0] ?? "", state: filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         } else {
-            searchActivities = [Event]()
+            searchActivities = []
             self.filterDictionary = filterDictionary
             showGroups = true
-            headerheight = 0
-            cellheight = 397
             checkIfThereAnyActivities()
         }
     }

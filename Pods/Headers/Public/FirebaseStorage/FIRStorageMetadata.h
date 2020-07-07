@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Public/FIRStorageMetadata.h
+../../../FirebaseStorage/FirebaseStorage/Sources/Public/FIRStorageMetadata.h

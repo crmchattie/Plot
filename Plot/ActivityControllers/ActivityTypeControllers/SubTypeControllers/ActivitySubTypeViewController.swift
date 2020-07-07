@@ -13,8 +13,11 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     
     weak var delegate : UpdateScheduleDelegate?
     
+    let kCompositionalHeader = "CompositionalHeader"
     let kActivityTypeCell = "ActivityTypeCell"
-    let headerId = "headerId"
+    let kActivitySubTypeCell = "ActivitySubTypeCell"
+    let kActivityHeaderCell = "ActivityHeaderCell"
+    
     let searchController = UISearchController(searchResultsController: nil)
     
     var umbrellaActivity: Activity!
@@ -31,16 +34,149 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     let viewPlaceholder = ViewPlaceholder()
         
     var timer: Timer?
-    var headerheight: CGFloat = 0
-    var cellheight: CGFloat = 0
     
     var showGroups = true
         
     fileprivate var reference: DatabaseReference!
-    let favActivities = ActivityTypeViewController()
     
     init() {
-        super.init(collectionViewLayout: UICollectionViewFlowLayout())
+        let layout = ActivitySubTypeViewController.initialLayout()
+        super.init(collectionViewLayout: layout)
+    }
+    
+    static func initialLayout() -> UICollectionViewCompositionalLayout {
+        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
+            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/3)))
+            item.contentInsets = .init(top: 0, leading: 0, bottom: 16, trailing: 16)
+            
+            let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(360)), subitems: [item])
+             
+            let section = NSCollectionLayoutSection(group: group)
+            section.orthogonalScrollingBehavior = .groupPaging
+            section.contentInsets.leading = 16
+            
+            let kind = UICollectionView.elementKindSectionHeader
+            section.boundarySupplementaryItems = [
+                .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
+            ]
+            return section
+        }
+        return layout
+    }
+    
+    static func searchLayout() -> UICollectionViewCompositionalLayout {
+        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
+            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
+            item.contentInsets = .init(top: 0, leading: 16, bottom: 16, trailing: 16)
+            
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(120)), subitems: [item])
+             
+            let section = NSCollectionLayoutSection(group: group)
+            
+            return section
+        }
+        return layout
+    }
+    
+    lazy var diffableDataSource: UICollectionViewDiffableDataSource<ActivitySection, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
+        if let object = object as? ActivityType {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
+            cell.intColor = (indexPath.item % 5)
+            cell.activityType = object
+            return cell
+        } else if let object = object as? GroupItem {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            cell.intColor = (indexPath.item % 5)
+            cell.fsVenue = object.venue
+            return cell
+        } else if let object = object as? Event {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            cell.event = object
+            return cell
+        } else if let object = object as? SygicPlace {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            cell.intColor = (indexPath.item % 5)
+            cell.sygicPlace = object
+            return cell
+        } else if let object = object as? Workout {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            cell.intColor = (indexPath.item % 5)
+            cell.workout = object
+            return cell
+        } else if let object = object as? Recipe {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            cell.recipe = object
+            return cell
+        }
+        return nil
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let object = diffableDataSource.itemIdentifier(for: indexPath)
+        if let recipe = object as? Recipe {
+            print("meal \(recipe.title)")
+            let destination = MealDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.recipe = recipe
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if let event = object as? Event {
+            print("event \(String(describing: event.name))")
+            let destination = EventDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.event = event
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if let workout = object as? Workout {
+            print("workout \(String(describing: workout.title))")
+            let destination = WorkoutDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.workout = workout
+            destination.intColor = (indexPath.item % 5)
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if let attraction = object as? Attraction {
+            print("attraction \(String(describing: attraction.name))")
+            let destination = EventDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.attraction = attraction
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else {
+            print("neither meals or events")
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -49,12 +185,15 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+                        
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
+        
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.centerInSuperview()
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
@@ -63,11 +202,14 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
+        collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
+        collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: kActivityHeaderCell)
+        collectionView.register(ActivitySubTypeCell.self, forCellWithReuseIdentifier: kActivitySubTypeCell)
         collectionView.register(ActivityTypeCell.self, forCellWithReuseIdentifier: kActivityTypeCell)
-        collectionView.register(SearchHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerId)
         
         addObservers()
-                
+        
+        setupSearchBar()
         
     }
     
@@ -75,6 +217,14 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         super.viewWillAppear(animated)
         print("view appearing")
         fetchFavAct()
+    }
+    
+    
+    fileprivate func setupSearchBar() {
+        definesPresentationContext = true
+        navigationItem.searchController = self.searchController
+        navigationItem.searchController?.obscuresBackgroundDuringPresentation = false
+        navigationItem.hidesSearchBarWhenScrolling = false
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

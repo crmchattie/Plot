@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Private/FIRStoragePath.h
+../../../FirebaseStorage/FirebaseStorage/Sources/FIRStoragePath.h

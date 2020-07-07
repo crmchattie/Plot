@@ -47,7 +47,7 @@ class MealExpandedDetailViewController: UICollectionViewController, UICollection
     }
     
     let activityIndicatorView: UIActivityIndicatorView = {
-        let aiv = UIActivityIndicatorView(style: .whiteLarge)
+        let aiv = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
         aiv.color = .darkGray
         aiv.startAnimating()
         aiv.hidesWhenStopped = true

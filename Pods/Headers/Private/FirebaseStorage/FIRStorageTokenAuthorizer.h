@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Private/FIRStorageTokenAuthorizer.h
+../../../FirebaseStorage/FirebaseStorage/Sources/FIRStorageTokenAuthorizer.h

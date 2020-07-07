@@ -94,9 +94,43 @@ class ActivityDetailCell: UICollectionViewCell {
                 imageView.tintColor = UIColor.white
                 imageView.backgroundColor = colors[intColor]
                 imageURL = "workout"
-                
                 setupViews()
             }
+        }
+    }
+    
+    var fsVenue: FSVenue! {
+        didSet {
+            if let fsVenue = fsVenue {
+                nameLabel.text = fsVenue.name
+                if let category = fsVenue.location?.formattedAddress?[0], let subcategory = fsVenue.categories?[0].shortName {
+                    categoryLabel.text = category
+                    subcategoryLabel.text = subcategory
+                }
+                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
+                imageView.tintColor = UIColor.white
+                imageView.backgroundColor = colors[intColor]
+                imageURL = "workout"
+            }
+            setupViews()
+        }
+    }
+    
+    var sygicPlace: SygicPlace! {
+        didSet {
+            if let sygicPlace = sygicPlace {
+                nameLabel.text = sygicPlace.name
+                if let category = sygicPlace.nameSuffix, let subcategoryArray = sygicPlace.categories {
+                    let subcategory = subcategoryArray.map({ String($0).capitalized }).joined(separator: ", ")
+                    categoryLabel.text = category
+                    subcategoryLabel.text = subcategory
+                }
+                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
+                imageView.tintColor = UIColor.white
+                imageView.backgroundColor = colors[intColor]
+                imageURL = "workout"
+            }
+            setupViews()
         }
     }
     

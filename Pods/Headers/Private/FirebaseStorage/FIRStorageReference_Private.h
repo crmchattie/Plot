@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Private/FIRStorageReference_Private.h
+../../../FirebaseStorage/FirebaseStorage/Sources/FIRStorageReference_Private.h

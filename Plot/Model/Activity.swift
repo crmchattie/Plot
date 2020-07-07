@@ -439,7 +439,7 @@ class Activity: NSObject, NSCopying, Codable {
     }
 }
 
-enum ActivityType: String {
+enum ActivityType: String, Equatable, Hashable {
     case basic, complex, recipe, workout, event, flight
     
     var activityCategoryText: String {

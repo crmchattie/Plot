@@ -1,1 +1,1 @@
-../../../FirebaseStorage/Firebase/Storage/Private/FIRStorageErrors.h
+../../../FirebaseStorage/FirebaseStorage/Sources/FIRStorageErrors.h

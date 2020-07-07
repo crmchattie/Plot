@@ -6,9 +6,9 @@
 import Foundation
 
 // MARK: - SygicCollectionsSearchResult
-class SygicCollectionsSearchResult: Codable {
+struct SygicCollectionsSearchResult: Codable, Equatable, Hashable {
     let statusCode: Int?
-    let serverTimestamp: Date?
+    let serverTimestamp: String?
     let data: DataClass?
 
     enum CodingKeys: String, CodingKey {
@@ -17,55 +17,16 @@ class SygicCollectionsSearchResult: Codable {
         case data
     }
 
-    init(statusCode: Int?, serverTimestamp: Date?, data: DataClass?) {
+    init(statusCode: Int?, serverTimestamp: String?, data: DataClass?) {
         self.statusCode = statusCode
         self.serverTimestamp = serverTimestamp
         self.data = data
     }
 }
 
-// MARK: SygicCollectionsSearchResult convenience initializers and mutators
-
-extension SygicCollectionsSearchResult {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(SygicCollectionsSearchResult.self, from: data)
-        self.init(statusCode: me.statusCode, serverTimestamp: me.serverTimestamp, data: me.data)
-    }
-
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        statusCode: Int?? = nil,
-        serverTimestamp: Date?? = nil,
-        data: DataClass?? = nil
-    ) -> SygicCollectionsSearchResult {
-        return SygicCollectionsSearchResult(
-            statusCode: statusCode ?? self.statusCode,
-            serverTimestamp: serverTimestamp ?? self.serverTimestamp,
-            data: data ?? self.data
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
 
 // MARK: - DataClass
-class DataClass: Codable {
+struct DataClass: Codable, Equatable, Hashable {
     let collections: [Collection]?
     let collection: Collection?
 
@@ -75,46 +36,8 @@ class DataClass: Codable {
     }
 }
 
-// MARK: DataClass convenience initializers and mutators
-
-extension DataClass {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(DataClass.self, from: data)
-        self.init(collections: me.collections, collection: me.collection)
-    }
-
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        collections: [Collection]?? = nil,
-        collection: Collection?? = nil
-    ) -> DataClass {
-        return DataClass(
-            collections: collections ?? self.collections,
-            collection: collection ?? self.collection
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
-}
-
 // MARK: - Collection
-class Collection: Codable {
+struct Collection: Codable, Equatable, Hashable {
     let id: Int
     let parentPlaceID, nameLong, nameShort, collectionDescription: String?
     let tags: [Tag]?
@@ -141,50 +64,6 @@ class Collection: Codable {
     }
 }
 
-// MARK: Collection convenience initializers and mutators
-
-extension Collection {
-    convenience init(data: Data) throws {
-        let me = try newJSONDecoder().decode(Collection.self, from: data)
-        self.init(id: me.id, parentPlaceID: me.parentPlaceID, nameLong: me.nameLong, nameShort: me.nameShort, collectionDescription: me.collectionDescription, tags: me.tags, placeIDS: me.placeIDS)
-    }
-
-    convenience init(_ json: String, using encoding: String.Encoding = .utf8) throws {
-        guard let data = json.data(using: encoding) else {
-            throw NSError(domain: "JSONDecoding", code: 0, userInfo: nil)
-        }
-        try self.init(data: data)
-    }
-
-    convenience init(fromURL url: URL) throws {
-        try self.init(data: try Data(contentsOf: url))
-    }
-
-    func with(
-        id: Int,
-        parentPlaceID: String?? = nil,
-        nameLong: String?? = nil,
-        nameShort: String?? = nil,
-        collectionDescription: String?? = nil,
-        tags: [Tag]?? = nil,
-        placeIDS: [String]?? = nil
-    ) -> Collection {
-        return Collection(
-            id: id,
-            parentPlaceID: parentPlaceID ?? self.parentPlaceID,
-            nameLong: nameLong ?? self.nameLong,
-            nameShort: nameShort ?? self.nameShort,
-            collectionDescription: collectionDescription ?? self.collectionDescription,
-            tags: tags ?? self.tags,
-            placeIDS: placeIDS ?? self.placeIDS
-        )
-    }
-
-    func jsonData() throws -> Data {
-        return try newJSONEncoder().encode(self)
-    }
-
-    func jsonString(encoding: String.Encoding = .utf8) throws -> String? {
-        return String(data: try self.jsonData(), encoding: encoding)
-    }
+func ==(lhs: Collection, rhs: Collection) -> Bool {
+    return lhs.id == rhs.id
 }
