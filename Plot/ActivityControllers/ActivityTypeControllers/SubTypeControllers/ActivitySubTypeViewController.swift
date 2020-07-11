@@ -15,7 +15,6 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     
     let kCompositionalHeader = "CompositionalHeader"
     let kActivityTypeCell = "ActivityTypeCell"
-    let kActivitySubTypeCell = "ActivitySubTypeCell"
     let kActivityHeaderCell = "ActivityHeaderCell"
     
     let searchController = UISearchController(searchResultsController: nil)
@@ -36,6 +35,12 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     var timer: Timer?
     
     var showGroups = true
+    
+    var activity: Activity!
+    var activeRecipe: Bool = false
+    
+    var startDateTime: Date?
+    var endDateTime: Date?
         
     fileprivate var reference: DatabaseReference!
     
@@ -47,13 +52,14 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     static func initialLayout() -> UICollectionViewCompositionalLayout {
         let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
             let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/3)))
-            item.contentInsets = .init(top: 0, leading: 0, bottom: 16, trailing: 16)
+            item.contentInsets = .init(top: 0, leading: 0, bottom: 8, trailing: 16)
             
             let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(360)), subitems: [item])
              
             let section = NSCollectionLayoutSection(group: group)
             section.orthogonalScrollingBehavior = .groupPaging
             section.contentInsets.leading = 16
+            section.contentInsets.trailing = 16
             
             let kind = UICollectionView.elementKindSectionHeader
             section.boundarySupplementaryItems = [
@@ -78,107 +84,6 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         return layout
     }
     
-    lazy var diffableDataSource: UICollectionViewDiffableDataSource<ActivitySection, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
-        if let object = object as? ActivityType {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
-            cell.intColor = (indexPath.item % 5)
-            cell.activityType = object
-            return cell
-        } else if let object = object as? GroupItem {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
-            cell.intColor = (indexPath.item % 5)
-            cell.fsVenue = object.venue
-            return cell
-        } else if let object = object as? Event {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
-            cell.event = object
-            return cell
-        } else if let object = object as? SygicPlace {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
-            cell.intColor = (indexPath.item % 5)
-            cell.sygicPlace = object
-            return cell
-        } else if let object = object as? Workout {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
-            cell.intColor = (indexPath.item % 5)
-            cell.workout = object
-            return cell
-        } else if let object = object as? Recipe {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
-            cell.recipe = object
-            return cell
-        }
-        return nil
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let object = diffableDataSource.itemIdentifier(for: indexPath)
-        if let recipe = object as? Recipe {
-            print("meal \(recipe.title)")
-            let destination = MealDetailViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.favAct = favAct
-            destination.recipe = recipe
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.activities = self.activities
-            destination.conversation = self.conversation
-            destination.schedule = self.schedule
-            destination.umbrellaActivity = self.umbrellaActivity
-            destination.delegate = self
-            self.navigationController?.pushViewController(destination, animated: true)
-        } else if let event = object as? Event {
-            print("event \(String(describing: event.name))")
-            let destination = EventDetailViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.favAct = favAct
-            destination.event = event
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.activities = self.activities
-            destination.conversation = self.conversation
-            destination.schedule = self.schedule
-            destination.umbrellaActivity = self.umbrellaActivity
-            destination.delegate = self
-            self.navigationController?.pushViewController(destination, animated: true)
-        } else if let workout = object as? Workout {
-            print("workout \(String(describing: workout.title))")
-            let destination = WorkoutDetailViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.favAct = favAct
-            destination.workout = workout
-            destination.intColor = (indexPath.item % 5)
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.activities = self.activities
-            destination.conversation = self.conversation
-            destination.schedule = self.schedule
-            destination.umbrellaActivity = self.umbrellaActivity
-            destination.delegate = self
-            self.navigationController?.pushViewController(destination, animated: true)
-        } else if let attraction = object as? Attraction {
-            print("attraction \(String(describing: attraction.name))")
-            let destination = EventDetailViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.favAct = favAct
-            destination.attraction = attraction
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.activities = self.activities
-            destination.conversation = self.conversation
-            destination.schedule = self.schedule
-            destination.umbrellaActivity = self.umbrellaActivity
-            destination.delegate = self
-            self.navigationController?.pushViewController(destination, animated: true)
-        } else {
-            print("neither meals or events")
-        }
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -197,14 +102,13 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
-        edgesForExtendedLayout = UIRectEdge.bottom
+        edgesForExtendedLayout = UIRectEdge.top
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: kActivityHeaderCell)
-        collectionView.register(ActivitySubTypeCell.self, forCellWithReuseIdentifier: kActivitySubTypeCell)
         collectionView.register(ActivityTypeCell.self, forCellWithReuseIdentifier: kActivityTypeCell)
         
         addObservers()
@@ -253,7 +157,6 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         { (error) in
             print(error.localizedDescription)
         }
-        
     }
     
     deinit {
@@ -282,6 +185,49 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.reloadData()
         
+    }
+    
+    func showActivityIndicator() {
+        if let navController = self.navigationController {
+            self.showSpinner(onView: navController.view)
+        } else {
+            self.showSpinner(onView: self.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
+    
+    func getSelectedFalconUsers(forActivity activity: Activity, completion: @escaping ([User])->()) {
+        guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        var selectedFalconUsers = [User]()
+        let group = DispatchGroup()
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if activity.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    selectedFalconUsers.append(user)
+                }
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            completion(selectedFalconUsers)
+        }
     }
     
     

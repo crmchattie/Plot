@@ -107,7 +107,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
         }
         
         if schedule.recipeID != nil {
-            activityTypeButton.setImage(UIImage(named: "meal"), for: .normal)
+            activityTypeButton.setImage(UIImage(named: "chef"), for: .normal)
         } else if schedule.workoutID != nil {
             activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
         } else if schedule.eventID != nil {

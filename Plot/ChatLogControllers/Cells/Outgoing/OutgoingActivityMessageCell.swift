@@ -87,7 +87,7 @@ class OutgoingActivityMessageCell: BaseActivityMessageCell {
         subcategoryView.text = subcategoryText
     }
     
-    let frameWidth: CGFloat = 235
+    let frameWidth: CGFloat = 200
     bubbleView.frame = CGRect(x: frame.width - frameWidth - 40, y: 0,
         width: frameWidth + 30, height: frame.size.height.rounded()).integral
     

@@ -289,12 +289,17 @@ class Service {
         }
         if price.isEmpty {
             parameters["price"] = nil
+        } else if let price = parameters["price"] {
+            var newPrice = price.replacingOccurrences(of: "[", with: "")
+            newPrice = newPrice.replacingOccurrences(of: "]", with: "")
+            parameters["price"] = newPrice.replacingOccurrences(of: " ", with: "")
         }
         
         parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
+
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
         
     }

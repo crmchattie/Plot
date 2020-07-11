@@ -333,7 +333,7 @@ class ChatLogController: UICollectionViewController {
       topViewController(rootViewController: self) is CropViewController ||
         self.navigationController?.visibleViewController is  CreateActivityViewController ||
         self.navigationController?.visibleViewController is  SelectActivityTableViewController ||
-        self.navigationController?.visibleViewController is  MealDetailViewController ||
+        self.navigationController?.visibleViewController is  RecipeDetailViewController ||
         self.navigationController?.visibleViewController is  EventDetailViewController ||
         self.navigationController?.visibleViewController is  WorkoutDetailViewController {
       return
@@ -657,7 +657,7 @@ class ChatLogController: UICollectionViewController {
                 let detailedRecipe = search
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
-                    let destination = MealDetailViewController()
+                    let destination = RecipeDetailViewController()
                     destination.recipe = detailedRecipe
                     destination.detailedRecipe = detailedRecipe
                     destination.users = self.users

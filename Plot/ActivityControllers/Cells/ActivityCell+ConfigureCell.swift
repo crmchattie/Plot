@@ -126,7 +126,7 @@ extension ActivityCell {
         }
         
         if activity.recipeID != nil {
-            activityTypeButton.setImage(UIImage(named: "meal"), for: .normal)
+            activityTypeButton.setImage(UIImage(named: "chef"), for: .normal)
         } else if activity.workoutID != nil {
             activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
         } else if activity.eventID != nil {

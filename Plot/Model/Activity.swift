@@ -48,6 +48,7 @@ class Activity: NSObject, NSCopying, Codable {
     var servings: Int?
     var workoutID: String?
     var eventID: String?
+    var placeID: String?
     var attractionID: String?
     var showExtras: Bool?
     
@@ -78,6 +79,7 @@ class Activity: NSObject, NSCopying, Codable {
         case workoutID
         case eventID
         case attractionID
+        case placeID
         case showExtras
     }
     
@@ -179,6 +181,7 @@ class Activity: NSObject, NSCopying, Codable {
         workoutID = dictionary?["workoutID"] as? String
         eventID = dictionary?["eventID"] as? String
         attractionID = dictionary?["attractionID"] as? String
+        placeID = dictionary?["placeID"] as? String
         showExtras = dictionary?["showExtras"] as? Bool
     }
     
@@ -335,8 +338,8 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["attractionID"] = value
         }
         
-        if let value = self.showExtras as AnyObject? {
-            dictionary["showExtras"] = value
+        if let value = self.placeID as AnyObject? {
+            dictionary["placeID"] = value
         }
         
         return dictionary

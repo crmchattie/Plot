@@ -743,7 +743,7 @@ class GrocerylistViewController: FormViewController {
                 let detailedRecipe = search
                 dispatchGroup.leave()
                 dispatchGroup.notify(queue: .main) {
-                    let destination = MealDetailViewController()
+                    let destination = RecipeDetailViewController()
                     destination.recipe = detailedRecipe
                     destination.detailedRecipe = detailedRecipe
                     destination.activeRecipe = true
@@ -754,7 +754,7 @@ class GrocerylistViewController: FormViewController {
                 }
             }
         } else {
-            let destination = MealTypeViewController()
+            let destination = RecipeTypeViewController()
             destination.recipeDelegate = self
             destination.activeRecipe = true
             self.navigationController?.pushViewController(destination, animated: true)

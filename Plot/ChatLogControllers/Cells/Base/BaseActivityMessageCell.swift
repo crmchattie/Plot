@@ -35,7 +35,7 @@ class BaseActivityMessageCell: BaseMessageCell {
     }
   
     func setupImageFromURL(message: Message, messageImageUrl: URL) {
-        if message.activityImageURL == "workout" || message.activityImageURL == "activityLarge"  {
+        if message.activityImageURL == "workout" || message.activityImageURL == "activityLarge" || message.activityImageURL == "meal" || message.activityImageURL == "recreation" || message.activityImageURL == "nightlife" || message.activityImageURL == "shopping" || message.activityImageURL == "event" || message.activityImageURL == "sightseeing" || message.activityImageURL == "chef" || message.activityImageURL == "trending" {
             messageImageView.image = UIImage(named: message.activityImageURL ?? "activityLarge")?.withRenderingMode(.alwaysTemplate)
             messageImageView.tintColor = UIColor.white
             messageImageView.backgroundColor = FalconPalette.defaultDarkBlue

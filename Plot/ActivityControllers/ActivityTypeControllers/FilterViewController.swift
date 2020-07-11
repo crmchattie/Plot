@@ -307,6 +307,8 @@ class FilterViewController: FormViewController {
         let alertController = UIAlertController(title: filterDictionary["location"]![0], message: nil, preferredStyle: .alert)
         let removeAddress = UIAlertAction(title: "Remove Address", style: .default) { (action:UIAlertAction) in
             if let locationRow: ButtonRow = self.form.rowBy(tag: "location") {
+                self.filterDictionary["lat"] = nil
+                self.filterDictionary["lon"] = nil
                 self.filterDictionary["zipcode"] = nil
                 self.filterDictionary["city"] = nil
                 self.filterDictionary["state"] = nil
@@ -332,6 +334,10 @@ extension FilterViewController: UpdateLocationDelegate {
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
         if let locationRow: ButtonRow = form.rowBy(tag: "location") {
             if locationName != "" {
+                for (_, value) in locationAddress {
+                    filterDictionary["lat"] = [String(value[0])]
+                    filterDictionary["lon"] = [String(value[1])]
+                }
                 filterDictionary["zipcode"] = [zipcode]
                 filterDictionary["city"] = [city]
                 filterDictionary["state"] = [state]
@@ -339,6 +345,8 @@ extension FilterViewController: UpdateLocationDelegate {
                 filterDictionary["location"] = [locationName]
                 locationRow.title = locationName
             } else {
+                filterDictionary["lat"] = nil
+                filterDictionary["lon"] = nil
                 filterDictionary["zipcode"] = nil
                 filterDictionary["city"] = nil
                 filterDictionary["state"] = nil
@@ -348,7 +356,6 @@ extension FilterViewController: UpdateLocationDelegate {
             }
             locationRow.updateCell()
         }
-        print("filterDictionary \(filterDictionary)")
     }
 }
 

@@ -710,8 +710,11 @@ class CreateActivityViewController: FormViewController {
                     segmentRow.value = "Hidden"
                 } else if let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
                     segmentRow.value = self!.segmentRowValue
-                    
                 }
+                guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+                let userReference = Database.database().reference().child("user-activities").child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
+                let values:[String : Any] = ["showExtras": row.value ?? false]
+                userReference.updateChildValues(values)
             }
             
         <<< SegmentedRow<String>("sections"){
@@ -1530,7 +1533,7 @@ class CreateActivityViewController: FormViewController {
                     let detailedRecipe = search
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
-                        let destination = MealDetailViewController()
+                        let destination = RecipeDetailViewController()
                         destination.activity = scheduleItem
                         destination.recipe = detailedRecipe
                         destination.detailedRecipe = detailedRecipe

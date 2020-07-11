@@ -29,9 +29,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                     categoryLabel.text = "Preparation time: \(category) mins"
                     subcategoryLabel.text = "Servings: \(subcategory)"
                 }
-                let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
-                imageView.sd_setImage(with: URL(string: recipeImage))
-                imageURL = recipeImage
+                imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
                 setupViews()
             }
         }
@@ -55,10 +53,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                 } else {
                     subcategoryLabel.text = ""
                 }
-                if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
-                    imageView.sd_setImage(with: URL(string: url))
-                    imageURL = url
-                }
+                imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
                 setupViews()
             }
         }
@@ -72,10 +67,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                     categoryLabel.text = "Total events: \(upcomingEvents)"
                 }
                 subcategoryLabel.text = ""
-                if let images = attraction.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
-                    imageView.sd_setImage(with: URL(string: url))
-                    imageURL = url
-                }
+                imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
                 setupViews()
             }
         }
@@ -89,10 +81,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                     categoryLabel.text = category
                     subcategoryLabel.text = "Number of exercises: \(subcategory)"
                 }
-                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
-                imageView.tintColor = UIColor.white
-                imageView.backgroundColor = colors[intColor]
-                imageURL = "workout"
+                imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
                 setupViews()
             }
         }
@@ -106,10 +95,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                     categoryLabel.text = category
                     subcategoryLabel.text = subcategory
                 }
-                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
-                imageView.tintColor = UIColor.white
-                imageView.backgroundColor = colors[intColor]
-                imageURL = "workout"
+                imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
                 setupViews()
             }
         }
@@ -124,10 +110,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
                     categoryLabel.text = category
                     subcategoryLabel.text = subcategory
                 }
-                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
-                imageView.tintColor = UIColor.white
-                imageView.backgroundColor = colors[intColor]
-                imageURL = "workout"
+                imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
                 setupViews()
             }
         }
@@ -201,13 +184,16 @@ class ActivitySubTypeCell: UICollectionViewCell {
 
     
     func setupViews() {
-                
+                        
 //        if let heartImage = heartButtonImage {
 //            heartButton.setImage(UIImage(named: heartImage), for: .normal)
 //            heartButton.isHidden = false
 //        } else {
 //            heartButton.isHidden = true
 //        }
+        
+        imageView.tintColor = UIColor.white
+        imageView.backgroundColor = colors[intColor]
         
         heartButton.constrainWidth(constant: 40)
         heartButton.constrainHeight(constant: 40)

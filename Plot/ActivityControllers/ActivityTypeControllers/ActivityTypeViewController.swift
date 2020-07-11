@@ -16,21 +16,20 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     weak var delegate : UpdateScheduleDelegate?
     weak var recipeDelegate : UpdateRecipeDelegate?
-        
+    
     fileprivate var reference: DatabaseReference!
     
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityTypeCell = "ActivityTypeCell"
-    private let kActivitySubTypeCell = "ActivitySubTypeCell"
     private let kActivityHeaderCell = "ActivityHeaderCell"
-        
+    
     var attractionsString = [String]()
     var customTypes: [ActivityType] = [.basic, .flight]
     var favAct = [String: [String]]()
     
     var sections: [ActivitySection] = [.custom, .food, .nightlife, .events, .sightseeing, .recreation, .shopping, .workouts, .recipes]
     var groups = [ActivitySection: [AnyHashable]]()
-        
+    
     var workoutIDs: [String] = ["ZB9Gina","E5YrL4F","lhNZOX1","LWampEt","5jbuzns","ltrgYTF","Z37OGjs","7GdJQBG","RKrXsHn","GwxLrim","nspLcIX","nHWkOhp","0ym6yNn","6VLf2M7","n8g5auz","CM5o2rv","ufiyRQc","N7aHlCw","gIeTbVT","lGaFbQK"]
     var intColor: Int = 0
     
@@ -44,13 +43,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var activities = [Activity]()
     var conversations = [Conversation]()
     var conversation: Conversation?
-        
+    
     var activity: Activity!
     var activeRecipe: Bool = false
     
     var startDateTime: Date?
     var endDateTime: Date?
-            
+    
     var locationManager = CLLocationManager()
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
@@ -64,13 +63,14 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             } else {
                 // second section
                 let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/3)))
-                item.contentInsets = .init(top: 0, leading: 0, bottom: 16, trailing: 16)
+                item.contentInsets = .init(top: 0, leading: 0, bottom: 8, trailing: 16)
                 
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(360)), subitems: [item])
-                 
+                
                 let section = NSCollectionLayoutSection(group: group)
                 section.orthogonalScrollingBehavior = .groupPaging
                 section.contentInsets.leading = 16
+                section.contentInsets.trailing = 16
                 
                 let kind = UICollectionView.elementKindSectionHeader
                 section.boundarySupplementaryItems = [
@@ -101,12 +101,12 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         
         return section
     }
-
+    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-        
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -133,9 +133,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: kActivityHeaderCell)
-        collectionView.register(ActivitySubTypeCell.self, forCellWithReuseIdentifier: kActivitySubTypeCell)
         collectionView.register(ActivityTypeCell.self, forCellWithReuseIdentifier: kActivityTypeCell)
-                
+        
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         
         addObservers()
@@ -144,7 +143,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         
         fetchData()
         
-                
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -219,26 +218,75 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             cell.activityType = object
             return cell
         } else if let object = object as? GroupItem {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+            cell.delegate = self
+            if let places = self.favAct["places"], places.contains(object.venue?.id ?? "") {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
             cell.intColor = (indexPath.item % 5)
+            cell.imageURL = self.sections[indexPath.section].image
             cell.fsVenue = object.venue
             return cell
+        } else if let object = object as? FSVenue {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+            cell.delegate = self
+            if let places = self.favAct["places"], places.contains(object.id) {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
+            cell.intColor = (indexPath.item % 5)
+            cell.imageURL = self.sections[indexPath.section].image
+            cell.fsVenue = object
+            return cell
         } else if let object = object as? Event {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+            cell.delegate = self
+            if let events = self.favAct["events"], events.contains(object.id) {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
+            cell.intColor = (indexPath.item % 5)
+            cell.imageURL = self.sections[indexPath.section].image
             cell.event = object
             return cell
         } else if let object = object as? SygicPlace {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+            cell.delegate = self
+            if let places = self.favAct["places"], places.contains(object.id) {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
             cell.intColor = (indexPath.item % 5)
+            cell.imageURL = self.sections[indexPath.section].image
             cell.sygicPlace = object
             return cell
         } else if let object = object as? Workout {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+            cell.delegate = self
+            if let workouts = self.favAct["workouts"], workouts.contains(object.identifier) {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
             cell.intColor = (indexPath.item % 5)
+            cell.imageURL = self.sections[indexPath.section].image
             cell.workout = object
             return cell
         } else if let object = object as? Recipe {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivitySubTypeCell, for: indexPath) as! ActivitySubTypeCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
+            cell.delegate = self
+            if let recipes = self.favAct["recipes"], recipes.contains("\(object.id)") {
+                cell.heartButtonImage = "heart-filled"
+            } else {
+                cell.heartButtonImage = "heart"
+            }
+            cell.intColor = (indexPath.item % 5)
+            cell.imageURL = self.sections[indexPath.section].image
             cell.recipe = object
             return cell
         }
@@ -249,44 +297,44 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         let object = diffableDataSource.itemIdentifier(for: indexPath)
         if let activityType = object as? ActivityType {
             let activityTypeName = activityType.rawValue
-                switch activityTypeName {
-                case "basic":
-                    print("basic")
-                    if let activity = self.umbrellaActivity {
-                        let destination = ScheduleViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.delegate = self
-                        destination.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
-                        destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    } else {
-                        let destination = CreateActivityViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.conversations = self.conversations
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    }
-                case "flight":
-                    print("flight")
-                    let destination = FlightSearchViewController()
+            switch activityTypeName {
+            case "basic":
+                print("basic")
+                if let activity = self.umbrellaActivity {
+                    let destination = ScheduleViewController()
+                    destination.hidesBottomBarWhenPushed = true
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    destination.delegate = self
+                    destination.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
+                    destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let destination = CreateActivityViewController()
                     destination.hidesBottomBarWhenPushed = true
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
                     destination.conversations = self.conversations
                     self.navigationController?.pushViewController(destination, animated: true)
-                case "meal":
-                    print("meal")
-                case "workout":
-                    print("workout")
-                default:
-                    print("default")
                 }
+            case "flight":
+                print("flight")
+                let destination = FlightSearchViewController()
+                destination.hidesBottomBarWhenPushed = true
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.conversations = self.conversations
+                self.navigationController?.pushViewController(destination, animated: true)
+            case "meal":
+                print("meal")
+            case "workout":
+                print("workout")
+            default:
+                print("default")
+            }
         } else if let recipe = object as? Recipe {
             print("meal \(recipe.title)")
-            let destination = MealDetailViewController()
+            let destination = RecipeDetailViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
             destination.recipe = recipe
@@ -357,8 +405,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         
         activityIndicatorView.startAnimating()
         
-        var workouts = [Workout]()
-        
         diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
             header.delegate = self
@@ -376,7 +422,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         })
         
         var snapshot = self.diffableDataSource.snapshot()
-                
+        
         let dispatchGroup = DispatchGroup()
         
         for section in sections {
@@ -389,10 +435,12 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             } else if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                 if section.type == "FSVenue" {
                     dispatchGroup.enter()
-                    Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 1, sortByDistance: 0, sortByPopularity: 1, price: [], query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                    Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
                         dispatchGroup.leave()
                         if let object = search?.response?.groups?[0].items {
                             self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
                         }
                     }
                 } else if section.type == "Event" {
@@ -401,6 +449,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         dispatchGroup.leave()
                         if let object = search?.embedded?.events {
                             self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
                         }
                     }
                 } else if section.type == "SygicPlace" {
@@ -409,9 +459,12 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         dispatchGroup.leave()
                         if let object = search?.data?.places {
                             self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
                         }
                     }
                 } else if section.type == "Workout" {
+                    var workouts = [Workout]()
                     for workoutID in self.workoutIDs {
                         dispatchGroup.enter()
                         self.reference = Database.database().reference().child("workouts").child("workouts")
@@ -423,7 +476,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                                     dispatchGroup.leave()
                                 }
                             }
-                          })
+                        })
                         { (error) in
                             print(error.localizedDescription)
                         }
@@ -434,16 +487,20 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         dispatchGroup.leave()
                         if let object = search?.recipes {
                             self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
                         }
                     }
                 }
             } else {
                 if section.type == "FSVenue" {
                     dispatchGroup.enter()
-                    Service.shared.fetchFSExplore(limit: "30", offset: "", time: "", day: "", openNow: 1, sortByDistance: 0, sortByPopularity: 1, price: [], query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: "") { (search, err) in
+                    Service.shared.fetchFSExplore(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras) { (search, err) in
                         dispatchGroup.leave()
                         if let object = search?.response?.groups?[0].items {
                             self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
                         }
                     }
                 } else if section.type == "Event" {
@@ -452,6 +509,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         dispatchGroup.leave()
                         if let object = search?.embedded?.events {
                             self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
                         }
                     }
                 } else if section.type == "SygicPlace" {
@@ -460,9 +519,12 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         dispatchGroup.leave()
                         if let object = search?.data?.places {
                             self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
                         }
                     }
                 } else if section.type == "Workout" {
+                    var workouts = [Workout]()
                     for workoutID in self.workoutIDs {
                         dispatchGroup.enter()
                         self.reference = Database.database().reference().child("workouts").child("workouts")
@@ -474,7 +536,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                                     dispatchGroup.leave()
                                 }
                             }
-                          })
+                        })
                         { (error) in
                             print(error.localizedDescription)
                         }
@@ -485,11 +547,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         dispatchGroup.leave()
                         if let object = search?.recipes {
                             self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
                         }
                     }
                 }
             }
-    
+            
             dispatchGroup.notify(queue: .main) {
                 if let object = self.groups[section] {
                     activityIndicatorView.stopAnimating()
@@ -503,87 +567,26 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     func fetchFavAct() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        
         self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
         self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
-                print("snapshot exists")
-                print(self.favAct)
-                print(favoriteActivitiesSnapshot)
                 if !NSDictionary(dictionary: self.favAct).isEqual(to: favoriteActivitiesSnapshot) {
-                    let updateFavoriteActivitiesSnapshot = favoriteActivitiesSnapshot.minus(dict: self.favAct)
-                    let updateFavAct = self.favAct.minus(dict: favoriteActivitiesSnapshot)
-                    print(updateFavAct)
-                    print(updateFavoriteActivitiesSnapshot)
+                    print("favAct")
                     self.favAct = favoriteActivitiesSnapshot
-                    for (_, values) in updateFavoriteActivitiesSnapshot {
-//                        for value in values {
-//                            print(value)
-//                            if let _ = self.recipes?.firstIndex(where: {"\($0.id)" == value}) {
-//                                let indexPath = IndexPath(row: 0, section: 0)
-//                                print(indexPath)
-//                                self.collectionView.reloadItems(at: [indexPath])
-//                            } else if let _ = self.workouts.firstIndex(where: {"\($0.identifier)" == value}) {
-//                                let indexPath = IndexPath(row: 1, section: 0)
-//                                print(indexPath)
-//                                self.collectionView.reloadItems(at: [indexPath])
-//                            } else if let _ = self.events?.firstIndex(where: {"\($0.id)" == value}) {
-//                                let indexPath = IndexPath(row: 2, section: 0)
-//                                print(indexPath)
-//                                self.collectionView.reloadItems(at: [indexPath])
-//                            }
-//                        }
-                    }
-                    for (_, values) in updateFavAct {
-//                        for value in values {
-//                            print(value)
-//                            if let _ = self.recipes?.firstIndex(where: {"\($0.id)" == value}) {
-//                                let indexPath = IndexPath(row: 0, section: 0)
-//                                print(indexPath)
-//                                self.collectionView.reloadItems(at: [indexPath])
-//                            } else if let _ = self.workouts.firstIndex(where: {"\($0.identifier)" == value}) {
-//                                let indexPath = IndexPath(row: 1, section: 0)
-//                                print(indexPath)
-//                                self.collectionView.reloadItems(at: [indexPath])
-//                            } else if let _ = self.events?.firstIndex(where: {"\($0.id)" == value}) {
-//                                let indexPath = IndexPath(row: 2, section: 0)
-//                                print(indexPath)
-//                                self.collectionView.reloadItems(at: [indexPath])
-//                            }
-//                        }
-                    }
+                    self.collectionView.reloadData()
                 }
-             } else {
-                print("snapshot does not exist")
-                print(self.favAct)
+            } else {
                 if !self.favAct.isEmpty {
-                    let updateFavAct = self.favAct
-                    print(updateFavAct)
                     self.favAct = [String: [String]]()
-                    for (_, values) in updateFavAct {
-//                        for value in values {
-//                            print(value)
-//                            if let _ = self.recipes?.firstIndex(where: {"\($0.id)" == value}) {
-//                                let indexPath = IndexPath(row: 0, section: 0)
-//                                print(indexPath)
-//                                self.collectionView.reloadItems(at: [indexPath])
-//                            } else if let _ = self.workouts.firstIndex(where: {"\($0.identifier)" == value}) {
-//                                let indexPath = IndexPath(row: 1, section: 0)
-//                                print(indexPath)
-//                                self.collectionView.reloadItems(at: [indexPath])
-//                            } else if let _ = self.events?.firstIndex(where: {"\($0.id)" == value}) {
-//                                let indexPath = IndexPath(row: 2, section: 0)
-//                                print(indexPath)
-//                                self.collectionView.reloadItems(at: [indexPath])
-//                            }
-//                        }
-                    }
+                    self.collectionView.reloadData()
+                    print("snapshot does not exist")
                 }
-            }
+           }
           })
         { (error) in
             print(error.localizedDescription)
         }
-        
     }
     
     func showActivityIndicator() {
@@ -594,7 +597,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         }
         self.navigationController?.view.isUserInteractionEnabled = false
     }
-
+    
     func hideActivityIndicator() {
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
@@ -628,14 +631,14 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             completion(selectedFalconUsers)
         }
     }
-  
+    
 }
 
 extension ActivityTypeViewController: CompositionalHeaderDelegate {
     func viewTapped(labelText: String) {
         switch labelText {
         case "Recipes":
-            let destination = MealTypeViewController()
+            let destination = RecipeTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             if let recipes = groups[.recipes] as? [Recipe], !recipes.isEmpty {
                 destination.groups[.american] = recipes
@@ -692,6 +695,20 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
             navigationController?.pushViewController(destination, animated: true)
+        case "Food":
+            print("Food")
+            let destination = FoodTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            navigationController?.pushViewController(destination, animated: true)
         default:
             print("Default")
         }
@@ -711,35 +728,9 @@ extension ActivityTypeViewController: UpdateScheduleDelegate {
     }
 }
 
-extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
+extension ActivityTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
-        if activeRecipe {
-            if let recipe = type as? Recipe {
-                var updatedRecipe = recipe
-                if updatedRecipe.title.contains("/") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "/", with: "")
-                }
-                if updatedRecipe.title.contains(".") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: ".", with: "")
-                }
-                if updatedRecipe.title.contains("#") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "#", with: "")
-                }
-                if updatedRecipe.title.contains("$") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "$", with: "")
-                }
-                if updatedRecipe.title.contains("[") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "[", with: "")
-                }
-                if updatedRecipe.title.contains("]") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "]", with: "")
-                }
-//                self.recipeUpdate?(updatedRecipe)
-            }
-            return
-        }
-        
         if schedule {
             let activityID = UUID().uuidString
             activity = Activity(dictionary: ["activityID": activityID as AnyObject])
@@ -749,7 +740,6 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
                 activity = Activity(dictionary: ["activityID": activityID as AnyObject])
             }
         }
-        
         if let recipe = type as? Recipe {
             activity.name = recipe.title
             activity.recipeID = "\(recipe.id)"
@@ -761,7 +751,7 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
@@ -774,7 +764,7 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
             } else if !schedule {
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
-                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 let timezone = TimeZone.current
                 let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                 startDateTime = rounded.addingTimeInterval(seconds)
@@ -798,7 +788,7 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
@@ -815,7 +805,7 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
             } else if !schedule {
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
-                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 let timezone = TimeZone.current
                 let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                 startDateTime = rounded.addingTimeInterval(seconds)
@@ -842,7 +832,7 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
@@ -855,7 +845,7 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
@@ -865,7 +855,6 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
             activity.allDay = false
             activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
-
             if let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
                 var newLocationName = locationName
                 if newLocationName.contains("/") {
@@ -891,6 +880,58 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
             }
         } else if let attraction = type as? Attraction {
             activity.name = attraction.name
+        } else if let place = type as? FSVenue {
+            activity.name = place.name
+            activity.activityType = "place"
+            activity.placeID = "\(place.id)"
+            if schedule, let umbrellaActivity = umbrellaActivity {
+                if let startDate = umbrellaActivity.startDateTime {
+                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                    endDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
+                    endDateTime = rounded.addingTimeInterval(seconds)
+                }
+            } else if !schedule {
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                let timezone = TimeZone.current
+                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                startDateTime = rounded.addingTimeInterval(seconds)
+                endDateTime = rounded.addingTimeInterval(seconds)
+            }
+            if let locationName = place.location?.address, let latitude = place.location?.lat, let longitude = place.location?.lng {
+                var newLocationName = locationName
+                if newLocationName.contains("/") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
+                }
+                if newLocationName.contains(".") {
+                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
+                }
+                if newLocationName.contains("#") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
+                }
+                if newLocationName.contains("$") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
+                }
+                if newLocationName.contains("[") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
+                }
+                if newLocationName.contains("]") {
+                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
+                }
+                activity.locationName = newLocationName
+                activity.locationAddress = [newLocationName: [latitude, longitude]]
+            }
+            activity.allDay = false
+            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
         } else {
             return
         }
@@ -900,26 +941,32 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
         if schedule, let _ = umbrellaActivity {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
-                                
-//                self.delegate?.updateSchedule(schedule: self.activity)
-//                if let recipeID = self.activity.recipeID {
-//                    self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
-//                }
+                self.delegate?.updateSchedule(schedule: self.activity)
+                if let recipeID = self.activity.recipeID {
+                    self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
+                }
+                
+                self.movingBackwards = false
+                self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
             }))
             
         } else if !schedule {
             alert.addAction(UIAlertAction(title: "Create New Activity", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new activity
-                                                    
+                
                 self.showActivityIndicator()
                 let createActivity = ActivityActions(activity: self.activity, active: false, selectedFalconUsers: [])
                 createActivity.createNewActivity()
                 self.hideActivityIndicator()
+                
+                self.movingBackwards = false
+                (self.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
+                self.tabBarController?.selectedIndex = 1
             }))
             
             alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
-                    
+                
                 // ChooseActivityTableViewController
                 let destination = ChooseActivityTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
@@ -928,15 +975,15 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
                 self.present(navController, animated: true, completion: nil)
-            
+                
             }))
-
+            
         }
         
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
-
+        
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
@@ -946,7 +993,7 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
         print("shareButtonTapped")
         
         let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-
+        
         alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
             print("User click Approve button")
             let destination = ChooseChatTableViewController()
@@ -960,10 +1007,10 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
             self.present(navController, animated: true, completion: nil)
             
         }))
-
+        
         alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
             print("User click Edit button")
-                // Fallback on earlier versions
+            // Fallback on earlier versions
             let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
             guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
                 else { return }
@@ -972,7 +1019,7 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
                                                               applicationActivities: nil)
             self.present(activityController, animated: true, completion: nil)
             activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-            Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                Bool, arrayReturnedItems: [Any]?, error: Error?) in
                 if completed {
                     print("share completed")
                     return
@@ -986,11 +1033,11 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
             
         }))
         
-
+        
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
-
+        
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
@@ -1080,6 +1127,26 @@ extension ActivityTypeViewController: ActivitySubTypeCellDelegate {
                         databaseReference.updateChildValues(["attractions": ["\(attraction.id)"]])
                     }
                 })
+            } else if let place = type as? FSVenue {
+                print(place.name)
+                databaseReference.child("places").observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists() {
+                        var value = snapshot.value as! [String]
+                        if value.contains("\(place.id)") {
+                            if let index = value.firstIndex(of: "\(place.id)") {
+                                value.remove(at: index)
+                            }
+                            databaseReference.updateChildValues(["places": value as NSArray])
+                        } else {
+                            value.append("\(place.id)")
+                            databaseReference.updateChildValues(["places": value as NSArray])
+                        }
+                        self.favAct["places"] = value
+                    } else {
+                        self.favAct["places"] = ["\(place.id)"]
+                        databaseReference.updateChildValues(["places": ["\(place.id)"]])
+                    }
+                })
             }
         }
     }
@@ -1103,9 +1170,9 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
                     
                     let scheduleList = [mergeActivity, activity]
                     newActivity.schedule = scheduleList
-                                       
+                    
                     self.showActivityIndicator()
-                                            
+                    
                     // need to delete merge activity
                     dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
@@ -1131,7 +1198,7 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
                     let scheduleList = [activity]
                     mergeActivity.schedule = scheduleList
                 }
-                                
+                
                 dispatchGroup.enter()
                 self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                     print("\(participants)")
@@ -1142,8 +1209,11 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
                     self.hideActivityIndicator()
                 }
             }
+            
             dispatchGroup.notify(queue: .main) {
-//                self.removeControllerHandler?("activity", activity)
+                self.movingBackwards = false
+                (self.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
+                self.tabBarController?.selectedIndex = 1
             }
         }
     }

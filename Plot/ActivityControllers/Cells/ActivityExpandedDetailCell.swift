@@ -60,6 +60,15 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         }
     }
     
+    var fsVenue: FSVenue! {
+        didSet {
+            if let _ = fsVenue {
+                extraLabel.isHidden = true
+                setupViews()
+            }
+        }
+    }
+    
     weak var delegate: ActivityExpandedDetailCellDelegate?
     
     override init(frame: CGRect) {

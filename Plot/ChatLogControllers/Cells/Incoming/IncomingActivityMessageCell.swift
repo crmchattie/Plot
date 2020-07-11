@@ -55,7 +55,7 @@ class IncomingActivityMessageCell: BaseActivityMessageCell {
         bubbleView.addSubview(categoryView)
         bubbleView.addSubview(subcategoryView)
         bubbleView.frame.origin = CGPoint(x: 10, y: 30)
-        bubbleView.frame.size.width = 265
+        bubbleView.frame.size.width = 230
         progressView.strokeColor = .black
         bubbleView.image = grayBubbleImage
         

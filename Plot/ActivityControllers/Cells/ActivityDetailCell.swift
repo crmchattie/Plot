@@ -389,6 +389,28 @@ class ActivityDetailCell: UICollectionViewCell {
                 activityObject = ActivityObject(dictionary: activity)
             }
             self.delegate?.shareButtonTapped(activityObject: activityObject)
+        } else if let fsVenue = fsVenue {
+            var activity = [String: AnyObject]()
+            var activityObject: ActivityObject
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
+                let data = compressImage(image: image)
+                activity = ["activityType": "event",
+                            "activityName": "\(fsVenue.name)",
+                            "activityTypeID": "\(fsVenue.id)",
+                            "activityImageURL": imageURL,
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                activity = ["activityType": "event",
+                            "activityName": "\(fsVenue.name)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
+                            "activityTypeID": "\(fsVenue.id)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            }
+            self.delegate?.shareButtonTapped(activityObject: activityObject)
         }
     }
 
@@ -403,7 +425,10 @@ class ActivityDetailCell: UICollectionViewCell {
             self.delegate?.heartButtonTapped(type: event)
         } else if let attraction = attraction {
             self.delegate?.heartButtonTapped(type: attraction)
+        } else if let fsVenue = fsVenue {
+            self.delegate?.heartButtonTapped(type: fsVenue)
         }
+        
     }
     
     @objc func dotsButtonTapped() {
