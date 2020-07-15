@@ -120,6 +120,9 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
         
+        let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
+        navigationItem.rightBarButtonItems = [mapBarButton]
+        
         tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
         tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
         
@@ -204,6 +207,27 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.reloadData()
+        
+    }
+    
+    @objc fileprivate func goToMap() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = MapViewController()
+        var locationSections = [ActivitySection]()
+        var locations = [ActivitySection: AnyHashable]()
+        for section in sections {
+            if section.type == "FSVenue" || section.type == "Event" {
+                locationSections.append(section)
+                locations[section] = groups[section]
+            }
+        }
+        destination.sections = locationSections
+        destination.locations = locations
+        destination.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(destination, animated: true)
         
     }
     
@@ -393,6 +417,36 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
+        } else if let place = object as? FSVenue {
+            print("place.id \(String(describing: place.id))")
+            let destination = PlaceDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.placeID = place.id
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if let groupItem = object as? GroupItem, let place = groupItem.venue {
+            print("place.id \(String(describing: place.id))")
+            let destination = PlaceDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.placeID = place.id
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
         } else {
             print("neither meals or events")
         }
@@ -427,7 +481,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         
         for section in sections {
             if let object = groups[section] {
-                activityIndicatorView.stopAnimating()
                 snapshot.appendSections([section])
                 snapshot.appendItems(object, toSection: section)
                 self.diffableDataSource.apply(snapshot)
@@ -640,9 +693,6 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
         case "Recipes":
             let destination = RecipeTypeViewController()
             destination.hidesBottomBarWhenPushed = true
-            if let recipes = groups[.recipes] as? [Recipe], !recipes.isEmpty {
-                destination.groups[.american] = recipes
-            }
             destination.favAct = favAct
             destination.users = users
             destination.filteredUsers = filteredUsers
@@ -698,6 +748,62 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
         case "Food":
             print("Food")
             let destination = FoodTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Nightlife":
+            print("Nightlife")
+            let destination = NightlifeTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Sightseeing":
+            print("Sightseeing")
+            let destination = SightseeingTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Recreation":
+            print("Recreation")
+            let destination = RecreationTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Shopping":
+            print("Shopping")
+            let destination = ShoppingTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
             destination.users = users

@@ -894,9 +894,6 @@ extension WorkoutTypeViewController: ActivityTypeCellDelegate {
                 print("User click Approve button")
                                 
                 self.delegate?.updateSchedule(schedule: self.activity)
-                if let recipeID = self.activity.recipeID {
-                    self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
-                }
                 
                 self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
             }))

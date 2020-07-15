@@ -415,6 +415,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
                activityCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
            }
         return cell
+            
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

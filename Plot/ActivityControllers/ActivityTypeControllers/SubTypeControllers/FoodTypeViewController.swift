@@ -12,7 +12,7 @@ import Firebase
 
 class FoodTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
     
-    var sections: [ActivitySection] = [.generalFood, .cheapEats, .americanFood, .seafoodFood, .vegetarianFood, .breakfastFood, .generalCoffee, .bakeryFood, .dessertFood, .fastFood, .asianFood, .italianFood, .mexicanFood, .middleeastFood]
+    var sections: [ActivitySection] = [.topFood, .cheapEats, .americanFood, .seafoodFood, .vegetarianFood, .breakfastFood, .generalCoffee, .bakeryFood, .dessertFood, .fastFood, .asianFood, .italianFood, .mexicanFood, .middleeastFood]
     var groups = [ActivitySection: [AnyHashable]]()
     var searchActivities = [AnyHashable]()
     
@@ -219,6 +219,36 @@ class FoodTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
+        } else if let place = object as? FSVenue {
+            print("place.id \(String(describing: place.id))")
+            let destination = PlaceDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.placeID = place.id
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if let groupItem = object as? GroupItem, let place = groupItem.venue {
+            print("place.id \(String(describing: place.id))")
+            let destination = PlaceDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.placeID = place.id
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
         } else {
             print("neither meals or events")
         }
@@ -289,7 +319,12 @@ class FoodTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 }
             }
         } else {
-            let categoryString = categoryIDs.joined(separator:",")
+            var categoryString = ""
+            if categoryIDs.isEmpty {
+                categoryString = sections[0].searchTerm
+            } else {
+                categoryString = categoryIDs.joined(separator:",")
+            }
             if lat == "", CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
                 dispatchGroup.enter()
                 Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
@@ -368,6 +403,7 @@ class FoodTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         let dispatchGroup = DispatchGroup()
         
         for section in self.sections {
+            print("section \(section)")
             if let object = self.groups[section] {
                 activityIndicatorView.stopAnimating()
                 snapshot.appendSections([section])
@@ -378,44 +414,44 @@ class FoodTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
                 if section.subType == "Recommend" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                        dispatchGroup.leave()
                         if let object = search?.response?.groups?[0].items {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
+                        dispatchGroup.leave()
                     }
                 } else if section.subType == "Browse" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSSearchLatLong(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
-                        dispatchGroup.leave()
                         if let object = search?.response?.venues {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
+                        dispatchGroup.leave()
                     }
                 }
             } else {
                 if section.subType == "Recommend" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSExplore(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: "") { (search, err) in
-                        dispatchGroup.leave()
                         if let object = search?.response?.groups?[0].items {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
+                        dispatchGroup.leave()
                     }
                 } else if section.subType == "Browse" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSSearch(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm) { (search, err) in
-                        dispatchGroup.leave()
                         if let object = search?.response?.venues {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
+                        dispatchGroup.leave()
                     }
                 }
             }
@@ -666,9 +702,6 @@ extension FoodTypeViewController: ActivityTypeCellDelegate {
                 print("User click Approve button")
                                 
                 self.delegate?.updateSchedule(schedule: self.activity)
-                if let recipeID = self.activity.recipeID {
-                    self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
-                }
                 
                 self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
             }))

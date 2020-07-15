@@ -41,7 +41,7 @@ class OutgoingActivityMessageCell: BaseActivityMessageCell {
     }()
 
   override func setupViews() {
-    messageImageView.constrainHeight(constant: 175)
+    messageImageView.constrainHeight(175)
     bubbleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(goToActivity(_:))))
     bubbleView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(handleLongTap(_:))))
     contentView.addSubview(bubbleView)

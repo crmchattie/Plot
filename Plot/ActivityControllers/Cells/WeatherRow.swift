@@ -205,7 +205,7 @@ class WeatherCollectionViewCell: UICollectionViewCell {
     
     func setupViews() {
         
-        weatherImageView.constrainHeight(constant: 40)
+        weatherImageView.constrainHeight(40)
         
         let stackView = VerticalStackView(arrangedSubviews: [
             dayLabel,

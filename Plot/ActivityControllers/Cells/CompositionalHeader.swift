@@ -51,7 +51,7 @@ class CompositionalHeader: UICollectionReusableView {
     
     func setupViews() {
                 
-        view.constrainHeight(constant: 30)
+        view.constrainHeight(30)
         
         addSubview(view)
         view.addSubview(titleLabel)

@@ -72,7 +72,7 @@ class ExerciseDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-        numberLabel.constrainWidth(constant: 25)
+        numberLabel.constrainWidth(25)
         
         let nameDetailStackView = VerticalStackView(arrangedSubviews: [nameLabel, detailLabel, UIView()], spacing: 2)
         nameDetailStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)

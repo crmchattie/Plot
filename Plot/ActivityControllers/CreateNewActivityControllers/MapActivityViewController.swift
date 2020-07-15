@@ -1,5 +1,5 @@
 //
-//  MapViewController.swift
+//  MapActivityViewController.swift
 //  Plot
 //
 //  Created by Cory McHattie on 6/30/19.
@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import GLKit
 
-class MapViewController: UIViewController {
+class MapActivityViewController: UIViewController {
     
     var window: UIWindow?
     var mapView: MKMapView?
@@ -40,7 +40,7 @@ class MapViewController: UIViewController {
         // always check to make sure we have permission before proceeding.
         checkLocationAuthorizationStatus()
         
-
+        
     }
     
     fileprivate func queryPlaces() {
@@ -53,16 +53,11 @@ class MapViewController: UIViewController {
             latitude = value[0]
             longitude = value[1]
             
-//            #if DEBUG
-//            print("place is:", locName, "with latitude", latitude, "and longitude", longitude)
-//            #endif
             let placeAnnotation = PlacesAnnotation(title: locName,
-                                                     coordinate: CLLocationCoordinate2D(latitude: latitude,
-                                                                                        longitude: longitude))
+                                                   coordinate: CLLocationCoordinate2D(latitude: latitude,
+                                                                                      longitude: longitude))
             self.mapView!.addAnnotation(placeAnnotation)
             
-//            locationPoints.append(CLLocationCoordinate2D(latitude: latitude,
-//                                                         longitude: longitude))
         }
         
         if let userLocation = locationManager.location {
@@ -73,27 +68,7 @@ class MapViewController: UIViewController {
         }
         
         self.mapView!.showAnnotations(self.mapView!.annotations, animated: true)
-
-    }
-    
-    /**
-     Sets the location of the user on the map
-     */
-    fileprivate func centerMapOnLocation() {
-//        guard let userLocation = locationManager.location else {
-//            let centerPoint = getCenterCoord(locationPoints: locationPoints)
-//            let coordinateRegion = MKCoordinateRegion(center: centerPoint.0,
-//                                                      latitudinalMeters: centerPoint.1, longitudinalMeters: centerPoint.1)
-//            mapView!.setRegion(coordinateRegion, animated: true)
-//            return
-//        }
-//        locationPoints.append(CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude,
-//                                                 longitude: userLocation.coordinate.longitude))
-//        let centerPoint = getCenterCoord(locationPoints: locationPoints)
-//        let coordinateRegion = MKCoordinateRegion(center: centerPoint.0,
-//                                              latitudinalMeters: centerPoint.1, longitudinalMeters: centerPoint.1)
-//        mapView!.setRegion(coordinateRegion, animated: true)
-
+        
     }
     
     
@@ -104,81 +79,27 @@ class MapViewController: UIViewController {
         if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
             mapView!.showsUserLocation = true
             queryPlaces()
-//            centerMapOnLocation()
+            //            centerMapOnLocation()
         } else {
             mapView!.showsUserLocation = false
             queryPlaces()
-//            centerMapOnLocation()
+            //            centerMapOnLocation()
             locationManager.requestWhenInUseAuthorization()
         }
     }
-    
-    // center func
-//    func getCenterCoord(locationPoints: [CLLocationCoordinate2D]) -> (CLLocationCoordinate2D, CLLocationDistance) {
-//
-//        var x:Float = 0.0
-//        var y:Float = 0.0
-//        var z:Float = 0.0
-//
-//        var secondLat: Double = locationPoints[0].latitude
-//        var secondLong: Double = locationPoints[0].longitude
-//        var maxDistance: CLLocationDistance = 0.0
-//
-//        for points in locationPoints {
-//
-//            let coordinateOne = CLLocation(latitude: points.latitude, longitude: points.longitude)
-//
-//            let lat = GLKMathDegreesToRadians(Float(points.latitude))
-//            let long = GLKMathDegreesToRadians(Float(points.longitude))
-//
-//            let coordinateTwo = CLLocation(latitude: secondLat, longitude: secondLong)
-//
-//            let distanceInMeters = coordinateOne.distance(from: coordinateTwo)
-//
-//            if distanceInMeters > maxDistance {
-//                maxDistance = distanceInMeters * 1.1
-//            }
-//
-//            secondLat = points.latitude
-//            secondLong = points.longitude
-//
-//            x += cos(lat) * cos(long)
-//            y += cos(lat) * sin(long)
-//            z += sin(lat)
-//        }
-//
-//        x = x / Float(locationPoints.count)
-//        y = y / Float(locationPoints.count)
-//        z = z / Float(locationPoints.count)
-//
-//        let resultLong = atan2(y, x)
-//        let resultHyp = sqrt(x * x + y * y)
-//        let resultLat = atan2(z, resultHyp)
-//
-//
-//        let result = CLLocationCoordinate2D(latitude: CLLocationDegrees(GLKMathRadiansToDegrees(Float(resultLat))), longitude: CLLocationDegrees(GLKMathRadiansToDegrees(Float(resultLong))))
-//
-//        print(result, maxDistance)
-//
-//        return (result, maxDistance)
-//
-//    }
 }
 
 // MARK: MKMapViewDelegate
-extension MapViewController: MKMapViewDelegate {
+extension MapActivityViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if let annotation = annotation as? PlacesAnnotation {
             let identifier = "pin"
             var view: MKPinAnnotationView
-            
             if let dequeuedView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKPinAnnotationView {
                 dequeuedView.annotation = annotation
                 view = dequeuedView
             } else {
                 let button = UIButton(type: .detailDisclosure)
-//                button.setImage(UIImage(named: "Car"), for: UIControl.State())
-                
                 view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
                 view.canShowCallout = true
                 view.calloutOffset = CGPoint(x: -5, y: 5)
@@ -201,19 +122,17 @@ extension MapViewController: MKMapViewDelegate {
 }
 
 // MARK: CLLocationManagerDelegate
-extension MapViewController: CLLocationManagerDelegate {
+extension MapActivityViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         // update if we can display the user location and use GPS
         switch status {
         case .authorizedWhenInUse, .authorizedAlways:
             mapView!.showsUserLocation = true
             queryPlaces()
-            centerMapOnLocation()
         case .denied, .restricted, .notDetermined:
             mapView!.showsUserLocation = false
-//            mapView!.removeAnnotations(mapView!.annotations)
+            //            mapView!.removeAnnotations(mapView!.annotations)
             queryPlaces()
-            centerMapOnLocation()
             // Show notification stating location services need enabling
             let alertController = mapAlertPresenter.presentAlertWarning(status)
             present(alertController, animated: true, completion: nil)

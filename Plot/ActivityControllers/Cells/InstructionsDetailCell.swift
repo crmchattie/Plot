@@ -38,7 +38,7 @@ class InstructionsDetailCell: UICollectionViewCell {
 
     func setupViews() {
         
-        numberLabel.constrainWidth(constant: 25)
+        numberLabel.constrainWidth(25)
         
         let labelStackView = VerticalStackView(arrangedSubviews: [instructionsLabel], spacing: 2)
         labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)

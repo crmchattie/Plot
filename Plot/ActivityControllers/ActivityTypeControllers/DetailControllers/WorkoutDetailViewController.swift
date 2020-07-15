@@ -520,9 +520,7 @@ extension WorkoutDetailViewController: WorkoutDetailCellDelegate {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        
         if let workout = workout {
-            print("view tapped")
             let destination = WebViewController()
             destination.urlString = "https://workoutlabs.com/fit/wkt/\(workout.identifier)/?app=plot"
             destination.controllerTitle = "Workout"

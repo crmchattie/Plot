@@ -62,9 +62,11 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
     
     var fsVenue: FSVenue! {
         didSet {
-            if let _ = fsVenue {
+            if let _ = recipe {
+                extraLabel.text = nil
                 extraLabel.isHidden = true
                 setupViews()
+
             }
         }
     }
@@ -90,7 +92,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         return label
     }()
     
@@ -130,7 +132,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         return label
     }()
     
@@ -154,7 +156,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         label.text = "Starts"
         return label
     }()
@@ -163,7 +165,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         return label
     }()
     
@@ -188,7 +190,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         label.text = "Ends"
         return label
     }()
@@ -197,7 +199,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         return label
     }()
     
@@ -223,7 +225,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.text = "Reminder"
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         return label
     }()
     
@@ -232,7 +234,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.text = "None"
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         return label
     }()
     
@@ -255,28 +257,28 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
             locationInfoView.isHidden = false
         }
         
-        locationView.constrainHeight(constant: 30)
-        locationArrowView.constrainWidth(constant: 16)
-        locationArrowView.constrainHeight(constant: 16)
-        locationInfoView.constrainWidth(constant: 30)
-        locationInfoView.constrainHeight(constant: 30)
+        locationView.constrainHeight(30)
+        locationArrowView.constrainWidth(16)
+        locationArrowView.constrainHeight(16)
+        locationInfoView.constrainWidth(30)
+        locationInfoView.constrainHeight(30)
         
-        participantsView.constrainHeight(constant: 30)
-        participantsArrowView.constrainWidth(constant: 16)
-        participantsArrowView.constrainHeight(constant: 16)
+        participantsView.constrainHeight(30)
+        participantsArrowView.constrainWidth(16)
+        participantsArrowView.constrainHeight(16)
         
-        startDateView.constrainHeight(constant: 30)
-        startDatePicker.constrainHeight(constant: 200)
+        startDateView.constrainHeight(30)
+        startDatePicker.constrainHeight(200)
         
-        endDateView.constrainHeight(constant: 30)
-        endDatePicker.constrainHeight(constant: 200)
+        endDateView.constrainHeight(30)
+        endDatePicker.constrainHeight(200)
         
-        reminderView.constrainHeight(constant: 30)
+        reminderView.constrainHeight(30)
         
         locationView.addSubview(locationLabel)
         locationView.addSubview(locationArrowView)
         locationView.addSubview(locationInfoView)
-        locationLabel.anchor(top: locationView.topAnchor, leading: locationView.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 0, left: 15, bottom: 0, right: 0))
+        locationLabel.anchor(top: locationView.topAnchor, leading: locationView.leadingAnchor, bottom: nil, trailing: locationInfoView.leadingAnchor, padding: .init(top: 0, left: 15, bottom: 0, right: 0))
         locationArrowView.anchor(top: nil, leading: nil, bottom: nil, trailing: locationView.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 15))
         locationArrowView.centerYAnchor.constraint(equalTo: locationLabel.centerYAnchor).isActive = true
         locationInfoView.anchor(top: nil, leading: nil, bottom: nil, trailing: locationArrowView.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 15))
@@ -318,7 +320,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
             extraLabelStackView
             ], spacing: 5)
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 5, right: 0))
+        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         
         
         let locationViewTapped = UITapGestureRecognizer(target: self, action: #selector(ActivityExpandedDetailCell.locationViewTapped(_:)))

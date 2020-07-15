@@ -84,8 +84,8 @@ class AttractionDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-        arrowView.constrainWidth(constant: 20)
-        arrowView.constrainHeight(constant: 20)
+        arrowView.constrainWidth(20)
+        arrowView.constrainHeight(20)
                 
         let nameDetailStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel], spacing: 2)
         nameDetailStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)

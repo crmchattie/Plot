@@ -1894,9 +1894,18 @@ class CreateActivityViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        let destination = MapViewController()
-        destination.locationAddress = locationAddress
-        navigationController?.pushViewController(destination, animated: true)
+        if locationAddress.count > 1 {
+            let destination = MapViewController()
+            var locations = [activity]
+            locations.append(contentsOf: scheduleList)
+            destination.sections = [.activities]
+            destination.locations = [.activities: locations]
+            navigationController?.pushViewController(destination, animated: true)
+        } else {
+            let destination = MapActivityViewController()
+            destination.locationAddress = locationAddress
+            navigationController?.pushViewController(destination, animated: true)
+        }
     }
     
     func share() {

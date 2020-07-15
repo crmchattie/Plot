@@ -25,7 +25,7 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
         super.viewDidLoad()
         
         title = "Recipes"
-        
+                
         let doneBarButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItem = doneBarButton
 
@@ -126,6 +126,7 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        movingBackwards = false
         let object = diffableDataSource.itemIdentifier(for: indexPath)
         if let activityType = object as? ActivityType {
             let activityTypeName = activityType.rawValue
@@ -381,7 +382,6 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
         let dispatchGroup = DispatchGroup()
         
         for section in sections {
-            print("section \(section.name)")
             if let object = groups[section] {
                 activityIndicatorView.stopAnimating()
                 snapshot.appendSections([section])

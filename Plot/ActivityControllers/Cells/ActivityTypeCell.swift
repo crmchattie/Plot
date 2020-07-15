@@ -91,8 +91,10 @@ class ActivityTypeCell: UICollectionViewCell {
         didSet {
             if let fsVenue = fsVenue {
                 nameLabel.text = fsVenue.name
-                if let category = fsVenue.location?.formattedAddress?[0], let subcategory = fsVenue.categories?[0].shortName {
-                    categoryLabel.text = category
+                if let address = fsVenue.location?.formattedAddress?[0] {
+                    categoryLabel.text = address
+                }
+                if let categories = fsVenue.categories, !categories.isEmpty, let subcategory = categories[0].shortName {
                     subcategoryLabel.text = subcategory
                 }
                 imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
@@ -195,17 +197,17 @@ class ActivityTypeCell: UICollectionViewCell {
         imageView.tintColor = UIColor.white
         imageView.backgroundColor = colors[intColor]
         
-        heartButton.constrainWidth(constant: 35)
-        heartButton.constrainHeight(constant: 35)
+        heartButton.constrainWidth(35)
+        heartButton.constrainHeight(35)
 
-        shareButton.constrainWidth(constant: 35)
-        shareButton.constrainHeight(constant: 35)
+        shareButton.constrainWidth(35)
+        shareButton.constrainHeight(35)
 
-        plusButton.constrainWidth(constant: 35)
-        plusButton.constrainHeight(constant: 35)
+        plusButton.constrainWidth(35)
+        plusButton.constrainHeight(35)
         
-        imageView.constrainWidth(constant: 75)
-        imageView.constrainHeight(constant: 75)
+        imageView.constrainWidth(75)
+        imageView.constrainHeight(75)
         
         let buttonStackView = UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()])
         buttonStackView.spacing = 2
@@ -218,7 +220,7 @@ class ActivityTypeCell: UICollectionViewCell {
         addSubview(stackView)
         stackView.fillSuperview()
 
-//        imageView.constrainHeight(constant: 231)
+//        imageView.constrainHeight(231)
         
 
 //        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, UIView()], spacing: 0)

@@ -580,7 +580,7 @@ extension SelectActivityTableViewController: ActivityCellDelegate {
             return
         }
         
-        let destination = MapViewController()
+        let destination = MapActivityViewController()
         destination.hidesBottomBarWhenPushed = true
         destination.locationAddress = locationAddress
         navigationController?.pushViewController(destination, animated: true)

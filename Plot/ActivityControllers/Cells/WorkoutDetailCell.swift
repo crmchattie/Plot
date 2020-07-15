@@ -71,9 +71,9 @@ class WorkoutDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-        clickView.constrainHeight(constant: 17)
-        clickArrowView.constrainWidth(constant: 16)
-        clickArrowView.constrainHeight(constant: 16)
+        clickView.constrainHeight(17)
+        clickArrowView.constrainWidth(16)
+        clickArrowView.constrainHeight(16)
         
         let labelStackView = UIStackView(arrangedSubviews: [notesLabel])
         labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)

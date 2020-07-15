@@ -529,7 +529,7 @@ class Service {
     
     // declare my generic json function here
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
-//        print("encodedURLRequest \(encodedURLRequest)")
+        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
             if let err = err {
                 print("err \(err)")

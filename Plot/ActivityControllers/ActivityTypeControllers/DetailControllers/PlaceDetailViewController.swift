@@ -17,23 +17,19 @@ class PlaceDetailViewController: ActivityDetailViewController {
     private let kActivityExpandedDetailCell = "ActivityExpandedDetailCell"
     private let kPlaceDetailCell = "PlaceDetailCell"
     
-    var placeID = String()
+    var placeID: String?
     var place: FSVenue?
         
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setActivity()
-        
-        if !active {
-            setMoreActivity()
-        }
-        
         if place == nil {
             fetchData()
         }
+        
+        setActivity()
             
-        title = "FSVenue"
+        title = "Place"
                 
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
@@ -69,7 +65,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
                 startDateTime = rounded.addingTimeInterval(seconds)
                 endDateTime = rounded.addingTimeInterval(seconds)
             }
-            if let locationName = place.location?.address, let latitude = place.location?.lat, let longitude = place.location?.lng {
+            if let location = place.location, let locationName = location.formattedAddress?[0], let latitude = location.lat, let longitude = location.lng {
                 var newLocationName = locationName
                 if newLocationName.contains("/") {
                     newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
@@ -89,6 +85,8 @@ class PlaceDetailViewController: ActivityDetailViewController {
                 if newLocationName.contains("]") {
                     newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
                 }
+                self.locationName = newLocationName
+                self.locationAddress = [newLocationName: [latitude, longitude]]
                 activity.locationName = newLocationName
                 activity.locationAddress = [newLocationName: [latitude, longitude]]
             }
@@ -107,11 +105,23 @@ class PlaceDetailViewController: ActivityDetailViewController {
             return
         }
         
-        Service.shared.fetchFSDetails(id: placeID) { (search, err) in
-            if let place = search?.response?.venue {
-                self.place = place
-                self.collectionView.reloadData()
+        let dispatchGroup = DispatchGroup()
+        
+        if let placeID = placeID {
+            dispatchGroup.enter()
+            Service.shared.fetchFSDetails(id: placeID) { (search, err) in
+                if let place = search?.response?.venue {
+                    self.place = place
+                }
+                dispatchGroup.leave()
             }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            if !self.active {
+                self.setMoreActivity()
+            }
+            self.collectionView.reloadData()
         }
         
     }
@@ -141,10 +151,6 @@ class PlaceDetailViewController: ActivityDetailViewController {
                 return cell
             }
         } else if indexPath.section == 1 {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kPlaceDetailCell, for: indexPath) as! PlaceDetailCell
-            cell.delegate = self
-            return cell
-        } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
             cell.delegate = self
             if let place = place {
@@ -163,11 +169,20 @@ class PlaceDetailViewController: ActivityDetailViewController {
             } else {
                 return cell
             }
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kPlaceDetailCell, for: indexPath) as! PlaceDetailCell
+            cell.delegate = self
+            if let place = place {
+                cell.fsVenue = place
+                return cell
+            } else {
+                return cell
+            }
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var height: CGFloat = 328
+        var height: CGFloat = 0
         if indexPath.section == 0 {
             let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
             dummyCell.fsVenue = place
@@ -176,12 +191,6 @@ class PlaceDetailViewController: ActivityDetailViewController {
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
         } else if indexPath.section == 1 {
-            let dummyCell = PlaceDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 17))
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 17))
-            height = estimatedSize.height
-            return CGSize(width: view.frame.width, height: height)
-        } else {
             if secondSectionHeight == 0 {
                 let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
                 dummyCell.fsVenue = place
@@ -194,17 +203,23 @@ class PlaceDetailViewController: ActivityDetailViewController {
             else {
                 return CGSize(width: view.frame.width, height: secondSectionHeight)
             }
+        } else {
+            let dummyCell = PlaceDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 200))
+            dummyCell.fsVenue = place
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 200))
+            height = estimatedSize.height
+            return CGSize(width: view.frame.width, height: height)
         }
-        
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        if section == 0 {
+            return UIEdgeInsets(top: 0, left: 0, bottom: 15, right: 0)
+        }
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
-    }
     
      @objc fileprivate func openLocationFinder() {
             guard currentReachabilityStatus != .notReachable else {
@@ -214,8 +229,8 @@ class PlaceDetailViewController: ActivityDetailViewController {
             let destination = LocationFinderTableViewController()
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
-    //        let navigationViewController = UINavigationController(rootViewController: destination)
-    //        self.present(navigationViewController, animated: true, completion: nil)
+//            let navigationViewController = UINavigationController(rootViewController: destination)
+//            self.present(navigationViewController, animated: true, completion: nil)
         }
         
     //update so existing invitees are shown as selected
@@ -321,9 +336,7 @@ extension PlaceDetailViewController: ActivityExpandedDetailCellDelegate {
     
     func locationViewTapped(labelText: String) {
         print("labelText \(labelText)")
-        
         openLocationFinder()
-        
     }
     
     func infoViewTapped() {
@@ -514,18 +527,25 @@ extension PlaceDetailViewController: ActivityExpandedDetailCellDelegate {
 }
 
 extension PlaceDetailViewController: PlaceDetailCellDelegate {
-    func viewTapped() {
+    func websiteTapped() {
+        print("website number")
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        
         let destination = WebViewController()
-        destination.urlString = place?.url
-        destination.controllerTitle = "Tickets"
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
+        if let place = place, let url = place.url {
+            destination.urlString = url
+            destination.controllerTitle = place.name
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            navigationViewController.modalPresentationStyle = .fullScreen
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
+    }
+    func phoneNumberTapped() {
+        print("phone number")
+        guard let number = URL(string: "tel://" + (place?.contact?.phone)!) else { return }
+        UIApplication.shared.open(number)
     }
 }
 

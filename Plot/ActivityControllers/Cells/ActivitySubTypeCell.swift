@@ -195,17 +195,17 @@ class ActivitySubTypeCell: UICollectionViewCell {
         imageView.tintColor = UIColor.white
         imageView.backgroundColor = colors[intColor]
         
-        heartButton.constrainWidth(constant: 40)
-        heartButton.constrainHeight(constant: 40)
+        heartButton.constrainWidth(40)
+        heartButton.constrainHeight(40)
 
-        shareButton.constrainWidth(constant: 40)
-        shareButton.constrainHeight(constant: 40)
+        shareButton.constrainWidth(40)
+        shareButton.constrainHeight(40)
 
-        plusButton.constrainWidth(constant: 40)
-        plusButton.constrainHeight(constant: 40)
+        plusButton.constrainWidth(40)
+        plusButton.constrainHeight(40)
         
-        imageView.constrainWidth(constant: 75)
-        imageView.constrainHeight(constant: 75)
+        imageView.constrainWidth(75)
+        imageView.constrainHeight(75)
         
         let buttonStackView = UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()])
         buttonStackView.spacing = 2
@@ -218,7 +218,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
         addSubview(stackView)
         stackView.fillSuperview()
 
-//        imageView.constrainHeight(constant: 231)
+//        imageView.constrainHeight(231)
         
 
 //        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, UIView()], spacing: 0)

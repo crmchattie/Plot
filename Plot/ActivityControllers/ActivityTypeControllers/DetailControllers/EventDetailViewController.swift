@@ -107,7 +107,7 @@ class EventDetailViewController: ActivityDetailViewController {
                     newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
                 }
                 self.locationName = newLocationName
-                locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
+                self.locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
                 activity.locationName = newLocationName
                 activity.locationAddress = locationAddress
             }
@@ -629,13 +629,14 @@ extension EventDetailViewController: EventDetailCellDelegate {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        
         let destination = WebViewController()
-        destination.urlString = event?.url
-        destination.controllerTitle = "Tickets"
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
+        if let event = event, let url = event.url {
+            destination.urlString = url
+            destination.controllerTitle = "Tickets"
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            navigationViewController.modalPresentationStyle = .fullScreen
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
     }
 }
 

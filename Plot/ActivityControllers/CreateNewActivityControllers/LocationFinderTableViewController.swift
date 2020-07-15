@@ -176,7 +176,6 @@ extension LocationFinderTableViewController: UITableViewDelegate {
             latitude = coordinates!.latitude
             longitude = coordinates!.longitude
             
-            print("response \(response!.mapItems[0].placemark)")
             let zipcode = response?.mapItems[0].placemark.postalCode ?? ""
             let city = response?.mapItems[0].placemark.locality ?? ""
             let state = response?.mapItems[0].placemark.administrativeArea ?? ""

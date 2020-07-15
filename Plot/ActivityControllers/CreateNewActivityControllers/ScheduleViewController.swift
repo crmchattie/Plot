@@ -665,7 +665,7 @@ class ScheduleViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        let destination = MapViewController()
+        let destination = MapActivityViewController()
         destination.locationAddress = locationAddress
         navigationController?.pushViewController(destination, animated: true)
     }

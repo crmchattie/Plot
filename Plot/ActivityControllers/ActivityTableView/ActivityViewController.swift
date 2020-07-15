@@ -1005,7 +1005,7 @@ extension ActivityViewController: ActivityCellDelegate {
             return
         }
         
-        let destination = MapViewController()
+        let destination = MapActivityViewController()
         destination.hidesBottomBarWhenPushed = true
         destination.locationAddress = locationAddress
         

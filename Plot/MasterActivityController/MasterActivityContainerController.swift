@@ -24,7 +24,7 @@ class MasterActivityContainerController: UIViewController {
             chatsVC.users = users
             listsVC.users = users
             notificationsVC.users = users
-            mapVC.searchVC.users = users
+//            mapVC.searchVC.users = users
         }
     }
     var filteredUsers = [User]() {
@@ -33,7 +33,7 @@ class MasterActivityContainerController: UIViewController {
             chatsVC.filteredUsers = filteredUsers
             listsVC.filteredUsers = filteredUsers
             notificationsVC.filteredUsers = filteredUsers
-            mapVC.searchVC.filteredUsers = filteredUsers
+//            mapVC.searchVC.filteredUsers = filteredUsers
         }
     }
     var conversations = [Conversation]() {
@@ -41,7 +41,7 @@ class MasterActivityContainerController: UIViewController {
             configureTabBarBadge()
             activitiesVC.conversations = conversations
             notificationsVC.conversations = conversations
-            mapVC.conversations = conversations
+//            mapVC.conversations = conversations
             listsVC.conversations = conversations
             let nav = self.tabBarController!.viewControllers![0] as! UINavigationController
             
@@ -56,8 +56,10 @@ class MasterActivityContainerController: UIViewController {
             configureTabBarBadge()
             notificationsVC.notificationActivities = activities
             notificationsVC.activityViewController = activitiesVC
-            mapVC.activities = activities
-            mapVC.activityViewController = activitiesVC
+            mapVC.sections = [.activities]
+            mapVC.locations = [.activities: activities]
+            mapVC.addAnnotations()
+//            mapVC.activityViewController = activitiesVC
             listsVC.activities = activities
             listsVC.activityViewController = activitiesVC
             
@@ -73,7 +75,7 @@ class MasterActivityContainerController: UIViewController {
     var invitations: [String: Invitation] = [:] {
         didSet {
             notificationsVC.invitations = invitations
-            mapVC.searchVC.invitations = invitations
+//            mapVC.searchVC.invitations = invitations
         }
     }
     var invitedActivities = [Activity]() {
@@ -111,8 +113,8 @@ class MasterActivityContainerController: UIViewController {
         return vc
     }()
     
-    lazy var mapVC: MapActivitiesViewController = {
-        let vc = MapActivitiesViewController()
+    lazy var mapVC: MapViewController = {
+        let vc = MapViewController()
         self.addAsChildVC(childVC: vc)
         return vc
     }()
@@ -187,7 +189,7 @@ class MasterActivityContainerController: UIViewController {
         customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         customSegmented.delegate = self
         
-        customSegmented.constrainHeight(constant: 50)
+        customSegmented.constrainHeight(50)
         
         view.addSubview(customSegmented)
         view.addSubview(containerView)
@@ -322,7 +324,6 @@ class MasterActivityContainerController: UIViewController {
 
 extension MasterActivityContainerController: CustomSegmentedControlDelegate {
     func changeToIndex(index:Int) {
-        print("changeToIndex \(index)")
         if self.index == 1 {
             if chatsVC.tableView.isEditing == true {
                 chatsVC.tableView.setEditing(false, animated: true)
@@ -368,9 +369,6 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
         activitiesVC.view.isHidden = !(index == 2)
         listsVC.view.isHidden = !(index == 3)
         mapVC.view.isHidden = !(index == 4)
-        if index == 3 {
-            mapVC.myViewDidLoad()
-        }
         self.index = index
         setNavBar()
     }

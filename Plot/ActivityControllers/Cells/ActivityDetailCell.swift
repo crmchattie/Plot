@@ -59,7 +59,7 @@ class ActivityDetailCell: UICollectionViewCell {
                     imageView.sd_setImage(with: URL(string: url))
                     imageURL = url
                 }
-                
+                subcategoryTextField.isUserInteractionEnabled = false
                 setupViews()
             }
         }
@@ -77,6 +77,7 @@ class ActivityDetailCell: UICollectionViewCell {
                     imageView.sd_setImage(with: URL(string: url))
                     imageURL = url
                 }
+                subcategoryTextField.isUserInteractionEnabled = false
                 setupViews()
             }
         }
@@ -94,6 +95,7 @@ class ActivityDetailCell: UICollectionViewCell {
                 imageView.tintColor = UIColor.white
                 imageView.backgroundColor = colors[intColor]
                 imageURL = "workout"
+                subcategoryTextField.isUserInteractionEnabled = false
                 setupViews()
             }
         }
@@ -103,16 +105,34 @@ class ActivityDetailCell: UICollectionViewCell {
         didSet {
             if let fsVenue = fsVenue {
                 nameLabel.text = fsVenue.name
-                if let category = fsVenue.location?.formattedAddress?[0], let subcategory = fsVenue.categories?[0].shortName {
-                    categoryLabel.text = category
-                    subcategoryLabel.text = subcategory
+                if let rating = fsVenue.rating {
+                    categoryLabel.text = "Rating: \(rating)/10"
                 }
-                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
-                imageView.tintColor = UIColor.white
-                imageView.backgroundColor = colors[intColor]
-                imageURL = "workout"
+                if let price = fsVenue.price, let tier = price.tier, let categories = fsVenue.categories, !categories.isEmpty, let category = categories[0].shortName {
+                    var categoryText = ""
+                    switch tier {
+                    case 1:
+                        categoryText = category + " - $"
+                    case 2:
+                        categoryText = category + " - $$"
+                    case 3:
+                        categoryText = category + " - $$$"
+                    case 4:
+                        categoryText = category + " - $$$$"
+                    default:
+                        categoryText = category
+                    }
+                    subcategoryLabel.text = categoryText
+                }
+                if let image = fsVenue.bestPhoto, let prefix = image.photoPrefix, let suffix = image.suffix {
+                    let url = prefix + "500x300" + suffix
+                    print("url \(url)")
+                    imageView.sd_setImage(with: URL(string: url))
+                    imageURL = url
+                }
+                subcategoryTextField.isUserInteractionEnabled = false
+                setupViews()
             }
-            setupViews()
         }
     }
     
@@ -125,11 +145,12 @@ class ActivityDetailCell: UICollectionViewCell {
                     categoryLabel.text = category
                     subcategoryLabel.text = subcategory
                 }
-                imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)
+                imageView.image = UIImage(named: "sightseeing")!.withRenderingMode(.alwaysTemplate)
                 imageView.tintColor = UIColor.white
                 imageView.backgroundColor = colors[intColor]
-                imageURL = "workout"
+                imageURL = "sightseeing"
             }
+            subcategoryTextField.isUserInteractionEnabled = false
             setupViews()
         }
     }
@@ -238,21 +259,21 @@ class ActivityDetailCell: UICollectionViewCell {
             heartButton.isHidden = true
         }
                         
-        heartButton.constrainWidth(constant: 40)
-        heartButton.constrainHeight(constant: 40)
+        heartButton.constrainWidth(40)
+        heartButton.constrainHeight(40)
         
-        shareButton.constrainWidth(constant: 40)
-        shareButton.constrainHeight(constant: 40)
+        shareButton.constrainWidth(40)
+        shareButton.constrainHeight(40)
         
-        plusButton.constrainWidth(constant: 40)
-        plusButton.constrainHeight(constant: 40)
+        plusButton.constrainWidth(40)
+        plusButton.constrainHeight(40)
         
-        dotsButton.constrainWidth(constant: 40)
-        dotsButton.constrainHeight(constant: 40)
+        dotsButton.constrainWidth(40)
+        dotsButton.constrainHeight(40)
 
-        imageView.constrainHeight(constant: 231)
+        imageView.constrainHeight(231)
         
-        subcategoryView.constrainHeight(constant: 17)
+        subcategoryView.constrainHeight(17)
         
         subcategoryView.addSubview(subcategoryLabel)
         subcategoryView.addSubview(subcategoryTextField)

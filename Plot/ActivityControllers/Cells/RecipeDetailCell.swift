@@ -46,7 +46,7 @@ class RecipeDetailCell: UICollectionViewCell {
         segmentedControl.autoresizingMask = .flexibleWidth
         segmentedControl.addTarget(self, action: #selector(action(_:)), for: .valueChanged)
         
-        segmentedControl.constrainHeight(constant: 30)
+        segmentedControl.constrainHeight(30)
         
         addSubview(segmentedControl)
         addSubview(recipeExpandedDetailViewController.view)

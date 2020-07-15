@@ -184,19 +184,23 @@ struct FSVenue: Codable, Equatable, Hashable {
     let verified: Bool?
     let stats: Stats?
     let url: String?
+    let price: Price?
     let likes: Likes?
+    let dislike, ok: Bool?
     let rating: Double?
     let ratingColor: String?
     let ratingSignals: Int?
     let beenHere: BeenHere?
     let photos: Listed?
-    let venueDescription, storeID: String?
+    let description, storeID: String?
     let page: FSPage?
     let hereNow: HereNow?
     let createdAt: Int?
     let tips: Listed?
     let shortURL: String?
     let timeZone: String?
+    let seasonalHours: [SeasonalHour]?
+    let defaultHours: Hours?
     let listed: Listed?
     let phrases: [Phrase]?
     let hours, popular: Hours?
@@ -207,12 +211,11 @@ struct FSVenue: Codable, Equatable, Hashable {
     enum CodingKeys: String, CodingKey {
         case id, name, contact, location
         case canonicalURL = "canonicalUrl"
-        case categories, verified, stats, url, likes, rating, ratingColor, ratingSignals, beenHere, photos
-        case venueDescription = "description"
+        case categories, verified, stats, url, likes, rating, ratingColor, ratingSignals, beenHere, photos, description
         case storeID = "storeId"
         case page, hereNow, createdAt, tips
         case shortURL = "shortUrl"
-        case timeZone, listed, phrases, hours, popular, pageUpdates, inbox, attributes, bestPhoto
+        case timeZone, listed, phrases, hours, popular, pageUpdates, inbox, attributes, bestPhoto, seasonalHours, defaultHours, price, dislike, ok
     }
     
     func hash(into hasher: inout Hasher) {
@@ -512,6 +515,18 @@ struct Open: Codable, Equatable, Hashable {
     init(renderedTime: String?) {
         self.renderedTime = renderedTime
     }
+}
+
+// MARK: - Price
+struct Price: Codable, Equatable, Hashable {
+    let tier: Int?
+    let message, currency: String?
+}
+
+// MARK: - SeasonalHour
+struct SeasonalHour: Codable, Equatable, Hashable {
+    let seasonalRange: String?
+    let timeframes: [Timeframe]?
 }
 
 // MARK: - Likes
