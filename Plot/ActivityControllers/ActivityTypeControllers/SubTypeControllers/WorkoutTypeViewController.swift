@@ -99,6 +99,7 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
             } else {
                 cell.heartButtonImage = "heart"
             }
+            cell.mapButton.isHidden = true
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
             cell.workout = object
@@ -111,6 +112,7 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
             } else {
                 cell.heartButtonImage = "heart"
             }
+            cell.mapButton.isHidden = true
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
             cell.recipe = object
@@ -1100,6 +1102,29 @@ extension WorkoutTypeViewController: ActivityTypeCellDelegate {
                         databaseReference.updateChildValues(["places": ["\(place.id)"]])
                     }
                 })
+            }
+        }
+    }
+    
+    func mapButtonTapped(type: Any) {
+        var locationAddress = [String : [Double]]()
+        if let event = type as? Event {
+            if let add = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let lat = Double(latitude), let longitude = event.embedded?.venues?[0].location?.longitude, let lon = Double(longitude) {
+                locationAddress[add] = [lat, lon]
+                
+                let destination = MapActivityViewController()
+                destination.locationAddress = locationAddress
+                navigationController?.pushViewController(destination, animated: true)
+
+            }
+        } else if let place = type as? FSVenue {
+            if let location = place.location, let add = location.address, let lat = location.lat, let lon = location.lng {
+                locationAddress[add] = [lat, lon]
+                
+                let destination = MapActivityViewController()
+                destination.locationAddress = locationAddress
+                navigationController?.pushViewController(destination, animated: true)
+
             }
         }
     }

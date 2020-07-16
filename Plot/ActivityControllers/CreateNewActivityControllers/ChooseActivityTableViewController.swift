@@ -52,6 +52,7 @@ class ChooseActivityTableViewController: UITableViewController {
     var activityID: String?
     var grocerylist: Grocerylist?
     var checklist: Checklist?
+    var activitylist: Activitylist?
     var packinglist: Packinglist?
     var users = [User]()
     var filteredUsers = [User]()

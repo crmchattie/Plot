@@ -10,7 +10,7 @@ import UIKit
 
 protocol ListCellDelegate: class {
     func openActivity(activityID: String)
-    func openChat(forConversation conversationID: String?, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?)
+    func openChat(forConversation conversationID: String?, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?)
 }
 
 class ListCell: UITableViewCell {
@@ -23,6 +23,7 @@ class ListCell: UITableViewCell {
     var grocerylist: Grocerylist?
     var checklist: Checklist?
     var packinglist: Packinglist?
+    var activitylist: Activitylist?
     
     weak var delegate: ListCellDelegate?
     
@@ -246,6 +247,8 @@ class ListCell: UITableViewCell {
             self.delegate?.openActivity(activityID: activityID)
         } else if let checklist = checklist, let activityID = checklist.activityID {
             self.delegate?.openActivity(activityID: activityID)
+        } else if let activitylist = activitylist, let activityID = activitylist.activityID {
+            self.delegate?.openActivity(activityID: activityID)
         } else if let packinglist = packinglist, let activityID = packinglist.activityID {
             self.delegate?.openActivity(activityID: activityID)
         }
@@ -254,21 +257,27 @@ class ListCell: UITableViewCell {
     @objc func chatButtonTapped() {
         if let grocerylist = grocerylist {
             if let conversationID = grocerylist.conversationID {
-                self.delegate?.openChat(forConversation: conversationID, grocerylist: grocerylist, checklist: nil, packinglist: nil)
+                self.delegate?.openChat(forConversation: conversationID, grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil)
             } else {
-                self.delegate?.openChat(forConversation: nil, grocerylist: grocerylist, checklist: nil, packinglist: nil)
+                self.delegate?.openChat(forConversation: nil, grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil)
             }
         } else if let checklist = checklist {
             if let conversationID = checklist.conversationID {
-                self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: checklist, packinglist: nil)
+                self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: checklist, packinglist: nil, activitylist: nil)
             } else {
-                self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: checklist, packinglist: nil)
+                self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: checklist, packinglist: nil, activitylist: nil)
+            }
+        } else if let activitylist = activitylist {
+            if let conversationID = activitylist.conversationID {
+                self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: nil, packinglist: nil, activitylist: activitylist)
+            } else {
+                self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: nil, packinglist: nil, activitylist: activitylist)
             }
         } else if let packinglist = packinglist {
             if let conversationID = packinglist.conversationID {
-                self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: nil, packinglist: packinglist)
+                self.delegate?.openChat(forConversation: conversationID, grocerylist: nil, checklist: nil, packinglist: packinglist, activitylist: nil)
             } else {
-                self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: nil, packinglist: packinglist)
+                self.delegate?.openChat(forConversation: nil, grocerylist: nil, checklist: nil, packinglist: packinglist, activitylist: nil)
             }
         }
     }

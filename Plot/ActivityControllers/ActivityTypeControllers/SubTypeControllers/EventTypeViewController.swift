@@ -27,9 +27,12 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         super.viewDidLoad()
         
         title = "Events"
+        
+        
+        let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
+        let doneBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        navigationItem.rightBarButtonItems = [mapBarButton, doneBarButton]
 
-        let doneBarButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(filter))
-        navigationItem.rightBarButtonItem = doneBarButton
 
         searchController.searchBar.delegate = self
                 
@@ -101,6 +104,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
             } else {
                 cell.heartButtonImage = "heart"
             }
+            cell.mapButton.isHidden = true
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
             cell.workout = object
@@ -113,6 +117,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
             } else {
                 cell.heartButtonImage = "heart"
             }
+            cell.mapButton.isHidden = true
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
             cell.recipe = object
@@ -264,9 +269,9 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         if favorites == "true" {
             if let events = self.favAct["events"] {
                 for event in events {
-                    if zipcode == "", CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+                    if zipcode == "", let lat = self.lat, let lon = self.lon {
                         dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(size: "30", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                        Service.shared.fetchEventsSegmentLatLong(size: "30", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: lat, long: lon) { (search, err) in
                             dispatchGroup.leave()
                             if let events = search?.embedded?.events {
                                 self.searchActivities.append(contentsOf: events)
@@ -284,9 +289,9 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 }
             }
         } else {
-            if zipcode == "", CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+            if zipcode == "", let lat = self.lat, let lon = self.lon {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: lat, long: lon) { (search, err) in
                     dispatchGroup.leave()
                     if let events = search?.embedded?.events {
                         self.searchActivities = events
@@ -340,8 +345,10 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
             return
         }
         
-        activityIndicatorView.startAnimating()
-        
+        var snapshot = self.diffableDataSource.snapshot()
+        snapshot.deleteAllItems()
+        self.diffableDataSource.apply(snapshot)
+                
         diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
             let snapshot = self.diffableDataSource.snapshot()
@@ -353,8 +360,8 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
             return header
         })
         
-        var snapshot = self.diffableDataSource.snapshot()
-        
+        activityIndicatorView.startAnimating()
+                
         // help you sync your data fetches together
         let dispatchQueue = DispatchQueue.global(qos: .background)
         let dispatchGroup = DispatchGroup()
@@ -368,9 +375,9 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                     snapshot.appendItems(object, toSection: section)
                     self.diffableDataSource.apply(snapshot)
                     continue
-                } else if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+                } else if let lat = self.lat, let lon = self.lon {
                     dispatchGroup.enter()
-                    Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                    Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "", lat: lat, long: lon) { (search, err) in
                         dispatchGroup.leave()
                         semaphore.signal()
                         if let object = search?.embedded?.events {
@@ -422,6 +429,27 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         destination.filters = filters
         destination.filterDictionary = filterDictionary
         self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    @objc fileprivate func goToMap() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = MapViewController()
+        var locationSections = [ActivitySection]()
+        var locations = [ActivitySection: AnyHashable]()
+        for section in sections {
+            if section.type == "FSVenue" || section.type == "Event" {
+                locationSections.append(section)
+                locations[section] = groups[section]
+            }
+        }
+        destination.sections = locationSections
+        destination.locations = locations
+        destination.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(destination, animated: true)
+        
     }
 
 }
@@ -851,6 +879,29 @@ extension EventTypeViewController: ActivityTypeCellDelegate {
             }
         }
     }
+    
+    func mapButtonTapped(type: Any) {
+        var locationAddress = [String : [Double]]()
+        if let event = type as? Event {
+            if let add = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let lat = Double(latitude), let longitude = event.embedded?.venues?[0].location?.longitude, let lon = Double(longitude) {
+                locationAddress[add] = [lat, lon]
+                
+                let destination = MapActivityViewController()
+                destination.locationAddress = locationAddress
+                navigationController?.pushViewController(destination, animated: true)
+
+            }
+        } else if let place = type as? FSVenue {
+            if let location = place.location, let add = location.address, let lat = location.lat, let lon = location.lng {
+                locationAddress[add] = [lat, lon]
+                
+                let destination = MapActivityViewController()
+                destination.locationAddress = locationAddress
+                navigationController?.pushViewController(destination, animated: true)
+
+            }
+        }
+    }
 }
 
 extension EventTypeViewController: UpdateFilter {
@@ -951,6 +1002,7 @@ extension EventTypeViewController: ChooseActivityDelegate {
         }
     }
 }
+
 
 //                            var finalEvents = [Event]()
 //                            for event in group {

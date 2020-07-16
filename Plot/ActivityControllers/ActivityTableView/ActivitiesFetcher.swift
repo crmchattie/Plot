@@ -153,6 +153,7 @@ class ActivitiesFetcher: NSObject {
             activity.activityID = metaInfo.activityID
             activity.conversationID = metaInfo.conversationID
             activity.checklistIDs = metaInfo.checklistIDs
+            activity.activitylistIDs = metaInfo.activitylistIDs
             activity.grocerylistID = metaInfo.grocerylistID
             activity.packinglistIDs = metaInfo.packinglistIDs
             activity.admin = metaInfo.admin
@@ -264,6 +265,7 @@ class ActivitiesFetcher: NSObject {
                                        eventKey: "eventID",
                                        placeKey: "placeID",
                                        checklistIDsKey: "checklistIDs",
+                                       activitylistIDsKey: "activitylistIDs",
                                        grocerylistIDKey: "grocerylistID",
                                        packinglistIDsKey: "packinglistIDs")
         })
@@ -308,6 +310,7 @@ class ActivitiesFetcher: NSObject {
                                        eventKey: "eventID",
                                        placeKey: "placeID",
                                        checklistIDsKey: "checklistIDs",
+                                       activitylistIDsKey: "activitylistIDs",
                                        grocerylistIDKey: "grocerylistID",
                                        packinglistIDsKey: "packinglistIDs")
         })
@@ -352,6 +355,7 @@ class ActivitiesFetcher: NSObject {
                                        eventKey: "eventID",
                                        placeKey: "placeID",
                                        checklistIDsKey: "checklistIDs",
+                                       activitylistIDsKey: "activitylistIDs",
                                        grocerylistIDKey: "grocerylistID",
                                        packinglistIDsKey: "packinglistIDs")
         })
@@ -386,6 +390,7 @@ class ActivitiesFetcher: NSObject {
                                            eventKey: String,
                                            placeKey: String,
                                            checklistIDsKey: String,
+                                           activitylistIDsKey: String,
                                            grocerylistIDKey: String,
                                            packinglistIDsKey: String) {
         
@@ -548,6 +553,11 @@ class ActivitiesFetcher: NSObject {
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
+        if snapshot.key == activitylistIDsKey {
+            activities[index].activitylistIDs = snapshot.value as? [String]
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
         if snapshot.key == grocerylistIDKey {
             activities[index].grocerylistID = snapshot.value as? String
             delegate?.activities(update: activities[index], reloadNeeded: true)
@@ -589,6 +599,7 @@ class ActivitiesFetcher: NSObject {
                                            eventKey: String,
                                            placeKey: String,
                                            checklistIDsKey: String,
+                                           activitylistIDsKey: String,
                                            grocerylistIDKey: String,
                                            packinglistIDsKey: String) {
         
@@ -703,6 +714,11 @@ class ActivitiesFetcher: NSObject {
         
         if snapshot.key == checklistIDsKey {
             activities[index].checklistIDs = [String]()
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == activitylistIDsKey {
+            activities[index].activitylistIDs = [String]()
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         

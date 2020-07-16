@@ -12,34 +12,35 @@ struct ListContainer: Codable {
     
     var grocerylist: Grocerylist?
     var checklist: Checklist?
+    var activitylist: Activitylist?
     var packinglist: Packinglist?
 
     var ID: String {
-        return grocerylist?.ID ?? checklist?.ID ?? packinglist?.ID ?? ""
+        return grocerylist?.ID ?? checklist?.ID ?? packinglist?.ID ?? activitylist?.ID ?? ""
     }
     
     var name: String {
-        return grocerylist?.name ?? checklist?.name ?? packinglist?.name ?? ""
+        return grocerylist?.name ?? checklist?.name ?? packinglist?.name ?? activitylist?.name ?? ""
     }
     
     var lastModifiedDate: Date {
-        return grocerylist?.lastModifiedDate ?? checklist?.lastModifiedDate ?? packinglist?.lastModifiedDate ?? Date.distantPast
+        return grocerylist?.lastModifiedDate ?? checklist?.lastModifiedDate ?? packinglist?.lastModifiedDate ?? activitylist?.lastModifiedDate ?? Date.distantPast
     }
     
     var createdDate: Date {
-        return grocerylist?.createdDate ?? checklist?.createdDate ?? packinglist?.createdDate ?? Date.distantPast
+        return grocerylist?.createdDate ?? checklist?.createdDate ?? packinglist?.createdDate ?? activitylist?.createdDate ?? Date.distantPast
     }
     
     var badge: Int {
-        return grocerylist?.badge ?? checklist?.badge ?? packinglist?.badge ?? 0
+        return grocerylist?.badge ?? checklist?.badge ?? packinglist?.badge ?? activitylist?.badge ?? 0
     }
     
     var muted: Bool {
-        return grocerylist?.muted ?? checklist?.muted ?? packinglist?.muted ?? false
+        return grocerylist?.muted ?? checklist?.muted ?? packinglist?.muted ?? activitylist?.muted ?? false
     }
     
     var pinned: Bool {
-        return grocerylist?.pinned ?? checklist?.pinned ?? packinglist?.pinned ?? false
+        return grocerylist?.pinned ?? checklist?.pinned ?? packinglist?.pinned ?? activitylist?.pinned ?? false
     }
     
     var type: String {
@@ -49,6 +50,8 @@ struct ListContainer: Codable {
             return "checklist"
         } else if packinglist != nil {
             return "packinglist"
+        } else if activitylist != nil {
+            return "activitylist"
         } else {
             return "none"
         }
@@ -57,6 +60,6 @@ struct ListContainer: Codable {
 }
 
 func ==(lhs: ListContainer, rhs: ListContainer) -> Bool {
-    return lhs.grocerylist == rhs.grocerylist && lhs.checklist == rhs.checklist && lhs.packinglist == rhs.packinglist
+    return lhs.grocerylist == rhs.grocerylist && lhs.checklist == rhs.checklist && lhs.packinglist == rhs.packinglist && lhs.activitylist == rhs.activitylist
 }
 

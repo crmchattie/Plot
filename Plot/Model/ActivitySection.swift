@@ -149,7 +149,7 @@ enum ActivitySection: Hashable, CaseIterable {
         case .generalShop: return "General"
         case .generalFood: return "General"
         case .generalDrinks: return "General"
-        case .generalCoffee: return "General"
+        case .generalCoffee: return "Coffee"
         case .generalArts: return "General"
         case .generalOutdoors: return "General"
         case .topFood, .topShop, .topRec, .topDrinks, .topSights: return "Top Picks"

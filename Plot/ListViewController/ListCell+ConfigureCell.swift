@@ -12,7 +12,7 @@ import SDWebImage
 
 extension ListCell {
     
-    func configureCell(for indexPath: IndexPath, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?) {
+    func configureCell(for indexPath: IndexPath, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?) {
         
         backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -85,6 +85,39 @@ extension ListCell {
             } else {
                 chatButton.tintColor = .systemBlue
             }
+        } else if let activitylist = activitylist {
+            self.activitylist = activitylist
+            nameLabel.text = activitylist.name
+            listTypeLabel.text = "Activitylist"
+            if let date = activitylist.lastModifiedDate {
+                timeLabel.text = date.formatRelativeString()
+            }
+            muteIndicator.isHidden = !(activitylist.muted ?? false)
+            
+            let badgeString = activitylist.badge?.toString()
+            let badgeInt = activitylist.badge ?? 0
+                                    
+            if badgeInt > 0  {
+                badgeLabel.text = badgeString
+                badgeLabel.isHidden = false
+                newMessageIndicator.isHidden = true
+            
+            } else {
+                newMessageIndicator.isHidden = true
+                badgeLabel.isHidden = true
+            }
+            
+            if activitylist.activityID == nil {
+                activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+            } else {
+                activityButton.tintColor = .systemBlue
+            }
+            
+            if activitylist.conversationID == nil {
+                chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+            } else {
+                chatButton.tintColor = .systemBlue
+            }
         } else if let packinglist = packinglist {
             self.packinglist = packinglist
             nameLabel.text = packinglist.name
@@ -123,6 +156,8 @@ extension ListCell {
             updateParticipantsThumbnailGL(grocerylist: grocerylist)
         } else if let checklist = checklist {
             updateParticipantsThumbnailCL(checklist: checklist)
+        } else if let activitylist = activitylist {
+            updateParticipantsThumbnailAL(activitylist: activitylist)
         } else if let packinglist = packinglist {
             updateParticipantsThumbnailPL(packinglist: packinglist)
         }
@@ -149,7 +184,7 @@ extension ListCell {
     }
     
     func loadParticipantsThumbnailGL(grocerylist: Grocerylist) {
-        self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, completion: { [weak self] (users) in
+        self.listViewControllerDataStore?.getParticipants(grocerylist: grocerylist, checklist: nil, activitylist: nil, packinglist: nil, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
                 if Auth.auth().currentUser?.uid == user.id {
@@ -195,7 +230,53 @@ extension ListCell {
     }
     
     func loadParticipantsThumbnailCL(checklist: Checklist) {
-        self.listViewControllerDataStore?.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil, completion: { [weak self] (users) in
+        self.listViewControllerDataStore?.getParticipants(grocerylist: nil, checklist: checklist, activitylist: nil, packinglist: nil, completion: { [weak self] (users) in
+            for i in 0..<users.count {
+                let user = users[i]
+                if Auth.auth().currentUser?.uid == user.id {
+                    continue
+                }
+                
+                if i > 8 {
+                    return
+                }
+                
+                guard let icon = self?.thumbnails[i], let url = user.thumbnailPhotoURL else {
+                    continue
+                }
+                
+                
+                icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in
+                    guard image != nil else { return }
+                    guard cacheType != SDImageCacheType.memory, cacheType != SDImageCacheType.disk else {
+                        return
+                    }
+                })
+            }
+        })
+    }
+    
+    func updateParticipantsThumbnailAL(activitylist: Activitylist) {
+        let participantsIDs = activitylist.participantsIDs ?? []
+        var participantsCount = 0
+        if participantsIDs.count > 1 {
+            // minus current user
+            participantsCount = participantsIDs.count - 1
+        }
+        for i in 0..<thumbnails.count {
+            if i < participantsCount {
+                thumbnails[i].isHidden = false
+                thumbnails[i].image = UIImage(named: "UserpicIcon")
+            } else {
+                thumbnails[i].isHidden = true
+            }
+        }
+        
+        loadParticipantsThumbnailAL(activitylist: activitylist)
+    }
+    
+    func loadParticipantsThumbnailAL(activitylist: Activitylist) {
+        self.listViewControllerDataStore?.getParticipants(grocerylist: nil, checklist: nil, activitylist: activitylist, packinglist: nil, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
                 if Auth.auth().currentUser?.uid == user.id {
@@ -241,7 +322,7 @@ extension ListCell {
     }
     
     func loadParticipantsThumbnailPL(packinglist: Packinglist) {
-        self.listViewControllerDataStore?.getParticipants(grocerylist: nil, checklist: nil, packinglist: packinglist, completion: { [weak self] (users) in
+        self.listViewControllerDataStore?.getParticipants(grocerylist: nil, checklist: nil, activitylist: nil, packinglist: packinglist, completion: { [weak self] (users) in
             for i in 0..<users.count {
                 let user = users[i]
                 if Auth.auth().currentUser?.uid == user.id {

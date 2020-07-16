@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 
 protocol ListViewControllerDataStore: class {
-    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, completion: @escaping ([User])->())
+    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, activitylist: Activitylist?, packinglist: Packinglist?, completion: @escaping ([User])->())
 }
 
 protocol HomeBaseLists: class {
@@ -32,7 +32,8 @@ class ListsViewController: UIViewController {
     var listListCopy = [ListContainer]()
     var listList = [ListContainer]()
     var filteredlistList = [ListContainer]()
-    var checklists = [Checklist]() 
+    var checklists = [Checklist]()
+    var activitylists = [Activitylist]()
     var grocerylists = [Grocerylist]()
     var packinglists = [Packinglist]()
     var users = [User]()
@@ -40,6 +41,7 @@ class ListsViewController: UIViewController {
     var conversations = [Conversation]()
     
     let checklistFetcher = ChecklistFetcher()
+    let activitylistFetcher = ActivitylistFetcher()
     let grocerylistFetcher = GrocerylistFetcher()
     //    let packinglistFetcher = PackinglistFetcher()
     
@@ -152,6 +154,14 @@ class ListsViewController: UIViewController {
             }
             self.observeChecklistsForCurrentUser()
         }
+        activitylistFetcher.fetchActivitylists { (activitylists) in
+            for activitylist in activitylists {
+                if activitylist.name == "nothing" { continue }
+                if let items = activitylist.items, Array(items.keys)[0] == "name" { continue }
+                self.activitylists.append(activitylist)
+            }
+            self.observeActivitylistsForCurrentUser()
+        }
         grocerylistFetcher.fetchGrocerylists { (grocerylists) in
             for grocerylist in grocerylists {
                 if grocerylist.name == "nothing" { continue }
@@ -190,6 +200,41 @@ class ListsViewController: UIViewController {
                         self!.checklists[index] = checklist
                         if let ID = checklist.ID {
                             self!.updateCellForCLID(ID: ID, checklist: checklist)
+                            self!.sortandreload()
+                        }
+                    }
+                }
+            }
+        )
+    }
+    
+    func observeActivitylistsForCurrentUser() {
+        self.activitylistFetcher.observeActivitylistForCurrentUser(activitylistsAdded: { [weak self] activitylistsAdded in
+                for activitylist in activitylistsAdded {
+                    if let index = self!.activitylists.firstIndex(where: {$0 == activitylist}) {
+                        self!.activitylists[index] = activitylist
+                        if let ID = activitylist.ID {
+                            self!.updateCellForALID(ID: ID, activitylist: activitylist)
+                            self!.sortandreload()
+                        }
+                    } else {
+                        self!.activitylists.append(activitylist)
+                        self!.sortandreload()
+                    }
+                }
+            }, activitylistsRemoved: { [weak self] activitylistsRemoved in
+                for activitylist in activitylistsRemoved {
+                    if let index = self!.activitylists.firstIndex(where: {$0 == activitylist}) {
+                        self!.activitylists.remove(at: index)
+                        self!.sortandreload()
+                    }
+                }
+            }, activitylistsChanged: { [weak self] activitylistsChanged in
+                for activitylist in activitylistsChanged {
+                    if let index = self!.activitylists.firstIndex(where: {$0 == activitylist}) {
+                        self!.activitylists[index] = activitylist
+                        if let ID = activitylist.ID {
+                            self!.updateCellForALID(ID: ID, activitylist: activitylist)
                             self!.sortandreload()
                         }
                     }
@@ -241,6 +286,14 @@ class ListsViewController: UIViewController {
         }
     }
     
+    func updateCellForALID(ID: String, activitylist: Activitylist) {
+        if let index = listList.firstIndex(where: {$0.ID == ID}) {
+            listList[index].activitylist = activitylist
+            let indexPath = IndexPath(row: index, section: 0)
+            updateCell(at: indexPath)
+        }
+    }
+    
     func updateCellForGLID(ID: String, grocerylist: Grocerylist) {
         if let index = listList.firstIndex(where: {$0.ID == ID}) {
             listList[index].grocerylist = grocerylist
@@ -270,7 +323,7 @@ class ListsViewController: UIViewController {
     }
     
     func sortandreload() {
-        listList = (checklists.map { ListContainer(grocerylist: nil, checklist: $0, packinglist: nil) } + grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
+        listList = (checklists.map { ListContainer(grocerylist: nil, checklist: $0, activitylist: nil, packinglist: nil) } + activitylists.map { ListContainer(grocerylist: nil, checklist: nil, activitylist: $0, packinglist: nil) } + grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, activitylist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
         delegate?.sendLists(lists: listList)
         listListCopy = listList
         tableView.reloadData()
@@ -317,11 +370,13 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         cell.selectionStyle = .none
         let list = listList[indexPath.row]
         if let grocerylist = list.grocerylist {
-            cell.configureCell(for: indexPath, grocerylist: grocerylist, checklist: nil, packinglist: nil)
+            cell.configureCell(for: indexPath, grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil)
         } else if let checklist = list.checklist {
-            cell.configureCell(for: indexPath, grocerylist: nil, checklist: checklist, packinglist: nil)
+            cell.configureCell(for: indexPath, grocerylist: nil, checklist: checklist, packinglist: nil, activitylist: nil)
+        } else if let activitylist = list.activitylist {
+            cell.configureCell(for: indexPath, grocerylist: nil, checklist: nil, packinglist: nil, activitylist: activitylist)
         } else if let packinglist = list.packinglist {
-            cell.configureCell(for: indexPath, grocerylist: nil, checklist: nil, packinglist: packinglist)
+            cell.configureCell(for: indexPath, grocerylist: nil, checklist: nil, packinglist: packinglist, activitylist: nil)
         }
         return cell
     }
@@ -339,7 +394,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             destination.filteredUsers = self.filteredUsers
             destination.activities = self.activities
             destination.conversations = self.conversations
-            self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil) { (participants) in
+            self.getParticipants(grocerylist: grocerylist, checklist: nil, activitylist: nil, packinglist: nil) { (participants) in
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
@@ -353,7 +408,21 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             destination.filteredUsers = self.filteredUsers
             destination.activities = self.activities
             destination.conversations = self.conversations
-            self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil) { (participants) in
+            self.getParticipants(grocerylist: nil, checklist: checklist, activitylist: nil, packinglist: nil) { (participants) in
+                destination.selectedFalconUsers = participants
+                self.navigationController?.pushViewController(destination, animated: true)
+            }
+        } else if let activitylist = list.activitylist {
+            let destination = ActivitylistViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.activitylist = activitylist
+            destination.comingFromLists = true
+            destination.connectedToAct = activitylist.activityID != nil
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.activities = self.activities
+            destination.conversations = self.conversations
+            self.getParticipants(grocerylist: nil, checklist: nil, activitylist: activitylist, packinglist: nil) { (participants) in
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
@@ -367,7 +436,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             destination.filteredUsers = self.filteredUsers
             destination.activities = self.activities
             destination.conversations = self.conversations
-            self.getParticipants(grocerylist: nil, checklist: nil, packinglist: packinglist) { (participants) in
+            self.getParticipants(grocerylist: nil, checklist: nil, activitylist: nil, packinglist: packinglist) { (participants) in
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
@@ -378,7 +447,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
 }
 
 extension ListsViewController: ListViewControllerDataStore {
-    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, completion: @escaping ([User])->()) {
+    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, activitylist: Activitylist?, packinglist: Packinglist?, completion: @escaping ([User])->()) {
         if let grocerylist = grocerylist, let ID = grocerylist.ID, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             let olderParticipants = self.participants[ID]
@@ -485,7 +554,7 @@ extension ListsViewController: ListCellDelegate {
         }
     }
     
-    func openChat(forConversation conversationID: String?, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?) {
+    func openChat(forConversation conversationID: String?, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?) {
         if conversationID == nil {
             let destination = ChooseChatTableViewController()
             let navController = UINavigationController(rootViewController: destination)
@@ -494,6 +563,8 @@ extension ListsViewController: ListCellDelegate {
                 destination.grocerylist = grocerylist
             } else if let checklist = checklist {
                 destination.checklist = checklist
+            } else if let activitylist = activitylist {
+                destination.activitylist = activitylist
             } else if let packinglist = packinglist {
                 destination.packinglist = packinglist
             }
@@ -587,7 +658,7 @@ extension ListsViewController: MessagesDelegate {
 }
 
 extension ListsViewController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
+    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
         if let grocerylistID = grocerylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child(grocerylistsEntity).child(grocerylistID).updateChildValues(updatedConversationID)

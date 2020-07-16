@@ -35,7 +35,6 @@ class WebViewController: UIViewController, WKUIDelegate {
         navigationItem.rightBarButtonItem = doneBarButton
         
         if let url = urlString, let myURL = URL(string: url) {
-            print(url)
             let myRequest = URLRequest(url: myURL)
             webView.load(myRequest)
             webView.allowsBackForwardNavigationGestures = true

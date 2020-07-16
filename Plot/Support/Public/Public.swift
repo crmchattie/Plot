@@ -1141,7 +1141,7 @@ let messageAlert = UIAlertController(title: "Activity Sent!", message: nil, pref
 
 let activityAlert = UIAlertController(title: "Activity Created!", message: nil, preferredStyle: UIAlertController.Style.alert)
 
-let activityNFAlert = UIAlertController(title: "Activity passed and cannot be loaded", message: nil, preferredStyle: UIAlertController.Style.alert)
+let activityNFAlert = UIAlertController(title: "Could Not Load Activity", message: nil, preferredStyle: UIAlertController.Style.alert)
 
 extension UIViewController {
     func messageSentAlert() {

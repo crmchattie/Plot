@@ -200,6 +200,7 @@ class ConversationsFetcher: NSObject {
             conversation.chatID = metaInfo.chatID
             conversation.activities = metaInfo.activities
             conversation.checklists = metaInfo.checklists
+            conversation.activitylists = metaInfo.activitylists
             conversation.grocerylists = metaInfo.grocerylists
             conversation.packinglists = metaInfo.packinglists
             self.prefetchThumbnail(from: conversation.chatThumbnailPhotoURL)
@@ -268,7 +269,7 @@ class ConversationsFetcher: NSObject {
                                            conversationPhotoKey: "chatThumbnailPhotoURL",
                                            chatID: chatID, membersIDsKey: "chatParticipantsIDs",
                                            adminKey: "admin", adminNeededKey: "adminNeeded",
-                                           activitiesKey: "activities", checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists")
+                                           activitiesKey: "activities", checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists", activitylistsKey: "activitylists")
         })
     }
     
@@ -282,7 +283,7 @@ class ConversationsFetcher: NSObject {
             
             self.handleConversationChanges(from: snapshot, conversationNameKey: "chatName",
                                            conversationPhotoKey: "chatThumbnailPhotoURL",
-                                           chatID: chatID, membersIDsKey: "chatParticipantsIDs", adminKey: "admin", adminNeededKey: "adminNeeded", activitiesKey: "activities", checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists")
+                                           chatID: chatID, membersIDsKey: "chatParticipantsIDs", adminKey: "admin", adminNeededKey: "adminNeeded", activitiesKey: "activities", checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists", activitylistsKey: "activitylists")
         })
     }
     
@@ -296,7 +297,7 @@ class ConversationsFetcher: NSObject {
             
             self.handleConversationRemovals(from: snapshot, conversationNameKey: "chatName",
                                             conversationPhotoKey: "chatThumbnailPhotoURL",
-                                            chatID: chatID, membersIDsKey: "chatParticipantsIDs", adminKey: "admin", adminNeededKey: "adminNeeded", activitiesKey: "activities", checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists")
+                                            chatID: chatID, membersIDsKey: "chatParticipantsIDs", adminKey: "admin", adminNeededKey: "adminNeeded", activitiesKey: "activities", checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists",  activitylistsKey: "activitylists")
         })
     }
     
@@ -310,13 +311,13 @@ class ConversationsFetcher: NSObject {
             
             self.handleConversationChanges(from: snapshot, conversationNameKey: "name",
                                            conversationPhotoKey: "thumbnailPhotoURL",
-                                           chatID: chatID, membersIDsKey: nil, adminKey: nil, adminNeededKey: nil, activitiesKey: nil, checklistsKey: nil, packinglistsKey: nil, grocerylistsKey: nil)
+                                           chatID: chatID, membersIDsKey: nil, adminKey: nil, adminNeededKey: nil, activitiesKey: nil, checklistsKey: nil, packinglistsKey: nil, grocerylistsKey: nil, activitylistsKey: nil)
         })
     }
     
     fileprivate func handleConversationChanges(from snapshot: DataSnapshot,
                                                conversationNameKey: String, conversationPhotoKey: String,
-                                               chatID: String, membersIDsKey: String?, adminKey: String?, adminNeededKey: String?, activitiesKey: String?, checklistsKey: String?, packinglistsKey: String?, grocerylistsKey: String?) {
+                                               chatID: String, membersIDsKey: String?, adminKey: String?, adminNeededKey: String?, activitiesKey: String?, checklistsKey: String?, packinglistsKey: String?, grocerylistsKey: String?, activitylistsKey: String?) {
         
         guard let index = conversations.firstIndex(where: { (conversation) -> Bool in
             return conversation.chatID == chatID
@@ -358,6 +359,11 @@ class ConversationsFetcher: NSObject {
             delegate?.conversations(update: conversations[index], reloadNeeded: true)
         }
         
+        if let activitylistsKey = activitiesKey, snapshot.key == activitylistsKey {
+            conversations[index].activitylists = snapshot.value as? [String]
+            delegate?.conversations(update: conversations[index], reloadNeeded: true)
+        }
+        
         if let packinglistsKey = activitiesKey, snapshot.key == packinglistsKey {
             conversations[index].packinglists = snapshot.value as? [String]
             delegate?.conversations(update: conversations[index], reloadNeeded: true)
@@ -371,7 +377,7 @@ class ConversationsFetcher: NSObject {
     
     fileprivate func handleConversationRemovals(from snapshot: DataSnapshot,
                                                 conversationNameKey: String, conversationPhotoKey: String,
-                                                chatID: String, membersIDsKey: String?, adminKey: String?, adminNeededKey: String?, activitiesKey: String?, checklistsKey: String?, packinglistsKey: String?, grocerylistsKey: String?) {
+                                                chatID: String, membersIDsKey: String?, adminKey: String?, adminNeededKey: String?, activitiesKey: String?, checklistsKey: String?, packinglistsKey: String?, grocerylistsKey: String?, activitylistsKey: String?) {
         
         guard let index = conversations.firstIndex(where: { (conversation) -> Bool in
             return conversation.chatID == chatID
@@ -385,6 +391,11 @@ class ConversationsFetcher: NSObject {
         
         if let checklistsKey = checklistsKey, snapshot.key == checklistsKey {
             conversations[index].checklists = nil
+            delegate?.conversations(update: conversations[index], reloadNeeded: true)
+        }
+        
+        if let activitylistsKey = checklistsKey, snapshot.key == activitylistsKey {
+            conversations[index].activitylists = nil
             delegate?.conversations(update: conversations[index], reloadNeeded: true)
         }
         

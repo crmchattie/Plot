@@ -1256,7 +1256,7 @@ extension GrocerylistViewController: ChooseActivityDelegate {
 }
 
 extension GrocerylistViewController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
+    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
         if let grocerylistID = grocerylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child(grocerylistsEntity).child(grocerylistID).updateChildValues(updatedConversationID)

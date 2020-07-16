@@ -26,8 +26,9 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
         
         title = "Shopping"
 
-        let doneBarButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(filter))
-        navigationItem.rightBarButtonItem = doneBarButton
+        let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
+        let doneBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        navigationItem.rightBarButtonItems = [mapBarButton, doneBarButton]
 
         searchController.searchBar.delegate = self
                 
@@ -99,6 +100,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             } else {
                 cell.heartButtonImage = "heart"
             }
+            cell.mapButton.isHidden = true
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
             cell.workout = object
@@ -111,6 +113,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             } else {
                 cell.heartButtonImage = "heart"
             }
+            cell.mapButton.isHidden = true
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
             cell.recipe = object
@@ -325,9 +328,19 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             } else {
                 categoryString = categoryIDs.joined(separator:",")
             }
-            if lat == "", CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+            if lat == "", let lat = self.lat, let lon = self.lon {
                 dispatchGroup.enter()
-                Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: lat, long: lon) { (search, err) in
+                    if let object = search?.response?.venues {
+                        self.searchActivities = object
+                    } else if let object = search?.response?.venue {
+                        self.searchActivities = [object]
+                    }
+                    dispatchGroup.leave()
+                }
+            } else if let lat = Double(lat), let lon = Double(lon) {
+                dispatchGroup.enter()
+                Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: lat, long: lon) { (search, err) in
                     if let object = search?.response?.venues {
                         self.searchActivities = object
                     } else if let object = search?.response?.venue {
@@ -384,8 +397,10 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             return
         }
         
-        activityIndicatorView.startAnimating()
-        
+        var snapshot = self.diffableDataSource.snapshot()
+        snapshot.deleteAllItems()
+        self.diffableDataSource.apply(snapshot)
+                
         diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
             let snapshot = self.diffableDataSource.snapshot()
@@ -397,23 +412,22 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             return header
         })
         
-        var snapshot = self.diffableDataSource.snapshot()
-        
+        activityIndicatorView.startAnimating()
+                
         // help you sync your data fetches together
         let dispatchGroup = DispatchGroup()
         
         for section in self.sections {
-            print("section \(section)")
             if let object = self.groups[section] {
                 activityIndicatorView.stopAnimating()
                 snapshot.appendSections([section])
                 snapshot.appendItems(object, toSection: section)
                 self.diffableDataSource.apply(snapshot)
                 continue
-            } else if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+            } else if let lat = self.lat, let lon = self.lon {
                 if section.subType == "Recommend" {
                     dispatchGroup.enter()
-                    Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                    Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: lat, long: lon) { (search, err) in
                         if let object = search?.response?.groups?[0].items {
                             self.groups[section] = object
                         } else {
@@ -423,7 +437,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
                     }
                 } else if section.subType == "Browse" {
                     dispatchGroup.enter()
-                    Service.shared.fetchFSSearchLatLong(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                    Service.shared.fetchFSSearchLatLong(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, lat: lat, long: lon) { (search, err) in
                         if let object = search?.response?.venues {
                             self.groups[section] = object
                         } else {
@@ -482,6 +496,27 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
         destination.filters = filters
         destination.filterDictionary = filterDictionary
         self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    @objc fileprivate func goToMap() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = MapViewController()
+        var locationSections = [ActivitySection]()
+        var locations = [ActivitySection: AnyHashable]()
+        for section in sections {
+            if section.type == "FSVenue" || section.type == "Event" {
+                locationSections.append(section)
+                locations[section] = groups[section]
+            }
+        }
+        destination.sections = locationSections
+        destination.locations = locations
+        destination.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(destination, animated: true)
+        
     }
 
 }
@@ -908,6 +943,29 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
                         databaseReference.updateChildValues(["places": ["\(place.id)"]])
                     }
                 })
+            }
+        }
+    }
+    
+    func mapButtonTapped(type: Any) {
+        var locationAddress = [String : [Double]]()
+        if let event = type as? Event {
+            if let add = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let lat = Double(latitude), let longitude = event.embedded?.venues?[0].location?.longitude, let lon = Double(longitude) {
+                locationAddress[add] = [lat, lon]
+                
+                let destination = MapActivityViewController()
+                destination.locationAddress = locationAddress
+                navigationController?.pushViewController(destination, animated: true)
+
+            }
+        } else if let place = type as? FSVenue {
+            if let location = place.location, let add = location.address, let lat = location.lat, let lon = location.lng {
+                locationAddress[add] = [lat, lon]
+                
+                let destination = MapActivityViewController()
+                destination.locationAddress = locationAddress
+                navigationController?.pushViewController(destination, animated: true)
+
             }
         }
     }

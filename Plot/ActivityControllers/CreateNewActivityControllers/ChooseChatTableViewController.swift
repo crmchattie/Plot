@@ -32,7 +32,7 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 protocol ChooseChatDelegate: class {
-    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?)
+    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?)
 }
 
 
@@ -53,6 +53,7 @@ class ChooseChatTableViewController: UITableViewController {
     var activity: Activity?
     var grocerylist: Grocerylist?
     var checklist: Checklist?
+    var activitylist: Activitylist?
     var packinglist: Packinglist?
     var users = [User]()
     var filteredUsers = [User]()
@@ -115,24 +116,29 @@ class ChooseChatTableViewController: UITableViewController {
         if let currentUserID = Auth.auth().currentUser?.uid {
             if let activity = activity {
                 let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
-                let membersIDs = fetchMembersIDs(grocerylist: nil, checklist: nil, packinglist: nil, activity: activity)
+                let membersIDs = fetchMembersIDs(grocerylist: nil, checklist: nil, packinglist: nil, activitylist: nil, activity: activity)
                 createChatwActivity(chatID: chatID, membersIDs: membersIDs, activity: activity)
-                delegate?.chosenChat(chatID: chatID, activityID: activity.activityID!, grocerylistID: nil, checklistID: nil, packinglistID: nil)
+                delegate?.chosenChat(chatID: chatID, activityID: activity.activityID!, grocerylistID: nil, checklistID: nil, packinglistID: nil, activitylistID: nil)
             } else if let grocerylist = grocerylist {
                 let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
-                let membersIDs = fetchMembersIDs(grocerylist: grocerylist, checklist: nil, packinglist: nil, activity: nil)
+                let membersIDs = fetchMembersIDs(grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil, activity: nil)
                 createChatwGL(chatID: chatID, membersIDs: membersIDs, grocerylist: grocerylist)
-                delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: grocerylist.ID, checklistID: nil, packinglistID: nil)
+                delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: grocerylist.ID, checklistID: nil, packinglistID: nil, activitylistID: nil)
             } else if let checklist = checklist {
                 let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
-                let membersIDs = fetchMembersIDs(grocerylist: nil, checklist: checklist, packinglist: nil, activity: nil)
+                let membersIDs = fetchMembersIDs(grocerylist: nil, checklist: checklist, packinglist: nil, activitylist: nil, activity: nil)
                 createChatwCL(chatID: chatID, membersIDs: membersIDs, checklist: checklist)
-                delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: checklist.ID, packinglistID: nil)
+                delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: checklist.ID, packinglistID: nil, activitylistID: nil)
+            } else if let activitylist = activitylist {
+                let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
+                let membersIDs = fetchMembersIDs(grocerylist: nil, checklist: nil, packinglist: nil, activitylist: activitylist, activity: nil)
+                createChatwAL(chatID: chatID, membersIDs: membersIDs, activitylist: activitylist)
+                delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: nil, packinglistID: nil, activitylistID: activitylist.ID)
             } else if let packinglist = packinglist {
                 let chatID = Database.database().reference().child("user-messages").child(currentUserID).childByAutoId().key ?? ""
-                let membersIDs = fetchMembersIDs(grocerylist: nil, checklist: nil, packinglist: packinglist, activity: nil)
+                let membersIDs = fetchMembersIDs(grocerylist: nil, checklist: nil, packinglist: packinglist, activitylist: nil, activity: nil)
                 createChatwPL(chatID: chatID, membersIDs: membersIDs, packinglist: packinglist)
-                delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: nil, packinglistID: packinglist.ID)
+                delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: nil, packinglistID: packinglist.ID, activitylistID: nil)
             } else if let activityObject = activityObject {
                 let destination = ContactsController()
                 destination.activityObject = activityObject
@@ -191,6 +197,20 @@ class ChooseChatTableViewController: UITableViewController {
         }
     }
     
+    func createChatwAL(chatID: String, membersIDs: ([String], [String:AnyObject]), activitylist: Activitylist) {
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, activitylistsEntity: [activitylist.ID!] as AnyObject, "chatName": activitylist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "activities": [activitylist.activityID] as AnyObject]
+            activityCreatingGroup.enter()
+            activityCreatingGroup.enter()
+            activityCreatingGroup.enter()
+            createGroupChatNode(reference: groupChatsReference, childValues: childValues)
+            connectMembersToGroupChat(memberIDs: membersIDs.0, chatID: chatID)
+            self.informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: membersIDs.0, text: "New group has been created")
+            dismiss(animated: true, completion: nil)
+        }
+    }
+    
     func createChatwPL(chatID: String, membersIDs: ([String], [String:AnyObject]), packinglist: Packinglist) {
         if let currentUserID = Auth.auth().currentUser?.uid {
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
@@ -205,7 +225,7 @@ class ChooseChatTableViewController: UITableViewController {
         }
     }
     
-    func fetchMembersIDs(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activity: Activity?) -> ([String], [String:AnyObject]) {
+    func fetchMembersIDs(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?, activity: Activity?) -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
 
@@ -359,22 +379,27 @@ class ChooseChatTableViewController: UITableViewController {
     if let chatID = conversation.chatID, let activity = activity, let activityName = activity.name?.trimmingCharacters(in: .whitespaces) {
         let text = "The \(activityName) activity was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: activity.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: activity.activityID!, grocerylistID: nil, checklistID: nil, packinglistID: nil)
+        delegate?.chosenChat(chatID: chatID, activityID: activity.activityID!, grocerylistID: nil, checklistID: nil, packinglistID: nil, activitylistID: nil)
         dismiss(animated: true, completion: nil)
     } else if let chatID = conversation.chatID, let grocerylist = grocerylist, let listName = grocerylist.name?.trimmingCharacters(in: .whitespaces) {
         let text = "The \(listName) list was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: grocerylist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: grocerylist.ID, checklistID: nil, packinglistID: nil)
+        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: grocerylist.ID, checklistID: nil, packinglistID: nil, activitylistID: nil)
         dismiss(animated: true, completion: nil)
     } else if let chatID = conversation.chatID, let checklist = checklist, let listName = checklist.name?.trimmingCharacters(in: .whitespaces) {
         let text = "The \(listName) list was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: checklist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: checklist.ID, packinglistID: nil)
+        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: checklist.ID, packinglistID: nil, activitylistID: nil)
+        dismiss(animated: true, completion: nil)
+    } else if let chatID = conversation.chatID, let activitylist = activitylist, let listName = activitylist.name?.trimmingCharacters(in: .whitespaces) {
+        let text = "The \(listName) list was connected to this chat"
+        informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: activitylist.participantsIDs!, text: text)
+        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: nil, packinglistID: nil, activitylistID: activitylist.ID)
         dismiss(animated: true, completion: nil)
     } else if let chatID = conversation.chatID, let packinglist = packinglist, let listName = packinglist.name?.trimmingCharacters(in: .whitespaces) {
         let text = "The \(listName) list was connected to this chat"
         informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: packinglist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID:nil, grocerylistID: nil, checklistID: nil, packinglistID: packinglist.ID)
+        delegate?.chosenChat(chatID: chatID, activityID:nil, grocerylistID: nil, checklistID: nil, packinglistID: packinglist.ID, activitylistID: nil)
         dismiss(animated: true, completion: nil)
     } else if let activityObject = activityObject {
         let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)

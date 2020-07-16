@@ -41,6 +41,9 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     
     var startDateTime: Date?
     var endDateTime: Date?
+    
+    var lat: Double?
+    var lon: Double?
         
     fileprivate var reference: DatabaseReference!
     

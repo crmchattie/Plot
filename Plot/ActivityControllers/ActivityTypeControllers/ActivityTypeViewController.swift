@@ -12,7 +12,7 @@ import Firebase
 import CodableFirebase
 import SwiftUI
 
-class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, CLLocationManagerDelegate {
     
     weak var delegate : UpdateScheduleDelegate?
     weak var recipeDelegate : UpdateRecipeDelegate?
@@ -51,6 +51,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var endDateTime: Date?
     
     var locationManager = CLLocationManager()
+    var lat: Double?
+    var lon: Double?
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
@@ -121,7 +123,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         navigationController?.navigationBar.layoutIfNeeded()
         
         let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
-        navigationItem.rightBarButtonItems = [mapBarButton]
+        let doneBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(updateLocal))
+        navigationItem.rightBarButtonItems = [mapBarButton, doneBarButton]
         
         tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
         tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
@@ -137,10 +140,15 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: kActivityHeaderCell)
         collectionView.register(ActivityTypeCell.self, forCellWithReuseIdentifier: kActivityTypeCell)
-        
-        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        
+                
         addObservers()
+        
+        if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+            lat = self.locationManager.location?.coordinate.latitude
+            lon = self.locationManager.location?.coordinate.longitude
+        } else {
+            requestUserLocation()
+        }
         
         groups[.custom] = customTypes
         
@@ -210,6 +218,24 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         
     }
     
+    fileprivate func requestUserLocation() {
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.delegate = self
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        switch status {
+        case .authorizedWhenInUse:
+            print("Received authorization of user location")
+            // request for where the user actually is
+            locationManager.startUpdatingLocation()
+            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+            
+        default:
+            print("Failed to authorize")
+        }
+    }
+    
     @objc fileprivate func goToMap() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
@@ -229,6 +255,16 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         destination.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(destination, animated: true)
         
+    }
+    
+    @objc fileprivate func updateLocal() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = LocationFinderTableViewController()
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -297,6 +333,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             } else {
                 cell.heartButtonImage = "heart"
             }
+            cell.mapButton.isHidden = true
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
             cell.workout = object
@@ -309,6 +346,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             } else {
                 cell.heartButtonImage = "heart"
             }
+            cell.mapButton.isHidden = true
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
             cell.recipe = object
@@ -457,8 +495,10 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             return
         }
         
-        activityIndicatorView.startAnimating()
-        
+        var snapshot = self.diffableDataSource.snapshot()
+        snapshot.deleteAllItems()
+        self.diffableDataSource.apply(snapshot)
+                        
         diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
             header.delegate = self
@@ -475,8 +515,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             return header
         })
         
-        var snapshot = self.diffableDataSource.snapshot()
-        
+        activityIndicatorView.startAnimating()
+                
         let dispatchGroup = DispatchGroup()
         
         for section in sections {
@@ -485,10 +525,10 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 snapshot.appendItems(object, toSection: section)
                 self.diffableDataSource.apply(snapshot)
                 continue
-            } else if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+            } else if let lat = lat, let lon = lon {
                 if section.type == "FSVenue" {
                     dispatchGroup.enter()
-                    Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                    Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: lat, long: lon) { (search, err) in
                         dispatchGroup.leave()
                         if let object = search?.response?.groups?[0].items {
                             self.groups[section] = object
@@ -498,7 +538,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     }
                 } else if section.type == "Event" {
                     dispatchGroup.enter()
-                    Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0) { (search, err) in
+                    Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "", lat: lat, long: lon) { (search, err) in
                         dispatchGroup.leave()
                         if let object = search?.embedded?.events {
                             self.groups[section] = object
@@ -508,7 +548,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     }
                 } else if section.type == "SygicPlace" {
                     dispatchGroup.enter()
-                    Service.shared.fetchSygicPlacesLatLong(limit: "30", offset: "", query: "", categories: ["discovering", "sightseeing"], categories_not: [], parent_place_id: "", place_ids: "", tags: "", tags_not: "", prefer_unique: "", city: "", stateCode: "", countryCode: "", lat: self.locationManager.location?.coordinate.latitude ?? 0.0, long: self.locationManager.location?.coordinate.longitude ?? 0.0, radius: "1000") { (search, err) in
+                    Service.shared.fetchSygicPlacesLatLong(limit: "30", offset: "", query: "", categories: ["discovering", "sightseeing"], categories_not: [], parent_place_id: "", place_ids: "", tags: "", tags_not: "", prefer_unique: "", city: "", stateCode: "", countryCode: "", lat: lat, long: lon, radius: "1000") { (search, err) in
                         dispatchGroup.leave()
                         if let object = search?.data?.places {
                             self.groups[section] = object
@@ -708,6 +748,8 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             let destination = EventTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -736,6 +778,8 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             let destination = EventTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -750,6 +794,8 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             let destination = FoodTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -764,6 +810,8 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             let destination = NightlifeTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -778,6 +826,8 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             let destination = SightseeingTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -792,6 +842,8 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             let destination = RecreationTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -806,6 +858,8 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             let destination = ShoppingTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
@@ -1256,6 +1310,23 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             }
         }
     }
+    
+    func mapButtonTapped(type: Any) {
+        var locationAddress = [String : [Double]]()
+        if let event = type as? Event {
+            if let add = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let lat = Double(latitude), let longitude = event.embedded?.venues?[0].location?.longitude, let lon = Double(longitude) {
+                locationAddress[add] = [lat, lon]
+            }
+        } else if let place = type as? FSVenue {
+            if let location = place.location, let add = location.address, let lat = location.lat, let lon = location.lng {
+                locationAddress[add] = [lat, lon]
+            }
+        }
+        
+        let destination = MapActivityViewController()
+        destination.locationAddress = locationAddress
+        navigationController?.pushViewController(destination, animated: true)
+    }
 }
 
 extension ActivityTypeViewController: ChooseActivityDelegate {
@@ -1321,6 +1392,18 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
                 (self.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
                 self.tabBarController?.selectedIndex = 1
             }
+        }
+    }
+}
+
+extension ActivityTypeViewController: UpdateLocationDelegate {
+    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
+        for (_, value) in locationAddress {
+            lat = value[0]
+            lon = value[1]
+            groups = [ActivitySection: [AnyHashable]]()
+            groups[.custom] = customTypes
+            fetchData()
         }
     }
 }

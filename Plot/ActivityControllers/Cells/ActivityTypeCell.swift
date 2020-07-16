@@ -12,6 +12,7 @@ protocol ActivityTypeCellDelegate: class {
     func plusButtonTapped(type: Any)
     func shareButtonTapped(activityObject: ActivityObject)
     func heartButtonTapped(type: Any)
+    func mapButtonTapped(type: Any)
 }
 
 class ActivityTypeCell: UICollectionViewCell {
@@ -122,9 +123,7 @@ class ActivityTypeCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-//        FavActDelegate.delegate = self
-//        falconUsersFetcher.delegate = self
-//        setupViews()
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -153,6 +152,14 @@ class ActivityTypeCell: UICollectionViewCell {
     let plusButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "plus"), for: .normal)
+        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let mapButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "map"), for: .normal)
         button.tintColor = ThemeManager.currentTheme().generalTitleColor
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -206,10 +213,13 @@ class ActivityTypeCell: UICollectionViewCell {
         plusButton.constrainWidth(35)
         plusButton.constrainHeight(35)
         
+        mapButton.constrainWidth(35)
+        mapButton.constrainHeight(35)
+        
         imageView.constrainWidth(75)
         imageView.constrainHeight(75)
         
-        let buttonStackView = UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()])
+        let buttonStackView = UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, mapButton, UIView()])
         buttonStackView.spacing = 2
         
         let stackView = UIStackView(arrangedSubviews: [imageView, VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, buttonStackView], spacing: 2)])
@@ -219,26 +229,11 @@ class ActivityTypeCell: UICollectionViewCell {
         
         addSubview(stackView)
         stackView.fillSuperview()
-
-//        imageView.constrainHeight(231)
-        
-
-//        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, UIView()], spacing: 0)
-//        labelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
-//        labelStackView.isLayoutMarginsRelativeArrangement = true
-//
-//        let stackView = VerticalStackView(arrangedSubviews: [
-//            imageView,
-//            UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView()]),
-//            labelStackView
-//            ], spacing: 2)
-//        addSubview(stackView)
-//        stackView.fillSuperview(padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
         heartButton.addTarget(self, action: #selector(heartButtonTapped), for: .touchUpInside)
-        
+        mapButton.addTarget(self, action: #selector(mapButtonTapped), for: .touchUpInside)
 
     }
     
@@ -248,6 +243,8 @@ class ActivityTypeCell: UICollectionViewCell {
         plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        mapButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        mapButton.isHidden = false
     }
 
     
@@ -395,6 +392,16 @@ class ActivityTypeCell: UICollectionViewCell {
             self.delegate?.heartButtonTapped(type: fsVenue)
         }
         
+    }
+    
+    @objc func mapButtonTapped() {
+        if let event = event {
+            self.delegate?.mapButtonTapped(type: event)
+        } else if let attraction = attraction {
+            self.delegate?.mapButtonTapped(type: attraction)
+        } else if let fsVenue = fsVenue {
+            self.delegate?.mapButtonTapped(type: fsVenue)
+        }
     }
 
 }

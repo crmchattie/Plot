@@ -777,7 +777,7 @@ class CreateActivityViewController: FormViewController {
     form +++
         MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                            header: "Lists",
-                           footer: "Add a checklist and/or recipe list") {
+                           footer: "Add a checklist, activity list and/or recipe list") {
                             $0.tag = "listsfields"
                             $0.hidden = "$sections != 'Lists'"
                             $0.addButtonProvider = { section in
@@ -1128,6 +1128,22 @@ class CreateActivityViewController: FormViewController {
                 })
             }
         }
+        if activity.activitylistIDs != nil {
+            for activitylistID in activity.activitylistIDs! {
+                dispatchGroup.enter()
+                let activitylistDataReference = Database.database().reference().child(activitylistsEntity).child(activitylistID)
+                activitylistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let activitylistSnapshotValue = snapshot.value {
+                        if let activitylist = try? FirebaseDecoder().decode(Activitylist.self, from: activitylistSnapshotValue) {
+                            var list = ListContainer()
+                            list.activitylist = activitylist
+                            self.listList.append(list)
+                        }
+                    }
+                    self.dispatchGroup.leave()
+                })
+            }
+        }
          dispatchGroup.notify(queue: .main) {
             self.listRow()
         }
@@ -1160,6 +1176,21 @@ class CreateActivityViewController: FormViewController {
                     row.cell.textLabel?.textAlignment = .left
                     row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.title = checklist.name
+                    }.onCellSelection({ cell, row in
+                        self.listIndex = row.indexPath!.row
+                        self.openList()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: mvs.count - 1)
+            } else if let activitylist = list.activitylist {
+                var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.title = activitylist.name
                     }.onCellSelection({ cell, row in
                         self.listIndex = row.indexPath!.row
                         self.openList()
@@ -1313,9 +1344,12 @@ class CreateActivityViewController: FormViewController {
                 groupActivityReference.child("grocerylistID").removeValue()
                 activity.packinglistIDs = nil
                 groupActivityReference.child("packinglistIDs").removeValue()
+                activity.activitylistIDs = nil
+                groupActivityReference.child("activitylistIDs").removeValue()
             } else {
                 var checklistIDs = [String]()
                 var packinglistIDs = [String]()
+                var activitylistIDs = [String]()
                 var grocerylistID = "nothing"
                 for list in listList {
                     if let checklist = list.checklist {
@@ -1324,6 +1358,8 @@ class CreateActivityViewController: FormViewController {
                         packinglistIDs.append(packinglist.ID!)
                     } else if let grocerylist = list.grocerylist {
                         grocerylistID = grocerylist.ID!
+                    } else if let activitylist = list.activitylist {
+                        activitylistIDs.append(activitylist.ID!)
                     }
                 }
                 if !checklistIDs.isEmpty {
@@ -1332,6 +1368,13 @@ class CreateActivityViewController: FormViewController {
                 } else {
                     activity.checklistIDs = nil
                     groupActivityReference.child("checklistIDs").removeValue()
+                }
+                if !activitylistIDs.isEmpty {
+                    activity.activitylistIDs = activitylistIDs
+                    groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
+                } else {
+                    activity.activitylistIDs = nil
+                    groupActivityReference.child("activitylistIDs").removeValue()
                 }
                 if grocerylistID != "nothing" {
                     activity.grocerylistID = grocerylistID
@@ -1673,6 +1716,11 @@ class CreateActivityViewController: FormViewController {
             destination.checklist = checklist
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
+        } else if listList.indices.contains(listIndex), let activitylist = listList[listIndex].activitylist {
+            let destination = ActivitylistViewController()
+            destination.activitylist = activitylist
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
         } else if listList.indices.contains(listIndex), let packinglist = listList[listIndex].packinglist {
             let destination = PackinglistViewController()
             destination.packinglist = packinglist
@@ -1702,6 +1750,11 @@ class CreateActivityViewController: FormViewController {
                 destination.delegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             }
+            let activityList = UIAlertAction(title: "Activity List", style: .default) { (action:UIAlertAction) in
+                let destination = ActivitylistViewController()
+                destination.delegate = self
+                self.navigationController?.pushViewController(destination, animated: true)
+            }
             let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
                 print("You've pressed cancel")
                 if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
@@ -1712,14 +1765,17 @@ class CreateActivityViewController: FormViewController {
             
             if activity.grocerylistID == nil {
                 alertController.addAction(groceryList)
+                alertController.addAction(activityList)
 //                alertController.addAction(packingList)
                 alertController.addAction(checkList)
                 alertController.addAction(cancelAlert)
                 self.present(alertController, animated: true, completion: nil)
             } else {
-                let destination = ChecklistViewController()
-                destination.delegate = self
-                self.navigationController?.pushViewController(destination, animated: true)
+                alertController.addAction(activityList)
+//                alertController.addAction(packingList)
+                alertController.addAction(checkList)
+                alertController.addAction(cancelAlert)
+                self.present(alertController, animated: true, completion: nil)
             }
         }
     }
@@ -2390,6 +2446,30 @@ extension CreateActivityViewController: UpdateChecklistDelegate {
     }
 }
 
+extension CreateActivityViewController: UpdateActivitylistDelegate {
+    func updateActivitylist(activitylist: Activitylist) {
+        if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+            let listRow = mvs.allRows[listIndex]
+            if activitylist.name != "ActivityListName" {
+                listRow.baseValue = activitylist
+                listRow.title = activitylist.name
+                listRow.updateCell()
+                if listList.indices.contains(listIndex) {
+                    listList[listIndex].activitylist = activitylist
+                } else {
+                    var list = ListContainer()
+                    list.activitylist = activitylist
+                    listList.append(list)
+                }
+                updateLists(type: "lists")
+            }
+            else {
+                mvs.remove(at: listIndex)
+            }
+        }
+    }
+}
+
 extension CreateActivityViewController: UpdatePackinglistDelegate {
     func updatePackinglist(packinglist: Packinglist) {
         if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
@@ -2452,7 +2532,7 @@ extension CreateActivityViewController: UpdateActivityMediaDelegate {
 }
 
 extension CreateActivityViewController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?) {
+    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
         if let activityID = activityID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
@@ -2490,6 +2570,20 @@ extension CreateActivityViewController: ChooseChatDelegate {
                     }
                     for ID in activity.checklistIDs! {
                         Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
+
+                    }
+                }
+                if activity.activitylistIDs != nil {
+                    if conversation.activitylists != nil {
+                        let activitylists = conversation.activitylists! + activity.activitylistIDs!
+                        let updatedActivitylists = [activitylistsEntity: activitylists as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
+                    } else {
+                        let updatedActivitylists = [activitylistsEntity: activity.activitylistIDs! as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
+                    }
+                    for ID in activity.activitylistIDs! {
+                        Database.database().reference().child(activitylistsEntity).child(ID).updateChildValues(updatedConversationID)
 
                     }
                 }
