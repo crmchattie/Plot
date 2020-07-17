@@ -14,13 +14,10 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
     var sections: [ActivitySection] = [.american, .italian, .vegetarian, .mexican, .breakfast, .dessert]
     var groups = [ActivitySection: [Recipe]]()
     var searchActivities = [Recipe]()
-    fileprivate var movingBackwards: Bool = true
 
     var filters: [filter] = [.cuisine, .excludeCuisine, .diet, .intolerances, .recipeType]
     var filterDictionary = [String: [String]]()
-    
-    weak var recipeDelegate : UpdateRecipeDelegate?
-        
+            
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -39,7 +36,9 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
         super.viewWillDisappear(animated)
         
         if self.movingBackwards {
-            self.recipeDelegate?.updateRecipe(recipe: nil)
+            if listType == "grocery" {
+                self.listDelegate?.updateRecipe(recipe: nil)
+            }
         }
     }
     
@@ -128,45 +127,44 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        movingBackwards = false
         let object = diffableDataSource.itemIdentifier(for: indexPath)
         if let activityType = object as? ActivityType {
             let activityTypeName = activityType.rawValue
-                switch activityTypeName {
-                case "basic":
-                    print("basic")
-                    if let activity = self.umbrellaActivity {
-                        let destination = ScheduleViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.delegate = self
-                        destination.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
-                        destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    } else {
-                        let destination = CreateActivityViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.conversations = self.conversations
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    }
-                case "flight":
-                    print("flight")
-                    let destination = FlightSearchViewController()
+            switch activityTypeName {
+            case "basic":
+                print("basic")
+                if let activity = self.umbrellaActivity {
+                    let destination = ScheduleViewController()
+                    destination.hidesBottomBarWhenPushed = true
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    destination.delegate = self
+                    destination.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
+                    destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let destination = CreateActivityViewController()
                     destination.hidesBottomBarWhenPushed = true
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
                     destination.conversations = self.conversations
                     self.navigationController?.pushViewController(destination, animated: true)
-                case "meal":
-                    print("meal")
-                case "workout":
-                    print("workout")
-                default:
-                    print("default")
                 }
+            case "flight":
+                print("flight")
+                let destination = FlightSearchViewController()
+                destination.hidesBottomBarWhenPushed = true
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.conversations = self.conversations
+                self.navigationController?.pushViewController(destination, animated: true)
+            case "meal":
+                print("meal")
+            case "workout":
+                print("workout")
+            default:
+                print("default")
+            }
         } else if let recipe = object as? Recipe {
             print("meal \(recipe.title)")
             let destination = RecipeDetailViewController()
@@ -178,9 +176,11 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
             destination.conversations = self.conversations
             destination.activities = self.activities
             destination.conversation = self.conversation
+            destination.listList = self.listList
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let event = object as? Event {
             print("event \(String(describing: event.name))")
@@ -191,11 +191,13 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let workout = object as? Workout {
             print("workout \(String(describing: workout.title))")
@@ -207,11 +209,13 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let attraction = object as? Attraction {
             print("attraction \(String(describing: attraction.name))")
@@ -222,11 +226,47 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if let place = object as? FSVenue {
+            print("place.id \(String(describing: place.id))")
+            let destination = PlaceDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.placeID = place.id
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.listList = self.listList
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if let groupItem = object as? GroupItem, let place = groupItem.venue {
+            print("place.id \(String(describing: place.id))")
+            let destination = PlaceDetailViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.placeID = place.id
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.conversations = self.conversations
+            destination.listList = self.listList
+            destination.activities = self.activities
+            destination.conversation = self.conversation
+            destination.schedule = self.schedule
+            destination.umbrellaActivity = self.umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             print("neither meals or events")
@@ -456,30 +496,19 @@ extension RecipeTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
         
-        if activeRecipe {
-            if let recipe = type as? Recipe {
-                var updatedRecipe = recipe
-                if updatedRecipe.title.contains("/") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "/", with: "")
-                }
-                if updatedRecipe.title.contains(".") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: ".", with: "")
-                }
-                if updatedRecipe.title.contains("#") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "#", with: "")
-                }
-                if updatedRecipe.title.contains("$") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "$", with: "")
-                }
-                if updatedRecipe.title.contains("[") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "[", with: "")
-                }
-                if updatedRecipe.title.contains("]") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "]", with: "")
-                }
+        if activeList {
+            if let object = type as? Recipe {
+                var updatedObject = object
+                updatedObject.title = updatedObject.title.removeCharacters()
                 self.movingBackwards = false
-                self.recipeDelegate!.updateRecipe(recipe: recipe)
-                self.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
+                
+                if listType == "grocery" {
+                    self.listDelegate!.updateRecipe(recipe: updatedObject)
+                    self.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
+                } else {
+                    self.listDelegate!.updateList(recipe: updatedObject, workout: nil, event: nil, place: nil)
+                    self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+                }
             }
             return
         }
@@ -610,25 +639,7 @@ extension RecipeTypeViewController: ActivityTypeCellDelegate {
             activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
             if let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
-                var newLocationName = locationName
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = locationName.removeCharacters()
                 activity.locationName = newLocationName
                 activity.locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
             }
@@ -661,25 +672,7 @@ extension RecipeTypeViewController: ActivityTypeCellDelegate {
                 endDateTime = rounded.addingTimeInterval(seconds)
             }
             if let locationName = place.location?.address, let latitude = place.location?.lat, let longitude = place.location?.lng {
-                var newLocationName = locationName
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = locationName.removeCharacters()
                 activity.locationName = newLocationName
                 activity.locationAddress = [newLocationName: [latitude, longitude]]
             }
@@ -961,12 +954,6 @@ extension RecipeTypeViewController: UpdateFilter {
         }
     }
         
-}
-
-extension RecipeTypeViewController: UpdateRecipeDelegate {
-    func updateRecipe(recipe: Recipe?) {
-        self.recipeDelegate?.updateRecipe(recipe: recipe)
-    }
 }
 
 extension RecipeTypeViewController: ChooseActivityDelegate {

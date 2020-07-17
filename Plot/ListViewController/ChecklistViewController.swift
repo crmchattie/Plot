@@ -67,8 +67,8 @@ class ChecklistViewController: FormViewController {
             }
             resetBadgeForSelf()
         } else {
+            self.navigationItem.rightBarButtonItem?.isEnabled = false
             if let currentUserID = Auth.auth().currentUser?.uid {
-                self.navigationItem.rightBarButtonItem?.isEnabled = false
                 let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
                 checklist = Checklist(dictionary: ["ID": ID as AnyObject])
                 checklist.name = "CheckListName"

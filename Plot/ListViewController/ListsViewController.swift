@@ -510,6 +510,37 @@ extension ListsViewController: ListViewControllerDataStore {
                 self.participants[ID] = participants
                 completion(participants)
             }
+        } else if let activitylist = activitylist, let ID = activitylist.ID, let participantsIDs = activitylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if activitylist.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
         } else if let packinglist = packinglist, let ID = packinglist.ID, let participantsIDs = packinglist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             let olderParticipants = self.participants[ID]

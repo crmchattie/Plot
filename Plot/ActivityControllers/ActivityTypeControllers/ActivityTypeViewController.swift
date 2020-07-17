@@ -12,10 +12,15 @@ import Firebase
 import CodableFirebase
 import SwiftUI
 
+protocol UpdateListDelegate: class {
+    func updateRecipe(recipe: Recipe?)
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?)
+}
+
 class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, CLLocationManagerDelegate {
     
     weak var delegate : UpdateScheduleDelegate?
-    weak var recipeDelegate : UpdateRecipeDelegate?
+    weak var listDelegate : UpdateListDelegate?
     
     fileprivate var reference: DatabaseReference!
     
@@ -43,9 +48,11 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var activities = [Activity]()
     var conversations = [Conversation]()
     var conversation: Conversation?
+    var listList = [ListContainer]()
     
     var activity: Activity!
-    var activeRecipe: Bool = false
+    var activeList: Bool = false
+    var listType: String?
     
     var startDateTime: Date?
     var endDateTime: Date?
@@ -169,6 +176,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         if movingBackwards && navigationController?.visibleViewController is CreateActivityViewController {
             let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
             delegate?.updateSchedule(schedule: activity)
+        } else if movingBackwards && activeList && navigationController?.visibleViewController is ActivitylistViewController {
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: nil)
         }
         
     }
@@ -405,9 +414,11 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.conversations = self.conversations
             destination.activities = self.activities
             destination.conversation = self.conversation
+            destination.listList = self.listList
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let event = object as? Event {
             print("event \(String(describing: event.name))")
@@ -418,11 +429,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let workout = object as? Workout {
             print("workout \(String(describing: workout.title))")
@@ -434,11 +447,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let attraction = object as? Attraction {
             print("attraction \(String(describing: attraction.name))")
@@ -449,11 +464,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let place = object as? FSVenue {
             print("place.id \(String(describing: place.id))")
@@ -464,11 +481,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let groupItem = object as? GroupItem, let place = groupItem.venue {
             print("place.id \(String(describing: place.id))")
@@ -479,11 +498,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             print("neither meals or events")
@@ -738,10 +759,12 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             destination.activities = activities
+            destination.listList = listList
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Events":
             print("Event")
@@ -754,10 +777,12 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             destination.activities = activities
+            destination.listList = listList
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Workouts":
             print("Workouts")
@@ -768,10 +793,12 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             destination.activities = activities
+            destination.listList = listList
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Attractions":
             print("Attractions")
@@ -784,10 +811,12 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             destination.activities = activities
+            destination.listList = listList
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Food":
             print("Food")
@@ -800,10 +829,12 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             destination.activities = activities
+            destination.listList = listList
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Nightlife":
             print("Nightlife")
@@ -816,10 +847,12 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             destination.activities = activities
+            destination.listList = listList
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Sightseeing":
             print("Sightseeing")
@@ -832,10 +865,12 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             destination.activities = activities
+            destination.listList = listList
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Recreation":
             print("Recreation")
@@ -848,10 +883,12 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             destination.activities = activities
+            destination.listList = listList
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             navigationController?.pushViewController(destination, animated: true)
         case "Shopping":
             print("Shopping")
@@ -864,10 +901,12 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
             destination.filteredUsers = filteredUsers
             destination.conversations = conversations
             destination.activities = activities
+            destination.listList = listList
             destination.conversation = conversation
             destination.schedule = schedule
             destination.umbrellaActivity = umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             navigationController?.pushViewController(destination, animated: true)
         default:
             print("Default")
@@ -888,9 +927,54 @@ extension ActivityTypeViewController: UpdateScheduleDelegate {
     }
 }
 
+extension ActivityTypeViewController: UpdateListDelegate {
+    func updateRecipe(recipe: Recipe?) {
+        self.listDelegate?.updateRecipe(recipe: recipe)
+    }
+    
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?) {
+        if let object = recipe {
+            self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil)
+        } else if let object = workout {
+            self.listDelegate?.updateList(recipe: nil, workout: object, event: nil, place: nil)
+        } else if let object = event {
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: object, place: nil)
+        } else if let object = place {
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: object)
+        }
+    }
+}
+
 extension ActivityTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
+        if activeList {
+            self.movingBackwards = false
+            if let object = type as? Recipe {
+                var updatedObject = object
+                updatedObject.title = updatedObject.title.removeCharacters()
+                self.listDelegate!.updateList(recipe: updatedObject, workout: nil, event: nil, place: nil)
+                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+            } else if let object = type as? Event {
+                var updatedObject = object
+                updatedObject.name = updatedObject.name.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: updatedObject, place: nil)
+                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+            } else if let object = type as? Workout {
+                var updatedObject = object
+                updatedObject.title = updatedObject.title.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil)
+                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+            } else if let object = type as? FSVenue {
+                var updatedObject = object
+                updatedObject.name = updatedObject.name.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject)
+                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+            }
+            
+            return
+        }
+        
         if schedule {
             let activityID = UUID().uuidString
             activity = Activity(dictionary: ["activityID": activityID as AnyObject])
@@ -1016,25 +1100,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
             if let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
-                var newLocationName = locationName
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = locationName.removeCharacters()
                 activity.locationName = newLocationName
                 activity.locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
             }
@@ -1067,25 +1133,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 endDateTime = rounded.addingTimeInterval(seconds)
             }
             if let locationName = place.location?.address, let latitude = place.location?.lat, let longitude = place.location?.lng {
-                var newLocationName = locationName
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = locationName.removeCharacters()
                 activity.locationName = newLocationName
                 activity.locationAddress = [newLocationName: [latitude, longitude]]
             }

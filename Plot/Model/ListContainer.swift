@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ListContainer: Codable {
+struct ListContainer: Codable, Equatable {
     
     var grocerylist: Grocerylist?
     var checklist: Checklist?

@@ -756,25 +756,7 @@ extension ScheduleViewController: UpdateLocationDelegate {
                 self.schedule.locationAddress![self.locationName] = nil
             }
             for (key, value) in locationAddress {
-                var newLocationName = key
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = key.removeCharacters()
                 locationRow.title = newLocationName
                 locationRow.updateCell()
 

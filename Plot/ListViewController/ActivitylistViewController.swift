@@ -10,15 +10,16 @@ import UIKit
 import Eureka
 import SplitRow
 import Firebase
+import CodableFirebase
 
 protocol UpdateActivitylistDelegate: class {
     func updateActivitylist(activitylist: Activitylist)
 }
 
 class ActivitylistViewController: FormViewController {
-          
+    
     weak var delegate : UpdateActivitylistDelegate?
-        
+    
     var activitylist: Activitylist!
     
     var users = [User]()
@@ -38,17 +39,19 @@ class ActivitylistViewController: FormViewController {
     var connectedToAct = true
     var comingFromLists = false
     
+    fileprivate var activityIndex: Int = 0
+    fileprivate var activityName: String = ""
+    
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
-                
+    
     override func viewDidLoad() {
-    super.viewDidLoad()
+        super.viewDidLoad()
         
         configureTableView()
-                
+        
         if activitylist != nil {
             active = true
-            self.navigationItem.rightBarButtonItem?.isEnabled = true
             var participantCount = self.selectedFalconUsers.count
             // If user is creating this activity (admin)
             if activitylist.admin == nil || activitylist.admin == Auth.auth().currentUser?.uid {
@@ -68,7 +71,6 @@ class ActivitylistViewController: FormViewController {
             resetBadgeForSelf()
         } else {
             if let currentUserID = Auth.auth().currentUser?.uid {
-                self.navigationItem.rightBarButtonItem?.isEnabled = false
                 let ID = Database.database().reference().child(userActivitylistsEntity).child(currentUserID).childByAutoId().key ?? ""
                 activitylist = Activitylist(dictionary: ["ID": ID as AnyObject])
                 activitylist.name = "ActivityListName"
@@ -76,7 +78,7 @@ class ActivitylistViewController: FormViewController {
             }
         }
         setupRightBarButton()
-
+        
         initializeForm()
         
     }
@@ -85,22 +87,21 @@ class ActivitylistViewController: FormViewController {
         super.viewWillDisappear(animated)
         
         if self.movingBackwards && !comingFromLists {
-            updateLists()
             delegate?.updateActivitylist(activitylist: activitylist)
         }
     }
-
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
     }
-  
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         guard tableView.isEditing else { return }
         tableView.endEditing(true)
         tableView.reloadData()
     }
-
+    
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -110,7 +111,7 @@ class ActivitylistViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Activitylist"
+        navigationItem.title = "Activity List"
     }
     
     func setupRightBarButton() {
@@ -125,7 +126,7 @@ class ActivitylistViewController: FormViewController {
                 let dotsBarButton = UIButton(type: .system)
                 dotsBarButton.setImage(dotsImage, for: .normal)
                 dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-                                
+                
                 navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
             } else {
                 let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
@@ -137,7 +138,6 @@ class ActivitylistViewController: FormViewController {
     
     @objc fileprivate func close() {
         movingBackwards = false
-        updateLists()
         if !comingFromLists {
             if let activity = activity {
                 activitylist.activityID = activity.activityID
@@ -149,13 +149,13 @@ class ActivitylistViewController: FormViewController {
             delegate?.updateActivitylist(activitylist: activitylist)
             self.navigationController?.popViewController(animated: true)
         }
-                
+        
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         if active, !connectedToAct {
             alert.addAction(UIAlertAction(title: "Update Activity List", style: .default, handler: { (_) in
                 print("User click Approve button")
-                                
+                
                 // update
                 self.showActivityIndicator()
                 let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
@@ -174,7 +174,7 @@ class ActivitylistViewController: FormViewController {
                     return
                 }
                 
-                            
+                
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     self.showActivityIndicator()
                     let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
@@ -196,12 +196,12 @@ class ActivitylistViewController: FormViewController {
                     self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 }
                 
-
+                
             }))
             
             alert.addAction(UIAlertAction(title: "Add to Activity", style: .default, handler: { (_) in
                 print("User click Edit button")
-                                    
+                
                 // ChooseActivityTableViewController
                 let destination = ChooseActivityTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
@@ -210,14 +210,14 @@ class ActivitylistViewController: FormViewController {
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
                 self.present(navController, animated: true, completion: nil)
-            
+                
             }))
             
             alert.addAction(UIAlertAction(title: "Duplicate & Add to Activity", style: .default, handler: { (_) in
                 print("User click Edit button")
                 
                 if let currentUserID = Auth.auth().currentUser?.uid {
-                                            
+                    
                     //duplicate activity as if it never was deleted aka leave admin and participants intact
                     let newActivitylistID = Database.database().reference().child(userActivitylistsEntity).child(currentUserID).childByAutoId().key ?? ""
                     let newActivitylist = self.activitylist.copy() as! Activitylist
@@ -237,29 +237,29 @@ class ActivitylistViewController: FormViewController {
                     destination.filteredActivities = self.activities
                     self.present(navController, animated: true, completion: nil)
                 }
-            
+                
             }))
             
         } else if connectedToAct {
-            alert.addAction(UIAlertAction(title: "Update Activitylist", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Update Activity List", style: .default, handler: { (_) in
                 print("User click Approve button")
                 
-                    self.showActivityIndicator()
-                    let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    createActivitylist.createNewActivitylist()
-                    self.hideActivityIndicator()
-                    
-                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                self.showActivityIndicator()
+                let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createActivitylist.createNewActivitylist()
+                self.hideActivityIndicator()
+                
+                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
             }))
             
-            alert.addAction(UIAlertAction(title: "Duplicate Activitylist", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Duplicate Activity List", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new activitylist with updated time
                 guard self.currentReachabilityStatus != .notReachable else {
                     basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
                     return
                 }
-                            
+                
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     self.showActivityIndicator()
                     let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
@@ -281,7 +281,7 @@ class ActivitylistViewController: FormViewController {
                     self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 }
                 
-
+                
             }))
             
             alert.addAction(UIAlertAction(title: "Copy to Another Activity", style: .default, handler: { (_) in
@@ -289,7 +289,7 @@ class ActivitylistViewController: FormViewController {
                 
                 let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createActivitylist.createNewActivitylist()
-                                    
+                
                 // ChooseActivityTableViewController
                 let destination = ChooseActivityTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
@@ -299,15 +299,15 @@ class ActivitylistViewController: FormViewController {
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
                 self.present(navController, animated: true, completion: nil)
-            
+                
             }))
             
             
         } else if !connectedToAct {
-            alert.addAction(UIAlertAction(title: "Create New Activitylist", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Create New Activity List", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new activity
-                                                        
+                
                 self.showActivityIndicator()
                 let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createActivitylist.createNewActivitylist()
@@ -319,7 +319,7 @@ class ActivitylistViewController: FormViewController {
             
             alert.addAction(UIAlertAction(title: "Add to Activity", style: .default, handler: { (_) in
                 print("User click Edit button")
-                                    
+                
                 // ChooseActivityTableViewController
                 let destination = ChooseActivityTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
@@ -328,15 +328,15 @@ class ActivitylistViewController: FormViewController {
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
                 self.present(navController, animated: true, completion: nil)
-            
+                
             }))
-
+            
         }
         
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
-
+        
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
@@ -348,16 +348,16 @@ class ActivitylistViewController: FormViewController {
         
         if connectedToAct {
             if activitylist.conversationID == nil {
-                alert.addAction(UIAlertAction(title: "Connect Activitylist/Activity to a Chat", style: .default, handler: { (_) in
+                alert.addAction(UIAlertAction(title: "Connect Activity List/Activity to a Chat", style: .default, handler: { (_) in
                     print("User click Approve button")
                     self.goToChat()
-
+                    
                 }))
             } else {
                 alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
                     print("User click Approve button")
                     self.goToChat()
-
+                    
                     
                 }))
             }
@@ -365,27 +365,27 @@ class ActivitylistViewController: FormViewController {
             alert.addAction(UIAlertAction(title: "Connect Activitylist to a Chat", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.goToChat()
-
+                
             }))
         } else {
             alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.goToChat()
-
+                
                 
             }))
         }
         
         
-//        alert.addAction(UIAlertAction(title: "Share Activitylist", style: .default, handler: { (_) in
-//            print("User click Edit button")
-//            self.share()
-//        }))
-
+        //        alert.addAction(UIAlertAction(title: "Share Activitylist", style: .default, handler: { (_) in
+        //            print("User click Edit button")
+        //            self.share()
+        //        }))
+        
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
-
+        
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
@@ -415,87 +415,89 @@ class ActivitylistViewController: FormViewController {
     }
     
     func share() {
-//        if let activity = activity, let name = activity.name {
-//            let imageName = "activityLarge"
-//            if let image = UIImage(named: imageName) {
-//                let data = compressImage(image: image)
-//                let aO = ["activityName": "\(name)",
-//                            "activityID": activityID,
-//                            "activityImageURL": "\(imageName)",
-//                            "object": data] as [String: AnyObject]
-//                let activityObject = ActivityObject(dictionary: aO)
-//
-//                let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-//
-//                alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
-//                    print("User click Approve button")
-//                    let destination = ChooseChatTableViewController()
-//                    let navController = UINavigationController(rootViewController: destination)
-//                    destination.activityObject = activityObject
-//                    destination.users = self.users
-//                    destination.filteredUsers = self.filteredUsers
-//                    destination.conversations = self.conversations
-//                    destination.filteredConversations = self.conversations
-//                    destination.filteredPinnedConversations = self.conversations
-//                    self.present(navController, animated: true, completion: nil)
-//
-//                }))
-//
-//                alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
-//                    print("User click Edit button")
-//                        // Fallback on earlier versions
-//                    let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
-//                    guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
-//                        else { return }
-//                    let shareContent: [Any] = [shareText, url]
-//                    let activityController = UIActivityViewController(activityItems: shareContent,
-//                                                                      applicationActivities: nil)
-//                    self.present(activityController, animated: true, completion: nil)
-//                    activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-//                    Bool, arrayReturnedItems: [Any]?, error: Error?) in
-//                        if completed {
-//                            print("share completed")
-//                            return
-//                        } else {
-//                            print("cancel")
-//                        }
-//                        if let shareError = error {
-//                            print("error while sharing: \(shareError.localizedDescription)")
-//                        }
-//                    }
-//
-//                }))
-//
-//
-//                alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-//                    print("User click Dismiss button")
-//                }))
-//
-//                self.present(alert, animated: true, completion: {
-//                    print("completion block")
-//                })
-//                print("shareButtonTapped")
-//            }
-//
-//
-//        }
+        //        if let activity = activity, let name = activity.name {
+        //            let imageName = "activityLarge"
+        //            if let image = UIImage(named: imageName) {
+        //                let data = compressImage(image: image)
+        //                let aO = ["activityName": "\(name)",
+        //                            "activityID": activityID,
+        //                            "activityImageURL": "\(imageName)",
+        //                            "object": data] as [String: AnyObject]
+        //                let activityObject = ActivityObject(dictionary: aO)
+        //
+        //                let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
+        //
+        //                alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+        //                    print("User click Approve button")
+        //                    let destination = ChooseChatTableViewController()
+        //                    let navController = UINavigationController(rootViewController: destination)
+        //                    destination.activityObject = activityObject
+        //                    destination.users = self.users
+        //                    destination.filteredUsers = self.filteredUsers
+        //                    destination.conversations = self.conversations
+        //                    destination.filteredConversations = self.conversations
+        //                    destination.filteredPinnedConversations = self.conversations
+        //                    self.present(navController, animated: true, completion: nil)
+        //
+        //                }))
+        //
+        //                alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+        //                    print("User click Edit button")
+        //                        // Fallback on earlier versions
+        //                    let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+        //                    guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+        //                        else { return }
+        //                    let shareContent: [Any] = [shareText, url]
+        //                    let activityController = UIActivityViewController(activityItems: shareContent,
+        //                                                                      applicationActivities: nil)
+        //                    self.present(activityController, animated: true, completion: nil)
+        //                    activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+        //                    Bool, arrayReturnedItems: [Any]?, error: Error?) in
+        //                        if completed {
+        //                            print("share completed")
+        //                            return
+        //                        } else {
+        //                            print("cancel")
+        //                        }
+        //                        if let shareError = error {
+        //                            print("error while sharing: \(shareError.localizedDescription)")
+        //                        }
+        //                    }
+        //
+        //                }))
+        //
+        //
+        //                alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        //                    print("User click Dismiss button")
+        //                }))
+        //
+        //                self.present(alert, animated: true, completion: {
+        //                    print("completion block")
+        //                })
+        //                print("shareButtonTapped")
+        //            }
+        //
+        //
+        //        }
         
     }
     
     func initializeForm() {
         form +++
-        Section()
+            Section()
             
-        <<< TextRow("Name") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-            $0.placeholder = $0.tag
-            if active, let activitylist = activitylist {
-                $0.value = activitylist.name
-            } else {
-                $0.cell.textField.becomeFirstResponder()
-            }
+            <<< TextRow("Name") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                if active, let activitylist = activitylist {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                    $0.value = activitylist.name
+                } else {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+                    $0.cell.textField.becomeFirstResponder()
+                }
             }.onChange() { [unowned self] row in
                 if let rowValue = row.value {
                     self.activitylist.name = rowValue
@@ -513,140 +515,280 @@ class ActivitylistViewController: FormViewController {
         
         if !connectedToAct {
             form.last!
-            <<< ButtonRow("Participants") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            row.cell.textLabel?.textAlignment = .left
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            row.cell.accessoryType = .disclosureIndicator
-            row.title = row.tag
-            if active {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.title = self.userNamesString
-            }
-            }.onCellSelection({ _,_ in
-                self.openParticipantsInviter()
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textLabel?.textAlignment = .left
-                if row.title == "Participants" {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                } else {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
+                <<< ButtonRow("Participants") { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    row.cell.accessoryType = .disclosureIndicator
+                    row.title = row.tag
+                    if active {
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        row.title = self.userNamesString
+                    }
+                }.onCellSelection({ _,_ in
+                    self.openParticipantsInviter()
+                }).cellUpdate { cell, row in
+                    cell.accessoryType = .disclosureIndicator
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textAlignment = .left
+                    if row.title == "Participants" {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    } else {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }
             }
         }
         
         form +++
-        MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-            header: "Activitylist",
-            footer: "Add a activitylist item") {
-            $0.tag = "activitylistfields"
-            $0.addButtonProvider = { section in
-                return ButtonRow(){
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    $0.title = "Add New Item"
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        cell.textLabel?.textAlignment = .left
-                        
-                }
-            }
-            $0.multivaluedRowToInsertAt = { index in
-                return SplitRow<TextRow, CheckRow>(){
-                    $0.rowLeftPercentage = 0.75
-                    $0.rowLeft = TextRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                        $0.placeholder = "Item"
-                        }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                    }
-                    
-                    $0.rowRight = CheckRow() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.cell.tintColor = FalconPalette.defaultBlue
-                        $0.value = false
-                        $0.cell.accessoryType = .checkmark
-                        $0.cell.tintAdjustmentMode = .dimmed
-                        }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.tintColor = FalconPalette.defaultBlue
-                            if row.value == false {
-                                cell.accessoryType = .checkmark
-                                cell.tintAdjustmentMode = .dimmed
-                            } else {
-                                cell.tintAdjustmentMode = .automatic
-                            }
-                    }
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    }.onChange() { _ in
-                        self.updateLists()
-                }
-                
-            }
-            
+            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                               header: "Activity List",
+                               footer: "Add a activitylist item") {
+                                $0.tag = "activitylistfields"
+                                $0.addButtonProvider = { section in
+                                    return ButtonRow(){
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.title = "Add New Activity"
+                                    }.cellUpdate { cell, row in
+                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        cell.textLabel?.textAlignment = .left
+                                        
+                                    }
+                                }
+                                $0.multivaluedRowToInsertAt = { index in
+                                    self.activityName = ""
+                                    self.activityIndex = index
+                                    self.openActivity()
+                                    return SplitRow<ButtonRow, CheckRow>(){ splitRow in
+                                        splitRow.rowLeftPercentage = 0.75
+                                        splitRow.rowLeft = ButtonRow(){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            $0.cell.textLabel?.textAlignment = .left
+                                            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                            $0.cell.textLabel?.numberOfLines = 0
+                                        }.onCellSelection({ cell, row in
+                                            self.activityName = row.title ?? ""
+                                            self.openActivity()
+                                        }).cellUpdate { cell, row in
+                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.textLabel?.textAlignment = .left
+                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                            cell.textLabel?.numberOfLines = 0
+                                        }
+                                        splitRow.rowRight = CheckRow() {
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            $0.cell.tintColor = FalconPalette.defaultBlue
+                                            $0.value = false
+                                            $0.cell.accessoryType = .checkmark
+                                            $0.cell.tintAdjustmentMode = .dimmed
+                                        }.cellUpdate { cell, row in
+                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.tintColor = FalconPalette.defaultBlue
+                                            if row.value == false {
+                                                cell.accessoryType = .checkmark
+                                                cell.tintAdjustmentMode = .dimmed
+                                            } else {
+                                                cell.tintAdjustmentMode = .automatic
+                                            }
+                                        }.onCellSelection({ (cell, row) in
+                                            if let title = splitRow.rowLeft?.title, self.activitylist.items![title] != nil {
+                                                self.activitylist.items![title] = row.value
+                                            }
+                                        })
+                                    }.cellUpdate { cell, row in
+                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                    }
+                                    
+                                }
+                                
         }
         
         if let items = self.activitylist.items {
-            for item in items {
+            for (key, value) in items {
                 var mvs = (form.sectionBy(tag: "activitylistfields") as! MultivaluedSection)
-                mvs.insert(SplitRow<TextRow, CheckRow>() {
-                    $0.rowLeftPercentage = 0.75
-                    $0.rowLeft = TextRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                        $0.value = item.key
-                        }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                mvs.insert(SplitRow<ButtonRow, CheckRow>() { splitRow in
+                    splitRow.rowLeftPercentage = 0.75
+                    splitRow.rowLeft = ButtonRow(){ row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.textLabel?.textAlignment = .left
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        row.cell.textLabel?.numberOfLines = 0
+                        row.title = key
+                        self.activityIndex = mvs.count - 1
+                        }.onCellSelection({ cell, row in
+                            self.activityName = key
+                            self.openActivity()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                        cell.textLabel?.numberOfLines = 0
                     }
-                    $0.rowRight = CheckRow() {
+                    splitRow.rowRight = CheckRow() {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         $0.cell.tintColor = FalconPalette.defaultBlue
-                        $0.value = item.value
+                        $0.value = value
                         $0.cell.accessoryType = .checkmark
                         $0.cell.tintAdjustmentMode = .dimmed
-                        }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.tintColor = FalconPalette.defaultBlue
-                            if row.value == false {
-                                cell.accessoryType = .checkmark
-                                cell.tintAdjustmentMode = .dimmed
-                            } else {
-                                cell.tintAdjustmentMode = .automatic
-                            }
-                    }
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    }.onChange() { _ in
-                        self.updateLists()
+                        cell.tintColor = FalconPalette.defaultBlue
+                        if row.value == false {
+                            cell.accessoryType = .checkmark
+                            cell.tintAdjustmentMode = .dimmed
+                        } else {
+                            cell.tintAdjustmentMode = .automatic
+                        }
+                    }.onCellSelection({ (cell, row) in
+                        self.activitylist.items![key] = row.value
+                    })
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 } , at: mvs.count - 1)
             }
         }
     }
     
-    fileprivate func updateLists() {
-            if let mvs = (form.values()["activitylistfields"] as? [Any?])?.compactMap({ $0 }) {
-                if !mvs.isEmpty {
-                    var activitylistDict = [String : Bool]()
-                    for element in mvs {
-                        let value = element as! SplitRowValue<Swift.String, Swift.Bool>
-                        if let text = value.left, let state = value.right {
-                            activitylistDict[text] = state
+    fileprivate func openActivity() {
+        print("activityName \(activityName)")
+        if activityName != "", let IDTypeDictionary = activitylist.IDTypeDictionary {
+            let name = activityName
+            print("name \(name)")
+            if let IDType = IDTypeDictionary[name] {
+                for (ID, type) in IDType {
+                    self.showActivityIndicator()
+                    print("ID \(ID)")
+                    print("type \(type)")
+                    let dispatchGroup = DispatchGroup()
+                    if type == "recipe" {
+                        dispatchGroup.enter()
+                        Service.shared.fetchRecipesInfo(id: Int(ID)!) { (search, err) in
+                            if let detailedRecipe = search {
+                                dispatchGroup.leave()
+                                dispatchGroup.notify(queue: .main) {
+                                    let destination = RecipeDetailViewController()
+                                    destination.recipe = detailedRecipe
+                                    destination.detailedRecipe = detailedRecipe
+                                    destination.activeList = true
+                                    destination.listType = "activity"
+                                    destination.listDelegate = self
+                                    self.hideActivityIndicator()
+                                    self.navigationController?.pushViewController(destination, animated: true)
+                                }
+                            } else {
+                                dispatchGroup.leave()
+                                dispatchGroup.notify(queue: .main) {
+                                    self.hideActivityIndicator()
+                                    self.activityNotFoundAlert()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                                        self.dismiss(animated: true, completion: nil)
+                                    })
+                                }
+                            }
+                        }
+                    } else if type == "workout" {
+                        print("workout type")
+                        var reference = Database.database().reference()
+                        dispatchGroup.enter()
+                        reference = Database.database().reference().child("workouts").child("workouts")
+                        reference.child(ID).observeSingleEvent(of: .value, with: { (snapshot) in
+                            print("snapshot workout type \(snapshot)")
+                            if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                                if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                    print("workout good")
+                                    dispatchGroup.leave()
+                                    let destination = WorkoutDetailViewController()
+                                    destination.workout = workout
+                                    destination.activeList = true
+                                    destination.listType = "activity"
+                                    destination.listDelegate = self
+                                    self.hideActivityIndicator()
+                                    self.navigationController?.pushViewController(destination, animated: true)
+                                }
+                            }
+                        })
+                        { (error) in
+                            print("workout bad")
+                            dispatchGroup.leave()
+                            self.hideActivityIndicator()
+                            print(error.localizedDescription)
+                        }
+                    } else if type == "event" {
+                        dispatchGroup.enter()
+                        Service.shared.fetchEventsSegment(size: "50", id: ID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
+                            if let events = search?.embedded?.events {
+                                let event = events[0]
+                                dispatchGroup.leave()
+                                dispatchGroup.notify(queue: .main) {
+                                    let destination = EventDetailViewController()
+                                    destination.event = event
+                                    destination.activeList = true
+                                    destination.listType = "activity"
+                                    destination.listDelegate = self
+                                    self.hideActivityIndicator()
+                                    self.navigationController?.pushViewController(destination, animated: true)
+                                }
+                            } else {
+                                dispatchGroup.leave()
+                                dispatchGroup.notify(queue: .main) {
+                                    self.hideActivityIndicator()
+                                    self.activityNotFoundAlert()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                                        self.dismiss(animated: true, completion: nil)
+                                    })
+                                }
+                            }
+                        }
+                    } else if type == "place" {
+                        dispatchGroup.enter()
+                        Service.shared.fetchFSDetails(id: ID) { (search, err) in
+                            if let place = search?.response?.venue {
+                                dispatchGroup.leave()
+                                dispatchGroup.notify(queue: .main) {
+                                    let destination = PlaceDetailViewController()
+                                    destination.hidesBottomBarWhenPushed = true
+                                    destination.place = place
+                                    destination.activeList = true
+                                    destination.listType = "activity"
+                                    destination.listDelegate = self
+                                    self.hideActivityIndicator()
+                                    self.navigationController?.pushViewController(destination, animated: true)
+                                }
+                            } else {
+                                dispatchGroup.leave()
+                                dispatchGroup.notify(queue: .main) {
+                                    self.hideActivityIndicator()
+                                    self.activityNotFoundAlert()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                                        self.dismiss(animated: true, completion: nil)
+                                    })
+                                }
+                            }
                         }
                     }
-                    self.activitylist.items = activitylistDict
-                } else {
-                    self.activitylist.items = nil
                 }
             }
+        } else {
+            let destination = ActivityTypeViewController()
+            destination.listDelegate = self
+            destination.activeList = true
+            self.hideActivityIndicator()
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
+    override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
+        super.rowsHaveBeenRemoved(rows, at: indexes)
+        let rowNumber : Int = indexes.first!.row
+        
+        DispatchQueue.main.async { [weak self] in
+            if let activities = self!.activitylist.items, rows[0].title != nil, let IDTypeDictionary = self!.activitylist.IDTypeDictionary {
+                let name = Array<String>(activities.keys)[rowNumber]
+                self!.activitylist.items![name] = nil
+                if IDTypeDictionary[name] != nil {
+                    self!.activitylist.IDTypeDictionary![name] = nil
+                }
+            }
+        }
     }
     
     @objc fileprivate func openParticipantsInviter() {
@@ -679,7 +821,7 @@ class ActivitylistViewController: FormViewController {
         }
         self.navigationController?.view.isUserInteractionEnabled = false
     }
-
+    
     func hideActivityIndicator() {
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
@@ -726,6 +868,63 @@ class ActivitylistViewController: FormViewController {
     }
 }
 
+extension ActivitylistViewController: UpdateListDelegate {
+    func updateRecipe(recipe: Recipe?) {
+        
+    }
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?) {
+        print("updating list")
+        if let mvs = self.form.sectionBy(tag: "activitylistfields") as? MultivaluedSection {
+            if let row = mvs.allRows[activityIndex] as? SplitRow<ButtonRow, CheckRow> {
+                if let object = recipe {
+                    row.rowLeft!.title = object.title
+                    row.updateCell()
+                    if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
+                        activitylist.items!["\(object.title)"] = false
+                        activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.id)":"recipe"]
+                    } else {
+                        activitylist.items = ["\(object.title)": false]
+                        activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.id)":"recipe"]]
+                    }
+                } else if let object = workout {
+                    row.rowLeft!.title = object.title
+                    row.updateCell()
+                    if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
+                        activitylist.items!["\(object.title)"] = false
+                        activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.identifier)":"workout"]
+                    } else {
+                        activitylist.items = ["\(object.title)": false]
+                        activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.identifier)":"workout"]]
+                    }
+                } else if let object = event {
+                    row.rowLeft!.title = object.name
+                    row.updateCell()
+                    if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
+                        activitylist.items!["\(object.name)"] = false
+                        activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"event"]
+                    } else {
+                        activitylist.items = ["\(object.name)": false]
+                        activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"event"]]
+                    }
+                } else if let object = place {
+                    row.rowLeft!.title = object.name
+                    row.updateCell()
+                    if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
+                        activitylist.items!["\(object.name)"] = false
+                        activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"place"]
+                    } else {
+                        activitylist.items = ["\(object.name)": false]
+                        activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"place"]]
+                    }
+                } else {
+                    print("object not found")
+                    mvs.remove(at: activityIndex)
+                }
+            }
+        }
+    }
+}
+
 extension ActivitylistViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
@@ -758,7 +957,7 @@ extension ActivitylistViewController: UpdateInvitees {
                 let createActivitylist = ActivitylistActions(activitylist: activitylist, active: active, selectedFalconUsers: selectedFalconUsers)
                 createActivitylist.updateActivitylistParticipants()
                 hideActivityIndicator()
-
+                
             }
             
         }
@@ -787,7 +986,7 @@ extension ActivitylistViewController: ChooseActivityDelegate {
                 newActivitylist.participantsIDs = mergeActivity.participantsIDs
                 newActivitylist.conversationID = mergeActivity.conversationID
                 newActivitylist.activityID = mergeActivity.activityID
-                                
+                
                 self.getSelectedFalconUsers(forActivitylist: activitylist) { (participants) in
                     self.showActivityIndicator()
                     let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: participants)
@@ -827,7 +1026,7 @@ extension ActivitylistViewController: ChooseChatDelegate {
         if let activitylistID = activitylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child(activitylistsEntity).child(activitylistID).updateChildValues(updatedConversationID)
-
+            
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activitylists != nil {
                     var activitylists = conversation.activitylists!

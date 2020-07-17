@@ -326,26 +326,27 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {
                             dispatchGroup.enter()
                             Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
-                                let detailedRecipe = search
-                                dispatchGroup.leave()
-                                dispatchGroup.notify(queue: .main) {
-                                    let destination = RecipeDetailViewController()
-                                    destination.hidesBottomBarWhenPushed = true
-                                    destination.recipe = detailedRecipe
-                                    destination.detailedRecipe = detailedRecipe
-                                    destination.activity = activity
-                                    self.getParticipants(forActivity: activity) { (participants) in
-                                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                                            destination.acceptedParticipant = acceptedParticipant
-                                            destination.selectedFalconUsers = participants
-                                            if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                                tabBarController.selectedIndex = 1
-                                                tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                                if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                                    homeNavigationController.pushViewController(destination, animated: true)
+                                if let detailedRecipe = search {
+                                    dispatchGroup.leave()
+                                    dispatchGroup.notify(queue: .main) {
+                                        let destination = RecipeDetailViewController()
+                                        destination.hidesBottomBarWhenPushed = true
+                                        destination.recipe = detailedRecipe
+                                        destination.detailedRecipe = detailedRecipe
+                                        destination.activity = activity
+                                        self.getParticipants(forActivity: activity) { (participants) in
+                                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                                destination.acceptedParticipant = acceptedParticipant
+                                                destination.selectedFalconUsers = participants
+                                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                                    tabBarController.selectedIndex = 1
+                                                    tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                                    if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                                        homeNavigationController.pushViewController(destination, animated: true)
+                                                        
+                                                    }
                                                     
                                                 }
-                                                
                                             }
                                         }
                                     }
@@ -417,25 +418,54 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         } else if let attractionID = activity.attractionID {
                             dispatchGroup.enter()
                             Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
-                                let attraction = search?.embedded?.attractions![0]
-                                dispatchGroup.leave()
-                                dispatchGroup.notify(queue: .main) {
-                                    let destination = EventDetailViewController()
-                                    destination.hidesBottomBarWhenPushed = true
-                                    destination.attraction = attraction
-                                    destination.activity = activity
-                                    self.getParticipants(forActivity: activity) { (participants) in
-                                        InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                                            destination.acceptedParticipant = acceptedParticipant
-                                            destination.selectedFalconUsers = participants
-                                            if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                                tabBarController.selectedIndex = 1
-                                                tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                                if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                                    homeNavigationController.pushViewController(destination, animated: true)
+                                if let attraction = search?.embedded?.attractions![0] {
+                                    dispatchGroup.leave()
+                                    dispatchGroup.notify(queue: .main) {
+                                        let destination = EventDetailViewController()
+                                        destination.hidesBottomBarWhenPushed = true
+                                        destination.attraction = attraction
+                                        destination.activity = activity
+                                        self.getParticipants(forActivity: activity) { (participants) in
+                                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                                destination.acceptedParticipant = acceptedParticipant
+                                                destination.selectedFalconUsers = participants
+                                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                                    tabBarController.selectedIndex = 1
+                                                    tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                                    if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                                        homeNavigationController.pushViewController(destination, animated: true)
+                                                        
+                                                    }
                                                     
                                                 }
-                                                
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else if let placeID = activity.placeID {
+                            dispatchGroup.enter()
+                            Service.shared.fetchFSDetails(id: placeID) { (search, err) in
+                                if let place = search?.response?.venue {
+                                    dispatchGroup.leave()
+                                    dispatchGroup.notify(queue: .main) {
+                                        let destination = PlaceDetailViewController()
+                                        destination.hidesBottomBarWhenPushed = true
+                                        destination.place = place
+                                        destination.activity = activity
+                                        self.getParticipants(forActivity: activity) { (participants) in
+                                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                                destination.acceptedParticipant = acceptedParticipant
+                                                destination.selectedFalconUsers = participants
+                                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                                    tabBarController.selectedIndex = 1
+                                                    tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                                    if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                                        homeNavigationController.pushViewController(destination, animated: true)
+                                                        
+                                                    }
+                                                    
+                                                }
                                             }
                                         }
                                     }

@@ -13,7 +13,9 @@ import MapKit
 
 class ActivityDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     var umbrellaActivity: Activity!
+    
     weak var delegate : UpdateScheduleDelegate?
+    weak var listDelegate : UpdateListDelegate?
 
     var activity: Activity!
     
@@ -25,6 +27,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     var acceptedParticipant: [User] = []
     var activities = [Activity]()
     var conversations = [Conversation]()
+    var listList = [ListContainer]()
     var conversation: Conversation?
     var favAct = [String: [String]]()
     
@@ -41,6 +44,9 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     
     var schedule: Bool = false
     var active: Bool = false
+    var activeList: Bool = false
+    var listType: String?
+    
     var activityID = String()
     
     let dispatchGroup = DispatchGroup()

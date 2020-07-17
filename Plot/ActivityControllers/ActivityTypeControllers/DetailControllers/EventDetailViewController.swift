@@ -28,7 +28,7 @@ class EventDetailViewController: ActivityDetailViewController {
         
         setActivity()
         
-        if !active {
+        if !active || !activeList {
             setMoreActivity()
         }
         
@@ -87,25 +87,7 @@ class EventDetailViewController: ActivityDetailViewController {
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
 
             if locationName == "Location", let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
-                var newLocationName = locationName
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = locationName.removeCharacters()
                 self.locationName = newLocationName
                 self.locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
                 activity.locationName = newLocationName
@@ -199,20 +181,35 @@ class EventDetailViewController: ActivityDetailViewController {
     }
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 4
+        if !activeList {
+            return 4
+        } else {
+            return 3
+        }
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 3 {
-            if let events = events {
-                return events.count
+        if !activeList {
+            if section == 3 {
+                if let events = events {
+                    return events.count
+                } else {
+                    return 0
+                }
             } else {
-                return 0
+                return 1
             }
         } else {
-            return 1
+            if section == 2 {
+                if let events = events {
+                    return events.count
+                } else {
+                    return 0
+                }
+            } else {
+                return 1
+            }
         }
-
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -239,7 +236,7 @@ class EventDetailViewController: ActivityDetailViewController {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kEventDetailCell, for: indexPath) as! EventDetailCell
             cell.delegate = self
             return cell
-        } else if indexPath.section == 2 {
+        } else if indexPath.section == 2 && !activeList {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
             cell.delegate = self
             if let event = event {
@@ -284,7 +281,7 @@ class EventDetailViewController: ActivityDetailViewController {
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 17))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.section == 2 {
+        } else if indexPath.section == 2 && !activeList {
             if secondSectionHeight == 0 {
                 let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
                 dummyCell.event = event
@@ -709,25 +706,7 @@ extension EventDetailViewController: UpdateLocationDelegate {
             self.activity.locationAddress![self.locationName] = nil
         }
         for (key, value) in locationAddress {
-            var newLocationName = key
-            if newLocationName.contains("/") {
-                newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-            }
-            if newLocationName.contains(".") {
-                newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-            }
-            if newLocationName.contains("#") {
-                newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-            }
-            if newLocationName.contains("$") {
-                newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-            }
-            if newLocationName.contains("[") {
-                newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-            }
-            if newLocationName.contains("]") {
-                newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-            }
+            let newLocationName = key.removeCharacters()
             self.locationName = newLocationName
             self.locationAddress[newLocationName] = value
             collectionView.reloadData()

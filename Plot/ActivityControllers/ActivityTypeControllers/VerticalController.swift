@@ -32,9 +32,9 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
     
     var umbrellaActivity: Activity!
     weak var delegate : UpdateScheduleDelegate?
-    weak var recipeDelegate : UpdateRecipeDelegate?
+    weak var listDelegate : UpdateListDelegate?
     var schedule: Bool = false
-    var activeRecipe: Bool = false
+    var activeList: Bool = false
     
     var startDateTime: Date?
     var endDateTime: Date?
@@ -290,27 +290,10 @@ extension VerticalController: ActivitySubTypeCellDelegate {
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
         
-        if activeRecipe {
+        if activeList {
             if let recipe = type as? Recipe {
                 var updatedRecipe = recipe
-                if updatedRecipe.title.contains("/") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "/", with: "")
-                }
-                if updatedRecipe.title.contains(".") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: ".", with: "")
-                }
-                if updatedRecipe.title.contains("#") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "#", with: "")
-                }
-                if updatedRecipe.title.contains("$") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "$", with: "")
-                }
-                if updatedRecipe.title.contains("[") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "[", with: "")
-                }
-                if updatedRecipe.title.contains("]") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "]", with: "")
-                }
+                updatedRecipe.title = updatedRecipe.title.removeCharacters()
                 self.recipeUpdate?(updatedRecipe)
             }
             return
@@ -443,25 +426,7 @@ extension VerticalController: ActivitySubTypeCellDelegate {
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
 
             if let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
-                var newLocationName = locationName
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = locationName.removeCharacters()
                 activity.locationName = newLocationName
                 activity.locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
             }

@@ -16,9 +16,8 @@ class Activitylist: NSObject, NSCopying, Codable {
     var name: String?
     var ID: String?
     var items: [String: Bool]?
-    var IDDictionary: [String: String]?
+    var IDTypeDictionary: [String: [String: String]]?
     var participantsIDs: [String]?
-    var activity: Activity?
     var activityID: String?
     var conversationID: String?
     var admin: String?
@@ -32,7 +31,7 @@ class Activitylist: NSObject, NSCopying, Codable {
         super.init()
         name = dictionary?["name"] as? String
         items = dictionary?["items"] as? [String: Bool]
-        IDDictionary = dictionary?["IDDictionary"] as? [String: String]
+        IDTypeDictionary = dictionary?["IDTypeDictionary"] as? [String: [String: String]]
         ID = dictionary?["ID"] as? String
         admin = dictionary?["admin"] as? String
         badge = dictionary?["badge"] as? Int
@@ -72,8 +71,8 @@ class Activitylist: NSObject, NSCopying, Codable {
             dictionary["items"] = value
         }
         
-        if let value = self.IDDictionary as AnyObject? {
-            dictionary["IDDictionary"] = value
+        if let value = self.IDTypeDictionary as AnyObject? {
+            dictionary["IDTypeDictionary"] = value
         }
         
         if let value = self.admin as AnyObject? {

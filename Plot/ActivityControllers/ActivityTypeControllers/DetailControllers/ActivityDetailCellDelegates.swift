@@ -21,32 +21,21 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
     }
     
     func plusButtonTapped() {
-        if activeRecipe {
-            if let recipe = self.detailedRecipe {
-                var updatedRecipe = recipe
-                if updatedRecipe.title.contains("/") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "/", with: "")
+        if activeList {
+            if let object = detailedRecipe {
+                var updatedObject = object
+                updatedObject.title = updatedObject.title.removeCharacters()
+                if listType == "grocery" {
+                    self.listDelegate!.updateRecipe(recipe: updatedObject)
+                    self.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
+                } else {
+                    self.listDelegate!.updateList(recipe: updatedObject, workout: nil, event: nil, place: nil)
+                    self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
                 }
-                if updatedRecipe.title.contains(".") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: ".", with: "")
-                }
-                if updatedRecipe.title.contains("#") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "#", with: "")
-                }
-                if updatedRecipe.title.contains("$") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "$", with: "")
-                }
-                if updatedRecipe.title.contains("[") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "[", with: "")
-                }
-                if updatedRecipe.title.contains("]") {
-                    updatedRecipe.title = updatedRecipe.title.replacingOccurrences(of: "]", with: "")
-                }
-                self.recipeDelegate?.updateRecipe(recipe: updatedRecipe)
-                self.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
-                return
             }
+            return
         }
+        
         if active, schedule, let activity = activity {
             
             let membersIDs = self.fetchMembersIDs()
@@ -502,6 +491,17 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
     }
     
     func plusButtonTapped() {
+        if activeList {
+            if let object = workout {
+                var updatedObject = object
+                updatedObject.title = updatedObject.title.removeCharacters()
+                
+                self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil)
+                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+            }
+            return
+        }
+        
         if active, schedule, let activity = activity {
             
             let membersIDs = self.fetchMembersIDs()
@@ -952,6 +952,16 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
     }
     
     func plusButtonTapped() {
+        if activeList {
+            if let object = event {
+                var updatedObject = object
+                updatedObject.name = updatedObject.name.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: updatedObject, place: nil)
+                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+            }
+            return
+        }
+        
         if active, schedule, let activity = activity {
             
             let membersIDs = self.fetchMembersIDs()
@@ -1423,6 +1433,16 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
     }
     
     func plusButtonTapped() {
+        if activeList {
+            if let object = place {
+                var updatedObject = object
+                updatedObject.name = updatedObject.name.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject)
+                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+            }
+            return
+        }
+        
         if active, schedule, let activity = activity {
             
             let membersIDs = self.fetchMembersIDs()

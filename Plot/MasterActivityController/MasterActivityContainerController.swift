@@ -87,6 +87,14 @@ class MasterActivityContainerController: UIViewController {
         didSet {
             configureTabBarBadge()
             notificationsVC.listList = listList
+            
+            let nav = self.tabBarController!.viewControllers![0] as! UINavigationController
+            
+            if nav.topViewController is ActivityTypeViewController {
+                let activityTab = nav.topViewController as! ActivityTypeViewController
+                activityTab.listList = listList
+                
+            }
         }
     }
     var selectedDate = Date()
@@ -437,6 +445,7 @@ extension MasterActivityContainerController {
         let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
         let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
             let destination = GrocerylistViewController()
+            destination.hidesBottomBarWhenPushed = true
             destination.connectedToAct = false
             destination.comingFromLists = true
             destination.users = self.users
@@ -446,6 +455,17 @@ extension MasterActivityContainerController {
         }
         let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
             let destination = PackinglistViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.connectedToAct = false
+            destination.comingFromLists = true
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.activities = self.activities
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+        let activityList = UIAlertAction(title: "Activity List", style: .default) { (action:UIAlertAction) in
+            let destination = ActivitylistViewController()
+            destination.hidesBottomBarWhenPushed = true
             destination.connectedToAct = false
             destination.comingFromLists = true
             destination.users = self.users
@@ -455,6 +475,7 @@ extension MasterActivityContainerController {
         }
         let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
             let destination = ChecklistViewController()
+            destination.hidesBottomBarWhenPushed = true
             destination.connectedToAct = false
             destination.comingFromLists = true
             destination.users = self.users
@@ -468,6 +489,7 @@ extension MasterActivityContainerController {
         }
         
         alertController.addAction(groceryList)
+        alertController.addAction(activityList)
         //                alertController.addAction(packingList)
         alertController.addAction(checkList)
         alertController.addAction(cancelAlert)

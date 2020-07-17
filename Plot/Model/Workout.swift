@@ -11,7 +11,8 @@ import Foundation
 // MARK: - Response
 struct Workout: Codable, Equatable, Hashable {
     let uuid = UUID().uuidString
-    let id, title, identifier: String
+    let id, identifier: String
+    var title: String
     let notes, workoutDuration, tagsStr: String?
     let equipment: [String]?
     let equipment_level: String?

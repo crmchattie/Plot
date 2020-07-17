@@ -51,7 +51,6 @@ class PackinglistViewController: FormViewController {
         
         if packinglist != nil {
             active = true
-            self.navigationItem.rightBarButtonItem?.isEnabled = true
             var participantCount = self.selectedFalconUsers.count
             
             // If user is creating this activity (admin)
@@ -72,7 +71,6 @@ class PackinglistViewController: FormViewController {
             
         } else {
             if let currentUserID = Auth.auth().currentUser?.uid {
-                self.navigationItem.rightBarButtonItem?.isEnabled = false
                 let ID = Database.database().reference().child(userPackinglistsEntity).child(currentUserID).childByAutoId().key ?? ""
                 packinglist = Packinglist(dictionary: ["ID": ID as AnyObject])
                 packinglist.name = "PackingListName"
@@ -294,8 +292,10 @@ class PackinglistViewController: FormViewController {
             $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.placeholder = $0.tag
             if active, let packinglist = packinglist {
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
                 $0.value = packinglist.name
             } else {
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
                 $0.cell.textField.becomeFirstResponder()
             }
             }.onChange() { [unowned self] row in

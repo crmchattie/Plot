@@ -126,41 +126,41 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
         let object = diffableDataSource.itemIdentifier(for: indexPath)
         if let activityType = object as? ActivityType {
             let activityTypeName = activityType.rawValue
-                switch activityTypeName {
-                case "basic":
-                    print("basic")
-                    if let activity = self.umbrellaActivity {
-                        let destination = ScheduleViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.delegate = self
-                        destination.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
-                        destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    } else {
-                        let destination = CreateActivityViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.conversations = self.conversations
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    }
-                case "flight":
-                    print("flight")
-                    let destination = FlightSearchViewController()
+            switch activityTypeName {
+            case "basic":
+                print("basic")
+                if let activity = self.umbrellaActivity {
+                    let destination = ScheduleViewController()
+                    destination.hidesBottomBarWhenPushed = true
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    destination.delegate = self
+                    destination.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
+                    destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let destination = CreateActivityViewController()
                     destination.hidesBottomBarWhenPushed = true
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
                     destination.conversations = self.conversations
                     self.navigationController?.pushViewController(destination, animated: true)
-                case "meal":
-                    print("meal")
-                case "workout":
-                    print("workout")
-                default:
-                    print("default")
                 }
+            case "flight":
+                print("flight")
+                let destination = FlightSearchViewController()
+                destination.hidesBottomBarWhenPushed = true
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.conversations = self.conversations
+                self.navigationController?.pushViewController(destination, animated: true)
+            case "meal":
+                print("meal")
+            case "workout":
+                print("workout")
+            default:
+                print("default")
+            }
         } else if let recipe = object as? Recipe {
             print("meal \(recipe.title)")
             let destination = RecipeDetailViewController()
@@ -172,9 +172,11 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             destination.conversations = self.conversations
             destination.activities = self.activities
             destination.conversation = self.conversation
+            destination.listList = self.listList
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let event = object as? Event {
             print("event \(String(describing: event.name))")
@@ -185,11 +187,13 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let workout = object as? Workout {
             print("workout \(String(describing: workout.title))")
@@ -201,11 +205,13 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let attraction = object as? Attraction {
             print("attraction \(String(describing: attraction.name))")
@@ -216,11 +222,13 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let place = object as? FSVenue {
             print("place.id \(String(describing: place.id))")
@@ -231,11 +239,13 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let groupItem = object as? GroupItem, let place = groupItem.venue {
             print("place.id \(String(describing: place.id))")
@@ -246,11 +256,13 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             destination.users = self.users
             destination.filteredUsers = self.filteredUsers
             destination.conversations = self.conversations
+            destination.listList = self.listList
             destination.activities = self.activities
             destination.conversation = self.conversation
             destination.schedule = self.schedule
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
+            destination.listDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             print("neither meals or events")
@@ -524,6 +536,17 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
 extension ShoppingTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: Any) {
         print("plusButtonTapped")
+        if activeList {
+            if let object = type as? FSVenue {
+                var updatedObject = object
+                updatedObject.name = updatedObject.name.removeCharacters()
+                self.movingBackwards = false
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject)
+                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+            }
+            return
+        }
+        
         if schedule {
             let activityID = UUID().uuidString
             activity = Activity(dictionary: ["activityID": activityID as AnyObject])
@@ -650,25 +673,7 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
             activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
             if let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
-                var newLocationName = locationName
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = locationName.removeCharacters()
                 activity.locationName = newLocationName
                 activity.locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
             }
@@ -701,25 +706,7 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
                 endDateTime = rounded.addingTimeInterval(seconds)
             }
             if let locationName = place.location?.address, let latitude = place.location?.lat, let longitude = place.location?.lng {
-                var newLocationName = locationName
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = locationName.removeCharacters()
                 activity.locationName = newLocationName
                 activity.locationAddress = [newLocationName: [latitude, longitude]]
             }

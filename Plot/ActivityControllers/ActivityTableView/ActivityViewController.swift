@@ -740,6 +740,41 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                     }
                 }
             }
+        } else if let placeID = activity.placeID {
+            dispatchGroup.enter()
+            Service.shared.fetchFSDetails(id: placeID) { (search, err) in
+                if let place = search?.response?.venue {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = PlaceDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.place = place
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.filteredActivities + self.filteredPinnedActivities
+                        destination.conversations = self.conversations
+                        self.getParticipants(forActivity: activity) { (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
+                                self.navigationController?.pushViewController(destination, animated: true)
+                            }
+                        }
+                    }
+                } else {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        self.hideActivityIndicator()
+                        self.activityNotFoundAlert()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.dismiss(animated: true, completion: nil)
+                        })
+                    }
+                }
+            }
         } else {
             self.hideActivityIndicator()
             let destination = CreateActivityViewController()

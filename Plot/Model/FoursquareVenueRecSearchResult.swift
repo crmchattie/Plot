@@ -176,7 +176,7 @@ struct Filter: Codable, Equatable, Hashable {
 struct FSVenue: Codable, Equatable, Hashable {
     let uuid = UUID().uuidString
     let id: String
-    let name: String
+    var name: String
     let contact: Contact?
     let location: FSLocation?
     let canonicalURL: String?

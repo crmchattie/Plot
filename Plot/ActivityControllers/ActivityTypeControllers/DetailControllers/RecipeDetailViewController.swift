@@ -10,24 +10,16 @@ import UIKit
 import Firebase
 import MapKit
 
-protocol UpdateRecipeDelegate: class {
-    func updateRecipe(recipe: Recipe?)
-}
-
 class RecipeDetailViewController: ActivityDetailViewController {
     
     private let kActivityDetailCell = "ActivityDetailCell"
     private let kActivityExpandedDetailCell = "ActivityExpandedDetailCell"
     private let kRecipeDetailCell = "RecipeDetailCell"
-    
-    weak var recipeDelegate : UpdateRecipeDelegate?
-    
+        
     var recipe: Recipe?
     
     var segment: Int = 0
     var servings: Int?
-    //for grocery list
-    var activeRecipe: Bool = false
     
     var ingredients = [ExtendedIngredient]()
     var instructions = [String]()
@@ -46,7 +38,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
         
         setActivity()
         
-        if !active || !activeRecipe {
+        if !active || !activeList {
             setMoreActivity()
         } else {
             if let activityServings = activity.servings {
@@ -202,7 +194,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
     
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if !activeRecipe {
+        if !activeList {
             return 3
         } else {
             return 2
@@ -227,7 +219,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
             } else {
                 return cell
             }
-        } else if indexPath.item == 1 && !activeRecipe {
+        } else if indexPath.item == 1 && !activeList {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
             cell.delegate = self
             if let recipe = recipe {
@@ -265,7 +257,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.item == 1 && !activeRecipe {
+        } else if indexPath.item == 1 && !activeList {
             if secondSectionHeight == 0 {
                 let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
                 dummyCell.recipe = recipe
@@ -648,25 +640,7 @@ extension RecipeDetailViewController: UpdateLocationDelegate {
             self.activity.locationAddress![self.locationName] = nil
         }
         for (key, value) in locationAddress {
-            var newLocationName = key
-            if newLocationName.contains("/") {
-                newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-            }
-            if newLocationName.contains(".") {
-                newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-            }
-            if newLocationName.contains("#") {
-                newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-            }
-            if newLocationName.contains("$") {
-                newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-            }
-            if newLocationName.contains("[") {
-                newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-            }
-            if newLocationName.contains("]") {
-                newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-            }
+            let newLocationName = key.removeCharacters()
             self.locationName = newLocationName
             self.locationAddress[newLocationName] = value
             collectionView.reloadData()

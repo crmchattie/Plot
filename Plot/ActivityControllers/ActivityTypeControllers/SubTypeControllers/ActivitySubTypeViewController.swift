@@ -12,6 +12,7 @@ import Firebase
 class ActivitySubTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     weak var delegate : UpdateScheduleDelegate?
+    weak var listDelegate : UpdateListDelegate?
     
     let kCompositionalHeader = "CompositionalHeader"
     let kActivityTypeCell = "ActivityTypeCell"
@@ -27,6 +28,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     var selectedFalconUsers = [User]()
     var activities = [Activity]()
     var conversations = [Conversation]()
+    var listList = [ListContainer]()
     var favAct = [String: [String]]()
     var conversation: Conversation?
     
@@ -37,7 +39,8 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     var showGroups = true
     
     var activity: Activity!
-    var activeRecipe: Bool = false
+    var activeList: Bool = false
+    var listType: String?
     
     var startDateTime: Date?
     var endDateTime: Date?
@@ -46,6 +49,9 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     var lon: Double?
         
     fileprivate var reference: DatabaseReference!
+    
+    var movingBackwards: Bool = true
+
     
     init() {
         let layout = ActivitySubTypeViewController.initialLayout()
@@ -245,6 +251,24 @@ extension ActivitySubTypeViewController: UpdateScheduleDelegate {
             self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
         } else if let recipe = recipe {
             self.delegate?.updateIngredients(recipe: recipe, recipeID: nil)
+        }
+    }
+}
+
+extension ActivitySubTypeViewController: UpdateListDelegate {
+    func updateRecipe(recipe: Recipe?) {
+        self.listDelegate?.updateRecipe(recipe: recipe)
+    }
+    
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?) {
+        if let object = recipe {
+            self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil)
+        } else if let object = workout {
+            self.listDelegate?.updateList(recipe: nil, workout: object, event: nil, place: nil)
+        } else if let object = event {
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: object, place: nil)
+        } else if let object = place {
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: object)
         }
     }
 }

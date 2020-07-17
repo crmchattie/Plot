@@ -66,25 +66,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
                 endDateTime = rounded.addingTimeInterval(seconds)
             }
             if let location = place.location, let locationName = location.formattedAddress?[0], let latitude = location.lat, let longitude = location.lng {
-                var newLocationName = locationName
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = locationName.removeCharacters()
                 self.locationName = newLocationName
                 self.locationAddress = [newLocationName: [latitude, longitude]]
                 activity.locationName = newLocationName
@@ -118,7 +100,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
         }
         
         dispatchGroup.notify(queue: .main) {
-            if !self.active {
+            if !self.active || !self.activeList {
                 self.setMoreActivity()
             }
             self.collectionView.reloadData()
@@ -127,7 +109,11 @@ class PlaceDetailViewController: ActivityDetailViewController {
     }
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 3
+        if !activeList {
+            return 3
+        } else {
+            return 2
+        }
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -150,7 +136,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
             } else {
                 return cell
             }
-        } else if indexPath.section == 1 {
+        } else if indexPath.section == 1 && !activeList {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
             cell.delegate = self
             if let place = place {
@@ -190,7 +176,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.section == 1 {
+        } else if indexPath.section == 1 && !activeList {
             if secondSectionHeight == 0 {
                 let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
                 dummyCell.fsVenue = place
@@ -600,25 +586,7 @@ extension PlaceDetailViewController: UpdateLocationDelegate {
             self.activity.locationAddress![self.locationName] = nil
         }
         for (key, value) in locationAddress {
-            var newLocationName = key
-            if newLocationName.contains("/") {
-                newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-            }
-            if newLocationName.contains(".") {
-                newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-            }
-            if newLocationName.contains("#") {
-                newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-            }
-            if newLocationName.contains("$") {
-                newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-            }
-            if newLocationName.contains("[") {
-                newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-            }
-            if newLocationName.contains("]") {
-                newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-            }
+            let newLocationName = key.removeCharacters()
             self.locationName = newLocationName
             self.locationAddress[newLocationName] = value
             collectionView.reloadData()

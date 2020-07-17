@@ -1573,21 +1573,31 @@ class CreateActivityViewController: FormViewController {
             if let recipeString = scheduleItem.recipeID, let recipeID = Int(recipeString) {
                 dispatchGroup.enter()
                 Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
-                    let detailedRecipe = search
-                    dispatchGroup.leave()
-                    dispatchGroup.notify(queue: .main) {
-                        let destination = RecipeDetailViewController()
-                        destination.activity = scheduleItem
-                        destination.recipe = detailedRecipe
-                        destination.detailedRecipe = detailedRecipe
-                        destination.users = self.acceptedParticipant
-                        destination.filteredUsers = self.acceptedParticipant
-                        destination.conversations = self.conversations
-                        destination.umbrellaActivity = self.activity
-                        destination.schedule = true
-                        destination.delegate = self
-                        self.hideActivityIndicator()
-                        self.navigationController?.pushViewController(destination, animated: true)
+                    if let detailedRecipe = search {
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            let destination = RecipeDetailViewController()
+                            destination.activity = scheduleItem
+                            destination.recipe = detailedRecipe
+                            destination.detailedRecipe = detailedRecipe
+                            destination.users = self.acceptedParticipant
+                            destination.filteredUsers = self.acceptedParticipant
+                            destination.conversations = self.conversations
+                            destination.umbrellaActivity = self.activity
+                            destination.schedule = true
+                            destination.delegate = self
+                            self.hideActivityIndicator()
+                            self.navigationController?.pushViewController(destination, animated: true)
+                        }
+                    } else {
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            self.hideActivityIndicator()
+                            self.activityNotFoundAlert()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                                self.dismiss(animated: true, completion: nil)
+                            })
+                        }
                     }
                 }
             } else if let eventID = scheduleItem.eventID {
@@ -1608,6 +1618,15 @@ class CreateActivityViewController: FormViewController {
                             destination.delegate = self
                             self.hideActivityIndicator()
                             self.navigationController?.pushViewController(destination, animated: true)
+                        }
+                    } else {
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            self.hideActivityIndicator()
+                            self.activityNotFoundAlert()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                                self.dismiss(animated: true, completion: nil)
+                            })
                         }
                     }
                 }
@@ -1640,20 +1659,59 @@ class CreateActivityViewController: FormViewController {
             } else if let attractionID = scheduleItem.attractionID {
                 dispatchGroup.enter()
                 Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
-                    let attraction = search?.embedded?.attractions![0]
-                    dispatchGroup.leave()
-                    dispatchGroup.notify(queue: .main) {
-                        let destination = EventDetailViewController()
-                        destination.activity = scheduleItem
-                        destination.attraction = attraction
-                        destination.users = self.acceptedParticipant
-                        destination.filteredUsers = self.acceptedParticipant
-                        destination.conversations = self.conversations
-                        destination.umbrellaActivity = self.activity
-                        destination.schedule = true
-                        destination.delegate = self
-                        self.hideActivityIndicator()
-                        self.navigationController?.pushViewController(destination, animated: true)
+                    if let attraction = search?.embedded?.attractions![0] {
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            let destination = EventDetailViewController()
+                            destination.activity = scheduleItem
+                            destination.attraction = attraction
+                            destination.users = self.acceptedParticipant
+                            destination.filteredUsers = self.acceptedParticipant
+                            destination.conversations = self.conversations
+                            destination.umbrellaActivity = self.activity
+                            destination.schedule = true
+                            destination.delegate = self
+                            self.hideActivityIndicator()
+                            self.navigationController?.pushViewController(destination, animated: true)
+                        }
+                    } else {
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            self.hideActivityIndicator()
+                            self.activityNotFoundAlert()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                                self.dismiss(animated: true, completion: nil)
+                            })
+                        }
+                    }
+                }
+            } else if let placeID = scheduleItem.placeID {
+                dispatchGroup.enter()
+                Service.shared.fetchFSDetails(id: placeID) { (search, err) in
+                    if let place = search?.response?.venue {
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            let destination = PlaceDetailViewController()
+                            destination.activity = scheduleItem
+                            destination.place = place
+                            destination.users = self.acceptedParticipant
+                            destination.filteredUsers = self.acceptedParticipant
+                            destination.conversations = self.conversations
+                            destination.umbrellaActivity = self.activity
+                            destination.schedule = true
+                            destination.delegate = self
+                            self.hideActivityIndicator()
+                            self.navigationController?.pushViewController(destination, animated: true)
+                        }
+                    } else {
+                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            self.hideActivityIndicator()
+                            self.activityNotFoundAlert()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                                self.dismiss(animated: true, completion: nil)
+                            })
+                        }
                     }
                 }
             } else {
@@ -2102,12 +2160,6 @@ class CreateActivityViewController: FormViewController {
                             if glIngredients[index].amount != nil && recipeIngredient.amount != nil  {
                                 glIngredients[index].amount! +=  recipeIngredient.amount! - recipeIngredient.amount! * Double(grocerylistServings) / Double(recipe.servings!)
                             }
-//                            if glIngredients[index].measures?.metric?.amount != nil && recipeIngredient.measures?.metric?.amount! != nil {
-//                                glIngredients[index].measures!.metric!.amount! +=  recipeIngredient.measures!.metric!.amount! - recipeIngredient.measures!.metric!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
-//                            }
-//                            if glIngredients[index].measures?.us?.amount != nil && recipeIngredient.measures?.us?.amount! != nil {
-//                                glIngredients[index].measures!.us!.amount! +=  recipeIngredient.measures!.us!.amount! - recipeIngredient.measures!.us!.amount! * Double(grocerylistServings) / Double(recipe.servings!)
-//                            }
                     }
                 }
             } else if grocerylist.recipes!["\(recipe.id)"] != nil && add {
@@ -2132,12 +2184,6 @@ class CreateActivityViewController: FormViewController {
                             if glIngredients[index].amount != nil {
                                 glIngredients[index].amount! += recipeIngredient.amount ?? 0.0
                             }
-//                            if glIngredients[index].measures?.metric?.amount != nil {
-//                                glIngredients[index].measures?.metric?.amount! += recipeIngredient.measures?.metric?.amount ?? 0.0
-//                            }
-//                            if glIngredients[index].measures?.us?.amount != nil {
-//                                glIngredients[index].measures?.us?.amount! += recipeIngredient.measures?.us?.amount ?? 0.0
-//                            }
                         } else {
                             if glIngredients[index].amount != nil {
                                 glIngredients[index].amount! -= recipeIngredient.amount ?? 0.0
@@ -2148,23 +2194,6 @@ class CreateActivityViewController: FormViewController {
                                     glIngredients[index].recipe![recipe.title] = nil
                                 }
                             }
-//                            if glIngredients[index].measures?.metric?.amount != nil {
-//                                glIngredients[index].measures?.metric?.amount! -= recipeIngredient.measures?.metric?.amount ?? 0.0
-//                                if glIngredients[index].measures?.metric?.amount! == 0 {
-//                                    glIngredients.remove(at: index)
-//                                    continue
-//                                } else {
-//                                    glIngredients[index].recipe![recipe.title] = nil
-//                                }
-//                            }
-//                            if glIngredients[index].measures?.us?.amount != nil {
-//                                glIngredients[index].measures?.us?.amount! -= recipeIngredient.measures?.us?.amount ?? 0.0
-//                                if glIngredients[index].measures?.us?.amount! == 0 {
-//                                    glIngredients.remove(at: index)
-//                                } else {
-//                                    glIngredients[index].recipe![recipe.title] = nil
-//                                }
-//                            }
                         }
                     } else {
                         if add {
@@ -2325,25 +2354,7 @@ extension CreateActivityViewController: UpdateLocationDelegate {
                 self.activity.locationAddress![self.locationName] = nil
             }
             for (key, value) in locationAddress {
-                var newLocationName = key
-                if newLocationName.contains("/") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-                }
-                if newLocationName.contains(".") {
-                    newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-                }
-                if newLocationName.contains("#") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-                }
-                if newLocationName.contains("$") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-                }
-                if newLocationName.contains("[") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-                }
-                if newLocationName.contains("]") {
-                    newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-                }
+                let newLocationName = key.removeCharacters()
                 locationRow.title = newLocationName
                 locationRow.updateCell()
 

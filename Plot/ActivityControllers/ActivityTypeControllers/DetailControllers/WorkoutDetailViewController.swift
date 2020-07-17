@@ -27,7 +27,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
         
         setActivity()
         
-        if !active {
+        if !active || !activeList {
             setMoreActivity()
         }
                     
@@ -93,18 +93,34 @@ class WorkoutDetailViewController: ActivityDetailViewController {
     }
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 4
+        if !activeList {
+            return 4
+        } else {
+            return 3
+        }
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 3 {
-            if let exercises = workout?.exercises {
-                return exercises.count
+        if !activeList {
+            if section == 3 {
+                if let exercises = workout?.exercises {
+                    return exercises.count
+                } else {
+                    return 0
+                }
             } else {
-                return 0
+                return 1
             }
         } else {
-            return 1
+            if section == 2 {
+                if let exercises = workout?.exercises {
+                    return exercises.count
+                } else {
+                    return 0
+                }
+            } else {
+                return 1
+            }
         }
     }
         
@@ -130,7 +146,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                 cell.delegate = self
             }
             return cell
-        } else if indexPath.section == 2 {
+        } else if indexPath.section == 2 && !activeList {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
             cell.delegate = self
             if let workout = workout {
@@ -175,7 +191,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.section == 2 {
+        } else if indexPath.section == 2 && !activeList {
             if secondSectionHeight == 0 {
                 let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 215))
                 dummyCell.workout = workout
@@ -582,25 +598,7 @@ extension WorkoutDetailViewController: UpdateLocationDelegate {
             self.activity.locationAddress![self.locationName] = nil
         }
         for (key, value) in locationAddress {
-            var newLocationName = key
-            if newLocationName.contains("/") {
-                newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-            }
-            if newLocationName.contains(".") {
-                newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-            }
-            if newLocationName.contains("#") {
-                newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-            }
-            if newLocationName.contains("$") {
-                newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-            }
-            if newLocationName.contains("[") {
-                newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-            }
-            if newLocationName.contains("]") {
-                newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-            }
+            let newLocationName = key.removeCharacters()
             self.locationName = newLocationName
             self.locationAddress[newLocationName] = value
             collectionView.reloadData()

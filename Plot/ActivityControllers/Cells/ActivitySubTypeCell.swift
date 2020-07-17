@@ -120,9 +120,7 @@ class ActivitySubTypeCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-//        FavActDelegate.delegate = self
-//        falconUsersFetcher.delegate = self
-//        setupViews()
+
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -584,25 +584,7 @@ extension FlightDetailViewController: UpdateLocationDelegate {
             self.activity.locationAddress![self.locationName] = nil
         }
         for (key, value) in locationAddress {
-            var newLocationName = key
-            if newLocationName.contains("/") {
-                newLocationName = newLocationName.replacingOccurrences(of: "/", with: "")
-            }
-            if newLocationName.contains(".") {
-                newLocationName = newLocationName.replacingOccurrences(of: ".", with: "")
-            }
-            if newLocationName.contains("#") {
-                newLocationName = newLocationName.replacingOccurrences(of: "#", with: "")
-            }
-            if newLocationName.contains("$") {
-                newLocationName = newLocationName.replacingOccurrences(of: "$", with: "")
-            }
-            if newLocationName.contains("[") {
-                newLocationName = newLocationName.replacingOccurrences(of: "[", with: "")
-            }
-            if newLocationName.contains("]") {
-                newLocationName = newLocationName.replacingOccurrences(of: "]", with: "")
-            }
+            let newLocationName = key.removeCharacters()
             self.locationName = newLocationName
             self.locationAddress[newLocationName] = value
             collectionView.reloadData()

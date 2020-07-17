@@ -123,7 +123,6 @@
 		10DE973B2475E4E600D4A7E8 /* ChecklistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */; };
 		10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */; };
 		10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */ = {isa = PBXBuildFile; productRef = 10E93D4824BE2E7A00F6EE18 /* LBTATools */; };
-		10E93D4D24BE41B500F6EE18 /* MKMapItem+Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D4A24BE41B300F6EE18 /* MKMapItem+Address.swift */; };
 		10E93D4E24BE41B500F6EE18 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D4B24BE41B400F6EE18 /* MapViewController.swift */; };
 		10E93D4F24BE41B500F6EE18 /* LocationsCarouselController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D4C24BE41B400F6EE18 /* LocationsCarouselController.swift */; };
 		10E93D5724BE43B700F6EE18 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5324BE43B600F6EE18 /* Extensions.swift */; };
@@ -141,6 +140,7 @@
 		10FBC8B924BFECD500D0E6B5 /* ActivitylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8B824BFECD500D0E6B5 /* ActivitylistViewController.swift */; };
 		10FBC8BB24BFEF7E00D0E6B5 /* ActivitylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BA24BFEF7E00D0E6B5 /* ActivitylistActions.swift */; };
 		10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BC24BFF01200D0E6B5 /* ActivitylistFetcher.swift */; };
+		10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */; };
 		26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */; };
 		265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */; };
 		2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2680A0332360C0BD00C4C287 /* Invitation.swift */; };
@@ -473,7 +473,6 @@
 		10DE97382475837B00D4A7E8 /* ListContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListContainer.swift; sourceTree = "<group>"; };
 		10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistFetcher.swift; sourceTree = "<group>"; };
 		10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsDetailCell.swift; sourceTree = "<group>"; };
-		10E93D4A24BE41B300F6EE18 /* MKMapItem+Address.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MKMapItem+Address.swift"; sourceTree = "<group>"; };
 		10E93D4B24BE41B400F6EE18 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		10E93D4C24BE41B400F6EE18 /* LocationsCarouselController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationsCarouselController.swift; sourceTree = "<group>"; };
 		10E93D5324BE43B600F6EE18 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -492,6 +491,7 @@
 		10FBC8B824BFECD500D0E6B5 /* ActivitylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistViewController.swift; sourceTree = "<group>"; };
 		10FBC8BA24BFEF7E00D0E6B5 /* ActivitylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistActions.swift; sourceTree = "<group>"; };
 		10FBC8BC24BFF01200D0E6B5 /* ActivitylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistFetcher.swift; sourceTree = "<group>"; };
+		10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseListTableViewController.swift; sourceTree = "<group>"; };
 		26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+Migration.swift"; sourceTree = "<group>"; };
 		2680A0332360C0BD00C4C287 /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
@@ -786,6 +786,7 @@
 				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
 				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
 				10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */,
+				10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */,
 				10DE97342475737500D4A7E8 /* ListCell.swift */,
 				10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */,
 				10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */,
@@ -888,7 +889,6 @@
 				10196EFB24411B5600B6AFDF /* MediaViewController.swift */,
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
 				10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */,
-				10196EF924411B5600B6AFDF /* ChooseChatTableViewController.swift */,
 				106D758A2442447C0039B534 /* ActivityActions.swift */,
 			);
 			path = CreateNewActivityControllers;
@@ -910,7 +910,6 @@
 			children = (
 				10E93D4B24BE41B400F6EE18 /* MapViewController.swift */,
 				10E93D4C24BE41B400F6EE18 /* LocationsCarouselController.swift */,
-				10E93D4A24BE41B300F6EE18 /* MKMapItem+Address.swift */,
 			);
 			path = MapViewController;
 			sourceTree = "<group>";
@@ -1405,6 +1404,7 @@
 				4BAEE4E121272D880045AB10 /* ChatsTableViewController+SearchHandlers.swift */,
 				4BAEE4CD21272D880045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift */,
 				4B5E99DF212CC0D5001F067F /* ConversationsFetcher.swift */,
+				10196EF924411B5600B6AFDF /* ChooseChatTableViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -2225,6 +2225,7 @@
 				109F849723D67A85002C0044 /* SearchHeader.swift in Sources */,
 				1069B2D4243115950048244C /* ActivityObject.swift in Sources */,
 				1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */,
+				10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */,
 				4BAEE54F212735880045AB10 /* User.swift in Sources */,
 				10B656CE24AFB0E7006686FA /* ActivitySection.swift in Sources */,
 				4BAEE5E0212735E50045AB10 /* UIImageExtensions.swift in Sources */,
@@ -2236,7 +2237,6 @@
 				10C50FA22274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift in Sources */,
 				26E3179B2379FB72007D1F21 /* ActivityTypeViewController.swift in Sources */,
 				10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */,
-				10E93D4D24BE41B500F6EE18 /* MKMapItem+Address.swift in Sources */,
 				4BAEE46F21272B380045AB10 /* NotificationsTableViewController.swift in Sources */,
 				4BAEE50421272D890045AB10 /* AutoSizingCollectionViewFlowLayout.swift in Sources */,
 				10E93D4F24BE41B500F6EE18 /* LocationsCarouselController.swift in Sources */,

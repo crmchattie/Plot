@@ -1143,6 +1143,8 @@ let activityAlert = UIAlertController(title: "Activity Created!", message: nil, 
 
 let activityNFAlert = UIAlertController(title: "Could Not Load Activity", message: nil, preferredStyle: UIAlertController.Style.alert)
 
+let dupeRecipeAlert = UIAlertController(title: "Recipe already on Grocery List", message: nil, preferredStyle: UIAlertController.Style.alert)
+
 extension UIViewController {
     func messageSentAlert() {
         self.present(messageAlert, animated: true, completion: nil)
@@ -1161,6 +1163,37 @@ extension UIViewController {
     }
     func removeActivityNotFoundAlert() {
         activityNFAlert.dismiss(animated: true, completion: nil)
+    }
+    func dupeRecAlert() {
+        self.present(dupeRecipeAlert, animated: true, completion: nil)
+    }
+    func removeDupeRecAlert() {
+        dupeRecipeAlert.dismiss(animated: true, completion: nil)
+    }
+}
+
+extension String {
+    func removeCharacters() -> String {
+        var updatedSelf = self
+        if self.contains("/") {
+            updatedSelf = self.replacingOccurrences(of: "/", with: "")
+        }
+        if self.contains(".") {
+            updatedSelf = self.replacingOccurrences(of: ".", with: "")
+        }
+        if self.contains("#") {
+            updatedSelf = self.replacingOccurrences(of: "#", with: "")
+        }
+        if self.contains("$") {
+            updatedSelf = self.replacingOccurrences(of: "$", with: "")
+        }
+        if self.contains("[") {
+            updatedSelf = self.replacingOccurrences(of: "[", with: "")
+        }
+        if self.contains("]") {
+            updatedSelf = self.replacingOccurrences(of: "]", with: "")
+        }
+        return updatedSelf
     }
 }
 

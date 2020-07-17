@@ -51,7 +51,6 @@ class GrocerylistViewController: FormViewController {
                 
         if grocerylist != nil {
             active = true
-            self.navigationItem.rightBarButtonItem?.isEnabled = true
                         
             var participantCount = self.selectedFalconUsers.count
             
@@ -73,7 +72,6 @@ class GrocerylistViewController: FormViewController {
             resetBadgeForSelf()
         } else {
             if let currentUserID = Auth.auth().currentUser?.uid {
-                self.navigationItem.rightBarButtonItem?.isEnabled = false
                 let ID = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).childByAutoId().key ?? ""
                 grocerylist = Grocerylist(dictionary: ["ID": ID as AnyObject])
                 grocerylist.createdDate = Date()
@@ -140,6 +138,7 @@ class GrocerylistViewController: FormViewController {
     
     @objc fileprivate func close() {
         movingBackwards = false
+        
         if !comingFromLists {
             if let activity = activity {
                 grocerylist.activityID = activity.activityID
@@ -490,8 +489,10 @@ class GrocerylistViewController: FormViewController {
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
                 if active, let grocerylist = grocerylist {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
                     $0.value = grocerylist.name
                 } else {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
                     $0.cell.textField.becomeFirstResponder()
                 }
             }.onChange() { [unowned self] row in
@@ -740,23 +741,34 @@ class GrocerylistViewController: FormViewController {
             let dispatchGroup = DispatchGroup()
             dispatchGroup.enter()
             Service.shared.fetchRecipesInfo(id: Int(id)!) { (search, err) in
-                let detailedRecipe = search
-                dispatchGroup.leave()
-                dispatchGroup.notify(queue: .main) {
-                    let destination = RecipeDetailViewController()
-                    destination.recipe = detailedRecipe
-                    destination.detailedRecipe = detailedRecipe
-                    destination.activeRecipe = true
-                    destination.servings = self.grocerylist.servings?["\(id)"]
-                    destination.recipeDelegate = self
-                    self.hideActivityIndicator()
-                    self.navigationController?.pushViewController(destination, animated: true)
+                if let detailedRecipe = search {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = RecipeDetailViewController()
+                        destination.recipe = detailedRecipe
+                        destination.detailedRecipe = detailedRecipe
+                        destination.activeList = true
+                        destination.listType = "grocery"
+                        destination.servings = self.grocerylist.servings?["\(id)"]
+                        destination.listDelegate = self
+                        self.hideActivityIndicator()
+                        self.navigationController?.pushViewController(destination, animated: true)
+                    }
+                } else {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        self.hideActivityIndicator()
+                        self.activityNotFoundAlert()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.dismiss(animated: true, completion: nil)
+                        })
+                    }
                 }
             }
         } else {
             let destination = RecipeTypeViewController()
-            destination.recipeDelegate = self
-            destination.activeRecipe = true
+            destination.listDelegate = self
+            destination.activeList = true
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }
@@ -1038,8 +1050,6 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
                 print("appending ingredient")
                 self.grocerylist.ingredients!.append(ingredient)
             }
-            
-            
             if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
                 if form.allSections.count > 3 {
                     for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
@@ -1055,7 +1065,7 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
     }
 }
 
-extension GrocerylistViewController: UpdateRecipeDelegate {
+extension GrocerylistViewController: UpdateListDelegate {
     func updateRecipe(recipe: Recipe?) {
         if let mvs = self.form.sectionBy(tag: "recipefields") as? MultivaluedSection {
             if let recipe = recipe {
@@ -1070,6 +1080,9 @@ extension GrocerylistViewController: UpdateRecipeDelegate {
                 mvs.remove(at: recipeIndex)
             }
         }
+    }
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?) {
+        
     }
 }
 

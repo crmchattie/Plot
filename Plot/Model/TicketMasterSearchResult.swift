@@ -29,7 +29,7 @@ struct Embedded: Codable, Equatable, Hashable {
 // MARK: - Event
 struct Event: Codable, Equatable, Hashable {
     let uuid = UUID().uuidString
-    let name: String
+    var name: String
     let type: EventType?
     let id: String
     let test: Bool?
