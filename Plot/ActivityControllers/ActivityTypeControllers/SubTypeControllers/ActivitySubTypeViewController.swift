@@ -42,6 +42,8 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     var activeList: Bool = false
     var listType: String?
     
+    var activityType: String!
+    
     var startDateTime: Date?
     var endDateTime: Date?
     
@@ -260,15 +262,15 @@ extension ActivitySubTypeViewController: UpdateListDelegate {
         self.listDelegate?.updateRecipe(recipe: recipe)
     }
     
-    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?) {
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?) {
         if let object = recipe {
-            self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil)
+            self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil, activityType: activityType)
         } else if let object = workout {
-            self.listDelegate?.updateList(recipe: nil, workout: object, event: nil, place: nil)
+            self.listDelegate?.updateList(recipe: nil, workout: object, event: nil, place: nil, activityType: activityType)
         } else if let object = event {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: object, place: nil)
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: object, place: nil, activityType: activityType)
         } else if let object = place {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: object)
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: object, activityType: activityType)
         }
     }
 }

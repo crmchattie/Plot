@@ -478,7 +478,7 @@ enum ActivityType: String, Equatable, Hashable {
         switch self {
             case .basic: return "activityLarge"
             case .complex: return "activityLarge"
-            case .recipe: return "meal"
+            case .recipe: return "recipe"
             case .workout: return "workout"
             case .event: return "event"
             case .flight: return "plane"

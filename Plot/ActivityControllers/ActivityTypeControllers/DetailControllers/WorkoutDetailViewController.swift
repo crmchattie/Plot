@@ -43,7 +43,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
     
     fileprivate func setMoreActivity() {
         if let workout = workout {
-            activity.activityType = "workout"
+            activity.activityType = activityType
             activity.workoutID = "\(workout.identifier)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
@@ -135,6 +135,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                     cell.heartButtonImage = "heart"
                 }
                 cell.active = active
+                cell.activeList = activeList
                 cell.intColor = intColor
                 cell.workout = workout
             }

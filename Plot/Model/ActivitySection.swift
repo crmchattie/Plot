@@ -311,14 +311,14 @@ enum ActivitySection: Hashable, CaseIterable {
     var image: String {
         switch self {
         case .custom, .search: return ""
-        case .food, .cheapEats, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .seafoodFood, .vegetarianFood, .comfortFood, .spanishFood, .generalFood, .generalCoffee, .topFood: return "meal"
+        case .food, .cheapEats, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .seafoodFood, .vegetarianFood, .comfortFood, .spanishFood, .generalFood, .generalCoffee, .topFood: return "food"
         case .nightlife, .topDrinks, .club, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .generalDrinks: return "nightlife"
         case .recreation, .topRec, .games, .recreationThemeParks, .active, .parks, .water, .land, .generalOutdoors: return "recreation"
         case .shopping, .topShop, .clothes, .consumerables, .generalShop: return "shopping"
         case .events, .music, .sports, .artstheatre, .family, .film, .miscellaneous: return "event"
         case .sightseeing, .topSights, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites, .sightseeingThemeParks, .generalArts: return "sightseeing"
         case .workouts, .quick, .hiit, .cardio, .yoga, .medium, .strength: return "workout"
-        case .recipes, .american, .italian, .vegetarian, .mexican, .breakfast, .dessert: return "chef"
+        case .recipes, .american, .italian, .vegetarian, .mexican, .breakfast, .dessert: return "recipe"
         case .trending: return "trending"
         case .activities: return "activity"
             

@@ -111,7 +111,7 @@ class FlightDetailViewController: ActivityDetailViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
-            cell.delegate = self
+//            cell.delegate = self
             if let workout = workout {
                 if let workouts = favAct["workouts"], workouts.contains(workout.identifier) {
                     cell.heartButtonImage = "heart-filled"

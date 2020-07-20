@@ -1145,6 +1145,10 @@ let activityNFAlert = UIAlertController(title: "Could Not Load Activity", messag
 
 let dupeRecipeAlert = UIAlertController(title: "Recipe already on Grocery List", message: nil, preferredStyle: UIAlertController.Style.alert)
 
+let activityAddedAlert = UIAlertController(title: "Activity Added!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let recipeAddedAlert = UIAlertController(title: "Recipe Added!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
 extension UIViewController {
     func messageSentAlert() {
         self.present(messageAlert, animated: true, completion: nil)
@@ -1152,10 +1156,10 @@ extension UIViewController {
     func removeMessageAlert() {
         messageAlert.dismiss(animated: true, completion: nil)
     }
-    func activitySentAlert() {
+    func activityCreatedAlert() {
         self.present(activityAlert, animated: true, completion: nil)
     }
-    func removeActivityAlert() {
+    func removeActivityCreatedAlert() {
         activityAlert.dismiss(animated: true, completion: nil)
     }
     func activityNotFoundAlert() {
@@ -1169,6 +1173,18 @@ extension UIViewController {
     }
     func removeDupeRecAlert() {
         dupeRecipeAlert.dismiss(animated: true, completion: nil)
+    }
+    func actAddAlert() {
+        self.present(activityAddedAlert, animated: true, completion: nil)
+    }
+    func removeActAddAlert() {
+        activityAddedAlert.dismiss(animated: true, completion: nil)
+    }
+    func recAddAlert() {
+        self.present(recipeAddedAlert, animated: true, completion: nil)
+    }
+    func removeRecAddAlert() {
+        recipeAddedAlert.dismiss(animated: true, completion: nil)
     }
 }
 

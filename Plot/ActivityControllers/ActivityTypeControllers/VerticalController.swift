@@ -463,7 +463,7 @@ extension VerticalController: ActivitySubTypeCellDelegate {
                                                     
             }))
             
-            alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Add to Existing Activity", style: .default, handler: { (_) in
                     
                     // ChooseActivityTableViewController
                     let destination = ChooseActivityTableViewController()

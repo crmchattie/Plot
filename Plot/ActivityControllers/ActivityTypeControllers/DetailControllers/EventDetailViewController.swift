@@ -50,7 +50,7 @@ class EventDetailViewController: ActivityDetailViewController {
     
     fileprivate func setMoreActivity() {
         if let event = event {
-            activity.activityType = "event"
+            activity.activityType = activityType
             activity.eventID = "\(event.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
@@ -223,6 +223,7 @@ class EventDetailViewController: ActivityDetailViewController {
                     cell.heartButtonImage = "heart"
                 }
                 cell.active = active
+                cell.activeList = activeList
                 cell.event = event
                 return cell
             } else if let attraction = attraction {

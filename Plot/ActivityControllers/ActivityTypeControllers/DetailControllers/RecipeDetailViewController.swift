@@ -65,10 +65,9 @@ class RecipeDetailViewController: ActivityDetailViewController {
     fileprivate func setMoreActivity() {
         if let recipe = recipe {
             activity.recipeID = "\(recipe.id)"
-            activity.activityType = "recipe"
+            activity.activityType = activityType
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
-
                     startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
                     endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
                 } else {
@@ -215,6 +214,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
                 }
                 cell.recipe = recipe
                 cell.active = active
+                cell.activeList = activeList
                 return cell
             } else {
                 return cell

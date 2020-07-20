@@ -125,13 +125,24 @@ extension ActivityCell {
             invitationSegmentHeightConstraint.constant = 0
         }
         
-        if activity.recipeID != nil {
-            activityTypeButton.setImage(UIImage(named: "chef"), for: .normal)
-        } else if activity.workoutID != nil {
+        switch activity.activityType {
+        case "recipe":
+            activityTypeButton.setImage(UIImage(named: "recipe"), for: .normal)
+        case "workout":
             activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
-        } else if activity.eventID != nil {
+        case "event":
             activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
-        } else {
+        case "food":
+            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
+        case "nightlife":
+            activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
+        case "recreation":
+            activityTypeButton.setImage(UIImage(named: "recreation"), for: .normal)
+        case "shopping":
+            activityTypeButton.setImage(UIImage(named: "shopping"), for: .normal)
+        case "sightseeing":
+            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
+        default:
             activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
         }
         

@@ -238,7 +238,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         longitude = array[1]
                         
                         if activity.recipeID != nil {
-                            type = "chef"
+                            type = "recipe"
                         } else if activity.workoutID != nil {
                             type = "workout"
                         } else if activity.eventID != nil {

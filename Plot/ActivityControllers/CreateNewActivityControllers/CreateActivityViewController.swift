@@ -751,12 +751,8 @@ class CreateActivityViewController: FormViewController {
                                 $0.multivaluedRowToInsertAt = { index in
                                     self.scheduleIndex = index
                                     self.openSchedule()
-                                    return ScheduleRow()
-                                        .onCellSelection() { cell, row in
-                                        self.scheduleIndex = index
-                                        self.openSchedule()
-                                        cell.cellResignFirstResponder()
-    //                                            self.tableView.endEditing(true)
+                                    return LabelRow("label"){ row in
+                                        
                                     }
                                 }
                                 
@@ -769,7 +765,6 @@ class CreateActivityViewController: FormViewController {
                                             self.scheduleIndex = row.indexPath!.row
                                             self.openSchedule()
                                             cell.cellResignFirstResponder()
-    //                                                self.tableView.endEditing(true)
                                     }, at: mvs.count - 1)
                                     
                                 }
@@ -2375,30 +2370,40 @@ extension CreateActivityViewController: UpdateLocationDelegate {
 
 extension CreateActivityViewController: UpdateScheduleDelegate {
     func updateSchedule(schedule: Activity) {
-        if let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
-            let scheduleRow = mvs.allRows[scheduleIndex]
-            if let _ = schedule.name {
+        if let _: LabelRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+            mvs.remove(at: mvs.count - 2)
+        }
+        
+        if let _ = schedule.name {
+            if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                let scheduleRow = mvs.allRows[scheduleIndex]
                 scheduleRow.baseValue = schedule
                 scheduleRow.reload()
-                if scheduleList.indices.contains(scheduleIndex) {
-                    scheduleList[scheduleIndex] = schedule
-                } else {
-                    Analytics.logEvent("new_schedule", parameters: [
-                        "activity_type": schedule.activityType ?? "basic" as NSObject
-                    ])
-                    scheduleList.append(schedule)
-                }
-                sortSchedule()
-                if let localAddress = schedule.locationAddress {
-                    for (key, value) in localAddress {
-                        locationAddress[key] = value
-                    }
-                }
-                setupRightBarButton(with: "Update")
-                updateLists(type: "schedule")
+                scheduleList[scheduleIndex] = schedule
             } else {
-                mvs.remove(at: scheduleIndex)
+                var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+                mvs.insert(ScheduleRow() {
+                    $0.value = schedule
+                    }.onCellSelection() { cell, row in
+                        self.scheduleIndex = row.indexPath!.row
+                        self.openSchedule()
+                        cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+                
+                Analytics.logEvent("new_schedule", parameters: [
+                    "activity_type": schedule.activityType ?? "basic" as NSObject
+                ])
+                scheduleList.append(schedule)
             }
+            
+            sortSchedule()
+            if let localAddress = schedule.locationAddress {
+                for (key, value) in localAddress {
+                    locationAddress[key] = value
+                }
+            }
+            setupRightBarButton(with: "Update")
+            updateLists(type: "schedule")
         }
     }
     func updateIngredients(recipe: Recipe?, recipeID: String?) {

@@ -83,7 +83,7 @@ class PlaceDetailCell: UICollectionViewCell {
                         }
                     }
                 }
-                if let attributes = fsVenue.attributes, let groups = attributes.groups {
+                if let attributes = fsVenue.attributes, let groups = attributes.groups, groups.count > 0 {
                     featuresLabel.text = "Features:"
                     for index in 0...groups.count - 1 {
                         if let name = groups[index].name, let items = groups[index].items {
@@ -121,9 +121,14 @@ class PlaceDetailCell: UICollectionViewCell {
                 }
                 if let url = fsVenue.url {
                     websiteLabel.text = url
+                } else {
+                    websiteView.isUserInteractionEnabled = false
                 }
                 if let contact = fsVenue.contact, let phoneNumber = contact.formattedPhone {
                     phoneNumberLabel.text = phoneNumber
+                } else {
+                    phoneLabel.isHidden = true
+                    phoneView.isUserInteractionEnabled = false
                 }
                 setupViews()
             }

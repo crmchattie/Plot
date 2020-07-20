@@ -39,7 +39,6 @@ class ActivitylistViewController: FormViewController {
     var connectedToAct = true
     var comingFromLists = false
     
-    fileprivate var activityIndex: Int = 0
     fileprivate var activityName: String = ""
     
     var chatLogController: ChatLogController? = nil
@@ -542,7 +541,7 @@ class ActivitylistViewController: FormViewController {
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Activity List",
-                               footer: "Add a activitylist item") {
+                               footer: "Add an activity to list") {
                                 $0.tag = "activitylistfields"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
@@ -556,46 +555,9 @@ class ActivitylistViewController: FormViewController {
                                 }
                                 $0.multivaluedRowToInsertAt = { index in
                                     self.activityName = ""
-                                    self.activityIndex = index
                                     self.openActivity()
-                                    return SplitRow<ButtonRow, CheckRow>(){ splitRow in
-                                        splitRow.rowLeftPercentage = 0.75
-                                        splitRow.rowLeft = ButtonRow(){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            $0.cell.textLabel?.textAlignment = .left
-                                            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            $0.cell.textLabel?.numberOfLines = 0
-                                        }.onCellSelection({ cell, row in
-                                            self.activityName = row.title ?? ""
-                                            self.openActivity()
-                                        }).cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            cell.textLabel?.textAlignment = .left
-                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            cell.textLabel?.numberOfLines = 0
-                                        }
-                                        splitRow.rowRight = CheckRow() {
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            $0.cell.tintColor = FalconPalette.defaultBlue
-                                            $0.value = false
-                                            $0.cell.accessoryType = .checkmark
-                                            $0.cell.tintAdjustmentMode = .dimmed
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                            cell.tintColor = FalconPalette.defaultBlue
-                                            if row.value == false {
-                                                cell.accessoryType = .checkmark
-                                                cell.tintAdjustmentMode = .dimmed
-                                            } else {
-                                                cell.tintAdjustmentMode = .automatic
-                                            }
-                                        }.onCellSelection({ (cell, row) in
-                                            if let title = splitRow.rowLeft?.title, self.activitylist.items![title] != nil {
-                                                self.activitylist.items![title] = row.value
-                                            }
-                                        })
-                                    }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                    return LabelRow("label"){ row in
+                                        
                                     }
                                     
                                 }
@@ -613,8 +575,7 @@ class ActivitylistViewController: FormViewController {
                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         row.cell.textLabel?.numberOfLines = 0
                         row.title = key
-                        self.activityIndex = mvs.count - 1
-                        }.onCellSelection({ cell, row in
+                        }.onCellSelection({ _, _ in
                             self.activityName = key
                             self.openActivity()
                     }).cellUpdate { cell, row in
@@ -649,15 +610,11 @@ class ActivitylistViewController: FormViewController {
     }
     
     fileprivate func openActivity() {
-        print("activityName \(activityName)")
         if activityName != "", let IDTypeDictionary = activitylist.IDTypeDictionary {
             let name = activityName
-            print("name \(name)")
             if let IDType = IDTypeDictionary[name] {
                 for (ID, type) in IDType {
                     self.showActivityIndicator()
-                    print("ID \(ID)")
-                    print("type \(type)")
                     let dispatchGroup = DispatchGroup()
                     if type == "recipe" {
                         dispatchGroup.enter()
@@ -669,8 +626,10 @@ class ActivitylistViewController: FormViewController {
                                     destination.recipe = detailedRecipe
                                     destination.detailedRecipe = detailedRecipe
                                     destination.activeList = true
+                                    destination.active = true
                                     destination.listType = "activity"
                                     destination.listDelegate = self
+                                    destination.activityType = type
                                     self.hideActivityIndicator()
                                     self.navigationController?.pushViewController(destination, animated: true)
                                 }
@@ -686,21 +645,20 @@ class ActivitylistViewController: FormViewController {
                             }
                         }
                     } else if type == "workout" {
-                        print("workout type")
                         var reference = Database.database().reference()
                         dispatchGroup.enter()
                         reference = Database.database().reference().child("workouts").child("workouts")
                         reference.child(ID).observeSingleEvent(of: .value, with: { (snapshot) in
-                            print("snapshot workout type \(snapshot)")
                             if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
                                 if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
-                                    print("workout good")
                                     dispatchGroup.leave()
                                     let destination = WorkoutDetailViewController()
                                     destination.workout = workout
                                     destination.activeList = true
+                                    destination.active = true
                                     destination.listType = "activity"
                                     destination.listDelegate = self
+                                    destination.activityType = type
                                     self.hideActivityIndicator()
                                     self.navigationController?.pushViewController(destination, animated: true)
                                 }
@@ -722,8 +680,10 @@ class ActivitylistViewController: FormViewController {
                                     let destination = EventDetailViewController()
                                     destination.event = event
                                     destination.activeList = true
+                                    destination.active = true
                                     destination.listType = "activity"
                                     destination.listDelegate = self
+                                    destination.activityType = type
                                     self.hideActivityIndicator()
                                     self.navigationController?.pushViewController(destination, animated: true)
                                 }
@@ -738,7 +698,7 @@ class ActivitylistViewController: FormViewController {
                                 }
                             }
                         }
-                    } else if type == "place" {
+                    } else {
                         dispatchGroup.enter()
                         Service.shared.fetchFSDetails(id: ID) { (search, err) in
                             if let place = search?.response?.venue {
@@ -748,8 +708,10 @@ class ActivitylistViewController: FormViewController {
                                     destination.hidesBottomBarWhenPushed = true
                                     destination.place = place
                                     destination.activeList = true
+                                    destination.active = true
                                     destination.listType = "activity"
                                     destination.listDelegate = self
+                                    destination.activityType = type
                                     self.hideActivityIndicator()
                                     self.navigationController?.pushViewController(destination, animated: true)
                                 }
@@ -778,14 +740,12 @@ class ActivitylistViewController: FormViewController {
     
     override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
         super.rowsHaveBeenRemoved(rows, at: indexes)
-        let rowNumber : Int = indexes.first!.row
         
         DispatchQueue.main.async { [weak self] in
-            if let activities = self!.activitylist.items, rows[0].title != nil, let IDTypeDictionary = self!.activitylist.IDTypeDictionary {
-                let name = Array<String>(activities.keys)[rowNumber]
-                self!.activitylist.items![name] = nil
-                if IDTypeDictionary[name] != nil {
-                    self!.activitylist.IDTypeDictionary![name] = nil
+            if let row = rows[0] as? SplitRow<ButtonRow, CheckRow>, row.rowLeft?.title != nil, let title = row.rowLeft?.title, self!.activitylist.items != nil, let IDTypeDictionary = self!.activitylist.IDTypeDictionary {
+                self!.activitylist.items![title] = nil
+                if IDTypeDictionary[title] != nil {
+                    self!.activitylist.IDTypeDictionary![title] = nil
                 }
             }
         }
@@ -872,56 +832,92 @@ extension ActivitylistViewController: UpdateListDelegate {
     func updateRecipe(recipe: Recipe?) {
         
     }
-    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?) {
-        print("updating list")
-        if let mvs = self.form.sectionBy(tag: "activitylistfields") as? MultivaluedSection {
-            if let row = mvs.allRows[activityIndex] as? SplitRow<ButtonRow, CheckRow> {
-                if let object = recipe {
-                    row.rowLeft!.title = object.title
-                    row.updateCell()
-                    if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                        activitylist.items!["\(object.title)"] = false
-                        activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.id)":"recipe"]
-                    } else {
-                        activitylist.items = ["\(object.title)": false]
-                        activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.id)":"recipe"]]
-                    }
-                } else if let object = workout {
-                    row.rowLeft!.title = object.title
-                    row.updateCell()
-                    if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                        activitylist.items!["\(object.title)"] = false
-                        activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.identifier)":"workout"]
-                    } else {
-                        activitylist.items = ["\(object.title)": false]
-                        activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.identifier)":"workout"]]
-                    }
-                } else if let object = event {
-                    row.rowLeft!.title = object.name
-                    row.updateCell()
-                    if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                        activitylist.items!["\(object.name)"] = false
-                        activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"event"]
-                    } else {
-                        activitylist.items = ["\(object.name)": false]
-                        activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"event"]]
-                    }
-                } else if let object = place {
-                    row.rowLeft!.title = object.name
-                    row.updateCell()
-                    if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                        activitylist.items!["\(object.name)"] = false
-                        activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"place"]
-                    } else {
-                        activitylist.items = ["\(object.name)": false]
-                        activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"place"]]
-                    }
-                } else {
-                    print("object not found")
-                    mvs.remove(at: activityIndex)
-                }
-            }
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?) {
+        if let _: LabelRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "activitylistfields") as? MultivaluedSection {
+            mvs.remove(at: mvs.count - 2)
         }
+        
+        var key = ""
+        if let object = recipe, let activityType = activityType {
+            key = object.title
+            if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
+                activitylist.items!["\(object.title)"] = false
+                activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.id)":"\(activityType)"]
+            } else {
+                activitylist.items = ["\(object.title)": false]
+                activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.id)":"\(activityType)"]]
+            }
+        } else if let object = workout, let activityType = activityType {
+            key = object.title
+            if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
+                activitylist.items!["\(object.title)"] = false
+                activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.identifier)":"\(activityType)"]
+            } else {
+                activitylist.items = ["\(object.title)": false]
+                activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.identifier)":"\(activityType)"]]
+            }
+        } else if let object = event, let activityType = activityType {
+            key = object.name
+            if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
+                activitylist.items!["\(object.name)"] = false
+                activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"\(activityType)"]
+            } else {
+                activitylist.items = ["\(object.name)": false]
+                activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"\(activityType)"]]
+            }
+        } else if let object = place, let activityType = activityType {
+            key = object.name
+            if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
+                activitylist.items!["\(object.name)"] = false
+                activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"\(activityType)"]
+            } else {
+                activitylist.items = ["\(object.name)": false]
+                activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"\(activityType)"]]
+            }
+        } else {
+            print("object not found")
+            return
+        }
+        
+        var mvs = (form.sectionBy(tag: "activitylistfields") as! MultivaluedSection)
+        mvs.insert(SplitRow<ButtonRow, CheckRow>() { splitRow in
+            splitRow.rowLeftPercentage = 0.75
+            splitRow.rowLeft = ButtonRow(){ row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textLabel?.numberOfLines = 0
+                row.title = key
+                }.onCellSelection({ cell, row in
+                    self.activityName = key
+                    self.openActivity()
+            }).cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textAlignment = .left
+                cell.textLabel?.numberOfLines = 0
+            }
+            splitRow.rowRight = CheckRow() {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.tintColor = FalconPalette.defaultBlue
+                $0.value = false
+                $0.cell.accessoryType = .checkmark
+                $0.cell.tintAdjustmentMode = .dimmed
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.tintColor = FalconPalette.defaultBlue
+                if row.value == false {
+                    cell.accessoryType = .checkmark
+                    cell.tintAdjustmentMode = .dimmed
+                } else {
+                    cell.tintAdjustmentMode = .automatic
+                }
+            }.onCellSelection({ (cell, row) in
+                self.activitylist.items![key] = row.value
+            })
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        } , at: mvs.count - 1)
     }
 }
 

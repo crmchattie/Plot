@@ -9,7 +9,7 @@
 import UIKit
 
 protocol ActivityTypeCellDelegate: class {
-    func plusButtonTapped(type: Any)
+    func plusButtonTapped(type: AnyHashable)
     func shareButtonTapped(activityObject: ActivityObject)
     func heartButtonTapped(type: Any)
     func mapButtonTapped(type: Any)
@@ -91,6 +91,22 @@ class ActivityTypeCell: UICollectionViewCell {
     var fsVenue: FSVenue! {
         didSet {
             if let fsVenue = fsVenue {
+                nameLabel.text = fsVenue.name
+                if let address = fsVenue.location?.formattedAddress?[0] {
+                    categoryLabel.text = address
+                }
+                if let categories = fsVenue.categories, !categories.isEmpty, let subcategory = categories[0].shortName {
+                    subcategoryLabel.text = subcategory
+                }
+                imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
+                setupViews()
+            }
+        }
+    }
+    
+    var groupItem: GroupItem! {
+        didSet {
+            if let groupItem = groupItem, let fsVenue = groupItem.venue  {
                 nameLabel.text = fsVenue.name
                 if let address = fsVenue.location?.formattedAddress?[0] {
                     categoryLabel.text = address
@@ -239,11 +255,13 @@ class ActivityTypeCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        mapButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        recipe = nil
+        workout = nil
+        event = nil
+        fsVenue = nil
+        groupItem = nil
+        sygicPlace = nil
+        attraction = nil
         mapButton.isHidden = false
     }
 
@@ -259,6 +277,8 @@ class ActivityTypeCell: UICollectionViewCell {
             self.delegate?.plusButtonTapped(type: attraction)
         } else if let fsVenue = fsVenue {
             self.delegate?.plusButtonTapped(type: fsVenue)
+        } else if let groupItem = groupItem {
+            self.delegate?.plusButtonTapped(type: groupItem)
         }
     }
     
@@ -374,6 +394,28 @@ class ActivityTypeCell: UICollectionViewCell {
                 activityObject = ActivityObject(dictionary: activity)
             }
             self.delegate?.shareButtonTapped(activityObject: activityObject)
+        } else if let groupItem = groupItem, let fsVenue = groupItem.venue {
+            var activity = [String: AnyObject]()
+            var activityObject: ActivityObject
+            if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
+                let data = compressImage(image: image)
+                activity = ["activityType": "event",
+                            "activityName": "\(fsVenue.name)",
+                            "activityTypeID": "\(fsVenue.id)",
+                            "activityImageURL": imageURL,
+                            "activityCategory": category,
+                            "activitySubcategory": subcategory,
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                activity = ["activityType": "event",
+                            "activityName": "\(fsVenue.name)",
+                            "activityCategory": "\(categoryLabel.text ?? "")",
+                            "activitySubcategory": "\(subcategoryLabel.text ?? "")",
+                            "activityTypeID": "\(fsVenue.id)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            }
+            self.delegate?.shareButtonTapped(activityObject: activityObject)
         }
     }
 
@@ -390,6 +432,8 @@ class ActivityTypeCell: UICollectionViewCell {
             self.delegate?.heartButtonTapped(type: attraction)
         } else if let fsVenue = fsVenue {
             self.delegate?.heartButtonTapped(type: fsVenue)
+        } else if let groupItem = groupItem, let fsVenue = groupItem.venue {
+            self.delegate?.heartButtonTapped(type: fsVenue)
         }
         
     }
@@ -400,6 +444,8 @@ class ActivityTypeCell: UICollectionViewCell {
         } else if let attraction = attraction {
             self.delegate?.mapButtonTapped(type: attraction)
         } else if let fsVenue = fsVenue {
+            self.delegate?.mapButtonTapped(type: fsVenue)
+        } else if let groupItem = groupItem, let fsVenue = groupItem.venue {
             self.delegate?.mapButtonTapped(type: fsVenue)
         }
     }

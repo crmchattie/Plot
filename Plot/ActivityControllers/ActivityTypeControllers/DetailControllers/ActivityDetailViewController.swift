@@ -47,6 +47,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     var activeList: Bool = false
     var listType: String?
     
+    var activityType: String!
+    
     var activityID = String()
     
     let dispatchGroup = DispatchGroup()

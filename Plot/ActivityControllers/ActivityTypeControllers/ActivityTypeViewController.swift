@@ -14,7 +14,7 @@ import SwiftUI
 
 protocol UpdateListDelegate: class {
     func updateRecipe(recipe: Recipe?)
-    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?)
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?)
 }
 
 class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, CLLocationManagerDelegate {
@@ -53,6 +53,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var activity: Activity!
     var activeList: Bool = false
     var listType: String?
+    var activityType: String!
     
     var startDateTime: Date?
     var endDateTime: Date?
@@ -177,7 +178,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
             delegate?.updateSchedule(schedule: activity)
         } else if movingBackwards && activeList && navigationController?.visibleViewController is ActivitylistViewController {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: nil)
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: nil, activityType: nil)
         }
         
     }
@@ -296,7 +297,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             }
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
-            cell.fsVenue = object.venue
+            cell.groupItem = object
             return cell
         } else if let object = object as? FSVenue {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
@@ -366,6 +367,9 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let object = diffableDataSource.itemIdentifier(for: indexPath)
+        let snapshot = self.diffableDataSource.snapshot()
+        let section = snapshot.sectionIdentifier(containingItem: object!)
+        print("sectionImage \(section?.image)")
         if let activityType = object as? ActivityType {
             let activityTypeName = activityType.rawValue
             switch activityTypeName {
@@ -419,6 +423,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let event = object as? Event {
             print("event \(String(describing: event.name))")
@@ -436,6 +442,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let workout = object as? Workout {
             print("workout \(String(describing: workout.title))")
@@ -454,6 +462,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let attraction = object as? Attraction {
             print("attraction \(String(describing: attraction.name))")
@@ -471,6 +481,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let place = object as? FSVenue {
             print("place.id \(String(describing: place.id))")
@@ -488,6 +500,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let groupItem = object as? GroupItem, let place = groupItem.venue {
             print("place.id \(String(describing: place.id))")
@@ -505,6 +519,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             print("neither meals or events")
@@ -932,46 +948,48 @@ extension ActivityTypeViewController: UpdateListDelegate {
         self.listDelegate?.updateRecipe(recipe: recipe)
     }
     
-    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?) {
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?) {
         if let object = recipe {
-            self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil)
+            self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil, activityType: activityType)
         } else if let object = workout {
-            self.listDelegate?.updateList(recipe: nil, workout: object, event: nil, place: nil)
+            self.listDelegate?.updateList(recipe: nil, workout: object, event: nil, place: nil, activityType: activityType)
         } else if let object = event {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: object, place: nil)
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: object, place: nil, activityType: activityType)
         } else if let object = place {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: object)
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: object, activityType: activityType)
         }
     }
 }
 
 extension ActivityTypeViewController: ActivityTypeCellDelegate {
-    func plusButtonTapped(type: Any) {
-        print("plusButtonTapped")
+    func plusButtonTapped(type: AnyHashable) {
+        let snapshot = self.diffableDataSource.snapshot()
+        let section = snapshot.sectionIdentifier(containingItem: type)
         if activeList {
             self.movingBackwards = false
             if let object = type as? Recipe {
                 var updatedObject = object
                 updatedObject.title = updatedObject.title.removeCharacters()
-                self.listDelegate!.updateList(recipe: updatedObject, workout: nil, event: nil, place: nil)
-                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+                self.listDelegate!.updateList(recipe: updatedObject, workout: nil, event: nil, place: nil, activityType: section?.image)
             } else if let object = type as? Event {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
-                self.listDelegate!.updateList(recipe: nil, workout: nil, event: updatedObject, place: nil)
-                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: updatedObject, place: nil, activityType: section?.image)
             } else if let object = type as? Workout {
                 var updatedObject = object
                 updatedObject.title = updatedObject.title.removeCharacters()
-                self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil)
-                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+                self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil, activityType: section?.image)
             } else if let object = type as? FSVenue {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
-                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject)
-                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
+            } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
+                var updatedObject = object
+                updatedObject.name = updatedObject.name.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
             }
-            
+            self.actAddAlert()
+            self.dismiss(animated: true, completion: nil)
             return
         }
         
@@ -987,7 +1005,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
         if let recipe = type as? Recipe {
             activity.name = recipe.title
             activity.recipeID = "\(recipe.id)"
-            activity.activityType = "recipe"
+            activity.activityType = section?.image
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
                     startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
@@ -1019,7 +1037,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
         } else if let workout = type as? Workout {
             activity.name = workout.title
-            activity.activityType = "workout"
+            activity.activityType = section?.image
             activity.workoutID = "\(workout.identifier)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
@@ -1064,7 +1082,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
         } else if let event = type as? Event {
             activity.name = event.name
-            activity.activityType = "event"
+            activity.activityType = section?.image
             activity.eventID = "\(event.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
@@ -1108,7 +1126,41 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             activity.name = attraction.name
         } else if let place = type as? FSVenue {
             activity.name = place.name
-            activity.activityType = "place"
+            activity.activityType = section?.image
+            activity.placeID = "\(place.id)"
+            if schedule, let umbrellaActivity = umbrellaActivity {
+                if let startDate = umbrellaActivity.startDateTime {
+                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                    endDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
+                    endDateTime = rounded.addingTimeInterval(seconds)
+                }
+            } else if !schedule {
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                let timezone = TimeZone.current
+                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                startDateTime = rounded.addingTimeInterval(seconds)
+                endDateTime = rounded.addingTimeInterval(seconds)
+            }
+            if let locationName = place.location?.address, let latitude = place.location?.lat, let longitude = place.location?.lng {
+                let newLocationName = locationName.removeCharacters()
+                activity.locationName = newLocationName
+                activity.locationAddress = [newLocationName: [latitude, longitude]]
+            }
+            activity.allDay = false
+            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
+        } else if let groupItem = type as? GroupItem, let place = groupItem.venue {
+            activity.name = place.name
+            activity.activityType = section?.image
             activity.placeID = "\(place.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
@@ -1149,13 +1201,15 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
         if schedule, let _ = umbrellaActivity {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
+                self.movingBackwards = false
+
                 self.delegate?.updateSchedule(schedule: self.activity)
                 if let recipeID = self.activity.recipeID {
                     self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
                 }
                 
-                self.movingBackwards = false
-                self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+                self.actAddAlert()
+                self.dismiss(animated: true, completion: nil)
             }))
             
         } else if !schedule {
@@ -1173,7 +1227,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 self.tabBarController?.selectedIndex = 1
             }))
             
-            alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Add to Existing Activity", style: .default, handler: { (_) in
                 
                 // ChooseActivityTableViewController
                 let destination = ChooseActivityTableViewController()
@@ -1182,6 +1236,29 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 destination.activity = self.activity
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
+                self.present(navController, animated: true, completion: nil)
+                
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Add to List", style: .default, handler: { (_) in
+                
+                // ChooseActivityTableViewController
+                let destination = ChooseListTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.lists = self.listList
+                destination.filteredLists = self.listList
+                destination.activityType = section?.image
+                if let object = type as? Recipe {
+                    destination.recipe = object
+                } else if let object = type as? Event {
+                    destination.event = object
+                } else if let object = type as? Workout {
+                    destination.workout = object
+                } else if let object = type as? FSVenue {
+                    destination.fsVenue = object
+                } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
+                    destination.fsVenue = object
+                }
                 self.present(navController, animated: true, completion: nil)
                 
             }))
@@ -1436,9 +1513,8 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                self.movingBackwards = false
-                (self.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
-                self.tabBarController?.selectedIndex = 1
+                self.actAddAlert()
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }

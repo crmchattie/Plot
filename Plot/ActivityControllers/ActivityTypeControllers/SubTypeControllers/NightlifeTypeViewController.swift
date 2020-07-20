@@ -124,6 +124,8 @@ class NightlifeTypeViewController: ActivitySubTypeViewController, UISearchBarDel
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let object = diffableDataSource.itemIdentifier(for: indexPath)
+        let snapshot = self.diffableDataSource.snapshot()
+        let section = snapshot.sectionIdentifier(containingItem: object!)
         if let activityType = object as? ActivityType {
             let activityTypeName = activityType.rawValue
             switch activityTypeName {
@@ -177,6 +179,8 @@ class NightlifeTypeViewController: ActivitySubTypeViewController, UISearchBarDel
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let event = object as? Event {
             print("event \(String(describing: event.name))")
@@ -194,6 +198,8 @@ class NightlifeTypeViewController: ActivitySubTypeViewController, UISearchBarDel
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let workout = object as? Workout {
             print("workout \(String(describing: workout.title))")
@@ -212,6 +218,8 @@ class NightlifeTypeViewController: ActivitySubTypeViewController, UISearchBarDel
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let attraction = object as? Attraction {
             print("attraction \(String(describing: attraction.name))")
@@ -229,6 +237,8 @@ class NightlifeTypeViewController: ActivitySubTypeViewController, UISearchBarDel
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let place = object as? FSVenue {
             print("place.id \(String(describing: place.id))")
@@ -246,6 +256,8 @@ class NightlifeTypeViewController: ActivitySubTypeViewController, UISearchBarDel
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let groupItem = object as? GroupItem, let place = groupItem.venue {
             print("place.id \(String(describing: place.id))")
@@ -263,6 +275,8 @@ class NightlifeTypeViewController: ActivitySubTypeViewController, UISearchBarDel
             destination.umbrellaActivity = self.umbrellaActivity
             destination.delegate = self
             destination.listDelegate = self
+            destination.listType = self.listType
+            destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             print("neither meals or events")
@@ -535,16 +549,25 @@ class NightlifeTypeViewController: ActivitySubTypeViewController, UISearchBarDel
 }
 
 extension NightlifeTypeViewController: ActivityTypeCellDelegate {
-    func plusButtonTapped(type: Any) {
+    func plusButtonTapped(type: AnyHashable) {
         print("plusButtonTapped")
+        let snapshot = self.diffableDataSource.snapshot()
+        let section = snapshot.sectionIdentifier(containingItem: type)
         if activeList {
+            self.movingBackwards = false
             if let object = type as? FSVenue {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
-                self.movingBackwards = false
-                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject)
-                self.navigationController?.backToViewController(viewController: ActivitylistViewController.self)
-            } 
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
+                self.actAddAlert()
+                self.dismiss(animated: true, completion: nil)
+            } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
+                var updatedObject = object
+                updatedObject.name = updatedObject.name.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
+                self.actAddAlert()
+                self.dismiss(animated: true, completion: nil)
+            }
             return
         }
         
@@ -557,11 +580,10 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
                 activity = Activity(dictionary: ["activityID": activityID as AnyObject])
             }
         }
-        
         if let recipe = type as? Recipe {
             activity.name = recipe.title
             activity.recipeID = "\(recipe.id)"
-            activity.activityType = "recipe"
+            activity.activityType = section?.image
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
                     startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
@@ -569,7 +591,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
@@ -582,7 +604,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
             } else if !schedule {
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
-                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 let timezone = TimeZone.current
                 let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                 startDateTime = rounded.addingTimeInterval(seconds)
@@ -593,7 +615,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
         } else if let workout = type as? Workout {
             activity.name = workout.title
-            activity.activityType = "workout"
+            activity.activityType = section?.image
             activity.workoutID = "\(workout.identifier)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
@@ -606,7 +628,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
@@ -623,7 +645,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
             } else if !schedule {
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
-                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 let timezone = TimeZone.current
                 let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                 startDateTime = rounded.addingTimeInterval(seconds)
@@ -638,7 +660,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
         } else if let event = type as? Event {
             activity.name = event.name
-            activity.activityType = "event"
+            activity.activityType = section?.image
             activity.eventID = "\(event.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
@@ -650,7 +672,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
@@ -663,7 +685,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
@@ -682,7 +704,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
             activity.name = attraction.name
         } else if let place = type as? FSVenue {
             activity.name = place.name
-            activity.activityType = "place"
+            activity.activityType = section?.image
             activity.placeID = "\(place.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
@@ -691,7 +713,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     startDateTime = rounded.addingTimeInterval(seconds)
@@ -700,7 +722,41 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
             } else if !schedule {
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
-                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                let timezone = TimeZone.current
+                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                startDateTime = rounded.addingTimeInterval(seconds)
+                endDateTime = rounded.addingTimeInterval(seconds)
+            }
+            if let locationName = place.location?.address, let latitude = place.location?.lat, let longitude = place.location?.lng {
+                let newLocationName = locationName.removeCharacters()
+                activity.locationName = newLocationName
+                activity.locationAddress = [newLocationName: [latitude, longitude]]
+            }
+            activity.allDay = false
+            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
+        } else if let groupItem = type as? GroupItem, let place = groupItem.venue {
+            activity.name = place.name
+            activity.activityType = section?.image
+            activity.placeID = "\(place.id)"
+            if schedule, let umbrellaActivity = umbrellaActivity {
+                if let startDate = umbrellaActivity.startDateTime {
+                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                    endDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    startDateTime = rounded.addingTimeInterval(seconds)
+                    endDateTime = rounded.addingTimeInterval(seconds)
+                }
+            } else if !schedule {
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 let timezone = TimeZone.current
                 let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                 startDateTime = rounded.addingTimeInterval(seconds)
@@ -723,34 +779,34 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
         if schedule, let _ = umbrellaActivity {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
-                                
+                self.movingBackwards = false
+
                 self.delegate?.updateSchedule(schedule: self.activity)
+                if let recipeID = self.activity.recipeID {
+                    self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
+                }
                 
-                self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+                self.actAddAlert()
+                self.dismiss(animated: true, completion: nil)
             }))
             
         } else if !schedule {
             alert.addAction(UIAlertAction(title: "Create New Activity", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new activity
-                                                    
+                
                 self.showActivityIndicator()
                 let createActivity = ActivityActions(activity: self.activity, active: false, selectedFalconUsers: [])
                 createActivity.createNewActivity()
                 self.hideActivityIndicator()
                 
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 2)
-                    homeTab.changeToIndex(index: 2)
-                }
+                self.movingBackwards = false
+                (self.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
                 self.tabBarController?.selectedIndex = 1
-                self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
             }))
             
-            alert.addAction(UIAlertAction(title: "Merge with Existing Activity", style: .default, handler: { (_) in
-                    
+            alert.addAction(UIAlertAction(title: "Add to Existing Activity", style: .default, handler: { (_) in
+                
                 // ChooseActivityTableViewController
                 let destination = ChooseActivityTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
@@ -759,15 +815,38 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
                 self.present(navController, animated: true, completion: nil)
-            
+                
             }))
-
+            
+            alert.addAction(UIAlertAction(title: "Add to List", style: .default, handler: { (_) in
+                
+                // ChooseActivityTableViewController
+                let destination = ChooseListTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.lists = self.listList
+                destination.filteredLists = self.listList
+                destination.activityType = section?.image
+                if let object = type as? Recipe {
+                    destination.recipe = object
+                } else if let object = type as? Event {
+                    destination.event = object
+                } else if let object = type as? Workout {
+                    destination.workout = object
+                } else if let object = type as? FSVenue {
+                    destination.fsVenue = object
+                } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
+                    destination.fsVenue = object
+                }
+                self.present(navController, animated: true, completion: nil)
+                
+            }))
+            
         }
         
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
-
+        
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
@@ -1045,14 +1124,8 @@ extension NightlifeTypeViewController: ChooseActivityDelegate {
                 }
             }
             dispatchGroup.notify(queue: .main) {
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 2)
-                    homeTab.changeToIndex(index: 2)
-                }
-                self.tabBarController?.selectedIndex = 1
-                self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                self.actAddAlert()
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }

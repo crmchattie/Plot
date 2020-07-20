@@ -136,6 +136,41 @@ class ActivityDetailCell: UICollectionViewCell {
         }
     }
     
+    var groupItem: GroupItem! {
+        didSet {
+            if let fsVenue = groupItem.venue {
+                nameLabel.text = fsVenue.name
+                if let rating = fsVenue.rating {
+                    categoryLabel.text = "Rating: \(rating)/10"
+                }
+                if let price = fsVenue.price, let tier = price.tier, let categories = fsVenue.categories, !categories.isEmpty, let category = categories[0].shortName {
+                    var categoryText = ""
+                    switch tier {
+                    case 1:
+                        categoryText = category + " - $"
+                    case 2:
+                        categoryText = category + " - $$"
+                    case 3:
+                        categoryText = category + " - $$$"
+                    case 4:
+                        categoryText = category + " - $$$$"
+                    default:
+                        categoryText = category
+                    }
+                    subcategoryLabel.text = categoryText
+                }
+                if let image = fsVenue.bestPhoto, let prefix = image.photoPrefix, let suffix = image.suffix {
+                    let url = prefix + "500x300" + suffix
+                    print("url \(url)")
+                    imageView.sd_setImage(with: URL(string: url))
+                    imageURL = url
+                }
+                subcategoryTextField.isUserInteractionEnabled = false
+                setupViews()
+            }
+        }
+    }
+    
     var sygicPlace: SygicPlace! {
         didSet {
             if let sygicPlace = sygicPlace {
@@ -245,10 +280,11 @@ class ActivityDetailCell: UICollectionViewCell {
     let imageView = UIImageView(cornerRadius: 0)
     
     var active: Bool = false
+    var activeList: Bool = false
     
     func setupViews() {
         
-        dotsButton.isHidden = !active
+        dotsButton.isHidden = !active || activeList
         
         subcategoryTextField.delegate = self
         
@@ -303,16 +339,6 @@ class ActivityDetailCell: UICollectionViewCell {
         
         let subcategoryViewTapped = UITapGestureRecognizer(target: self, action: #selector(ActivityDetailCell.subcategoryViewTapped(_:)))
         subcategoryView.addGestureRecognizer(subcategoryViewTapped)
-
-    }
-        
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        dotsButton.tintColor = ThemeManager.currentTheme().generalTitleColor
 
     }
     

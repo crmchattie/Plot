@@ -40,8 +40,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
     
     fileprivate func setMoreActivity() {
         if let place = place {
-            activity.name = place.name
-            activity.activityType = "place"
+            activity.activityType = activityType
             activity.placeID = "\(place.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
                 if let startDate = umbrellaActivity.startDateTime {
@@ -131,6 +130,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
                     cell.heartButtonImage = "heart"
                 }
                 cell.active = active
+                cell.activeList = activeList
                 cell.fsVenue = place
                 return cell
             } else {

@@ -106,12 +106,25 @@ final class ScheduleCell: Cell<Activity>, CellType {
             locationNameLabel.text = schedule.locationName
         }
         
-        if schedule.recipeID != nil {
-            activityTypeButton.setImage(UIImage(named: "chef"), for: .normal)
-        } else if schedule.workoutID != nil {
+        switch schedule.activityType {
+        case "recipe":
+            activityTypeButton.setImage(UIImage(named: "recipe"), for: .normal)
+        case "workout":
             activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
-        } else if schedule.eventID != nil {
+        case "event":
             activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+        case "food":
+            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
+        case "nightlife":
+            activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
+        case "recreation":
+            activityTypeButton.setImage(UIImage(named: "recreation"), for: .normal)
+        case "shopping":
+            activityTypeButton.setImage(UIImage(named: "shopping"), for: .normal)
+        case "sightseeing":
+            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
+        default:
+            activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
         }
         
     }

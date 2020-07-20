@@ -50,6 +50,7 @@ class ChooseListTableViewController: UITableViewController {
     var workout: Workout!
     var fsVenue: FSVenue!
     var sygicPlace: SygicPlace!
+    var activityType: String!
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -140,7 +141,6 @@ class ChooseListTableViewController: UITableViewController {
                 activitylist.name = "Activity List"
                 activitylist.createdDate = Date()
                 self.updateActivitylist(activitylist: activitylist, active: false)
-
             }
         }
         let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
@@ -252,13 +252,16 @@ class ChooseListTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("didSelectRow")
         self.navigationItem.searchController?.isActive = false
         let list = filteredLists[indexPath.row]
         
         if let grocerylist = list.grocerylist {
             if recipe.extendedIngredients != nil {
+                print("extendedIngredients does not equal nil")
                 updateGrocerylist(grocerylist: grocerylist, recipe: recipe, active: true)
             } else {
+                print("extendedIngredients does equal nil")
                 lookupRecipe(grocerylist: grocerylist, recipeID: recipe.id, active: true)
             }
         } else if let activitylist = list.activitylist {
@@ -319,6 +322,7 @@ class ChooseListTableViewController: UITableViewController {
                         glIngredients.append(recIngredient)
                     }
                 }
+                grocerylist.ingredients = glIngredients
             } else {
                 self.dupeRecAlert()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
@@ -339,53 +343,65 @@ class ChooseListTableViewController: UITableViewController {
         self.getParticipants(grocerylist: grocerylist, checklist: nil, activitylist: nil, packinglist: nil) { (participants) in
             let createGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: active, selectedFalconUsers: participants)
             createGrocerylist.createNewGrocerylist()
-            self.dismiss(animated: true, completion: nil)
+            self.recAddAlert()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                self.removeRecAddAlert()
+                self.dismiss(animated: true, completion: nil)
+                return
+            })
         }
     }
     
     func updateActivitylist(activitylist: Activitylist, active: Bool) {
-        if let object = recipe {
-            let updatedTitle = object.title.removeCharacters()
+        if let object = recipe, let activityType = activityType {
             if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                activitylist.items!["\(updatedTitle)"] = false
-                activitylist.IDTypeDictionary!["\(updatedTitle)"] = ["\(object.id)":"recipe"]
+                activitylist.items!["\(object.title)"] = false
+                activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.id)":"\(activityType)"]
             } else {
-                activitylist.items = ["\(updatedTitle)": false]
-                activitylist.IDTypeDictionary = ["\(updatedTitle)": ["\(object.id)":"recipe"]]
+                activitylist.items = ["\(object.title)": false]
+                activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.id)":"\(activityType)"]]
             }
-        } else if let object = workout {
-            let updatedTitle = object.title.removeCharacters()
+        } else if let object = workout, let activityType = activityType {
             if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                activitylist.items!["\(updatedTitle)"] = false
-                activitylist.IDTypeDictionary!["\(updatedTitle)"] = ["\(object.identifier)":"workout"]
+                activitylist.items!["\(object.title)"] = false
+                activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.identifier)":"\(activityType)"]
             } else {
-                activitylist.items = ["\(updatedTitle)": false]
-                activitylist.IDTypeDictionary = ["\(updatedTitle)": ["\(object.identifier)":"workout"]]
+                activitylist.items = ["\(object.title)": false]
+                activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.identifier)":"\(activityType)"]]
             }
-        } else if let object = event {
-            let updatedTitle = object.name.removeCharacters()
+        } else if let object = event, let activityType = activityType {
             if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                activitylist.items!["\(updatedTitle)"] = false
-                activitylist.IDTypeDictionary!["\(updatedTitle)"] = ["\(object.id)":"event"]
+                activitylist.items!["\(object.name)"] = false
+                activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"\(activityType)"]
             } else {
-                activitylist.items = ["\(updatedTitle)": false]
-                activitylist.IDTypeDictionary = ["\(updatedTitle)": ["\(object.id)":"event"]]
+                activitylist.items = ["\(object.name)": false]
+                activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"\(activityType)"]]
             }
-        } else if let object = fsVenue {
-            let updatedTitle = object.name.removeCharacters()
+        } else if let object = fsVenue, let activityType = activityType {
             if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                activitylist.items!["\(updatedTitle)"] = false
-                activitylist.IDTypeDictionary!["\(updatedTitle)"] = ["\(object.id)":"place"]
+                activitylist.items!["\(object.name)"] = false
+                activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"\(activityType)"]
             } else {
-                activitylist.items = ["\(updatedTitle)": false]
-                activitylist.IDTypeDictionary = ["\(updatedTitle)": ["\(object.id)":"place"]]
+                activitylist.items = ["\(object.name)": false]
+                activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"\(activityType)"]]
             }
+        } else {
+            print("object not found")
+            return
         }
+        
+        
+        print("updating participants")
         
         self.getParticipants(grocerylist: nil, checklist: nil, activitylist: activitylist, packinglist: nil) { (participants) in
             let createActivitylist = ActivitylistActions(activitylist: activitylist, active: active, selectedFalconUsers: participants)
             createActivitylist.createNewActivitylist()
-            self.dismiss(animated: true, completion: nil)
+            self.actAddAlert()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                self.removeActAddAlert()
+                self.dismiss(animated: true, completion: nil)
+                return
+            })
         }
     }
 }
@@ -485,6 +501,37 @@ extension ChooseListTableViewController: ListViewControllerDataStore {
             var participants: [User] = []
             for id in participantsIDs {
                 if checklist.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let activitylist = activitylist, let ID = activitylist.ID, let participantsIDs = activitylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if activitylist.admin == currentUserID && id == currentUserID {
                     continue
                 }
                 
