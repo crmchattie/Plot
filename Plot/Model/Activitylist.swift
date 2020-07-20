@@ -52,7 +52,7 @@ class Activitylist: NSObject, NSCopying, Codable {
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
-        let copy = Checklist(dictionary: self.toAnyObject())
+        let copy = Activitylist(dictionary: self.toAnyObject())
         return copy
     }
     

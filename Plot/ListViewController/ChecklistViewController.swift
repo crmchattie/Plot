@@ -767,7 +767,6 @@ extension ChecklistViewController: UpdateInvitees {
 
 extension ChecklistViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
-        self.showActivityIndicator()
         if connectedToAct {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let newChecklistID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -792,8 +791,9 @@ extension ChecklistViewController: ChooseActivityDelegate {
                     self.showActivityIndicator()
                     let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: participants)
                     createChecklist.createNewChecklist()
-                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                     self.hideActivityIndicator()
+                    self.addedToActAlert()
+                    self.dismiss(animated: true, completion: nil)
                 }
             }
         } else {
@@ -815,8 +815,9 @@ extension ChecklistViewController: ChooseActivityDelegate {
                 self.showActivityIndicator()
                 let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: participants)
                 createChecklist.createNewChecklist()
-                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 self.hideActivityIndicator()
+                self.addedToActAlert()
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }
@@ -851,6 +852,8 @@ extension ChecklistViewController: ChooseChatDelegate {
                     }
                     Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
+                self.connectedToChatAlert()
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }

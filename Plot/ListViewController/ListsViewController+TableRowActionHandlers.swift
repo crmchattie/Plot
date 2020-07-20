@@ -107,10 +107,31 @@ extension ListsViewController {
 
                 tableView.deleteRows(at: [indexPath], with: .left)
                 tableView.endUpdates()
-            Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
-            Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).removeValue()
+                Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
+                Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).removeValue()
 
                 let dataReference = Database.database().reference().child(checklistsEntity).child(list.ID)
+                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+                    if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
+                        var varMemberIDs = membersIDs
+                        varMemberIDs[currentUserID] = nil
+                        dataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
+                    }
+                })
+            }
+        } else if list.type == "activitylist" {
+            if let index = self.activitylists.firstIndex(where: {$0 == list.activitylist}) {
+                tableView.beginUpdates()
+                listList.remove(at: indexPath.row)
+                activitylists.remove(at: index)
+
+                tableView.deleteRows(at: [indexPath], with: .left)
+                tableView.endUpdates()
+                Database.database().reference().child(userActivitylistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
+                Database.database().reference().child(userActivitylistsEntity).child(currentUserID).child(list.ID).removeValue()
+
+                let dataReference = Database.database().reference().child(activitylistsEntity).child(list.ID)
                 dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                     guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
                     if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
@@ -161,6 +182,13 @@ extension ListsViewController {
             })
         } else if list.type == "checklist" {
             let metadataReference = Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
+            metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
+                if error != nil {
+                    basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
+                }
+            })
+        } else if list.type == "activitylist" {
+            let metadataReference = Database.database().reference().child(userActivitylistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
             metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
                 if error != nil {
                     basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)

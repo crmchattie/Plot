@@ -1193,6 +1193,8 @@ extension ActivityViewController: ChooseChatDelegate {
                     }
                 }
             }
+            self.connectedToChatAlert()
+            self.dismiss(animated: true, completion: nil)
         }
     }
 }

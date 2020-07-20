@@ -693,7 +693,6 @@ extension ListsViewController: ChooseChatDelegate {
         if let grocerylistID = grocerylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child(grocerylistsEntity).child(grocerylistID).updateChildValues(updatedConversationID)
-
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.grocerylists != nil {
                     var grocerylists = conversation.grocerylists!
@@ -718,10 +717,11 @@ extension ListsViewController: ChooseChatDelegate {
                     Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
             }
+            self.connectedToChatAlert()
+            self.dismiss(animated: true, completion: nil)
         } else if let checklistID = checklistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child(checklistsEntity).child(checklistID).updateChildValues(updatedConversationID)
-
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.checklists != nil {
                     var checklists = conversation.checklists!
@@ -746,6 +746,37 @@ extension ListsViewController: ChooseChatDelegate {
                     Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
             }
+            self.connectedToChatAlert()
+            self.dismiss(animated: true, completion: nil)
+        } else if let activitylistID = activitylistID {
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child(activitylistsEntity).child(activitylistID).updateChildValues(updatedConversationID)
+            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+                if conversation.activitylists != nil {
+                    var activitylists = conversation.activitylists!
+                    activitylists.append(activitylistID)
+                    let updatedActivitylists = [activitylistsEntity: activitylists as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
+                } else {
+                    let updatedActivitylists = [activitylistsEntity: [activitylistID] as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
+                }
+                if let activityID = activityID {
+                    Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+                    if conversation.activities != nil {
+                        var activities = conversation.activities!
+                        activities.append(activityID)
+                        let updatedActivities = ["activities": activities as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    } else {
+                        let updatedActivities = ["activities": [activityID] as AnyObject]
+                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                    }
+                    Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
+                }
+            }
+            self.connectedToChatAlert()
+            self.dismiss(animated: true, completion: nil)
         } else if let packinglistID = packinglistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child(packinglistsEntity).child(packinglistID).updateChildValues(updatedConversationID)
@@ -774,6 +805,8 @@ extension ListsViewController: ChooseChatDelegate {
                     Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
             }
+            self.connectedToChatAlert()
+            self.dismiss(animated: true, completion: nil)
         }
     }
 }

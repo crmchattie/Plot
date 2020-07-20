@@ -45,11 +45,13 @@ class ChatListTableViewCell: UITableViewCell {
       nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
     }
     
-    func configureCell(checklist: Checklist?, grocerylist: Grocerylist?, packinglist: Packinglist?) {
+    func configureCell(checklist: Checklist?, grocerylist: Grocerylist?, packinglist: Packinglist?, activitylist: Activitylist?) {
         if let grocerylist = grocerylist {
             nameLabel.text = grocerylist.name
         } else if let checklist = checklist {
             nameLabel.text = checklist.name
+        } else if let activitylist = activitylist {
+            nameLabel.text = activitylist.name
         } else if let packinglist = packinglist {
             nameLabel.text = packinglist.name
         }

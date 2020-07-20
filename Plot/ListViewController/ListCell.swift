@@ -232,6 +232,10 @@ class ListCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        grocerylist = nil
+        checklist = nil
+        packinglist = nil
+        activitylist = nil
         nameLabel.text = ""
         listTypeLabel.text = nil
         activityLabel.text = nil

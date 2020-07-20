@@ -361,7 +361,7 @@ class ActivitylistViewController: FormViewController {
                 }))
             }
         } else if activitylist.conversationID == nil {
-            alert.addAction(UIAlertAction(title: "Connect Activitylist to a Chat", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Connect Activity List to a Chat", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.goToChat()
                 
@@ -918,6 +918,9 @@ extension ActivitylistViewController: UpdateListDelegate {
         }.cellUpdate { cell, row in
             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         } , at: mvs.count - 1)
+        
+        let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+        createActivitylist.createNewActivitylist()
     }
 }
 
@@ -962,7 +965,6 @@ extension ActivitylistViewController: UpdateInvitees {
 
 extension ActivitylistViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
-        self.showActivityIndicator()
         if connectedToAct {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let newActivitylistID = Database.database().reference().child(userActivitylistsEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -987,8 +989,9 @@ extension ActivitylistViewController: ChooseActivityDelegate {
                     self.showActivityIndicator()
                     let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: participants)
                     createActivitylist.createNewActivitylist()
-                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                     self.hideActivityIndicator()
+                    self.addedToActAlert()
+                    self.dismiss(animated: true, completion: nil)
                 }
             }
         } else {
@@ -1010,8 +1013,9 @@ extension ActivitylistViewController: ChooseActivityDelegate {
                 self.showActivityIndicator()
                 let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: participants)
                 createActivitylist.createNewActivitylist()
-                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
                 self.hideActivityIndicator()
+                self.addedToActAlert()
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }
@@ -1022,7 +1026,6 @@ extension ActivitylistViewController: ChooseChatDelegate {
         if let activitylistID = activitylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child(activitylistsEntity).child(activitylistID).updateChildValues(updatedConversationID)
-            
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activitylists != nil {
                     var activitylists = conversation.activitylists!
@@ -1046,6 +1049,8 @@ extension ActivitylistViewController: ChooseChatDelegate {
                     }
                     Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
+                self.connectedToChatAlert()
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }

@@ -1149,6 +1149,10 @@ let activityAddedAlert = UIAlertController(title: "Activity Added!", message: ni
 
 let recipeAddedAlert = UIAlertController(title: "Recipe Added!", message: nil, preferredStyle: UIAlertController.Style.alert)
 
+let addedToActivityAlert = UIAlertController(title: "Added to Activity!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let conToChatAlert = UIAlertController(title: "Connected to Chat!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
 extension UIViewController {
     func messageSentAlert() {
         self.present(messageAlert, animated: true, completion: nil)
@@ -1185,6 +1189,18 @@ extension UIViewController {
     }
     func removeRecAddAlert() {
         recipeAddedAlert.dismiss(animated: true, completion: nil)
+    }
+    func addedToActAlert() {
+        self.present(addedToActivityAlert, animated: true, completion: nil)
+    }
+    func removeAddedToActAlert() {
+        addedToActivityAlert.dismiss(animated: true, completion: nil)
+    }
+    func connectedToChatAlert() {
+        self.present(conToChatAlert, animated: true, completion: nil)
+    }
+    func removeConnectedToChatAlert() {
+        conToChatAlert.dismiss(animated: true, completion: nil)
     }
 }
 

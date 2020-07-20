@@ -749,7 +749,7 @@ extension WorkoutTypeViewController: ActivityTypeCellDelegate {
                 
                 self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil, activityType: section?.image)
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }
             return
         }
@@ -970,7 +970,7 @@ extension WorkoutTypeViewController: ActivityTypeCellDelegate {
                 }
                 
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }))
             
         } else if !schedule {
@@ -1253,7 +1253,7 @@ extension WorkoutTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
+            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
@@ -1309,7 +1309,7 @@ extension WorkoutTypeViewController: ChooseActivityDelegate {
             
             dispatchGroup.notify(queue: .main) {
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }
         }
     }

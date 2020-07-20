@@ -2618,6 +2618,8 @@ extension CreateActivityViewController: ChooseChatDelegate {
                     }
                 }
             }
+            self.connectedToChatAlert()
+            self.dismiss(animated: true, completion: nil)
         }
     }
 }

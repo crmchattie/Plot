@@ -559,13 +559,13 @@ extension SightseeingTypeViewController: ActivityTypeCellDelegate {
                 updatedObject.name = updatedObject.name.removeCharacters()
                 self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
                 self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }
             return
         }
@@ -786,7 +786,7 @@ extension SightseeingTypeViewController: ActivityTypeCellDelegate {
                 }
                 
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }))
             
         } else if !schedule {
@@ -1069,7 +1069,7 @@ extension SightseeingTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
+            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
@@ -1124,7 +1124,7 @@ extension SightseeingTypeViewController: ChooseActivityDelegate {
             }
             dispatchGroup.notify(queue: .main) {
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }
         }
     }

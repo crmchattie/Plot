@@ -449,9 +449,8 @@ extension RecipeDetailViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
+            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
-                    
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
                     newActivity.activityID = newActivityID
@@ -558,7 +557,7 @@ extension RecipeDetailViewController: ChooseActivityDelegate {
             
             dispatchGroup.notify(queue: .main) {
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }
         }
     }
@@ -578,7 +577,7 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
             if !active {
                 self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil, activityType: activityType)
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             } else if let activity = self.activity {
                 activity.name = updatedObject.title
                 activity.activityType = activityType
@@ -981,7 +980,7 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
+            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
@@ -1124,7 +1123,7 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
             if !active {
                 self.listDelegate!.updateList(recipe: nil, workout: nil, event: updatedObject, place: nil, activityType: activityType)
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             } else if let activity = self.activity {
                 activity.name = updatedObject.name
                 activity.activityType = activityType
@@ -1554,7 +1553,7 @@ extension EventDetailViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
+            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
@@ -1662,7 +1661,7 @@ extension EventDetailViewController: ChooseActivityDelegate {
             
             dispatchGroup.notify(queue: .main) {
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }
         }
     }
@@ -1682,7 +1681,7 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
             if !active {
                 self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: activityType)
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             } else if let activity = self.activity {
                 activity.name = updatedObject.name
                 activity.activityType = activityType
@@ -2085,7 +2084,7 @@ extension PlaceDetailViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
+            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
@@ -2194,7 +2193,7 @@ extension PlaceDetailViewController: ChooseActivityDelegate {
             
             dispatchGroup.notify(queue: .main) {
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }
         }
     }

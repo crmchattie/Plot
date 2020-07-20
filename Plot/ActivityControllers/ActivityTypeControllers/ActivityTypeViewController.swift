@@ -29,7 +29,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
     var attractionsString = [String]()
-    var customTypes: [ActivityType] = [.basic, .flight]
+    var customTypes: [ActivityType] = [.basic]
     var favAct = [String: [String]]()
     
     var sections: [ActivitySection] = [.custom, .food, .nightlife, .events, .sightseeing, .recreation, .shopping, .workouts, .recipes]
@@ -989,7 +989,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
             }
             self.actAddAlert()
-            self.dismiss(animated: true, completion: nil)
+            self.removeActAddAlert()
             return
         }
         
@@ -1209,7 +1209,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 }
                 
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }))
             
         } else if !schedule {
@@ -1458,7 +1458,7 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil {
+            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil || mergeActivity.placeID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
@@ -1514,7 +1514,7 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
             
             dispatchGroup.notify(queue: .main) {
                 self.actAddAlert()
-                self.dismiss(animated: true, completion: nil)
+                self.removeActAddAlert()
             }
         }
     }

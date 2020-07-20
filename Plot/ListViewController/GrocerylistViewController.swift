@@ -886,6 +886,10 @@ class GrocerylistViewController: FormViewController {
                 
             }
         }
+        
+        let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+        createGrocerylist.createNewGrocerylist()
+        
         if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
             if form.allSections.count > 3 {
                 for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
@@ -1005,16 +1009,14 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
                 if items[index].amount != nil {
                     self.grocerylist.ingredients![index].amount! += ingredient.amount ?? 0.0
                 }
-//                if items[index].measures?.metric?.amount != nil {
-//                    self.grocerylist.ingredients![index].measures?.metric?.amount! += ingredient.measures?.metric?.amount ?? 0.0
-//                }
-//                if items[index].measures?.us?.amount != nil {
-//                    self.grocerylist.ingredients![index].measures?.us?.amount! += ingredient.measures?.us?.amount ?? 0.0
-//                }
             } else {
                 print("appending ingredient")
                 self.grocerylist.ingredients!.append(ingredient)
             }
+            
+            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createGrocerylist.createNewGrocerylist()
+            
             if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
                 if form.allSections.count > 3 {
                     for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
@@ -1025,6 +1027,10 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
             }
         } else if self.grocerylist.ingredients == nil {
             self.grocerylist.ingredients = [ingredient]
+            
+            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createGrocerylist.createNewGrocerylist()
+            
             addIngredients()
         }
     }
@@ -1197,10 +1203,12 @@ extension GrocerylistViewController: ChooseActivityDelegate {
                     let deleteGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: true, selectedFalconUsers: self.selectedFalconUsers)
                     deleteGrocerylist.deleteGrocerylist()
                     dispatchGroup.leave()
-                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                    self.addedToActAlert()
+                    self.dismiss(animated: true, completion: nil)
                 }
             } else {
-                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                self.addedToActAlert()
+                self.dismiss(animated: true, completion: nil)
             }
         } else {
             if connectedToAct {
@@ -1220,7 +1228,8 @@ extension GrocerylistViewController: ChooseActivityDelegate {
                         let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: participants)
                         createGrocerylist.createNewGrocerylist()
                         self.hideActivityIndicator()
-                        self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                        self.addedToActAlert()
+                        self.dismiss(animated: true, completion: nil)
                     }
                 }
             } else {
@@ -1236,7 +1245,8 @@ extension GrocerylistViewController: ChooseActivityDelegate {
                     let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: participants)
                     createGrocerylist.createNewGrocerylist()
                     self.hideActivityIndicator()
-                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                    self.addedToActAlert()
+                    self.dismiss(animated: true, completion: nil)
                 }
             }
         }
@@ -1248,7 +1258,6 @@ extension GrocerylistViewController: ChooseChatDelegate {
         if let grocerylistID = grocerylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child(grocerylistsEntity).child(grocerylistID).updateChildValues(updatedConversationID)
-
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.grocerylists != nil {
                     var grocerylists = conversation.grocerylists!
@@ -1272,6 +1281,8 @@ extension GrocerylistViewController: ChooseChatDelegate {
                     }
                     Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
                 }
+                self.connectedToChatAlert()
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }

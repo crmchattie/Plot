@@ -615,6 +615,8 @@ extension FlightDetailViewController: ChooseChatDelegate {
                }
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+            self.connectedToChatAlert()
+            self.dismiss(animated: true, completion: nil)
         }
     }
 }

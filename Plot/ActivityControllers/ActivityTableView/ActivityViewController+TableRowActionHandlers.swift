@@ -202,7 +202,7 @@ extension ActivityViewController {
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()
         
-    Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+        Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
         Database.database().reference().child("user-activities").child(currentUserID).child(activityID).removeValue()
     
         let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)

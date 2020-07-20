@@ -38,6 +38,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
     var checklists = [Checklist]()
     var grocerylists = [Grocerylist]()
     var packinglists = [Packinglist]()
+    var activitylists = [Activitylist]()
     var sections = [String]()
     var conversation: Conversation!
     let fullAdminControlls = ["Add members", "Change admin", "Remove admin", "Leave the group"]
@@ -266,6 +267,20 @@ class GroupAdminControlsTableViewController: UITableViewController {
                 })
             }
         }
+        if conversation?.activitylists != nil {
+            sections.append("Activity Lists")
+            for checklistID in conversation!.activitylists! {
+                let activitylistDataReference = Database.database().reference().child(activitylistsEntity).child(checklistID)
+                activitylistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let activitylistSnapshotValue = snapshot.value {
+                        if let activitylist = try? FirebaseDecoder().decode(Activitylist.self, from: activitylistSnapshotValue) {
+                            self.activitylists.append(activitylist)
+                            self.tableView.reloadData()
+                        }
+                    }
+                })
+            }
+        }
         if conversation?.packinglists != nil {
             sections.append("Packing Lists")
             for packinglistID in conversation!.packinglists! {
@@ -439,6 +454,8 @@ class GroupAdminControlsTableViewController: UITableViewController {
             return checklists.count
         } else if sections[section - 2] == "Grocery Lists" {
             return grocerylists.count
+        } else if sections[section - 2] == "Activity Lists" {
+            return activitylists.count
         } else if sections[section - 2] == "Packing Lists" {
             return packinglists.count
         } else {
@@ -453,7 +470,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         if indexPath.section == 1, members[indexPath.row].id != conversationAdminID, members[indexPath.row].id != Auth.auth().currentUser!.uid {
             return true
-        } else if indexPath.section == 2 {
+        } else if indexPath.section >= 2 {
             return true
         } else {
             return false
@@ -602,6 +619,49 @@ class GroupAdminControlsTableViewController: UITableViewController {
                     self.tableView.endUpdates()
                 }
             }
+        } else if sections[indexPath.section - 2] == "Activity Lists" {
+            let membersIDs = self.members.map { $0.id ?? "" }
+            if let activitylistID = self.activitylists[indexPath.row].ID {
+                var activitylistIDs = [String]()
+                let newActivitylistName = self.activitylists[indexPath.row].name?.trimmingCharacters(in: .whitespaces) ?? ""
+                let text = "The \(newActivitylistName) activity list was disconnected to this chat"
+                informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: membersIDs, text: text)
+                let activitylistReference = Database.database().reference().child(activitylistsEntity).child(activitylistID).child("conversationID")
+                activitylistReference.removeValue()
+                let chatReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("activitylists")
+                chatReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    for child in snapshot.children {
+                        let snap = child as! DataSnapshot
+                        let key = snap.key
+                        let value = snap.value as! String
+                        if activitylistID == value {
+                            chatReference.child(key).removeValue()
+                        } else {
+                            activitylistIDs.append(value)
+                        }
+                    }
+                    let updatedActivities = ["activitylists": activitylistIDs as AnyObject]
+                    Database.database().reference().child("groupChats").child(self.chatID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                })
+                
+                guard let activitylistIndex = self.activitylists.firstIndex(where: { (activitylist) -> Bool in
+                    return activitylist.ID == activitylistID
+                }) else { return }
+                
+                if tableView.numberOfRows(inSection: indexPath.section) == 1 {
+                    self.tableView.beginUpdates()
+                    self.activitylists.remove(at: activitylistIndex)
+                    self.sections.removeAll(where: {$0 == "Activity Lists"})
+                    let indexSet = IndexSet(arrayLiteral: indexPath.section)
+                    self.tableView.deleteSections(indexSet, with: .left)
+                    self.tableView.endUpdates()
+                } else {
+                    self.tableView.beginUpdates()
+                    self.activitylists.remove(at: activitylistIndex)
+                    self.tableView.deleteRows(at: [IndexPath(row:activitylistIndex, section: 2)], with: .left)
+                    self.tableView.endUpdates()
+                }
+            }
         } else if sections[indexPath.section - 2] == "Packing Lists" {
             let membersIDs = self.members.map { $0.id ?? "" }
             if let packinglistID = self.packinglists[indexPath.row].ID {
@@ -645,7 +705,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
                     self.tableView.endUpdates()
                 }
             }
-        }
+        } 
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -868,21 +928,26 @@ class GroupAdminControlsTableViewController: UITableViewController {
         } else if sections[indexPath.section - 2] == "Checklists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
             cell.selectionStyle = .none
-            cell.configureCell(checklist: checklists[indexPath.row], grocerylist: nil, packinglist: nil)
+            cell.configureCell(checklist: checklists[indexPath.row], grocerylist: nil, packinglist: nil, activitylist: nil)
             return cell
         } else if sections[indexPath.section - 2] == "Grocery Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
             cell.selectionStyle = .none
-            cell.configureCell(checklist: nil, grocerylist: grocerylists[indexPath.row], packinglist: nil)
+            cell.configureCell(checklist: nil, grocerylist: grocerylists[indexPath.row], packinglist: nil, activitylist: nil)
+            return cell
+        } else if sections[indexPath.section - 2] == "Activity Lists" {
+            let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
+            cell.selectionStyle = .none
+            cell.configureCell(checklist: nil, grocerylist: nil, packinglist: nil, activitylist: activitylists[indexPath.row])
             return cell
         } else if sections[indexPath.section - 2] == "Packing Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
             cell.selectionStyle = .none
-            cell.configureCell(checklist: nil, grocerylist: nil, packinglist: packinglists[indexPath.row])
+            cell.configureCell(checklist: nil, grocerylist: nil, packinglist: packinglists[indexPath.row], activitylist: nil)
             return cell
         } else {
             let cell = UITableViewCell(style: UITableViewCell.CellStyle.default,
-            reuseIdentifier: "default")
+                                       reuseIdentifier: "default")
             return cell
         }
     }
