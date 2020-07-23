@@ -20,6 +20,7 @@ enum Identifiers {
     static let activityCategory = "ACTIVITY_CATEGORY"
     static let checklistCategory = "CHECKLIST_CATEGORY"
     static let grocerylistCategory = "GROCERYLIST_CATEGORY"
+    static let activitylistCategory = "ACTIVITYLIST_CATEGORY"
 }
 
 @UIApplicationMain
@@ -120,9 +121,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 identifier: Identifiers.grocerylistCategory, actions: [viewListAction],
                 intentIdentifiers: [], options: [])
             
+            let activitylistCategory = UNNotificationCategory(
+                identifier: Identifiers.activitylistCategory, actions: [viewListAction],
+                intentIdentifiers: [], options: [])
+            
             
             // 3
-            UNUserNotificationCenter.current().setNotificationCategories([chatCategory, activityCategory, checklistCategory, grocerylistCategory])
+            UNUserNotificationCenter.current().setNotificationCategories([chatCategory, activityCategory, checklistCategory, grocerylistCategory, activitylistCategory])
             
             //get application instance ID
             InstanceID.instanceID().instanceID { (result, error) in
@@ -503,7 +508,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 destination.checklist = checklist
                                 destination.comingFromLists = true
                                 destination.connectedToAct = false
-                                self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil) { (participants) in
+                                self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil, activitylist: nil) { (participants) in
                                     destination.selectedFalconUsers = participants
                                     if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
                                         tabBarController.selectedIndex = 1
@@ -527,7 +532,31 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 destination.grocerylist = grocerylist
                                 destination.comingFromLists = true
                                 destination.connectedToAct = false
-                                self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil) { (participants) in
+                                self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil) { (participants) in
+                                    destination.selectedFalconUsers = participants
+                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                        tabBarController.selectedIndex = 1
+                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                            homeNavigationController.pushViewController(destination, animated: true)
+                                            
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    })
+                } else if let activitylistID = userInfo["activitylistID"] as? String {
+                    let ref = Database.database().reference()
+                    ref.child(activitylistsEntity).child(activitylistID).observeSingleEvent(of: .value, with: { activitylistSnapshot in
+                        if activitylistSnapshot.exists(), let activitylistSnapshotValue = activitylistSnapshot.value {
+                            if let activitylist = try? FirebaseDecoder().decode(Activitylist.self, from: activitylistSnapshotValue) {
+                                let destination = ActivitylistViewController()
+                                destination.activitylist = activitylist
+                                destination.comingFromLists = true
+                                destination.connectedToAct = false
+                                self.getParticipants(grocerylist: nil, checklist: nil, packinglist: nil, activitylist: activitylist) { (participants) in
                                     destination.selectedFalconUsers = participants
                                     if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
                                         tabBarController.selectedIndex = 1
@@ -550,7 +579,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         completionHandler()
     }
     
-    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, completion: @escaping ([User])->()) {
+    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?, completion: @escaping ([User])->()) {
         if let grocerylist = grocerylist, let ID = grocerylist.ID, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             let olderParticipants = self.participants[ID]
@@ -588,6 +617,37 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             var participants: [User] = []
             for id in participantsIDs {
                 if checklist.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let activitylist = activitylist, let ID = activitylist.ID, let participantsIDs = activitylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if activitylist.admin == currentUserID && id == currentUserID {
                     continue
                 }
                 

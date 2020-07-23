@@ -2391,7 +2391,8 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
                 }, at: mvs.count - 1)
                 
                 Analytics.logEvent("new_schedule", parameters: [
-                    "activity_type": schedule.activityType ?? "basic" as NSObject
+                    "schedule_name": schedule.name ?? "name" as NSObject,
+                    "schedule_type": schedule.activityType ?? "basic" as NSObject
                 ])
                 scheduleList.append(schedule)
             }

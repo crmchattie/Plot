@@ -1036,18 +1036,39 @@ extension ActivityViewController: ActivityCellDelegate {
             return
         }
         
-        guard let locationAddress = activity.locationAddress else {
+        guard activity.locationAddress != nil else {
             return
         }
         
-        let destination = MapActivityViewController()
-        destination.hidesBottomBarWhenPushed = true
-        destination.locationAddress = locationAddress
+        var scheduleList = [Activity]()
+        var locationAddress = [String : [Double]]()
         
-        // If we're presenting a modal sheet
-        if let presentedViewController = presentedViewController as? UINavigationController {
-            presentedViewController.pushViewController(destination, animated: true)
+        if activity.schedule != nil {
+            locationAddress = activity.locationAddress!
+            for schedule in activity.schedule! {
+                if schedule.name == "nothing" { continue }
+                scheduleList.append(schedule)
+                guard let localAddress = schedule.locationAddress else { continue }
+                for (key, value) in localAddress {
+                    locationAddress[key] = value
+                }
+            }
         } else {
+            locationAddress = activity.locationAddress!
+        }
+        
+        if locationAddress.count > 1 {
+            let destination = MapViewController()
+            destination.hidesBottomBarWhenPushed = true
+            var locations = [activity]
+            locations.append(contentsOf: scheduleList)
+            destination.sections = [.activities]
+            destination.locations = [.activities: locations]
+            navigationController?.pushViewController(destination, animated: true)
+        } else {
+            let destination = MapActivityViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.locationAddress = locationAddress
             navigationController?.pushViewController(destination, animated: true)
         }
     }

@@ -255,6 +255,11 @@ class ActivityTypeCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        mapButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         recipe = nil
         workout = nil
         event = nil
@@ -377,7 +382,7 @@ class ActivityTypeCell: UICollectionViewCell {
             var activityObject: ActivityObject
             if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
                 let data = compressImage(image: image)
-                activity = ["activityType": "event",
+                activity = ["activityType": "place",
                             "activityName": "\(fsVenue.name)",
                             "activityTypeID": "\(fsVenue.id)",
                             "activityImageURL": imageURL,
@@ -386,7 +391,7 @@ class ActivityTypeCell: UICollectionViewCell {
                             "object": data] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             } else {
-                activity = ["activityType": "event",
+                activity = ["activityType": "place",
                             "activityName": "\(fsVenue.name)",
                             "activityCategory": "\(categoryLabel.text ?? "")",
                             "activitySubcategory": "\(subcategoryLabel.text ?? "")",
@@ -399,7 +404,7 @@ class ActivityTypeCell: UICollectionViewCell {
             var activityObject: ActivityObject
             if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
                 let data = compressImage(image: image)
-                activity = ["activityType": "event",
+                activity = ["activityType": "place",
                             "activityName": "\(fsVenue.name)",
                             "activityTypeID": "\(fsVenue.id)",
                             "activityImageURL": imageURL,
@@ -408,7 +413,7 @@ class ActivityTypeCell: UICollectionViewCell {
                             "object": data] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             } else {
-                activity = ["activityType": "event",
+                activity = ["activityType": "place",
                             "activityName": "\(fsVenue.name)",
                             "activityCategory": "\(categoryLabel.text ?? "")",
                             "activitySubcategory": "\(subcategoryLabel.text ?? "")",

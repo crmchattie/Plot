@@ -77,11 +77,13 @@ class ActivityActions: NSObject {
         
         if active {
             Analytics.logEvent("update_activity", parameters: [
+                "activity_name": activity.name ?? "name" as NSObject,
                 "activity_type": activity.activityType ?? "basic" as NSObject
             ])
             updateActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
         } else {
             Analytics.logEvent("new_activity", parameters: [
+                "activity_name": activity.name ?? "name" as NSObject,
                 "activity_type": activity.activityType ?? "basic" as NSObject
             ])
             newActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)

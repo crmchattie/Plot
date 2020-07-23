@@ -369,7 +369,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         let object = diffableDataSource.itemIdentifier(for: indexPath)
         let snapshot = self.diffableDataSource.snapshot()
         let section = snapshot.sectionIdentifier(containingItem: object!)
-        print("sectionImage \(section?.image)")
         if let activityType = object as? ActivityType {
             let activityTypeName = activityType.rawValue
             switch activityTypeName {
@@ -1458,7 +1457,7 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil || mergeActivity.placeID != nil {
+            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                     let newActivity = mergeActivity.copy() as! Activity
@@ -1466,6 +1465,7 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
                     newActivity.recipeID = nil
                     newActivity.workoutID = nil
                     newActivity.eventID = nil
+                    newActivity.placeID = nil
                     
                     mergeActivity.participantsIDs = newActivity.participantsIDs
                     activity.participantsIDs = newActivity.participantsIDs
@@ -1487,9 +1487,9 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
                     self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
                         let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
                         createActivity.createNewActivity()
+                        self.hideActivityIndicator()
                         dispatchGroup.leave()
                     }
-                    self.hideActivityIndicator()
                 }
             } else {
                 if mergeActivity.schedule != nil {
@@ -1503,18 +1503,19 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
                 
                 dispatchGroup.enter()
                 self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-                    print("\(participants)")
                     self.showActivityIndicator()
                     let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                     createActivity.createNewActivity()
-                    dispatchGroup.leave()
                     self.hideActivityIndicator()
+                    dispatchGroup.leave()
                 }
             }
             
             dispatchGroup.notify(queue: .main) {
-                self.actAddAlert()
-                self.removeActAddAlert()
+               self.actAddAlert()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                    self.removeActAddAlert()
+                })
             }
         }
     }

@@ -82,6 +82,11 @@ class ChooseActivityTableViewController: UITableViewController {
             activities.remove(at: index)
             filteredActivities.remove(at: index)
         }
+    } else if checklist != nil || grocerylist != nil || activitylist != nil || packinglist != nil {
+        activities = activities.filter({ (activity) in
+            return activity.recipeID == nil && activity.workoutID == nil && activity.eventID == nil && activity.placeID == nil
+        })
+        filteredActivities = activities
     }
    
     configureTableView()

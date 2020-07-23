@@ -428,6 +428,10 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["eventID"] = value
         }
         
+        if let value = self.placeID as AnyObject? {
+            dictionary["placeID"] = value
+        }
+        
         return dictionary
     }
     

@@ -647,6 +647,7 @@ extension VerticalController: ChooseActivityDelegate {
                     newActivity.recipeID = nil
                     newActivity.workoutID = nil
                     newActivity.eventID = nil
+                    newActivity.placeID = nil
                     
                     mergeActivity.participantsIDs = newActivity.participantsIDs
                     activity.participantsIDs = newActivity.participantsIDs

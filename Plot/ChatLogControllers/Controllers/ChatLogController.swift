@@ -323,7 +323,7 @@ class ChatLogController: UICollectionViewController {
     setupCollectionView()
     setRightBarButtonItem()
     setupTitleName()
-//    setupActivities()
+    
   }
 
   override func viewDidDisappear(_ animated: Bool) {
@@ -335,7 +335,8 @@ class ChatLogController: UICollectionViewController {
         self.navigationController?.visibleViewController is  SelectActivityTableViewController ||
         self.navigationController?.visibleViewController is  RecipeDetailViewController ||
         self.navigationController?.visibleViewController is  EventDetailViewController ||
-        self.navigationController?.visibleViewController is  WorkoutDetailViewController {
+        self.navigationController?.visibleViewController is  WorkoutDetailViewController ||
+        self.navigationController?.visibleViewController is  PlaceDetailViewController {
       return
     }
 
@@ -743,6 +744,7 @@ class ChatLogController: UICollectionViewController {
                 }
             }
         } else if message.activityType == "place", let placeID = message.activityTypeID {
+            print("place")
             dispatchGroup.enter()
             Service.shared.fetchFSDetails(id: placeID) { (search, err) in
                 if let place = search?.response?.venue {

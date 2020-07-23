@@ -1261,6 +1261,7 @@ extension WorkoutTypeViewController: ChooseActivityDelegate {
                     newActivity.recipeID = nil
                     newActivity.workoutID = nil
                     newActivity.eventID = nil
+                    newActivity.placeID = nil
                     
                     mergeActivity.participantsIDs = newActivity.participantsIDs
                     activity.participantsIDs = newActivity.participantsIDs
@@ -1308,8 +1309,10 @@ extension WorkoutTypeViewController: ChooseActivityDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                self.actAddAlert()
-                self.removeActAddAlert()
+               self.actAddAlert()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                    self.removeActAddAlert()
+                })
             }
         }
     }

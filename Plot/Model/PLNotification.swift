@@ -13,6 +13,7 @@ class PLNotification: NSObject, Codable, NSCoding {
     let activityID: String?
     let checklistID: String?
     let grocerylistID: String?
+    let activitylistID: String?
     let googleCAE: String?
     let gcmMessageID: String?
     let aps: Aps
@@ -25,13 +26,15 @@ class PLNotification: NSObject, Codable, NSCoding {
         case activityID
         case checklistID
         case grocerylistID
+        case activitylistID
     }
     
-    init(chatID: String?, activityID: String?, checklistID: String?, grocerylistID: String?, googleCAE: String?, gcmMessageID: String?, aps: Aps) {
+    init(chatID: String?, activityID: String?, checklistID: String?, grocerylistID: String?, activitylistID: String?, googleCAE: String?, gcmMessageID: String?, aps: Aps) {
         self.chatID = chatID
         self.activityID = activityID
         self.checklistID = checklistID
         self.grocerylistID = grocerylistID
+        self.activitylistID = activitylistID
         self.googleCAE = googleCAE
         self.gcmMessageID = gcmMessageID
         self.aps = aps
@@ -46,6 +49,7 @@ class PLNotification: NSObject, Codable, NSCoding {
         let activityID = decoder.decodeObject(forKey: CodingKeys.activityID.rawValue) as? String
         let checklistID = decoder.decodeObject(forKey: CodingKeys.checklistID.rawValue) as? String
         let grocerylistID = decoder.decodeObject(forKey: CodingKeys.grocerylistID.rawValue) as? String
+        let activitylistID = decoder.decodeObject(forKey: CodingKeys.activitylistID.rawValue) as? String
         let googleCAE = decoder.decodeObject(forKey: CodingKeys.googleCAE.rawValue) as? String
         let gcmMessageID = decoder.decodeObject(forKey: CodingKeys.gcmMessageID.rawValue) as? String
         
@@ -54,6 +58,7 @@ class PLNotification: NSObject, Codable, NSCoding {
             activityID: activityID,
             checklistID: checklistID,
             grocerylistID: grocerylistID,
+            activitylistID: activitylistID,
             googleCAE: googleCAE,
             gcmMessageID: gcmMessageID,
             aps: aps
@@ -65,6 +70,7 @@ class PLNotification: NSObject, Codable, NSCoding {
         coder.encode(self.activityID, forKey: CodingKeys.activityID.rawValue)
         coder.encode(self.checklistID, forKey: CodingKeys.checklistID.rawValue)
         coder.encode(self.grocerylistID, forKey: CodingKeys.grocerylistID.rawValue)
+        coder.encode(self.activitylistID, forKey: CodingKeys.activitylistID.rawValue)
         coder.encode(self.googleCAE, forKey: CodingKeys.googleCAE.rawValue)
         coder.encode(self.gcmMessageID, forKey: CodingKeys.gcmMessageID.rawValue)
         coder.encode(self.aps, forKey: CodingKeys.aps.rawValue)
@@ -92,6 +98,12 @@ class PLNotification: NSObject, Codable, NSCoding {
             if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
                 let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
                 let newBody = body.replacingOccurrences(of: "The grocery list", with: "The \(newSubtitle) grocery list")
+                return "\(newBody) by \(self.aps.alert.title)"
+            }
+        } else if aps.category == "ACTIVITYLIST_CATEGORY" {
+            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
+                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
+                let newBody = body.replacingOccurrences(of: "The activity list", with: "The \(newSubtitle) activity list")
                 return "\(newBody) by \(self.aps.alert.title)"
             }
         }

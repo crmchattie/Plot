@@ -457,6 +457,7 @@ extension RecipeDetailViewController: ChooseActivityDelegate {
                     newActivity.recipeID = nil
                     newActivity.workoutID = nil
                     newActivity.eventID = nil
+                    newActivity.placeID = nil
                     
                     if let oldParticipantsIDs = activity.participantsIDs {
                         if let newParticipantsIDs = newActivity.participantsIDs {
@@ -556,8 +557,10 @@ extension RecipeDetailViewController: ChooseActivityDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                self.actAddAlert()
-                self.removeActAddAlert()
+               self.actAddAlert()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                    self.removeActAddAlert()
+                })
             }
         }
     }
@@ -989,6 +992,7 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
                     newActivity.recipeID = nil
                     newActivity.workoutID = nil
                     newActivity.eventID = nil
+                    newActivity.placeID = nil
                     
                     if let oldParticipantsIDs = activity.participantsIDs {
                         if let newParticipantsIDs = newActivity.participantsIDs {
@@ -1088,22 +1092,10 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                if self.active {
-                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
-                } else {
-                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                    if nav.topViewController is MasterActivityContainerController {
-                        let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 2)
-                        homeTab.changeToIndex(index: 2)
-                    }
-                    self.tabBarController?.selectedIndex = 1
-                    if #available(iOS 13.0, *) {
-                        self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
-                    } else {
-                        // Fallback on earlier versions
-                    }
-                }
+               self.actAddAlert()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                    self.removeActAddAlert()
+                })
             }
         }
     }
@@ -1561,6 +1553,7 @@ extension EventDetailViewController: ChooseActivityDelegate {
                     newActivity.recipeID = nil
                     newActivity.workoutID = nil
                     newActivity.eventID = nil
+                    newActivity.placeID = nil
                     
                     if let oldParticipantsIDs = activity.participantsIDs {
                         if let newParticipantsIDs = newActivity.participantsIDs {
@@ -1660,8 +1653,10 @@ extension EventDetailViewController: ChooseActivityDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                self.actAddAlert()
-                self.removeActAddAlert()
+               self.actAddAlert()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                    self.removeActAddAlert()
+                })
             }
         }
     }
@@ -2093,6 +2088,7 @@ extension PlaceDetailViewController: ChooseActivityDelegate {
                     newActivity.recipeID = nil
                     newActivity.workoutID = nil
                     newActivity.eventID = nil
+                    newActivity.placeID = nil
                     
                     if let oldParticipantsIDs = activity.participantsIDs {
                         if let newParticipantsIDs = newActivity.participantsIDs {
@@ -2192,8 +2188,10 @@ extension PlaceDetailViewController: ChooseActivityDelegate {
             }
             
             dispatchGroup.notify(queue: .main) {
-                self.actAddAlert()
-                self.removeActAddAlert()
+               self.actAddAlert()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                    self.removeActAddAlert()
+                })
             }
         }
     }

@@ -342,6 +342,17 @@ class ActivityDetailCell: UICollectionViewCell {
 
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        dotsButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+
+    }
+
+    
     @objc func plusButtonTapped() {
         self.delegate?.plusButtonTapped()
     }
@@ -441,7 +452,7 @@ class ActivityDetailCell: UICollectionViewCell {
             var activityObject: ActivityObject
             if let image = imageView.image, let imageURL = imageURL, let category = categoryLabel.text, let subcategory = subcategoryLabel.text {
                 let data = compressImage(image: image)
-                activity = ["activityType": "event",
+                activity = ["activityType": "place",
                             "activityName": "\(fsVenue.name)",
                             "activityTypeID": "\(fsVenue.id)",
                             "activityImageURL": imageURL,
@@ -450,7 +461,7 @@ class ActivityDetailCell: UICollectionViewCell {
                             "object": data] as [String: AnyObject]
                 activityObject = ActivityObject(dictionary: activity)
             } else {
-                activity = ["activityType": "event",
+                activity = ["activityType": "place",
                             "activityName": "\(fsVenue.name)",
                             "activityCategory": "\(categoryLabel.text ?? "")",
                             "activitySubcategory": "\(subcategoryLabel.text ?? "")",
