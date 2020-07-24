@@ -246,6 +246,27 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         } else {
                             type = "activity"
                         }
+                        
+                        switch activity.activityType {
+                        case "recipe":
+                            type = "recipe"
+                        case "workout":
+                            type = "workout"
+                        case "event":
+                            type = "event"
+                        case "food":
+                            type = "food"
+                        case "nightlife":
+                            type = "nightlife"
+                        case "recreation":
+                            type = "recreation"
+                        case "shopping":
+                            type = "shopping"
+                        case "sightseeing":
+                            type = "sightseeing"
+                        default:
+                            type = "activity"
+                        }
                                             
                         let annotation = CustomMapItemAnnotation()
                         let placemark = MKPlacemark(coordinate: .init(latitude: latitude, longitude: longitude))
