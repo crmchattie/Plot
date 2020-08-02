@@ -371,6 +371,7 @@ class GeneralTabBarController: UITabBarController {
         }
         
         let text = "Welcome to Plot! If you have any questions, thoughts and/or concerns, just send us a message here! Enjoy Plotting"
+//        "Hi, thanks for downloading Plot! I’m the founder of Plot and am reaching out to see if you are available for a quick call (< 20 min) to help improve the product? If so, a $20 Amazon gift card is coming your way. Thanks for reading and enjoying Plotting!"
         let messageReference = Database.database().reference().child("messages").childByAutoId()
         guard let messageUID = messageReference.key else { return }
         let messageStatus = messageStatusDelivered

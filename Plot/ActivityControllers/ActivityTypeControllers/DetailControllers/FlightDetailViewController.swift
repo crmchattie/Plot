@@ -43,6 +43,7 @@ class FlightDetailViewController: ActivityDetailViewController {
     
     fileprivate func setMoreActivity() {
         if let workout = workout {
+            activity.name = workout.title
             activity.activityType = "flight"
             activity.workoutID = "\(workout.identifier)"
             if schedule, let umbrellaActivity = umbrellaActivity {
@@ -359,7 +360,7 @@ extension FlightDetailViewController: ActivityExpandedDetailCellDelegate {
             
             let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
             let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
-                self.goToMap(locationAddress: self.locationAddress)
+                self.goToMap(activity: self.activity)
             }
             let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
                 let pasteboard = UIPasteboard.general

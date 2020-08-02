@@ -1040,10 +1040,11 @@ extension ActivityViewController: ActivityCellDelegate {
             return
         }
         
-        var scheduleList = [Activity]()
-        var locationAddress = [String : [Double]]()
+        var locations = [activity]
         
         if activity.schedule != nil {
+            var scheduleList = [Activity]()
+            var locationAddress = [String : [Double]]()
             locationAddress = activity.locationAddress!
             for schedule in activity.schedule! {
                 if schedule.name == "nothing" { continue }
@@ -1053,24 +1054,29 @@ extension ActivityViewController: ActivityCellDelegate {
                     locationAddress[key] = value
                 }
             }
-        } else {
-            locationAddress = activity.locationAddress!
+            locations.append(contentsOf: scheduleList)
         }
         
-        if locationAddress.count > 1 {
-            let destination = MapViewController()
-            destination.hidesBottomBarWhenPushed = true
-            var locations = [activity]
-            locations.append(contentsOf: scheduleList)
-            destination.sections = [.activities]
-            destination.locations = [.activities: locations]
-            navigationController?.pushViewController(destination, animated: true)
-        } else {
-            let destination = MapActivityViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.locationAddress = locationAddress
-            navigationController?.pushViewController(destination, animated: true)
-        }
+        let destination = MapViewController()
+        destination.hidesBottomBarWhenPushed = true
+        destination.sections = [.activities]
+        destination.locations = [.activities: locations]
+        navigationController?.pushViewController(destination, animated: true)
+        
+//        if locationAddress.count > 1 {
+//            let destination = MapViewController()
+//            destination.hidesBottomBarWhenPushed = true
+//            var locations = [activity]
+//            locations.append(contentsOf: scheduleList)
+//            destination.sections = [.activities]
+//            destination.locations = [.activities: locations]
+//            navigationController?.pushViewController(destination, animated: true)
+//        } else {
+//            let destination = MapActivityViewController()
+//            destination.hidesBottomBarWhenPushed = true
+//            destination.locationAddress = locationAddress
+//            navigationController?.pushViewController(destination, animated: true)
+//        }
     }
     
     func openChat(forConversation conversationID: String?, activityID: String?) {

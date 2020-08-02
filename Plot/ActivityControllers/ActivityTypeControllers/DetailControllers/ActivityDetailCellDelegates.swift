@@ -88,9 +88,7 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                 }))
             }
             
-        } else
-        
-        if active, !schedule, let activity = activity {
+        } else if active, !schedule, let activity = activity {
             alert.addAction(UIAlertAction(title: "Update Activity", style: .default, handler: { (_) in
                 print("User click Approve button")
                                 
@@ -229,8 +227,6 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
                 if let activity = self.activity {
-                    activity.name = self.recipe?.title
-                    
                     let membersIDs = self.fetchMembersIDs()
                     activity.participantsIDs = membersIDs.0
                     
@@ -249,8 +245,6 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                 // create new activity
                 
                 if let activity = self.activity {
-                    activity.name = self.recipe?.title
-                                        
                     self.showActivityIndicator()
                     let createActivity = ActivityActions(activity: activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     createActivity.createNewActivity()
@@ -275,8 +269,6 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Existing Activity", style: .default, handler: { (_) in
                 
                 if let activity = self.activity {
-                    activity.name = self.recipe?.title
-                    
                     // ChooseActivityTableViewController
                     let destination = ChooseActivityTableViewController()
                     let navController = UINavigationController(rootViewController: destination)
@@ -420,10 +412,10 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
             }
         }
                 
-        if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
+        if let localName = activity.locationName, localName != "locationName", let _ = activity.locationAddress {
             alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
                 print("User click Edit button")
-                self.goToMap(locationAddress: localAddress)
+                self.goToMap(activity: self.activity)
             }))
         }
            
@@ -766,8 +758,6 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
                 if let activity = self.activity {
-                    activity.name = self.workout?.title
-                    
                     let membersIDs = self.fetchMembersIDs()
                     activity.participantsIDs = membersIDs.0
                     
@@ -784,8 +774,6 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                 // create new activity
                 
                 if let activity = self.activity {
-                    activity.name = self.workout?.title
-                                        
                     self.showActivityIndicator()
                     let createActivity = ActivityActions(activity: activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     createActivity.createNewActivity()
@@ -810,8 +798,6 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Existing Activity", style: .default, handler: { (_) in
                 
                 if let activity = self.activity {
-                    activity.name = self.workout?.title
-                                        
                     // ChooseActivityTableViewController
                     let destination = ChooseActivityTableViewController()
                     let navController = UINavigationController(rootViewController: destination)
@@ -954,10 +940,10 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
             }
         }
             
-        if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
+        if let localName = activity.locationName, localName != "locationName", let _ = activity.locationAddress {
             alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
                 print("User click Edit button")
-                self.goToMap(locationAddress: localAddress)
+                self.goToMap(activity: self.activity)
             }))
         }
            
@@ -1307,8 +1293,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
                 if let activity = self.activity {
-                    activity.name = self.event?.name
-                    
                     let membersIDs = self.fetchMembersIDs()
                     activity.participantsIDs = membersIDs.0
                     
@@ -1325,8 +1309,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                 // create new activity
                 
                 if let activity = self.activity {
-                    activity.name = self.event?.name
-                                        
                     self.showActivityIndicator()
                     let createActivity = ActivityActions(activity: activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     createActivity.createNewActivity()
@@ -1351,8 +1333,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Existing Activity", style: .default, handler: { (_) in
                 
                 if let activity = self.activity {
-                    activity.name = self.event?.name
-                    
                     // ChooseActivityTableViewController
                     let destination = ChooseActivityTableViewController()
                     let navController = UINavigationController(rootViewController: destination)
@@ -1516,10 +1496,10 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
             }
         }
             
-        if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
+        if let localName = activity.locationName, localName != "locationName", let _ = activity.locationAddress {
             alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
                 print("User click Edit button")
-                self.goToMap(locationAddress: localAddress)
+                self.goToMap(activity: self.activity)
             }))
         }
            
@@ -1862,8 +1842,6 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
                 if let activity = self.activity {
-                    activity.name = self.place?.name
-                    
                     let membersIDs = self.fetchMembersIDs()
                     activity.participantsIDs = membersIDs.0
                     
@@ -1880,8 +1858,6 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                 // create new activity
                 
                 if let activity = self.activity {
-                    activity.name = self.place?.name
-                                        
                     self.showActivityIndicator()
                     let createActivity = ActivityActions(activity: activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     createActivity.createNewActivity()
@@ -1906,8 +1882,6 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Existing Activity", style: .default, handler: { (_) in
                 
                 if let activity = self.activity {
-                    activity.name = self.place?.name
-                                        
                     // ChooseActivityTableViewController
                     let destination = ChooseActivityTableViewController()
                     let navController = UINavigationController(rootViewController: destination)
@@ -2050,10 +2024,10 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
             }
         }
             
-        if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
+        if let localName = activity.locationName, localName != "locationName", let _ = activity.locationAddress {
             alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
                 print("User click Edit button")
-                self.goToMap(locationAddress: localAddress)
+                self.goToMap(activity: self.activity)
             }))
         }
            

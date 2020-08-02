@@ -88,7 +88,7 @@ extension ListCell {
         } else if let activitylist = activitylist {
             self.activitylist = activitylist
             nameLabel.text = activitylist.name
-            listTypeLabel.text = "Activitylist"
+            listTypeLabel.text = "Activity List"
             if let date = activitylist.lastModifiedDate {
                 timeLabel.text = date.formatRelativeString()
             }

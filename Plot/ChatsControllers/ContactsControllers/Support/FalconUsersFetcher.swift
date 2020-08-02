@@ -78,7 +78,7 @@ class FalconUsersFetcher: NSObject {
                     self.reference.child("users").child(child.key).observeSingleEvent(of: .value, with: { snapshot in
                         if snapshot.exists() {
                             guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                            
+                                                        
                             dictionary.updateValue(child.key as AnyObject, forKey: "id")
                             if let thumbnailURLString = User(dictionary: dictionary).thumbnailPhotoURL, let thumbnailURL = URL(string: thumbnailURLString) {
                                 SDWebImagePrefetcher.shared.prefetchURLs([thumbnailURL])

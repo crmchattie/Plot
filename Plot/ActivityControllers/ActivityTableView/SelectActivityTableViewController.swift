@@ -605,14 +605,20 @@ extension SelectActivityTableViewController: ActivityCellDelegate {
             return
         }
         
-        guard let locationAddress = activity.locationAddress else {
+        guard activity.locationAddress != nil else {
             return
         }
         
-        let destination = MapActivityViewController()
+        let destination = MapViewController()
         destination.hidesBottomBarWhenPushed = true
-        destination.locationAddress = locationAddress
+        destination.sections = [.activities]
+        destination.locations = [.activities: activity]
         navigationController?.pushViewController(destination, animated: true)
+        
+//        let destination = MapActivityViewController()
+//        destination.hidesBottomBarWhenPushed = true
+//        destination.locationAddress = locationAddress
+//        navigationController?.pushViewController(destination, animated: true)
     }
     
     func openChat(forConversation conversationID: String?, activityID: String?) {

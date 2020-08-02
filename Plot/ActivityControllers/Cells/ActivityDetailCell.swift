@@ -126,7 +126,6 @@ class ActivityDetailCell: UICollectionViewCell {
                 }
                 if let image = fsVenue.bestPhoto, let prefix = image.photoPrefix, let suffix = image.suffix {
                     let url = prefix + "500x300" + suffix
-                    print("url \(url)")
                     imageView.sd_setImage(with: URL(string: url))
                     imageURL = url
                 }

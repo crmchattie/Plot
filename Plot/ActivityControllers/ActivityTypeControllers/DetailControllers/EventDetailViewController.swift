@@ -28,7 +28,7 @@ class EventDetailViewController: ActivityDetailViewController {
         
         setActivity()
         
-        if !active || !activeList {
+        if !active {
             setMoreActivity()
         }
         
@@ -50,6 +50,7 @@ class EventDetailViewController: ActivityDetailViewController {
     
     fileprivate func setMoreActivity() {
         if let event = event {
+            activity.name = event.name
             activity.activityType = activityType
             activity.eventID = "\(event.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
@@ -467,7 +468,7 @@ extension EventDetailViewController: ActivityExpandedDetailCellDelegate {
             
             let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
             let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
-                self.goToMap(locationAddress: self.locationAddress)
+                self.goToMap(activity: self.activity)
             }
             let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
                 let pasteboard = UIPasteboard.general

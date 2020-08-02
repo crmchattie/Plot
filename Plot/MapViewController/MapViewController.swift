@@ -13,13 +13,19 @@ import LBTATools
 extension MapViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if !(annotation is CustomMapItemAnnotation) { return nil }
         
-        if (annotation is MKPointAnnotation) {
-            let annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "id")
+        let annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: "id")
+        
+        if (annotation is CustomMapItemAnnotation) {
             annotationView.canShowCallout = true
-            return annotationView
+            if let placeAnnotation = annotation as? CustomMapItemAnnotation {
+                if let type = placeAnnotation.type {
+                    annotationView.image = UIImage(named: "\(type)-color")
+                }
+            }
         }
-        return nil
+        return annotationView
     }
     
 }
@@ -46,13 +52,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
             print("Failed to authorize")
         }
     }
-    
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        guard let firstLocation = locations.first else { return }
-//        mapView.setRegion(.init(center: firstLocation.coordinate, span: .init(latitudeDelta: 0.1, longitudeDelta: 0.1)), animated: false)
-//
-////        locationManager.stopUpdatingLocation()
-//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,12 +100,14 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
             
             if let events = locations[section] as? [Event] {
                 for event in events {
-                    if let add = event.embedded?.venues?[0].address?.line1, let lat = event.embedded?.venues?[0].location?.latitude, let lon = event.embedded?.venues?[0].location?.longitude, let startDateTime = event.dates?.start?.dateTime, let date = startDateTime.toDate() {
+                    if let add = event.embedded?.venues?[0].address?.line1, let lat = event.embedded?.venues?[0].location?.latitude, let lon = event.embedded?.venues?[0].location?.longitude {
                         name = event.name
                         type = section.image
                         address = add
-                        let newDate = date.startDateTimeString()
-                        category = "\(newDate)"
+                        if let startDateTime = event.dates?.start?.dateTime, let date = startDateTime.toDate() {
+                            let newDate = date.startDateTimeString()
+                            category = "\(newDate)"
+                        }
                         latitude = Double(lat) ?? 0.0
                         longitude = Double(lon) ?? 0.0
                                                 
@@ -117,6 +118,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         annotation.title = name
                         annotation.subtitle = address
                         annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                        annotation.type = type
                                     
                         self.mapView.addAnnotation(annotation)
                         
@@ -143,6 +145,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         annotation.title = name
                         annotation.subtitle = address
                         annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                        annotation.type = type
                                     
                         self.mapView.addAnnotation(annotation)
                         
@@ -170,6 +173,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                             annotation.title = name
                             annotation.subtitle = address
                             annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                            annotation.type = type
                                         
                             self.mapView.addAnnotation(annotation)
                             
@@ -237,16 +241,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         latitude = array[0]
                         longitude = array[1]
                         
-                        if activity.recipeID != nil {
-                            type = "recipe"
-                        } else if activity.workoutID != nil {
-                            type = "workout"
-                        } else if activity.eventID != nil {
-                            type = "event"
-                        } else {
-                            type = "activity"
-                        }
-                        
                         switch activity.activityType {
                         case "recipe":
                             type = "recipe"
@@ -275,6 +269,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         annotation.title = name
                         annotation.subtitle = address
                         annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                        annotation.type = type
                                     
                         self.mapView.addAnnotation(annotation)
                         
@@ -298,6 +293,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     
     class CustomMapItemAnnotation: MKPointAnnotation {
         var mapItem: MKMapItem?
+        var type: String?
     }
     
     fileprivate func setupAnnotationsForMap() {

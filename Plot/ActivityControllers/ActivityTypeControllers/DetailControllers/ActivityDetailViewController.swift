@@ -323,13 +323,14 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         
     }
     
-    @objc func goToMap(locationAddress: [String: [Double]]) {
+    @objc func goToMap(activity: Activity) {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        let destination = MapActivityViewController()
-        destination.locationAddress = locationAddress
+        let destination = MapViewController()
+        destination.sections = [.activities]
+        destination.locations = [.activities: activity]
         navigationController?.pushViewController(destination, animated: true)
     }
     

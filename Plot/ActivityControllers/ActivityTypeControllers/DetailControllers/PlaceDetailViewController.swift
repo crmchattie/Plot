@@ -40,6 +40,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
     
     fileprivate func setMoreActivity() {
         if let place = place {
+            activity.name = place.name
             activity.activityType = activityType
             activity.placeID = "\(place.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
@@ -99,7 +100,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
         }
         
         dispatchGroup.notify(queue: .main) {
-            if !self.active || !self.activeList {
+            if !self.active {
                 self.setMoreActivity()
             }
             self.collectionView.reloadData()
@@ -358,7 +359,7 @@ extension PlaceDetailViewController: ActivityExpandedDetailCellDelegate {
             
             let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
             let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
-                self.goToMap(locationAddress: self.locationAddress)
+                self.goToMap(activity: self.activity)
             }
             let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
                 let pasteboard = UIPasteboard.general

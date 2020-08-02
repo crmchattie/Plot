@@ -38,7 +38,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
         
         setActivity()
         
-        if !active || !activeList {
+        if !active {
             setMoreActivity()
         } else {
             if let activityServings = activity.servings {
@@ -64,6 +64,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
     
     fileprivate func setMoreActivity() {
         if let recipe = recipe {
+            activity.name = recipe.title
             activity.recipeID = "\(recipe.id)"
             activity.activityType = activityType
             if schedule, let umbrellaActivity = umbrellaActivity {
@@ -444,7 +445,7 @@ extension RecipeDetailViewController: ActivityExpandedDetailCellDelegate {
             
             let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
             let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
-                self.goToMap(locationAddress: self.locationAddress)
+                self.goToMap(activity: self.activity)
             }
             let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
                 let pasteboard = UIPasteboard.general

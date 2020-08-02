@@ -52,7 +52,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
     
     var workout: Workout! {
         didSet {
-            if let _ = workout {                
+            if let _ = workout {
                 extraLabel.text = "Workout Preview:"
                 setupViews()
 
@@ -81,6 +81,21 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    let nameField: UITextField = {
+        let textField = UITextField()
+        textField.textColor = ThemeManager.currentTheme().generalTitleColor
+        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.attributedPlaceholder = NSAttributedString(string: "Activity Name",
+        attributes: [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor])
+        textField.isUserInteractionEnabled = true
+        textField.returnKeyType = .done
+        textField.keyboardAppearance = .default
+        textField.addDoneButtonOnKeyboard()
+        textField.setRightPaddingPoints(15)
+        textField.setLeftPaddingPoints(15)
+        return textField
+    }()
     
     let locationView: UIView = {
         let view = UIView()
@@ -248,7 +263,14 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-            
+        nameField.delegate = self
+        
+        if nameField.text == "Activity Name" {
+            locationLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        } else {
+            locationLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+                    
         if locationLabel.text == "Location" {
             locationLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
             locationInfoView.isHidden = true
@@ -257,6 +279,8 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
             locationInfoView.isHidden = false
         }
         
+        nameField.constrainHeight(30)
+                        
         locationView.constrainHeight(30)
         locationArrowView.constrainWidth(16)
         locationArrowView.constrainHeight(16)
@@ -310,6 +334,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         extraLabelStackView.isLayoutMarginsRelativeArrangement = true
         
         let stackView = VerticalStackView(arrangedSubviews: [
+            nameField,
             locationView,
             participantsView,
             startDateView,
@@ -321,7 +346,6 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
             ], spacing: 5)
         addSubview(stackView)
         stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        
         
         let locationViewTapped = UITapGestureRecognizer(target: self, action: #selector(ActivityExpandedDetailCell.locationViewTapped(_:)))
         locationView.addGestureRecognizer(locationViewTapped)
@@ -352,7 +376,6 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
             return
         }
         
-        print("locationLabel \(labelText)")
         if labelText == "Location" {
             locationLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
             locationInfoView.isHidden = true
@@ -429,5 +452,18 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
             return
         }
         self.delegate?.reminderViewTapped(labelText: labelText)
+    }
+}
+
+extension ActivityExpandedDetailCell: UITextFieldDelegate {
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if textField.text == "" || textField.text == nil {
+            return false
+        }
+        return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        
     }
 }

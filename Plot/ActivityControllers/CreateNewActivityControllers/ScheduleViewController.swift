@@ -665,9 +665,16 @@ class ScheduleViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        let destination = MapActivityViewController()
-        destination.locationAddress = locationAddress
+        
+        
+        let destination = MapViewController()
+        destination.sections = [.activities]
+        destination.locations = [.activities: schedule]
         navigationController?.pushViewController(destination, animated: true)
+        
+//        let destination = MapActivityViewController()
+//        destination.locationAddress = locationAddress
+//        navigationController?.pushViewController(destination, animated: true)
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {

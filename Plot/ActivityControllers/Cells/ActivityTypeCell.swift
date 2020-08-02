@@ -12,7 +12,7 @@ protocol ActivityTypeCellDelegate: class {
     func plusButtonTapped(type: AnyHashable)
     func shareButtonTapped(activityObject: ActivityObject)
     func heartButtonTapped(type: Any)
-    func mapButtonTapped(type: Any)
+    func mapButtonTapped(type: AnyHashable)
 }
 
 class ActivityTypeCell: UICollectionViewCell {
@@ -31,6 +31,7 @@ class ActivityTypeCell: UICollectionViewCell {
                     subcategoryLabel.text = "Servings: \(subcategory)"
                 }
                 imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
+                mapButton.isHidden = true
                 setupViews()
             }
         }
@@ -54,6 +55,11 @@ class ActivityTypeCell: UICollectionViewCell {
                 } else {
                     subcategoryLabel.text = ""
                 }
+                if let _ = event.embedded?.venues?[0].address?.line1, let _ = event.embedded?.venues?[0].location?.latitude, let _ = event.embedded?.venues?[0].location?.longitude {
+                    mapButton.isHidden = false
+                } else {
+                    mapButton.isHidden = true
+                }
                 imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
                 setupViews()
             }
@@ -69,6 +75,7 @@ class ActivityTypeCell: UICollectionViewCell {
                 }
                 subcategoryLabel.text = ""
                 imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
+                mapButton.isHidden = true
                 setupViews()
             }
         }
@@ -83,6 +90,7 @@ class ActivityTypeCell: UICollectionViewCell {
                     subcategoryLabel.text = "Number of exercises: \(subcategory)"
                 }
                 imageView.image = UIImage(named: imageURL ?? "")!.withRenderingMode(.alwaysTemplate)
+                mapButton.isHidden = true
                 setupViews()
             }
         }
@@ -444,14 +452,18 @@ class ActivityTypeCell: UICollectionViewCell {
     }
     
     @objc func mapButtonTapped() {
-        if let event = event {
+        if let recipe = recipe {
+            self.delegate?.mapButtonTapped(type: recipe)
+        } else if let workout = workout {
+            self.delegate?.mapButtonTapped(type: workout)
+        } else if let event = event {
             self.delegate?.mapButtonTapped(type: event)
         } else if let attraction = attraction {
             self.delegate?.mapButtonTapped(type: attraction)
         } else if let fsVenue = fsVenue {
             self.delegate?.mapButtonTapped(type: fsVenue)
-        } else if let groupItem = groupItem, let fsVenue = groupItem.venue {
-            self.delegate?.mapButtonTapped(type: fsVenue)
+        } else if let groupItem = groupItem {
+            self.delegate?.mapButtonTapped(type: groupItem)
         }
     }
 
