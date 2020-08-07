@@ -82,6 +82,9 @@ class PlaceDetailCell: UICollectionViewCell {
                             }
                         }
                     }
+                } else {
+                    statusLabel.isHidden = true
+                    hoursLabel.isHidden = true
                 }
                 if let attributes = fsVenue.attributes, let groups = attributes.groups, groups.count > 0 {
                     featuresLabel.text = "Features:"
@@ -118,16 +121,19 @@ class PlaceDetailCell: UICollectionViewCell {
                             }
                         }
                     }
-                }
-                if let url = fsVenue.url {
-                    websiteLabel.text = url
                 } else {
+                    featuresLabel.isHidden = true
+                }
+                if fsVenue.url == nil {
+                    websiteLabel.isHidden = true
+                    websiteView.isHidden = true
                     websiteView.isUserInteractionEnabled = false
                 }
                 if let contact = fsVenue.contact, let phoneNumber = contact.formattedPhone {
                     phoneNumberLabel.text = phoneNumber
                 } else {
                     phoneLabel.isHidden = true
+                    phoneView.isHidden = true
                     phoneView.isUserInteractionEnabled = false
                 }
                 setupViews()
@@ -168,6 +174,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
+        label.text = "Website"
         return label
     }()
     
@@ -355,8 +362,8 @@ class PlaceDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-        phoneView.constrainHeight(30)
-        websiteView.constrainHeight(30)
+        phoneView.constrainHeight(20)
+        websiteView.constrainHeight(20)
         
         phoneView.addSubview(phoneLabel)
         phoneView.addSubview(phoneNumberLabel)
@@ -364,26 +371,52 @@ class PlaceDetailCell: UICollectionViewCell {
         phoneNumberLabel.anchor(top: phoneView.topAnchor, leading: nil, bottom: nil, trailing: phoneView.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         
         websiteView.addSubview(websiteLabel)
-        websiteLabel.centerXAnchor.constraint(equalTo: websiteView.centerXAnchor).isActive = true
+        websiteLabel.anchor(top: websiteView.topAnchor, leading: websiteView.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+//        websiteLabel.centerXAnchor.constraint(equalTo: websiteView.centerXAnchor).isActive = true
         
+        if !hoursLabel.isHidden && !featuresLabel.isHidden {
+            let hoursStackView = VerticalStackView(arrangedSubviews:
+                [monLabel, tuesLabel, wedLabel, thursLabel, friLabel, satLabel, sunLabel
+                ], spacing: 10)
+            hoursStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+            hoursStackView.isLayoutMarginsRelativeArrangement = true
+            
+            let featuresStackView = VerticalStackView(arrangedSubviews:
+                [oneLabel, twoLabel, threeLabel, fourLabel, fiveLabel, sixLabel, sevenLabel, eightLabel
+                ], spacing: 10)
+            featuresStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+            featuresStackView.isLayoutMarginsRelativeArrangement = true
         
-        let hoursStackView = VerticalStackView(arrangedSubviews:
-        [monLabel, tuesLabel, wedLabel, thursLabel, friLabel, satLabel, sunLabel
-        ], spacing: 10)
-        hoursStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
-        hoursStackView.isLayoutMarginsRelativeArrangement = true
+            let stackView = VerticalStackView(arrangedSubviews:
+                [phoneView, websiteView, statusLabel, hoursLabel, hoursStackView, featuresLabel, featuresStackView
+                ], spacing: 10)
+            addSubview(stackView)
+            stackView.fillSuperview(padding: .init(top: 2, left: 15, bottom: 20, right: 15))
+        } else if !hoursLabel.isHidden {
+            let hoursStackView = VerticalStackView(arrangedSubviews:
+                [monLabel, tuesLabel, wedLabel, thursLabel, friLabel, satLabel, sunLabel
+                ], spacing: 10)
+            hoursStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+            hoursStackView.isLayoutMarginsRelativeArrangement = true
+                    
+            let stackView = VerticalStackView(arrangedSubviews:
+                [phoneView, websiteView, statusLabel, hoursLabel, hoursStackView
+                ], spacing: 10)
+            addSubview(stackView)
+            stackView.fillSuperview(padding: .init(top: 2, left: 15, bottom: 20, right: 15))
+        } else {
+            let featuresStackView = VerticalStackView(arrangedSubviews:
+                [oneLabel, twoLabel, threeLabel, fourLabel, fiveLabel, sixLabel, sevenLabel, eightLabel
+                ], spacing: 10)
+            featuresStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+            featuresStackView.isLayoutMarginsRelativeArrangement = true
         
-        let featuresStackView = VerticalStackView(arrangedSubviews:
-        [oneLabel, twoLabel, threeLabel, fourLabel, fiveLabel, sixLabel, sevenLabel, eightLabel
-        ], spacing: 10)
-        featuresStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
-        featuresStackView.isLayoutMarginsRelativeArrangement = true
-    
-        let stackView = VerticalStackView(arrangedSubviews:
-            [phoneView, websiteView, statusLabel, hoursLabel, hoursStackView, featuresLabel, featuresStackView
-            ], spacing: 10)
-        addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 0, left: 15, bottom: 20, right: 15))
+            let stackView = VerticalStackView(arrangedSubviews:
+                [phoneView, websiteView, statusLabel, featuresLabel, featuresStackView
+                ], spacing: 10)
+            addSubview(stackView)
+            stackView.fillSuperview(padding: .init(top: 2, left: 15, bottom: 20, right: 15))
+        }
        
         let websiteGesture = UITapGestureRecognizer(target: self, action: #selector(websiteTapped(_:)))
         websiteView.addGestureRecognizer(websiteGesture)

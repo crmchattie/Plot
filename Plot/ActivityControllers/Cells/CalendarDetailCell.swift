@@ -21,56 +21,6 @@ protocol CalendarDetailCellDelegate: class {
 
 class CalendarDetailCell: UICollectionViewCell {
     
-    var recipe: Recipe! {
-        didSet {
-            if let _ = recipe {
-                extraLabel.text = nil
-                extraLabel.isHidden = true
-                setupViews()
-
-            }
-        }
-    }
-    
-    var event: Event! {
-        didSet {
-            if let _ = event {
-                extraLabel.text = "Other Dates:"
-                setupViews()
-            }
-        }
-    }
-    
-    var attraction: Attraction! {
-        didSet {
-            if attraction != nil {
-                extraLabel.text = "Other Dates:"
-                setupViews()
-            }
-        }
-    }
-    
-    var workout: Workout! {
-        didSet {
-            if let _ = workout {                
-                extraLabel.text = "Workout Preview:"
-                setupViews()
-
-            }
-        }
-    }
-    
-    var fsVenue: FSVenue! {
-        didSet {
-            if let _ = recipe {
-                extraLabel.text = nil
-                extraLabel.isHidden = true
-                setupViews()
-
-            }
-        }
-    }
-    
     weak var delegate: CalendarDetailCellDelegate?
     
     override init(frame: CGRect) {
@@ -251,14 +201,6 @@ class CalendarDetailCell: UICollectionViewCell {
         label.numberOfLines = 1
         return label
     }()
-    
-    let extraLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.numberOfLines = 1
-        return label
-    }()
    
     func setupViews() {
                     
@@ -319,11 +261,7 @@ class CalendarDetailCell: UICollectionViewCell {
         reminderView.addSubview(rightReminderLabel)
         leftReminderLabel.anchor(top: reminderView.topAnchor, leading: reminderView.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 0, left: 15, bottom: 0, right: 0))
         rightReminderLabel.anchor(top: reminderView.topAnchor, leading: nil, bottom: nil, trailing: reminderView.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 15))
-        
-        let extraLabelStackView = UIStackView(arrangedSubviews: [extraLabel])
-        extraLabelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
-        extraLabelStackView.isLayoutMarginsRelativeArrangement = true
-        
+                
         let stackView = VerticalStackView(arrangedSubviews: [
             nameField,
             locationView,
@@ -332,8 +270,7 @@ class CalendarDetailCell: UICollectionViewCell {
             startDatePicker,
             endDateView,
             endDatePicker,
-            reminderView,
-            extraLabelStackView
+            reminderView
             ], spacing: 5)
         addSubview(stackView)
         stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 0, right: 0))

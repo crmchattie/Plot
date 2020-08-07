@@ -14,7 +14,8 @@ import MapKit
 class PlaceDetailViewController: ActivityDetailViewController {
     
     private let kActivityDetailCell = "ActivityDetailCell"
-    private let kActivityExpandedDetailCell = "ActivityExpandedDetailCell"
+    private let kActivityExpandedDetailCell = "kActivityExpandedDetailCell"
+    private let kCalendarDetailCell = "CalendarDetailCell"
     private let kPlaceDetailCell = "PlaceDetailCell"
     
     var placeID: String?
@@ -33,6 +34,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
                 
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
+        collectionView.register(CalendarDetailCell.self, forCellWithReuseIdentifier: kCalendarDetailCell)
         collectionView.register(PlaceDetailCell.self, forCellWithReuseIdentifier: kPlaceDetailCell)
         
                                         
@@ -109,7 +111,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
     }
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if !activeList {
+        if segment == 0 {
             return 3
         } else {
             return 2
@@ -132,39 +134,46 @@ class PlaceDetailViewController: ActivityDetailViewController {
                 }
                 cell.active = active
                 cell.activeList = activeList
+                cell.imageURL = activityType
                 cell.fsVenue = place
                 return cell
             } else {
                 return cell
             }
-        } else if indexPath.section == 1 && !activeList {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
-            cell.delegate = self
-            if let place = place {
-                cell.locationLabel.text = locationName
-                cell.participantsLabel.text = userNamesString
-                cell.rightReminderLabel.text = reminder
-                if let startDateTime = startDateTime, let endDateTime = endDateTime {
-                    dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
-                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
-                    cell.startDatePicker.date = startDateTime
-                    cell.endDatePicker.date = endDateTime
+        } else if segment == 0 {
+            if indexPath.section == 1 {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
+                cell.delegate = self
+                if let place = place {
+                    cell.fsVenue = place
+                    return cell
+                } else {
+                    return cell
                 }
-                cell.fsVenue = place
-                return cell
             } else {
-                return cell
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kPlaceDetailCell, for: indexPath) as! PlaceDetailCell
+                cell.delegate = self
+                if let place = place {
+                    cell.fsVenue = place
+                    return cell
+                } else {
+                    return cell
+                }
             }
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kPlaceDetailCell, for: indexPath) as! PlaceDetailCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCalendarDetailCell, for: indexPath) as! CalendarDetailCell
             cell.delegate = self
-            if let place = place {
-                cell.fsVenue = place
-                return cell
-            } else {
-                return cell
+            cell.locationLabel.text = locationName
+            cell.participantsLabel.text = userNamesString
+            cell.rightReminderLabel.text = reminder
+            if let startDateTime = startDateTime, let endDateTime = endDateTime {
+                dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
+                cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
+                cell.startDatePicker.date = startDateTime
+                cell.endDatePicker.date = endDateTime
             }
+            return cell
         }
     }
     
@@ -172,38 +181,51 @@ class PlaceDetailViewController: ActivityDetailViewController {
         var height: CGFloat = 0
         if indexPath.section == 0 {
             let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
+            dummyCell.activeList = activeList
             dummyCell.fsVenue = place
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.section == 1 && !activeList {
-            if secondSectionHeight == 0 {
-                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
+        } else if segment == 0 {
+            if indexPath.section == 1 {
+                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
                 dummyCell.fsVenue = place
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
+                height = estimatedSize.height
+                return CGSize(width: view.frame.width, height: height)
+            } else {
+                let dummyCell = PlaceDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 200))
+                dummyCell.fsVenue = place
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 200))
+                height = estimatedSize.height
+                return CGSize(width: view.frame.width, height: height)
+            }
+        } else {
+            if secondSectionHeight == 0 {
+                let dummyCell = CalendarDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
                 dummyCell.layoutIfNeeded()
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 150))
                 height = estimatedSize.height
                 secondSectionHeight = height
                 return CGSize(width: view.frame.width, height: height)
-            }
-            else {
+            } else {
                 return CGSize(width: view.frame.width, height: secondSectionHeight)
             }
-        } else {
-            let dummyCell = PlaceDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 200))
-            dummyCell.fsVenue = place
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 200))
-            height = estimatedSize.height
-            return CGSize(width: view.frame.width, height: height)
         }
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        if section == 0 {
-            return UIEdgeInsets(top: 0, left: 0, bottom: 15, right: 0)
-        }
         return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
 
@@ -306,6 +328,12 @@ class PlaceDetailViewController: ActivityDetailViewController {
 }
 
 extension PlaceDetailViewController: ActivityExpandedDetailCellDelegate {
+    func servingsUpdated(servings: Int) {
+        
+    }
+}
+
+extension PlaceDetailViewController: CalendarDetailCellDelegate {
     func startDateChanged(startDate: Date) {
         startDateTime = startDate
         activity.startDateTime = NSNumber(value: Int((startDate).timeIntervalSince1970))

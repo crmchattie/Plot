@@ -68,6 +68,15 @@ class WorkoutDetailCell: UICollectionViewCell {
         imageView.tintColor = ThemeManager.currentTheme().generalSubtitleColor
         return imageView
     }()
+    
+    let extraLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.numberOfLines = 1
+        label.text = "Workout Preview:"
+        return label
+    }()
    
     func setupViews() {
         
@@ -85,12 +94,17 @@ class WorkoutDetailCell: UICollectionViewCell {
         clickArrowView.anchor(top: nil, leading: nil, bottom: nil, trailing: clickView.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 15))
         clickArrowView.centerYAnchor.constraint(equalTo: getWorkoutLabel.centerYAnchor).isActive = true
         
+        let extraLabelStackView = UIStackView(arrangedSubviews: [extraLabel])
+        extraLabelStackView.layoutMargins = UIEdgeInsets(top: 18, left: 15, bottom: 0, right: 0)
+        extraLabelStackView.isLayoutMarginsRelativeArrangement = true
+        
         let stackView = VerticalStackView(arrangedSubviews:
             [labelStackView,
-            clickView
+            clickView,
+            extraLabelStackView
             ], spacing: 2)
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 18, right: 0))
+        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 0, right: 0))
        
         let viewGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         clickView.addGestureRecognizer(viewGesture)

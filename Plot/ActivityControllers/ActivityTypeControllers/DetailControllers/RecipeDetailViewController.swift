@@ -13,12 +13,12 @@ import MapKit
 class RecipeDetailViewController: ActivityDetailViewController {
     
     private let kActivityDetailCell = "ActivityDetailCell"
-    private let kActivityExpandedDetailCell = "ActivityExpandedDetailCell"
+    private let kActivityExpandedDetailCell = "kActivityExpandedDetailCell"
+    private let kCalendarDetailCell = "CalendarDetailCell"
     private let kRecipeDetailCell = "RecipeDetailCell"
         
     var recipe: Recipe?
     
-    var segment: Int = 0
     var servings: Int?
     
     var ingredients = [ExtendedIngredient]()
@@ -58,6 +58,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
         
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
+        collectionView.register(CalendarDetailCell.self, forCellWithReuseIdentifier: kCalendarDetailCell)
         collectionView.register(RecipeDetailCell.self, forCellWithReuseIdentifier: kRecipeDetailCell)
         
     }
@@ -103,7 +104,6 @@ class RecipeDetailViewController: ActivityDetailViewController {
     }
     
     fileprivate func fetchData() {
-        
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
@@ -126,7 +126,6 @@ class RecipeDetailViewController: ActivityDetailViewController {
     
     func fetchDetails() {
         let dispatchGroup = DispatchGroup()
-        
         if let recipe = detailedRecipe {
             firstHeight = 0
             secondHeight = 0
@@ -194,7 +193,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
     
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if !activeList {
+        if segment == 0 {
             return 3
         } else {
             return 2
@@ -220,31 +219,37 @@ class RecipeDetailViewController: ActivityDetailViewController {
             } else {
                 return cell
             }
-        } else if indexPath.item == 1 && !activeList {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
-            cell.delegate = self
-            if let recipe = recipe {
-                cell.locationLabel.text = locationName
-                cell.participantsLabel.text = userNamesString
-                cell.rightReminderLabel.text = reminder
-                if let startDateTime = startDateTime, let endDateTime = endDateTime {
-                    dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
-                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
-                    cell.startDatePicker.date = startDateTime
-                    cell.endDatePicker.date = endDateTime
+        } else if segment == 0 {
+            if indexPath.item == 1 {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
+                cell.delegate = self
+                if let recipe = recipe {
+                    cell.recipe = recipe
+                    return cell
+                } else {
+                    return cell
                 }
-                cell.recipe = recipe
-                return cell
             } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kRecipeDetailCell, for: indexPath) as! RecipeDetailCell
+                cell.recipeExpandedDetailViewController.ingredients = ingredients
+                cell.recipeExpandedDetailViewController.equipment = equipment
+                cell.recipeExpandedDetailViewController.instructions = instructions
+                cell.recipeExpandedDetailViewController.collectionView.reloadData()
                 return cell
             }
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kRecipeDetailCell, for: indexPath) as! RecipeDetailCell
-            cell.recipeExpandedDetailViewController.ingredients = ingredients
-            cell.recipeExpandedDetailViewController.equipment = equipment
-            cell.recipeExpandedDetailViewController.instructions = instructions
-            cell.recipeExpandedDetailViewController.collectionView.reloadData()
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCalendarDetailCell, for: indexPath) as! CalendarDetailCell
+            cell.delegate = self
+            cell.locationLabel.text = locationName
+            cell.participantsLabel.text = userNamesString
+            cell.rightReminderLabel.text = reminder
+            if let startDateTime = startDateTime, let endDateTime = endDateTime {
+                dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
+                cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
+                cell.startDatePicker.date = startDateTime
+                cell.endDatePicker.date = endDateTime
+            }
             return cell
         }
     }
@@ -253,31 +258,47 @@ class RecipeDetailViewController: ActivityDetailViewController {
         var height: CGFloat = 0
         if indexPath.item == 0 {
             let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
+            dummyCell.activeList = activeList
             dummyCell.recipe = recipe
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.item == 1 && !activeList {
-            if secondSectionHeight == 0 {
-                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
+        } else if segment == 0 {
+            if indexPath.item == 1 {
+                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
                 dummyCell.recipe = recipe
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
+                height = estimatedSize.height
+                return CGSize(width: view.frame.width, height: height)
+            } else {
+                if heightArray.count == 3, let maxHeight = heightArray.max() {
+                    return CGSize(width: self.view.frame.width, height: maxHeight + 50)
+                } else {
+                    return CGSize(width: self.view.frame.width, height: 150)
+                }
+            }
+        } else {
+            if secondSectionHeight == 0 {
+                let dummyCell = CalendarDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
                 dummyCell.layoutIfNeeded()
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 150))
                 height = estimatedSize.height
                 secondSectionHeight = height
                 return CGSize(width: view.frame.width, height: height)
-            }
-            else {
+            } else {
                 return CGSize(width: view.frame.width, height: secondSectionHeight)
             }
-        } else {
-            if heightArray.count == 3, let maxHeight = heightArray.max() {
-                return CGSize(width: self.view.frame.width, height: maxHeight + 50)
-            } else {
-                return CGSize(width: self.view.frame.width, height: 150)
-            }
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
     }
     
     func estimateFrameForText(width: CGFloat, text: String, font: UIFont) -> CGRect {
@@ -393,6 +414,18 @@ class RecipeDetailViewController: ActivityDetailViewController {
 }
 
 extension RecipeDetailViewController: ActivityExpandedDetailCellDelegate {
+    func servingsUpdated(servings: Int) {
+        if let activity = activity, servings != detailedRecipe?.servings {
+            activity.servings = servings
+            fetchDetails()
+        } else if self.servings != nil, servings != detailedRecipe?.servings {
+            self.servings = servings
+            fetchDetails()
+        }
+    }
+}
+
+extension RecipeDetailViewController: CalendarDetailCellDelegate {
     func startDateChanged(startDate: Date) {
         startDateTime = startDate
         activity.startDateTime = NSNumber(value: Int((startDate).timeIntervalSince1970))

@@ -14,7 +14,8 @@ import MapKit
 class WorkoutDetailViewController: ActivityDetailViewController {
     
     private let kActivityDetailCell = "ActivityDetailCell"
-    private let kActivityExpandedDetailCell = "ActivityExpandedDetailCell"
+    private let kActivityExpandedDetailCell = "kActivityExpandedDetailCell"
+    private let kCalendarDetailCell = "CalendarDetailCell"
     private let kWorkoutDetailCell = "WorkoutDetailCell"
     private let kExerciseDetailCell = "ExerciseDetailCell"
         
@@ -35,6 +36,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
         
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
+        collectionView.register(CalendarDetailCell.self, forCellWithReuseIdentifier: kCalendarDetailCell)
         collectionView.register(WorkoutDetailCell.self, forCellWithReuseIdentifier: kWorkoutDetailCell)
         collectionView.register(ExerciseDetailCell.self, forCellWithReuseIdentifier: kExerciseDetailCell)
 
@@ -94,15 +96,15 @@ class WorkoutDetailViewController: ActivityDetailViewController {
     }
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if !activeList {
+        if segment == 0 {
             return 4
         } else {
-            return 3
+            return 2
         }
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if !activeList {
+        if segment == 0 {
             if section == 3 {
                 if let exercises = workout?.exercises {
                     return exercises.count
@@ -113,15 +115,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                 return 1
             }
         } else {
-            if section == 2 {
-                if let exercises = workout?.exercises {
-                    return exercises.count
-                } else {
-                    return 0
-                }
-            } else {
-                return 1
-            }
+            return 1
         }
     }
         
@@ -141,37 +135,43 @@ class WorkoutDetailViewController: ActivityDetailViewController {
                 cell.workout = workout
             }
             return cell
-        } else if indexPath.section == 1 {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kWorkoutDetailCell, for: indexPath) as! WorkoutDetailCell
-            if let workout = workout {
-                cell.workout = workout
+        } else if segment == 0 {
+            if indexPath.section == 1 {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
                 cell.delegate = self
-            }
-            return cell
-        } else if indexPath.section == 2 && !activeList {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
-            cell.delegate = self
-            if let workout = workout {
-                cell.locationLabel.text = locationName
-                cell.participantsLabel.text = userNamesString
-                cell.rightReminderLabel.text = reminder
-                if let startDateTime = startDateTime, let endDateTime = endDateTime {
-                    dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
-                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
-                    cell.startDatePicker.date = startDateTime
-                    cell.endDatePicker.date = endDateTime
+                if let workout = workout {
+                    cell.workout = workout
+                    return cell
+                } else {
+                    return cell
                 }
-                cell.workout = workout
+            } else if indexPath.section == 2 {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kWorkoutDetailCell, for: indexPath) as! WorkoutDetailCell
+                if let workout = workout {
+                    cell.workout = workout
+                    cell.delegate = self
+                }
                 return cell
             } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kExerciseDetailCell, for: indexPath) as! ExerciseDetailCell
+                if let workout = workout {
+                    cell.count = indexPath.item + 1
+                    cell.exercise = workout.exercises![indexPath.item]
+                }
                 return cell
             }
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kExerciseDetailCell, for: indexPath) as! ExerciseDetailCell
-            if let workout = workout {
-                cell.count = indexPath.item + 1
-                cell.exercise = workout.exercises![indexPath.item]
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCalendarDetailCell, for: indexPath) as! CalendarDetailCell
+            cell.delegate = self
+            cell.locationLabel.text = locationName
+            cell.participantsLabel.text = userNamesString
+            cell.rightReminderLabel.text = reminder
+            if let startDateTime = startDateTime, let endDateTime = endDateTime {
+                dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
+                cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
+                cell.startDatePicker.date = startDateTime
+                cell.endDatePicker.date = endDateTime
             }
             return cell
         }
@@ -181,24 +181,40 @@ class WorkoutDetailViewController: ActivityDetailViewController {
         var height: CGFloat = 328
         if indexPath.section == 0 {
             let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
+            dummyCell.activeList = activeList
             dummyCell.workout = workout
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.section == 1 {
-            let dummyCell = WorkoutDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
-            dummyCell.workout = workout
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
-            height = estimatedSize.height
-            return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.section == 2 && !activeList {
-            if secondSectionHeight == 0 {
-                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 215))
+        } else if segment == 0 {
+            if indexPath.section == 1 {
+                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
                 dummyCell.workout = workout
                 dummyCell.layoutIfNeeded()
-                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 215))
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
+                height = estimatedSize.height
+                return CGSize(width: view.frame.width, height: height)
+            } else if indexPath.section == 2 {
+                let dummyCell = WorkoutDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
+                dummyCell.workout = workout
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
+                height = estimatedSize.height
+                return CGSize(width: view.frame.width, height: height)
+            } else {
+                let dummyCell = ExerciseDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 30))
+                dummyCell.exercise = workout?.exercises![indexPath.item]
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 30))
+                height = estimatedSize.height
+                return CGSize(width: view.frame.width, height: height)
+            }
+        } else {
+            if secondSectionHeight == 0 {
+                let dummyCell = CalendarDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 150))
                 height = estimatedSize.height
                 secondSectionHeight = height
                 return CGSize(width: view.frame.width, height: height)
@@ -206,13 +222,6 @@ class WorkoutDetailViewController: ActivityDetailViewController {
             else {
                 return CGSize(width: view.frame.width, height: secondSectionHeight)
             }
-        } else {
-            let dummyCell = ExerciseDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 30))
-            dummyCell.exercise = workout?.exercises![indexPath.item]
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 30))
-            height = estimatedSize.height
-            return CGSize(width: view.frame.width, height: height)
         }
         
     }
@@ -323,6 +332,12 @@ class WorkoutDetailViewController: ActivityDetailViewController {
 }
 
 extension WorkoutDetailViewController: ActivityExpandedDetailCellDelegate {
+    func servingsUpdated(servings: Int) {
+        
+    }
+}
+
+extension WorkoutDetailViewController: CalendarDetailCellDelegate {
     func startDateChanged(startDate: Date) {
         startDateTime = startDate
         activity.startDateTime = NSNumber(value: Int((startDate).timeIntervalSince1970))

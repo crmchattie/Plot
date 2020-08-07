@@ -68,7 +68,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
-
+    
+    var segment: Int = 0
         
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())

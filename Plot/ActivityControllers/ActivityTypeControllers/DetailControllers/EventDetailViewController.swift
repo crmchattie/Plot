@@ -14,7 +14,8 @@ import MapKit
 class EventDetailViewController: ActivityDetailViewController {
     
     private let kActivityDetailCell = "ActivityDetailCell"
-    private let kActivityExpandedDetailCell = "ActivityExpandedDetailCell"
+    private let kActivityExpandedDetailCell = "kActivityExpandedDetailCell"
+    private let kCalendarDetailCell = "CalendarDetailCell"
     private let kEventDetailCell = "EventDetailCell"
     private let kAttractionDetailCell = "AttractionDetailCell"
     
@@ -42,6 +43,7 @@ class EventDetailViewController: ActivityDetailViewController {
                 
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)
+        collectionView.register(CalendarDetailCell.self, forCellWithReuseIdentifier: kCalendarDetailCell)
         collectionView.register(EventDetailCell.self, forCellWithReuseIdentifier: kEventDetailCell)
         collectionView.register(AttractionDetailCell.self, forCellWithReuseIdentifier: kAttractionDetailCell)
         
@@ -182,15 +184,15 @@ class EventDetailViewController: ActivityDetailViewController {
     }
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if !activeList {
+        if segment == 0 {
             return 4
         } else {
-            return 3
+            return 2
         }
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if !activeList {
+        if segment == 0 {
             if section == 3 {
                 if let events = events {
                     return events.count
@@ -201,15 +203,7 @@ class EventDetailViewController: ActivityDetailViewController {
                 return 1
             }
         } else {
-            if section == 2 {
-                if let events = events {
-                    return events.count
-                } else {
-                    return 0
-                }
-            } else {
-                return 1
-            }
+            return 1
         }
     }
     
@@ -234,35 +228,41 @@ class EventDetailViewController: ActivityDetailViewController {
             else {
                 return cell
             }
-        } else if indexPath.section == 1 {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kEventDetailCell, for: indexPath) as! EventDetailCell
-            cell.delegate = self
-            return cell
-        } else if indexPath.section == 2 && !activeList {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
-            cell.delegate = self
-            if let event = event {
-                cell.locationLabel.text = locationName
-                cell.participantsLabel.text = userNamesString
-                cell.rightReminderLabel.text = reminder
-                if let startDateTime = startDateTime, let endDateTime = endDateTime {
-                    dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
-                    cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
-                    cell.startDatePicker.date = startDateTime
-                    cell.endDatePicker.date = endDateTime
+        } else if segment == 0 {
+            if indexPath.section == 1 {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityExpandedDetailCell, for: indexPath) as! ActivityExpandedDetailCell
+                cell.delegate = self
+                if let event = event {
+                    cell.event = event
+                    return cell
+                } else {
+                    return cell
                 }
-                cell.event = event
+            } else if indexPath.section == 2 {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kEventDetailCell, for: indexPath) as! EventDetailCell
+                cell.delegate = self
                 return cell
             } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kAttractionDetailCell, for: indexPath) as! AttractionDetailCell
+                cell.delegate = self
+                if let events = events {
+                    cell.count = indexPath.item + 1
+                    cell.event = events[indexPath.item]
+                }
                 return cell
             }
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kAttractionDetailCell, for: indexPath) as! AttractionDetailCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCalendarDetailCell, for: indexPath) as! CalendarDetailCell
             cell.delegate = self
-            if let events = events {
-                cell.count = indexPath.item + 1
-                cell.event = events[indexPath.item]
+            cell.locationLabel.text = locationName
+            cell.participantsLabel.text = userNamesString
+            cell.rightReminderLabel.text = reminder
+            if let startDateTime = startDateTime, let endDateTime = endDateTime {
+                dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                cell.startDateLabel.text = dateFormatter.string(from: startDateTime)
+                cell.endDateLabel.text = dateFormatter.string(from: endDateTime)
+                cell.startDatePicker.date = startDateTime
+                cell.endDatePicker.date = endDateTime
             }
             return cell
         }
@@ -272,21 +272,37 @@ class EventDetailViewController: ActivityDetailViewController {
         var height: CGFloat = 328
         if indexPath.section == 0 {
             let dummyCell = ActivityDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
+            dummyCell.activeList = activeList
             dummyCell.event = event
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
             height = estimatedSize.height
             return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.section == 1 {
-            let dummyCell = EventDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 17))
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 17))
-            height = estimatedSize.height
-            return CGSize(width: view.frame.width, height: height)
-        } else if indexPath.section == 2 && !activeList {
-            if secondSectionHeight == 0 {
-                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
+        } else if segment == 0 {
+            if indexPath.section == 1 {
+                let dummyCell = ActivityExpandedDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
                 dummyCell.event = event
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
+                height = estimatedSize.height
+                return CGSize(width: view.frame.width, height: height)
+            } else if indexPath.section == 2 {
+                let dummyCell = EventDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 17))
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 17))
+                height = estimatedSize.height
+                return CGSize(width: view.frame.width, height: height)
+            } else {
+                let dummyCell = AttractionDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
+                dummyCell.event = events?[indexPath.item]
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
+                height = estimatedSize.height
+                return CGSize(width: view.frame.width, height: height)
+            }
+        } else {
+            if secondSectionHeight == 0 {
+                let dummyCell = CalendarDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 150))
                 dummyCell.layoutIfNeeded()
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 150))
                 height = estimatedSize.height
@@ -296,13 +312,6 @@ class EventDetailViewController: ActivityDetailViewController {
             else {
                 return CGSize(width: view.frame.width, height: secondSectionHeight)
             }
-        } else {
-            let dummyCell = AttractionDetailCell(frame: .init(x: 0, y: 0, width: view.frame.width, height: 1000))
-            dummyCell.event = events?[indexPath.item]
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 1000))
-            height = estimatedSize.height
-            return CGSize(width: view.frame.width, height: height)
         }
         
     }
@@ -413,6 +422,12 @@ class EventDetailViewController: ActivityDetailViewController {
 }
 
 extension EventDetailViewController: ActivityExpandedDetailCellDelegate {
+    func servingsUpdated(servings: Int) {
+        
+    }
+}
+
+extension EventDetailViewController: CalendarDetailCellDelegate {
     func startDateChanged(startDate: Date) {
         startDateTime = startDate
         activity.startDateTime = NSNumber(value: Int((startDate).timeIntervalSince1970))

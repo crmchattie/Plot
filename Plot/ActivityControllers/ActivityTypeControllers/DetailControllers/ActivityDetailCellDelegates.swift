@@ -10,14 +10,9 @@ import UIKit
 import Firebase
 
 extension RecipeDetailViewController: ActivityDetailCellDelegate {
-    func servingsUpdated(servings: Int) {
-        if let activity = activity, servings != detailedRecipe?.servings {
-            activity.servings = servings
-            fetchDetails()
-        } else if self.servings != nil, servings != detailedRecipe?.servings {
-            self.servings = servings
-            fetchDetails()
-        }
+    func segmentSwitched(segment: Int) {
+        self.segment = segment
+        self.collectionView.reloadData()
     }
     
     func plusButtonTapped() {
@@ -305,69 +300,93 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
         })
     }
     
-    func shareButtonTapped(activityObject: ActivityObject) {
-        
-        if let activity = activity {
-            activityObject.activityID = activity.activityID
-        }
-        
-        let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
-            print("User click Approve button")
-            let destination = ChooseChatTableViewController()
-            let navController = UINavigationController(rootViewController: destination)
-            destination.activityObject = activityObject
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.filteredConversations = self.conversations
-            destination.filteredPinnedConversations = self.conversations
-            self.present(navController, animated: true, completion: nil)
-            
-        }))
-
-        alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
-            print("User click Edit button")
-                // Fallback on earlier versions
-            let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
-            guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
-                else { return }
-            let shareContent: [Any] = [shareText, url]
-            let activityController = UIActivityViewController(activityItems: shareContent,
-                                                              applicationActivities: nil)
-            self.present(activityController, animated: true, completion: nil)
-            activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-            Bool, arrayReturnedItems: [Any]?, error: Error?) in
-                if completed {
-                    print("share completed")
-                    return
-                } else {
-                    print("cancel")
-                }
-                if let shareError = error {
-                    print("error while sharing: \(shareError.localizedDescription)")
-                }
+    func shareButtonTapped() {
+        if let recipe = recipe {
+            var activityObject: ActivityObject
+            if let activityType = activityType, let image = UIImage(named: activityType), let category = recipe.readyInMinutes, let subcategory = recipe.servings {
+                print("categoryObject \(category)")
+                let data = compressImage(image: image)
+                let activity = ["activityType": "recipe",
+                            "activityName": "\(recipe.title)",
+                            "activityTypeID": "\(recipe.id)",
+                            "activityImageURL": activityType,
+                            "activityCategory": "Preparation time: \(category) mins",
+                            "activitySubcategory": "\(subcategory)",
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else if let category = recipe.readyInMinutes, let subcategory = recipe.servings {
+                let activity = ["activityType": "recipe",
+                            "activityName": "\(recipe.title)",
+                            "activityCategory": "Preparation time: \(category) mins",
+                            "activitySubcategory": "\(subcategory)",
+                            "activityTypeID": "\(recipe.id)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                return
             }
             
-        }))
-        
+            if let activity = activity {
+                activityObject.activityID = activity.activityID
+            }
+            
+            let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
 
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
+            alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+                print("User click Approve button")
+                let destination = ChooseChatTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.activityObject = activityObject
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.conversations = self.conversations
+                destination.filteredConversations = self.conversations
+                destination.filteredPinnedConversations = self.conversations
+                self.present(navController, animated: true, completion: nil)
+                
+            }))
 
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-        print("shareButtonTapped")
+            alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+                print("User click Edit button")
+                    // Fallback on earlier versions
+                let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+                guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+                    else { return }
+                let shareContent: [Any] = [shareText, url]
+                let activityController = UIActivityViewController(activityItems: shareContent,
+                                                                  applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+                activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+                Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                    if completed {
+                        print("share completed")
+                        return
+                    } else {
+                        print("cancel")
+                    }
+                    if let shareError = error {
+                        print("error while sharing: \(shareError.localizedDescription)")
+                    }
+                }
+                
+            }))
+            
+
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            print("shareButtonTapped")
+        }
     }
     
-    func heartButtonTapped(type: Any) {
+    func heartButtonTapped() {
         print("heartButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
-            if let recipe = type as? Recipe {
+            if let recipe = recipe {
                 print(recipe.title)
                 databaseReference.child("recipes").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {
@@ -559,8 +578,9 @@ extension RecipeDetailViewController: ChooseActivityDelegate {
 }
 
 extension WorkoutDetailViewController: ActivityDetailCellDelegate {
-    func servingsUpdated(servings: Int) {
-        
+    func segmentSwitched(segment: Int) {
+        self.segment = segment
+        self.collectionView.reloadData()
     }
     
     func plusButtonTapped() {
@@ -834,69 +854,93 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
         })
     }
     
-    func shareButtonTapped(activityObject: ActivityObject) {
-        
-        if let activity = activity {
-            activityObject.activityID = activity.activityID
-        }
-        
-        let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
-            print("User click Approve button")
-            let destination = ChooseChatTableViewController()
-            let navController = UINavigationController(rootViewController: destination)
-            destination.activityObject = activityObject
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.filteredConversations = self.conversations
-            destination.filteredPinnedConversations = self.conversations
-            self.present(navController, animated: true, completion: nil)
-            
-        }))
-
-        alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
-            print("User click Edit button")
-                // Fallback on earlier versions
-            let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
-            guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
-                else { return }
-            let shareContent: [Any] = [shareText, url]
-            let activityController = UIActivityViewController(activityItems: shareContent,
-                                                              applicationActivities: nil)
-            self.present(activityController, animated: true, completion: nil)
-            activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-            Bool, arrayReturnedItems: [Any]?, error: Error?) in
-                if completed {
-                    print("share completed")
-                    return
-                } else {
-                    print("cancel")
-                }
-                if let shareError = error {
-                    print("error while sharing: \(shareError.localizedDescription)")
-                }
+    func shareButtonTapped() {
+        if let workout = workout {
+            var activityObject: ActivityObject
+            if let activityType = activityType, let image = UIImage(named: activityType), let category = workout.tagsStr, let subcategory = workout.exercises?.count {
+                print("categoryObject \(category)")
+                let data = compressImage(image: image)
+                let activity = ["activityType": "workout",
+                            "activityName": "\(workout.title)",
+                            "activityTypeID": "\(workout.identifier)",
+                            "activityImageURL": activityType,
+                            "activityCategory": "\(category)",
+                            "activitySubcategory": "Number of exercises: \(subcategory)",
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else if let category = workout.tagsStr, let subcategory = workout.exercises?.count {
+                let activity = ["activityType": "workout",
+                            "activityName": "\(workout.title)",
+                            "activityCategory": "\(category)",
+                            "activitySubcategory": "Number of exercises: \(subcategory)",
+                            "activityTypeID": "\(workout.identifier)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                return
             }
             
-        }))
-        
+            if let activity = activity {
+                activityObject.activityID = activity.activityID
+            }
+            
+            let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
 
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
+            alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+                print("User click Approve button")
+                let destination = ChooseChatTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.activityObject = activityObject
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.conversations = self.conversations
+                destination.filteredConversations = self.conversations
+                destination.filteredPinnedConversations = self.conversations
+                self.present(navController, animated: true, completion: nil)
+                
+            }))
 
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-        print("shareButtonTapped")
+            alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+                print("User click Edit button")
+                    // Fallback on earlier versions
+                let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+                guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+                    else { return }
+                let shareContent: [Any] = [shareText, url]
+                let activityController = UIActivityViewController(activityItems: shareContent,
+                                                                  applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+                activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+                Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                    if completed {
+                        print("share completed")
+                        return
+                    } else {
+                        print("cancel")
+                    }
+                    if let shareError = error {
+                        print("error while sharing: \(shareError.localizedDescription)")
+                    }
+                }
+                
+            }))
+            
+
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            print("shareButtonTapped")
+        }
     }
     
-    func heartButtonTapped(type: Any) {
+    func heartButtonTapped() {
         print("heartButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
-            if let workout = type as? Workout {
+            if let workout = workout {
                 print(workout.title)
                 databaseReference.child("workouts").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {
@@ -1088,10 +1132,10 @@ extension WorkoutDetailViewController: ChooseActivityDelegate {
 }
 
 extension EventDetailViewController: ActivityDetailCellDelegate {
-    func servingsUpdated(servings: Int) {
-        
+    func segmentSwitched(segment: Int) {
+        self.segment = segment
+        self.collectionView.reloadData()
     }
-    
     func plusButtonTapped() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
@@ -1369,69 +1413,101 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
         })
     }
     
-    func shareButtonTapped(activityObject: ActivityObject) {
-        
-        if let activity = activity {
-            activityObject.activityID = activity.activityID
-        }
-        
-        let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
-            print("User click Approve button")
-            let destination = ChooseChatTableViewController()
-            let navController = UINavigationController(rootViewController: destination)
-            destination.activityObject = activityObject
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.filteredConversations = self.conversations
-            destination.filteredPinnedConversations = self.conversations
-            self.present(navController, animated: true, completion: nil)
-            
-        }))
-
-        alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
-            print("User click Edit button")
-                // Fallback on earlier versions
-            let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
-            guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
-                else { return }
-            let shareContent: [Any] = [shareText, url]
-            let activityController = UIActivityViewController(activityItems: shareContent,
-                                                              applicationActivities: nil)
-            self.present(activityController, animated: true, completion: nil)
-            activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-            Bool, arrayReturnedItems: [Any]?, error: Error?) in
-                if completed {
-                    print("share completed")
-                    return
-                } else {
-                    print("cancel")
-                }
-                if let shareError = error {
-                    print("error while sharing: \(shareError.localizedDescription)")
-                }
+    func shareButtonTapped() {
+        if let event = event {
+            var subcategory = ""
+            if let minPrice = event.priceRanges?[0].min, let maxPrice = event.priceRanges?[0].max {
+                let formatter = CurrencyFormatter()
+                formatter.locale = .current
+                formatter.numberStyle = .currency
+                let minPriceString = formatter.string(for: minPrice)!
+                let maxPriceString = formatter.string(for: maxPrice)!
+                subcategory = "Price range: \(minPriceString) to \(maxPriceString)"
+            } else {
+                subcategory = ""
+            }
+            var activityObject: ActivityObject
+            if let activityType = activityType, let image = UIImage(named: activityType) {
+                let data = compressImage(image: image)
+                let activity = ["activityType": "event",
+                            "activityName": "\(event.name)",
+                            "activityTypeID": "\(event.id)",
+                            "activityImageURL": activityType,
+                            "activityCategory": "\(event.embedded?.venues?[0].name?.capitalized ?? "")",
+                            "activitySubcategory": "Number of exercises: \(subcategory)",
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                let activity = ["activityType": "event",
+                            "activityName": "\(event.name)",
+                            "activityCategory": "\(event.embedded?.venues?[0].name?.capitalized ?? "")",
+                            "activitySubcategory": "Number of exercises: \(subcategory)",
+                            "activityTypeID": "\(event.id)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
             }
             
-        }))
-        
+            if let activity = activity {
+                activityObject.activityID = activity.activityID
+            }
+            
+            let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
 
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
+            alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+                print("User click Approve button")
+                let destination = ChooseChatTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.activityObject = activityObject
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.conversations = self.conversations
+                destination.filteredConversations = self.conversations
+                destination.filteredPinnedConversations = self.conversations
+                self.present(navController, animated: true, completion: nil)
+                
+            }))
 
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-        print("shareButtonTapped")
+            alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+                print("User click Edit button")
+                    // Fallback on earlier versions
+                let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+                guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+                    else { return }
+                let shareContent: [Any] = [shareText, url]
+                let activityController = UIActivityViewController(activityItems: shareContent,
+                                                                  applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+                activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+                Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                    if completed {
+                        print("share completed")
+                        return
+                    } else {
+                        print("cancel")
+                    }
+                    if let shareError = error {
+                        print("error while sharing: \(shareError.localizedDescription)")
+                    }
+                }
+                
+            }))
+            
+
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            print("shareButtonTapped")
+        }
     }
     
-    func heartButtonTapped(type: Any) {
+    func heartButtonTapped() {
         print("heartButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
-            if let event = type as? Event {
+            if let event = event {
                 print(event.name)
                 databaseReference.child("events").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {
@@ -1449,26 +1525,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                     } else {
                         self.favAct["events"] = ["\(event.id)"]
                         databaseReference.updateChildValues(["events": ["\(event.id)"]])
-                    }
-                })
-            } else if let attraction = type as? Attraction {
-                print(attraction.name)
-                databaseReference.child("attractions").observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists() {
-                        var value = snapshot.value as! [String]
-                        if value.contains("\(attraction.id)") {
-                            if let index = value.firstIndex(of: "\(attraction.id)") {
-                                value.remove(at: index)
-                            }
-                            databaseReference.updateChildValues(["attractions": value as NSArray])
-                        } else {
-                            value.append("\(attraction.id)")
-                            databaseReference.updateChildValues(["attractions": value as NSArray])
-                        }
-                        self.favAct["attractions"] = value
-                    } else {
-                        self.favAct["attractions"] = ["\(attraction.id)"]
-                        databaseReference.updateChildValues(["attractions": ["\(attraction.id)"]])
                     }
                 })
             }
@@ -1643,8 +1699,9 @@ extension EventDetailViewController: ChooseActivityDelegate {
 }
 
 extension PlaceDetailViewController: ActivityDetailCellDelegate {
-    func servingsUpdated(servings: Int) {
-        
+    func segmentSwitched(segment: Int) {
+        self.segment = segment
+        self.collectionView.reloadData()
     }
     
     func plusButtonTapped() {
@@ -1918,69 +1975,109 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
         })
     }
     
-    func shareButtonTapped(activityObject: ActivityObject) {
-        
-        if let activity = activity {
-            activityObject.activityID = activity.activityID
-        }
-        
-        let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
-            print("User click Approve button")
-            let destination = ChooseChatTableViewController()
-            let navController = UINavigationController(rootViewController: destination)
-            destination.activityObject = activityObject
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.conversations = self.conversations
-            destination.filteredConversations = self.conversations
-            destination.filteredPinnedConversations = self.conversations
-            self.present(navController, animated: true, completion: nil)
-            
-        }))
-
-        alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
-            print("User click Edit button")
-                // Fallback on earlier versions
-            let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
-            guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
-                else { return }
-            let shareContent: [Any] = [shareText, url]
-            let activityController = UIActivityViewController(activityItems: shareContent,
-                                                              applicationActivities: nil)
-            self.present(activityController, animated: true, completion: nil)
-            activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-            Bool, arrayReturnedItems: [Any]?, error: Error?) in
-                if completed {
-                    print("share completed")
-                    return
-                } else {
-                    print("cancel")
-                }
-                if let shareError = error {
-                    print("error while sharing: \(shareError.localizedDescription)")
+    func shareButtonTapped() {
+        if let place = place {
+            var category = ""
+            var subcategory = ""
+            if let rating = place.rating {
+                category = "Rating: \(rating)/10"
+            }
+            if let price = place.price, let tier = price.tier, let categories = place.categories, !categories.isEmpty, let category = categories[0].shortName {
+                switch tier {
+                case 1:
+                    subcategory = category + " - $"
+                case 2:
+                    subcategory = category + " - $$"
+                case 3:
+                    subcategory = category + " - $$$"
+                case 4:
+                    subcategory = category + " - $$$$"
+                default:
+                    subcategory = category
                 }
             }
+            var activityObject: ActivityObject
+            if let activityType = activityType, let image = UIImage(named: activityType) {
+                let data = compressImage(image: image)
+                let activity = ["activityType": "place",
+                            "activityName": "\(place.name)",
+                            "activityTypeID": "\(place.id)",
+                            "activityImageURL": activityType,
+                            "activityCategory": "\(category)",
+                            "activitySubcategory": "\(subcategory)",
+                            "object": data] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            } else {
+                let activity = ["activityType": "place",
+                            "activityName": "\(place.name)",
+                            "activityCategory": "\(category)",
+                            "activitySubcategory": "\(subcategory)",
+                            "activityTypeID": "\(place.id)"] as [String: AnyObject]
+                activityObject = ActivityObject(dictionary: activity)
+            }
             
-        }))
-        
+            if let activity = activity {
+                activityObject.activityID = activity.activityID
+            }
+            
+            let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
 
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
+            alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
+                print("User click Approve button")
+                let destination = ChooseChatTableViewController()
+                let navController = UINavigationController(rootViewController: destination)
+                destination.activityObject = activityObject
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.conversations = self.conversations
+                destination.filteredConversations = self.conversations
+                destination.filteredPinnedConversations = self.conversations
+                self.present(navController, animated: true, completion: nil)
+                
+            }))
 
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-        print("shareButtonTapped")
+            alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
+                print("User click Edit button")
+                    // Fallback on earlier versions
+                let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
+                guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
+                    else { return }
+                let shareContent: [Any] = [shareText, url]
+                let activityController = UIActivityViewController(activityItems: shareContent,
+                                                                  applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+                activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
+                Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                    if completed {
+                        print("share completed")
+                        return
+                    } else {
+                        print("cancel")
+                    }
+                    if let shareError = error {
+                        print("error while sharing: \(shareError.localizedDescription)")
+                    }
+                }
+                
+            }))
+            
+
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            print("shareButtonTapped")
+        }
     }
     
-    func heartButtonTapped(type: Any) {
+    func heartButtonTapped() {
         print("heartButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
-            if let place = type as? FSVenue {
+            if let place = place {
                 print(place.name)
                 databaseReference.child("places").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {

@@ -51,7 +51,7 @@ class RecipeDetailCell: UICollectionViewCell {
         addSubview(segmentedControl)
         addSubview(recipeExpandedDetailViewController.view)
         
-        segmentedControl.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 5, bottom: 0, right: 5))
+        segmentedControl.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 15, left: 5, bottom: 0, right: 5))
         recipeExpandedDetailViewController.view.anchor(top: segmentedControl.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         
     }
