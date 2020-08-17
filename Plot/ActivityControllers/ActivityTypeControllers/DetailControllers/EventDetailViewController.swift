@@ -53,6 +53,7 @@ class EventDetailViewController: ActivityDetailViewController {
     fileprivate func setMoreActivity() {
         if let event = event {
             activity.name = event.name
+            activityName = event.name
             activity.activityType = activityType
             activity.eventID = "\(event.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
@@ -254,6 +255,7 @@ class EventDetailViewController: ActivityDetailViewController {
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCalendarDetailCell, for: indexPath) as! CalendarDetailCell
             cell.delegate = self
+            cell.nameField.text = activityName
             cell.locationLabel.text = locationName
             cell.participantsLabel.text = userNamesString
             cell.rightReminderLabel.text = reminder
@@ -428,6 +430,10 @@ extension EventDetailViewController: ActivityExpandedDetailCellDelegate {
 }
 
 extension EventDetailViewController: CalendarDetailCellDelegate {
+    func nameChanged(labelText: String) {
+        activity.name = labelText
+    }
+    
     func startDateChanged(startDate: Date) {
         startDateTime = startDate
         activity.startDateTime = NSNumber(value: Int((startDate).timeIntervalSince1970))

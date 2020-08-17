@@ -34,6 +34,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     var userNames : [String] = []
     var userNamesString: String = ""
     
+    var activityName: String = ""
+    
     var locationName: String = "Location"
     var locationAddress = [String : [Double]]()
     
@@ -116,6 +118,9 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
             active = true
             if let activityID = activity.activityID {
                 self.activityID = activityID
+            }
+            if let name = activity.name {
+                self.activityName = name
             }
             if let localName = activity.locationName, localName != "Location", let localAddress = activity.locationAddress {
                 locationName = localName

@@ -66,6 +66,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
     fileprivate func setMoreActivity() {
         if let recipe = recipe {
             activity.name = recipe.title
+            activityName = recipe.title
             activity.recipeID = "\(recipe.id)"
             activity.activityType = activityType
             if schedule, let umbrellaActivity = umbrellaActivity {
@@ -240,6 +241,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCalendarDetailCell, for: indexPath) as! CalendarDetailCell
             cell.delegate = self
+            cell.nameField.text = activityName
             cell.locationLabel.text = locationName
             cell.participantsLabel.text = userNamesString
             cell.rightReminderLabel.text = reminder
@@ -426,6 +428,10 @@ extension RecipeDetailViewController: ActivityExpandedDetailCellDelegate {
 }
 
 extension RecipeDetailViewController: CalendarDetailCellDelegate {
+    func nameChanged(labelText: String) {
+        activity.name = labelText
+    }
+    
     func startDateChanged(startDate: Date) {
         startDateTime = startDate
         activity.startDateTime = NSNumber(value: Int((startDate).timeIntervalSince1970))

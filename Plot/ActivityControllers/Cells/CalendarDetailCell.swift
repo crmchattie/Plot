@@ -17,6 +17,7 @@ protocol CalendarDetailCellDelegate: class {
     func startDateChanged(startDate: Date)
     func endDateChanged(endDate: Date)
     func reminderViewTapped(labelText: String)
+    func nameChanged(labelText: String)
 }
 
 class CalendarDetailCell: UICollectionViewCell {
@@ -34,7 +35,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let nameField: UITextField = {
         let textField = UITextField()
-        textField.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        textField.textColor = ThemeManager.currentTheme().generalTitleColor
         textField.font = UIFont.preferredFont(forTextStyle: .body)
         textField.placeholder = "Activity Name"
         textField.isUserInteractionEnabled = true
@@ -203,6 +204,8 @@ class CalendarDetailCell: UICollectionViewCell {
     }()
    
     func setupViews() {
+        
+        nameField.delegate = self
                     
         if locationLabel.text == "Location" {
             locationLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -381,4 +384,21 @@ class CalendarDetailCell: UICollectionViewCell {
         }
         self.delegate?.reminderViewTapped(labelText: labelText)
     }
+}
+
+extension CalendarDetailCell: UITextFieldDelegate {
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if textField.text == "" || textField.text == nil {
+            return false
+        }
+        return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if let text = textField.text {
+            self.delegate?.nameChanged(labelText: text)
+        }
+    }
+    
+    
 }

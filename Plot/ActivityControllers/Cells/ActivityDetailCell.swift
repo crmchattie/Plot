@@ -23,12 +23,15 @@ class ActivityDetailCell: UICollectionViewCell {
     
     var favAct = [String: [String]]()
     
+    var typeString: String = ""
+    
     var recipe: Recipe! {
         didSet {
             if let recipe = recipe {
                 let recipeImage = "https://spoonacular.com/recipeImages/\(recipe.id)-636x393.jpg"
                 imageView.sd_setImage(with: URL(string: recipeImage))
                 imageURL = recipeImage
+                typeString = "Recipe"
                 setupViews()
             }
         }
@@ -41,6 +44,7 @@ class ActivityDetailCell: UICollectionViewCell {
                     imageView.sd_setImage(with: URL(string: url))
                     imageURL = url
                 }
+                typeString = "Event"
                 setupViews()
             }
         }
@@ -49,6 +53,7 @@ class ActivityDetailCell: UICollectionViewCell {
     var attraction: Attraction! {
         didSet {
             if let _ = attraction {
+                typeString = "Attraction"
                 setupViews()
             }
         }
@@ -61,6 +66,7 @@ class ActivityDetailCell: UICollectionViewCell {
                 imageView.tintColor = UIColor.white
                 imageView.backgroundColor = colors[intColor]
                 imageURL = "workout"
+                typeString = "Workout"
                 setupViews()
             }
         }
@@ -78,6 +84,7 @@ class ActivityDetailCell: UICollectionViewCell {
                     imageView.tintColor = UIColor.white
                     imageView.backgroundColor = colors[intColor]
                 }
+                typeString = "Place"
                 setupViews()
             }
         }
@@ -95,6 +102,7 @@ class ActivityDetailCell: UICollectionViewCell {
                     imageView.tintColor = UIColor.white
                     imageView.backgroundColor = colors[intColor]
                 }
+                typeString = "Place"
                 setupViews()
             }
         }
@@ -108,6 +116,7 @@ class ActivityDetailCell: UICollectionViewCell {
                 imageView.backgroundColor = colors[intColor]
                 imageURL = "sightseeing"
             }
+            typeString = "Place"
             setupViews()
         }
     }
@@ -160,7 +169,7 @@ class ActivityDetailCell: UICollectionViewCell {
     }()
     
     var segmentedControl: UISegmentedControl = {
-        let segmentControl = UISegmentedControl(items: [NSLocalizedString("Activity", comment: ""), NSLocalizedString("Calendar", comment: "")])
+        let segmentControl = UISegmentedControl(items: ["Activity", "Calendar"])
         segmentControl.selectedSegmentIndex = 0
         segmentControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
         return segmentControl
@@ -194,6 +203,9 @@ class ActivityDetailCell: UICollectionViewCell {
         
         dotsButton.constrainWidth(40)
         dotsButton.constrainHeight(40)
+        
+        segmentedControl.setTitle(typeString, forSegmentAt: 0)
+        segmentedControl.setTitle("Calendar", forSegmentAt: 1)
                 
         segmentedControl.addTarget(self, action: #selector(action(_:)), for: .valueChanged)
 

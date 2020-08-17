@@ -43,6 +43,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
     fileprivate func setMoreActivity() {
         if let place = place {
             activity.name = place.name
+            activityName = place.name
             activity.activityType = activityType
             activity.placeID = "\(place.id)"
             if schedule, let umbrellaActivity = umbrellaActivity {
@@ -163,6 +164,7 @@ class PlaceDetailViewController: ActivityDetailViewController {
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCalendarDetailCell, for: indexPath) as! CalendarDetailCell
             cell.delegate = self
+            cell.nameField.text = activityName
             cell.locationLabel.text = locationName
             cell.participantsLabel.text = userNamesString
             cell.rightReminderLabel.text = reminder
@@ -334,6 +336,10 @@ extension PlaceDetailViewController: ActivityExpandedDetailCellDelegate {
 }
 
 extension PlaceDetailViewController: CalendarDetailCellDelegate {
+    func nameChanged(labelText: String) {
+        activity.name = labelText
+    }
+    
     func startDateChanged(startDate: Date) {
         startDateTime = startDate
         activity.startDateTime = NSNumber(value: Int((startDate).timeIntervalSince1970))

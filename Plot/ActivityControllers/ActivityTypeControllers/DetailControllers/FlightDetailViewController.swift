@@ -46,6 +46,7 @@ class FlightDetailViewController: ActivityDetailViewController {
     fileprivate func setMoreActivity() {
         if let workout = workout {
             activity.name = workout.title
+            activityName = workout.title
             activity.activityType = "flight"
             activity.workoutID = "\(workout.identifier)"
             if schedule, let umbrellaActivity = umbrellaActivity {
@@ -162,6 +163,7 @@ class FlightDetailViewController: ActivityDetailViewController {
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCalendarDetailCell, for: indexPath) as! CalendarDetailCell
             cell.delegate = self
+            cell.nameField.text = activityName
             cell.locationLabel.text = locationName
             cell.participantsLabel.text = userNamesString
             cell.rightReminderLabel.text = reminder
@@ -336,6 +338,10 @@ extension FlightDetailViewController: ActivityExpandedDetailCellDelegate {
 }
 
 extension FlightDetailViewController: CalendarDetailCellDelegate {
+    func nameChanged(labelText: String) {
+        activity.name = labelText
+    }
+    
     func startDateChanged(startDate: Date) {
         startDateTime = startDate
         activity.startDateTime = NSNumber(value: Int((startDate).timeIntervalSince1970))
