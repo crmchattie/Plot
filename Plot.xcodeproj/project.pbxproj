@@ -134,6 +134,7 @@
 		10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EE245C5B8000C80AAF /* Checklist.swift */; };
 		10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27F0245C6B6400C80AAF /* Packinglist.swift */; };
 		10EE27F3245DFA8E00C80AAF /* PackinglistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */; };
+		10F3032524EB746E00C04B8F /* AccountsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F3032424EB746E00C04B8F /* AccountsTableViewController.swift */; };
 		10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */; };
 		10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */; };
 		10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */; };
@@ -486,6 +487,7 @@
 		10EE27EE245C5B8000C80AAF /* Checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checklist.swift; sourceTree = "<group>"; };
 		10EE27F0245C6B6400C80AAF /* Packinglist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packinglist.swift; sourceTree = "<group>"; };
 		10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackinglistViewController.swift; sourceTree = "<group>"; };
+		10F3032424EB746E00C04B8F /* AccountsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsTableViewController.swift; sourceTree = "<group>"; };
 		10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientSearchViewController.swift; sourceTree = "<group>"; };
 		10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDetailCell.swift; sourceTree = "<group>"; };
 		10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailViewController.swift; sourceTree = "<group>"; };
@@ -917,6 +919,14 @@
 			path = MapViewController;
 			sourceTree = "<group>";
 		};
+		10F3032324EB744500C04B8F /* Accounts */ = {
+			isa = PBXGroup;
+			children = (
+				10F3032424EB746E00C04B8F /* AccountsTableViewController.swift */,
+			);
+			path = Accounts;
+			sourceTree = "<group>";
+		};
 		26391FEA235EC3B3002BB4C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1074,6 +1084,7 @@
 		4BAEE45021272B380045AB10 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
+				10F3032324EB744500C04B8F /* Accounts */,
 				4BAEE45D21272B380045AB10 /* Model */,
 				4BAEE45A21272B380045AB10 /* Support */,
 				4BAEE46021272B380045AB10 /* NotificationsAndSounds */,
@@ -2295,6 +2306,7 @@
 				4BAEE5DC212735E50045AB10 /* AnimationController.swift in Sources */,
 				4BAEE4FD21272D890045AB10 /* BaseVoiceMessageCell.swift in Sources */,
 				4BAEE5DB212735E50045AB10 /* ImageCell.swift in Sources */,
+				10F3032524EB746E00C04B8F /* AccountsTableViewController.swift in Sources */,
 				2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */,
 				4BAEE5D3212735E50045AB10 /* RoundProgressView.swift in Sources */,
 				10DE97392475837B00D4A7E8 /* ListContainer.swift in Sources */,
