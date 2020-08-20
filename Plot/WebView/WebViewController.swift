@@ -9,7 +9,7 @@
 import UIKit
 import WebKit
 
-class WebViewController: UIViewController, WKUIDelegate {
+class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     var webView: WKWebView!
     
@@ -21,16 +21,17 @@ class WebViewController: UIViewController, WKUIDelegate {
         let webConfiguration = WKWebViewConfiguration()
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.uiDelegate = self
+        webView.navigationDelegate = self
         view = webView
-
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         print(urlString ?? "")
         
         title = controllerTitle
-
+        
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.rightBarButtonItem = doneBarButton
         
@@ -39,9 +40,30 @@ class WebViewController: UIViewController, WKUIDelegate {
             webView.load(myRequest)
             webView.allowsBackForwardNavigationGestures = true
         }
+
     }
     
     @IBAction func done(_ sender: AnyObject) {
         self.dismiss(animated: true, completion: nil)
     }
+    
+    func webView(_ webView: WKWebView, decidePolicyFor
+        navigationAction: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Swift.Void) {
+        
+        // Intercept custom URI
+        let surl = navigationAction.request.url?.absoluteString
+        print("surl \(surl)")
+        if (surl?.hasPrefix("atrium://"))! {
+            // Take action here
+            print("atrium://")
+            // Cancel request
+            decisionHandler(.cancel)
+            return
+        }
+
+        // Allow request
+        decisionHandler(.allow)
+    }
+    
 }

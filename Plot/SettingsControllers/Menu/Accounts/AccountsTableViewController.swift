@@ -25,7 +25,7 @@ class AccountsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Data and Storage"
+        title = "Accounts"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
@@ -47,7 +47,6 @@ class AccountsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
         
         cell.accessoryType = .disclosureIndicator
-        //      cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         cell.backgroundColor = view.backgroundColor
@@ -69,6 +68,17 @@ class AccountsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 0 {
+            
+        }
+        if indexPath.row == 1 {
+            let destination = FinancialAccountsViewController()
+            destination.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(destination, animated: true)
+        }
+        if indexPath.row == 2 {
+            
+        }
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }

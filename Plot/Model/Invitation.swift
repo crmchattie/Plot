@@ -12,18 +12,18 @@ enum Status: Int, Codable {
     case pending, accepted, declined, uninvited
     
     var description: String {
-      get {
-        switch self {
-          case .pending:
-            return "Pending"
-          case .accepted:
-            return "Accepted"
-          case .declined:
-            return "Declined"
-          case .uninvited:
-            return "Invite"
+        get {
+            switch self {
+            case .pending:
+                return "Pending"
+            case .accepted:
+                return "Accepted"
+            case .declined:
+                return "Declined"
+            case .uninvited:
+                return "Invite"
+            }
         }
-      }
     }
 }
 

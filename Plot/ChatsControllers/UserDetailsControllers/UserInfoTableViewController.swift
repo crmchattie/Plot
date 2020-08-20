@@ -64,7 +64,6 @@ class UserInfoTableViewController: UITableViewController {
   }
   
   fileprivate func getUserInfo() {
-    
     userReference = Database.database().reference().child("users").child(conversationID)
     handle = userReference.observe(.value) { (snapshot) in
       if snapshot.exists() {

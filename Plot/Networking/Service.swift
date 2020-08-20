@@ -527,10 +527,298 @@ class Service {
                         
     }
     
+    func createMXUser(id: String, completion: @escaping ((MXUserResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": "\(MXAPI.apiKey)",
+                                        "MX-Client-ID": "\(MXAPI.clientID)",
+                                        "Accept": "\(MXAPI.version)",
+                                        "Content-Type": "\(MXAPI.contentType)"]
+        urlRequest.httpMethod = "POST"
+        let parameters = ["user": ["identifier": "\(id)"]]
+        let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
+        urlRequest.httpBody = jsonData
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+                        
+    }
+    
+    func updateMXUser(method: String, guid: String, is_disabled: Bool?, completion: @escaping ((MXUserResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid)!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        
+        var parameters = [String: String]()
+        
+        if method == "get" {
+            urlRequest.httpMethod = "GET"
+        }
+        else if method == "put" {
+            urlRequest.httpMethod = "PUT"
+            if let is_disabled = is_disabled {
+                parameters = ["is_disabled":"\(is_disabled)"]
+            }
+        }
+        
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
+    func deleteMXUser(guid: String, completion: @escaping ((String?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid)!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "DELETE"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+                        
+    }
+    
+    func getMXConnectURL(guid: String, current_member_guid: String?, completion: @escaping ((MXUserResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/connect_widget_url")!
+        }()
+        
+        var parameters = ["is_mobile_webview":"\(true)",
+                        "ui_message_version": "\(4)"]
+        if UITraitCollection.current.userInterfaceStyle == .light {
+            parameters["color_scheme"] = "light"
+        } else {
+            parameters["color_scheme"] = "dark"
+        }
+        if let guid = current_member_guid {
+            parameters["current_member_guid"] = "\(guid)"
+        }
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "POST"
+        
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
+    func getMXMembers(guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "GET"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+    }
+    
+    func getMXMemberStatus(guid: String, member_guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid+"/status")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "GET"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+    }
+    
+    func getMXMemberAccounts(guid: String, member_guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid+"/accounts")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "GET"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+    }
+    
+    func aggregateMXMember(guid: String, member_guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid+"/aggregate")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "POST"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+    }
+    
+    func deleteMXMember(guid: String, member_guid: String, completion: @escaping ((String?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid)!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "DELETE"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+    }
+    
+    func getMXAccounts(guid: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/accounts")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "GET"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+    }
+    
+    func getMXAccount(guid: String, account_guid: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/accounts"+account_guid)!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "GET"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+    }
+    
+    func getMXTransactions(guid: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/transactions")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "GET"
+        
+        var parameters = [String: String]()
+        //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
+        if let from_date = from_date {
+            parameters["from_date"] = "\(from_date)"
+        }
+        if let to_date = to_date {
+            parameters["to_date"] = "\(to_date)"
+        }
+        
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+    }
+    
+    func getMXMemberTransactions(guid: String, member_guid: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid+"/transactions")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "GET"
+        
+        var parameters = [String: String]()
+        //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
+        if let from_date = from_date {
+            parameters["from_date"] = "\(from_date)"
+        }
+        if let to_date = to_date {
+            parameters["to_date"] = "\(to_date)"
+        }
+        
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+    }
+    
+    func getMXAccountTransactions(guid: String, account_guid: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/accounts"+account_guid+"/transactions")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "GET"
+        
+        var parameters = [String: String]()
+        //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
+        if let from_date = from_date {
+            parameters["from_date"] = "\(from_date)"
+        }
+        if let to_date = to_date {
+            parameters["to_date"] = "\(to_date)"
+        }
+        
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+    }
+    
     // declare my generic json function here
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
-        print("encodedURLRequest \(encodedURLRequest)")
+//        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
+//            print("resObject \(resp)")
             if let err = err {
                 print("err \(err)")
                 completion(nil, err)
@@ -598,6 +886,21 @@ struct SygicAPI {
     static let tripTemplatesUrlString = "https://api.sygictravelapi.com/1.1/en/trips/templates"
     static let tripDetailsUrlString = "https://api.sygictravelapi.com/1.1/en/trips"
     static fileprivate let apiKey = "gLr9XJrFQB3picSrsJoC1nSCUyIsMQQ8rr4meHN1"
+}
+
+struct MXAPI {
+    //production environment
+    //static let baseURL = "https://atrium.mx.com/"
+    
+    //development environment URL
+    static let baseURL = "https://vestibule.mx.com/"
+    
+    //development environment keys
+    static fileprivate let apiKey = "07c825a06c719bafc82e812445d02230cdd67b47"
+    static fileprivate let clientID = "cc3f22cd-7431-4bd9-955c-2624dcbb0e26"
+    
+    static fileprivate let version = "application/vnd.mx.atrium.v1+json"
+    static fileprivate let contentType = "application/json"
 }
 
 extension URLRequest {

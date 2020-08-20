@@ -74,7 +74,7 @@ class WorkoutDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
-        label.text = "Workout Preview:"
+        label.text = "Workout:"
         return label
     }()
    
