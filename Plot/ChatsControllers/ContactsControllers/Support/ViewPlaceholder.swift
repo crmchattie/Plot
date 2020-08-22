@@ -36,6 +36,7 @@ enum ViewPlaceholderTitle: String {
     case emptyInvitedActivities = "You have not yet been invited to any activities"
     case emptyLists = "You don't have any lists yet"
     case emptyIngredients = "Please search for ingredients above"
+    case emptyAccounts = "You are not connected to any accounts yet"
 }
 
 enum ViewPlaceholderSubtitle: String {
@@ -51,6 +52,7 @@ enum ViewPlaceholderSubtitle: String {
     case emptyInvitedActivities = "Once you are invited to an activity it will appear here"
     case emptyMap = "Activities will appear here and on the map as pins"
     case emptyLists = "You can add a list with the plus button in the upper right corner"
+    case emptyAccounts = "You can add an account with the plus button in the upper right corner"
 }
 
 class ViewPlaceholder: UIView {

@@ -125,9 +125,9 @@ class FlightDetailViewController: ActivityDetailViewController {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kActivityDetailCell, for: indexPath) as! ActivityDetailCell
             if let workout = workout {
                 if let workouts = favAct["workouts"], workouts.contains(workout.identifier) {
-                    cell.heartButtonImage = "heart-filled"
+                    cell.bookmarkButtonImage = "bookmark-filled"
                 } else {
-                    cell.heartButtonImage = "heart"
+                    cell.bookmarkButtonImage = "bookmark"
                 }
                 cell.active = active
                 cell.activeList = activeList

@@ -11,7 +11,7 @@ import UIKit
 protocol ActivityDetailCellDelegate: class {
     func plusButtonTapped()
     func shareButtonTapped()
-    func heartButtonTapped()
+    func bookmarkButtonTapped()
     func dotsButtonTapped()
     func segmentSwitched(segment: Int)
 }
@@ -135,9 +135,9 @@ class ActivityDetailCell: UICollectionViewCell {
     let imageView = UIImageView(cornerRadius: 0)
     
     var imageURL: String?
-    var heartButtonImage: String?
+    var bookmarkButtonImage: String?
 
-    let heartButton: UIButton = {
+    let bookmarkButton: UIButton = {
         let button = UIButton(type: .system)
         button.tintColor = ThemeManager.currentTheme().generalTitleColor
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -183,17 +183,17 @@ class ActivityDetailCell: UICollectionViewCell {
         dotsButton.isHidden = !active || activeList
         segmentedControl.isHidden = activeList
                 
-        if let heartImage = heartButtonImage {
-            heartButton.setImage(UIImage(named: heartImage), for: .normal)
-            heartButton.isHidden = false
+        if let heartImage = bookmarkButtonImage {
+            bookmarkButton.setImage(UIImage(named: heartImage), for: .normal)
+            bookmarkButton.isHidden = false
         } else {
-            heartButton.isHidden = true
+            bookmarkButton.isHidden = true
         }
         
         imageView.constrainHeight(231)
                         
-        heartButton.constrainWidth(40)
-        heartButton.constrainHeight(40)
+        bookmarkButton.constrainWidth(40)
+        bookmarkButton.constrainHeight(40)
         
         shareButton.constrainWidth(40)
         shareButton.constrainHeight(40)
@@ -211,7 +211,7 @@ class ActivityDetailCell: UICollectionViewCell {
 
         segmentedControl.constrainHeight(30)
                 
-        let buttonStack = UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, UIView(), dotsButton])
+        let buttonStack = UIStackView(arrangedSubviews: [plusButton, shareButton, bookmarkButton, UIView(), dotsButton])
         buttonStack.isLayoutMarginsRelativeArrangement = true
         buttonStack.layoutMargins = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 15)
                 
@@ -225,7 +225,7 @@ class ActivityDetailCell: UICollectionViewCell {
         
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
-        heartButton.addTarget(self, action: #selector(heartButtonTapped), for: .touchUpInside)
+        bookmarkButton.addTarget(self, action: #selector(bookmarkButtonTapped), for: .touchUpInside)
         dotsButton.addTarget(self, action: #selector(dotsButtonTapped), for: .touchUpInside)
         
     }
@@ -234,7 +234,7 @@ class ActivityDetailCell: UICollectionViewCell {
         super.prepareForReuse()
         plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        bookmarkButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         dotsButton.tintColor = ThemeManager.currentTheme().generalTitleColor
 
     }
@@ -247,10 +247,10 @@ class ActivityDetailCell: UICollectionViewCell {
         self.delegate?.shareButtonTapped()
     }
 
-    @objc func heartButtonTapped() {
-        heartButtonImage = (heartButtonImage == "heart") ? "heart-filled" : "heart"
-        heartButton.setImage(UIImage(named: heartButtonImage!), for: .normal)
-        self.delegate?.heartButtonTapped()
+    @objc func bookmarkButtonTapped() {
+        bookmarkButtonImage = (bookmarkButtonImage == "bookmark") ? "bookmark-filled" : "bookmark"
+        bookmarkButton.setImage(UIImage(named: bookmarkButtonImage!), for: .normal)
+        self.delegate?.bookmarkButtonTapped()
     }
     
     @objc func dotsButtonTapped() {

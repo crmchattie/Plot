@@ -382,8 +382,8 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
         }
     }
     
-    func heartButtonTapped() {
-        print("heartButtonTapped")
+    func bookmarkButtonTapped() {
+        print("bookmarkButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
             if let recipe = recipe {
@@ -936,8 +936,8 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
         }
     }
     
-    func heartButtonTapped() {
-        print("heartButtonTapped")
+    func bookmarkButtonTapped() {
+        print("bookmarkButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
             if let workout = workout {
@@ -1503,8 +1503,8 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
         }
     }
     
-    func heartButtonTapped() {
-        print("heartButtonTapped")
+    func bookmarkButtonTapped() {
+        print("bookmarkButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
             if let event = event {
@@ -2073,8 +2073,8 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
         }
     }
     
-    func heartButtonTapped() {
-        print("heartButtonTapped")
+    func bookmarkButtonTapped() {
+        print("bookmarkButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
             if let place = place {

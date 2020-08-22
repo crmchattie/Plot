@@ -12,6 +12,11 @@ import CodableFirebase
 
 class FinancialAccountsViewController: UITableViewController {
     
+    var mxMembers = [MXMember]()
+    var mxUser: MXUser!
+    
+    let viewPlaceholder = ViewPlaceholder()
+    
     deinit {
         print("STORAGE DID DEINIT")
     }
@@ -27,16 +32,26 @@ class FinancialAccountsViewController: UITableViewController {
         
         let newAccountBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
         navigationItem.rightBarButtonItem = newAccountBarButton
+        
+        grabMXUser()
     }
     
-    @objc func newAccount() {
+    func checkIfThereAreAnyResults(isEmpty: Bool) {
+        guard isEmpty else {
+            viewPlaceholder.remove(from: tableView, priority: .medium)
+            return
+        }
+        viewPlaceholder.add(for: tableView, title: .emptyAccounts, subtitle: .emptyAccounts, priority: .medium, position: .top)
+    }
+    
+    func grabMXUser() {
         if let currentUser = Auth.auth().currentUser?.uid {
             let mxIDReference = Database.database().reference().child(usersFinancialEntity).child(currentUser)
             mxIDReference.observe(.value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value {
                     if let user = try? FirebaseDecoder().decode(MXUser.self, from: value) {
-                        print("userFinancial \(user)")
-                        self.openMXConnect(guid: user.guid)
+                        self.mxUser = user
+                        self.grabMXMembers(guid: user.guid)
                     }
                 } else if !snapshot.exists() {
                     let identifier = UUID().uuidString
@@ -45,17 +60,39 @@ class FinancialAccountsViewController: UITableViewController {
                             var user = search?.user
                             user!.identifier = identifier
                             if let firebaseUser = try? FirebaseEncoder().encode(user) {
-                                print("firebaseUser \(firebaseUser)")
                                 mxIDReference.setValue(firebaseUser)
                             }
-                            print("userFinancial \(user)")
-                            self.openMXConnect(guid: user!.guid)
-                        } else {
-                            return
+                            self.mxUser = user
+                            self.grabMXMembers(guid: user!.guid)
                         }
                     }
                 }
             })
+        }
+    }
+    
+    func grabMXMembers(guid: String) {
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
+        Service.shared.getMXMembers(guid: guid) { (search, err) in
+            if let members = search?.members {
+                self.mxMembers = members
+                dispatchGroup.leave()
+            } else if let member = search?.member {
+                self.mxMembers = [member]
+                dispatchGroup.leave()
+            } else {
+                dispatchGroup.leave()
+            }
+        }
+        dispatchGroup.notify(queue: .main) {
+            self.tableView.reloadData()
+        }
+    }
+    
+    @objc func newAccount() {
+        if let user = mxUser {
+            self.openMXConnect(guid: user.guid)
         }
     }
     
@@ -66,39 +103,46 @@ class FinancialAccountsViewController: UITableViewController {
                     let destination = WebViewController()
                     destination.urlString = url
                     destination.controllerTitle = ""
+                    destination.delegate = self
                     let navigationViewController = UINavigationController(rootViewController: destination)
                     navigationViewController.modalPresentationStyle = .fullScreen
                     self.present(navigationViewController, animated: true, completion: nil)
                 }
-            } else {
-                return
             }
         }
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        if mxMembers.count == 0 {
+            checkIfThereAreAnyResults(isEmpty: true)
+        } else {
+            checkIfThereAreAnyResults(isEmpty: false)
+        }
+        return mxMembers.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let identifier = "cell"
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-        
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         cell.backgroundColor = view.backgroundColor
+        cell.textLabel?.text = mxMembers[indexPath.row].name
+        cell.isUserInteractionEnabled = true
+        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         
-        if indexPath.row == 0 {
-            cell.textLabel?.text = "Test Account"
-            cell.isUserInteractionEnabled = true
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+}
+
+extension FinancialAccountsViewController: EndedWebViewDelegate {
+    func updateMXMembers() {
+        if let user = mxUser {
+            grabMXMembers(guid: user.guid)
+        }
     }
 }

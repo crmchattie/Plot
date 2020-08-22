@@ -99,10 +99,10 @@ class MasterActivityContainerController: UIViewController {
     }
     var selectedDate = Date()
     
-    let titles = ["Updates", "Chats", "Activities", "Lists", "Map"]
+    let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
     var index: Int = 2
     
-    let customSegmented = CustomSegmentedControl(buttonImages: ["notification-bell","chat","activity", "list", "map"])
+    let customSegmented = CustomSegmentedControl(buttonImages: ["chat","heart","activity", "money", "list"])
     let containerView = UIView()
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
@@ -123,7 +123,7 @@ class MasterActivityContainerController: UIViewController {
     
     lazy var mapVC: MapViewController = {
         let vc = MapViewController()
-        self.addAsChildVC(childVC: vc)
+//        self.addAsChildVC(childVC: vc)
         return vc
     }()
     
@@ -135,6 +135,18 @@ class MasterActivityContainerController: UIViewController {
     
     lazy var notificationsVC: NotificationsViewController = {
         let vc = NotificationsViewController()
+//        self.addAsChildVC(childVC: vc)
+        return vc
+    }()
+    
+    lazy var financeVC: FinanceViewController = {
+        let vc = FinanceViewController()
+        self.addAsChildVC(childVC: vc)
+        return vc
+    }()
+    
+    lazy var healthVC: HealthViewController = {
+        let vc = HealthViewController()
         self.addAsChildVC(childVC: vc)
         return vc
     }()
@@ -147,6 +159,8 @@ class MasterActivityContainerController: UIViewController {
         activitiesVC.delegate = self
         chatsVC.delegate = self
         listsVC.delegate = self
+        financeVC.delegate = self
+        healthVC.delegate = self
         changeToIndex(index: index)
         addObservers()
     }
@@ -237,12 +251,17 @@ class MasterActivityContainerController: UIViewController {
     }
     
     func setNavBar() {
-        if index == 1 {
+        if index == 0 {
             navigationItem.title = titles[index]
             let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
             let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.leftBarButtonItem = editButtonItem
             navigationItem.rightBarButtonItems = [newChatBarButton, searchBarButton]
+        } else if index == 1 {
+            navigationItem.title = titles[index]
+            let newHealthItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newHealthItem))
+            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+            navigationItem.rightBarButtonItems = [newHealthItemBarButton, searchBarButton]
         } else if index == 2 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMMM yyyy"
@@ -253,6 +272,11 @@ class MasterActivityContainerController: UIViewController {
             navigationItem.leftBarButtonItem = editButtonItem
             navigationItem.rightBarButtonItems = [newActivityBarButton, searchBarButton]
         } else if index == 3 {
+            navigationItem.title = titles[index]
+            let newFinanceItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newFinanceItem))
+            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+            navigationItem.rightBarButtonItems = [newFinanceItemBarButton, searchBarButton]
+        } else if index == 4 {
             navigationItem.title = titles[index]
             let newListBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))
             let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
@@ -332,7 +356,7 @@ class MasterActivityContainerController: UIViewController {
 
 extension MasterActivityContainerController: CustomSegmentedControlDelegate {
     func changeToIndex(index:Int) {
-        if self.index == 1 {
+        if self.index == 0 {
             if chatsVC.tableView.isEditing == true {
                 chatsVC.tableView.setEditing(false, animated: true)
                 editButtonItem.style = .plain
@@ -356,7 +380,7 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
                     cancelButton.isEnabled = true
                 }
             }
-        } else if self.index == 3 {
+        } else if self.index == 5 {
             if listsVC.tableView.isEditing == true {
                 listsVC.tableView.setEditing(false, animated: true)
                 editButtonItem.style = .plain
@@ -369,14 +393,16 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
                 }
             }
         }
-        notificationsVC.view.isHidden = !(index == 0)
-        if index == 0 {
-            notificationsVC.sortInvitedActivities()
-        }
-        chatsVC.view.isHidden = !(index == 1)
+//        notificationsVC.view.isHidden = !(index == 0)
+//        if index == 0 {
+//            notificationsVC.sortInvitedActivities()
+//        }
+        chatsVC.view.isHidden = !(index == 0)
+        healthVC.view.isHidden = !(index == 1)
         activitiesVC.view.isHidden = !(index == 2)
-        listsVC.view.isHidden = !(index == 3)
-        mapVC.view.isHidden = !(index == 4)
+        financeVC.view.isHidden = !(index == 3)
+        listsVC.view.isHidden = !(index == 4)
+//        mapVC.view.isHidden = !(index == 4)
         self.index = index
         setNavBar()
     }
@@ -505,6 +531,26 @@ extension MasterActivityContainerController {
             listsVC.setupSearchController()
         }
     }
+    
+    @objc fileprivate func newFinanceItem() {
+        if self.index == 1 {
+            chatsVC.setupSearchController()
+        } else if self.index == 2 {
+            activitiesVC.setupSearchController()
+        } else if self.index == 3 {
+            listsVC.setupSearchController()
+        }
+    }
+    
+    @objc fileprivate func newHealthItem() {
+        if self.index == 1 {
+            chatsVC.setupSearchController()
+        } else if self.index == 2 {
+            activitiesVC.setupSearchController()
+        } else if self.index == 3 {
+            listsVC.setupSearchController()
+        }
+    }
 }
 
 extension MasterActivityContainerController: HomeBaseActivities {
@@ -535,4 +581,12 @@ extension MasterActivityContainerController: HomeBaseLists {
     func sendLists(lists: [ListContainer]) {
         self.listList = lists
     }
+}
+
+extension MasterActivityContainerController: HomeBaseFinance {
+    
+}
+
+extension MasterActivityContainerController: HomeBaseHealth {
+    
 }

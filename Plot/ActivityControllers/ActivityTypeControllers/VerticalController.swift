@@ -142,9 +142,9 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
         if recipes != nil {
             let recipe = recipes![indexPath.item]
             if let recipes = favAct["recipes"], recipes.contains("\(recipe.id)") {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.recipe = recipe
             cell.event = nil
@@ -156,9 +156,9 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
         } else if events != nil {
             let event = events![indexPath.item]
             if let events = favAct["events"], events.contains(event.id) {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.event = event
             cell.recipe = nil
@@ -170,9 +170,9 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
         } else if workouts != nil {
             let workout = workouts![indexPath.item]
             if let workouts = favAct["workouts"], workouts.contains(workout.identifier) {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.intColor = (indexPath.item % 5)
             cell.workout = workout
@@ -186,9 +186,9 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             let attraction = attractions![indexPath.item]
             cell.attraction = attraction
             if let attractions = favAct["attractions"], attractions.contains(attraction.id) {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.event = nil
             cell.workout = nil
@@ -200,9 +200,9 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             let fsVenue = groupItems![indexPath.item].venue
             cell.fsVenue = fsVenue
             if let groupItems = favAct["groupItems"], groupItems.contains(fsVenue!.id) {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.intColor = (indexPath.item % 5)
             cell.event = nil
@@ -215,9 +215,9 @@ class VerticalController: UICollectionViewController, UICollectionViewDelegateFl
             let sygicPlace = sygicPlaces![indexPath.item]
             cell.sygicPlace = sygicPlace
             if let sygicPlaces = favAct["sygicPlaces"], sygicPlaces.contains(sygicPlace.id) {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.intColor = (indexPath.item % 5)
             cell.event = nil
@@ -541,8 +541,8 @@ extension VerticalController: ActivitySubTypeCellDelegate {
         print("shareButtonTapped")
     }
     
-    func heartButtonTapped(type: Any) {
-        print("heartButtonTapped")
+    func bookmarkButtonTapped(type: Any) {
+        print("bookmarkButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
             if let recipe = type as? Recipe {

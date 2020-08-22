@@ -9,6 +9,10 @@
 import UIKit
 import WebKit
 
+protocol EndedWebViewDelegate: class {
+    func updateMXMembers()
+}
+
 class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     var webView: WKWebView!
@@ -16,6 +20,8 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     var urlString: String?
     
     var controllerTitle: String?
+    
+    weak var delegate : EndedWebViewDelegate?
     
     override func loadView() {
         let webConfiguration = WKWebViewConfiguration()
@@ -44,6 +50,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     }
     
     @IBAction func done(_ sender: AnyObject) {
+        self.delegate?.updateMXMembers()
         self.dismiss(animated: true, completion: nil)
     }
     

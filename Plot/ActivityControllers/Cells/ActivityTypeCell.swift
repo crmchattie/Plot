@@ -11,7 +11,7 @@ import UIKit
 protocol ActivityTypeCellDelegate: class {
     func plusButtonTapped(type: AnyHashable)
     func shareButtonTapped(activityObject: ActivityObject)
-    func heartButtonTapped(type: Any)
+    func bookmarkButtonTapped(type: Any)
     func mapButtonTapped(type: AnyHashable)
 }
 
@@ -155,11 +155,11 @@ class ActivityTypeCell: UICollectionViewCell {
     }
     
     var imageURL: String?
-    var heartButtonImage: String?
+    var bookmarkButtonImage: String?
     
-    let heartButton: UIButton = {
+    let bookmarkButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "heart"), for: .normal)
+        button.setImage(UIImage(named: "bookmark"), for: .normal)
         button.tintColor = ThemeManager.currentTheme().generalTitleColor
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -218,18 +218,18 @@ class ActivityTypeCell: UICollectionViewCell {
     
     func setupViews() {
                         
-        if let heartImage = heartButtonImage {
-            heartButton.setImage(UIImage(named: heartImage), for: .normal)
-            heartButton.isHidden = false
+        if let heartImage = bookmarkButtonImage {
+            bookmarkButton.setImage(UIImage(named: heartImage), for: .normal)
+            bookmarkButton.isHidden = false
         } else {
-            heartButton.isHidden = true
+            bookmarkButton.isHidden = true
         }
         
         imageView.tintColor = UIColor.white
         imageView.backgroundColor = colors[intColor]
         
-        heartButton.constrainWidth(35)
-        heartButton.constrainHeight(35)
+        bookmarkButton.constrainWidth(35)
+        bookmarkButton.constrainHeight(35)
 
         shareButton.constrainWidth(35)
         shareButton.constrainHeight(35)
@@ -243,7 +243,7 @@ class ActivityTypeCell: UICollectionViewCell {
         imageView.constrainWidth(75)
         imageView.constrainHeight(75)
         
-        let buttonStackView = UIStackView(arrangedSubviews: [plusButton, shareButton, heartButton, mapButton, UIView()])
+        let buttonStackView = UIStackView(arrangedSubviews: [plusButton, shareButton, bookmarkButton, mapButton, UIView()])
         buttonStackView.spacing = 2
         
         let stackView = UIStackView(arrangedSubviews: [imageView, VerticalStackView(arrangedSubviews: [nameLabel, categoryLabel, subcategoryLabel, buttonStackView], spacing: 2)])
@@ -256,7 +256,7 @@ class ActivityTypeCell: UICollectionViewCell {
         
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
-        heartButton.addTarget(self, action: #selector(heartButtonTapped), for: .touchUpInside)
+        bookmarkButton.addTarget(self, action: #selector(bookmarkButtonTapped), for: .touchUpInside)
         mapButton.addTarget(self, action: #selector(mapButtonTapped), for: .touchUpInside)
 
     }
@@ -266,7 +266,7 @@ class ActivityTypeCell: UICollectionViewCell {
         nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        heartButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        bookmarkButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         mapButton.tintColor = ThemeManager.currentTheme().generalTitleColor
         recipe = nil
         workout = nil
@@ -432,21 +432,21 @@ class ActivityTypeCell: UICollectionViewCell {
         }
     }
 
-    @objc func heartButtonTapped() {
-        heartButtonImage = (heartButtonImage == "heart") ? "heart-filled" : "heart"
-        heartButton.setImage(UIImage(named: heartButtonImage!), for: .normal)
+    @objc func bookmarkButtonTapped() {
+        bookmarkButtonImage = (bookmarkButtonImage == "bookmark") ? "bookmark-filled" : "bookmark"
+        bookmarkButton.setImage(UIImage(named: bookmarkButtonImage!), for: .normal)
         if let recipe = recipe {
-            self.delegate?.heartButtonTapped(type: recipe)
+            self.delegate?.bookmarkButtonTapped(type: recipe)
         } else if let workout = workout {
-            self.delegate?.heartButtonTapped(type: workout)
+            self.delegate?.bookmarkButtonTapped(type: workout)
         } else if let event = event {
-            self.delegate?.heartButtonTapped(type: event)
+            self.delegate?.bookmarkButtonTapped(type: event)
         } else if let attraction = attraction {
-            self.delegate?.heartButtonTapped(type: attraction)
+            self.delegate?.bookmarkButtonTapped(type: attraction)
         } else if let fsVenue = fsVenue {
-            self.delegate?.heartButtonTapped(type: fsVenue)
+            self.delegate?.bookmarkButtonTapped(type: fsVenue)
         } else if let groupItem = groupItem, let fsVenue = groupItem.venue {
-            self.delegate?.heartButtonTapped(type: fsVenue)
+            self.delegate?.bookmarkButtonTapped(type: fsVenue)
         }
         
     }

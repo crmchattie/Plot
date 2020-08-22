@@ -214,9 +214,9 @@ class EventDetailViewController: ActivityDetailViewController {
             cell.delegate = self
             if let event = event {
                 if let events = favAct["events"], events.contains(event.id) {
-                    cell.heartButtonImage = "heart-filled"
+                    cell.bookmarkButtonImage = "bookmark-filled"
                 } else {
-                    cell.heartButtonImage = "heart"
+                    cell.bookmarkButtonImage = "bookmark"
                 }
                 cell.active = active
                 cell.activeList = activeList

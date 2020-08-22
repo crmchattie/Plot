@@ -129,9 +129,9 @@ class PlaceDetailViewController: ActivityDetailViewController {
             cell.delegate = self
             if let place = place {
                 if let places = favAct["places"], places.contains(place.id) {
-                    cell.heartButtonImage = "heart-filled"
+                    cell.bookmarkButtonImage = "bookmark-filled"
                 } else {
-                    cell.heartButtonImage = "heart"
+                    cell.bookmarkButtonImage = "bookmark"
                 }
                 cell.active = active
                 cell.activeList = activeList

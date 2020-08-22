@@ -47,9 +47,9 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
             cell.delegate = self
             if let places = self.favAct["places"], places.contains(object.venue?.id ?? "") {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
@@ -59,9 +59,9 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
             cell.delegate = self
             if let places = self.favAct["places"], places.contains(object.id) {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
@@ -71,9 +71,9 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
             cell.delegate = self
             if let events = self.favAct["events"], events.contains(object.id) {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
@@ -83,9 +83,9 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
             cell.delegate = self
             if let places = self.favAct["places"], places.contains(object.id) {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
@@ -95,9 +95,9 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
             cell.delegate = self
             if let workouts = self.favAct["workouts"], workouts.contains(object.identifier) {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
@@ -107,9 +107,9 @@ class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDeleg
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
             cell.delegate = self
             if let recipes = self.favAct["recipes"], recipes.contains("\(object.id)") {
-                cell.heartButtonImage = "heart-filled"
+                cell.bookmarkButtonImage = "bookmark-filled"
             } else {
-                cell.heartButtonImage = "heart"
+                cell.bookmarkButtonImage = "bookmark"
             }
             cell.intColor = (indexPath.item % 5)
             cell.imageURL = self.sections[indexPath.section].image
@@ -1087,8 +1087,8 @@ extension WorkoutTypeViewController: ActivityTypeCellDelegate {
         })
     }
     
-    func heartButtonTapped(type: Any) {
-        print("heartButtonTapped")
+    func bookmarkButtonTapped(type: Any) {
+        print("bookmarkButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
             let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
             if let recipe = type as? Recipe {

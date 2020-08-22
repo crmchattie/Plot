@@ -208,10 +208,10 @@ class RecipeDetailViewController: ActivityDetailViewController {
             if let recipe = recipe {
                 if let recipes = favAct["recipes"], recipes.contains("\(recipe.id)") {
                     print("heart filled")
-                    cell.heartButtonImage = "heart-filled"
+                    cell.bookmarkButtonImage = "bookmark-filled"
                 } else {
-                    print("heart")
-                    cell.heartButtonImage = "heart"
+                    print("bookmark")
+                    cell.bookmarkButtonImage = "bookmark"
                 }
                 cell.recipe = recipe
                 cell.active = active

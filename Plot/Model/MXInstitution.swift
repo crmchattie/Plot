@@ -6,6 +6,11 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
+struct MXInstitutionResult: Codable, Equatable {
+    let institution: MXInstitution?
+    let institutions: [MXInstitution]?
+}
+
 struct MXInstitution: Codable, Equatable {
     let code: String
     let medium_logo_url: String

@@ -733,6 +733,22 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
+    func getMXInstitution(institution_guid: String, completion: @escaping ((MXInstitutionResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"institutions/"+institution_guid)!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        urlRequest.httpMethod = "GET"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+    }
+    
     func getMXTransactions(guid: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
         
         let baseURL: URL = {
@@ -818,7 +834,7 @@ class Service {
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
 //        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
-//            print("resObject \(resp)")
+            print("resObject \(resp)")
             if let err = err {
                 print("err \(err)")
                 completion(nil, err)
