@@ -96,7 +96,7 @@ extension AccountSettingsController { /* user name editing */
         userProfileContainerView.bio.resignFirstResponder()
         navigationItem.leftBarButtonItem = nil
         navigationItem.rightBarButtonItem = nil
-        configureNavigationBarDefaultRightBarButton()
+        configureNavigationBar()
         view.setNeedsLayout()
     }
     
@@ -115,7 +115,7 @@ extension AccountSettingsController { /* user name editing */
         self.view.isUserInteractionEnabled = false
         navigationItem.leftBarButtonItem = nil
         navigationItem.rightBarButtonItem = nil
-        configureNavigationBarDefaultRightBarButton()
+        configureNavigationBar()
         userProfileContainerView.name.resignFirstResponder()
         userProfileContainerView.bio.resignFirstResponder()
         

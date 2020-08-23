@@ -12,8 +12,8 @@ import Firebase
 
 class RecreationTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
     
-    var sections: [ActivitySection] = [.topRec, .games, .active, .parks, .water, .land, .recreationThemeParks]
-    var groups = [ActivitySection: [AnyHashable]]()
+    var sections: [SectionType] = [.topRec, .games, .active, .parks, .water, .land, .recreationThemeParks]
+    var groups = [SectionType: [AnyHashable]]()
     var searchActivities = [AnyHashable]()
     
     var filters: [filter] = [.location, .fsFoodCategoryId]
@@ -38,7 +38,7 @@ class RecreationTypeViewController: ActivitySubTypeViewController, UISearchBarDe
         
     }
     
-    lazy var diffableDataSource: UICollectionViewDiffableDataSource<ActivitySection, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
+    lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
         if let object = object as? ActivityType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
             cell.intColor = (indexPath.item % 5)
@@ -528,8 +528,8 @@ class RecreationTypeViewController: ActivitySubTypeViewController, UISearchBarDe
             return
         }
         let destination = MapViewController()
-        var locationSections = [ActivitySection]()
-        var locations = [ActivitySection: AnyHashable]()
+        var locationSections = [SectionType]()
+        var locations = [SectionType: AnyHashable]()
         for section in sections {
             if section.type == "FSVenue" || section.type == "Event" {
                 locationSections.append(section)

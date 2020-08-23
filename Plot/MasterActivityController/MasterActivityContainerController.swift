@@ -23,8 +23,6 @@ class MasterActivityContainerController: UIViewController {
             activitiesVC.users = users
             chatsVC.users = users
             listsVC.users = users
-            notificationsVC.users = users
-//            mapVC.searchVC.users = users
         }
     }
     var filteredUsers = [User]() {
@@ -32,68 +30,71 @@ class MasterActivityContainerController: UIViewController {
             activitiesVC.filteredUsers = filteredUsers
             chatsVC.filteredUsers = filteredUsers
             listsVC.filteredUsers = filteredUsers
-            notificationsVC.filteredUsers = filteredUsers
-//            mapVC.searchVC.filteredUsers = filteredUsers
         }
     }
     var conversations = [Conversation]() {
         didSet {
             configureTabBarBadge()
             activitiesVC.conversations = conversations
-            notificationsVC.conversations = conversations
-//            mapVC.conversations = conversations
             listsVC.conversations = conversations
-            let nav = self.tabBarController!.viewControllers![0] as! UINavigationController
             
-            if nav.topViewController is ActivityTypeViewController {
-                let activityTab = nav.topViewController as! ActivityTypeViewController
-                activityTab.conversations = conversations
+            if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
+                if actTypeVC.topViewController is ActivityTypeViewController, let activityTab = actTypeVC.topViewController as? ActivityTypeViewController {
+                    activityTab.conversations = conversations
+                }
+                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
+                    settingsTab.conversations = conversations
+                }
             }
         }
     }
     var activities = [Activity]() {
         didSet {
             configureTabBarBadge()
-            notificationsVC.notificationActivities = activities
-            notificationsVC.activityViewController = activitiesVC
-            mapVC.sections = [.activities]
-            mapVC.locations = [.activities: activities]
-            mapVC.addAnnotations()
-//            mapVC.activityViewController = activitiesVC
+//            mapVC.sections = [.activities]
+//            mapVC.locations = [.activities: activities]
+//            mapVC.addAnnotations()
             listsVC.activities = activities
             listsVC.activityViewController = activitiesVC
             
-            let nav = self.tabBarController!.viewControllers![0] as! UINavigationController
-            
-            if nav.topViewController is ActivityTypeViewController {
-                let activityTab = nav.topViewController as! ActivityTypeViewController
-                activityTab.activities = activities
-                
+            if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
+                if actTypeVC.topViewController is ActivityTypeViewController, let activityTab = actTypeVC.topViewController as? ActivityTypeViewController {
+                    activityTab.activities = activities
+                }
+                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
+                    settingsTab.activities = activities
+                }
             }
         }
     }
     var invitations: [String: Invitation] = [:] {
         didSet {
-            notificationsVC.invitations = invitations
-//            mapVC.searchVC.invitations = invitations
+            if let nav = self.tabBarController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
+                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
+                    settingsTab.invitations = invitations
+                }
+            }
         }
     }
     var invitedActivities = [Activity]() {
         didSet {
-            notificationsVC.invitedActivities = invitedActivities
+            if let nav = self.tabBarController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
+                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
+                    settingsTab.invitedActivities = invitedActivities
+                }
+            }
         }
     }
     var listList = [ListContainer]() {
         didSet {
             configureTabBarBadge()
-            notificationsVC.listList = listList
-            
-            let nav = self.tabBarController!.viewControllers![0] as! UINavigationController
-            
-            if nav.topViewController is ActivityTypeViewController {
-                let activityTab = nav.topViewController as! ActivityTypeViewController
-                activityTab.listList = listList
-                
+            if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
+                if actTypeVC.topViewController is ActivityTypeViewController, let activityTab = actTypeVC.topViewController as? ActivityTypeViewController {
+                    activityTab.listList = listList
+                }
+                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
+                    settingsTab.listList = listList
+                }
             }
         }
     }
@@ -121,21 +122,9 @@ class MasterActivityContainerController: UIViewController {
         return vc
     }()
     
-    lazy var mapVC: MapViewController = {
-        let vc = MapViewController()
-//        self.addAsChildVC(childVC: vc)
-        return vc
-    }()
-    
     lazy var listsVC: ListsViewController = {
         let vc = ListsViewController()
         self.addAsChildVC(childVC: vc)
-        return vc
-    }()
-    
-    lazy var notificationsVC: NotificationsViewController = {
-        let vc = NotificationsViewController()
-//        self.addAsChildVC(childVC: vc)
         return vc
     }()
     
@@ -251,6 +240,8 @@ class MasterActivityContainerController: UIViewController {
     }
     
     func setNavBar() {
+        navigationItem.leftBarButtonItems = nil
+        navigationItem.rightBarButtonItems = nil
         if index == 0 {
             navigationItem.title = titles[index]
             let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
@@ -269,6 +260,7 @@ class MasterActivityContainerController: UIViewController {
             navigationItem.title = dateString
             let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
             let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+//            let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
             navigationItem.leftBarButtonItem = editButtonItem
             navigationItem.rightBarButtonItems = [newActivityBarButton, searchBarButton]
         } else if index == 3 {
@@ -282,10 +274,6 @@ class MasterActivityContainerController: UIViewController {
             let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.leftBarButtonItem = editButtonItem
             navigationItem.rightBarButtonItems = [newListBarButton, searchBarButton]
-        } else {
-            navigationItem.title = titles[index]
-            navigationItem.leftBarButtonItem = nil
-            navigationItem.rightBarButtonItems = nil
         }
     }
     
@@ -393,16 +381,11 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
                 }
             }
         }
-//        notificationsVC.view.isHidden = !(index == 0)
-//        if index == 0 {
-//            notificationsVC.sortInvitedActivities()
-//        }
         chatsVC.view.isHidden = !(index == 0)
         healthVC.view.isHidden = !(index == 1)
         activitiesVC.view.isHidden = !(index == 2)
         financeVC.view.isHidden = !(index == 3)
         listsVC.view.isHidden = !(index == 4)
-//        mapVC.view.isHidden = !(index == 4)
         self.index = index
         setNavBar()
     }
@@ -550,6 +533,10 @@ extension MasterActivityContainerController {
         } else if self.index == 3 {
             listsVC.setupSearchController()
         }
+    }
+    
+    @objc fileprivate func goToMap() {
+        
     }
 }
 

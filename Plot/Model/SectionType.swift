@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum ActivitySection: Hashable, CaseIterable {
+enum SectionType: Hashable, CaseIterable {
     case custom
     case food
     case cheapEats

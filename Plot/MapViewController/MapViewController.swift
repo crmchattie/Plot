@@ -34,8 +34,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     
     let mapView = MKMapView()
     let locationManager = CLLocationManager()
-    var sections = [ActivitySection]()
-    var locations = [ActivitySection: AnyHashable]()
+    var sections = [SectionType]()
+    var locations = [SectionType: AnyHashable]()
     
     fileprivate func requestUserLocation() {
         locationManager.requestWhenInUseAuthorization()

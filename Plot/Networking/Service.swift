@@ -653,7 +653,7 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
-    func getMXMemberAccounts(guid: String, member_guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
+    func getMXMemberAccounts(guid: String, member_guid: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid+"/accounts")!
@@ -733,10 +733,10 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
-    func getMXInstitution(institution_guid: String, completion: @escaping ((MXInstitutionResult?), Error?) -> ()) {
+    func getMXInstitution(institution_code: String, completion: @escaping ((MXInstitutionResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"institutions/"+institution_guid)!
+            return URL(string: MXAPI.baseURL+"institutions/"+institution_code)!
         }()
         
         var urlRequest = URLRequest(url: baseURL)

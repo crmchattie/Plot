@@ -32,6 +32,14 @@ class AccountSettingsController: UITableViewController {
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     let nightMode = UIButton()
     
+    var users = [User]()
+    var filteredUsers = [User]()
+    var activities = [Activity]()
+    var invitedActivities = [Activity]()
+    var conversations = [Conversation]()
+    var listList = [ListContainer]()
+    var invitations = [String: Invitation]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -47,7 +55,7 @@ class AccountSettingsController: UITableViewController {
         configureTableView()
         configureContainerView()
         listenChanges()
-        configureNavigationBarDefaultRightBarButton()
+        configureNavigationBar()
         addObservers()
     }
     
@@ -108,7 +116,7 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
     }
     
-    func configureNavigationBarDefaultRightBarButton() {
+    func configureNavigationBar() {
         nightMode.setImage(UIImage(named: "defaultTheme"), for: .normal)
         nightMode.setImage(UIImage(named: "darkTheme"), for: .selected)
         nightMode.imageView?.contentMode = .scaleAspectFit
@@ -119,6 +127,9 @@ class AccountSettingsController: UITableViewController {
         
         let rightBarButton = UIBarButtonItem(customView: nightMode)
         navigationItem.setRightBarButton(rightBarButton, animated: false)
+        
+        let notificationsBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell"), style: .plain, target: self, action: #selector(goToNotifications))
+        navigationItem.leftBarButtonItem = notificationsBarButton
     }
     
     @objc fileprivate func changeTheme() {
@@ -193,6 +204,20 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.name.text = ""
         userProfileContainerView.phone.text = ""
         userProfileContainerView.profileImageView.image = nil
+    }
+    
+    @objc func goToNotifications() {
+        let destination = NotificationsViewController()
+        destination.notificationActivities = activities
+        destination.invitedActivities = invitedActivities
+        destination.invitations = invitations
+        destination.users = users
+        destination.filteredUsers = filteredUsers
+        destination.conversations = conversations
+        destination.listList = listList
+        destination.sortInvitedActivities()
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func listenChanges() {

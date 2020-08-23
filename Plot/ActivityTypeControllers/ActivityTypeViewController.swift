@@ -1,44 +1,287 @@
 //
-//  FoodTypeViewController.swift
+//  ActivityTypeViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 7/7/20.
-//  Copyright © 2020 Immature Creations. All rights reserved.
+//  Created by Hafiz Usama on 2019-11-11.
+//  Copyright © 2019 Immature Creations. All rights reserved.
 //
 
 import UIKit
 import MapKit
 import Firebase
+import CodableFirebase
+import SwiftUI
 
-class FoodTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
+protocol UpdateListDelegate: class {
+    func updateRecipe(recipe: Recipe?)
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?)
+}
+
+class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, CLLocationManagerDelegate {
     
-    var sections: [ActivitySection] = [.topFood,.americanFood, .seafoodFood, .vegetarianFood,  .cheapEats, .breakfastFood, .generalCoffee, .bakeryFood, .dessertFood, .fastFood, .asianFood, .italianFood, .mexicanFood, .middleeastFood]
-    var groups = [ActivitySection: [AnyHashable]]()
-    var searchActivities = [AnyHashable]()
+    weak var delegate : UpdateScheduleDelegate?
+    weak var listDelegate : UpdateListDelegate?
     
-    var filters: [filter] = [.location, .fsFoodCategoryId]
-    var filterDictionary = [String: [String]]()
-        
+    fileprivate var reference: DatabaseReference!
+    
+    private let kCompositionalHeader = "CompositionalHeader"
+    private let kActivityTypeCell = "ActivityTypeCell"
+    private let kActivityHeaderCell = "ActivityHeaderCell"
+    
+    var attractionsString = [String]()
+    var customTypes: [ActivityType] = [.basic]
+    var favAct = [String: [String]]()
+    
+    var sections: [SectionType] = [.custom, .food, .nightlife, .events, .sightseeing, .recreation, .shopping, .workouts, .recipes]
+    var groups = [SectionType: [AnyHashable]]()
+    
+    var workoutIDs: [String] = ["ZB9Gina","E5YrL4F","lhNZOX1","LWampEt","5jbuzns","ltrgYTF","Z37OGjs","7GdJQBG","RKrXsHn","GwxLrim","nspLcIX","nHWkOhp","0ym6yNn","6VLf2M7","n8g5auz","CM5o2rv","ufiyRQc","N7aHlCw","gIeTbVT","lGaFbQK"]
+    var intColor: Int = 0
+    
+    var umbrellaActivity: Activity!
+    var schedule: Bool = false
+    var movingBackwards: Bool = true
+    
+    var users = [User]()
+    var filteredUsers = [User]()
+    var selectedFalconUsers = [User]()
+    var activities = [Activity]()
+    var conversations = [Conversation]()
+    var conversation: Conversation?
+    var listList = [ListContainer]()
+    
+    var activity: Activity!
+    var activeList: Bool = false
+    var listType: String?
+    var activityType: String!
+    
+    var startDateTime: Date?
+    var endDateTime: Date?
+    
     var locationManager = CLLocationManager()
+    var lat: Double?
+    var lon: Double?
+    
+    let navigationItemActivityIndicator = NavigationItemActivityIndicator()
+    
+    init() {
         
+        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
+            
+            if sectionNumber == 0 {
+                return ActivityTypeViewController.topSection()
+            } else {
+                // second section
+                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/3)))
+                item.contentInsets = .init(top: 0, leading: 0, bottom: 8, trailing: 16)
+                
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(360)), subitems: [item])
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .groupPaging
+                section.contentInsets.leading = 16
+                section.contentInsets.trailing = 16
+                
+                let kind = UICollectionView.elementKindSectionHeader
+                section.boundarySupplementaryItems = [
+                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
+                ]
+                
+                return section
+            }
+        }
+        
+        super.init(collectionViewLayout: layout)
+    }
+    
+    static func topSection() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
+        item.contentInsets.bottom = 16
+        item.contentInsets.trailing = 16
+        
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(175)), subitems: [item])
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .groupPaging
+        section.contentInsets.leading = 16
+        
+        let kind = UICollectionView.elementKindSectionHeader
+        section.boundarySupplementaryItems = [
+            .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
+        ]
+        
+        return section
+    }
+    
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Food"
-
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.centerInSuperview()
+        
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
-        let doneBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        let doneBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(updateLocal))
         navigationItem.rightBarButtonItems = [mapBarButton, doneBarButton]
-
-        searchController.searchBar.delegate = self
+        
+        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
+        
+        extendedLayoutIncludesOpaqueBars = true
+        definesPresentationContext = true
+        edgesForExtendedLayout = UIRectEdge.top
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
+        collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: kActivityHeaderCell)
+        collectionView.register(ActivityTypeCell.self, forCellWithReuseIdentifier: kActivityTypeCell)
                 
-        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        addObservers()
+        
+        if CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways {
+            lat = self.locationManager.location?.coordinate.latitude
+            lon = self.locationManager.location?.coordinate.longitude
+        } else {
+            requestUserLocation()
+        }
+        
+        groups[.custom] = customTypes
         
         fetchData()
         
+        
     }
     
-    lazy var diffableDataSource: UICollectionViewDiffableDataSource<ActivitySection, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        managePresense()
+        fetchFavAct()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if movingBackwards && navigationController?.visibleViewController is CreateActivityViewController {
+            let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
+            delegate?.updateSchedule(schedule: activity)
+        } else if movingBackwards && activeList && navigationController?.visibleViewController is ActivitylistViewController {
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: nil, activityType: nil)
+        }
+        
+    }
+    
+    fileprivate func managePresense() {
+        if currentReachabilityStatus == .notReachable {
+            navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .connecting,
+                                                                  activityPriority: .high,
+                                                                  color: ThemeManager.currentTheme().generalTitleColor)
+        }
+        
+        let connectedReference = Database.database().reference(withPath: ".info/connected")
+        connectedReference.observe(.value, with: { (snapshot) in
+            
+            if self.currentReachabilityStatus != .notReachable {
+                self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
+            } else {
+                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: ThemeManager.currentTheme().generalTitleColor)
+            }
+        })
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func changeTheme() {
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
+        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
+        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
+        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+        
+        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
+        
+        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.reloadData()
+        
+    }
+    
+    fileprivate func requestUserLocation() {
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.delegate = self
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        switch status {
+        case .authorizedWhenInUse:
+            print("Received authorization of user location")
+            // request for where the user actually is
+            locationManager.startUpdatingLocation()
+            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+            
+        default:
+            print("Failed to authorize")
+        }
+    }
+    
+    @objc fileprivate func goToMap() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = MapViewController()
+        var locationSections = [SectionType]()
+        var locations = [SectionType: AnyHashable]()
+        for section in sections {
+            if section.type == "FSVenue" || section.type == "Event" {
+                locationSections.append(section)
+                locations[section] = groups[section]
+            }
+        }
+        destination.sections = locationSections
+        destination.locations = locations
+        destination.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(destination, animated: true)
+        
+    }
+    
+    @objc fileprivate func updateLocal() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = LocationFinderTableViewController()
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return ThemeManager.currentTheme().statusBarStyle
+    }
+    
+    lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
         if let object = object as? ActivityType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
             cell.intColor = (indexPath.item % 5)
@@ -280,157 +523,27 @@ class FoodTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
             print("neither meals or events")
         }
     }
-        
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print(searchText)
-        
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        
-        timer?.invalidate()
-        
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased(), categories: self.filterDictionary["fsFoodCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
-        })
-    }
     
-    func complexSearch(query: String, categories: [String], lat: String, lon: String, favorites: String) {
+    private func fetchData() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        print("query \(query), categories \(categories), lat \(lat), lon \(lon), favorites \(favorites)")
-        
-        var snapshot = diffableDataSource.snapshot()
-        snapshot.deleteAllItems()
-        self.diffableDataSource.apply(snapshot)
-        collectionView.collectionViewLayout = ActivitySubTypeViewController.searchLayout()
-        
-        activityIndicatorView.startAnimating()
-        
-        searchActivities = []
-        showGroups = false
-        
-        var categoryIDs = [String]()
-        for category in categories {
-            categoryIDs.append(FoursquareCategoryDictionary[category] ?? "")
-        }
-        
-        let dispatchGroup = DispatchGroup()
-        
-        if favorites == "true" {
-            if let places = self.favAct["places"] {
-                for place in places {
-                    dispatchGroup.enter()
-                    Service.shared.fetchFSDetails(id: place) { (search, err) in
-                        if let place = search?.response?.venue, let categories = place.categories {
-                            dispatchGroup.leave()
-                            for category in categories {
-                                dispatchGroup.enter()
-                                if !categoryIDs.isEmpty, categoryIDs.contains(category.id ?? "") {
-                                    self.searchActivities.append(place)
-                                    dispatchGroup.leave()
-                                    break
-                                } else if categoryIDs.isEmpty {
-                                    self.searchActivities.append(place)
-                                    dispatchGroup.leave()
-                                    break
-                                } else {
-                                    dispatchGroup.leave()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            var categoryString = ""
-            if categoryIDs.isEmpty {
-                categoryString = sections[0].searchTerm
-            } else {
-                categoryString = categoryIDs.joined(separator:",")
-            }
-            if lat == "", let lat = self.lat, let lon = self.lon {
-                dispatchGroup.enter()
-                Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: lat, long: lon) { (search, err) in
-                    if let object = search?.response?.venues {
-                        self.searchActivities = object
-                    } else if let object = search?.response?.venue {
-                        self.searchActivities = [object]
-                    }
-                    dispatchGroup.leave()
-                }
-            } else if let lat = Double(lat), let lon = Double(lon) {
-                dispatchGroup.enter()
-                Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: lat, long: lon) { (search, err) in
-                    if let object = search?.response?.venues {
-                        self.searchActivities = object
-                    } else if let object = search?.response?.venue {
-                        self.searchActivities = [object]
-                    }
-                    dispatchGroup.leave()
-                }
-            } else {
-                dispatchGroup.enter()
-                Service.shared.fetchFSSearch(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString) { (search, err) in
-                    if let object = search?.response?.venues {
-                        self.searchActivities = object
-                    } else if let object = search?.response?.venue {
-                        self.searchActivities = [object]
-                    }
-                    dispatchGroup.leave()
-                }
-            }
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            activityIndicatorView.stopAnimating()
-            if !self.searchActivities.isEmpty {
-                snapshot.appendSections([.search])
-                snapshot.appendItems(self.searchActivities, toSection: .search)
-                self.diffableDataSource.apply(snapshot)
-            } else {
-                self.checkIfThereAnyActivities()
-            }
-        }
-    }
-    
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchActivities = []
-        
-        collectionView.collectionViewLayout = ActivitySubTypeViewController.initialLayout()
-        var snapshot = diffableDataSource.snapshot()
-        snapshot.deleteSections([.search])
-        for section in sections {
-            if let object = groups[section] {
-                snapshot.appendSections([section])
-                snapshot.appendItems(object, toSection: section)
-                diffableDataSource.apply(snapshot)
-            }
-        }
-        showGroups = true
-        checkIfThereAnyActivities()
-    }
-    
-    fileprivate func fetchData() {
-        
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         
         var snapshot = self.diffableDataSource.snapshot()
         snapshot.deleteAllItems()
         self.diffableDataSource.apply(snapshot)
-                
+                        
         diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
+            header.delegate = self
             let snapshot = self.diffableDataSource.snapshot()
             if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
                 header.titleLabel.text = section.name
-                header.subTitleLabel.isHidden = true
+                if section == .custom {
+                    header.subTitleLabel.isHidden = true
+                } else {
+                    header.subTitleLabel.isHidden = false
+                }
             }
             
             return header
@@ -438,62 +551,136 @@ class FoodTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         
         activityIndicatorView.startAnimating()
                 
-        // help you sync your data fetches together
         let dispatchGroup = DispatchGroup()
         
-        for section in self.sections {
-            if let object = self.groups[section] {
-                activityIndicatorView.stopAnimating()
+        for section in sections {
+            if let object = groups[section] {
                 snapshot.appendSections([section])
                 snapshot.appendItems(object, toSection: section)
                 self.diffableDataSource.apply(snapshot)
                 continue
-            } else if let lat = self.lat, let lon = self.lon {
-                if section.subType == "Recommend" {
+            } else if let lat = lat, let lon = lon {
+                if section.type == "FSVenue" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: lat, long: lon) { (search, err) in
+                        dispatchGroup.leave()
                         if let object = search?.response?.groups?[0].items {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
-                        dispatchGroup.leave()
                     }
-                } else if section.subType == "Browse" {
+                } else if section.type == "Event" {
                     dispatchGroup.enter()
-                    Service.shared.fetchFSSearchLatLong(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, lat: lat, long: lon) { (search, err) in
-                        if let object = search?.response?.venues {
+                    Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "", lat: lat, long: lon) { (search, err) in
+                        dispatchGroup.leave()
+                        if let object = search?.embedded?.events {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
+                    }
+                } else if section.type == "SygicPlace" {
+                    dispatchGroup.enter()
+                    Service.shared.fetchSygicPlacesLatLong(limit: "30", offset: "", query: "", categories: ["discovering", "sightseeing"], categories_not: [], parent_place_id: "", place_ids: "", tags: "", tags_not: "", prefer_unique: "", city: "", stateCode: "", countryCode: "", lat: lat, long: lon, radius: "1000") { (search, err) in
                         dispatchGroup.leave()
+                        if let object = search?.data?.places {
+                            self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
+                    }
+                } else if section.type == "Workout" {
+                    var workouts = [Workout]()
+                    for workoutID in self.workoutIDs {
+                        dispatchGroup.enter()
+                        self.reference = Database.database().reference().child("workouts").child("workouts")
+                        self.reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                                if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                    workouts.append(workout)
+                                    self.groups[section] = workouts
+                                    dispatchGroup.leave()
+                                }
+                            }
+                        })
+                        { (error) in
+                            print(error.localizedDescription)
+                        }
+                    }
+                } else if section.type == "Recipe" {
+                    dispatchGroup.enter()
+                    Service.shared.fetchRecipesComplex(query: "", cuisine: [section.searchTerm], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                        dispatchGroup.leave()
+                        if let object = search?.recipes {
+                            self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
                     }
                 }
             } else {
-                if section.subType == "Recommend" {
+                if section.type == "FSVenue" {
                     dispatchGroup.enter()
-                    Service.shared.fetchFSExplore(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: "") { (search, err) in
+                    Service.shared.fetchFSExplore(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras) { (search, err) in
+                        dispatchGroup.leave()
                         if let object = search?.response?.groups?[0].items {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
-                        dispatchGroup.leave()
                     }
-                } else if section.subType == "Browse" {
+                } else if section.type == "Event" {
                     dispatchGroup.enter()
-                    Service.shared.fetchFSSearch(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm) { (search, err) in
-                        if let object = search?.response?.venues {
+                    Service.shared.fetchEventsSegment(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
+                        dispatchGroup.leave()
+                        if let object = search?.embedded?.events {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
+                    }
+                } else if section.type == "SygicPlace" {
+                    dispatchGroup.enter()
+                    Service.shared.fetchSygicPlaces(limit: "30", offset: "", query: "", categories: ["discovering", "sightseeing"], categories_not: [], parent_place_id: "", place_ids: "", tags: "", tags_not: "", prefer_unique: "", city: "", stateCode: "", countryCode: "", radius: "1000") { (search, err) in
                         dispatchGroup.leave()
+                        if let object = search?.data?.places {
+                            self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
+                    }
+                } else if section.type == "Workout" {
+                    var workouts = [Workout]()
+                    for workoutID in self.workoutIDs {
+                        dispatchGroup.enter()
+                        self.reference = Database.database().reference().child("workouts").child("workouts")
+                        self.reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                                if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                    workouts.append(workout)
+                                    self.groups[section] = workouts
+                                    dispatchGroup.leave()
+                                }
+                            }
+                        })
+                        { (error) in
+                            print(error.localizedDescription)
+                        }
+                    }
+                } else if section.type == "Recipe" {
+                    dispatchGroup.enter()
+                    Service.shared.fetchRecipesComplex(query: "", cuisine: [section.searchTerm], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
+                        dispatchGroup.leave()
+                        if let object = search?.recipes {
+                            self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
                     }
                 }
             }
-                                    
+            
             dispatchGroup.notify(queue: .main) {
                 if let object = self.groups[section] {
                     activityIndicatorView.stopAnimating()
@@ -505,66 +692,301 @@ class FoodTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate
         }
     }
     
-    func checkIfThereAnyActivities() {
-        if searchActivities.count > 0 || showGroups {
-            viewPlaceholder.remove(from: view, priority: .medium)
-        } else {
-            viewPlaceholder.add(for: view, title: .emptyPlaces, subtitle: .emptyRecipesEvents, priority: .medium, position: .top)
+    func fetchFavAct() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        
+        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
+                if !NSDictionary(dictionary: self.favAct).isEqual(to: favoriteActivitiesSnapshot) {
+                    print("favAct")
+                    self.favAct = favoriteActivitiesSnapshot
+                    self.collectionView.reloadData()
+                }
+            } else {
+                if !self.favAct.isEmpty {
+                    self.favAct = [String: [String]]()
+                    self.collectionView.reloadData()
+                    print("snapshot does not exist")
+                }
+           }
+          })
+        { (error) in
+            print(error.localizedDescription)
         }
     }
     
-    @objc func filter() {
-        let destination = FilterViewController()
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        destination.delegate = self
-        destination.filters = filters
-        destination.filterDictionary = filterDictionary
-        self.present(navigationViewController, animated: true, completion: nil)
+    func showActivityIndicator() {
+        if let navController = self.navigationController {
+            self.showSpinner(onView: navController.view)
+        } else {
+            self.showSpinner(onView: self.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
     }
     
-    @objc fileprivate func goToMap() {
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
+    
+    func getSelectedFalconUsers(forActivity activity: Activity, completion: @escaping ([User])->()) {
+        guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-        let destination = MapViewController()
-        var locationSections = [ActivitySection]()
-        var locations = [ActivitySection: AnyHashable]()
-        for section in sections {
-            if section.type == "FSVenue" || section.type == "Event" {
-                locationSections.append(section)
-                locations[section] = groups[section]
+        var selectedFalconUsers = [User]()
+        let group = DispatchGroup()
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if activity.admin == currentUserID && id == currentUserID {
+                continue
             }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    selectedFalconUsers.append(user)
+                }
+                group.leave()
+            })
         }
-        destination.sections = locationSections
-        destination.locations = locations
-        destination.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(destination, animated: true)
         
+        group.notify(queue: .main) {
+            completion(selectedFalconUsers)
+        }
     }
-
+    
 }
 
-extension FoodTypeViewController: ActivityTypeCellDelegate {
+extension ActivityTypeViewController: CompositionalHeaderDelegate {
+    func viewTapped(labelText: String) {
+        switch labelText {
+        case "Recipes":
+            let destination = RecipeTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.listList = listList
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Events":
+            print("Event")
+            let destination = EventTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.listList = listList
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Workouts":
+            print("Workouts")
+            let destination = WorkoutTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.listList = listList
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Attractions":
+            print("Attractions")
+            let destination = EventTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.listList = listList
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Food":
+            print("Food")
+            let destination = FoodTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.listList = listList
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Nightlife":
+            print("Nightlife")
+            let destination = NightlifeTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.listList = listList
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Sightseeing":
+            print("Sightseeing")
+            let destination = SightseeingTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.listList = listList
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Recreation":
+            print("Recreation")
+            let destination = RecreationTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.listList = listList
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        case "Shopping":
+            print("Shopping")
+            let destination = ShoppingTypeViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.favAct = favAct
+            destination.lat = lat
+            destination.lon = lon
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
+            destination.activities = activities
+            destination.listList = listList
+            destination.conversation = conversation
+            destination.schedule = schedule
+            destination.umbrellaActivity = umbrellaActivity
+            destination.delegate = self
+            destination.listDelegate = self
+            navigationController?.pushViewController(destination, animated: true)
+        default:
+            print("Default")
+        }
+    }
+}
+
+extension ActivityTypeViewController: UpdateScheduleDelegate {
+    func updateSchedule(schedule: Activity) {
+        delegate?.updateSchedule(schedule: schedule)
+    }
+    func updateIngredients(recipe: Recipe?, recipeID: String?) {
+        if let recipeID = recipeID {
+            self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
+        } else if let recipe = recipe {
+            self.delegate?.updateIngredients(recipe: recipe, recipeID: nil)
+        }
+    }
+}
+
+extension ActivityTypeViewController: UpdateListDelegate {
+    func updateRecipe(recipe: Recipe?) {
+        self.listDelegate?.updateRecipe(recipe: recipe)
+    }
+    
+    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?) {
+        if let object = recipe {
+            self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil, activityType: activityType)
+        } else if let object = workout {
+            self.listDelegate?.updateList(recipe: nil, workout: object, event: nil, place: nil, activityType: activityType)
+        } else if let object = event {
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: object, place: nil, activityType: activityType)
+        } else if let object = place {
+            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: object, activityType: activityType)
+        }
+    }
+}
+
+extension ActivityTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: AnyHashable) {
-        print("plusButtonTapped")
         let snapshot = self.diffableDataSource.snapshot()
         let section = snapshot.sectionIdentifier(containingItem: type)
         if activeList {
             self.movingBackwards = false
-            if let object = type as? FSVenue {
+            if let object = type as? Recipe {
+                var updatedObject = object
+                updatedObject.title = updatedObject.title.removeCharacters()
+                self.listDelegate!.updateList(recipe: updatedObject, workout: nil, event: nil, place: nil, activityType: section?.image)
+            } else if let object = type as? Event {
+                var updatedObject = object
+                updatedObject.name = updatedObject.name.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: updatedObject, place: nil, activityType: section?.image)
+            } else if let object = type as? Workout {
+                var updatedObject = object
+                updatedObject.title = updatedObject.title.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil, activityType: section?.image)
+            } else if let object = type as? FSVenue {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
                 self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
-                self.actAddAlert()
-                self.removeActAddAlert()
             } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
                 self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
-                self.actAddAlert()
-                self.removeActAddAlert()
             }
+            self.actAddAlert()
+            self.removeActAddAlert()
             return
         }
         
@@ -853,7 +1275,7 @@ extension FoodTypeViewController: ActivityTypeCellDelegate {
         print("shareButtonTapped")
         
         let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-
+        
         alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
             print("User click Approve button")
             let destination = ChooseChatTableViewController()
@@ -867,10 +1289,10 @@ extension FoodTypeViewController: ActivityTypeCellDelegate {
             self.present(navController, animated: true, completion: nil)
             
         }))
-
+        
         alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
             print("User click Edit button")
-                // Fallback on earlier versions
+            // Fallback on earlier versions
             let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
             guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
                 else { return }
@@ -879,7 +1301,7 @@ extension FoodTypeViewController: ActivityTypeCellDelegate {
                                                               applicationActivities: nil)
             self.present(activityController, animated: true, completion: nil)
             activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-            Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                Bool, arrayReturnedItems: [Any]?, error: Error?) in
                 if completed {
                     print("share completed")
                     return
@@ -893,11 +1315,11 @@ extension FoodTypeViewController: ActivityTypeCellDelegate {
             
         }))
         
-
+        
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
-
+        
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
@@ -1023,38 +1445,27 @@ extension FoodTypeViewController: ActivityTypeCellDelegate {
             navigationController?.pushViewController(destination, animated: true)
 
         }
-    }
-}
-
-extension FoodTypeViewController: UpdateFilter {
-    func updateFilter(filterDictionary : [String: [String]]) {
-        print("filterDictionary \(filterDictionary)")
-        if !filterDictionary.values.isEmpty {
-            showGroups = false
-            self.filterDictionary = filterDictionary
-            complexSearch(query: "", categories: self.filterDictionary["fsFoodCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
-        } else {
-            searchActivities = []
-            self.filterDictionary = filterDictionary
-            
-            collectionView.collectionViewLayout = ActivitySubTypeViewController.initialLayout()
-            var snapshot = diffableDataSource.snapshot()
-            snapshot.deleteSections([.search])
-            for section in sections {
-                if let object = groups[section] {
-                    snapshot.appendSections([section])
-                    snapshot.appendItems(object, toSection: section)
-                    diffableDataSource.apply(snapshot)
-                }
-            }
-            showGroups = true
-            checkIfThereAnyActivities()
-        }
-    }
         
+        
+        
+//        var locationAddress = [String : [Double]]()
+//        if let event = type as? Event {
+//            if let add = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let lat = Double(latitude), let longitude = event.embedded?.venues?[0].location?.longitude, let lon = Double(longitude) {
+//                locationAddress[add] = [lat, lon]
+//            }
+//        } else if let place = type as? FSVenue {
+//            if let location = place.location, let add = location.address, let lat = location.lat, let lon = location.lng {
+//                locationAddress[add] = [lat, lon]
+//            }
+//        }
+//
+//        let destination = MapActivityViewController()
+//        destination.locationAddress = locationAddress
+//        navigationController?.pushViewController(destination, animated: true)
+    }
 }
 
-extension FoodTypeViewController: ChooseActivityDelegate {
+extension ActivityTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
@@ -1073,9 +1484,9 @@ extension FoodTypeViewController: ChooseActivityDelegate {
                     
                     let scheduleList = [mergeActivity, activity]
                     newActivity.schedule = scheduleList
-                                       
+                    
                     self.showActivityIndicator()
-                                            
+                    
                     // need to delete merge activity
                     dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
@@ -1088,9 +1499,9 @@ extension FoodTypeViewController: ChooseActivityDelegate {
                     self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
                         let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
                         createActivity.createNewActivity()
+                        self.hideActivityIndicator()
                         dispatchGroup.leave()
                     }
-                    self.hideActivityIndicator()
                 }
             } else {
                 if mergeActivity.schedule != nil {
@@ -1101,23 +1512,35 @@ extension FoodTypeViewController: ChooseActivityDelegate {
                     let scheduleList = [activity]
                     mergeActivity.schedule = scheduleList
                 }
-                                
+                
                 dispatchGroup.enter()
                 self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-                    print("\(participants)")
                     self.showActivityIndicator()
                     let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                     createActivity.createNewActivity()
-                    dispatchGroup.leave()
                     self.hideActivityIndicator()
+                    dispatchGroup.leave()
                 }
             }
+            
             dispatchGroup.notify(queue: .main) {
                self.actAddAlert()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
                     self.removeActAddAlert()
                 })
             }
+        }
+    }
+}
+
+extension ActivityTypeViewController: UpdateLocationDelegate {
+    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
+        for (_, value) in locationAddress {
+            lat = value[0]
+            lon = value[1]
+            groups = [SectionType: [AnyHashable]]()
+            groups[.custom] = customTypes
+            fetchData()
         }
     }
 }

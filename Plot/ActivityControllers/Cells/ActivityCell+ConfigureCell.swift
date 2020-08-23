@@ -98,13 +98,13 @@ extension ActivityCell {
         if activity.activityType != "nothing" && activity.activityType != nil {
             activityTypeLabel.text = activity.activityType?.capitalized
         } else {
-            activityTypeLabel.text = nil
+            activityTypeLabel.text = ""
         }
         
         if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
             activityAddressLabel.text = activity.locationName
         } else {
-            activityAddressLabel.text = nil
+            activityAddressLabel.text = ""
         }
         
         if let invitation = invitation {

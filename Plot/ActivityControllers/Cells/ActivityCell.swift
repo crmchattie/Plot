@@ -293,9 +293,9 @@ class ActivityCell: UITableViewCell {
         activityImageView.image = nil
         activityImageView.sd_cancelCurrentImageLoad()
         nameLabel.text = ""
-        startLabel.text = nil
-        activityTypeLabel.text = nil
-        activityAddressLabel.text = nil
+        startLabel.text = ""
+        activityTypeLabel.text = ""
+        activityAddressLabel.text = ""
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         newActivityIndicator.isHidden = true

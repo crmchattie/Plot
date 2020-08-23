@@ -1,8 +1,8 @@
 //
-//  EventTypeViewController.swift
+//  SightseeingTypeViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 3/8/20.
+//  Created by Cory McHattie on 7/7/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
@@ -10,29 +10,25 @@ import UIKit
 import MapKit
 import Firebase
 
-class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
+class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
     
-    var sections: [ActivitySection] = [.music, .sports, .artstheatre, .family, .film, .miscellaneous]
-    var groups = [ActivitySection: [Event]]()
-    var searchActivities = [Event]()
+    var sections: [SectionType] = [.topSights, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites, .sightseeingThemeParks]
+    var groups = [SectionType: [AnyHashable]]()
+    var searchActivities = [AnyHashable]()
     
-    var filters: [filter] = [.eventType, .eventStartDate, .eventEndDate, .location]
+    var filters: [filter] = [.location, .fsFoodCategoryId]
     var filterDictionary = [String: [String]]()
-    
-    var attractions = [String]()
-    
+        
     var locationManager = CLLocationManager()
         
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Events"
-        
-        
+        title = "Sightseeing"
+
         let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
         let doneBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [mapBarButton, doneBarButton]
-
 
         searchController.searchBar.delegate = self
                 
@@ -42,7 +38,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         
     }
     
-    lazy var diffableDataSource: UICollectionViewDiffableDataSource<ActivitySection, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
+    lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
         if let object = object as? ActivityType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
             cell.intColor = (indexPath.item % 5)
@@ -296,17 +292,16 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased(), eventType: self.filterDictionary["eventType"]?[0] ?? "", eventStartDate: self.filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: self.filterDictionary["eventEndDate"]?[0] ?? "", zipcode: self.filterDictionary["zipcode"]?[0] ?? "", city: self.filterDictionary["city"]?[0] ?? "", state: self.filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+            self.complexSearch(query: searchText.lowercased(), categories: self.filterDictionary["fsFoodCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         })
     }
     
-    func complexSearch(query: String, eventType: String, eventStartDate: String, eventEndDate: String, zipcode: String, city: String, state: String, country: String, favorites: String) {
-        print("query \(query), eventType \(eventType), eventStartDate \(eventStartDate), eventEndDate \(eventEndDate), zipcode \(zipcode), city \(city), state \(state), country \(country), favorites \(favorites)")
-        
+    func complexSearch(query: String, categories: [String], lat: String, lon: String, favorites: String) {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
+        print("query \(query), categories \(categories), lat \(lat), lon \(lon), favorites \(favorites)")
         
         var snapshot = diffableDataSource.snapshot()
         snapshot.deleteAllItems()
@@ -317,47 +312,75 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         
         searchActivities = []
         showGroups = false
-
+        
+        var categoryIDs = [String]()
+        for category in categories {
+            categoryIDs.append(FoursquareCategoryDictionary[category] ?? "")
+        }
+        
         let dispatchGroup = DispatchGroup()
         
         if favorites == "true" {
-            if let events = self.favAct["events"] {
-                for event in events {
-                    if zipcode == "", let lat = self.lat, let lon = self.lon {
-                        dispatchGroup.enter()
-                        Service.shared.fetchEventsSegmentLatLong(size: "30", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: lat, long: lon) { (search, err) in
+            if let places = self.favAct["places"] {
+                for place in places {
+                    dispatchGroup.enter()
+                    Service.shared.fetchFSDetails(id: place) { (search, err) in
+                        if let place = search?.response?.venue, let categories = place.categories {
                             dispatchGroup.leave()
-                            if let events = search?.embedded?.events {
-                                self.searchActivities.append(contentsOf: events)
-                            }
-                        }
-                    } else {
-                        dispatchGroup.enter()
-                        Service.shared.fetchEventsSegment(size: "30", id: event, keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
-                            dispatchGroup.leave()
-                            if let events = search?.embedded?.events {
-                                self.searchActivities.append(contentsOf: events)
+                            for category in categories {
+                                dispatchGroup.enter()
+                                if !categoryIDs.isEmpty, categoryIDs.contains(category.id ?? "") {
+                                    self.searchActivities.append(place)
+                                    dispatchGroup.leave()
+                                    break
+                                } else if categoryIDs.isEmpty {
+                                    self.searchActivities.append(place)
+                                    dispatchGroup.leave()
+                                    break
+                                } else {
+                                    dispatchGroup.leave()
+                                }
                             }
                         }
                     }
                 }
             }
         } else {
-            if zipcode == "", let lat = self.lat, let lon = self.lon {
+            var categoryString = ""
+            if categoryIDs.isEmpty {
+                categoryString = sections[0].searchTerm
+            } else {
+                categoryString = categoryIDs.joined(separator:",")
+            }
+            if lat == "", let lat = self.lat, let lon = self.lon {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: country, classificationName: eventType, classificationId: "", lat: lat, long: lon) { (search, err) in
-                    dispatchGroup.leave()
-                    if let events = search?.embedded?.events {
-                        self.searchActivities = events
+                Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: lat, long: lon) { (search, err) in
+                    if let object = search?.response?.venues {
+                        self.searchActivities = object
+                    } else if let object = search?.response?.venue {
+                        self.searchActivities = [object]
                     }
+                    dispatchGroup.leave()
+                }
+            } else if let lat = Double(lat), let lon = Double(lon) {
+                dispatchGroup.enter()
+                Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: lat, long: lon) { (search, err) in
+                    if let object = search?.response?.venues {
+                        self.searchActivities = object
+                    } else if let object = search?.response?.venue {
+                        self.searchActivities = [object]
+                    }
+                    dispatchGroup.leave()
                 }
             } else {
                 dispatchGroup.enter()
-                Service.shared.fetchEventsSegment(size: "30", id: "", keyword: query, attractionId: "", venueId: "", postalCode: zipcode, radius: "", unit: "", startDateTime: eventStartDate, endDateTime: eventEndDate, city: city, stateCode: state, countryCode: "", classificationName: eventType, classificationId: "") { (search, err) in
-                    dispatchGroup.leave()
-                    if let events = search?.embedded?.events {
-                        self.searchActivities = events
+                Service.shared.fetchFSSearch(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString) { (search, err) in
+                    if let object = search?.response?.venues {
+                        self.searchActivities = object
+                    } else if let object = search?.response?.venue {
+                        self.searchActivities = [object]
                     }
+                    dispatchGroup.leave()
                 }
             }
         }
@@ -365,7 +388,6 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         dispatchGroup.notify(queue: .main) {
             activityIndicatorView.stopAnimating()
             if !self.searchActivities.isEmpty {
-                self.searchActivities = sortEvents(events: self.searchActivities)
                 snapshot.appendSections([.search])
                 snapshot.appendItems(self.searchActivities, toSection: .search)
                 self.diffableDataSource.apply(snapshot)
@@ -417,51 +439,67 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         activityIndicatorView.startAnimating()
                 
         // help you sync your data fetches together
-        let dispatchQueue = DispatchQueue.global(qos: .background)
         let dispatchGroup = DispatchGroup()
-        let semaphore = DispatchSemaphore(value: 0)
         
-        dispatchQueue.async {
-            for section in self.sections {
+        for section in self.sections {
+            if let object = self.groups[section] {
+                activityIndicatorView.stopAnimating()
+                snapshot.appendSections([section])
+                snapshot.appendItems(object, toSection: section)
+                self.diffableDataSource.apply(snapshot)
+                continue
+            } else if let lat = self.lat, let lon = self.lon {
+                if section.subType == "Recommend" {
+                    dispatchGroup.enter()
+                    Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: lat, long: lon) { (search, err) in
+                        if let object = search?.response?.groups?[0].items {
+                            self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
+                        dispatchGroup.leave()
+                    }
+                } else if section.subType == "Browse" {
+                    dispatchGroup.enter()
+                    Service.shared.fetchFSSearchLatLong(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, lat: lat, long: lon) { (search, err) in
+                        if let object = search?.response?.venues {
+                            self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
+                        dispatchGroup.leave()
+                    }
+                }
+            } else {
+                if section.subType == "Recommend" {
+                    dispatchGroup.enter()
+                    Service.shared.fetchFSExplore(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: "") { (search, err) in
+                        if let object = search?.response?.groups?[0].items {
+                            self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
+                        dispatchGroup.leave()
+                    }
+                } else if section.subType == "Browse" {
+                    dispatchGroup.enter()
+                    Service.shared.fetchFSSearch(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm) { (search, err) in
+                        if let object = search?.response?.venues {
+                            self.groups[section] = object
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
+                        dispatchGroup.leave()
+                    }
+                }
+            }
+                                    
+            dispatchGroup.notify(queue: .main) {
                 if let object = self.groups[section] {
                     activityIndicatorView.stopAnimating()
                     snapshot.appendSections([section])
                     snapshot.appendItems(object, toSection: section)
                     self.diffableDataSource.apply(snapshot)
-                    continue
-                } else if let lat = self.lat, let lon = self.lon {
-                    dispatchGroup.enter()
-                    Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "", lat: lat, long: lon) { (search, err) in
-                        dispatchGroup.leave()
-                        semaphore.signal()
-                        if let object = search?.embedded?.events {
-                            self.groups[section] = object
-                        } else {
-                            self.sections.removeAll(where: {$0 == section})
-                        }
-                    }
-                } else {
-                    dispatchGroup.enter()
-                    Service.shared.fetchEventsSegment(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "") { (search, err) in
-                        dispatchGroup.leave()
-                        semaphore.signal()
-                        if let object = search?.embedded?.events {
-                            self.groups[section] = object
-                        } else {
-                            self.sections.removeAll(where: {$0 == section})
-                        }
-                    }
-                }
-                
-                semaphore.wait()
-                        
-                dispatchGroup.notify(queue: .main) {
-                    if let object = self.groups[section] {
-                        activityIndicatorView.stopAnimating()
-                        snapshot.appendSections([section])
-                        snapshot.appendItems(object, toSection: section)
-                        self.diffableDataSource.apply(snapshot)
-                    }
                 }
             }
         }
@@ -471,9 +509,8 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         if searchActivities.count > 0 || showGroups {
             viewPlaceholder.remove(from: view, priority: .medium)
         } else {
-            viewPlaceholder.add(for: view, title: .emptyEvents, subtitle: .emptyRecipesEvents, priority: .medium, position: .top)
+            viewPlaceholder.add(for: view, title: .emptyPlaces, subtitle: .emptyRecipesEvents, priority: .medium, position: .top)
         }
-        collectionView?.reloadData()
     }
     
     @objc func filter() {
@@ -491,8 +528,8 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
             return
         }
         let destination = MapViewController()
-        var locationSections = [ActivitySection]()
-        var locations = [ActivitySection: AnyHashable]()
+        var locationSections = [SectionType]()
+        var locations = [SectionType: AnyHashable]()
         for section in sections {
             if section.type == "FSVenue" || section.type == "Event" {
                 locationSections.append(section)
@@ -508,17 +545,23 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
 
 }
 
-extension EventTypeViewController: ActivityTypeCellDelegate {
+extension SightseeingTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: AnyHashable) {
         print("plusButtonTapped")
         let snapshot = self.diffableDataSource.snapshot()
         let section = snapshot.sectionIdentifier(containingItem: type)
         if activeList {
-            if let object = type as? Event {
+            self.movingBackwards = false
+            if let object = type as? FSVenue {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
-                self.movingBackwards = false
-                self.listDelegate!.updateList(recipe: nil, workout: nil, event: updatedObject, place: nil, activityType: section?.image)
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
+                self.actAddAlert()
+                self.removeActAddAlert()
+            } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
+                var updatedObject = object
+                updatedObject.name = updatedObject.name.removeCharacters()
+                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
                 self.actAddAlert()
                 self.removeActAddAlert()
             }
@@ -981,16 +1024,15 @@ extension EventTypeViewController: ActivityTypeCellDelegate {
 
         }
     }
-        
 }
 
-extension EventTypeViewController: UpdateFilter {
+extension SightseeingTypeViewController: UpdateFilter {
     func updateFilter(filterDictionary : [String: [String]]) {
         print("filterDictionary \(filterDictionary)")
         if !filterDictionary.values.isEmpty {
             showGroups = false
             self.filterDictionary = filterDictionary
-            complexSearch(query: "", eventType: filterDictionary["eventType"]?[0] ?? "", eventStartDate: filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: filterDictionary["eventEndDate"]?[0] ?? "", zipcode: filterDictionary["zipcode"]?[0] ?? "", city: filterDictionary["city"]?[0] ?? "", state: filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+            complexSearch(query: "", categories: self.filterDictionary["fsFoodCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         } else {
             searchActivities = []
             self.filterDictionary = filterDictionary
@@ -1012,7 +1054,7 @@ extension EventTypeViewController: UpdateFilter {
         
 }
 
-extension EventTypeViewController: ChooseActivityDelegate {
+extension SightseeingTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
@@ -1070,7 +1112,6 @@ extension EventTypeViewController: ChooseActivityDelegate {
                     self.hideActivityIndicator()
                 }
             }
-            
             dispatchGroup.notify(queue: .main) {
                self.actAddAlert()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
@@ -1080,19 +1121,3 @@ extension EventTypeViewController: ChooseActivityDelegate {
         }
     }
 }
-
-
-//                            var finalEvents = [Event]()
-//                            for event in group {
-//                                print(event.name!)
-//                                if let attractions = event.embedded?.attractions, let attraction = attractions[0].id {
-//                                    if !self.attractions.contains(attraction) {
-//                                        print("attraction")
-//                                        self.attractions.append(attraction)
-//                                        finalEvents.append(event)
-//                                    }
-//                                } else {
-//                                    finalEvents.append(event)
-//                                }
-//                            }
-//                            finalEvents = sortEvents(events: finalEvents)

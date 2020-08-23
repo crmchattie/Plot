@@ -1,5 +1,5 @@
 //
-//  ShoppingTypeViewController.swift
+//  NightlifeTypeViewController.swift
 //  Plot
 //
 //  Created by Cory McHattie on 7/7/20.
@@ -10,35 +10,35 @@ import UIKit
 import MapKit
 import Firebase
 
-class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
+class NightlifeTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
     
-    var sections: [ActivitySection] = [.topShop, .clothes, .consumerables, .generalShop]
-    var groups = [ActivitySection: [AnyHashable]]()
+    var sections: [SectionType] = [.topDrinks, .cocktailBar, .beerBar, .club, .diveBar, .pub, .sportsBar, .wineBar, .whiskeyBar, .beachBar, .beerGarden, .karaokeBar, .brewery]
+    var groups = [SectionType: [AnyHashable]]()
     var searchActivities = [AnyHashable]()
     
     var filters: [filter] = [.location, .fsFoodCategoryId]
     var filterDictionary = [String: [String]]()
-    
+        
     var locationManager = CLLocationManager()
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Shopping"
-        
+        title = "Nightlife"
+
         let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
         let doneBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [mapBarButton, doneBarButton]
-        
+
         searchController.searchBar.delegate = self
-        
+                
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         
         fetchData()
         
     }
     
-    lazy var diffableDataSource: UICollectionViewDiffableDataSource<ActivitySection, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
+    lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
         if let object = object as? ActivityType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
             cell.intColor = (indexPath.item % 5)
@@ -280,7 +280,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             print("neither meals or events")
         }
     }
-    
+        
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
         
@@ -424,7 +424,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
         var snapshot = self.diffableDataSource.snapshot()
         snapshot.deleteAllItems()
         self.diffableDataSource.apply(snapshot)
-        
+                
         diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
             let snapshot = self.diffableDataSource.snapshot()
@@ -437,7 +437,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
         })
         
         activityIndicatorView.startAnimating()
-        
+                
         // help you sync your data fetches together
         let dispatchGroup = DispatchGroup()
         
@@ -493,7 +493,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
                     }
                 }
             }
-            
+                                    
             dispatchGroup.notify(queue: .main) {
                 if let object = self.groups[section] {
                     activityIndicatorView.stopAnimating()
@@ -522,14 +522,15 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
+    
     @objc fileprivate func goToMap() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = MapViewController()
-        var locationSections = [ActivitySection]()
-        var locations = [ActivitySection: AnyHashable]()
+        var locationSections = [SectionType]()
+        var locations = [SectionType: AnyHashable]()
         for section in sections {
             if section.type == "FSVenue" || section.type == "Event" {
                 locationSections.append(section)
@@ -542,10 +543,10 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
         navigationController?.pushViewController(destination, animated: true)
         
     }
-    
+
 }
 
-extension ShoppingTypeViewController: ActivityTypeCellDelegate {
+extension NightlifeTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: AnyHashable) {
         print("plusButtonTapped")
         let snapshot = self.diffableDataSource.snapshot()
@@ -777,7 +778,7 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.movingBackwards = false
-                
+
                 self.delegate?.updateSchedule(schedule: self.activity)
                 if let recipeID = self.activity.recipeID {
                     self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
@@ -853,7 +854,7 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
         print("shareButtonTapped")
         
         let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-        
+
         alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
             print("User click Approve button")
             let destination = ChooseChatTableViewController()
@@ -867,10 +868,10 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
             self.present(navController, animated: true, completion: nil)
             
         }))
-        
+
         alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
             print("User click Edit button")
-            // Fallback on earlier versions
+                // Fallback on earlier versions
             let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
             guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
                 else { return }
@@ -879,7 +880,7 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
                                                               applicationActivities: nil)
             self.present(activityController, animated: true, completion: nil)
             activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-                Bool, arrayReturnedItems: [Any]?, error: Error?) in
+            Bool, arrayReturnedItems: [Any]?, error: Error?) in
                 if completed {
                     print("share completed")
                     return
@@ -893,11 +894,11 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
             
         }))
         
-        
+
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
-        
+
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
@@ -1026,7 +1027,7 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
     }
 }
 
-extension ShoppingTypeViewController: UpdateFilter {
+extension NightlifeTypeViewController: UpdateFilter {
     func updateFilter(filterDictionary : [String: [String]]) {
         print("filterDictionary \(filterDictionary)")
         if !filterDictionary.values.isEmpty {
@@ -1051,10 +1052,10 @@ extension ShoppingTypeViewController: UpdateFilter {
             checkIfThereAnyActivities()
         }
     }
-    
+        
 }
 
-extension ShoppingTypeViewController: ChooseActivityDelegate {
+extension NightlifeTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
@@ -1073,9 +1074,9 @@ extension ShoppingTypeViewController: ChooseActivityDelegate {
                     
                     let scheduleList = [mergeActivity, activity]
                     newActivity.schedule = scheduleList
-                    
+                                       
                     self.showActivityIndicator()
-                    
+                                            
                     // need to delete merge activity
                     dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
@@ -1101,7 +1102,7 @@ extension ShoppingTypeViewController: ChooseActivityDelegate {
                     let scheduleList = [activity]
                     mergeActivity.schedule = scheduleList
                 }
-                
+                                
                 dispatchGroup.enter()
                 self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                     print("\(participants)")

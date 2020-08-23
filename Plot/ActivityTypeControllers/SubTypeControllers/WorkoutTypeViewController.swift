@@ -1,44 +1,43 @@
 //
-//  SightseeingTypeViewController.swift
+//  WorkoutTypeViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 7/7/20.
+//  Created by Cory McHattie on 3/21/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import UIKit
-import MapKit
 import Firebase
+import CodableFirebase
 
-class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
+class WorkoutTypeViewController: ActivitySubTypeViewController, UISearchBarDelegate {
     
-    var sections: [ActivitySection] = [.topSights, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites, .sightseeingThemeParks]
-    var groups = [ActivitySection: [AnyHashable]]()
-    var searchActivities = [AnyHashable]()
+    fileprivate var workoutTypeReference: DatabaseReference!
+    fileprivate var workoutReference: DatabaseReference!
     
-    var filters: [filter] = [.location, .fsFoodCategoryId]
+    var sections: [SectionType] = [.quick, .hiit, .cardio, .medium, .strength]
+    var groups = [SectionType: [Workout]]()
+    var searchActivities = [Workout]()
+    
+    var filters: [filter] = [.workoutType, .muscles, .duration, .equipmentLevel, .equipment]
     var filterDictionary = [String: [String]]()
-        
-    var locationManager = CLLocationManager()
-        
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Sightseeing"
-
-        let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
-        let doneBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
-        navigationItem.rightBarButtonItems = [mapBarButton, doneBarButton]
-
+        title = "Workouts"
+        
+        let doneBarButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(filter))
+        navigationItem.rightBarButtonItem = doneBarButton
+        
+        
         searchController.searchBar.delegate = self
-                
-        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         
         fetchData()
         
     }
     
-    lazy var diffableDataSource: UICollectionViewDiffableDataSource<ActivitySection, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
+    lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
         if let object = object as? ActivityType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
             cell.intColor = (indexPath.item % 5)
@@ -280,7 +279,7 @@ class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarD
             print("neither meals or events")
         }
     }
-        
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
         
@@ -292,16 +291,17 @@ class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarD
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased(), categories: self.filterDictionary["fsFoodCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+            self.complexSearch(query: searchText.lowercased(), workoutType: self.filterDictionary["workoutType"]?[0] ?? "", muscles: self.filterDictionary["muscles"] ?? [], duration: self.filterDictionary["duration"]?[0] ?? "", equipmentLevel: self.filterDictionary["equipmentLevel"]?[0] ?? "", equipment: self.filterDictionary["equipment"] ?? [], favorites: self.filterDictionary["favorites"]?[0] ?? "")
         })
     }
     
-    func complexSearch(query: String, categories: [String], lat: String, lon: String, favorites: String) {
+    func complexSearch(query: String, workoutType: String, muscles: [String], duration: String, equipmentLevel: String, equipment: [String], favorites: String) {
+        print("query \(query), workoutType \(workoutType), muscles \(muscles), duration \(duration), equipmentLevel \(equipmentLevel), equipment \(equipment), favorites \(favorites)")
+        
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        print("query \(query), categories \(categories), lat \(lat), lon \(lon), favorites \(favorites)")
         
         var snapshot = diffableDataSource.snapshot()
         snapshot.deleteAllItems()
@@ -313,86 +313,285 @@ class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarD
         searchActivities = []
         showGroups = false
         
-        var categoryIDs = [String]()
-        for category in categories {
-            categoryIDs.append(FoursquareCategoryDictionary[category] ?? "")
-        }
+        var workoutIDs = [String]()
+        self.workoutTypeReference = Database.database().reference().child("workouts").child("types_of_workouts")
         
         let dispatchGroup = DispatchGroup()
         
         if favorites == "true" {
-            if let places = self.favAct["places"] {
-                for place in places {
-                    dispatchGroup.enter()
-                    Service.shared.fetchFSDetails(id: place) { (search, err) in
-                        if let place = search?.response?.venue, let categories = place.categories {
-                            dispatchGroup.leave()
-                            for category in categories {
-                                dispatchGroup.enter()
-                                if !categoryIDs.isEmpty, categoryIDs.contains(category.id ?? "") {
-                                    self.searchActivities.append(place)
-                                    dispatchGroup.leave()
-                                    break
-                                } else if categoryIDs.isEmpty {
-                                    self.searchActivities.append(place)
-                                    dispatchGroup.leave()
-                                    break
-                                } else {
-                                    dispatchGroup.leave()
+            if let workouts = self.favAct["workouts"] {
+                print("workouts \(workouts)")
+                workoutIDs = workouts
+                for workoutID in workouts {
+                    var include = true
+                    if workoutType != "" {
+                        dispatchGroup.enter()
+                        var newValue = String()
+                        if workoutType == "Strength" {
+                            newValue = "workout"
+                        } else {
+                            newValue = workoutType.replacingOccurrences(of: " ", with: "_")
+                            newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                            newValue = newValue.lowercased()
+                        }
+                        self.workoutTypeReference.child("type_of_workouts").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                                if !workoutsSnapshotValue.contains(workoutID) {
+                                    include = false
+                                    if let index = workoutIDs.firstIndex(of: workoutID) {
+                                        workoutIDs.remove(at: index)
+                                    }
                                 }
                             }
-                        }
+                            dispatchGroup.leave()
+                        })
+                    }
+                    guard include == true else { continue }
+                    for muscle in muscles {
+                        dispatchGroup.enter()
+                        var newValue = muscle.replacingOccurrences(of: " ", with: "_")
+                        newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                        newValue = newValue.lowercased()
+                        self.workoutTypeReference.child("muscle_groups").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                                if !workoutsSnapshotValue.contains(workoutID) {
+                                    include = false
+                                    if let index = workoutIDs.firstIndex(of: workoutID) {
+                                        workoutIDs.remove(at: index)
+                                    }
+                                }
+                            }
+                            dispatchGroup.leave()
+                        })
+                    }
+                    guard include == true else { continue }
+                    if duration != "" {
+                        dispatchGroup.enter()
+                        var newValue = duration.replacingOccurrences(of: " ", with: "_")
+                        newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                        newValue = newValue.lowercased()
+                        self.workoutTypeReference.child("workout_durations").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                                if !workoutsSnapshotValue.contains(workoutID) {
+                                    include = false
+                                    if let index = workoutIDs.firstIndex(of: workoutID) {
+                                        workoutIDs.remove(at: index)
+                                    }
+                                }
+                            }
+                            dispatchGroup.leave()
+                        })
+                    }
+                    guard include == true else { continue }
+                    if equipmentLevel != "" {
+                        dispatchGroup.enter()
+                        let newValue = equipmentLevel.lowercased()
+                        self.workoutTypeReference.child("equipment_level").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                                if !workoutsSnapshotValue.contains(workoutID) {
+                                    include = false
+                                    if let index = workoutIDs.firstIndex(of: workoutID) {
+                                        workoutIDs.remove(at: index)
+                                    }
+                                }
+                            }
+                            dispatchGroup.leave()
+                        })
+                    }
+                    guard include == true else { continue }
+                    for equip in equipment {
+                        dispatchGroup.enter()
+                        var newValue = equip.replacingOccurrences(of: " ", with: "_")
+                        newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                        newValue = newValue.lowercased()
+                        self.workoutTypeReference.child("equipment").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                                if !workoutsSnapshotValue.contains(workoutID) {
+                                    include = false
+                                    if let index = workoutIDs.firstIndex(of: workoutID) {
+                                        workoutIDs.remove(at: index)
+                                    }
+                                }
+                            }
+                            dispatchGroup.leave()
+                        })
                     }
                 }
             }
         } else {
-            var categoryString = ""
-            if categoryIDs.isEmpty {
-                categoryString = sections[0].searchTerm
-            } else {
-                categoryString = categoryIDs.joined(separator:",")
+            if workoutType != "" {
+                dispatchGroup.enter()
+                var newValue = String()
+                if workoutType == "Strength" {
+                    newValue = "workout"
+                } else {
+                    newValue = workoutType.replacingOccurrences(of: " ", with: "_")
+                    newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                    newValue = newValue.lowercased()
+                }
+                print("newValue \(newValue)")
+                self.workoutTypeReference.child("type_of_workouts").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                    print("snapshot \(snapshot)")
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                        print("workoutsSnapshotValue \(workoutsSnapshotValue)")
+                        workoutIDs += workoutsSnapshotValue
+                        print("workoutIDs \(workoutIDs)")
+                    }
+                    dispatchGroup.leave()
+                })
             }
-            if lat == "", let lat = self.lat, let lon = self.lon {
+            
+            for muscle in muscles {
                 dispatchGroup.enter()
-                Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: lat, long: lon) { (search, err) in
-                    if let object = search?.response?.venues {
-                        self.searchActivities = object
-                    } else if let object = search?.response?.venue {
-                        self.searchActivities = [object]
+                var newValue = muscle.replacingOccurrences(of: " ", with: "_")
+                newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                newValue = newValue.lowercased()
+                print("newValue \(newValue)")
+                self.workoutTypeReference.child("muscle_groups").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                        print("workoutsSnapshotValue \(workoutsSnapshotValue)")
+                        if workoutIDs.isEmpty {
+                            workoutIDs += workoutsSnapshotValue
+                        } else {
+                            let existingWorkoutIDsSet = Set(workoutIDs)
+                            let newWorkoutIDsSet = Set(workoutsSnapshotValue)
+                            let bothWorkoutIDsSet = existingWorkoutIDsSet.intersection(newWorkoutIDsSet)
+                            print("bothWorkoutIDsSet \(bothWorkoutIDsSet)")
+                            workoutIDs = Array(bothWorkoutIDsSet)
+                            print("workoutIDs \(workoutIDs)")
+                        }
                     }
                     dispatchGroup.leave()
-                }
-            } else if let lat = Double(lat), let lon = Double(lon) {
+                })
+            }
+            if duration != "" {
                 dispatchGroup.enter()
-                Service.shared.fetchFSSearchLatLong(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString, lat: lat, long: lon) { (search, err) in
-                    if let object = search?.response?.venues {
-                        self.searchActivities = object
-                    } else if let object = search?.response?.venue {
-                        self.searchActivities = [object]
+                var newValue = duration.replacingOccurrences(of: " ", with: "_")
+                newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                newValue = newValue.lowercased()
+                print("newValue \(newValue)")
+                self.workoutTypeReference.child("workout_durations").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                        if workoutIDs.isEmpty {
+                            workoutIDs += workoutsSnapshotValue
+                        } else {
+                            let existingWorkoutIDsSet = Set(workoutIDs)
+                            let newWorkoutIDsSet = Set(workoutsSnapshotValue)
+                            let bothWorkoutIDsSet = existingWorkoutIDsSet.intersection(newWorkoutIDsSet)
+                            print("bothWorkoutIDsSet \(bothWorkoutIDsSet)")
+                            workoutIDs = Array(bothWorkoutIDsSet)
+                            print("workoutIDs \(workoutIDs)")
+                        }
                     }
                     dispatchGroup.leave()
-                }
-            } else {
+                })
+            }
+            if equipmentLevel != "" {
                 dispatchGroup.enter()
-                Service.shared.fetchFSSearch(limit: "30", query: query, radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: categoryString) { (search, err) in
-                    if let object = search?.response?.venues {
-                        self.searchActivities = object
-                    } else if let object = search?.response?.venue {
-                        self.searchActivities = [object]
+                let newValue = equipmentLevel.lowercased()
+                print("newValue \(newValue)")
+                self.workoutTypeReference.child("equipment_level").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                        if workoutIDs.isEmpty {
+                            workoutIDs += workoutsSnapshotValue
+                        } else {
+                            let existingWorkoutIDsSet = Set(workoutIDs)
+                            let newWorkoutIDsSet = Set(workoutsSnapshotValue)
+                            let bothWorkoutIDsSet = existingWorkoutIDsSet.intersection(newWorkoutIDsSet)
+                            print("bothWorkoutIDsSet \(bothWorkoutIDsSet)")
+                            workoutIDs = Array(bothWorkoutIDsSet)
+                            print("workoutIDs \(workoutIDs)")
+                        }
                     }
                     dispatchGroup.leave()
-                }
+                })
+            }
+            for equip in equipment {
+                dispatchGroup.enter()
+                var newValue = equip.replacingOccurrences(of: " ", with: "_")
+                newValue = newValue.replacingOccurrences(of: "/", with: "&")
+                newValue = newValue.lowercased()
+                print("newValue \(newValue)")
+                self.workoutTypeReference.child("equipment").child(newValue).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                        print("workoutsSnapshotValue \(workoutsSnapshotValue)")
+                        workoutIDs += workoutsSnapshotValue
+                        workoutIDs = Array(Set(workoutIDs))
+                        print("equipmentIDList \(workoutIDs)")
+                    }
+                    dispatchGroup.leave()
+                })
             }
         }
         
         dispatchGroup.notify(queue: .main) {
-            activityIndicatorView.stopAnimating()
-            if !self.searchActivities.isEmpty {
-                snapshot.appendSections([.search])
-                snapshot.appendItems(self.searchActivities, toSection: .search)
-                self.diffableDataSource.apply(snapshot)
-            } else {
-                self.checkIfThereAnyActivities()
+            print("looking up workouts")
+            print("workoutIDs \(workoutIDs)")
+            if !workoutIDs.isEmpty, query == "" {
+                for workoutID in workoutIDs {
+                    dispatchGroup.enter()
+                    self.workoutReference = Database.database().reference().child("workouts").child("workouts")
+                    self.workoutReference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                        print("snapshot \(snapshot)")
+                        if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                            if let workout = try? FirebaseDecoder().decode(Workout.self, from:      workoutSnapshotValue) {
+                                print("adding working to searchActivities")
+                                self.searchActivities.append(workout)
+                                self.checkIfThereAnyActivities()
+                            }
+                        }
+                        dispatchGroup.leave()
+                    })
+                }
+                dispatchGroup.notify(queue: .main) {
+                    print("notify")
+                    activityIndicatorView.stopAnimating()
+                    if !self.searchActivities.isEmpty {
+                        print("not empty")
+                        print("!self.searchActivities.isEmpty \(!self.searchActivities.isEmpty)")
+                        snapshot.appendSections([.search])
+                        snapshot.appendItems(self.searchActivities, toSection: .search)
+                        self.diffableDataSource.apply(snapshot)
+                    } else {
+                        print("!self.searchActivities.isEmpty \(!self.searchActivities.isEmpty)")
+                        self.checkIfThereAnyActivities()
+                    }
+                }
+                
+            } else if !workoutIDs.isEmpty {
+                for workoutID in workoutIDs {
+                    dispatchGroup.enter()
+                    self.workoutReference = Database.database().reference().child("workouts").child("workouts")
+                    self.workoutReference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                        if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                            if let workout = try? FirebaseDecoder().decode(Workout.self, from:      workoutSnapshotValue) {
+                                let notes = workout.notes ?? ""
+                                let tags = workout.tagsStr ?? ""
+                                let title = workout.title
+                                if notes.contains(query) || tags.contains(query) || title.contains(query) {
+                                    self.searchActivities.append(workout)
+                                    self.checkIfThereAnyActivities()
+                                }
+                            }
+                        }
+                        dispatchGroup.leave()
+                    })
+                }
+                
+                dispatchGroup.notify(queue: .main) {
+                    print("notify")
+                    activityIndicatorView.stopAnimating()
+                    if !self.searchActivities.isEmpty {
+                        print("not empty")
+                        print("!self.searchActivities.isEmpty \(!self.searchActivities.isEmpty)")
+                        snapshot.appendSections([.search])
+                        snapshot.appendItems(self.searchActivities, toSection: .search)
+                        self.diffableDataSource.apply(snapshot)
+                    } else {
+                        print("!self.searchActivities.isEmpty \(!self.searchActivities.isEmpty)")
+                        self.checkIfThereAnyActivities()
+                    }
+                }
             }
         }
     }
@@ -403,6 +602,7 @@ class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarD
         collectionView.collectionViewLayout = ActivitySubTypeViewController.initialLayout()
         var snapshot = diffableDataSource.snapshot()
         snapshot.deleteSections([.search])
+        
         for section in sections {
             if let object = groups[section] {
                 snapshot.appendSections([section])
@@ -410,6 +610,7 @@ class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarD
                 diffableDataSource.apply(snapshot)
             }
         }
+        
         showGroups = true
         checkIfThereAnyActivities()
     }
@@ -421,10 +622,8 @@ class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarD
             return
         }
         
-        var snapshot = self.diffableDataSource.snapshot()
-        snapshot.deleteAllItems()
-        self.diffableDataSource.apply(snapshot)
-                
+        activityIndicatorView.startAnimating()
+        
         diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
             let snapshot = self.diffableDataSource.snapshot()
@@ -436,81 +635,92 @@ class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarD
             return header
         })
         
-        activityIndicatorView.startAnimating()
-                
-        // help you sync your data fetches together
+        var collectionViewSnapshot = self.diffableDataSource.snapshot()
+        
         let dispatchGroup = DispatchGroup()
         
-        for section in self.sections {
-            if let object = self.groups[section] {
+        workoutTypeReference = Database.database().reference().child("workouts").child("types_of_workouts")
+        workoutReference = Database.database().reference().child("workouts").child("workouts")
+        
+        for section in sections {
+            if let object = groups[section] {
                 activityIndicatorView.stopAnimating()
-                snapshot.appendSections([section])
-                snapshot.appendItems(object, toSection: section)
-                self.diffableDataSource.apply(snapshot)
+                collectionViewSnapshot.appendSections([section])
+                collectionViewSnapshot.appendItems(object, toSection: section)
+                self.diffableDataSource.apply(collectionViewSnapshot)
                 continue
-            } else if let lat = self.lat, let lon = self.lon {
-                if section.subType == "Recommend" {
-                    dispatchGroup.enter()
-                    Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: lat, long: lon) { (search, err) in
-                        if let object = search?.response?.groups?[0].items {
-                            self.groups[section] = object
-                        } else {
-                            self.sections.removeAll(where: {$0 == section})
-                        }
+            } else if section.subType == "Type" {
+                dispatchGroup.enter()
+                self.workoutTypeReference.child("type_of_workouts").child(section.searchTerm).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
                         dispatchGroup.leave()
-                    }
-                } else if section.subType == "Browse" {
-                    dispatchGroup.enter()
-                    Service.shared.fetchFSSearchLatLong(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, lat: lat, long: lon) { (search, err) in
-                        if let object = search?.response?.venues {
-                            self.groups[section] = object
-                        } else {
-                            self.sections.removeAll(where: {$0 == section})
+                        var workouts = [Workout]()
+                        for workoutID in workoutsSnapshotValue {
+                            dispatchGroup.enter()
+                            self.workoutReference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                                if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                                    if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                        workouts.append(workout)
+                                        self.groups[section] = workouts
+                                        dispatchGroup.leave()
+                                    } else {
+                                        dispatchGroup.leave()
+                                    }
+                                }
+                            })
                         }
-                        dispatchGroup.leave()
-                    }
-                }
-            } else {
-                if section.subType == "Recommend" {
-                    dispatchGroup.enter()
-                    Service.shared.fetchFSExplore(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: "") { (search, err) in
-                        if let object = search?.response?.groups?[0].items {
-                            self.groups[section] = object
-                        } else {
-                            self.sections.removeAll(where: {$0 == section})
+                        dispatchGroup.notify(queue: .main) {
+                            if let object = self.groups[section] {
+                                activityIndicatorView.stopAnimating()
+                                collectionViewSnapshot.appendSections([section])
+                                collectionViewSnapshot.appendItems(object, toSection: section)
+                                self.diffableDataSource.apply(collectionViewSnapshot)
+                            }
                         }
-                        dispatchGroup.leave()
                     }
-                } else if section.subType == "Browse" {
-                    dispatchGroup.enter()
-                    Service.shared.fetchFSSearch(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm) { (search, err) in
-                        if let object = search?.response?.venues {
-                            self.groups[section] = object
-                        } else {
-                            self.sections.removeAll(where: {$0 == section})
+                })
+            } else if section.subType == "Duration" {
+                dispatchGroup.enter()
+                self.workoutTypeReference.child("workout_durations").child(section.searchTerm).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let workoutsSnapshotValue = snapshot.value as! [String]? {
+                        dispatchGroup.leave()
+                        var workouts = [Workout]()
+                        for workoutID in workoutsSnapshotValue {
+                            dispatchGroup.enter()
+                            self.workoutReference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                                if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                                    if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                        workouts.append(workout)
+                                        self.groups[section] = workouts
+                                        dispatchGroup.leave()
+                                    } else {
+                                        dispatchGroup.leave()
+                                    }
+                                }
+                            })
                         }
-                        dispatchGroup.leave()
+                        dispatchGroup.notify(queue: .main) {
+                            if let object = self.groups[section] {
+                                activityIndicatorView.stopAnimating()
+                                collectionViewSnapshot.appendSections([section])
+                                collectionViewSnapshot.appendItems(object, toSection: section)
+                                self.diffableDataSource.apply(collectionViewSnapshot)
+                            }
+                        }
                     }
-                }
-            }
-                                    
-            dispatchGroup.notify(queue: .main) {
-                if let object = self.groups[section] {
-                    activityIndicatorView.stopAnimating()
-                    snapshot.appendSections([section])
-                    snapshot.appendItems(object, toSection: section)
-                    self.diffableDataSource.apply(snapshot)
-                }
+                })
             }
         }
     }
+    
     
     func checkIfThereAnyActivities() {
         if searchActivities.count > 0 || showGroups {
             viewPlaceholder.remove(from: view, priority: .medium)
         } else {
-            viewPlaceholder.add(for: view, title: .emptyPlaces, subtitle: .emptyRecipesEvents, priority: .medium, position: .top)
+            viewPlaceholder.add(for: view, title: .emptyWorkouts, subtitle: .emptyWorkouts, priority: .medium, position: .top)
         }
+        collectionView?.reloadData()
     }
     
     @objc func filter() {
@@ -522,46 +732,20 @@ class SightseeingTypeViewController: ActivitySubTypeViewController, UISearchBarD
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
-    @objc fileprivate func goToMap() {
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        let destination = MapViewController()
-        var locationSections = [ActivitySection]()
-        var locations = [ActivitySection: AnyHashable]()
-        for section in sections {
-            if section.type == "FSVenue" || section.type == "Event" {
-                locationSections.append(section)
-                locations[section] = groups[section]
-            }
-        }
-        destination.sections = locationSections
-        destination.locations = locations
-        destination.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(destination, animated: true)
-        
-    }
-
 }
 
-extension SightseeingTypeViewController: ActivityTypeCellDelegate {
+extension WorkoutTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: AnyHashable) {
         print("plusButtonTapped")
         let snapshot = self.diffableDataSource.snapshot()
         let section = snapshot.sectionIdentifier(containingItem: type)
         if activeList {
-            self.movingBackwards = false
-            if let object = type as? FSVenue {
+            if let object = type as? Workout {
                 var updatedObject = object
-                updatedObject.name = updatedObject.name.removeCharacters()
-                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
-                self.actAddAlert()
-                self.removeActAddAlert()
-            } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
-                var updatedObject = object
-                updatedObject.name = updatedObject.name.removeCharacters()
-                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
+                updatedObject.title = updatedObject.title.removeCharacters()
+                self.movingBackwards = false
+                
+                self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil, activityType: section?.image)
                 self.actAddAlert()
                 self.removeActAddAlert()
             }
@@ -853,7 +1037,7 @@ extension SightseeingTypeViewController: ActivityTypeCellDelegate {
         print("shareButtonTapped")
         
         let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
-
+        
         alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
             print("User click Approve button")
             let destination = ChooseChatTableViewController()
@@ -867,10 +1051,10 @@ extension SightseeingTypeViewController: ActivityTypeCellDelegate {
             self.present(navController, animated: true, completion: nil)
             
         }))
-
+        
         alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
             print("User click Edit button")
-                // Fallback on earlier versions
+            // Fallback on earlier versions
             let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
             guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
                 else { return }
@@ -879,7 +1063,7 @@ extension SightseeingTypeViewController: ActivityTypeCellDelegate {
                                                               applicationActivities: nil)
             self.present(activityController, animated: true, completion: nil)
             activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-            Bool, arrayReturnedItems: [Any]?, error: Error?) in
+                Bool, arrayReturnedItems: [Any]?, error: Error?) in
                 if completed {
                     print("share completed")
                     return
@@ -893,11 +1077,11 @@ extension SightseeingTypeViewController: ActivityTypeCellDelegate {
             
         }))
         
-
+        
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
-
+        
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
@@ -1012,27 +1196,17 @@ extension SightseeingTypeViewController: ActivityTypeCellDelegate {
     }
     
     func mapButtonTapped(type: AnyHashable) {
-        let snapshot = self.diffableDataSource.snapshot()
-        let section = snapshot.sectionIdentifier(containingItem: type)
-                
-        if let section = section {
-            let destination = MapViewController()
-            destination.sections = [section]
-            destination.locations = [section: [type]]
-            destination.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(destination, animated: true)
-
-        }
+        
     }
 }
 
-extension SightseeingTypeViewController: UpdateFilter {
+extension WorkoutTypeViewController: UpdateFilter {
     func updateFilter(filterDictionary : [String: [String]]) {
         print("filterDictionary \(filterDictionary)")
         if !filterDictionary.values.isEmpty {
             showGroups = false
             self.filterDictionary = filterDictionary
-            complexSearch(query: "", categories: self.filterDictionary["fsFoodCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+            complexSearch(query: "", workoutType: self.filterDictionary["workoutType"]?[0] ?? "", muscles: self.filterDictionary["muscles"] ?? [], duration: self.filterDictionary["duration"]?[0] ?? "", equipmentLevel: self.filterDictionary["equipmentLevel"]?[0] ?? "", equipment: self.filterDictionary["equipment"] ?? [], favorites: self.filterDictionary["favorites"]?[0] ?? "")
         } else {
             searchActivities = []
             self.filterDictionary = filterDictionary
@@ -1051,10 +1225,10 @@ extension SightseeingTypeViewController: UpdateFilter {
             checkIfThereAnyActivities()
         }
     }
-        
+    
 }
 
-extension SightseeingTypeViewController: ChooseActivityDelegate {
+extension WorkoutTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
@@ -1073,9 +1247,9 @@ extension SightseeingTypeViewController: ChooseActivityDelegate {
                     
                     let scheduleList = [mergeActivity, activity]
                     newActivity.schedule = scheduleList
-                                       
+                    
                     self.showActivityIndicator()
-                                            
+                    
                     // need to delete merge activity
                     dispatchGroup.enter()
                     self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
@@ -1101,7 +1275,7 @@ extension SightseeingTypeViewController: ChooseActivityDelegate {
                     let scheduleList = [activity]
                     mergeActivity.schedule = scheduleList
                 }
-                                
+                
                 dispatchGroup.enter()
                 self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
                     print("\(participants)")
@@ -1112,6 +1286,7 @@ extension SightseeingTypeViewController: ChooseActivityDelegate {
                     self.hideActivityIndicator()
                 }
             }
+            
             dispatchGroup.notify(queue: .main) {
                self.actAddAlert()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {

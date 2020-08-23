@@ -444,6 +444,8 @@ extension GeneralTabBarController: FalconUsersUpdatesDelegate {
         homeController.filteredUsers = users
         discoverController.users = users
         discoverController.filteredUsers = users
+        settingsController.users = users
+        settingsController.filteredUsers = users
         globalUsers = users
     }
 }

@@ -566,7 +566,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 invitation = value
             }
             cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
-            
         } else {
             let activity = filteredActivities[indexPath.row]
             var invitation: Invitation? = nil

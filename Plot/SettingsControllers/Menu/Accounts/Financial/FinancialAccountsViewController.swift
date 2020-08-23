@@ -12,8 +12,11 @@ import CodableFirebase
 
 class FinancialAccountsViewController: UITableViewController {
     
+    let financialMemberCellID = "financialMemberCellID"
+    
     var mxMembers = [MXMember]()
     var mxUser: MXUser!
+    var institutionDict = [String: String]()
     
     let viewPlaceholder = ViewPlaceholder()
     
@@ -24,16 +27,19 @@ class FinancialAccountsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        grabMXUser()
+        
         title = "Financial Accounts"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
+        tableView.register(FinancialMemberCell.self, forCellReuseIdentifier: financialMemberCellID)
+        
         let newAccountBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
         navigationItem.rightBarButtonItem = newAccountBarButton
         
-        grabMXUser()
     }
     
     func checkIfThereAreAnyResults(isEmpty: Bool) {
@@ -77,11 +83,29 @@ class FinancialAccountsViewController: UITableViewController {
         Service.shared.getMXMembers(guid: guid) { (search, err) in
             if let members = search?.members {
                 self.mxMembers = members
+                for member in self.mxMembers {
+                    self.grabInsitutionalDetails(institution_code: member.institution_code)
+                }
                 dispatchGroup.leave()
             } else if let member = search?.member {
+                self.grabInsitutionalDetails(institution_code: member.institution_code)
                 self.mxMembers = [member]
                 dispatchGroup.leave()
             } else {
+                dispatchGroup.leave()
+            }
+        }
+    }
+    
+    func grabInsitutionalDetails(institution_code: String) {
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
+        Service.shared.getMXInstitution(institution_code: institution_code) { (search, err) in
+            if let institution = search?.institution {
+                self.institutionDict[institution_code] = institution.medium_logo_url
+                dispatchGroup.leave()
+            } else {
+                print("error with search")
                 dispatchGroup.leave()
             }
         }
@@ -122,14 +146,19 @@ class FinancialAccountsViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let identifier = "cell"
-        let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-        cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        cell.textLabel?.adjustsFontForContentSizeCategory = true
-        cell.backgroundColor = view.backgroundColor
-        cell.textLabel?.text = mxMembers[indexPath.row].name
-        cell.isUserInteractionEnabled = true
-        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        let cell = tableView.dequeueReusableCell(withIdentifier: financialMemberCellID, for: indexPath) as? FinancialMemberCell ?? FinancialMemberCell()
+        cell.nameLabel.text = mxMembers[indexPath.row].name
+        if let imageURL = institutionDict[mxMembers[indexPath.row].institution_code] {
+            cell.companyImageView.sd_setImage(with: URL(string: imageURL))
+        }
+        let status = mxMembers[indexPath.row].connection_status
+        if status == "CONNECTED" {
+            cell.statusImageView.image =  UIImage(named: "success")
+        } else if status == "CREATED" || status == "UPDATED" || status == "DELAYED" || status == "RESUMED" {
+            cell.statusImageView.image =  UIImage(named: "updating")
+        } else {
+            cell.statusImageView.image =  UIImage(named: "failure")
+        }
         
         return cell
     }
