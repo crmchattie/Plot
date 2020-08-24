@@ -28,26 +28,41 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     init() {
         
         let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
-            
-            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/2)))
-            item.contentInsets = .init(top: 0, leading: 0, bottom: 8, trailing: 16)
-            
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(120)), subitems: [item])
-            
-            let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .groupPaging
-            section.contentInsets.leading = 16
-            section.contentInsets.trailing = 16
-            
-            let kind = UICollectionView.elementKindSectionHeader
-            section.boundarySupplementaryItems = [
-                .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
-            ]
-            
-            return section
+            if sectionNumber == 0 {
+                return FinanceViewController.topSection()
+            } else {
+                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/2)))
+                item.contentInsets = .init(top: 0, leading: 16, bottom: 16, trailing: 16)
+                
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(120)), subitems: [item])
+                
+                let section = NSCollectionLayoutSection(group: group)
+                
+                let kind = UICollectionView.elementKindSectionHeader
+                section.boundarySupplementaryItems = [
+                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
+                ]
+                return section
+            }
         }
         
         super.init(collectionViewLayout: layout)
+    }
+    
+    static func topSection() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
+        item.contentInsets = .init(top: 0, leading: 16, bottom: 16, trailing: 16)
+        
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(120)), subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        let kind = UICollectionView.elementKindSectionHeader
+        section.boundarySupplementaryItems = [
+            .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
+        ]
+        
+        return section
     }
     
     required init?(coder: NSCoder) {
@@ -201,6 +216,10 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 dispatchGroup.leave()
             }
         }
+    }
+    
+    func categorizeTransactions() {
+        
     }
     
     lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in

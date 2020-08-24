@@ -21,8 +21,10 @@ struct MXInstitution: Codable, Equatable {
     let supports_account_verification: Bool
     let supports_transaction_history: Bool
     let url: String
+    
 }
 
 func ==(lhs: MXInstitution, rhs: MXInstitution) -> Bool {
-    return lhs.code == rhs.code
+    return lhs.code == rhs.code && lhs.name == rhs.name
+    
 }

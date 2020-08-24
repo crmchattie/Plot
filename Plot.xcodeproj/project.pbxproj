@@ -13,6 +13,9 @@
 		100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100A53EF23E0E839004AA952 /* HorizontalSnappingController.swift */; };
 		100A53F323E3BDAC004AA952 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100A53F223E3BDAC004AA952 /* Filter.swift */; };
 		100E0DB024D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100E0DAF24D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift */; };
+		1017D32B24F2B746001D7CBE /* MXHolding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1017D32A24F2B746001D7CBE /* MXHolding.swift */; };
+		1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1017D32C24F2B879001D7CBE /* MXMerchant.swift */; };
+		1017D32F24F2B8E5001D7CBE /* MXMerchantLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1017D32E24F2B8E5001D7CBE /* MXMerchantLocation.swift */; };
 		10196EFF24411B5600B6AFDF /* LocationFinderTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196EEF24411B5500B6AFDF /* LocationFinderTableViewController.swift */; };
 		10196F0024411B5600B6AFDF /* PlacesAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */; };
 		10196F0224411B5600B6AFDF /* MapActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196EF224411B5500B6AFDF /* MapActivityViewController.swift */; };
@@ -364,6 +367,9 @@
 		100A53EF23E0E839004AA952 /* HorizontalSnappingController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalSnappingController.swift; sourceTree = "<group>"; };
 		100A53F223E3BDAC004AA952 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		100E0DAF24D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityExpandedDetailCell.swift; sourceTree = "<group>"; };
+		1017D32A24F2B746001D7CBE /* MXHolding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXHolding.swift; sourceTree = "<group>"; };
+		1017D32C24F2B879001D7CBE /* MXMerchant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXMerchant.swift; sourceTree = "<group>"; };
+		1017D32E24F2B8E5001D7CBE /* MXMerchantLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXMerchantLocation.swift; sourceTree = "<group>"; };
 		10196EEF24411B5500B6AFDF /* LocationFinderTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationFinderTableViewController.swift; sourceTree = "<group>"; };
 		10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlacesAnnotation.swift; sourceTree = "<group>"; };
 		10196EF224411B5500B6AFDF /* MapActivityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapActivityViewController.swift; sourceTree = "<group>"; };
@@ -1580,6 +1586,9 @@
 				10F3032B24EC6FD300C04B8F /* MXInstitution.swift */,
 				10F3032D24EC6FE500C04B8F /* MXMember.swift */,
 				10F3032F24EC6FF800C04B8F /* MXAccount.swift */,
+				1017D32A24F2B746001D7CBE /* MXHolding.swift */,
+				1017D32C24F2B879001D7CBE /* MXMerchant.swift */,
+				1017D32E24F2B8E5001D7CBE /* MXMerchantLocation.swift */,
 				10F3033124EC700C00C04B8F /* Transaction.swift */,
 				105F66EA2415942B00F6EDB6 /* Workout.swift */,
 				101B908F2457999600EDDB90 /* Weather.swift */,
@@ -2140,6 +2149,7 @@
 				4BAEE5B5212735E50045AB10 /* INSPhotosDataSource.swift in Sources */,
 				10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */,
 				4BAEE4FA21272D890045AB10 /* ChatLogController+MediaPickerHandlers.swift in Sources */,
+				1017D32B24F2B746001D7CBE /* MXHolding.swift in Sources */,
 				26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */,
 				10E93D5A24BE43B700F6EE18 /* UIView+Layout.swift in Sources */,
 				4BAEE50621272D890045AB10 /* SelectedMediaCollectionCell.swift in Sources */,
@@ -2148,6 +2158,7 @@
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				101B90902457999600EDDB90 /* Weather.swift in Sources */,
+				1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */,
 				4B5E99DE212CC0C0001F067F /* InAppNotificationManager.swift in Sources */,
 				4BAEE5D1212735E50045AB10 /* SelectedParticipantsCollectionView.swift in Sources */,
 				26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */,
@@ -2366,6 +2377,7 @@
 				1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */,
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,
 				4BAEE51421272D890045AB10 /* VoiceRecordingViewController.swift in Sources */,
+				1017D32F24F2B8E5001D7CBE /* MXMerchantLocation.swift in Sources */,
 				10F3033024EC6FF800C04B8F /* MXAccount.swift in Sources */,
 				4BAEE51121272D890045AB10 /* BaseMediaMessageCell.swift in Sources */,
 				10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */,

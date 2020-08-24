@@ -86,7 +86,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
             let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
             item.contentInsets = .init(top: 0, leading: 16, bottom: 16, trailing: 16)
             
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(120)), subitems: [item])
+            let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(120)), subitems: [item])
              
             let section = NSCollectionLayoutSection(group: group)
             

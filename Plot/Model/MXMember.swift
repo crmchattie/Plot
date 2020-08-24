@@ -26,5 +26,5 @@ struct MXMember: Codable, Equatable {
 }
 
 func ==(lhs: MXMember, rhs: MXMember) -> Bool {
-    return lhs.guid == rhs.guid && lhs.identifier == rhs.identifier
+    return lhs.guid == rhs.guid
 }
