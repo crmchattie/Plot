@@ -6,6 +6,8 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
+let usersFinancialHoldingsEntity = "user-financial-holdings"
+
 import Foundation
 
 struct MXHoldingResult: Codable, Equatable {
@@ -30,6 +32,7 @@ struct MXHolding: Codable, Equatable {
     let symbol: String?
     let updated_at: String
     let user_guid: String
+    var participantsIDs: [String]?
 }
 
 func ==(lhs: MXHolding, rhs: MXHolding) -> Bool {

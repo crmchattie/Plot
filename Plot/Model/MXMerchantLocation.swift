@@ -14,17 +14,17 @@ struct MXMerchantLocationResult: Codable, Equatable {
 }
 
 struct MXMerchantLocation: Codable, Equatable {
-    let city: String
-    let country: String
-    let guid: String
-    let latitude: Double
-    let longitude: Double
-    let merchant_guid: String
-    let phone_number: String
-    let postal_code: String
-    let state: String
+    let city: String?
+    let country: String?
+    let guid: String?
+    let latitude: Double?
+    let longitude: Double?
+    let merchant_guid: String?
+    let phone_number: String?
+    let postal_code: String?
+    let state: String?
     let store_number: String?
-    let street_address: String
+    let street_address: String?
 }
 
 func ==(lhs: MXMerchantLocation, rhs: MXMerchantLocation) -> Bool {

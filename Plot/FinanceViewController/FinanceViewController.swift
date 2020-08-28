@@ -20,7 +20,8 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     var mxUser: MXUser!
     var mxMembers = [MXMember]()
     var mxAccountsDict = [String: [MXAccount]]()
-    var transactionsDict = [String: [Transaction]]()
+    var transactionsAcctDict = [String: [Transaction]]()
+    var transactionsCatDict = [String: [Transaction]]()
     
     var sections: [SectionType] = []
     var groups = [SectionType: [AnyHashable]]()
@@ -194,23 +195,24 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         dispatchGroup.notify(queue: .main) {
             for (_, values) in self.mxAccountsDict {
                 for value in values {
-                    if self.transactionsDict[value.guid] == nil {
-                        self.grabTransactions(guid: guid, account_guid: value.guid)
+                    if self.transactionsAcctDict[value.guid] == nil {
+                        self.grabTransactionsAcct(guid: guid, account_guid: value.guid)
                     }
                 }
             }
+            self.categorizeTransactions(transactionsAcctDict: self.transactionsAcctDict)
         }
     }
     
-    func grabTransactions(guid: String, account_guid: String) {
+    func grabTransactionsAcct(guid: String, account_guid: String) {
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
         Service.shared.getMXAccountTransactions(guid: guid, account_guid: account_guid, from_date: nil, to_date: nil) { (search, err) in
             if let transactions = search?.transactions {
-                self.transactionsDict[account_guid] = transactions
+                self.transactionsAcctDict[account_guid] = transactions
                 dispatchGroup.leave()
             } else if let transaction = search?.transaction {
-                self.transactionsDict[account_guid] = [transaction]
+                self.transactionsAcctDict[account_guid] = [transaction]
                 dispatchGroup.leave()
             } else {
                 dispatchGroup.leave()
@@ -218,8 +220,13 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         }
     }
     
-    func categorizeTransactions() {
-        
+    func categorizeTransactions(transactionsAcctDict: [String: [Transaction]]) {
+        var transactionsCatDict = [String: [Transaction]]()
+        for (account, transactions) in transactionsAcctDict {
+            for transaction in transactions {
+                
+            }
+        }
     }
     
     lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in

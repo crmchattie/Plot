@@ -6,6 +6,8 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
+let usersFinancialMembersEntity = "user-financial-members"
+
 struct MXMemberResult: Codable, Equatable {
     let member: MXMember?
     let members: [MXMember]?
@@ -23,6 +25,7 @@ struct MXMember: Codable, Equatable {
     let status: String
     let successfully_aggregated_at: String
     let user_guid: String
+    var participantsIDs: [String]?
 }
 
 func ==(lhs: MXMember, rhs: MXMember) -> Bool {

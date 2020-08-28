@@ -53,7 +53,6 @@ class Activity: NSObject, NSCopying, Codable {
     var attractionID: String?
     var showExtras: Bool?
     
-    
     enum CodingKeys: String, CodingKey {
         case name
         case activityType
