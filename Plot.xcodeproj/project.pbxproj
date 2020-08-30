@@ -148,6 +148,9 @@
 		10FBC8BB24BFEF7E00D0E6B5 /* ActivitylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BA24BFEF7E00D0E6B5 /* ActivitylistActions.swift */; };
 		10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BC24BFF01200D0E6B5 /* ActivitylistFetcher.swift */; };
 		10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */; };
+		2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2623AA8C24FA2A250020A316 /* HealthKit.framework */; };
+		2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */; };
+		2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA9124FB67BF0020A316 /* HealthKitService.swift */; };
 		26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */; };
 		265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */; };
 		2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2680A0332360C0BD00C4C287 /* Invitation.swift */; };
@@ -506,6 +509,9 @@
 		10FBC8BA24BFEF7E00D0E6B5 /* ActivitylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistActions.swift; sourceTree = "<group>"; };
 		10FBC8BC24BFF01200D0E6B5 /* ActivitylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistFetcher.swift; sourceTree = "<group>"; };
 		10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseListTableViewController.swift; sourceTree = "<group>"; };
+		2623AA8C24FA2A250020A316 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSetupAssistant.swift; sourceTree = "<group>"; };
+		2623AA9124FB67BF0020A316 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+Migration.swift"; sourceTree = "<group>"; };
 		2680A0332360C0BD00C4C287 /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
@@ -714,6 +720,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */,
 				7E6985A6EF59641559135D26 /* libPods-Plot.a in Frameworks */,
 				10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */,
 			);
@@ -993,6 +1000,15 @@
 			path = WebView;
 			sourceTree = "<group>";
 		};
+		2623AA8E24FA2D710020A316 /* HealthKit */ = {
+			isa = PBXGroup;
+			children = (
+				2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */,
+				2623AA9124FB67BF0020A316 /* HealthKitService.swift */,
+			);
+			path = HealthKit;
+			sourceTree = "<group>";
+		};
 		26391FEA235EC3B3002BB4C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1039,6 +1055,7 @@
 		2AF4427B37282913090A248D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2623AA8C24FA2A250020A316 /* HealthKit.framework */,
 				CDB136BC84E7E2C2D4FDB49B /* libPods-Plot.a */,
 				0D773FFBAA1393BD2878E54F /* libPods-ShareExtension.a */,
 			);
@@ -1088,6 +1105,7 @@
 				10F3033324EE03C600C04B8F /* WebView */,
 				26A5DDD92394CB8E00771DC1 /* Networking */,
 				4BAEE557212735E50045AB10 /* Support */,
+				2623AA8E24FA2D710020A316 /* HealthKit */,
 				4B4F45421F32246000A6FF96 /* GeneralTabBarController.swift */,
 				4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */,
 				26CDFB21239E278200567666 /* NewUserActivities.json */,
@@ -2267,6 +2285,7 @@
 				4B6521FA219B3A4400FF655E /* GroupMembersManager.swift in Sources */,
 				10C83342249ACC8F0037F638 /* SygicToursSearchResult.swift in Sources */,
 				4BAEE46521272B380045AB10 /* AccountSettingsController.swift in Sources */,
+				2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */,
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
 				10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */,
 				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
@@ -2339,6 +2358,7 @@
 				4BAEE5B8212735E50045AB10 /* INSPhotosInteractionAnimator.swift in Sources */,
 				1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */,
 				4BAEE5EA212735E50045AB10 /* Country.swift in Sources */,
+				2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */,
 				4BAEE4FE21272D890045AB10 /* OutgoingVoiceMessageCell.swift in Sources */,
 				108BDE6D24B5106900BE2CBA /* SightseeingTypeViewController.swift in Sources */,
 				4BAEE51321272D890045AB10 /* ChatLogController+PhotoEditorDelegate.swift in Sources */,
