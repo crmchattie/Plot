@@ -10,7 +10,7 @@ import HealthKit
 
 class HealthKitSetupAssistant {
     
-    class let healthStore = HKHealthStore()
+    static let healthStore = HKHealthStore()
     
     private enum HealthkitSetupError: Error {
         case notAvailableOnDevice
