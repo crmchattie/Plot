@@ -80,7 +80,7 @@ class FinancialAccountsViewController: UITableViewController {
     func grabMXMembers(guid: String) {
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
-        Service.shared.getMXMembers(guid: guid) { (search, err) in
+        Service.shared.getMXMembers(guid: guid, page: "1", records_per_page: "100") { (search, err) in
             if let members = search?.members {
                 self.mxMembers = members
                 for member in self.mxMembers {

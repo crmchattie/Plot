@@ -621,7 +621,7 @@ class Service {
                         
     }
     
-    func getMXMembers(guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
+    func getMXMembers(guid: String, page: String, records_per_page: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: MXAPI.baseURL+"users/"+guid+"/members")!
@@ -634,13 +634,16 @@ class Service {
                                         "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
-        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+        let parameters = ["page":"\(page)",
+        "records_per_page": "\(records_per_page)"]
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
     }
     
     func getMXMemberStatus(guid: String, member_guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid+"/status")!
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid+"/status")!
         }()
         
         var urlRequest = URLRequest(url: baseURL)
@@ -653,10 +656,10 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
-    func getMXMemberAccounts(guid: String, member_guid: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
+    func getMXMemberAccounts(guid: String, member_guid: String, page: String, records_per_page: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid+"/accounts")!
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid+"/accounts")!
         }()
         
         var urlRequest = URLRequest(url: baseURL)
@@ -666,13 +669,17 @@ class Service {
                                         "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
-        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+        let parameters = ["page":"\(page)",
+        "records_per_page": "\(records_per_page)"]
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
     }
     
     func aggregateMXMember(guid: String, member_guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid+"/aggregate")!
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid+"/aggregate")!
         }()
         
         var urlRequest = URLRequest(url: baseURL)
@@ -688,7 +695,7 @@ class Service {
     func deleteMXMember(guid: String, member_guid: String, completion: @escaping ((String?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid)!
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid)!
         }()
         
         var urlRequest = URLRequest(url: baseURL)
@@ -701,7 +708,7 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
-    func getMXAccounts(guid: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
+    func getMXAccounts(guid: String, page: String, records_per_page: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: MXAPI.baseURL+"users/"+guid+"/accounts")!
@@ -714,13 +721,17 @@ class Service {
                                         "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
-        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+        let parameters = ["page":"\(page)",
+        "records_per_page": "\(records_per_page)"]
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
     }
     
     func getMXAccount(guid: String, account_guid: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid+"/accounts"+account_guid)!
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/accounts/"+account_guid)!
         }()
         
         var urlRequest = URLRequest(url: baseURL)
@@ -749,7 +760,7 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
-    func getMXTransactions(guid: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
+    func getMXTransactions(guid: String, page: String, records_per_page: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: MXAPI.baseURL+"users/"+guid+"/transactions")!
@@ -762,7 +773,8 @@ class Service {
                                         "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
-        var parameters = [String: String]()
+        var parameters = ["page":"\(page)",
+        "records_per_page": "\(records_per_page)"]
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
         if let from_date = from_date {
             parameters["from_date"] = "\(from_date)"
@@ -776,10 +788,10 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
     }
     
-    func getMXMemberTransactions(guid: String, member_guid: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
+    func getMXMemberTransactions(guid: String, member_guid: String, page: String, records_per_page: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid+"/members"+member_guid+"/transactions")!
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid+"/transactions")!
         }()
         
         var urlRequest = URLRequest(url: baseURL)
@@ -789,7 +801,8 @@ class Service {
                                         "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
-        var parameters = [String: String]()
+        var parameters = ["page":"\(page)",
+        "records_per_page": "\(records_per_page)"]
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
         if let from_date = from_date {
             parameters["from_date"] = "\(from_date)"
@@ -803,10 +816,10 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
     }
     
-    func getMXAccountTransactions(guid: String, account_guid: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
+    func getMXAccountTransactions(guid: String, account_guid: String, page: String, records_per_page: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid+"/accounts"+account_guid+"/transactions")!
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/accounts/"+account_guid+"/transactions")!
         }()
         
         var urlRequest = URLRequest(url: baseURL)
@@ -816,7 +829,8 @@ class Service {
                                         "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
-        var parameters = [String: String]()
+        var parameters = ["page": "\(page)",
+        "records_per_page": "\(records_per_page)"]
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
         if let from_date = from_date {
             parameters["from_date"] = "\(from_date)"
@@ -834,7 +848,7 @@ class Service {
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
 //        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
-            print("resObject \(resp)")
+//            print("resObject \(resp)")
             if let err = err {
                 print("err \(err)")
                 completion(nil, err)

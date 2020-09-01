@@ -6,11 +6,13 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
+let financialMembersEntity = "financial-members"
 let usersFinancialMembersEntity = "user-financial-members"
 
-struct MXMemberResult: Codable, Equatable {
+struct MXMemberResult: Codable {
     let member: MXMember?
     let members: [MXMember]?
+    let pagination: MXPagination?
 }
 
 struct MXMember: Codable, Equatable {

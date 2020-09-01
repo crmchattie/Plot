@@ -7,17 +7,19 @@
 //
 
 let usersFinancialAccountsEntity = "user-financial-accounts"
+let financialAccountsEntity = "financial-accounts"
 
-struct MXAccountResult: Codable, Equatable {
+struct MXAccountResult: Codable {
     let account: MXAccount?
     let accounts: [MXAccount]?
+    let pagination: MXPagination?
 }
 
-struct MXAccount: Codable, Equatable {
+struct MXAccount: Codable, Equatable, Hashable {
     let account_number: String
     let apr: Double?
     let apy: Double?
-    let available_balance: Double
+    let available_balance: Double?
     let available_credit: Double?
     let balance: Double
     let cash_balance: Double?
@@ -39,7 +41,7 @@ struct MXAccount: Codable, Equatable {
     let member_guid: String
     let minimum_balance: Double?
     let minimum_payment: Double?
-    let name: String
+    var name: String
     let original_balance: Double?
     let payment_due_at: String?
     let payoff_balance: Double?
@@ -52,9 +54,9 @@ struct MXAccount: Codable, Equatable {
     var participantsIDs: [String]?
     var bs_type: String {
         if self.type == "CHECKING" || self.type == "SAVINGS" || self.type == "INVESTMENT" || self.type == "PROPERTY" || self.type == "CASH" || self.type == "INSURANCE" || self.type == "PREPAID" {
-            return "asset"
+            return "Asset"
         } else if self.type == "LOAN" || self.type == "CREDIT_CARD" || self.type == "LINE_OF_CREDIT" || self.type == "MORTGAGE" {
-            return "liability"
+            return "Liability"
         } else {
             return "none"
         }

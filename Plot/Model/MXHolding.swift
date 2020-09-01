@@ -7,12 +7,14 @@
 //
 
 let usersFinancialHoldingsEntity = "user-financial-holdings"
+let financialHoldingsEntity = "financial-holdings"
 
 import Foundation
 
-struct MXHoldingResult: Codable, Equatable {
+struct MXHoldingResult: Codable {
     let holding: MXHolding?
     let holdings: [MXHolding]?
+    let pagination: MXPagination?
 }
 
 struct MXHolding: Codable, Equatable {

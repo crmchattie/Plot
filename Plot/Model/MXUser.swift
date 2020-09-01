@@ -8,9 +8,10 @@
 
 let usersFinancialEntity = "user-financial"
 
-struct MXUserResult: Codable, Equatable {
+struct MXUserResult: Codable {
     let user: MXUser?
     let users: [MXUser]?
+    let pagination: MXPagination?
 }
 
 struct MXUser: Codable, Equatable {
@@ -23,4 +24,11 @@ struct MXUser: Codable, Equatable {
 
 func ==(lhs: MXUser, rhs: MXUser) -> Bool {
     return lhs.guid == rhs.guid && lhs.identifier == rhs.identifier
+}
+
+struct MXPagination: Codable {
+    let current_page: Int
+    let per_page: Int
+    let total_entries: Int
+    let total_pages: Int
 }

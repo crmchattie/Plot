@@ -6,9 +6,10 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-struct MXInstitutionResult: Codable, Equatable {
+struct MXInstitutionResult: Codable {
     let institution: MXInstitution?
     let institutions: [MXInstitution]?
+    let pagination: MXPagination?
 }
 
 struct MXInstitution: Codable, Equatable {

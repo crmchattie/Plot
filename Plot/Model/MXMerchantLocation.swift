@@ -8,9 +8,10 @@
 
 import Foundation
 
-struct MXMerchantLocationResult: Codable, Equatable {
+struct MXMerchantLocationResult: Codable {
     let merchantLocation: MXMerchantLocation?
     let merchantLocations: [MXMerchantLocation]?
+    let pagination: MXPagination?
 }
 
 struct MXMerchantLocation: Codable, Equatable {
