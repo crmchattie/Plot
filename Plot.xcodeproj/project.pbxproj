@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		10021A1624F1A480006A1B25 /* FinancialMemberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10021A1524F1A480006A1B25 /* FinancialMemberCell.swift */; };
+		10021A1624F1A480006A1B25 /* FinancialMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10021A1524F1A480006A1B25 /* FinancialMemberView.swift */; };
 		100A53EC23E0DD9C004AA952 /* ActivityHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100A53EB23E0DD9C004AA952 /* ActivityHeaderCell.swift */; };
 		100A53EE23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100A53ED23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift */; };
 		100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100A53EF23E0E839004AA952 /* HorizontalSnappingController.swift */; };
@@ -93,6 +93,8 @@
 		109FEB3D22A7003000621D2F /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3C22A7003000621D2F /* Schedule.swift */; };
 		109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB4122A9C3DD00621D2F /* Purchase.swift */; };
 		10A18D3A2458E1A5006990F2 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18D392458E1A5006990F2 /* PurchasesViewController.swift */; };
+		10B4AE3324FE9CBA005B967B /* FinancialAccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */; };
+		10B4AE3524FEC5BC005B967B /* FinanceAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */; };
 		10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CB24AF761F006686FA /* CompositionalHeader.swift */; };
 		10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CD24AFB0E7006686FA /* SectionType.swift */; };
 		10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */; };
@@ -361,7 +363,7 @@
 
 /* Begin PBXFileReference section */
 		0D773FFBAA1393BD2878E54F /* libPods-ShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ShareExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		10021A1524F1A480006A1B25 /* FinancialMemberCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialMemberCell.swift; sourceTree = "<group>"; };
+		10021A1524F1A480006A1B25 /* FinancialMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialMemberView.swift; sourceTree = "<group>"; };
 		100A53EB23E0DD9C004AA952 /* ActivityHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHeaderCell.swift; sourceTree = "<group>"; };
 		100A53ED23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHeaderHorizontalController.swift; sourceTree = "<group>"; };
 		100A53EF23E0E839004AA952 /* HorizontalSnappingController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalSnappingController.swift; sourceTree = "<group>"; };
@@ -451,6 +453,8 @@
 		109FEB3C22A7003000621D2F /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		109FEB4122A9C3DD00621D2F /* Purchase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Purchase.swift; sourceTree = "<group>"; };
 		10A18D392458E1A5006990F2 /* PurchasesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchasesViewController.swift; sourceTree = "<group>"; };
+		10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialAccountCell.swift; sourceTree = "<group>"; };
+		10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceAccountViewController.swift; sourceTree = "<group>"; };
 		10B656CB24AF761F006686FA /* CompositionalHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionalHeader.swift; sourceTree = "<group>"; };
 		10B656CD24AFB0E7006686FA /* SectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionType.swift; sourceTree = "<group>"; };
 		10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
@@ -815,6 +819,7 @@
 			isa = PBXGroup;
 			children = (
 				1082C89424F0A8F500CF6491 /* FinanceViewController.swift */,
+				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
 			);
 			path = FinanceViewController;
 			sourceTree = "<group>";
@@ -980,7 +985,8 @@
 			isa = PBXGroup;
 			children = (
 				10F3032624EC622000C04B8F /* FinancialAccountsViewController.swift */,
-				10021A1524F1A480006A1B25 /* FinancialMemberCell.swift */,
+				10021A1524F1A480006A1B25 /* FinancialMemberView.swift */,
+				10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */,
 			);
 			path = Financial;
 			sourceTree = "<group>";
@@ -2121,6 +2127,7 @@
 				10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */,
 				10C8334824A3A43F0037F638 /* SygicCollectionsSearchResult.swift in Sources */,
 				105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */,
+				10B4AE3324FE9CBA005B967B /* FinancialAccountCell.swift in Sources */,
 				4BAEE51F21272D890045AB10 /* ChatsTableViewController+SearchHandlers.swift in Sources */,
 				4BAEE5BC212735E50045AB10 /* INSPhotoViewController.swift in Sources */,
 				4BAEE52321272D890045AB10 /* GroupAdminControlsTableViewController.swift in Sources */,
@@ -2139,6 +2146,7 @@
 				4BAEE46E21272B380045AB10 /* Biometrics.swift in Sources */,
 				4BAEE4F221272D890045AB10 /* SelectChatTableViewController.swift in Sources */,
 				10FBC8B724BFE58F00D0E6B5 /* Activitylist.swift in Sources */,
+				10B4AE3524FEC5BC005B967B /* FinanceAccountViewController.swift in Sources */,
 				4BAEE50521272D890045AB10 /* MediaPicerControllerNew+ImagePicker.swift in Sources */,
 				4BAEE50821272D890045AB10 /* UserCell.swift in Sources */,
 				1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */,
@@ -2165,7 +2173,7 @@
 				4BA1E77C2152511B00391BCB /* UploadProgress.swift in Sources */,
 				4BAEE5D7212735E50045AB10 /* AnnouncementFactory.swift in Sources */,
 				4BAEE5EF212735E50045AB10 /* RevealableCollectionViewCell.swift in Sources */,
-				10021A1624F1A480006A1B25 /* FinancialMemberCell.swift in Sources */,
+				10021A1624F1A480006A1B25 /* FinancialMemberView.swift in Sources */,
 				10E93D5724BE43B700F6EE18 /* Extensions.swift in Sources */,
 				4BAEE4F621272D890045AB10 /* GroupPictureAvatarOpenerDelegate.swift in Sources */,
 				4BAEE4FB21272D890045AB10 /* InputBlockerContainerView.swift in Sources */,

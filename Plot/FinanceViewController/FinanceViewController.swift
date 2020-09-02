@@ -17,9 +17,9 @@ protocol HomeBaseFinance: class {
 class FinanceViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     weak var delegate: HomeBaseFinance?
     
-    //    var mxUser: MXUser!
-    //    var mxMembers = [MXMember]()
-    var mxAccountsDict = [String: [MXAccount]]()
+    //    var user: MXUser!
+    //    var members = [MXMember]()
+    var accountsDict = [String: [MXAccount]]()
     var transactionsAcctDict = [MXAccount: [Transaction]]()
     var categoryAmountDict = [String: Double]()
     var topcategoryAmountDict = [String: Double]()
@@ -139,9 +139,11 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                             self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
                                 dispatchGroup.leave()
                                 for account in accounts {
-                                    dispatchGroup.enter()
-                                    self.getTransactionsAcct(guid: user.guid, account: account) { _ in
-                                        dispatchGroup.leave()
+                                    if account.should_link ?? true {
+                                        dispatchGroup.enter()
+                                        self.getTransactionsAcct(guid: user.guid, account: account) { _ in
+                                            dispatchGroup.leave()
+                                        }
                                     }
                                 }
                             }
@@ -160,7 +162,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     func getMXUser(completion: @escaping (MXUser?) -> ()) {
         if let currentUser = Auth.auth().currentUser?.uid {
             let mxIDReference = Database.database().reference().child(usersFinancialEntity).child(currentUser)
-            mxIDReference.observe(.value, with: { (snapshot) in
+            mxIDReference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value {
                     if let user = try? FirebaseDecoder().decode(MXUser.self, from: value) {
                         completion(user)
@@ -194,12 +196,39 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     
     func getMXAccounts(guid: String, member_guid: String, completion: @escaping ([MXAccount]) -> ()) {
         Service.shared.getMXMemberAccounts(guid: guid, member_guid: member_guid, page: "1", records_per_page: "100") { (search, err) in
-            if let accounts = search?.accounts {
-                self.mxAccountsDict[member_guid] = accounts
-                completion(accounts)
-            } else if let account = search?.account {
-                self.mxAccountsDict[member_guid] = [account]
-                completion([account])
+            if search?.accounts != nil {
+                var accounts = search?.accounts
+                for index in 0...accounts!.count - 1 {
+                    if let currentUser = Auth.auth().currentUser?.uid {
+                        let reference = Database.database().reference().child(financialAccountsEntity).child(currentUser).child(accounts![index].guid).child("should_link")
+                        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let value = snapshot.value, let should_link = value as? Bool {
+                                accounts![index].should_link = should_link
+                            } else if !snapshot.exists() {
+                                reference.setValue(true)
+                                accounts![index].should_link = true
+                            }
+                            
+                            if index == accounts!.count - 1 {
+                                completion(accounts!)
+                            }
+                        })
+                    }
+                }
+            } else if search?.account != nil {
+                var account = search?.account
+                if let currentUser = Auth.auth().currentUser?.uid {
+                    let reference = Database.database().reference().child(financialAccountsEntity).child(currentUser).child(account!.guid).child("should_link")
+                    reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if snapshot.exists(), let value = snapshot.value, let should_link = value as? Bool {
+                            account!.should_link = should_link
+                        } else if !snapshot.exists() {
+                            reference.setValue(true)
+                            account!.should_link = true
+                        }
+                        completion([account!])
+                    })
+                }
             }
         }
     }

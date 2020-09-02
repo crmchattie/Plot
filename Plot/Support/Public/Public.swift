@@ -1530,3 +1530,6 @@ extension UITextField {
     }
 }
 
+class TapGesture: UITapGestureRecognizer {
+    var item = Int()
+}

@@ -15,7 +15,7 @@ struct MXMemberResult: Codable {
     let pagination: MXPagination?
 }
 
-struct MXMember: Codable, Equatable {
+struct MXMember: Codable, Equatable, Hashable {
     let aggregated_at: String
     let connection_status: String
     let guid: String

@@ -42,7 +42,7 @@ class ChecklistViewController: FormViewController {
     var messagesFetcher: MessagesFetcher? = nil
                 
     override func viewDidLoad() {
-    super.viewDidLoad()
+        super.viewDidLoad()
         
         configureTableView()
                 

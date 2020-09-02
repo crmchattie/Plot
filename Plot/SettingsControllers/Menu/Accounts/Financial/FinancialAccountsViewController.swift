@@ -12,10 +12,11 @@ import CodableFirebase
 
 class FinancialAccountsViewController: UITableViewController {
     
-    let financialMemberCellID = "financialMemberCellID"
+    let financialAccountCellID = "financialAccountCellID"
     
-    var mxMembers = [MXMember]()
-    var mxUser: MXUser!
+    var members = [MXMember]()
+    var memberAccountsDict = [MXMember: [MXAccount]]()
+    var user: MXUser!
     var institutionDict = [String: String]()
     
     let viewPlaceholder = ViewPlaceholder()
@@ -35,7 +36,6 @@ class FinancialAccountsViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
-        tableView.register(FinancialMemberCell.self, forCellReuseIdentifier: financialMemberCellID)
         
         let newAccountBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
         navigationItem.rightBarButtonItem = newAccountBarButton
@@ -52,13 +52,11 @@ class FinancialAccountsViewController: UITableViewController {
     
     func grabMXUser() {
         if let currentUser = Auth.auth().currentUser?.uid {
-            let mxIDReference = Database.database().reference().child(usersFinancialEntity).child(currentUser)
-            mxIDReference.observe(.value, with: { (snapshot) in
-                if snapshot.exists(), let value = snapshot.value {
-                    if let user = try? FirebaseDecoder().decode(MXUser.self, from: value) {
-                        self.mxUser = user
-                        self.grabMXMembers(guid: user.guid)
-                    }
+            let reference = Database.database().reference().child(usersFinancialEntity).child(currentUser)
+            reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let value = snapshot.value, let user = try? FirebaseDecoder().decode(MXUser.self, from: value) {
+                    self.user = user
+                    self.grabMXMembers(guid: user.guid)
                 } else if !snapshot.exists() {
                     let identifier = UUID().uuidString
                     Service.shared.createMXUser(id: identifier) { (search, err) in
@@ -66,9 +64,9 @@ class FinancialAccountsViewController: UITableViewController {
                             var user = search?.user
                             user!.identifier = identifier
                             if let firebaseUser = try? FirebaseEncoder().encode(user) {
-                                mxIDReference.setValue(firebaseUser)
+                                reference.setValue(firebaseUser)
                             }
-                            self.mxUser = user
+                            self.user = user
                             self.grabMXMembers(guid: user!.guid)
                         }
                     }
@@ -82,46 +80,94 @@ class FinancialAccountsViewController: UITableViewController {
         dispatchGroup.enter()
         Service.shared.getMXMembers(guid: guid, page: "1", records_per_page: "100") { (search, err) in
             if let members = search?.members {
-                self.mxMembers = members
-                for member in self.mxMembers {
-                    self.grabInsitutionalDetails(institution_code: member.institution_code)
+                self.members = members
+                for member in members {
+                    dispatchGroup.enter()
+                    self.grabInsitutionalDetails(institution_code: member.institution_code) {
+                        dispatchGroup.leave()
+                    }
+                    dispatchGroup.enter()
+                    self.getMXAccounts(guid: guid, member_guid: member.guid) { (accounts) in
+                        self.memberAccountsDict[member] = accounts
+                        dispatchGroup.leave()
+                    }
                 }
-                dispatchGroup.leave()
             } else if let member = search?.member {
-                self.grabInsitutionalDetails(institution_code: member.institution_code)
-                self.mxMembers = [member]
-                dispatchGroup.leave()
-            } else {
-                dispatchGroup.leave()
+                self.members = [member]
+                dispatchGroup.enter()
+                self.grabInsitutionalDetails(institution_code: member.institution_code) {
+                    dispatchGroup.leave()
+                }
+                dispatchGroup.enter()
+                self.getMXAccounts(guid: guid, member_guid: member.guid) { (accounts) in
+                    self.memberAccountsDict[member] = accounts
+                    dispatchGroup.leave()
+                }
             }
+            dispatchGroup.leave()
         }
-    }
-    
-    func grabInsitutionalDetails(institution_code: String) {
-        let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-        Service.shared.getMXInstitution(institution_code: institution_code) { (search, err) in
-            if let institution = search?.institution {
-                self.institutionDict[institution_code] = institution.medium_logo_url
-                dispatchGroup.leave()
-            } else {
-                print("error with search")
-                dispatchGroup.leave()
-            }
-        }
+        
         dispatchGroup.notify(queue: .main) {
             self.tableView.reloadData()
         }
     }
     
-    @objc func newAccount() {
-        if let user = mxUser {
-            self.openMXConnect(guid: user.guid)
+    func getMXAccounts(guid: String, member_guid: String, completion: @escaping ([MXAccount]) -> ()) {
+        Service.shared.getMXMemberAccounts(guid: guid, member_guid: member_guid, page: "1", records_per_page: "100") { (search, err) in
+            if search?.accounts != nil {
+                var accounts = search?.accounts
+                for index in 0...accounts!.count - 1 {
+                    if let currentUser = Auth.auth().currentUser?.uid {
+                        let reference = Database.database().reference().child(financialAccountsEntity).child(currentUser).child(accounts![index].guid).child("should_link")
+                        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let value = snapshot.value, let should_link = value as? Bool {
+                                accounts![index].should_link = should_link
+                            } else if !snapshot.exists() {
+                                reference.setValue(true)
+                                accounts![index].should_link = true
+                            }
+                            
+                            if index == accounts!.count - 1 {
+                                completion(accounts!)
+                            }
+                        })
+                    }
+                }
+            } else if search?.account != nil {
+                var account = search?.account
+                if let currentUser = Auth.auth().currentUser?.uid {
+                    let reference = Database.database().reference().child(financialAccountsEntity).child(currentUser).child(account!.guid).child("should_link")
+                    reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if snapshot.exists(), let value = snapshot.value, let should_link = value as? Bool {
+                            account!.should_link = should_link
+                        } else if !snapshot.exists() {
+                            reference.setValue(true)
+                            account!.should_link = true
+                        }
+                        completion([account!])
+                    })
+                }
+            }
         }
     }
     
-    func openMXConnect(guid: String) {
-        Service.shared.getMXConnectURL(guid: guid, current_member_guid: nil) { (search, err) in
+    func grabInsitutionalDetails(institution_code: String, completion: @escaping () -> ()) {
+        Service.shared.getMXInstitution(institution_code: institution_code) { (search, err) in
+            if let institution = search?.institution {
+                self.institutionDict[institution_code] = institution.medium_logo_url
+                completion()
+            }
+        }
+    }
+    
+    @objc func newAccount() {
+        if let user = user {
+            self.openMXConnect(guid: user.guid, current_member_guid: nil)
+        }
+    }
+    
+    func openMXConnect(guid: String, current_member_guid: String?) {
+        Service.shared.getMXConnectURL(guid: guid, current_member_guid: current_member_guid ?? nil) { (search, err) in
             if let url = search?.user?.connect_widget_url {
                 DispatchQueue.main.async {
                     let destination = WebViewController()
@@ -136,42 +182,113 @@ class FinancialAccountsViewController: UITableViewController {
         }
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if mxMembers.count == 0 {
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        if members.count == 0 {
             checkIfThereAreAnyResults(isEmpty: true)
         } else {
             checkIfThereAreAnyResults(isEmpty: false)
         }
-        return mxMembers.count
+        return members.count
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let member = members[section]
+        if let accounts = memberAccountsDict[member] {
+            return accounts.count
+        }
+        return 0
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = FinancialMemberView()
+        headerView.nameLabel.text = members[section].name
+        if let imageURL = institutionDict[members[section].institution_code] {
+            headerView.companyImageView.sd_setImage(with: URL(string: imageURL))
+        }
+        let status = members[section].connection_status
+        if status == "CONNECTED" {
+            headerView.statusImageView.image =  UIImage(named: "success")
+            headerView.infoLabel.text = "Information is up-to-date"
+        } else if status == "CREATED" || status == "UPDATED" || status == "DELAYED" || status == "RESUMED" {
+            headerView.statusImageView.image =  UIImage(named: "updating")
+            headerView.infoLabel.text = "Information is updating"
+        } else {
+            headerView.statusImageView.image =  UIImage(named: "failure")
+            headerView.infoLabel.text = "Please click to fix connection"
+        }
+        let viewTap = TapGesture(target: self, action: #selector(self.viewTapped(_:)))
+        viewTap.item = section
+        headerView.addGestureRecognizer(viewTap)
+        return headerView
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 80
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: financialMemberCellID, for: indexPath) as? FinancialMemberCell ?? FinancialMemberCell()
-        cell.nameLabel.text = mxMembers[indexPath.row].name
-        if let imageURL = institutionDict[mxMembers[indexPath.row].institution_code] {
-            cell.companyImageView.sd_setImage(with: URL(string: imageURL))
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "Cell")
+        cell.selectionStyle = .none
+        let member = members[indexPath.section]
+        if let accounts = memberAccountsDict[member] {
+            cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.textLabel!.font = UIFont.preferredFont(forTextStyle: .body)
+            cell.textLabel!.text = accounts[indexPath.row].name
+            cell.detailTextLabel!.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.detailTextLabel!.font = UIFont.preferredFont(forTextStyle: .callout)
+            if accounts[indexPath.row].should_link ?? true {
+                cell.detailTextLabel!.text = "Account Linked to Financial Profile"
+                cell.accessoryType = .checkmark
+            } else {
+                cell.detailTextLabel!.text = "Account Not Linked to Financial Profile"
+                cell.accessoryType = .none
+            }
         }
-        let status = mxMembers[indexPath.row].connection_status
-        if status == "CONNECTED" {
-            cell.statusImageView.image =  UIImage(named: "success")
-        } else if status == "CREATED" || status == "UPDATED" || status == "DELAYED" || status == "RESUMED" {
-            cell.statusImageView.image =  UIImage(named: "updating")
-        } else {
-            cell.statusImageView.image =  UIImage(named: "failure")
-        }
-        
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: false)
+        let member = members[indexPath.section]
+        if let accounts = memberAccountsDict[member] {
+            let account = accounts[indexPath.row]
+            let destination = FinanceAccountViewController()
+            destination.delegate = self
+            destination.account = account
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
+        
+    }
+    
+    @objc func viewTapped(_ sender: TapGesture) {
+        if let user = user {
+            let member = members[sender.item]
+            self.openMXConnect(guid: user.guid, current_member_guid: member.guid)
+        }
     }
 }
 
 extension FinancialAccountsViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        if let user = mxUser {
+        if let user = user {
             grabMXMembers(guid: user.guid)
+        }
+    }
+}
+
+extension FinancialAccountsViewController: UpdateAccountDelegate {
+    func updateAccount(account: MXAccount) {
+        print("updateAccount")
+        for (member, accounts) in memberAccountsDict {
+            for index in 0...accounts.count - 1 {
+                if accounts[index] == account {
+                    var accs = accounts
+                    accs[index] = account
+                    memberAccountsDict[member] = accs
+                    tableView.reloadData()
+                }
+            }
         }
     }
 }

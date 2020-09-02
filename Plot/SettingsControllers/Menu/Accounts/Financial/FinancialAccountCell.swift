@@ -1,14 +1,14 @@
 //
-//  FinancialMemberCell.swift
+//  FinancialAccountCell.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/22/20.
+//  Created by Cory McHattie on 9/1/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import UIKit
 
-class FinancialMemberCell: UITableViewCell {
+class FinancialAccountCell: UITableViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -36,17 +36,14 @@ class FinancialMemberCell: UITableViewCell {
 
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)!
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
         nameLabel.text = nil
-        companyImageView.image = nil
-        companyImageView.sd_cancelCurrentImageLoad()
-        statusImageView.image = nil
-        statusImageView.sd_cancelCurrentImageLoad()
         
     }
+ 
 }
