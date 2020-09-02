@@ -18,18 +18,39 @@ class HealthKitService {
     class func syncEventsFromHealthKitData() {
         authorizeHealthKit { result in
             if result {
+                
                 HealthKitService.loadAndDisplayMostRecentWeight(for: .pound(), completion: { weight in
+                    
                     print(weight)
                 })
                 
-                HealthKitService.getCumulativeSumSample(forIdentifier: .stepCount, unit: .count(), date: Date()) { steps in
-                    print(steps)
+                let today = Date()
+                let year = Calendar.current.component(.year, from: today)
+                let month = Calendar.current.component(.month, from: today)
+                let day = Calendar.current.component(.day, from: today)
+                if let lastYear = Calendar.current.date(from: DateComponents(year: year-1, month: month, day: day)) {
+                    HealthKitService.getCumulativeSumSample(forIdentifier: .stepCount, unit: .count(), startDate: lastYear, endDate: today) { annualSteps in
+                        if let annualSteps = annualSteps {
+                            let totalDays = Calendar.current.dateComponents([.day], from: lastYear, to: today).day ?? 0
+                            let annualAverage = Int(annualSteps)/totalDays
+                            HealthKitService.getCumulativeSumSample(forIdentifier: .stepCount, unit: .count(), date: Date()) { steps in
+                                if let steps = steps {
+                                    let stepsActivity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
+                                    stepsActivity.activityType = ActivityType.workout.rawValue
+                                    stepsActivity.name = "Steps"
+                                    stepsActivity.activityDescription = "\(steps) steps today"
+                                    stepsActivity.notes = "\(annualAverage) steps on average"
+                                    print(stepsActivity)
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 HealthKitService.getCumulativeSumSample(forIdentifier: .distanceWalkingRunning, unit: .mile(), date: Date()) { distance in
                     print(distance)
                 }
-                
+
                 HealthKitService.getCumulativeSumSample(forIdentifier: .activeEnergyBurned, unit: .kilocalorie(), date: Date()) { steps in
                     print(steps)
                 }
@@ -112,19 +133,27 @@ class HealthKitService {
                                       unit: HKUnit,
                                       date: Date,
                                       completion: @escaping (Double?) -> Void) {
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: date)
+        let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
+        
+        getCumulativeSumSample(forIdentifier: identifier, unit: unit, startDate: startDate, endDate: endDate, completion: completion)
+    }
+    
+    class func getCumulativeSumSample(forIdentifier identifier: HKQuantityTypeIdentifier,
+                                      unit: HKUnit,
+                                      startDate: Date,
+                                      endDate: Date,
+                                      completion: @escaping (Double?) -> Void) {
         guard let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) else {
             completion(nil)
             return
         }
         
-        let calendar = Calendar.current
-        let startDate = calendar.startOfDay(for: date)
-        let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: date)
-        
         //  Set the Predicates & Interval
         let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
         var interval = DateComponents()
-        interval.day = 1
+        interval.year = 1
         
         //  Perform the Query
         let query = HKStatisticsCollectionQuery(

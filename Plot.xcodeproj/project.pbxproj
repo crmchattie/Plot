@@ -148,6 +148,9 @@
 		10FBC8BB24BFEF7E00D0E6B5 /* ActivitylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BA24BFEF7E00D0E6B5 /* ActivitylistActions.swift */; };
 		10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BC24BFF01200D0E6B5 /* ActivitylistFetcher.swift */; };
 		10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */; };
+		260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87C924FF5FE900715A64 /* HealthKitManager.swift */; };
+		260C87CC24FF600900715A64 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CB24FF600900715A64 /* AsyncOperation.swift */; };
+		260C87CE24FF60B200715A64 /* HealthKitActivityOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CD24FF60B100715A64 /* HealthKitActivityOperation.swift */; };
 		2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2623AA8C24FA2A250020A316 /* HealthKit.framework */; };
 		2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */; };
 		2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA9124FB67BF0020A316 /* HealthKitService.swift */; };
@@ -509,6 +512,9 @@
 		10FBC8BA24BFEF7E00D0E6B5 /* ActivitylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistActions.swift; sourceTree = "<group>"; };
 		10FBC8BC24BFF01200D0E6B5 /* ActivitylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistFetcher.swift; sourceTree = "<group>"; };
 		10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseListTableViewController.swift; sourceTree = "<group>"; };
+		260C87C924FF5FE900715A64 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
+		260C87CB24FF600900715A64 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
+		260C87CD24FF60B100715A64 /* HealthKitActivityOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitActivityOperation.swift; sourceTree = "<group>"; };
 		2623AA8C24FA2A250020A316 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSetupAssistant.swift; sourceTree = "<group>"; };
 		2623AA9124FB67BF0020A316 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
@@ -1005,6 +1011,9 @@
 			children = (
 				2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */,
 				2623AA9124FB67BF0020A316 /* HealthKitService.swift */,
+				260C87C924FF5FE900715A64 /* HealthKitManager.swift */,
+				260C87CD24FF60B100715A64 /* HealthKitActivityOperation.swift */,
+				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);
 			path = HealthKit;
 			sourceTree = "<group>";
@@ -2174,6 +2183,7 @@
 				4BAEE50121272D890045AB10 /* OutgoingPhotoMessageCell.swift in Sources */,
 				1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */,
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
+				260C87CE24FF60B200715A64 /* HealthKitActivityOperation.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				101B90902457999600EDDB90 /* Weather.swift in Sources */,
 				1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */,
@@ -2194,6 +2204,7 @@
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
 				4BA1E7832152582F00391BCB /* ChatLogController+DataSource.swift in Sources */,
 				10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */,
+				260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */,
 				10D3410024ABD741009269B7 /* ActivityContainer.swift in Sources */,
 				4BAEE5E5212735E50045AB10 /* EnterVerificationCodeController.swift in Sources */,
 				4BAEE49B21272C5E0045AB10 /* ContactsDetailController.swift in Sources */,
@@ -2218,6 +2229,7 @@
 				10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */,
 				4BAEE5EC212735E50045AB10 /* SelectNewAdminTableViewController.swift in Sources */,
 				4BAEE550212735880045AB10 /* MediaObject.swift in Sources */,
+				260C87CC24FF600900715A64 /* AsyncOperation.swift in Sources */,
 				4BAEE5B7212735E50045AB10 /* INSPhotosTransitionAnimator.swift in Sources */,
 				4BAEE46D21272B380045AB10 /* SwitchObject.swift in Sources */,
 				103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */,
