@@ -419,7 +419,6 @@ extension GeneralTabBarController: ManageAppearanceHome {
         }
         grabContacts()
         addNewUserItems()
-        HealthKitService.syncEventsFromHealthKitData()
     }
 }
 

@@ -71,4 +71,11 @@ extension Date {
         return dateFormatter.string(from: self)
     }
 
+    var dayBefore: Date {
+        return Calendar.current.date(byAdding: .day, value: -1, to: self)!
+    }
+    
+    var dayAfter: Date {
+        return Calendar.current.date(byAdding: .day, value: 1, to: self)!
+    }
 }

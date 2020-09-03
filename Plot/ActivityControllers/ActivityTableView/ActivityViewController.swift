@@ -69,6 +69,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     var conversations = [Conversation]()
     let activitiesFetcher = ActivitiesFetcher()
     let invitationsFetcher = InvitationsFetcher()
+    let healhKitManager = HealthKitManager()
     
     let viewPlaceholder = ViewPlaceholder()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
@@ -889,6 +890,13 @@ extension ActivityViewController: ActivityUpdatesDelegate {
         
         self.pinnedActivities = pinned
         self.activities = unpinned
+        
+        self.healhKitManager.loadHealthKitActivities { [weak self] healhKitActivities in
+            self?.activities.append(contentsOf: healhKitActivities)
+            DispatchQueue.main.async {
+                self?.handleReloadTable()
+            }
+        }
         
         fetchInvitations()
     }

@@ -150,7 +150,9 @@
 		10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */; };
 		260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87C924FF5FE900715A64 /* HealthKitManager.swift */; };
 		260C87CC24FF600900715A64 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CB24FF600900715A64 /* AsyncOperation.swift */; };
-		260C87CE24FF60B200715A64 /* HealthKitActivityOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CD24FF60B100715A64 /* HealthKitActivityOperation.swift */; };
+		260C87CE24FF60B200715A64 /* HealthKitStepsActivityOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CD24FF60B100715A64 /* HealthKitStepsActivityOperation.swift */; };
+		260C87D02500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CF2500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift */; };
+		260C87D22500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87D12500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift */; };
 		2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2623AA8C24FA2A250020A316 /* HealthKit.framework */; };
 		2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */; };
 		2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA9124FB67BF0020A316 /* HealthKitService.swift */; };
@@ -514,7 +516,9 @@
 		10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseListTableViewController.swift; sourceTree = "<group>"; };
 		260C87C924FF5FE900715A64 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		260C87CB24FF600900715A64 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
-		260C87CD24FF60B100715A64 /* HealthKitActivityOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitActivityOperation.swift; sourceTree = "<group>"; };
+		260C87CD24FF60B100715A64 /* HealthKitStepsActivityOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitStepsActivityOperation.swift; sourceTree = "<group>"; };
+		260C87CF2500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitAnnualAverageStepsOperation.swift; sourceTree = "<group>"; };
+		260C87D12500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitStepsActivityGroupOperation.swift; sourceTree = "<group>"; };
 		2623AA8C24FA2A250020A316 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSetupAssistant.swift; sourceTree = "<group>"; };
 		2623AA9124FB67BF0020A316 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
@@ -1009,11 +1013,13 @@
 		2623AA8E24FA2D710020A316 /* HealthKit */ = {
 			isa = PBXGroup;
 			children = (
-				2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */,
-				2623AA9124FB67BF0020A316 /* HealthKitService.swift */,
 				260C87C924FF5FE900715A64 /* HealthKitManager.swift */,
-				260C87CD24FF60B100715A64 /* HealthKitActivityOperation.swift */,
+				260C87CF2500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift */,
+				260C87D12500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift */,
+				260C87CD24FF60B100715A64 /* HealthKitStepsActivityOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
+				2623AA9124FB67BF0020A316 /* HealthKitService.swift */,
+				2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */,
 			);
 			path = HealthKit;
 			sourceTree = "<group>";
@@ -2183,7 +2189,7 @@
 				4BAEE50121272D890045AB10 /* OutgoingPhotoMessageCell.swift in Sources */,
 				1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */,
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
-				260C87CE24FF60B200715A64 /* HealthKitActivityOperation.swift in Sources */,
+				260C87CE24FF60B200715A64 /* HealthKitStepsActivityOperation.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				101B90902457999600EDDB90 /* Weather.swift in Sources */,
 				1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */,
@@ -2271,6 +2277,7 @@
 				10C50FA42274EF9100111033 /* Activity.swift in Sources */,
 				106618AF24BA37D6003C3F36 /* PlaceDetailViewController.swift in Sources */,
 				4BAEE48621272C4F0045AB10 /* OnboardingController.swift in Sources */,
+				260C87D02500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift in Sources */,
 				10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
 				1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */,
@@ -2351,6 +2358,7 @@
 				4BAEE50D21272D890045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift in Sources */,
 				1069B2D4243115950048244C /* ActivityObject.swift in Sources */,
 				1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */,
+				260C87D22500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift in Sources */,
 				10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */,
 				4BAEE54F212735880045AB10 /* User.swift in Sources */,
 				10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */,

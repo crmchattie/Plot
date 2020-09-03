@@ -24,29 +24,6 @@ class HealthKitService {
                     print(weight)
                 })
                 
-                let today = Date()
-                let year = Calendar.current.component(.year, from: today)
-                let month = Calendar.current.component(.month, from: today)
-                let day = Calendar.current.component(.day, from: today)
-                if let lastYear = Calendar.current.date(from: DateComponents(year: year-1, month: month, day: day)) {
-                    HealthKitService.getCumulativeSumSample(forIdentifier: .stepCount, unit: .count(), startDate: lastYear, endDate: today) { annualSteps in
-                        if let annualSteps = annualSteps {
-                            let totalDays = Calendar.current.dateComponents([.day], from: lastYear, to: today).day ?? 0
-                            let annualAverage = Int(annualSteps)/totalDays
-                            HealthKitService.getCumulativeSumSample(forIdentifier: .stepCount, unit: .count(), date: Date()) { steps in
-                                if let steps = steps {
-                                    let stepsActivity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
-                                    stepsActivity.activityType = ActivityType.workout.rawValue
-                                    stepsActivity.name = "Steps"
-                                    stepsActivity.activityDescription = "\(steps) steps today"
-                                    stepsActivity.notes = "\(annualAverage) steps on average"
-                                    print(stepsActivity)
-                                }
-                            }
-                        }
-                    }
-                }
-                
                 HealthKitService.getCumulativeSumSample(forIdentifier: .distanceWalkingRunning, unit: .mile(), date: Date()) { distance in
                     print(distance)
                 }
