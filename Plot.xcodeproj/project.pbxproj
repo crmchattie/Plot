@@ -166,6 +166,7 @@
 		26B975E72363F9C6003BFBE3 /* InvitationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B975E62363F9C6003BFBE3 /* InvitationsViewController.swift */; };
 		26B975E92364009C003BFBE3 /* InvitationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B975E82364009C003BFBE3 /* InvitationCell.swift */; };
 		26B975ED2365374A003BFBE3 /* InvitationsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */; };
+		26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C4431C250F0CB000A9533C /* HealthMetric.swift */; };
 		26CDFB22239E278200567666 /* NewUserActivities.json in Resources */ = {isa = PBXBuildFile; fileRef = 26CDFB21239E278200567666 /* NewUserActivities.json */; };
 		26E3179B2379FB72007D1F21 /* ActivityTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E3179A2379FB72007D1F21 /* ActivityTypeViewController.swift */; };
 		26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */; };
@@ -532,6 +533,7 @@
 		26B975E62363F9C6003BFBE3 /* InvitationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationsViewController.swift; sourceTree = "<group>"; };
 		26B975E82364009C003BFBE3 /* InvitationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationCell.swift; sourceTree = "<group>"; };
 		26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationsFetcher.swift; sourceTree = "<group>"; };
+		26C4431C250F0CB000A9533C /* HealthMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthMetric.swift; sourceTree = "<group>"; };
 		26CDFB21239E278200567666 /* NewUserActivities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = NewUserActivities.json; sourceTree = "<group>"; };
 		26E3179A2379FB72007D1F21 /* ActivityTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeViewController.swift; sourceTree = "<group>"; };
 		26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeCell.swift; sourceTree = "<group>"; };
@@ -1013,6 +1015,7 @@
 		2623AA8E24FA2D710020A316 /* HealthKit */ = {
 			isa = PBXGroup;
 			children = (
+				26C4431B250F0C9200A9533C /* Model */,
 				260C87C924FF5FE900715A64 /* HealthKitManager.swift */,
 				260C87CF2500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift */,
 				260C87D12500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift */,
@@ -1048,6 +1051,14 @@
 				26B975E82364009C003BFBE3 /* InvitationCell.swift */,
 			);
 			path = Invitations;
+			sourceTree = "<group>";
+		};
+		26C4431B250F0C9200A9533C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				26C4431C250F0CB000A9533C /* HealthMetric.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		26E8E3A4238B2C81000F30C8 /* Notfications */ = {
@@ -2326,6 +2337,7 @@
 				4BAEE5F5212735E50045AB10 /* NavigationItemActivityIndicator.swift in Sources */,
 				4BAEE51C21272D890045AB10 /* BaseMessageCell+CellDeletionHandlers.swift in Sources */,
 				4BA1E778215250BF00391BCB /* MessageSender.swift in Sources */,
+				26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */,
 				4BAEE4F021272D890045AB10 /* AddGroupMembersController.swift in Sources */,
 				4BAEE51D21272D890045AB10 /* BaseMessageCell.swift in Sources */,
 				10217A7B23103661004CBA9E /* ActivityViewController.swift in Sources */,

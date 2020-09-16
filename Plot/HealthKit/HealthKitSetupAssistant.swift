@@ -28,6 +28,7 @@ class HealthKitSetupAssistant {
         // Prepare the data types that will interact with HealthKit
         guard let bodyMassIndex = HKObjectType.quantityType(forIdentifier: .bodyMassIndex),
             let bodyMass = HKObjectType.quantityType(forIdentifier: .bodyMass),
+            let heartRate = HKObjectType.quantityType(forIdentifier: .heartRate),
             let stepCount = HKObjectType.quantityType(forIdentifier: .stepCount),
             let distanceWalkingRunning = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning),
             let distanceCycling = HKObjectType.quantityType(forIdentifier: .distanceCycling),
@@ -41,6 +42,7 @@ class HealthKitSetupAssistant {
                                                         stepCount,
                                                         distanceWalkingRunning,
                                                         distanceCycling,
+                                                        heartRate,
                                                         bodyMass,
                                                         bodyMassIndex,
                                                         HKObjectType.workoutType()]

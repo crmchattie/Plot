@@ -13,9 +13,11 @@ class HealthKitManager {
     private let lock = NSLock()
     private var queue: OperationQueue
     private var activities: [Activity]
+    private var metrics: [HealthMetric]
     
     init() {
         self.activities = []
+        self.metrics = []
         self.queue = OperationQueue()
         self.queue.maxConcurrentOperationCount = 1
     }
@@ -60,5 +62,10 @@ extension HealthKitManager: HealthKitActivityOperationDelegate {
     func insertActivity(_ operation: HealthKitStepsActivityOperation, _ activity: Activity) {
         lock.lock(); defer { lock.unlock() }
         activities.append(activity)
+    }
+    
+    func insertMetric(_ operation: HealthKitStepsActivityOperation, _ metric: HealthMetric) {
+        lock.lock(); defer { lock.unlock() }
+        metrics.append(metric)
     }
 }

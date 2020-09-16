@@ -31,6 +31,12 @@ class HealthKitService {
                 HealthKitService.getCumulativeSumSample(forIdentifier: .activeEnergyBurned, unit: .kilocalorie(), date: Date()) { steps in
                     print(steps)
                 }
+                
+                let date = Date()
+                let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+                HealthKitService.getDiscreteAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit, startDate: date, endDate: date, completion: { heartRate in
+                    print(heartRate)
+                })
             }
         }
     }
@@ -142,6 +148,37 @@ class HealthKitService {
         
         query.initialResultsHandler = { query, results, error in
             let count = results?.statistics().first?.sumQuantity()?.doubleValue(for: unit)
+            completion(count)
+        }
+
+        healthStore.execute(query)
+    }
+    
+    class func getDiscreteAverageSample(forIdentifier identifier: HKQuantityTypeIdentifier,
+                                      unit: HKUnit,
+                                      startDate: Date,
+                                      endDate: Date,
+                                      completion: @escaping (Double?) -> Void) {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) else {
+            completion(nil)
+            return
+        }
+        
+        //  Set the Predicates & Interval
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+        var interval = DateComponents()
+        interval.year = 1
+        
+        //  Perform the Query
+        let query = HKStatisticsCollectionQuery(
+            quantityType: quantityType,
+            quantitySamplePredicate: predicate,
+            options: [.discreteAverage],
+            anchorDate: startDate,
+            intervalComponents: interval)
+        
+        query.initialResultsHandler = { query, results, error in
+            let count = results?.statistics().first?.averageQuantity()?.doubleValue(for: unit)
             completion(count)
         }
 
