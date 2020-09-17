@@ -12,19 +12,17 @@ class HealthKitManager {
     
     private let lock = NSLock()
     private var queue: OperationQueue
-    private var activities: [Activity]
     private var metrics: [HealthMetric]
     
     init() {
-        self.activities = []
         self.metrics = []
         self.queue = OperationQueue()
-        self.queue.maxConcurrentOperationCount = 1
+        //self.queue.maxConcurrentOperationCount = 1
     }
     
-    func loadHealthKitActivities(_ completion: @escaping ([Activity]) -> Void) {
+    func loadHealthKitActivities(_ completion: @escaping ([HealthMetric]) -> Void) {
         // Start clean
-        activities = []
+        metrics = []
         
         HealthKitService.authorizeHealthKit { [weak self] authorized in
             guard authorized, let queue = self?.queue else {
@@ -33,11 +31,12 @@ class HealthKitManager {
             }
             
             let today = Date()
+            
             // Operation to fetch annual average steps
-            let annualAverageStepsOperation = HealthKitAnnualAverageStepsOperation(date: today)
+            let annualAverageStepsOperation = AnnualAverageStepsOperation(date: today)
             
             // Operation to fetch daily total steps from date to the number of days in the past
-            let groupOperation = HealthKitStepsActivityGroupOperation(date: today, days: 7)
+            let groupOperation = StepsGroupOperation(date: today, days: 1)
             groupOperation.delegate = self
             
             // Assign fetched annual average steps to groupOperation that assign it to each daily steps fetch operation
@@ -45,26 +44,33 @@ class HealthKitManager {
                 groupOperation.annualAverageSteps = annualAverageStepsOperation.steps
             }
             
+            let annualAverageHeartRateOperation = AnnualAverageHeartRateOperation(date: today)
+            let heartRateOperation = HeartRateOperation(date: today)
+            heartRateOperation.delegate = self
+            
+            let heartRateOpAdapter = BlockOperation() { [unowned annualAverageHeartRateOperation, unowned heartRateOperation] in
+                heartRateOperation.annualAverageHeartRate = annualAverageHeartRateOperation.heartRate
+            }
+            
             adapter.addDependency(annualAverageStepsOperation)
             groupOperation.addDependency(adapter)
             
-            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter], waitUntilFinished: false)
+            heartRateOpAdapter.addDependency(annualAverageHeartRateOperation)
+            heartRateOperation.addDependency(heartRateOpAdapter)
+            
+            
+            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             queue.addBarrierBlock { [weak self] in
-                completion(self?.activities ?? [])
+                completion(self?.metrics ?? [])
             }
         }
     }
 }
 
-extension HealthKitManager: HealthKitActivityOperationDelegate {
-    func insertActivity(_ operation: HealthKitStepsActivityOperation, _ activity: Activity) {
-        lock.lock(); defer { lock.unlock() }
-        activities.append(activity)
-    }
-    
-    func insertMetric(_ operation: HealthKitStepsActivityOperation, _ metric: HealthMetric) {
+extension HealthKitManager: MetricOperationDelegate {
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric) {
         lock.lock(); defer { lock.unlock() }
         metrics.append(metric)
     }

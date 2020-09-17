@@ -150,15 +150,17 @@
 		10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */; };
 		260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87C924FF5FE900715A64 /* HealthKitManager.swift */; };
 		260C87CC24FF600900715A64 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CB24FF600900715A64 /* AsyncOperation.swift */; };
-		260C87CE24FF60B200715A64 /* HealthKitStepsActivityOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CD24FF60B100715A64 /* HealthKitStepsActivityOperation.swift */; };
-		260C87D02500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CF2500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift */; };
-		260C87D22500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87D12500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift */; };
+		260C87CE24FF60B200715A64 /* StepsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CD24FF60B100715A64 /* StepsOperation.swift */; };
+		260C87D02500BFDF00715A64 /* AnnualAverageStepsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CF2500BFDF00715A64 /* AnnualAverageStepsOperation.swift */; };
+		260C87D22500C0D400715A64 /* StepsGroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87D12500C0D400715A64 /* StepsGroupOperation.swift */; };
 		2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2623AA8C24FA2A250020A316 /* HealthKit.framework */; };
 		2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */; };
 		2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA9124FB67BF0020A316 /* HealthKitService.swift */; };
 		26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */; };
 		265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */; };
 		2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2680A0332360C0BD00C4C287 /* Invitation.swift */; };
+		26836B4F251338BD00AFC2D7 /* AnnualAverageHeartRateOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26836B4E251338BD00AFC2D7 /* AnnualAverageHeartRateOperation.swift */; };
+		26836B51251338E800AFC2D7 /* HeartRateOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26836B50251338E800AFC2D7 /* HeartRateOperation.swift */; };
 		26A29E9A2389FF90008F7351 /* ActivityAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A29E992389FF90008F7351 /* ActivityAnnotation.swift */; };
 		26A5DDD82394CB2400771DC1 /* RecipeSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */; };
 		26B915212383B9B0007536E0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26B915202383B9B0007536E0 /* LaunchScreen.storyboard */; };
@@ -517,15 +519,17 @@
 		10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseListTableViewController.swift; sourceTree = "<group>"; };
 		260C87C924FF5FE900715A64 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		260C87CB24FF600900715A64 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
-		260C87CD24FF60B100715A64 /* HealthKitStepsActivityOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitStepsActivityOperation.swift; sourceTree = "<group>"; };
-		260C87CF2500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitAnnualAverageStepsOperation.swift; sourceTree = "<group>"; };
-		260C87D12500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitStepsActivityGroupOperation.swift; sourceTree = "<group>"; };
+		260C87CD24FF60B100715A64 /* StepsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsOperation.swift; sourceTree = "<group>"; };
+		260C87CF2500BFDF00715A64 /* AnnualAverageStepsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnualAverageStepsOperation.swift; sourceTree = "<group>"; };
+		260C87D12500C0D400715A64 /* StepsGroupOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsGroupOperation.swift; sourceTree = "<group>"; };
 		2623AA8C24FA2A250020A316 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSetupAssistant.swift; sourceTree = "<group>"; };
 		2623AA9124FB67BF0020A316 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+Migration.swift"; sourceTree = "<group>"; };
 		2680A0332360C0BD00C4C287 /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
+		26836B4E251338BD00AFC2D7 /* AnnualAverageHeartRateOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnualAverageHeartRateOperation.swift; sourceTree = "<group>"; };
+		26836B50251338E800AFC2D7 /* HeartRateOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRateOperation.swift; sourceTree = "<group>"; };
 		26A29E992389FF90008F7351 /* ActivityAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAnnotation.swift; sourceTree = "<group>"; };
 		26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeSearchResult.swift; sourceTree = "<group>"; };
 		26B915202383B9B0007536E0 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -1015,12 +1019,9 @@
 		2623AA8E24FA2D710020A316 /* HealthKit */ = {
 			isa = PBXGroup;
 			children = (
+				2647B82D25131EBD0021E3B0 /* Operations */,
 				26C4431B250F0C9200A9533C /* Model */,
 				260C87C924FF5FE900715A64 /* HealthKitManager.swift */,
-				260C87CF2500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift */,
-				260C87D12500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift */,
-				260C87CD24FF60B100715A64 /* HealthKitStepsActivityOperation.swift */,
-				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 				2623AA9124FB67BF0020A316 /* HealthKitService.swift */,
 				2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */,
 			);
@@ -1033,6 +1034,19 @@
 				26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		2647B82D25131EBD0021E3B0 /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				260C87CF2500BFDF00715A64 /* AnnualAverageStepsOperation.swift */,
+				260C87D12500C0D400715A64 /* StepsGroupOperation.swift */,
+				260C87CD24FF60B100715A64 /* StepsOperation.swift */,
+				26836B4E251338BD00AFC2D7 /* AnnualAverageHeartRateOperation.swift */,
+				26836B50251338E800AFC2D7 /* HeartRateOperation.swift */,
+				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
+			);
+			path = Operations;
 			sourceTree = "<group>";
 		};
 		26A5DDD92394CB8E00771DC1 /* Networking */ = {
@@ -2200,7 +2214,7 @@
 				4BAEE50121272D890045AB10 /* OutgoingPhotoMessageCell.swift in Sources */,
 				1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */,
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
-				260C87CE24FF60B200715A64 /* HealthKitStepsActivityOperation.swift in Sources */,
+				260C87CE24FF60B200715A64 /* StepsOperation.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				101B90902457999600EDDB90 /* Weather.swift in Sources */,
 				1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */,
@@ -2209,6 +2223,7 @@
 				26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */,
 				4BA1E77C2152511B00391BCB /* UploadProgress.swift in Sources */,
 				4BAEE5D7212735E50045AB10 /* AnnouncementFactory.swift in Sources */,
+				26836B51251338E800AFC2D7 /* HeartRateOperation.swift in Sources */,
 				4BAEE5EF212735E50045AB10 /* RevealableCollectionViewCell.swift in Sources */,
 				10021A1624F1A480006A1B25 /* FinancialMemberCell.swift in Sources */,
 				10E93D5724BE43B700F6EE18 /* Extensions.swift in Sources */,
@@ -2288,7 +2303,7 @@
 				10C50FA42274EF9100111033 /* Activity.swift in Sources */,
 				106618AF24BA37D6003C3F36 /* PlaceDetailViewController.swift in Sources */,
 				4BAEE48621272C4F0045AB10 /* OnboardingController.swift in Sources */,
-				260C87D02500BFDF00715A64 /* HealthKitAnnualAverageStepsOperation.swift in Sources */,
+				260C87D02500BFDF00715A64 /* AnnualAverageStepsOperation.swift in Sources */,
 				10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
 				1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */,
@@ -2370,7 +2385,7 @@
 				4BAEE50D21272D890045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift in Sources */,
 				1069B2D4243115950048244C /* ActivityObject.swift in Sources */,
 				1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */,
-				260C87D22500C0D400715A64 /* HealthKitStepsActivityGroupOperation.swift in Sources */,
+				260C87D22500C0D400715A64 /* StepsGroupOperation.swift in Sources */,
 				10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */,
 				4BAEE54F212735880045AB10 /* User.swift in Sources */,
 				10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */,
@@ -2417,6 +2432,7 @@
 				4BAEE47021272B380045AB10 /* AccountSettingsController+nameEditing.swift in Sources */,
 				4BAEE5DA212735E50045AB10 /* CameraCell.swift in Sources */,
 				4BAEE4FC21272D890045AB10 /* ChatLogController+ImageZoomHandlers.swift in Sources */,
+				26836B4F251338BD00AFC2D7 /* AnnualAverageHeartRateOperation.swift in Sources */,
 				105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */,
 				10F3032E24EC6FE500C04B8F /* MXMember.swift in Sources */,
 				4BAEE51221272D890045AB10 /* UserInfoPhoneNumberTableViewCell.swift in Sources */,

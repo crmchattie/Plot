@@ -1,5 +1,5 @@
 //
-//  HealthKitStepsActivityGroupOperation.swift
+//  StepsGroupOperation.swift
 //  Plot
 //
 //  Created by Hafiz Usama on 2020-09-02.
@@ -8,12 +8,12 @@
 
 import Foundation
 
-class HealthKitStepsActivityGroupOperation: AsyncOperation {
+class StepsGroupOperation: AsyncOperation {
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     private var date: Date
     private var days: Int
-    weak var delegate: HealthKitActivityOperationDelegate?
+    weak var delegate: MetricOperationDelegate?
     var annualAverageSteps: Int?
     
     init(date: Date, days: Int) {
@@ -30,7 +30,7 @@ class HealthKitStepsActivityGroupOperation: AsyncOperation {
         var nextDate = date
         // Loop from current date backward to total days
         for _ in 0..<days {
-            let operation = HealthKitStepsActivityOperation(date: nextDate)
+            let operation = StepsOperation(date: nextDate)
             operation.delegate = delegate
             operation.annualAverageSteps = annualAverageSteps
             queue.addOperation(operation)

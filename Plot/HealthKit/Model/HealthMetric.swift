@@ -11,12 +11,13 @@ import Foundation
 struct HealthMetric {
     let type: HealthMetricType
     let total: Int
-    let unit: String
+    let date: Date
+    var unit: String?
     var average: Int?
-    init(type: HealthMetricType, total: Int, unit: String) {
+    init(type: HealthMetricType, total: Int, date: Date) {
         self.type = type
         self.total = total
-        self.unit = unit
+        self.date = date
     }
 }
 
@@ -24,5 +25,6 @@ enum HealthMetricType {
     case steps
     case nutrition
     case exercise
-    case personal
+    case heartRate
+    case weight
 }

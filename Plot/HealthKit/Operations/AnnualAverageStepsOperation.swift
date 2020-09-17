@@ -1,5 +1,5 @@
 //
-//  HealthKitAnnualAverageStepsOperation.swift
+//  AnnualAverageStepsOperation.swift
 //  Plot
 //
 //  Created by Hafiz Usama on 2020-09-02.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-class HealthKitAnnualAverageStepsOperation: AsyncOperation {
+class AnnualAverageStepsOperation: AsyncOperation {
     private var startDate: Date
     var steps: Int?
     

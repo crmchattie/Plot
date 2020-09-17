@@ -33,8 +33,14 @@ class HealthKitService {
                 }
                 
                 let date = Date()
+//                let year = Calendar.current.component(.year, from: date)
+//                let month = Calendar.current.component(.month, from: date)
+//                let day = Calendar.current.component(.day, from: date)
+//                guard let lastYear = Calendar.current.date(from: DateComponents(year: year-1, month: month, day: day)) else {
+//                    return
+//                }
                 let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-                HealthKitService.getDiscreteAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit, startDate: date, endDate: date, completion: { heartRate in
+                HealthKitService.getDiscreteAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit, date: date, completion: { heartRate in
                     print(heartRate)
                 })
             }
@@ -152,6 +158,17 @@ class HealthKitService {
         }
 
         healthStore.execute(query)
+    }
+    
+    class func getDiscreteAverageSample(forIdentifier identifier: HKQuantityTypeIdentifier,
+                                      unit: HKUnit,
+                                      date: Date,
+                                      completion: @escaping (Double?) -> Void) {
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: date)
+        let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
+        
+        getDiscreteAverageSample(forIdentifier: identifier, unit: unit, startDate: startDate, endDate: endDate, completion: completion)
     }
     
     class func getDiscreteAverageSample(forIdentifier identifier: HKQuantityTypeIdentifier,
