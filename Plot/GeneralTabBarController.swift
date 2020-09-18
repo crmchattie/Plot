@@ -43,6 +43,7 @@ class GeneralTabBarController: UITabBarController {
     let homeController = MasterActivityContainerController()
     let discoverController = ActivityTypeViewController()
     let settingsController = AccountSettingsController()
+    let healhKitManager = HealthKitManager()
     var window: UIWindow?
     
     let splashContainer: SplashScreenContainer = {
@@ -419,6 +420,10 @@ extension GeneralTabBarController: ManageAppearanceHome {
         }
         grabContacts()
         addNewUserItems()
+        
+        self.healhKitManager.loadHealthKitActivities { metrics in
+            homeController.healthMetrics = metrics
+        }
     }
 }
 

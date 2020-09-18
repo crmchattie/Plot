@@ -30,8 +30,7 @@ class HealthKitManager {
                 return
             }
             
-            let today = Date()
-            
+            let today = Date().dayBefore
             // Operation to fetch annual average steps
             let annualAverageStepsOperation = AnnualAverageStepsOperation(date: today)
             
@@ -63,7 +62,9 @@ class HealthKitManager {
             
             // Once everything is fetched return the activities
             queue.addBarrierBlock { [weak self] in
-                completion(self?.metrics ?? [])
+                DispatchQueue.main.async {
+                    completion(self?.metrics ?? [])
+                }
             }
         }
     }

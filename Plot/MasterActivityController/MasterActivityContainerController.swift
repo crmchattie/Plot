@@ -98,6 +98,13 @@ class MasterActivityContainerController: UIViewController {
             }
         }
     }
+    
+    var healthMetrics: [HealthMetric] = [] {
+        didSet {
+            healthVC.healthMetrics = healthMetrics
+        }
+    }
+    
     var selectedDate = Date()
     
     let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
