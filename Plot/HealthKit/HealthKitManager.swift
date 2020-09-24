@@ -30,7 +30,11 @@ class HealthKitManager {
                 return
             }
             
-            let today = Date().dayBefore
+            //let today = Date().dayBefore
+            let today = Date()
+            
+            // Steps
+            
             // Operation to fetch annual average steps
             let annualAverageStepsOperation = AnnualAverageStepsOperation(date: today)
             
@@ -43,6 +47,10 @@ class HealthKitManager {
                 groupOperation.annualAverageSteps = annualAverageStepsOperation.steps
             }
             
+            adapter.addDependency(annualAverageStepsOperation)
+            groupOperation.addDependency(adapter)
+            
+            // Heart Rate
             let annualAverageHeartRateOperation = AnnualAverageHeartRateOperation(date: today)
             let heartRateOperation = HeartRateOperation(date: today)
             heartRateOperation.delegate = self
@@ -51,18 +59,27 @@ class HealthKitManager {
                 heartRateOperation.annualAverageHeartRate = annualAverageHeartRateOperation.heartRate
             }
             
-            adapter.addDependency(annualAverageStepsOperation)
-            groupOperation.addDependency(adapter)
-            
             heartRateOpAdapter.addDependency(annualAverageHeartRateOperation)
             heartRateOperation.addDependency(heartRateOpAdapter)
             
+            // Weight
+            let annualAverageWeightOperation = AnnualAverageWeightOperation(date: today)
+            let weightOperation = WeightOperation(date: today)
+            weightOperation.delegate = self
             
-            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter], waitUntilFinished: false)
+            let weightOpAdapter = BlockOperation() { [unowned annualAverageWeightOperation, unowned weightOperation] in
+                weightOperation.annualAverageWeight = annualAverageWeightOperation.weight
+            }
+            
+            weightOpAdapter.addDependency(annualAverageWeightOperation)
+            weightOperation.addDependency(weightOpAdapter)
+            
+            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             queue.addBarrierBlock { [weak self] in
                 DispatchQueue.main.async {
+                    self?.metrics.sort(by: {$0.rank < $1.rank})
                     completion(self?.metrics ?? [])
                 }
             }

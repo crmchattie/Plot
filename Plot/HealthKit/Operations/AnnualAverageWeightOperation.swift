@@ -1,16 +1,16 @@
 //
-//  AnnualAverageHeartRateOperation.swift
+//  AnnualAverageWeightOperation.swift
 //  Plot
 //
-//  Created by Hafiz Usama on 2020-09-16.
+//  Created by Hafiz Usama on 2020-09-23.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import HealthKit
 
-class AnnualAverageHeartRateOperation: AsyncOperation {
+class AnnualAverageWeightOperation: AsyncOperation {
     private var date: Date
-    var heartRate: Double?
+    var weight: Double?
     
     init(date: Date) {
         self.date = date
@@ -29,14 +29,14 @@ class AnnualAverageHeartRateOperation: AsyncOperation {
             return
         }
         
-        let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-        HealthKitService.getDiscreteAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit, startDate: lastYear, endDate: date) { [weak self] heartRate in
-            guard let heartRate = heartRate, let _self = self else {
+        let beatsPerMinuteUnit = HKUnit.pound()
+        HealthKitService.getDiscreteAverageSample(forIdentifier: .bodyMass, unit: beatsPerMinuteUnit, startDate: lastYear, endDate: date) { [weak self] weight in
+            guard let weight = weight, let _self = self else {
                 self?.finish()
                 return
             }
             
-            _self.heartRate = heartRate
+            _self.weight = weight
             self?.finish()
         }
     }

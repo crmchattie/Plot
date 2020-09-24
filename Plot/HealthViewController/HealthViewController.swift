@@ -37,6 +37,7 @@ class HealthViewController: UIViewController {
         
         view.addSubview(tableView)
         configureView()
+        addObservers()
     }
     
     deinit {
@@ -84,9 +85,9 @@ extension HealthViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+        cell.backgroundColor = tableView.backgroundColor
         let metric = healthMetrics[indexPath.row]
-        cell.textLabel?.text = metric.type.rawValue.capitalized
-        cell.detailTextLabel?.text = "\(metric.total) \(metric.unit)"
+        cell.configure(metric)
         return cell
     }
 }

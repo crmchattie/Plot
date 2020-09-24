@@ -14,7 +14,7 @@ class StepsGroupOperation: AsyncOperation {
     private var date: Date
     private var days: Int
     weak var delegate: MetricOperationDelegate?
-    var annualAverageSteps: Int?
+    var annualAverageSteps: Double?
     
     init(date: Date, days: Int) {
         self.date = date

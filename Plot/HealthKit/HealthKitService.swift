@@ -71,8 +71,8 @@ class HealthKitService {
             return
         }
         
-        getMostRecentSample(for: weightSampleType, start: Date.distantPast, end: Date()) { (sample, error) in
-            guard let sample = sample else {
+        getMostRecentSamples(for: weightSampleType, startDate: Date.distantPast, endDate: Date()) { (samples, error) in
+            guard let sample = samples?.first as? HKQuantitySample else {
                 if let error = error {
                     print(error)
                 }
@@ -80,21 +80,21 @@ class HealthKitService {
                 completion(nil)
                 return
             }
-            
+            //
             // HKUnit.gramUnit(with: .kilo)
             let weightInKilograms = sample.quantity.doubleValue(for: unit)
             completion(weightInKilograms)
         }
     }
     
-    class func getMostRecentSample(for sampleType: HKSampleType,
-                                   start: Date,
-                                   end: Date,
-                                   completion: @escaping (HKQuantitySample?, Error?) -> Swift.Void) {
+    class func getMostRecentSamples(for sampleType: HKSampleType,
+                                   startDate: Date,
+                                   endDate: Date,
+                                   completion: @escaping ([HKSample]?, Error?) -> Swift.Void) {
         
         // Use HKQuery to load the most recent samples.
-        let mostRecentPredicate = HKQuery.predicateForSamples(withStart: start,
-                                                              end: end,
+        let mostRecentPredicate = HKQuery.predicateForSamples(withStart: startDate,
+                                                              end: endDate,
                                                               options: .strictEndDate)
         
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate,
@@ -106,13 +106,7 @@ class HealthKitService {
                                         predicate: mostRecentPredicate,
                                         limit: limit,
                                         sortDescriptors: [sortDescriptor]) { (query, samples, error) in
-                                            guard let samples = samples,
-                                                let mostRecentSample = samples.first as? HKQuantitySample else {
-                                                    
-                                                    completion(nil, error)
-                                                    return
-                                            }
-                                            completion(mostRecentSample, nil)
+                                            completion(samples, error)
         }
         
         healthStore.execute(sampleQuery)

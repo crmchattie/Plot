@@ -12,7 +12,7 @@ import HealthKit
 class StepsOperation: AsyncOperation {
     private var startDate: Date
     weak var delegate: MetricOperationDelegate?
-    var annualAverageSteps: Int?
+    var annualAverageSteps: Double?
     
     init(date: Date) {
         self.startDate = date
@@ -29,8 +29,8 @@ class StepsOperation: AsyncOperation {
                 return
             }
 
-            let steps = Int(stepsResult)
-            var metric = HealthMetric(type: .steps, total: steps, date: _self.startDate, unit: "steps")
+            let steps = stepsResult
+            var metric = HealthMetric(type: .steps, total: steps, date: _self.startDate, unit: "steps", rank: HealthMetricType.steps.rank)
             metric.average = _self.annualAverageSteps
             
             _self.delegate?.insertMetric(_self, metric)

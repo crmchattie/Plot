@@ -10,7 +10,7 @@ import Foundation
 
 class AnnualAverageStepsOperation: AsyncOperation {
     private var startDate: Date
-    var steps: Int?
+    var steps: Double?
     
     init(date: Date) {
         self.startDate = date
@@ -36,7 +36,7 @@ class AnnualAverageStepsOperation: AsyncOperation {
             }
             
             let totalDays = Calendar.current.dateComponents([.day], from: lastYear, to: _self.startDate).day ?? 0
-            _self.steps = Int(annualSteps)/totalDays
+            _self.steps = annualSteps/Double(totalDays)
             self?.finish()
         }
     }

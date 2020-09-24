@@ -153,6 +153,8 @@
 		260C87CE24FF60B200715A64 /* StepsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CD24FF60B100715A64 /* StepsOperation.swift */; };
 		260C87D02500BFDF00715A64 /* AnnualAverageStepsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CF2500BFDF00715A64 /* AnnualAverageStepsOperation.swift */; };
 		260C87D22500C0D400715A64 /* StepsGroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87D12500C0D400715A64 /* StepsGroupOperation.swift */; };
+		261FAF77251C661D008636DF /* AnnualAverageWeightOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261FAF76251C661D008636DF /* AnnualAverageWeightOperation.swift */; };
+		261FAF79251C69C0008636DF /* WeightOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261FAF78251C69C0008636DF /* WeightOperation.swift */; };
 		2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2623AA8C24FA2A250020A316 /* HealthKit.framework */; };
 		2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */; };
 		2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA9124FB67BF0020A316 /* HealthKitService.swift */; };
@@ -523,6 +525,8 @@
 		260C87CD24FF60B100715A64 /* StepsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsOperation.swift; sourceTree = "<group>"; };
 		260C87CF2500BFDF00715A64 /* AnnualAverageStepsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnualAverageStepsOperation.swift; sourceTree = "<group>"; };
 		260C87D12500C0D400715A64 /* StepsGroupOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsGroupOperation.swift; sourceTree = "<group>"; };
+		261FAF76251C661D008636DF /* AnnualAverageWeightOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnualAverageWeightOperation.swift; sourceTree = "<group>"; };
+		261FAF78251C69C0008636DF /* WeightOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightOperation.swift; sourceTree = "<group>"; };
 		2623AA8C24FA2A250020A316 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSetupAssistant.swift; sourceTree = "<group>"; };
 		2623AA9124FB67BF0020A316 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
@@ -1047,6 +1051,8 @@
 				260C87CD24FF60B100715A64 /* StepsOperation.swift */,
 				26836B4E251338BD00AFC2D7 /* AnnualAverageHeartRateOperation.swift */,
 				26836B50251338E800AFC2D7 /* HeartRateOperation.swift */,
+				261FAF76251C661D008636DF /* AnnualAverageWeightOperation.swift */,
+				261FAF78251C69C0008636DF /* WeightOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);
 			path = Operations;
@@ -2192,6 +2198,7 @@
 				101B90972458DA2D00EDDB90 /* WeatherRow.swift in Sources */,
 				10E93D5924BE43B700F6EE18 /* BetterSnappingLayout.swift in Sources */,
 				105E12532447955500A278D0 /* ActivityDetailCellDelegates.swift in Sources */,
+				261FAF79251C69C0008636DF /* WeightOperation.swift in Sources */,
 				4BAEE4F421272D890045AB10 /* SelectGroupMembersController.swift in Sources */,
 				26E8EFE7237F393900B9067E /* MapActivitiesViewController.swift in Sources */,
 				4BAEE54D212735880045AB10 /* Conversation.swift in Sources */,
@@ -2399,6 +2406,7 @@
 				109F849023D607C6002C0044 /* RecipeTypeViewController.swift in Sources */,
 				100A53EC23E0DD9C004AA952 /* ActivityHeaderCell.swift in Sources */,
 				4BAEE5E2212735E50045AB10 /* Public.swift in Sources */,
+				261FAF77251C661D008636DF /* AnnualAverageWeightOperation.swift in Sources */,
 				10C50FA22274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift in Sources */,
 				26E3179B2379FB72007D1F21 /* ActivityTypeViewController.swift in Sources */,
 				10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */,
