@@ -102,21 +102,19 @@ class HealthMetricCell: UITableViewCell {
     func configure(_ healthMetric: HealthMetric) {
         titleLabel.text = healthMetric.type.string
         var total = "\(Int(healthMetric.total))"
-        if healthMetric.type == .weight {
+        if healthMetric.type == HealthMetricType.weight {
             total = healthMetric.total.clean
         }
         
         subtitleLabel.text = "\(total) \(healthMetric.unit) today"
         if let averageValue = healthMetric.average {
             var average = "\(Int(averageValue))"
-            if healthMetric.type == .weight {
+            if healthMetric.type == HealthMetricType.weight {
                 average = averageValue.clean
             }
             detailLabel.text = "\(average) \(healthMetric.unit) on average"
         }
-        
-        //String(format: "%.2f", myDouble)
-        
+
         titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         subtitleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         detailLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor

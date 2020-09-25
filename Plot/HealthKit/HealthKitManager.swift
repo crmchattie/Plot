@@ -74,7 +74,12 @@ class HealthKitManager {
             weightOpAdapter.addDependency(annualAverageWeightOperation)
             weightOperation.addDependency(weightOpAdapter)
             
-            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter], waitUntilFinished: false)
+            // Workouts
+            let workoutOperation = WorkoutOperation(date: today)
+            workoutOperation.delegate = self
+            
+            // Setup queue
+            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, workoutOperation], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             queue.addBarrierBlock { [weak self] in

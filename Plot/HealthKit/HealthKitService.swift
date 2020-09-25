@@ -195,4 +195,38 @@ class HealthKitService {
 
         healthStore.execute(query)
     }
+    
+    class func getAllWorkouts(forStartDate startDate: Date,
+                               endDate: Date,
+                               completion: @escaping ([HKWorkout]?, Error?) -> Void) {
+        // Get all workouts with the "Other" activity type.
+        let workoutPredicate = HKQuery.predicateForWorkouts(with: .other)
+        
+        let datePredicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+        
+        // Combine the predicates into a single predicate.
+        let compound = NSCompoundPredicate(andPredicateWithSubpredicates:
+            [workoutPredicate, datePredicate])
+        
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate,
+                                              ascending: true)
+        
+        let query = HKSampleQuery(
+            sampleType: .workoutType(),
+            predicate: compound,
+            limit: 0,
+            sortDescriptors: [sortDescriptor]) { (query, samples, error) in
+                DispatchQueue.main.async {
+                    // Cast the samples as HKWorkout
+                    guard let samples = samples as? [HKWorkout], error == nil else {
+                        completion(nil, error)
+                        return
+                    }
+                    
+                    completion(samples, nil)
+                }
+        }
+        
+        HKHealthStore().execute(query)
+    }
 }

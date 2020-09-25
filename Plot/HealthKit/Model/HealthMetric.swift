@@ -7,14 +7,16 @@
 //
 
 import Foundation
+import HealthKit
 
 struct HealthMetric: Equatable {
     let type: HealthMetricType
     let total: Double
     let date: Date
     var unit: String
-    var average: Double?
     var rank: Int
+    var average: Double?
+    var hkWorkout: HKWorkout?
     init(type: HealthMetricType, total: Double, date: Date, unit: String, rank: Int) {
         self.type = type
         self.total = total
@@ -28,10 +30,10 @@ struct HealthMetric: Equatable {
     }
 }
 
-enum HealthMetricType: String {
+enum HealthMetricType {
     case steps
     case nutrition
-    case exercise
+    case workout
     case heartRate
     case weight
     
@@ -42,7 +44,7 @@ enum HealthMetricType: String {
                 return "Steps"
             case .nutrition:
                 return "Nutrition"
-            case .exercise:
+            case .workout:
                 return "Exercise"
             case .heartRate:
                 return "Heart Rate"
@@ -59,7 +61,7 @@ enum HealthMetricType: String {
                 return 3
             case .nutrition:
                 return 4
-            case .exercise:
+            case .workout:
                 return 5
             case .heartRate:
                 return 2

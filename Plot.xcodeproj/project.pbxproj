@@ -158,6 +158,7 @@
 		2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2623AA8C24FA2A250020A316 /* HealthKit.framework */; };
 		2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */; };
 		2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA9124FB67BF0020A316 /* HealthKitService.swift */; };
+		26317C30251DB250007CC315 /* WorkoutOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26317C2F251DB250007CC315 /* WorkoutOperation.swift */; };
 		26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */; };
 		265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */; };
 		2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2680A0332360C0BD00C4C287 /* Invitation.swift */; };
@@ -530,6 +531,7 @@
 		2623AA8C24FA2A250020A316 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSetupAssistant.swift; sourceTree = "<group>"; };
 		2623AA9124FB67BF0020A316 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
+		26317C2F251DB250007CC315 /* WorkoutOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutOperation.swift; sourceTree = "<group>"; };
 		26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+Migration.swift"; sourceTree = "<group>"; };
 		2680A0332360C0BD00C4C287 /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
@@ -1053,6 +1055,7 @@
 				26836B50251338E800AFC2D7 /* HeartRateOperation.swift */,
 				261FAF76251C661D008636DF /* AnnualAverageWeightOperation.swift */,
 				261FAF78251C69C0008636DF /* WeightOperation.swift */,
+				26317C2F251DB250007CC315 /* WorkoutOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);
 			path = Operations;
@@ -2380,6 +2383,7 @@
 				4BAEE50021272D890045AB10 /* UserInfoTableViewController.swift in Sources */,
 				10F3032A24EC6FBC00C04B8F /* MXUser.swift in Sources */,
 				4BAEE5D6212735E50045AB10 /* Announcement.swift in Sources */,
+				26317C30251DB250007CC315 /* WorkoutOperation.swift in Sources */,
 				10196F0724411B5600B6AFDF /* SelectActivityMembersViewController.swift in Sources */,
 				4BAEE5E4212735E50045AB10 /* EnterVerificationContainerView+timerHandlers.swift in Sources */,
 				10EE27F3245DFA8E00C80AAF /* PackinglistViewController.swift in Sources */,
