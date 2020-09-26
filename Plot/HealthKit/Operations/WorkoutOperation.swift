@@ -10,11 +10,12 @@ import HealthKit
 
 class WorkoutOperation: AsyncOperation {
     private var startDate: Date
+    private var workoutActivityType: HKWorkoutActivityType
     weak var delegate: MetricOperationDelegate?
-    var annualAverageWeight: Double?
-    
-    init(date: Date) {
+
+    init(date: Date, workoutActivityType: HKWorkoutActivityType) {
         self.startDate = date
+        self.workoutActivityType = workoutActivityType
     }
     
     override func main() {
@@ -22,25 +23,31 @@ class WorkoutOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        let year = Calendar.current.component(.year, from: startDate)
-        let month = Calendar.current.component(.month, from: startDate)
-        let day = Calendar.current.component(.day, from: startDate)
-        guard let lastSevenDays = Calendar.current.date(from: DateComponents(year: year, month: month, day: day-7)) else {
-            self.finish()
-            return
-        }
-        
-        HealthKitService.getAllWorkouts(forStartDate: lastSevenDays, endDate: startDate) { [weak self] workouts, error  in
-
+        HealthKitService.getAllWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate.lastYear, endDate: startDate) { [weak self] workouts, error  in
             guard let workouts = workouts, error == nil, let _self = self else {
                 self?.finish()
                 return
             }
             
-            for workout in workouts {
-                let total = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
+            if
+                let workout = workouts.last,
+                // Take last 48-hours
+                workout.endDate >= Date().dayBefore.dayBefore,
+                let total = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()),
+                total > 0 {
+                
                 var metric = HealthMetric(type: HealthMetricType.workout, total: total, date: _self.startDate, unit: "calories", rank: HealthMetricType.workout.rank)
                 metric.hkWorkout = workout
+                
+                var averageEnergyBurned: Double = 0
+                workouts.forEach { workout in
+                    averageEnergyBurned += workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
+                }
+                if averageEnergyBurned != 0 {
+                    averageEnergyBurned /= Double(workouts.count)
+                    metric.average = averageEnergyBurned
+                }
+
                 _self.delegate?.insertMetric(_self, metric)
             }
 

@@ -43,7 +43,6 @@ class HealthMetricCell: UITableViewCell {
     
     let activityTypeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "activity"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -100,13 +99,22 @@ class HealthMetricCell: UITableViewCell {
     }
     
     func configure(_ healthMetric: HealthMetric) {
-        titleLabel.text = healthMetric.type.string
+        var timeAgo = "today"
+        var title = healthMetric.type.name
+        if healthMetric.type == HealthMetricType.workout, let hkWorkout = healthMetric.hkWorkout {
+            title = hkWorkout.workoutActivityType.name
+            timeAgo = timeAgoSinceDate(hkWorkout.endDate)
+        }
+        
+        titleLabel.text = title
+        
         var total = "\(Int(healthMetric.total))"
         if healthMetric.type == HealthMetricType.weight {
             total = healthMetric.total.clean
         }
         
-        subtitleLabel.text = "\(total) \(healthMetric.unit) today"
+        subtitleLabel.text = "\(total) \(healthMetric.unit) \(timeAgo)"
+        
         if let averageValue = healthMetric.average {
             var average = "\(Int(averageValue))"
             if healthMetric.type == HealthMetricType.weight {
@@ -115,8 +123,38 @@ class HealthMetricCell: UITableViewCell {
             detailLabel.text = "\(average) \(healthMetric.unit) on average"
         }
 
+        updateImage(healthMetric)
+        
         titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         subtitleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         detailLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+    }
+    
+    func updateImage(_ healthMetric: HealthMetric) {
+        var imageName = "activity"
+        switch healthMetric.type {
+        case .steps:
+            imageName = "walking"
+        case .nutrition:
+            imageName = "activity"
+        case .workout:
+            if let workoutActivityType = healthMetric.hkWorkout?.workoutActivityType {
+                if workoutActivityType == .running {
+                    imageName = "running"
+                }
+                else if workoutActivityType == .cycling {
+                    imageName = "cycling"
+                }
+                else {
+                    imageName = "dumbell"
+                }
+            }
+        case .heartRate:
+            imageName = "heart-rate"
+        case .weight:
+            imageName = "body-weight-scales"
+        }
+        
+        activityTypeButton.setImage(UIImage(named: imageName), for: .normal)
     }
 }

@@ -37,7 +37,7 @@ enum HealthMetricType {
     case heartRate
     case weight
     
-    var string: String {
+    var name: String {
         get {
             switch self {
             case .steps:

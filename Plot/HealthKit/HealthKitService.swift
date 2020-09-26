@@ -20,28 +20,23 @@ class HealthKitService {
             if result {
                 
                 HealthKitService.loadAndDisplayMostRecentWeight(for: .pound(), completion: { weight in
-                    
-                    print(weight)
                 })
                 
                 HealthKitService.getCumulativeSumSample(forIdentifier: .distanceWalkingRunning, unit: .mile(), date: Date()) { distance in
-                    print(distance)
                 }
 
                 HealthKitService.getCumulativeSumSample(forIdentifier: .activeEnergyBurned, unit: .kilocalorie(), date: Date()) { steps in
-                    print(steps)
                 }
                 
                 let date = Date()
-//                let year = Calendar.current.component(.year, from: date)
-//                let month = Calendar.current.component(.month, from: date)
-//                let day = Calendar.current.component(.day, from: date)
-//                guard let lastYear = Calendar.current.date(from: DateComponents(year: year-1, month: month, day: day)) else {
-//                    return
-//                }
+                let year = Calendar.current.component(.year, from: date)
+                let month = Calendar.current.component(.month, from: date)
+                let day = Calendar.current.component(.day, from: date)
+                guard let lastYear = Calendar.current.date(from: DateComponents(year: year-1, month: month, day: day)) else {
+                    return
+                }
                 let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
                 HealthKitService.getDiscreteAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit, date: date, completion: { heartRate in
-                    print(heartRate)
                 })
             }
         }
@@ -196,11 +191,12 @@ class HealthKitService {
         healthStore.execute(query)
     }
     
-    class func getAllWorkouts(forStartDate startDate: Date,
-                               endDate: Date,
-                               completion: @escaping ([HKWorkout]?, Error?) -> Void) {
+    class func getAllWorkouts(forWorkoutActivityType workoutActivityType: HKWorkoutActivityType,
+                              startDate: Date,
+                              endDate: Date,
+                              completion: @escaping ([HKWorkout]?, Error?) -> Void) {
         // Get all workouts with the "Other" activity type.
-        let workoutPredicate = HKQuery.predicateForWorkouts(with: .other)
+        let workoutPredicate = HKQuery.predicateForWorkouts(with: workoutActivityType)
         
         let datePredicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
         
@@ -217,6 +213,7 @@ class HealthKitService {
             limit: 0,
             sortDescriptors: [sortDescriptor]) { (query, samples, error) in
                 DispatchQueue.main.async {
+                    
                     // Cast the samples as HKWorkout
                     guard let samples = samples as? [HKWorkout], error == nil else {
                         completion(nil, error)

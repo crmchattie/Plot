@@ -75,11 +75,20 @@ class HealthKitManager {
             weightOperation.addDependency(weightOpAdapter)
             
             // Workouts
-            let workoutOperation = WorkoutOperation(date: today)
-            workoutOperation.delegate = self
+            let functionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .functionalStrengthTraining)
+            functionalStrengthTrainingOp.delegate = self
+            
+            let traditionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .traditionalStrengthTraining)
+            traditionalStrengthTrainingOp.delegate = self
+            
+            let runningOp = WorkoutOperation(date: today, workoutActivityType: .running)
+            runningOp.delegate = self
+            
+            let cyclingOp = WorkoutOperation(date: today, workoutActivityType: .cycling)
+            cyclingOp.delegate = self
             
             // Setup queue
-            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, workoutOperation], waitUntilFinished: false)
+            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             queue.addBarrierBlock { [weak self] in

@@ -21,16 +21,8 @@ class AnnualAverageWeightOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        let year = Calendar.current.component(.year, from: date)
-        let month = Calendar.current.component(.month, from: date)
-        let day = Calendar.current.component(.day, from: date)
-        guard let lastYear = Calendar.current.date(from: DateComponents(year: year-1, month: month, day: day)) else {
-            self.finish()
-            return
-        }
-        
         let beatsPerMinuteUnit = HKUnit.pound()
-        HealthKitService.getDiscreteAverageSample(forIdentifier: .bodyMass, unit: beatsPerMinuteUnit, startDate: lastYear, endDate: date) { [weak self] weight in
+        HealthKitService.getDiscreteAverageSample(forIdentifier: .bodyMass, unit: beatsPerMinuteUnit, startDate: date.lastYear, endDate: date) { [weak self] weight in
             guard let weight = weight, let _self = self else {
                 self?.finish()
                 return
