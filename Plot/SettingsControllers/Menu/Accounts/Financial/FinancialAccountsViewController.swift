@@ -52,7 +52,7 @@ class FinancialAccountsViewController: UITableViewController {
     
     func grabMXUser() {
         if let currentUser = Auth.auth().currentUser?.uid {
-            let reference = Database.database().reference().child(usersFinancialEntity).child(currentUser)
+            let reference = Database.database().reference().child(userFinancialEntity).child(currentUser)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value, let user = try? FirebaseDecoder().decode(MXUser.self, from: value) {
                     self.user = user
@@ -118,7 +118,7 @@ class FinancialAccountsViewController: UITableViewController {
                 var accounts = search?.accounts
                 for index in 0...accounts!.count - 1 {
                     if let currentUser = Auth.auth().currentUser?.uid {
-                        let reference = Database.database().reference().child(financialAccountsEntity).child(currentUser).child(accounts![index].guid).child("should_link")
+                        let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(accounts![index].guid).child("should_link")
                         reference.observeSingleEvent(of: .value, with: { (snapshot) in
                             if snapshot.exists(), let value = snapshot.value, let should_link = value as? Bool {
                                 accounts![index].should_link = should_link

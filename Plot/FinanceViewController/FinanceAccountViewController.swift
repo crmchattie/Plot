@@ -52,7 +52,6 @@ class FinanceAccountViewController: FormViewController {
         
         // create dateFormatter with UTC time format
         let isodateFormatter = ISO8601DateFormatter()
-        
         let dateFormatterPrint = DateFormatter()
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
 
@@ -61,7 +60,6 @@ class FinanceAccountViewController: FormViewController {
             Section()
             
             <<< TextRow("Name") {
-                $0.cell.isUserInteractionEnabled = false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
@@ -69,6 +67,14 @@ class FinanceAccountViewController: FormViewController {
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                if let value = row.value {
+                    self.account.name = value
+                    if let currentUser = Auth.auth().currentUser?.uid {
+                        let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("name")
+                        reference.setValue(value)
+                    }
+                }
             }
             
             <<< TextRow("Type") {
@@ -97,7 +103,7 @@ class FinanceAccountViewController: FormViewController {
             }
         
         form.last!
-            <<< TextRow("Information Last Updated On") {
+            <<< TextRow("Last Updated On") {
                 $0.cell.isUserInteractionEnabled = false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -106,8 +112,8 @@ class FinanceAccountViewController: FormViewController {
                     $0.value = dateFormatterPrint.string(from: date)
                 }
                 }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
             
             <<< CheckRow() {
@@ -133,7 +139,7 @@ class FinanceAccountViewController: FormViewController {
                     row.updateCell()
                     self.account.should_link = row.value
                     if let currentUser = Auth.auth().currentUser?.uid {
-                        let reference = Database.database().reference().child(financialAccountsEntity).child(currentUser).child(self.account.guid).child("should_link")
+                        let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("should_link")
                         reference.setValue(row.value!)
                     }
                 }

@@ -6,7 +6,7 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-let usersFinancialEntity = "user-financial"
+let userFinancialEntity = "user-financial"
 
 struct MXUserResult: Codable {
     let user: MXUser?

@@ -432,24 +432,24 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 } else if let lat = self.lat, let lon = self.lon {
                     dispatchGroup.enter()
                     Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "", lat: lat, long: lon) { (search, err) in
-                        dispatchGroup.leave()
-                        semaphore.signal()
                         if let object = search?.embedded?.events {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
+                        dispatchGroup.leave()
+                        semaphore.signal()
                     }
                 } else {
                     dispatchGroup.enter()
                     Service.shared.fetchEventsSegment(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "") { (search, err) in
-                        dispatchGroup.leave()
-                        semaphore.signal()
                         if let object = search?.embedded?.events {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
                         }
+                        dispatchGroup.leave()
+                        semaphore.signal()
                     }
                 }
                 

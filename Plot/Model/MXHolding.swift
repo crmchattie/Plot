@@ -6,7 +6,7 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-let usersFinancialHoldingsEntity = "user-financial-holdings"
+let userFinancialHoldingsEntity = "user-financial-holdings"
 let financialHoldingsEntity = "financial-holdings"
 
 import Foundation
@@ -17,7 +17,7 @@ struct MXHoldingResult: Codable {
     let pagination: MXPagination?
 }
 
-struct MXHolding: Codable, Equatable {
+struct MXHolding: Codable, Equatable, Hashable {
     let account_guid: String
     let cost_basis: Decimal?
     let created_at: String

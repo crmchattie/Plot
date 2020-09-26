@@ -70,5 +70,12 @@ extension Date {
         dateFormatter.dateFormat = format
         return dateFormatter.string(from: self)
     }
+    
+    public func removeTimeStamp(fromDate: Date) -> Date {
+        guard let date = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: fromDate)) else {
+            fatalError("Failed to strip time from Date object")
+        }
+        return date
+    }
 
 }

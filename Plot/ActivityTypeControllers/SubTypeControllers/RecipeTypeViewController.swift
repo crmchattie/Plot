@@ -445,32 +445,32 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
             } else if section.subType == "Cuisine" {
                 dispatchGroup.enter()
                 Service.shared.fetchRecipesComplex(query: "", cuisine: [section.searchTerm], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-                    dispatchGroup.leave()
                     if let object = search?.recipes {
                         self.groups[section] = object
                     } else {
                         self.sections.removeAll(where: {$0 == section})
                     }
+                    dispatchGroup.leave()
                 }
             } else if section.subType == "Diet" {
                 dispatchGroup.enter()
                 Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: section.searchTerm, intolerances: [""], type: "") { (search, err) in
-                    dispatchGroup.leave()
                     if let object = search?.recipes {
                         self.groups[section] = object
                     } else {
                         self.sections.removeAll(where: {$0 == section})
                     }
+                    dispatchGroup.leave()
                 }
             } else {
                 dispatchGroup.enter()
                 Service.shared.fetchRecipesComplex(query: section.searchTerm, cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-                    dispatchGroup.leave()
                     if let object = search?.recipes {
                         self.groups[section] = object
                     } else {
                         self.sections.removeAll(where: {$0 == section})
                     }
+                    dispatchGroup.leave()
                 }
             }
             dispatchGroup.notify(queue: .main) {

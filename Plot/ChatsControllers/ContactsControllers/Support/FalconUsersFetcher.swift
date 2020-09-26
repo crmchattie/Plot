@@ -65,7 +65,7 @@ class FalconUsersFetcher: NSObject {
 
         reference = Database.database().reference()
         
-        //add Plot user
+        //add 'Plot' user
         reference.child("relationships").child(self.userID!).child("acdmpzhmDWaBdcEo17DRMt8gwCh1").setValue("true")
 
         //create check if user exists in relationship table and return relationships

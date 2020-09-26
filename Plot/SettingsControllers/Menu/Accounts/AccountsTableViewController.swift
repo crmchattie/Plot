@@ -73,7 +73,6 @@ class AccountsTableViewController: UITableViewController {
         }
         if indexPath.row == 1 {
             let destination = FinancialAccountsViewController()
-            destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
         }
         if indexPath.row == 2 {

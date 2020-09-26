@@ -235,6 +235,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.rowHeight = UITableView.automaticDimension
         activityView.tableView.estimatedRowHeight = 105
         
+        
         // apply theme
         applyCalendarTheme()
     }

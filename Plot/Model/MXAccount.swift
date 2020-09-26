@@ -6,7 +6,7 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-let usersFinancialAccountsEntity = "user-financial-accounts"
+let userFinancialAccountsEntity = "user-financial-accounts"
 let financialAccountsEntity = "financial-accounts"
 
 struct MXAccountResult: Codable {
@@ -36,7 +36,7 @@ struct MXAccount: Codable, Equatable, Hashable {
     let is_closed: Bool
     let last_payment: Double?
     let last_payment_at: String?
-    let loan_amount: Double?
+    let loan_balance: Double?
     let matures_on: String?
     let member_guid: String
     let minimum_balance: Double?
@@ -52,15 +52,16 @@ struct MXAccount: Codable, Equatable, Hashable {
     let updated_at: String
     let user_guid: String
     var should_link: Bool?
+    var tags: [String]?
     var participantsIDs: [String]?
-    var bs_type: String {
+    var bs_type: BalanceSheetType {
         switch self.type {
         case .checking, .savings, .investment, .property, .cash, .insurance, .prepaid:
-            return "Asset"
+            return .Asset
         case .loan, .creditCard, .lineOfCredit, .mortgage:
-            return "Liability"
-        default:
-            return "None"
+            return .Liability
+        case .any:
+            return .None
         }
     }
 }
@@ -69,10 +70,33 @@ func ==(lhs: MXAccount, rhs: MXAccount) -> Bool {
     return lhs.guid == rhs.guid && lhs.user_guid == rhs.user_guid
 }
 
+struct UserAccount: Codable, Equatable, Hashable {
+    var name: String?
+    var tags: [String]?
+    var should_link: Bool?
+}
+
+struct AccountDetails: Codable, Equatable, Hashable {
+    let uuid = UUID().uuidString
+    var name: String
+    var balance: Double
+    var level: AccountCatLevel
+    var subtype: MXAccountSubType?
+    var type: MXAccountType?
+    var bs_type: BalanceSheetType
+}
+
+enum AccountCatLevel: String, Codable {
+    case account
+    case subtype
+    case type
+    case bs_type
+}
+
 func assets(accounts: [MXAccount]) -> Double {
     var assets: Double = 0.0
     for account in accounts {
-        if account.bs_type == "asset" {
+        if account.bs_type == .Asset {
             assets += account.balance
         }
     }
@@ -82,7 +106,7 @@ func assets(accounts: [MXAccount]) -> Double {
 func liabilities(accounts: [MXAccount]) -> Double {
     var liabilities: Double = 0.0
     for account in accounts {
-        if account.bs_type == "liability" {
+        if account.bs_type == .Liability {
             liabilities += account.balance
         }
     }
@@ -94,18 +118,34 @@ func networth(accounts: [MXAccount]) -> Double {
     return networth
 }
 
+enum BalanceSheetType: String, CaseIterable, Codable {
+    case NetWorth
+    case Asset
+    case Liability
+    case None
+    
+    var name: String {
+        switch self {
+        case .NetWorth: return "Net Worth"
+        case .Asset: return "Asset"
+        case .Liability: return "Liability"
+        case .None: return "None"
+        }
+    }
+}
+
 enum MXAccountType: String, CaseIterable, Codable {
+    case cash = "CASH"
     case checking = "CHECKING"
     case savings = "SAVINGS"
     case investment = "INVESTMENT"
     case property = "PROPERTY"
-    case cash = "CASH"
     case insurance = "INSURANCE"
     case prepaid = "PREPAID"
-    case loan = "LOAN"
     case creditCard = "CREDIT_CARD"
-    case lineOfCredit = "LINE_OF_CREDIT"
     case mortgage = "MORTGAGE"
+    case loan = "LOAN"
+    case lineOfCredit = "LINE_OF_CREDIT"
     case any = "ANY"
     
     var name: String {
@@ -455,6 +495,108 @@ enum MXAccountSubType: String, CaseIterable, Codable {
         case .none: return .any
         }
     }
+}
+
+func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDetails], [AccountDetails: [MXAccount]]) -> ()) {
+    var accountsList = [AccountDetails]()
+    var accountsDict = [AccountDetails: [MXAccount]]()
+    for account in accounts {
+        if account.should_link ?? true == false {
+            continue
+        }
+        let accountDetail = AccountDetails(name: account.name, balance: account.balance, level: .account, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+        accountsDict[accountDetail] = [account]
+        if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype.name && $0.level == .subtype && $0.subtype == account.subtype && $0.type == account.type && $0.bs_type == account.bs_type}) {
+            var accountDetail = accountsDict.keys[index]
+            var accounts = accountsDict[accountDetail]
+            
+            accountsDict[accountDetail] = nil
+            
+            accountDetail.balance += account.balance
+            accounts!.append(account)
+            
+            accountsDict[accountDetail] = accounts
+        } else {
+            let accountDetail = AccountDetails(name: account.subtype.name, balance: account.balance, level: .subtype, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+            accountsDict[accountDetail] = [account]
+        }
+        if let index = accountsDict.keys.firstIndex(where: {$0.name == account.type.name && $0.level == .type && $0.type == account.type && $0.bs_type == account.bs_type}) {
+            var accountDetail = accountsDict.keys[index]
+            var accounts = accountsDict[accountDetail]
+            
+            accountsDict[accountDetail] = nil
+            
+            accountDetail.balance = account.balance
+            accounts!.append(account)
+            
+            accountsDict[accountDetail] = accounts
+        } else {
+            let accountDetail = AccountDetails(name: account.type.name, balance: account.balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type)
+            accountsDict[accountDetail] = [account]
+        }
+        if let index = accountsDict.keys.firstIndex(where: {$0.name == account.bs_type.name && $0.level == .bs_type && $0.bs_type == account.bs_type}) {
+            var accountDetail = accountsDict.keys[index]
+            var accounts = accountsDict[accountDetail]
+            
+            accountsDict[accountDetail] = nil
+            
+            accountDetail.balance += account.balance
+            accounts!.append(account)
+            
+            accountsDict[accountDetail] = accounts
+        } else {
+            let accountDetail = AccountDetails(name: account.bs_type.name, balance: account.balance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type)
+            accountsDict[accountDetail] = [account]
+        }
+    }
+    
+    accountsList = Array(accountsDict.keys)
+    var sortedAccountsList = [AccountDetails]()
+    if !accountsList.isEmpty {
+        if let assetAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Asset}), let liabilityAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Liability}) {
+            let assetAccounts = accountsDict[assetAccountDetail] ?? []
+            let liabilityAccounts = accountsDict[liabilityAccountDetail] ?? []
+            let accounts = assetAccounts + liabilityAccounts
+            let balance = assetAccountDetail.balance - liabilityAccountDetail.balance
+            let accountDetail = AccountDetails(name: "Net Worth", balance: balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
+            sortedAccountsList.insert(accountDetail, at: 0)
+            accountsDict[accountDetail] = accounts
+        } else if let assetAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Asset}) {
+            let assetAccounts = accountsDict[assetAccountDetail] ?? []
+            let accountDetail = AccountDetails(name: "Net Worth", balance: assetAccountDetail.balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
+            sortedAccountsList.insert(accountDetail, at: 0)
+            accountsDict[accountDetail] = assetAccounts
+        } else if let liabilityAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Liability}) {
+            let liabilityAccounts = accountsDict[liabilityAccountDetail] ?? []
+            let accountDetail = AccountDetails(name: "Net Worth", balance: liabilityAccountDetail.balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
+            sortedAccountsList.insert(accountDetail, at: 0)
+            accountsDict[accountDetail] = liabilityAccounts
+        }
+        for bs_type in BalanceSheetType.allCases {
+            if let accountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == bs_type}) {
+                sortedAccountsList.append(accountDetail)
+                for type in MXAccountType.allCases {
+                    if let accountDetail = accountsList.first(where: {$0.level == .type && $0.bs_type == bs_type && $0.type == type}) {
+                        sortedAccountsList.append(accountDetail)
+                        for subtype in MXAccountSubType.allCases {
+                            if let accountDetail = accountsList.first(where: {$0.level == .subtype && $0.bs_type == bs_type && $0.type == type && $0.subtype == subtype}) {
+                                if subtype != .none {
+                                    sortedAccountsList.append(accountDetail)
+                                }
+                            }
+                            let accounts = accountsList.filter({$0.level == .account && $0.bs_type == bs_type && $0.type == type && $0.subtype == subtype})
+                            for account in accounts {
+                                if account.balance != 0 {
+                                    sortedAccountsList.append(account)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    completion(sortedAccountsList, accountsDict)
 }
 
 

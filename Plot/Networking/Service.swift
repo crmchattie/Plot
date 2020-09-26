@@ -840,7 +840,7 @@ class Service {
         }
         
         let encodedURLRequest = urlRequest.encode(with: parameters)
-        
+                
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
     }
     

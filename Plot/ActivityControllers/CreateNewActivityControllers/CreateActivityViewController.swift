@@ -483,7 +483,6 @@ class CreateActivityViewController: FormViewController {
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
-                    
                     if self.activity.allDay == true {
                         $0.dateFormatter?.dateStyle = .full
                         $0.dateFormatter?.timeStyle = .none
@@ -504,8 +503,7 @@ class CreateActivityViewController: FormViewController {
                     self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.startDateTime = $0.value
-                }
-                .onChange { [weak self] row in
+                }.onChange { [weak self] row in
                     let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
                     if row.value?.compare(endRow.value!) == .orderedDescending {
                         endRow.value = Date(timeInterval: 0, since: row.value!)
@@ -516,10 +514,8 @@ class CreateActivityViewController: FormViewController {
                     if self!.active {
                         self!.scheduleReminder()
                     }
-                    print("startdate update")
                     self!.weatherRow()
-                }
-                .onExpandInlineRow { [weak self] cell, row, inlineRow in
+                }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                     inlineRow.cellUpdate() { cell, row in
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -565,7 +561,6 @@ class CreateActivityViewController: FormViewController {
                         $0.dateFormatter?.timeStyle = .short
                     }
                     $0.updateCell()
-                    
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
@@ -576,8 +571,7 @@ class CreateActivityViewController: FormViewController {
                     self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.endDateTime = $0.value
-                }
-                .onChange { [weak self] row in
+                }.onChange { [weak self] row in
                     let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
                     if row.value?.compare(startRow.value!) == .orderedAscending {
                         startRow.value = Date(timeInterval: 0, since: row.value!)
@@ -585,27 +579,26 @@ class CreateActivityViewController: FormViewController {
                     }
                     self!.activity.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.endDateTime = row.value
-                    print("startdate update")
                     self!.weatherRow()
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                         inlineRow.cellUpdate() { cell, row in
-                            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-                            let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
-                            if allRow.value ?? false {
-                                cell.datePicker.datePickerMode = .date
-                                cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                            }
-                            else {
-                                cell.datePicker.datePickerMode = .dateAndTime
-                                cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                            }
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
+                        if allRow.value ?? false {
+                            cell.datePicker.datePickerMode = .date
+                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         }
-                        let color = cell.detailTextLabel?.textColor
-                        row.onCollapseInlineRow { cell, _, _ in
-                            cell.detailTextLabel?.textColor = color
+                        else {
+                            cell.datePicker.datePickerMode = .dateAndTime
+                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         }
-                        cell.detailTextLabel?.textColor = cell.tintColor
+                    }
+                    let color = cell.detailTextLabel?.textColor
+                    row.onCollapseInlineRow { cell, _, _ in
+                        cell.detailTextLabel?.textColor = color
+                    }
+                    cell.detailTextLabel?.textColor = cell.tintColor
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

@@ -6,8 +6,8 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
+let userFinancialMembersEntity = "user-financial-members"
 let financialMembersEntity = "financial-members"
-let usersFinancialMembersEntity = "user-financial-members"
 
 struct MXMemberResult: Codable {
     let member: MXMember?
