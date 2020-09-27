@@ -58,6 +58,9 @@ class FinancialTransactionFetcher: NSObject {
                                     if let value = userTransaction.tags {
                                         _transaction.tags = value
                                     }
+                                    if let value = userTransaction.should_link {
+                                        _transaction.should_link = value
+                                    }
                                     transactions.append(_transaction)
                                 }
                             }
@@ -142,6 +145,9 @@ class FinancialTransactionFetcher: NSObject {
                                     }
                                     if let value = userTransaction.tags {
                                         _transaction.tags = value
+                                    }
+                                    if let value = userTransaction.should_link {
+                                        _transaction.should_link = value
                                     }
                                     transactions.append(_transaction)
                                 }

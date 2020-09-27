@@ -30,7 +30,9 @@ class FinanceTableViewCell: UITableViewCell {
                 if let date = isodateFormatter.date(from: transaction.transacted_at) {
                     bottomLabel.text = "Transacted On: \(dateFormatterPrint.string(from: date))"
                 }
-                
+                IV.isHidden = !(transaction.should_link ?? true)
+                IV.image = UIImage(systemName: "checkmark")
+                IV.preferredSymbolConfiguration = UIImage.SymbolConfiguration(weight: .bold)
                 setupViews()
             }
         }
@@ -56,6 +58,9 @@ class FinanceTableViewCell: UITableViewCell {
                 if let date = isodateFormatter.date(from: account.updated_at) {
                     bottomLabel.text = "Last Updated On: \(dateFormatterPrint.string(from: date))"
                 }
+                IV.isHidden = !(account.should_link ?? true)
+                IV.image = UIImage(systemName: "checkmark")
+                IV.preferredSymbolConfiguration = UIImage.SymbolConfiguration(weight: .bold)
                 setupViews()
             }
         }
@@ -113,11 +118,10 @@ class FinanceTableViewCell: UITableViewCell {
         let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
         labelStackView.spacing = 2
         
-        let stackView = UIStackView(arrangedSubviews: [labelStackView, UIView(), categoryLabel])
+        let stackView = UIStackView(arrangedSubviews: [labelStackView, UIView(), IV, categoryLabel])
         stackView.spacing = 2
         stackView.alignment = .center
         stackView.distribution = .fill
-        
         
         addSubview(stackView)
         stackView.fillSuperview(padding: .init(top: 0, left: 16, bottom: 20, right: 16))
@@ -129,6 +133,12 @@ class FinanceTableViewCell: UITableViewCell {
         categoryLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         middleLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
         bottomLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        
+        nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        middleLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        bottomLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        IV.isHidden = false
     }
     
 }

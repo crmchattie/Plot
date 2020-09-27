@@ -50,6 +50,7 @@ struct Transaction: Codable, Equatable, Hashable {
     let user_guid: String
     //user defined tags
     var tags: [String]?
+    var should_link: Bool?
     var participantsIDs: [String]?
     var cash_flow_type: String {
         if type == "CREDIT" {
@@ -127,6 +128,7 @@ struct UserTransaction: Codable, Equatable, Hashable {
     var top_level_category: TransactionTopLevelCategory?
     var group: TransactionGroup?
     var tags: [String]?
+    var should_link: Bool?
 }
 
 enum TransactionCatLevel: String, Codable {
@@ -435,6 +437,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                 continue
             }
         }
+        guard transaction.should_link ?? true else { continue }
         switch transaction.type {
         case "DEBIT":
             switch type {

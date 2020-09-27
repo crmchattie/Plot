@@ -451,7 +451,7 @@ extension MasterActivityContainerController {
     }
     
     @objc fileprivate func newList() {
-        let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .actionSheet)
         let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
             let destination = GrocerylistViewController()
             destination.hidesBottomBarWhenPushed = true
@@ -462,16 +462,16 @@ extension MasterActivityContainerController {
             destination.activities = self.activities
             self.navigationController?.pushViewController(destination, animated: true)
         }
-        let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
-            let destination = PackinglistViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.connectedToAct = false
-            destination.comingFromLists = true
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.activities = self.activities
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
+//        let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
+//            let destination = PackinglistViewController()
+//            destination.hidesBottomBarWhenPushed = true
+//            destination.connectedToAct = false
+//            destination.comingFromLists = true
+//            destination.users = self.users
+//            destination.filteredUsers = self.filteredUsers
+//            destination.activities = self.activities
+//            self.navigationController?.pushViewController(destination, animated: true)
+//        }
         let activityList = UIAlertAction(title: "Activity List", style: .default) { (action:UIAlertAction) in
             let destination = ActivitylistViewController()
             destination.hidesBottomBarWhenPushed = true
@@ -499,7 +499,7 @@ extension MasterActivityContainerController {
         
         alertController.addAction(groceryList)
         alertController.addAction(activityList)
-        //                alertController.addAction(packingList)
+//                alertController.addAction(packingList)
         alertController.addAction(checkList)
         alertController.addAction(cancelAlert)
         self.present(alertController, animated: true, completion: nil)
@@ -516,23 +516,46 @@ extension MasterActivityContainerController {
     }
     
     @objc fileprivate func newFinanceItem() {
-        if self.index == 1 {
-            chatsVC.setupSearchController()
-        } else if self.index == 2 {
-            activitiesVC.setupSearchController()
-        } else if self.index == 3 {
-            listsVC.setupSearchController()
+        let alertController = UIAlertController(title: "New Item", message: nil, preferredStyle: .actionSheet)
+        let transaction = UIAlertAction(title: "Transaction", style: .default) { (action:UIAlertAction) in
+            
+        }
+        let account = UIAlertAction(title: "Account", style: .default) { (action:UIAlertAction) in
+            self.financeVC.getMXUser { (user) in
+                if let user = user {
+                    self.openMXConnect(guid: user.guid, current_member_guid: nil)
+                }
+            }
+        }
+        let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
+            print("You've pressed cancel")
+            
+        }
+        
+        alertController.addAction(transaction)
+        alertController.addAction(account)
+        alertController.addAction(cancelAlert)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func openMXConnect(guid: String, current_member_guid: String?) {
+        Service.shared.getMXConnectURL(guid: guid, current_member_guid: current_member_guid ?? nil) { (search, err) in
+            if let url = search?.user?.connect_widget_url {
+                DispatchQueue.main.async {
+                    let destination = WebViewController()
+                    destination.urlString = url
+                    destination.controllerTitle = ""
+                    destination.delegate = self
+                    let navigationViewController = UINavigationController(rootViewController: destination)
+                    navigationViewController.modalPresentationStyle = .fullScreen
+                    self.present(navigationViewController, animated: true, completion: nil)
+                }
+            }
         }
     }
     
     @objc fileprivate func newHealthItem() {
-        if self.index == 1 {
-            chatsVC.setupSearchController()
-        } else if self.index == 2 {
-            activitiesVC.setupSearchController()
-        } else if self.index == 3 {
-            listsVC.setupSearchController()
-        }
+        
     }
     
     @objc fileprivate func goToMap() {
@@ -576,4 +599,10 @@ extension MasterActivityContainerController: HomeBaseFinance {
 
 extension MasterActivityContainerController: HomeBaseHealth {
     
+}
+
+extension MasterActivityContainerController: EndedWebViewDelegate {
+    func updateMXMembers() {
+        financeVC.getMXData()
+    }
 }

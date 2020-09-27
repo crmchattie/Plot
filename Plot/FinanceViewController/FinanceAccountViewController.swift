@@ -123,10 +123,10 @@ class FinanceAccountViewController: FormViewController {
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.accessoryType = .checkmark
                 if self.account.should_link ?? true {
-                    $0.title = "Account Linked to Financial Profile"
+                    $0.title = "Included in Financial Profile"
                     $0.value = true
                 } else {
-                    $0.title = "Account Not Linked to Financial Profile"
+                    $0.title = "Not Included in Financial Profile"
                     $0.value = false
                 }
                 }.cellUpdate { cell, row in
@@ -135,7 +135,7 @@ class FinanceAccountViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }.onChange { row in
-                    row.title = row.value! ? "Account Linked to Financial Profile" : "Account Not Linked to Financial Profile"
+                    row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
                     row.updateCell()
                     self.account.should_link = row.value
                     if let currentUser = Auth.auth().currentUser?.uid {

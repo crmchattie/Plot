@@ -99,6 +99,7 @@ enum SectionType: Hashable, CaseIterable {
     case transactionTopLevelCategories
     case transactionGroups
     case balanceSheet
+    case financialAccounts
     
     var name: String {
         switch self {
@@ -188,7 +189,7 @@ enum SectionType: Hashable, CaseIterable {
         case .incomeStatement: return "Income Statement"
         case .transactions: return "Transactions"
         case .balanceSheet: return "Balance Sheet"
-        
+        case .financialAccounts: return "Accounts"
         }
     }
     
@@ -202,7 +203,7 @@ enum SectionType: Hashable, CaseIterable {
         case .search: return "Search"
         case .activities: return "Activites"
         case .incomeStatement, .transactions, .transactionCategories, .transactionTopLevelCategories, .transactionGroups: return "Transactions"
-        case .balanceSheet: return "Accounts"
+        case .balanceSheet, .financialAccounts: return "Accounts"
         }
     }
     
@@ -224,6 +225,7 @@ enum SectionType: Hashable, CaseIterable {
         case .incomeStatement: return "Income Statement"
         case .transactions: return "Transactions"
         case .balanceSheet: return "Balance Sheet"
+        case .financialAccounts: return "Accounts"
             
         }
     }
@@ -241,13 +243,13 @@ enum SectionType: Hashable, CaseIterable {
         case .generalOutdoors: return "outdoors"
         case .trending: return "trending"
         case .activities: return "activites"
-        case .incomeStatement, .transactions, .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .balanceSheet: return "finance"
+        case .incomeStatement, .transactions, .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .balanceSheet, .financialAccounts: return "finance"
         }
     }
     
     var price: [Int] {
         switch self {
-        case .custom, .events, .music, .sports, .artstheatre, .family, .film, .miscellaneous, .workouts, .hiit, .cardio, .yoga, .strength, .quick, .medium, .recipes, .american, .italian, .mexican, .breakfast, .dessert, .vegetarian, .search, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .vegetarianFood, .comfortFood, .spanishFood, .food, .seafoodFood, .nightlife, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .club, .recreation, .games, .active, .sightseeingThemeParks, .recreationThemeParks, .shopping, .parks, .water, .land, .consumerables, .clothes, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites, .sightseeing, .generalShop, .generalFood, .generalDrinks, .generalCoffee, .generalArts, .generalOutdoors, .trending, .topFood, .topShop, .topRec, .topDrinks, .topSights, .activities, .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .transactions, .incomeStatement, .balanceSheet: return []
+        case .custom, .events, .music, .sports, .artstheatre, .family, .film, .miscellaneous, .workouts, .hiit, .cardio, .yoga, .strength, .quick, .medium, .recipes, .american, .italian, .mexican, .breakfast, .dessert, .vegetarian, .search, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .vegetarianFood, .comfortFood, .spanishFood, .food, .seafoodFood, .nightlife, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .club, .recreation, .games, .active, .sightseeingThemeParks, .recreationThemeParks, .shopping, .parks, .water, .land, .consumerables, .clothes, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites, .sightseeing, .generalShop, .generalFood, .generalDrinks, .generalCoffee, .generalArts, .generalOutdoors, .trending, .topFood, .topShop, .topRec, .topDrinks, .topSights, .activities, .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .transactions, .incomeStatement, .balanceSheet, .financialAccounts: return []
         case .cheapEats: return [1]
         }
     }
@@ -325,7 +327,7 @@ enum SectionType: Hashable, CaseIterable {
         case .workouts, .strength: return "work_out"
         case .search: return "Search"
         case .activities: return "Activites"
-        case .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .transactions, .incomeStatement, .balanceSheet: return "Finance"
+        case .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .transactions, .incomeStatement, .balanceSheet, .financialAccounts: return "Finance"
         }
     }
     
@@ -342,7 +344,7 @@ enum SectionType: Hashable, CaseIterable {
         case .recipes, .american, .italian, .vegetarian, .mexican, .breakfast, .dessert: return "recipe"
         case .trending: return "trending"
         case .activities: return "activity"
-        case .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .incomeStatement, .transactions, .balanceSheet: return "finance"
+        case .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .incomeStatement, .transactions, .balanceSheet, .financialAccounts: return "finance"
             
         }
     }

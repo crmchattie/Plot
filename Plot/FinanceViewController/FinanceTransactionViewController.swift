@@ -103,6 +103,34 @@ class FinanceTransactionViewController: FormViewController {
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
             
+            <<< CheckRow() {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            $0.cell.tintColor = FalconPalette.defaultBlue
+            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.accessoryType = .checkmark
+            if self.transaction.should_link ?? true {
+                $0.title = "Included in Financial Profile"
+                $0.value = true
+            } else {
+                $0.title = "Not Included in Financial Profile"
+                $0.value = false
+            }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.tintColor = FalconPalette.defaultBlue
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
+                row.updateCell()
+                self.transaction.should_link = row.value
+                if let currentUser = Auth.auth().currentUser?.uid {
+                    let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("should_link")
+                    reference.setValue(row.value!)
+                }
+            }
+            
             <<< PickerInputRow<String>("Group") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

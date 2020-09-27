@@ -28,7 +28,7 @@ class FinancialAccountsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        grabMXUser()
+        getMXUser()
         
         title = "Financial Accounts"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -50,13 +50,13 @@ class FinancialAccountsViewController: UITableViewController {
         viewPlaceholder.add(for: tableView, title: .emptyAccounts, subtitle: .emptyAccounts, priority: .medium, position: .top)
     }
     
-    func grabMXUser() {
+    func getMXUser() {
         if let currentUser = Auth.auth().currentUser?.uid {
             let reference = Database.database().reference().child(userFinancialEntity).child(currentUser)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value, let user = try? FirebaseDecoder().decode(MXUser.self, from: value) {
                     self.user = user
-                    self.grabMXMembers(guid: user.guid)
+                    self.getMXMembers(guid: user.guid)
                 } else if !snapshot.exists() {
                     let identifier = UUID().uuidString
                     Service.shared.createMXUser(id: identifier) { (search, err) in
@@ -67,7 +67,7 @@ class FinancialAccountsViewController: UITableViewController {
                                 reference.setValue(firebaseUser)
                             }
                             self.user = user
-                            self.grabMXMembers(guid: user!.guid)
+                            self.getMXMembers(guid: user!.guid)
                         }
                     }
                 }
@@ -75,7 +75,7 @@ class FinancialAccountsViewController: UITableViewController {
         }
     }
     
-    func grabMXMembers(guid: String) {
+    func getMXMembers(guid: String) {
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
         Service.shared.getMXMembers(guid: guid, page: "1", records_per_page: "100") { (search, err) in
@@ -83,7 +83,7 @@ class FinancialAccountsViewController: UITableViewController {
                 self.members = members
                 for member in members {
                     dispatchGroup.enter()
-                    self.grabInsitutionalDetails(institution_code: member.institution_code) {
+                    self.getInsitutionalDetails(institution_code: member.institution_code) {
                         dispatchGroup.leave()
                     }
                     dispatchGroup.enter()
@@ -95,7 +95,7 @@ class FinancialAccountsViewController: UITableViewController {
             } else if let member = search?.member {
                 self.members = [member]
                 dispatchGroup.enter()
-                self.grabInsitutionalDetails(institution_code: member.institution_code) {
+                self.getInsitutionalDetails(institution_code: member.institution_code) {
                     dispatchGroup.leave()
                 }
                 dispatchGroup.enter()
@@ -151,7 +151,7 @@ class FinancialAccountsViewController: UITableViewController {
         }
     }
     
-    func grabInsitutionalDetails(institution_code: String, completion: @escaping () -> ()) {
+    func getInsitutionalDetails(institution_code: String, completion: @escaping () -> ()) {
         Service.shared.getMXInstitution(institution_code: institution_code) { (search, err) in
             if let institution = search?.institution {
                 self.institutionDict[institution_code] = institution.medium_logo_url
@@ -272,7 +272,7 @@ class FinancialAccountsViewController: UITableViewController {
 extension FinancialAccountsViewController: EndedWebViewDelegate {
     func updateMXMembers() {
         if let user = user {
-            grabMXMembers(guid: user.guid)
+            getMXMembers(guid: user.guid)
         }
     }
 }

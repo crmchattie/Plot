@@ -25,7 +25,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     var transactionDict = [TransactionDetails: [Transaction]]()
     var accountDict = [AccountDetails: [MXAccount]]()
     
-    var sections: [SectionType] = [.balanceSheet, .incomeStatement]
+    var sections: [SectionType] = [.balanceSheet, .financialAccounts, .incomeStatement, .transactions]
     var groups = [SectionType: [AnyHashable]]()
     
     let transactionFetcher = FinancialTransactionFetcher()
@@ -37,8 +37,14 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
+    let startDate = Date()
+    let endDate = Date()
+    
     init() {
         let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
+            if sectionNumber % 2 != 0 {
+                return FinanceViewController.transactionsSection()
+            }
             let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
             item.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
             
@@ -58,13 +64,15 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         super.init(collectionViewLayout: layout)
     }
     
-    static func topSection() -> NSCollectionLayoutSection {
+    static func transactionsSection() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
-        item.contentInsets = .init(top: 0, leading: 16, bottom: 16, trailing: 16)
+        item.contentInsets = .init(top: 0, leading: 0, bottom: 20, trailing: 0)
         
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(120)), subitems: [item])
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(85)), subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets.leading = 16
+        section.contentInsets.trailing = 16
         
         let kind = UICollectionView.elementKindSectionHeader
         section.boundarySupplementaryItems = [
@@ -142,7 +150,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
             
             self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
                 self.transactions = firebaseTransactions
-                self.updateCollectionView()
                 self.observeTransactionsForCurrentUser()
                 self.getMXData()
             }
@@ -316,7 +323,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 for account in accountsAdded {
                     if !self!.accounts.contains(account) {
                         self!.accounts.append(account)
-                        self!.groups[.balanceSheet] = nil
                         self!.updateCollectionView()
                     }
                 }
@@ -324,7 +330,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 for account in accountsRemoved {
                     if let index = self!.accounts.firstIndex(where: {$0 == account}) {
                         self!.accounts.remove(at: index)
-                        self!.groups[.balanceSheet] = nil
                         self!.updateCollectionView()
                     }
                 }
@@ -332,7 +337,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 for account in accountsChanged {
                     if let index = self!.accounts.firstIndex(where: {$0 == account}) {
                         self!.accounts[index] = account
-                        self!.groups[.balanceSheet] = nil
                         self!.updateCollectionView()
                     }
                 }
@@ -345,7 +349,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 for transaction in transactionsAdded {
                     if !self!.transactions.contains(transaction) {
                         self!.transactions.append(transaction)
-                        self!.groups[.incomeStatement] = nil
                         self!.updateCollectionView()
                     }
                 }
@@ -353,7 +356,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 for transaction in transactionsRemoved {
                     if let index = self!.transactions.firstIndex(where: {$0 == transaction}) {
                         self!.transactions.remove(at: index)
-                        self!.groups[.incomeStatement] = nil
                         self!.updateCollectionView()
                     }
                 }
@@ -361,7 +363,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 for transaction in transactionsChanged {
                     if let index = self!.transactions.firstIndex(where: {$0 == transaction}) {
                         self!.transactions[index] = transaction
-                        self!.groups[.incomeStatement] = nil
                         self!.updateCollectionView()
                     }
                 }
@@ -399,7 +400,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     }
     
     private func updateCollectionView() {
-        print("updateCollectionView")
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -423,28 +423,36 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         })
                                 
         for section in sections {
-            if let object = groups[section] {
-                snapshot.appendSections([section])
-                snapshot.appendItems(object, toSection: section)
-                self.diffableDataSource.apply(snapshot)
-                continue
-            } else if section.type == "Accounts" {
+            if section.type == "Accounts" {
                 if section.subType == "Balance Sheet" {
                     dispatchGroup.enter()
-                    categorizeAccounts(accounts: self.accounts) { (accountsList, accountsDict) in
+                    categorizeAccounts(accounts: accounts) { (accountsList, accountsDict) in
                         self.groups[section] = accountsList
                         self.accountDict = accountsDict
                         dispatchGroup.leave()
                     }
+                } else if section.subType == "Accounts" {
+                    accounts.sort { (account1, account2) -> Bool in
+                        return account1.name < account2.name
+                    }
+                    self.groups[section] = accounts
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
                     dispatchGroup.enter()
-                    categorizeTransactions(transactions: self.transactions, start: Date().startOfMonth, end: Date().endOfMonth, type: .none) { (transactionsList, transactionsDict) in
+                    categorizeTransactions(transactions: transactions, start: Date().startOfMonth, end: Date().endOfMonth, type: .none) { (transactionsList, transactionsDict) in
                         self.groups[section] = transactionsList
                         self.transactionDict = transactionsDict
                         dispatchGroup.leave()
                     }
+                } else if section.subType == "Transactions" {
+                    transactions = transactions.sorted(by: { (transaction1, transaction2) -> Bool in
+                        if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
+                            return date1 > date2
+                        }
+                        return transaction1.description < transaction2.description
+                    })
+                    self.groups[section] = transactions
                 }
             }
             
@@ -466,6 +474,14 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         } else if let object = object as? AccountDetails {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
             cell.accountDetails = object
+            return cell
+        } else if let object = object as? Transaction {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+            cell.transaction = object
+            return cell
+        } else if let object = object as? MXAccount {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+            cell.account = object
             return cell
         }
         return nil
@@ -491,7 +507,25 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             }
-        }
+        } else if let object = object as? Transaction {
+            if section?.subType == "Transactions" {
+                let destination = FinanceTransactionViewController()
+                destination.transaction = object
+                destination.hidesBottomBarWhenPushed = true
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
+//                navigationController?.pushViewController(destination, animated: true)
+            }
+        } else if let object = object as? MXAccount {
+                if section?.subType == "Accounts" {
+                    let destination = FinanceAccountViewController()
+                    destination.account = object
+                    destination.hidesBottomBarWhenPushed = true
+                    let navigationViewController = UINavigationController(rootViewController: destination)
+                    self.present(navigationViewController, animated: true, completion: nil)
+//                    navigationController?.pushViewController(destination, animated: true)
+                }
+            }
     }
     
 }
@@ -504,7 +538,6 @@ extension FinanceViewController: CompositionalHeaderDelegate {
 
 extension FinanceViewController: UpdateFinancialsDelegate {
     func updateTransactions(transactions: [Transaction]) {
-//        groups[.incomeStatement] = nil
 //        for transaction in transactions {
 //            print("transactionDes delegate \(transaction.description)")
 //            if let index = self.transactions.firstIndex(of: transaction) {
@@ -515,7 +548,6 @@ extension FinanceViewController: UpdateFinancialsDelegate {
 //        updateCollectionView()
     }
     func updateAccounts(accounts: [MXAccount]) {
-//        groups[.balanceSheet] = nil
 //        for account in accounts {
 //            if let index = self.accounts.firstIndex(of: account) {
 //                self.accounts[index] = account
