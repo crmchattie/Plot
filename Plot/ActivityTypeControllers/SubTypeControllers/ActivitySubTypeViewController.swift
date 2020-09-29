@@ -74,7 +74,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
             
             let kind = UICollectionView.elementKindSectionHeader
             section.boundarySupplementaryItems = [
-                .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
+                .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(30)), elementKind: kind, alignment: .topLeading)
             ]
             return section
         }

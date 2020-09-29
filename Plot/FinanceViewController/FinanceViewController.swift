@@ -31,7 +31,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     let transactionFetcher = FinancialTransactionFetcher()
     let accountFetcher = FinancialAccountFetcher()
     
-    private let kCompositionalHeader = "CompositionalHeader"
+    private let kHeaderCell = "HeaderCell"
     private let kFinanceCollectionViewCell = "FinanceCollectionViewCell"
     
     let isodateFormatter = ISO8601DateFormatter()
@@ -40,46 +40,55 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     let startDate = Date()
     let endDate = Date()
     
-    init() {
-        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
-            if sectionNumber % 2 != 0 {
-                return FinanceViewController.transactionsSection()
-            }
-            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
-            item.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
-            
-            let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(30)), subitems: [item])
-            
-            let section = NSCollectionLayoutSection(group: group)
-            section.contentInsets.leading = 16
-            section.contentInsets.trailing = 16
-            
-            let kind = UICollectionView.elementKindSectionHeader
-            section.boundarySupplementaryItems = [
-                .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
-            ]
-            return section
-        }
-        
-        super.init(collectionViewLayout: layout)
-    }
+    //    init() {
+    //        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
+    //            if sectionNumber % 2 != 0 {
+    //                return FinanceViewController.transactionsSection()
+    //            }
+    //            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
+    //            item.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+    //
+    //            let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(30)), subitems: [item])
+    //            group.contentInsets = .init(top: 10, leading: 0, bottom: 0, trailing: 0)
+    //
+    //            let section = NSCollectionLayoutSection(group: group)
+    //            section.contentInsets.leading = 16
+    //            section.contentInsets.trailing = 16
+    //
+    //            let kind = UICollectionView.elementKindSectionHeader
+    //            section.boundarySupplementaryItems = [
+    //                .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
+    //            ]
+    //            return section
+    //        }
+    //
+    //        super.init(collectionViewLayout: layout)
+    //    }
+    //
+    //    static func transactionsSection() -> NSCollectionLayoutSection {
+    //        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
+    //        item.contentInsets = .init(top: 0, leading: 0, bottom: 20, trailing: 0)
+    //
+    //        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(85)), subitems: [item])
+    //
+    //        let section = NSCollectionLayoutSection(group: group)
+    //        section.contentInsets.leading = 16
+    //        section.contentInsets.trailing = 16
+    //
+    //        let kind = UICollectionView.elementKindSectionHeader
+    //        section.boundarySupplementaryItems = [
+    //            .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
+    //        ]
+    //
+    //        return section
+    //    }
+    //
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
     
-    static func transactionsSection() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
-        item.contentInsets = .init(top: 0, leading: 0, bottom: 20, trailing: 0)
-        
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(85)), subitems: [item])
-        
-        let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets.leading = 16
-        section.contentInsets.trailing = 16
-        
-        let kind = UICollectionView.elementKindSectionHeader
-        section.boundarySupplementaryItems = [
-            .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
-        ]
-        
-        return section
+    init() {
+        super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
     
     required init?(coder: NSCoder) {
@@ -107,7 +116,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
-        collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
+        collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kHeaderCell)
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
         
         addObservers()
@@ -150,6 +159,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
             
             self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
                 self.transactions = firebaseTransactions
+                self.updateCollectionView()
                 self.observeTransactionsForCurrentUser()
                 self.getMXData()
             }
@@ -164,8 +174,8 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
             if let user = user {
                 self.getMXMembers(guid: user.guid) { (members) in
                     for member in members {
-                        dispatchGroup.enter()
                         if member.connection_status == "CONNECTED" && member.is_being_aggregated == false {
+                            dispatchGroup.enter()
                             self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
                                 updatedAccounts.append(contentsOf: accounts)
                                 dispatchGroup.leave()
@@ -204,8 +214,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                                     }
                                 }
                             }
-                        } else {
-                            dispatchGroup.leave()
                         }
                     }
                     dispatchGroup.notify(queue: .main) {
@@ -312,7 +320,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 } else if let transaction = search?.transaction {
                     completion([transaction])
                 }  else {
-                   completion([])
+                    completion([])
                 }
             }
         }
@@ -320,12 +328,12 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     
     func observeAccountsForCurrentUser() {
         self.accountFetcher.observeAccountForCurrentUser(accountsAdded: { [weak self] accountsAdded in
-                for account in accountsAdded {
-                    if !self!.accounts.contains(account) {
-                        self!.accounts.append(account)
-                        self!.updateCollectionView()
-                    }
+            for account in accountsAdded {
+                if !self!.accounts.contains(account) {
+                    self!.accounts.append(account)
+                    self!.updateCollectionView()
                 }
+            }
             }, accountsRemoved: { [weak self] accountsRemoved in
                 for account in accountsRemoved {
                     if let index = self!.accounts.firstIndex(where: {$0 == account}) {
@@ -346,12 +354,12 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     
     func observeTransactionsForCurrentUser() {
         self.transactionFetcher.observeTransactionForCurrentUser(transactionsAdded: { [weak self] transactionsAdded in
-                for transaction in transactionsAdded {
-                    if !self!.transactions.contains(transaction) {
-                        self!.transactions.append(transaction)
-                        self!.updateCollectionView()
-                    }
+            for transaction in transactionsAdded {
+                if !self!.transactions.contains(transaction) {
+                    self!.transactions.append(transaction)
+                    self!.updateCollectionView()
                 }
+            }
             }, transactionsRemoved: { [weak self] transactionsRemoved in
                 for transaction in transactionsRemoved {
                     if let index = self!.transactions.firstIndex(where: {$0 == transaction}) {
@@ -406,22 +414,22 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         
         let dispatchGroup = DispatchGroup()
         
-        var snapshot = self.diffableDataSource.snapshot()
-        snapshot.deleteAllItems()
-        self.diffableDataSource.apply(snapshot)
+        //        var snapshot = self.diffableDataSource.snapshot()
+        //        snapshot.deleteAllItems()
+        //        self.diffableDataSource.apply(snapshot)
+        //
+        //        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
+        //            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
+        //            header.delegate = self
+        //            let snapshot = self.diffableDataSource.snapshot()
+        //            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
+        //                header.titleLabel.text = section.name
+        //                header.subTitleLabel.isHidden = true
+        //            }
+        //
+        //            return header
+        //        })
         
-        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
-            header.delegate = self
-            let snapshot = self.diffableDataSource.snapshot()
-            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
-                header.titleLabel.text = section.name
-                header.subTitleLabel.isHidden = true
-            }
-
-            return header
-        })
-                                
         for section in sections {
             if section.type == "Accounts" {
                 if section.subType == "Balance Sheet" {
@@ -457,80 +465,158 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
             }
             
             dispatchGroup.notify(queue: .main) {
-                if let object = self.groups[section] {
-                    snapshot.appendSections([section])
-                    snapshot.appendItems(object, toSection: section)
-                    self.diffableDataSource.apply(snapshot)
-                }
+                self.collectionView.reloadData()
+//                if let object = self.groups[section] {
+//                    snapshot.appendSections([section])
+//                    snapshot.appendItems(object, toSection: section)
+//                    self.diffableDataSource.apply(snapshot)
+//                }
             }
         }
     }
     
-    lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
-        if let object = object as? TransactionDetails {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.transactionDetails = object
-            return cell
-        } else if let object = object as? AccountDetails {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.accountDetails = object
-            return cell
-        } else if let object = object as? Transaction {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.transaction = object
-            return cell
-        } else if let object = object as? MXAccount {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.account = object
-            return cell
-        }
-        return nil
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        sections.count
     }
     
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        let sec = sections[section]
+        return groups[sec]?.count ?? 0
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let section = sections[indexPath.section]
+        let object = groups[section]
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+        if let object = object as? [TransactionDetails] {
+            cell.transactionDetails = object[indexPath.item]
+        } else if let object = object as? [AccountDetails] {
+            cell.accountDetails = object[indexPath.item]
+        } else if let object = object as? [Transaction] {
+            cell.transaction = object[indexPath.item]
+        } else if let object = object as? [MXAccount] {
+            cell.account = object[indexPath.item]
+        }
+        return cell
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var height: CGFloat = 328
+        let section = sections[indexPath.section]
+        let object = groups[section]
+        let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: view.frame.width - 32, height: 1000))
+        if let object = object as? [TransactionDetails] {
+            dummyCell.transactionDetails = object[indexPath.item]
+        } else if let object = object as? [AccountDetails] {
+            dummyCell.accountDetails = object[indexPath.item]
+        } else if let object = object as? [Transaction] {
+            dummyCell.transaction = object[indexPath.item]
+        } else if let object = object as? [MXAccount] {
+            dummyCell.account = object[indexPath.item]
+        }
+        dummyCell.layoutIfNeeded()
+        let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width - 32, height: 1000))
+        height = estimatedSize.height
+        return CGSize(width: view.frame.width - 32, height: height)
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: view.frame.width, height: 30)
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let section = sections[indexPath.section]
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
+        header.delegate = self
+        header.titleLabel.text = section.name
+        header.subTitleLabel.isHidden = true
+        return header
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 16, bottom: 20, right: 16)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+    
+    //    lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
+    //        if let object = object as? TransactionDetails {
+    //            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+    //            if object.level != .group {
+    //                cell.transactionDetails = object
+    //            }
+    //            return cell
+    //        } else if let object = object as? AccountDetails {
+    //            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+    //            if object.level != .bs_type {
+    //                cell.accountDetails = object
+    //            }
+    //            return cell
+    //        } else if let object = object as? Transaction {
+    //            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+    //            cell.transaction = object
+    //            return cell
+    //        } else if let object = object as? MXAccount {
+    //            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+    //            cell.account = object
+    //            return cell
+    //        }
+    //        return nil
+    //    }
+    //
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let object = diffableDataSource.itemIdentifier(for: indexPath)
-        let snapshot = self.diffableDataSource.snapshot()
-        let section = snapshot.sectionIdentifier(containingItem: object!)
-        if let object = object as? TransactionDetails {
-            if section?.subType == "Income Statement", let transactions = transactionDict[object] {
+        let section = sections[indexPath.section]
+        let object = groups[section]
+        if let object = object as? [TransactionDetails] {
+            if section.subType == "Income Statement", let transactions = transactionDict[object[indexPath.item]] {
                 let destination = FinanceTableViewController()
                 destination.delegate = self
                 destination.transactions = transactions
                 destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             }
-        } else if let object = object as? AccountDetails {
-            if section?.subType == "Balance Sheet", let accounts = accountDict[object] {
+        } else if let object = object as? [AccountDetails] {
+            if section.subType == "Balance Sheet", let accounts = accountDict[object[indexPath.item]] {
                 let destination = FinanceTableViewController()
                 destination.delegate = self
                 destination.accounts = accounts
                 destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             }
-        } else if let object = object as? Transaction {
-            if section?.subType == "Transactions" {
+        } else if let object = object as? [Transaction] {
+            if section.subType == "Transactions" {
                 let destination = FinanceTransactionViewController()
-                destination.transaction = object
+                destination.transaction = object[indexPath.item]
                 destination.hidesBottomBarWhenPushed = true
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
-//                navigationController?.pushViewController(destination, animated: true)
+                //                navigationController?.pushViewController(destination, animated: true)
             }
-        } else if let object = object as? MXAccount {
-                if section?.subType == "Accounts" {
-                    let destination = FinanceAccountViewController()
-                    destination.account = object
-                    destination.hidesBottomBarWhenPushed = true
-                    let navigationViewController = UINavigationController(rootViewController: destination)
-                    self.present(navigationViewController, animated: true, completion: nil)
-//                    navigationController?.pushViewController(destination, animated: true)
-                }
+        } else if let object = object as? [MXAccount] {
+            if section.subType == "Accounts" {
+                let destination = FinanceAccountViewController()
+                destination.account = object[indexPath.item]
+                destination.hidesBottomBarWhenPushed = true
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
+                //                    navigationController?.pushViewController(destination, animated: true)
             }
+        }
+        collectionView.deselectItem(at: indexPath, animated: true)
     }
     
 }
 
-extension FinanceViewController: CompositionalHeaderDelegate {
+extension FinanceViewController: HeaderCellDelegate {
     func viewTapped(labelText: String) {
         
     }
@@ -538,21 +624,21 @@ extension FinanceViewController: CompositionalHeaderDelegate {
 
 extension FinanceViewController: UpdateFinancialsDelegate {
     func updateTransactions(transactions: [Transaction]) {
-//        for transaction in transactions {
-//            print("transactionDes delegate \(transaction.description)")
-//            if let index = self.transactions.firstIndex(of: transaction) {
-//                print("transactionDes delegate \(transaction.description)")
-//                self.transactions[index] = transaction
-//            }
-//        }
-//        updateCollectionView()
+        //        for transaction in transactions {
+        //            print("transactionDes delegate \(transaction.description)")
+        //            if let index = self.transactions.firstIndex(of: transaction) {
+        //                print("transactionDes delegate \(transaction.description)")
+        //                self.transactions[index] = transaction
+        //            }
+        //        }
+        //        updateCollectionView()
     }
     func updateAccounts(accounts: [MXAccount]) {
-//        for account in accounts {
-//            if let index = self.accounts.firstIndex(of: account) {
-//                self.accounts[index] = account
-//            }
-//        }
-//        updateCollectionView()
+        //        for account in accounts {
+        //            if let index = self.accounts.firstIndex(of: account) {
+        //                self.accounts[index] = account
+        //            }
+        //        }
+        //        updateCollectionView()
     }
 }

@@ -127,8 +127,8 @@ enum BalanceSheetType: String, CaseIterable, Codable {
     var name: String {
         switch self {
         case .NetWorth: return "Net Worth"
-        case .Asset: return "Asset"
-        case .Liability: return "Liability"
+        case .Asset: return "Assets"
+        case .Liability: return "Liabilities"
         case .None: return "None"
         }
     }

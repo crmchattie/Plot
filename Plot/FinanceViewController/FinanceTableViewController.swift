@@ -136,7 +136,6 @@ class FinanceTableViewController: UITableViewController {
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
 //            navigationController?.pushViewController(destination, animated: true)
-            tableView.deselectRow(at: indexPath, animated: true)
         } else if let filteredAccounts = filteredAccounts {
             let account = filteredAccounts[indexPath.row]
             let destination = FinanceAccountViewController()
@@ -145,8 +144,9 @@ class FinanceTableViewController: UITableViewController {
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
 //            navigationController?.pushViewController(destination, animated: true)
-            tableView.deselectRow(at: indexPath, animated: true)
+            
         }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
 

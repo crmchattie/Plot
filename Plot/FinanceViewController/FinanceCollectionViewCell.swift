@@ -13,6 +13,10 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     var transactionDetails: TransactionDetails! {
         didSet {
             if let transactionDetails = transactionDetails {
+                accountDetails = nil
+                transaction = nil
+                account = nil
+                
                 let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = "USD"
                 numberFormatter.numberStyle = .currency
@@ -25,8 +29,11 @@ class FinanceCollectionViewCell: UICollectionViewCell {
 
                 switch transactionDetails.level {
                 case .category:
+                    heightConstraint = 5
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+                    nameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+                    categoryLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
                     if transactionDetails.group == .income, let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = "\(amount)"
@@ -34,17 +41,27 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                         categoryLabel.text = "\(amount)"
                     }
                 case .top:
-                    nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
-                    categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
+                    nameLabel.font = UIFont.preferredFont(forTextStyle: .callout)
+                    categoryLabel.font = UIFont.preferredFont(forTextStyle: .callout)
                     
                     if transactionDetails.group == .income, let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = "\(amount)"
+                        heightConstraint = 20
+
                     } else if let amount = numberFormatter.string(from: transactionDetails.amount * -1 as NSNumber) {
                         categoryLabel.text = "\(amount)"
+                        heightConstraint = 5
+
                     }
                 case .group:
-                    nameLabel.font = UIFont.preferredFont(forTextStyle: .title3)
-                    categoryLabel.font = UIFont.preferredFont(forTextStyle: .title3)
+                    heightConstraint = 20
+                    if (transactionDetails.group == .income || transactionDetails.group == .expense || transactionDetails.group == .difference) {
+                        nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
+                        categoryLabel.font = UIFont.preferredFont(forTextStyle: .headline)
+                    } else {
+                        nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
+                        categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
+                    }
                     
                     if (transactionDetails.group == .income || transactionDetails.group == .difference), let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = "\(amount)"
@@ -60,6 +77,10 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     var accountDetails: AccountDetails! {
         didSet {
             if let accountDetails = accountDetails {
+                transactionDetails = nil
+                transaction = nil
+                account = nil
+                
                 let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = "USD"
                 numberFormatter.numberStyle = .currency
@@ -72,20 +93,25 @@ class FinanceCollectionViewCell: UICollectionViewCell {
 
                 switch accountDetails.level {
                 case .account:
+                    heightConstraint = 5
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+                    nameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+                    categoryLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
                     if let amount = numberFormatter.string(from: accountDetails.balance as NSNumber) {
                         categoryLabel.text = "\(amount)"
                     }
                 case .subtype:
-                    nameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-                    categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+                    heightConstraint = 5
+                    nameLabel.font = UIFont.preferredFont(forTextStyle: .callout)
+                    categoryLabel.font = UIFont.preferredFont(forTextStyle: .callout)
                     
                     if let amount = numberFormatter.string(from: accountDetails.balance as NSNumber) {
                         categoryLabel.text = "\(amount)"
                     }
                 case .type:
+                    heightConstraint = 20
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
                     
@@ -93,8 +119,9 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                         categoryLabel.text = "\(amount)"
                     }
                 case .bs_type:
-                    nameLabel.font = UIFont.preferredFont(forTextStyle: .title3)
-                    categoryLabel.font = UIFont.preferredFont(forTextStyle: .title3)
+                    heightConstraint = 20
+                    nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
+                    categoryLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                     
                     if let amount = numberFormatter.string(from: accountDetails.balance as NSNumber) {
                         categoryLabel.text = "\(amount)"
@@ -108,6 +135,10 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     var transaction: Transaction! {
         didSet {
             if let transaction = transaction {
+                transactionDetails = nil
+                accountDetails = nil
+                account = nil
+                
                 let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = "USD"
                 numberFormatter.numberStyle = .currency
@@ -117,6 +148,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 dateFormatterPrint.dateFormat = "EEEE, MMM d, yyyy"
                 
                 categoryLabel.isHidden = true
+                heightConstraint = 20
                 
                 nameLabel.text = transaction.description
                 if let amount = numberFormatter.string(from: transaction.amount as NSNumber) {
@@ -136,6 +168,10 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     var account: MXAccount! {
         didSet {
             if let account = account {
+                transactionDetails = nil
+                accountDetails = nil
+                transaction = nil
+                
                 let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = "USD"
                 numberFormatter.numberStyle = .currency
@@ -145,6 +181,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 dateFormatterPrint.dateFormat = "MMM dd, yyyy"
                 
                 categoryLabel.isHidden = true
+                heightConstraint = 20
                 
                 nameLabel.text = account.name
                 if let balance = numberFormatter.string(from: account.balance as NSNumber) {
@@ -204,22 +241,25 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     }()
     
     let imageView = UIImageView(cornerRadius: 8)
-        
-    func setupViews() {
-        let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
-        labelStackView.spacing = 2
+    
+    var heightConstraint = CGFloat()
 
-        let stackView = UIStackView(arrangedSubviews: [labelStackView, UIView(), imageView, categoryLabel])
+    func setupViews() {
+        let verticalStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
+
+        let stackView = UIStackView(arrangedSubviews: [verticalStackView, UIView(), imageView, categoryLabel])
         stackView.spacing = 2
         stackView.alignment = .center
         stackView.distribution = .fill
 
         addSubview(stackView)
-        stackView.fillSuperview()
+        stackView.fillSuperview(padding: .init(top: heightConstraint, left: 0, bottom: 0, right: 0))
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        heightConstraint = CGFloat()
+                
         nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         categoryLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         middleLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -234,6 +274,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         middleLabel.isHidden = false
         bottomLabel.isHidden = false
         imageView.isHidden = false
+        
     }
     
 }
