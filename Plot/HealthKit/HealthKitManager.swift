@@ -13,20 +13,29 @@ class HealthKitManager {
     private let lock = NSLock()
     private var queue: OperationQueue
     private var metrics: [HealthMetric]
+    private var activities: [Activity]
+    private var isRunning: Bool
     
     init() {
+        self.isRunning = false
         self.metrics = []
+        self.activities = []
         self.queue = OperationQueue()
         //self.queue.maxConcurrentOperationCount = 1
     }
     
     func loadHealthKitActivities(_ completion: @escaping ([HealthMetric]) -> Void) {
+        guard !isRunning else { return }
+        
         // Start clean
         metrics = []
+        activities = []
         
+        isRunning = true
         HealthKitService.authorizeHealthKit { [weak self] authorized in
             guard authorized, let queue = self?.queue else {
                 completion([])
+                self?.isRunning = false
                 return
             }
             
@@ -87,14 +96,18 @@ class HealthKitManager {
             let cyclingOp = WorkoutOperation(date: today, workoutActivityType: .cycling)
             cyclingOp.delegate = self
             
+            let hiitOp = WorkoutOperation(date: today, workoutActivityType: .highIntensityIntervalTraining)
+            hiitOp.delegate = self
+            
             // Setup queue
-            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp], waitUntilFinished: false)
+            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             queue.addBarrierBlock { [weak self] in
                 DispatchQueue.main.async {
                     self?.metrics.sort(by: {$0.rank < $1.rank})
                     completion(self?.metrics ?? [])
+                    self?.isRunning = false
                 }
             }
         }
@@ -106,4 +119,15 @@ extension HealthKitManager: MetricOperationDelegate {
         lock.lock(); defer { lock.unlock() }
         metrics.append(metric)
     }
+    
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ activities: [Activity]) {
+        lock.lock(); defer { lock.unlock() }
+        metrics.append(metric)
+        self.activities.append(contentsOf: activities)
+    }
+}
+
+protocol MetricOperationDelegate: class {
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric)
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ activities: [Activity])
 }

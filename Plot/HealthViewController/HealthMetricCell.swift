@@ -81,7 +81,7 @@ class HealthMetricCell: UITableViewCell {
         detailLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
         
         activityTypeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
-        activityTypeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
+        activityTypeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
     }
@@ -104,6 +104,9 @@ class HealthMetricCell: UITableViewCell {
         if healthMetric.type == HealthMetricType.workout, let hkWorkout = healthMetric.hkWorkout {
             title = hkWorkout.workoutActivityType.name
             timeAgo = timeAgoSinceDate(hkWorkout.endDate)
+        }
+        else if healthMetric.type == HealthMetricType.heartRate {
+            timeAgo = timeAgoSinceDate(healthMetric.date)
         }
         
         titleLabel.text = title

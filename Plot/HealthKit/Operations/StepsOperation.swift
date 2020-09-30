@@ -38,7 +38,3 @@ class StepsOperation: AsyncOperation {
         }
     }
 }
-
-protocol MetricOperationDelegate: class {
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric)
-}
