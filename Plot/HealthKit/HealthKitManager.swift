@@ -24,7 +24,7 @@ class HealthKitManager {
         //self.queue.maxConcurrentOperationCount = 1
     }
     
-    func loadHealthKitActivities(_ completion: @escaping ([HealthMetric]) -> Void) {
+    func loadHealthKitActivities(_ completion: @escaping ([HealthMetric], [Activity]) -> Void) {
         guard !isRunning else { return }
         
         // Start clean
@@ -34,7 +34,7 @@ class HealthKitManager {
         isRunning = true
         HealthKitService.authorizeHealthKit { [weak self] authorized in
             guard authorized, let queue = self?.queue else {
-                completion([])
+                completion([], [])
                 self?.isRunning = false
                 return
             }
@@ -106,7 +106,7 @@ class HealthKitManager {
             queue.addBarrierBlock { [weak self] in
                 DispatchQueue.main.async {
                     self?.metrics.sort(by: {$0.rank < $1.rank})
-                    completion(self?.metrics ?? [])
+                    completion(self?.metrics ?? [], self?.activities ?? [])
                     self?.isRunning = false
                 }
             }

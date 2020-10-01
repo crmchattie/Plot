@@ -14,9 +14,16 @@ protocol HomeBaseHealth: class {
 //    func sendLists(lists: [ListContainer])
 }
 
+protocol HealthViewControllerActivitiesDelegate: class {
+    func update(_ healthViewController: HealthViewController, _ healthActivities: [Activity])
+}
+
 class HealthViewController: UIViewController {
     weak var delegate: HomeBaseHealth?
+    weak var healthActivitiesDelegate: HealthViewControllerActivitiesDelegate?
     
+    var hasViewAppeared = false
+    let healhKitManager = HealthKitManager()
     var healthMetrics: [HealthMetric] = [] {
         didSet {
             if oldValue != healthMetrics {
@@ -34,10 +41,24 @@ class HealthViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.addSubview(tableView)
+        
         configureView()
         addObservers()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if !hasViewAppeared {
+            hasViewAppeared = true
+            self.healhKitManager.loadHealthKitActivities { [weak self] metrics, activities in
+                self?.healthMetrics = metrics
+                if let _self = self {
+                    _self.healthActivitiesDelegate?.update(_self, activities)
+                }
+            }
+        }
     }
     
     deinit {

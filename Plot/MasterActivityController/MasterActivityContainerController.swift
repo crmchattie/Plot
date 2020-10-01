@@ -99,12 +99,6 @@ class MasterActivityContainerController: UIViewController {
         }
     }
     
-    var healthMetrics: [HealthMetric] = [] {
-        didSet {
-            healthVC.healthMetrics = healthMetrics
-        }
-    }
-    
     var selectedDate = Date()
     
     let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
@@ -114,6 +108,8 @@ class MasterActivityContainerController: UIViewController {
     let containerView = UIView()
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
+    
+    var healthVCInitialized = false
     
     weak var delegate: ManageAppearanceHome?
     
@@ -143,6 +139,7 @@ class MasterActivityContainerController: UIViewController {
     
     lazy var healthVC: HealthViewController = {
         let vc = HealthViewController()
+        healthVCInitialized = true
         self.addAsChildVC(childVC: vc)
         return vc
     }()
@@ -156,7 +153,6 @@ class MasterActivityContainerController: UIViewController {
         chatsVC.delegate = self
         listsVC.delegate = self
         financeVC.delegate = self
-        healthVC.delegate = self
         changeToIndex(index: index)
         addObservers()
     }
@@ -389,10 +385,19 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
             }
         }
         chatsVC.view.isHidden = !(index == 0)
-        healthVC.view.isHidden = !(index == 1)
         activitiesVC.view.isHidden = !(index == 2)
         financeVC.view.isHidden = !(index == 3)
         listsVC.view.isHidden = !(index == 4)
+        
+        let isHealthVCIsHidden = !(index == 1)
+        if isHealthVCIsHidden && !healthVCInitialized {
+            // Don't do anything if healthVC is hidden and not initialized. We don't to access healthVC so that its viewDidAppear execute
+        } else {
+            healthVC.delegate = self
+            healthVC.healthActivitiesDelegate = activitiesVC
+            healthVC.view.isHidden = !(index == 1)
+        }
+        
         self.index = index
         setNavBar()
     }

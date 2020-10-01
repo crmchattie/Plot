@@ -64,6 +64,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     var filteredActivities = [Activity]()
     var pinnedActivities = [Activity]()
     var filteredPinnedActivities = [Activity]()
+    var healthActivities = [Activity]()
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
@@ -889,6 +890,7 @@ extension ActivityViewController: ActivityUpdatesDelegate {
         
         self.pinnedActivities = pinned
         self.activities = unpinned
+        self.activities.append(contentsOf: self.healthActivities)
         
         fetchInvitations()
     }
@@ -1221,6 +1223,16 @@ extension ActivityViewController: ChooseChatDelegate {
             }
             self.connectedToChatAlert()
             self.dismiss(animated: true, completion: nil)
+        }
+    }
+}
+
+extension ActivityViewController: HealthViewControllerActivitiesDelegate {
+    func update(_ healthViewController: HealthViewController, _ healthActivities: [Activity]) {
+        self.healthActivities = healthActivities
+        self.activities.append(contentsOf: healthActivities)
+        DispatchQueue.main.async {
+            self.handleReloadTable()
         }
     }
 }
