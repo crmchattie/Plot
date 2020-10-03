@@ -61,6 +61,9 @@ class FinancialTransactionFetcher: NSObject {
                                     if let value = userTransaction.should_link {
                                         _transaction.should_link = value
                                     }
+                                    if let value = userTransaction.date_for_reports, value != "" {
+                                        _transaction.date_for_reports = value
+                                    }
                                     transactions.append(_transaction)
                                 }
                             }
@@ -148,6 +151,9 @@ class FinancialTransactionFetcher: NSObject {
                                     }
                                     if let value = userTransaction.should_link {
                                         _transaction.should_link = value
+                                    }
+                                    if let value = userTransaction.date_for_reports, value != "" {
+                                        _transaction.date_for_reports = value
                                     }
                                     transactions.append(_transaction)
                                 }

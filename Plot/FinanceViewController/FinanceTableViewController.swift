@@ -27,6 +27,9 @@ class FinanceTableViewController: UITableViewController {
     
     var searchBar: UISearchBar?
     var searchController: UISearchController?
+    
+    let isodateFormatter = ISO8601DateFormatter()
+    let dateFormatterPrint = DateFormatter()
         
     deinit {
         print("STORAGE DID DEINIT")
@@ -75,6 +78,9 @@ class FinanceTableViewController: UITableViewController {
     func handleReloadTable() {
         if transactions != nil {
             transactions.sort { (transaction1, transaction2) -> Bool in
+                if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
+                    return date1 > date2
+                }
                 return transaction1.description < transaction2.description
             }
             filteredTransactions = transactions

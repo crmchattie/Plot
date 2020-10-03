@@ -37,8 +37,8 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
-    let startDate = Date()
-    let endDate = Date()
+    let startDate = Date().startOfMonth
+    let endDate = Date().endOfMonth
     
     //    init() {
     //        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
@@ -153,76 +153,188 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     }
     
     func getFinancialData() {
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
         accountFetcher.fetchAccounts { (firebaseAccounts) in
             self.accounts = firebaseAccounts
             self.observeAccountsForCurrentUser()
-            
-            self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
-                self.transactions = firebaseTransactions
-                self.updateCollectionView()
-                self.observeTransactionsForCurrentUser()
-                self.getMXData()
-            }
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.enter()
+        self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
+            self.transactions = firebaseTransactions
+            self.observeTransactionsForCurrentUser()
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.getMXData()
+            self.updateCollectionView()
         }
     }
     
+//    func getMXData() {
+//        let dispatchGroup = DispatchGroup()
+//        var newTransactions = [Transaction]()
+//        var updatedAccounts = [MXAccount]()
+//        self.getMXUser { user in
+//            if let user = user {
+//                self.getMXMembers(guid: user.guid) { (members) in
+//                    for member in members {
+//                        if member.connection_status == "CONNECTED" && member.is_being_aggregated == false {
+//                            dispatchGroup.enter()
+//                            self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
+//                                updatedAccounts.append(contentsOf: accounts)
+//                                dispatchGroup.leave()
+//                                for account in accounts {
+//                                    if account.should_link ?? true {
+//                                        dispatchGroup.enter()
+//                                        if let finalAccount = self.accounts.first(where: { $0.guid == account.guid}), let date = self.isodateFormatter.date(from: finalAccount.updated_at) {
+//                                            self.getTransactionsAcct(guid: user.guid, account: finalAccount, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
+//                                                dispatchGroup.leave()
+//                                                for transaction in transactions {
+//                                                    dispatchGroup.enter()
+//                                                    if !self.transactions.contains(transaction) {
+//                                                        self.transactions.append(transaction)
+//                                                        if transaction.status != .pending {
+//                                                            newTransactions.append(transaction)
+//                                                        }
+//                                                        dispatchGroup.leave()
+//                                                    } else {
+//                                                        dispatchGroup.leave()
+//                                                    }
+//                                                }
+//                                            }
+//                                        } else {
+//                                            self.getTransactionsAcct(guid: user.guid, account: account, from_date: nil, to_date: nil) { (transactions) in
+//                                                dispatchGroup.leave()
+//                                                for transaction in transactions {
+//                                                    dispatchGroup.enter()
+//                                                    if !self.transactions.contains(transaction) {
+//                                                        self.transactions.append(transaction)
+//                                                        if transaction.status != .pending {
+//                                                            newTransactions.append(transaction)
+//                                                        }
+//                                                        dispatchGroup.leave()
+//                                                    } else {
+//                                                        dispatchGroup.leave()
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                    dispatchGroup.notify(queue: .main) {
+//                        self.accounts = updatedAccounts
+//                        self.updateCollectionView()
+//                        self.updateFirebase(accounts: updatedAccounts, transactions: newTransactions)
+//                    }
+//                }
+//            }
+//        }
+//    }
+    
     func getMXData() {
+        print("getMXData")
         let dispatchGroup = DispatchGroup()
         var newTransactions = [Transaction]()
         var updatedAccounts = [MXAccount]()
+        dispatchGroup.enter()
         self.getMXUser { user in
+            dispatchGroup.enter()
+            dispatchGroup.leave()
             if let user = user {
+                dispatchGroup.enter()
                 self.getMXMembers(guid: user.guid) { (members) in
                     for member in members {
+                        dispatchGroup.enter()
                         if member.connection_status == "CONNECTED" && member.is_being_aggregated == false {
                             dispatchGroup.enter()
                             self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
                                 updatedAccounts.append(contentsOf: accounts)
-                                dispatchGroup.leave()
                                 for account in accounts {
-                                    if account.should_link ?? true {
+                                    dispatchGroup.enter()
+                                    if !self.accounts.contains(account) {
                                         dispatchGroup.enter()
-                                        if let finalAccount = self.accounts.first(where: { $0.guid == account.guid}), let date = self.isodateFormatter.date(from: finalAccount.updated_at) {
-                                            self.getTransactionsAcct(guid: user.guid, account: finalAccount, from_date: date, to_date: Date()) { (transactions) in
-                                                dispatchGroup.leave()
-                                                for transaction in transactions {
-                                                    dispatchGroup.enter()
-                                                    if !self.transactions.contains(transaction) {
-                                                        self.transactions.append(transaction)
+                                        self.getTransactionsAcct(guid: user.guid, account: account, from_date: nil, to_date: nil) {
+                                            (transactions) in
+                                            for transaction in transactions {
+                                                dispatchGroup.enter()
+                                                if !self.transactions.contains(transaction) {
+                                                    self.transactions.append(transaction)
+                                                    if transaction.status != .pending {
                                                         newTransactions.append(transaction)
-                                                        dispatchGroup.leave()
-                                                    } else {
-                                                        dispatchGroup.leave()
                                                     }
+                                                    dispatchGroup.leave()
+                                                } else {
+                                                    dispatchGroup.leave()
                                                 }
                                             }
-                                        } else {
-                                            self.getTransactionsAcct(guid: user.guid, account: account, from_date: nil, to_date: nil) { (transactions) in
-                                                dispatchGroup.leave()
-                                                for transaction in transactions {
-                                                    dispatchGroup.enter()
-                                                    if !self.transactions.contains(transaction) {
-                                                        self.transactions.append(transaction)
-                                                        newTransactions.append(transaction)
-                                                        dispatchGroup.leave()
-                                                    } else {
-                                                        dispatchGroup.leave()
-                                                    }
-                                                }
-                                            }
+                                            dispatchGroup.leave()
                                         }
                                     }
+                                    dispatchGroup.leave()
                                 }
+                                dispatchGroup.leave()
                             }
                         }
+                        dispatchGroup.leave()
                     }
-                    dispatchGroup.notify(queue: .main) {
-                        self.accounts = updatedAccounts
-                        self.updateCollectionView()
-                        self.updateFirebase(accounts: updatedAccounts, transactions: newTransactions)
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                let date = self.isodateFormatter.date(from: self.accounts[0].updated_at) ?? Date()
+                self.getTransactions(guid: user.guid, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
+                    for transaction in transactions {
+                        dispatchGroup.enter()
+                        let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
+                        if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
+                            self.transactions.append(transaction)
+                            if transaction.status != .pending {
+                                newTransactions.append(transaction)
+                            }
+                            dispatchGroup.leave()
+                        } else {
+                            dispatchGroup.leave()
+                        }
                     }
                 }
+                dispatchGroup.leave()
+//                for account in self.accounts {
+//                    if account.should_link ?? true {
+//                        dispatchGroup.enter()
+//                        if let finalAccount = self.accounts.first(where: { $0.guid == account.guid}), let date = self.isodateFormatter.date(from: finalAccount.updated_at) {
+//                            self.getTransactionsAcct(guid: user.guid, account: finalAccount, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
+//                                dispatchGroup.leave()
+//                                for transaction in transactions {
+//                                    dispatchGroup.enter()
+//                                    if !self.transactions.contains(transaction) {
+//                                        self.transactions.append(transaction)
+//                                        if transaction.status != .pending {
+//                                            newTransactions.append(transaction)
+//                                        }
+//                                        dispatchGroup.leave()
+//                                    } else {
+//                                        dispatchGroup.leave()
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
             }
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.accounts = updatedAccounts
+            self.updateCollectionView()
+            self.updateFirebase(accounts: updatedAccounts, transactions: newTransactions)
         }
     }
     
@@ -315,6 +427,33 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
             }
         } else {
             Service.shared.getMXAccountTransactions(guid: guid, account_guid: account.guid, page: "1", records_per_page: "100", from_date: nil, to_date: nil) { (search, err) in
+                if let transactions = search?.transactions {
+                    completion(transactions)
+                } else if let transaction = search?.transaction {
+                    completion([transaction])
+                }  else {
+                    completion([])
+                }
+            }
+        }
+    }
+    
+    func getTransactions(guid: String, from_date: Date?, to_date: Date?, completion: @escaping ([Transaction]) -> ()) {
+        dateFormatterPrint.dateFormat = "yyyy-MM-dd"
+        if let fromDate = from_date, let toDate = to_date {
+            let from_date_string = dateFormatterPrint.string(from: fromDate)
+            let to_date_string = dateFormatterPrint.string(from: toDate)
+            Service.shared.getMXTransactions(guid: guid, page: "1", records_per_page: "100", from_date: from_date_string, to_date: to_date_string) { (search, err) in
+                if let transactions = search?.transactions {
+                    completion(transactions)
+                } else if let transaction = search?.transaction {
+                    completion([transaction])
+                } else {
+                    completion([])
+                }
+            }
+        } else {
+            Service.shared.getMXTransactions(guid: guid, page: "1", records_per_page: "100", from_date: nil, to_date: nil) { (search, err) in
                 if let transactions = search?.transactions {
                     completion(transactions)
                 } else if let transaction = search?.transaction {
@@ -448,19 +587,31 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
                     dispatchGroup.enter()
-                    categorizeTransactions(transactions: transactions, start: Date().startOfMonth, end: Date().endOfMonth, type: .none) { (transactionsList, transactionsDict) in
+                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, type: .none) { (transactionsList, transactionsDict) in
                         self.groups[section] = transactionsList
                         self.transactionDict = transactionsDict
                         dispatchGroup.leave()
                     }
                 } else if section.subType == "Transactions" {
-                    transactions = transactions.sorted(by: { (transaction1, transaction2) -> Bool in
+                    var filteredTransactions = transactions.filter { (transaction) -> Bool in
+                        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
+                            if transactionDate > startDate.stripTime() && endDate.stripTime() > transactionDate {
+                                return true
+                            }
+                        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                            if transactionDate > startDate.stripTime() && endDate.stripTime() > transactionDate {
+                                return true
+                            }
+                        }
+                        return false
+                    }
+                    filteredTransactions = filteredTransactions.sorted(by: { (transaction1, transaction2) -> Bool in
                         if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
                             return date1 > date2
                         }
                         return transaction1.description < transaction2.description
                     })
-                    self.groups[section] = transactions
+                    self.groups[section] = filteredTransactions
                 }
             }
             

@@ -19,7 +19,7 @@ class FinanceTableViewCell: UITableViewCell {
                 
                 let isodateFormatter = ISO8601DateFormatter()
                 let dateFormatterPrint = DateFormatter()
-                dateFormatterPrint.dateFormat = "EEEE, MMM d, yyyy"
+                dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
                 
                 categoryLabel.isHidden = true
                 

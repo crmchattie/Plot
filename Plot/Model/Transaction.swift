@@ -42,7 +42,7 @@ struct Transaction: Codable, Equatable, Hashable {
     let merchant_guid: String?
     let original_description: String
     let posted_at: String
-    let status: String
+    let status: TransactionStatus
     var top_level_category: TransactionTopLevelCategory
     let transacted_at: String
     let type: String
@@ -52,6 +52,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var tags: [String]?
     var should_link: Bool?
     var participantsIDs: [String]?
+    var date_for_reports: String?
     var cash_flow_type: String {
         if type == "CREDIT" {
             return "Inflow"
@@ -129,12 +130,25 @@ struct UserTransaction: Codable, Equatable, Hashable {
     var group: TransactionGroup?
     var tags: [String]?
     var should_link: Bool?
+    var date_for_reports: String?
 }
 
 enum TransactionCatLevel: String, Codable {
     case category
     case top
     case group
+}
+
+enum TransactionStatus: String, Codable {
+    case pending = "PENDING"
+    case posted = "POSTED"
+    
+    var name: String {
+        switch self {
+        case .pending: return "Pending"
+        case .posted: return "Posted"
+        }
+    }
 }
 
 enum TransactionGroup: String, CaseIterable, Codable {
@@ -432,7 +446,11 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     // create dateFormatter with UTC time format
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
-        if let transactionDate = isodateFormatter.date(from: transaction.transacted_at), let start = start, let end = end {
+        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date), let start = start, let end = end {
+            if transactionDate < start.stripTime() || end.stripTime() < transactionDate {
+                continue
+            }
+        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at), let start = start, let end = end {
             if transactionDate < start.stripTime() || end.stripTime() < transactionDate {
                 continue
             }
