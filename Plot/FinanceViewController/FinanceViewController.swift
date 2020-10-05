@@ -174,167 +174,119 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         }
     }
     
-//    func getMXData() {
-//        let dispatchGroup = DispatchGroup()
-//        var newTransactions = [Transaction]()
-//        var updatedAccounts = [MXAccount]()
-//        self.getMXUser { user in
-//            if let user = user {
-//                self.getMXMembers(guid: user.guid) { (members) in
-//                    for member in members {
-//                        if member.connection_status == "CONNECTED" && member.is_being_aggregated == false {
-//                            dispatchGroup.enter()
-//                            self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
-//                                updatedAccounts.append(contentsOf: accounts)
-//                                dispatchGroup.leave()
-//                                for account in accounts {
-//                                    if account.should_link ?? true {
-//                                        dispatchGroup.enter()
-//                                        if let finalAccount = self.accounts.first(where: { $0.guid == account.guid}), let date = self.isodateFormatter.date(from: finalAccount.updated_at) {
-//                                            self.getTransactionsAcct(guid: user.guid, account: finalAccount, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
-//                                                dispatchGroup.leave()
-//                                                for transaction in transactions {
-//                                                    dispatchGroup.enter()
-//                                                    if !self.transactions.contains(transaction) {
-//                                                        self.transactions.append(transaction)
-//                                                        if transaction.status != .pending {
-//                                                            newTransactions.append(transaction)
-//                                                        }
-//                                                        dispatchGroup.leave()
-//                                                    } else {
-//                                                        dispatchGroup.leave()
-//                                                    }
-//                                                }
-//                                            }
-//                                        } else {
-//                                            self.getTransactionsAcct(guid: user.guid, account: account, from_date: nil, to_date: nil) { (transactions) in
-//                                                dispatchGroup.leave()
-//                                                for transaction in transactions {
-//                                                    dispatchGroup.enter()
-//                                                    if !self.transactions.contains(transaction) {
-//                                                        self.transactions.append(transaction)
-//                                                        if transaction.status != .pending {
-//                                                            newTransactions.append(transaction)
-//                                                        }
-//                                                        dispatchGroup.leave()
-//                                                    } else {
-//                                                        dispatchGroup.leave()
-//                                                    }
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                    dispatchGroup.notify(queue: .main) {
-//                        self.accounts = updatedAccounts
-//                        self.updateCollectionView()
-//                        self.updateFirebase(accounts: updatedAccounts, transactions: newTransactions)
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
     func getMXData() {
-        print("getMXData")
         let dispatchGroup = DispatchGroup()
-        var newTransactions = [Transaction]()
         var updatedAccounts = [MXAccount]()
         dispatchGroup.enter()
         self.getMXUser { user in
             dispatchGroup.enter()
-            dispatchGroup.leave()
             if let user = user {
+                self.getMXTransactions(user: user, account: nil, date: nil)
                 dispatchGroup.enter()
                 self.getMXMembers(guid: user.guid) { (members) in
                     for member in members {
                         dispatchGroup.enter()
-                        if member.connection_status == "CONNECTED" && member.is_being_aggregated == false {
+                        if member.connection_status == .connected, let date = self.isodateFormatter.date(from: member.aggregated_at), date < Date().addingTimeInterval(-10800) {
                             dispatchGroup.enter()
-                            self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
-                                updatedAccounts.append(contentsOf: accounts)
-                                for account in accounts {
-                                    dispatchGroup.enter()
-                                    if !self.accounts.contains(account) {
-                                        dispatchGroup.enter()
-                                        self.getTransactionsAcct(guid: user.guid, account: account, from_date: nil, to_date: nil) {
-                                            (transactions) in
-                                            for transaction in transactions {
-                                                dispatchGroup.enter()
-                                                if !self.transactions.contains(transaction) {
-                                                    self.transactions.append(transaction)
-                                                    if transaction.status != .pending {
-                                                        newTransactions.append(transaction)
-                                                    }
-                                                    dispatchGroup.leave()
-                                                } else {
-                                                    dispatchGroup.leave()
-                                                }
-                                            }
-                                            dispatchGroup.leave()
+                            Service.shared.aggregateMXMember(guid: user.guid, member_guid: member.guid) { (search, err)  in
+                                var updatedMember: MXMember!
+                                if let member = search?.member {
+                                    updatedMember = member
+                                }
+                                while updatedMember.is_being_aggregated == true {
+                                    Service.shared.getMXMemberStatus(guid: user.guid, member_guid: member.guid) { (search, err) in
+                                        if let member = search?.member {
+                                            updatedMember = member
                                         }
                                     }
-                                    dispatchGroup.leave()
+                                    if updatedMember.connection_status == .challenged {
+                                        self.openMXConnect(guid: user.guid, current_member_guid: member.guid)
+                                    }
                                 }
                                 dispatchGroup.leave()
                             }
+                        } else if member.connection_status != .connected && member.is_being_aggregated == false {
+                            self.openMXConnect(guid: user.guid, current_member_guid: member.guid)
+                        }
+                        dispatchGroup.enter()
+                        self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
+                            updatedAccounts.append(contentsOf: accounts)
+                            for account in accounts {
+                                dispatchGroup.enter()
+                                if !self.accounts.contains(account) {
+                                    self.getMXTransactions(user: user, account: account, date: nil)
+                                }
+                                dispatchGroup.leave()
+                            }
+                            dispatchGroup.leave()
                         }
                         dispatchGroup.leave()
                     }
                     dispatchGroup.leave()
                 }
-                
-                dispatchGroup.enter()
-                let date = self.isodateFormatter.date(from: self.accounts[0].updated_at) ?? Date()
-                self.getTransactions(guid: user.guid, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
-                    for transaction in transactions {
-                        dispatchGroup.enter()
-                        let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
-                        if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
-                            self.transactions.append(transaction)
-                            if transaction.status != .pending {
-                                newTransactions.append(transaction)
-                            }
-                            dispatchGroup.leave()
-                        } else {
-                            dispatchGroup.leave()
-                        }
-                    }
-                }
-                dispatchGroup.leave()
-//                for account in self.accounts {
-//                    if account.should_link ?? true {
-//                        dispatchGroup.enter()
-//                        if let finalAccount = self.accounts.first(where: { $0.guid == account.guid}), let date = self.isodateFormatter.date(from: finalAccount.updated_at) {
-//                            self.getTransactionsAcct(guid: user.guid, account: finalAccount, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
-//                                dispatchGroup.leave()
-//                                for transaction in transactions {
-//                                    dispatchGroup.enter()
-//                                    if !self.transactions.contains(transaction) {
-//                                        self.transactions.append(transaction)
-//                                        if transaction.status != .pending {
-//                                            newTransactions.append(transaction)
-//                                        }
-//                                        dispatchGroup.leave()
-//                                    } else {
-//                                        dispatchGroup.leave()
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
             }
             dispatchGroup.leave()
         }
+        dispatchGroup.leave()
         
         dispatchGroup.notify(queue: .main) {
-            self.accounts = updatedAccounts
+            if !updatedAccounts.isEmpty {
+                self.accounts = updatedAccounts
+            }
             self.updateCollectionView()
-            self.updateFirebase(accounts: updatedAccounts, transactions: newTransactions)
+            self.updateFirebase(accounts: updatedAccounts, transactions: [])
+        }
+    }
+    
+    func getMXTransactions(user: MXUser, account: MXAccount?, date: Date?) {
+        let dispatchGroup = DispatchGroup()
+        var updatedTransactions = [Transaction]()
+        var newTransactions = [Transaction]()
+        dispatchGroup.enter()
+        if let account = account {
+            dispatchGroup.enter()
+            if let date = date {
+                self.getTransactionsAcct(guid: user.guid, account: account, from_date: date, to_date: Date().addingTimeInterval(86400)) {
+                    (transactions) in
+                    updatedTransactions = transactions
+                    dispatchGroup.leave()
+                }
+            } else {
+                self.getTransactionsAcct(guid: user.guid, account: account, from_date: nil, to_date: nil) {
+                    (transactions) in
+                    updatedTransactions = transactions
+                    dispatchGroup.leave()
+                }
+            }
+        } else {
+            dispatchGroup.enter()
+            let account = self.accounts.min(by:{ self.isodateFormatter.date(from: $0.updated_at)! < self.isodateFormatter.date(from: $1.updated_at)! })
+            let date = self.isodateFormatter.date(from: account!.updated_at) ?? Date()
+            self.getTransactions(guid: user.guid, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
+                updatedTransactions = transactions
+                dispatchGroup.leave()
+            }
+        }
+        
+        for transaction in updatedTransactions {
+            dispatchGroup.enter()
+            let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
+            if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
+                self.transactions.append(transaction)
+                if transaction.status != .pending {
+                    newTransactions.append(transaction)
+                }
+                dispatchGroup.leave()
+            } else {
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.leave()
+        
+        dispatchGroup.notify(queue: .main) {
+            self.updateCollectionView()
+            self.updateFirebase(accounts: [], transactions: newTransactions)
         }
     }
     
@@ -460,6 +412,22 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                     completion([transaction])
                 }  else {
                     completion([])
+                }
+            }
+        }
+    }
+    
+    func openMXConnect(guid: String, current_member_guid: String?) {
+        Service.shared.getMXConnectURL(guid: guid, current_member_guid: current_member_guid ?? nil) { (search, err) in
+            if let url = search?.user?.connect_widget_url {
+                DispatchQueue.main.async {
+                    let destination = WebViewController()
+                    destination.urlString = url
+                    destination.controllerTitle = ""
+                    destination.delegate = self
+                    let navigationViewController = UINavigationController(rootViewController: destination)
+                    navigationViewController.modalPresentationStyle = .fullScreen
+                    self.present(navigationViewController, animated: true, completion: nil)
                 }
             }
         }
@@ -791,5 +759,11 @@ extension FinanceViewController: UpdateFinancialsDelegate {
         //            }
         //        }
         //        updateCollectionView()
+    }
+}
+
+extension FinanceViewController: EndedWebViewDelegate {
+    func updateMXMembers() {
+        getMXData()
     }
 }

@@ -607,6 +607,7 @@ class Service {
         }
         if let guid = current_member_guid {
             parameters["current_member_guid"] = "\(guid)"
+            parameters["disable_institution_search"] = "true"
         }
         
         var urlRequest = URLRequest(url: baseURL)

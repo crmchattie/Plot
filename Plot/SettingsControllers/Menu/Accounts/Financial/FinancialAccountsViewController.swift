@@ -206,10 +206,10 @@ class FinancialAccountsViewController: UITableViewController {
             headerView.companyImageView.sd_setImage(with: URL(string: imageURL))
         }
         let status = members[section].connection_status
-        if status == "CONNECTED" {
+        if status == .connected {
             headerView.statusImageView.image =  UIImage(named: "success")
             headerView.infoLabel.text = "Information is up-to-date"
-        } else if status == "CREATED" || status == "UPDATED" || status == "DELAYED" || status == "RESUMED" {
+        } else if status == .created || status == .updated || status == .delayed || status == .resumed {
             headerView.statusImageView.image =  UIImage(named: "updating")
             headerView.infoLabel.text = "Information is updating"
         } else {

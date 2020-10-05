@@ -20,6 +20,7 @@ struct MXUser: Codable, Equatable {
     var is_disabled: Bool?
     let metadata: String?
     let connect_widget_url: String?
+    
 }
 
 func ==(lhs: MXUser, rhs: MXUser) -> Bool {
