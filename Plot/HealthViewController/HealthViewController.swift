@@ -15,7 +15,7 @@ protocol HomeBaseHealth: class {
 }
 
 protocol HealthViewControllerActivitiesDelegate: class {
-    func update(_ healthViewController: HealthViewController, _ healthActivities: [Activity])
+    func update(_ healthViewController: HealthViewController, _ shouldFetchActivities: Bool)
 }
 
 class HealthViewController: UIViewController {
@@ -39,9 +39,17 @@ class HealthViewController: UIViewController {
         return tableView
     }()
     
+    let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView()
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.startAnimating()
+        return spinner
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(tableView)
+        view.addSubview(spinner)
         
         configureView()
         addObservers()
@@ -52,10 +60,24 @@ class HealthViewController: UIViewController {
         
         if !hasViewAppeared {
             hasViewAppeared = true
-            self.healhKitManager.loadHealthKitActivities { [weak self] metrics, activities in
-                self?.healthMetrics = metrics
-                if let _self = self {
-                    _self.healthActivitiesDelegate?.update(_self, activities)
+            
+            HealthKitService.authorizeHealthKit { [weak self] authorized in
+                guard authorized else {
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    self?.spinner.startAnimating()
+                }
+                
+                self?.healhKitManager.loadHealthKitActivities { [weak self] metrics, shouldFetchActivities in
+                    DispatchQueue.main.async {
+                        self?.healthMetrics = metrics
+                        if let _self = self {
+                            _self.healthActivitiesDelegate?.update(_self, shouldFetchActivities)
+                            _self.spinner.stopAnimating()
+                        }
+                    }
                 }
             }
         }
@@ -84,7 +106,9 @@ class HealthViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
         
         tableView.separatorStyle = .none

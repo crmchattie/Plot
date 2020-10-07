@@ -13,6 +13,7 @@ class WorkoutOperation: AsyncOperation {
     private var startDate: Date
     private var workoutActivityType: HKWorkoutActivityType
     weak var delegate: MetricOperationDelegate?
+    var lastSyncDate: Date?
 
     init(date: Date, workoutActivityType: HKWorkoutActivityType) {
         self.startDate = date
@@ -43,18 +44,21 @@ class WorkoutOperation: AsyncOperation {
                     let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
                     averageEnergyBurned += totalEnergyBurned
                     
-                    var activityID = UUID().uuidString
-                    if let currentUserID = Auth.auth().currentUser?.uid, let newId = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key {
-                        activityID = newId
+                    // Only create activities that past lastSync date time
+                    if _self.lastSyncDate == nil || (workout.startDate >= _self.lastSyncDate!) {
+                        var activityID = UUID().uuidString
+                        if let currentUserID = Auth.auth().currentUser?.uid, let newId = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
+                            activityID = newId
+                        }
+
+                        let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
+                        activity.activityType = ActivityType.workout.rawValue
+                        activity.name = workout.workoutActivityType.name
+                        activity.activityDescription = "\(totalEnergyBurned.clean) calories"
+                        activity.startDateTime = NSNumber(value: workout.startDate.timeIntervalSince1970)
+                        activity.endDateTime = NSNumber(value: workout.endDate.timeIntervalSince1970)
+                        activities.append(activity)
                     }
-                    
-                    let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-                    activity.activityType = ActivityType.workout.rawValue
-                    activity.name = workout.workoutActivityType.name
-                    activity.activityDescription = "\(totalEnergyBurned.clean) calories"
-                    activity.startDateTime = NSNumber(value: workout.startDate.timeIntervalSince1970)
-                    activity.endDateTime = NSNumber(value: workout.endDate.timeIntervalSince1970)
-                    activities.append(activity)
                 }
                 
                 if averageEnergyBurned != 0 {

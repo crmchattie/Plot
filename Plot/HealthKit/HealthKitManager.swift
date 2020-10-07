@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import Firebase
+import CodableFirebase
 
 class HealthKitManager {
     
@@ -15,6 +17,7 @@ class HealthKitManager {
     private var metrics: [HealthMetric]
     private var activities: [Activity]
     private var isRunning: Bool
+    private var saveActivitiesDispatchGroup: DispatchGroup!
     
     init() {
         self.isRunning = false
@@ -24,22 +27,15 @@ class HealthKitManager {
         //self.queue.maxConcurrentOperationCount = 1
     }
     
-    func loadHealthKitActivities(_ completion: @escaping ([HealthMetric], [Activity]) -> Void) {
+    func loadHealthKitActivities(_ completion: @escaping ([HealthMetric], Bool) -> Void) {
         guard !isRunning else { return }
         
         // Start clean
         metrics = []
         activities = []
-        
         isRunning = true
-        HealthKitService.authorizeHealthKit { [weak self] authorized in
-            guard authorized, let queue = self?.queue else {
-                completion([], [])
-                self?.isRunning = false
-                return
-            }
-            
-            //let today = Date().dayBefore
+
+        self.getUserHealthLastSyncDate { [weak self] lastSyncDate in
             let today = Date()
             
             // Steps
@@ -86,31 +82,121 @@ class HealthKitManager {
             // Workouts
             let functionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .functionalStrengthTraining)
             functionalStrengthTrainingOp.delegate = self
+            functionalStrengthTrainingOp.lastSyncDate = lastSyncDate
             
             let traditionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .traditionalStrengthTraining)
             traditionalStrengthTrainingOp.delegate = self
+            traditionalStrengthTrainingOp.lastSyncDate = lastSyncDate
             
             let runningOp = WorkoutOperation(date: today, workoutActivityType: .running)
             runningOp.delegate = self
+            runningOp.lastSyncDate = lastSyncDate
             
             let cyclingOp = WorkoutOperation(date: today, workoutActivityType: .cycling)
             cyclingOp.delegate = self
+            cyclingOp.lastSyncDate = lastSyncDate
             
             let hiitOp = WorkoutOperation(date: today, workoutActivityType: .highIntensityIntervalTraining)
             hiitOp.delegate = self
+            hiitOp.lastSyncDate = lastSyncDate
             
             // Setup queue
-            queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp], waitUntilFinished: false)
+            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
-            queue.addBarrierBlock { [weak self] in
-                DispatchQueue.main.async {
-                    self?.metrics.sort(by: {$0.rank < $1.rank})
-                    completion(self?.metrics ?? [], self?.activities ?? [])
-                    self?.isRunning = false
+            self?.queue.addBarrierBlock { [weak self] in
+                guard let _self = self else {
+                    completion([], false)
+                    return
                 }
+                
+                _self.metrics.sort(by: {$0.rank < $1.rank})
+                
+                // if we properly fetched the items then save
+                if _self.activities.count > 0 {
+                    _self.saveActivitiesOnFirebase(_self.activities, completion: {
+                        completion(_self.metrics, true)
+                    })
+                }
+                else {
+                    completion(_self.metrics, false)
+                }
+                
+                self?.isRunning = false
             }
         }
+    }
+    
+    func getUserHealthLastSyncDate(_ completion: @escaping (Date?) -> Void) {
+        guard let currentUser = Auth.auth().currentUser?.uid else {
+            completion(nil)
+            return
+        }
+            
+        let reference = Database.database().reference().child(userHealthEntity).child(currentUser)
+        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(),
+                let value = snapshot.value,
+                let userHealth = try? FirebaseDecoder().decode(UserHealth.self, from: value) {
+                completion(userHealth.lastSyncDate)
+            } else {
+                completion(nil)
+            }
+            
+            reference.removeAllObservers()
+        })
+    }
+    
+    func saveActivitiesOnFirebase(_ activities: [Activity], completion: @escaping () -> Void) {
+        guard activities.count > 0, let currentUserId = Auth.auth().currentUser?.uid else {
+            completion()
+            return
+        }
+        
+        saveActivitiesDispatchGroup = DispatchGroup()
+        
+        saveActivitiesDispatchGroup.notify(queue: DispatchQueue.global(), execute: {
+            completion()
+        })
+        
+        for activity in activities {
+            if let activityID = activity.activityID {
+                
+                saveActivitiesDispatchGroup.enter()
+                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+                activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
+                    self?.saveActivitiesDispatchGroup.leave()
+                })
+                
+                saveActivitiesDispatchGroup.enter()
+                let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+        
+                let values: [String : Any] = ["isGroupActivity": false, "badge": 0]
+                userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
+                    self?.saveActivitiesDispatchGroup.leave()
+                })
+            }
+        }
+        
+        let reference = Database.database().reference().child(userHealthEntity).child(currentUserId)
+        saveActivitiesDispatchGroup.enter()
+        reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
+            if snapshot.exists(), let value = snapshot.value, var userHealth = try? FirebaseDecoder().decode(UserHealth.self, from: value) {
+                userHealth.lastSyncDate = Date()
+                if let firebaseUserHealth = try? FirebaseEncoder().encode(userHealth) {
+                    reference.setValue(firebaseUserHealth)
+                }
+            }
+            else if !snapshot.exists() {
+                let identifier = UUID().uuidString
+                let userHealth = UserHealth(identifier: identifier, lastSyncDate: Date())
+                if let firebaseUserHealth = try? FirebaseEncoder().encode(userHealth) {
+                    reference.setValue(firebaseUserHealth)
+                }
+            }
+            
+            self?.saveActivitiesDispatchGroup.leave()
+        })
     }
 }
 
