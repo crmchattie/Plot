@@ -19,11 +19,15 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     
     var transactions = [Transaction]()
     var accounts = [MXAccount]()
+    var members = [MXMember]()
+    var user: MXUser!
     
     var transactionsAcctDict = [MXAccount: [Transaction]]()
     
     var transactionDict = [TransactionDetails: [Transaction]]()
     var accountDict = [AccountDetails: [MXAccount]]()
+    
+    var institutionDict = [String: String]()
     
     var sections: [SectionType] = [.balanceSheet, .financialAccounts, .incomeStatement, .transactions]
     var groups = [SectionType: [AnyHashable]]()
@@ -33,6 +37,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     
     private let kHeaderCell = "HeaderCell"
     private let kFinanceCollectionViewCell = "FinanceCollectionViewCell"
+    private let kFinanceCollectionViewMemberCell = "FinanceCollectionViewMemberCell"
     
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
@@ -83,9 +88,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     //        return section
     //    }
     //
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
     
     init() {
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
@@ -118,6 +120,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         
         collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kHeaderCell)
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
+        collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
         
         addObservers()
         
@@ -181,66 +184,78 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         self.getMXUser { user in
             dispatchGroup.enter()
             if let user = user {
-                self.getMXTransactions(user: user, account: nil, date: nil)
                 dispatchGroup.enter()
+                self.getMXTransactions(user: user, account: nil, date: nil)
                 self.getMXMembers(guid: user.guid) { (members) in
                     for member in members {
                         dispatchGroup.enter()
-                        if member.connection_status == .connected, let date = self.isodateFormatter.date(from: member.aggregated_at), date < Date().addingTimeInterval(-10800) {
+                        if member.connection_status == .connected && !member.is_being_aggregated, let date = self.isodateFormatter.date(from: member.aggregated_at), date < Date().addingTimeInterval(-10800) {
                             dispatchGroup.enter()
                             Service.shared.aggregateMXMember(guid: user.guid, member_guid: member.guid) { (search, err)  in
-                                var updatedMember: MXMember!
                                 if let member = search?.member {
-                                    updatedMember = member
-                                }
-                                while updatedMember.is_being_aggregated == true {
-                                    Service.shared.getMXMemberStatus(guid: user.guid, member_guid: member.guid) { (search, err) in
-                                        if let member = search?.member {
-                                            updatedMember = member
+                                    dispatchGroup.enter()
+                                    self.pollMemberStatus(guid: user.guid, member_guid: member.guid) { (member) in
+                                        print("moving on")
+                                        dispatchGroup.enter()
+                                        self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
+                                            updatedAccounts.append(contentsOf: accounts)
+                                            for account in accounts {
+                                                dispatchGroup.enter()
+                                                if !self.accounts.contains(account) {
+                                                    self.getMXTransactions(user: user, account: account, date: nil)
+                                                }
+                                                dispatchGroup.leave()
+                                            }
+                                            dispatchGroup.leave()
                                         }
+                                        dispatchGroup.leave()
                                     }
-                                    if updatedMember.connection_status == .challenged {
-                                        self.openMXConnect(guid: user.guid, current_member_guid: member.guid)
+                                    dispatchGroup.leave()
+                                }
+                            }
+                        } else if member.connection_status == .connected && !member.is_being_aggregated {
+                            dispatchGroup.enter()
+                            self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
+                                updatedAccounts.append(contentsOf: accounts)
+                                for account in accounts {
+                                    dispatchGroup.enter()
+                                    if !self.accounts.contains(account) {
+                                        self.getMXTransactions(user: user, account: account, date: nil)
                                     }
+                                    dispatchGroup.leave()
                                 }
                                 dispatchGroup.leave()
                             }
-                        } else if member.connection_status != .connected && member.is_being_aggregated == false {
-                            self.openMXConnect(guid: user.guid, current_member_guid: member.guid)
-                        }
-                        dispatchGroup.enter()
-                        self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
-                            updatedAccounts.append(contentsOf: accounts)
-                            for account in accounts {
-                                dispatchGroup.enter()
-                                if !self.accounts.contains(account) {
-                                    self.getMXTransactions(user: user, account: account, date: nil)
-                                }
+                        } else if (member.connection_status == .prevented || member.connection_status == .denied) && !member.is_being_aggregated {
+                            dispatchGroup.enter()
+                            if !self.sections.contains(.issues) {
+                                self.sections.insert(.issues, at: 0)
+                            }
+                            self.members.append(member)
+                            self.getInsitutionalDetails(institution_code: member.institution_code) {
                                 dispatchGroup.leave()
                             }
-                            dispatchGroup.leave()
                         }
                         dispatchGroup.leave()
                     }
                     dispatchGroup.leave()
                 }
+                dispatchGroup.leave()
             }
             dispatchGroup.leave()
         }
-        dispatchGroup.leave()
         
         dispatchGroup.notify(queue: .main) {
-            if !updatedAccounts.isEmpty {
-                self.accounts = updatedAccounts
-            }
+            print("dispatchGroup.notify")
+            self.accounts = updatedAccounts
             self.updateCollectionView()
             self.updateFirebase(accounts: updatedAccounts, transactions: [])
         }
     }
     
     func getMXTransactions(user: MXUser, account: MXAccount?, date: Date?) {
+        print("getMXTransactions")
         let dispatchGroup = DispatchGroup()
-        var updatedTransactions = [Transaction]()
         var newTransactions = [Transaction]()
         dispatchGroup.enter()
         if let account = account {
@@ -248,36 +263,59 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
             if let date = date {
                 self.getTransactionsAcct(guid: user.guid, account: account, from_date: date, to_date: Date().addingTimeInterval(86400)) {
                     (transactions) in
-                    updatedTransactions = transactions
+                    for transaction in transactions {
+                        dispatchGroup.enter()
+                        let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
+                        if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
+                            self.transactions.append(transaction)
+                            if transaction.status != .pending {
+                                newTransactions.append(transaction)
+                            }
+                            dispatchGroup.leave()
+                        } else {
+                            dispatchGroup.leave()
+                        }
+                    }
                     dispatchGroup.leave()
                 }
             } else {
                 self.getTransactionsAcct(guid: user.guid, account: account, from_date: nil, to_date: nil) {
                     (transactions) in
-                    updatedTransactions = transactions
+                    for transaction in transactions {
+                        dispatchGroup.enter()
+                        let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
+                        if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
+                            self.transactions.append(transaction)
+                            if transaction.status != .pending {
+                                newTransactions.append(transaction)
+                            }
+                            dispatchGroup.leave()
+                        } else {
+                            dispatchGroup.leave()
+                        }
+                    }
                     dispatchGroup.leave()
                 }
             }
         } else {
+            print("grabbing all transactions")
             dispatchGroup.enter()
             let account = self.accounts.min(by:{ self.isodateFormatter.date(from: $0.updated_at)! < self.isodateFormatter.date(from: $1.updated_at)! })
             let date = self.isodateFormatter.date(from: account!.updated_at) ?? Date()
             self.getTransactions(guid: user.guid, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
-                updatedTransactions = transactions
-                dispatchGroup.leave()
-            }
-        }
-        
-        for transaction in updatedTransactions {
-            dispatchGroup.enter()
-            let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
-            if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
-                self.transactions.append(transaction)
-                if transaction.status != .pending {
-                    newTransactions.append(transaction)
+                for transaction in transactions {
+                    dispatchGroup.enter()
+                    let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
+                    if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
+                        self.transactions.append(transaction)
+                        if transaction.status != .pending {
+                            newTransactions.append(transaction)
+                        }
+                        dispatchGroup.leave()
+                    } else {
+                        dispatchGroup.leave()
+                    }
                 }
-                dispatchGroup.leave()
-            } else {
                 dispatchGroup.leave()
             }
         }
@@ -296,6 +334,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
             mxIDReference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value {
                     if let user = try? FirebaseDecoder().decode(MXUser.self, from: value) {
+                        self.user = user
                         completion(user)
                     }
                 } else if !snapshot.exists() {
@@ -307,6 +346,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                             if let firebaseUser = try? FirebaseEncoder().encode(user) {
                                 mxIDReference.setValue(firebaseUser)
                             }
+                            self.user = user
                             completion(user)
                         }
                     }
@@ -433,6 +473,41 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         }
     }
     
+    func pollMemberStatus(guid: String, member_guid: String, completion: @escaping (MXMember) -> ()) {
+        Service.shared.getMXMember(guid: guid, member_guid: member_guid) { (search, err) in
+            if let member = search?.member {
+                print("poll member \(member.name)")
+                if member.connection_status == .challenged {
+                    print("challenged")
+                    if !self.sections.contains(.issues) {
+                        self.sections.insert(.issues, at: 0)
+                    }
+                    self.members.append(member)
+                    self.getInsitutionalDetails(institution_code: member.institution_code) {
+                        completion(member)
+                    }
+                } else if member.is_being_aggregated {
+                    print("is_being_aggregated")
+                    self.pollMemberStatus(guid: guid, member_guid: member_guid) { member in
+                        completion(member)
+                    }
+                } else {
+                    print("completion")
+                    completion(member)
+                }
+            }
+        }
+    }
+    
+    func getInsitutionalDetails(institution_code: String, completion: @escaping () -> ()) {
+        Service.shared.getMXInstitution(institution_code: institution_code) { (search, err) in
+            if let institution = search?.institution {
+                self.institutionDict[institution_code] = institution.medium_logo_url
+                completion()
+            }
+        }
+    }
+    
     func observeAccountsForCurrentUser() {
         self.accountFetcher.observeAccountForCurrentUser(accountsAdded: { [weak self] accountsAdded in
             for account in accountsAdded {
@@ -521,75 +596,88 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         
         let dispatchGroup = DispatchGroup()
         
-        //        var snapshot = self.diffableDataSource.snapshot()
-        //        snapshot.deleteAllItems()
-        //        self.diffableDataSource.apply(snapshot)
-        //
-        //        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
-        //            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
-        //            header.delegate = self
-        //            let snapshot = self.diffableDataSource.snapshot()
-        //            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
-        //                header.titleLabel.text = section.name
-        //                header.subTitleLabel.isHidden = true
-        //            }
-        //
-        //            return header
-        //        })
-        
         for section in sections {
-            if section.type == "Accounts" {
+            if section.type == "Issues" {
+                dispatchGroup.enter()
+                if !members.isEmpty {
+                    members.sort { (member1, member2) -> Bool in
+                        return member1.name < member2.name
+                    }
+                    self.groups[section] = members
+                    dispatchGroup.leave()
+                } else {
+                    self.sections.removeAll(where: {$0 == section})
+                    dispatchGroup.leave()
+                }
+            } else if section.type == "Accounts" {
                 if section.subType == "Balance Sheet" {
                     dispatchGroup.enter()
                     categorizeAccounts(accounts: accounts) { (accountsList, accountsDict) in
-                        self.groups[section] = accountsList
-                        self.accountDict = accountsDict
+                        if !accountsList.isEmpty {
+                            self.groups[section] = accountsList
+                            self.accountDict = accountsDict
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
                         dispatchGroup.leave()
                     }
                 } else if section.subType == "Accounts" {
-                    accounts.sort { (account1, account2) -> Bool in
-                        return account1.name < account2.name
+                    dispatchGroup.enter()
+                    if !accounts.isEmpty {
+                        accounts.sort { (account1, account2) -> Bool in
+                            return account1.name < account2.name
+                        }
+                        self.groups[section] = accounts
+                        dispatchGroup.leave()
+                    } else {
+                        self.sections.removeAll(where: {$0 == section})
+                        dispatchGroup.leave()
                     }
-                    self.groups[section] = accounts
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
                     dispatchGroup.enter()
                     categorizeTransactions(transactions: transactions, start: startDate, end: endDate, type: .none) { (transactionsList, transactionsDict) in
-                        self.groups[section] = transactionsList
-                        self.transactionDict = transactionsDict
+                        if !transactionsList.isEmpty {
+                            self.groups[section] = transactionsList
+                            self.transactionDict = transactionsDict
+                        } else {
+                            self.sections.removeAll(where: {$0 == section})
+                        }
                         dispatchGroup.leave()
                     }
                 } else if section.subType == "Transactions" {
-                    var filteredTransactions = transactions.filter { (transaction) -> Bool in
-                        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                            if transactionDate > startDate.stripTime() && endDate.stripTime() > transactionDate {
-                                return true
+                    dispatchGroup.enter()
+                    if !transactions.isEmpty {
+                        var filteredTransactions = transactions.filter { (transaction) -> Bool in
+                            if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
+                                if transactionDate > startDate.stripTime() && endDate.stripTime() > transactionDate {
+                                    return true
+                                }
+                            } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                                if transactionDate > startDate.stripTime() && endDate.stripTime() > transactionDate {
+                                    return true
+                                }
                             }
-                        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-                            if transactionDate > startDate.stripTime() && endDate.stripTime() > transactionDate {
-                                return true
-                            }
+                            return false
                         }
-                        return false
+                        filteredTransactions = filteredTransactions.sorted(by: { (transaction1, transaction2) -> Bool in
+                            if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
+                                return date1 > date2
+                            }
+                            return transaction1.description < transaction2.description
+                        })
+                        self.groups[section] = filteredTransactions
+                        dispatchGroup.leave()
+                    } else {
+                        self.sections.removeAll(where: {$0 == section})
+                        dispatchGroup.leave()
                     }
-                    filteredTransactions = filteredTransactions.sorted(by: { (transaction1, transaction2) -> Bool in
-                        if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
-                            return date1 > date2
-                        }
-                        return transaction1.description < transaction2.description
-                    })
-                    self.groups[section] = filteredTransactions
                 }
             }
             
             dispatchGroup.notify(queue: .main) {
                 self.collectionView.reloadData()
-//                if let object = self.groups[section] {
-//                    snapshot.appendSections([section])
-//                    snapshot.appendItems(object, toSection: section)
-//                    self.diffableDataSource.apply(snapshot)
-//                }
             }
         }
     }
@@ -606,37 +694,60 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = sections[indexPath.section]
         let object = groups[section]
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-        if let object = object as? [TransactionDetails] {
-            cell.transactionDetails = object[indexPath.item]
-        } else if let object = object as? [AccountDetails] {
-            cell.accountDetails = object[indexPath.item]
-        } else if let object = object as? [Transaction] {
-            cell.transaction = object[indexPath.item]
-        } else if let object = object as? [MXAccount] {
-            cell.account = object[indexPath.item]
+        if section != .issues {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+            if let object = object as? [TransactionDetails] {
+                cell.transactionDetails = object[indexPath.item]
+            } else if let object = object as? [AccountDetails] {
+                cell.accountDetails = object[indexPath.item]
+            } else if let object = object as? [Transaction] {
+                cell.transaction = object[indexPath.item]
+            } else if let object = object as? [MXAccount] {
+                cell.account = object[indexPath.item]
+            }
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
+            if let object = object as? [MXMember] {
+                if let imageURL = institutionDict[object[indexPath.item].institution_code] {
+                    cell.imageURL = imageURL
+                    cell.member = object[indexPath.item]
+                }
+            }
+            return cell
         }
-        return cell
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var height: CGFloat = 328
         let section = sections[indexPath.section]
         let object = groups[section]
-        let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: view.frame.width - 32, height: 1000))
-        if let object = object as? [TransactionDetails] {
-            dummyCell.transactionDetails = object[indexPath.item]
-        } else if let object = object as? [AccountDetails] {
-            dummyCell.accountDetails = object[indexPath.item]
-        } else if let object = object as? [Transaction] {
-            dummyCell.transaction = object[indexPath.item]
-        } else if let object = object as? [MXAccount] {
-            dummyCell.account = object[indexPath.item]
+        if section != .issues {
+            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: view.frame.width - 32, height: 1000))
+            if let object = object as? [TransactionDetails] {
+                dummyCell.transactionDetails = object[indexPath.item]
+            } else if let object = object as? [AccountDetails] {
+                dummyCell.accountDetails = object[indexPath.item]
+            } else if let object = object as? [Transaction] {
+                dummyCell.transaction = object[indexPath.item]
+            } else if let object = object as? [MXAccount] {
+                dummyCell.account = object[indexPath.item]
+            }
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width - 32, height: 1000))
+            height = estimatedSize.height
+        } else {
+            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: view.frame.width - 32, height: 1000))
+            if let object = object as? [MXMember] {
+                if let imageURL = institutionDict[object[indexPath.item].institution_code] {
+                    dummyCell.imageURL = imageURL
+                    dummyCell.member = object[indexPath.item]
+                }
+            }
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width - 32, height: 1000))
+            height = estimatedSize.height
         }
-        dummyCell.layoutIfNeeded()
-        let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width - 32, height: 1000))
-        height = estimatedSize.height
         return CGSize(width: view.frame.width - 32, height: height)
         
     }
@@ -718,7 +829,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 destination.hidesBottomBarWhenPushed = true
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
-                //                navigationController?.pushViewController(destination, animated: true)
             }
         } else if let object = object as? [MXAccount] {
             if section.subType == "Accounts" {
@@ -727,7 +837,10 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 destination.hidesBottomBarWhenPushed = true
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
-                //                    navigationController?.pushViewController(destination, animated: true)
+            }
+        } else if let object = object as? [MXMember] {
+            if section.type == "Issues", let user = user {
+                self.openMXConnect(guid: user.guid, current_member_guid: object[indexPath.item].guid)
             }
         }
         collectionView.deselectItem(at: indexPath, animated: true)
@@ -743,27 +856,17 @@ extension FinanceViewController: HeaderCellDelegate {
 
 extension FinanceViewController: UpdateFinancialsDelegate {
     func updateTransactions(transactions: [Transaction]) {
-        //        for transaction in transactions {
-        //            print("transactionDes delegate \(transaction.description)")
-        //            if let index = self.transactions.firstIndex(of: transaction) {
-        //                print("transactionDes delegate \(transaction.description)")
-        //                self.transactions[index] = transaction
-        //            }
-        //        }
-        //        updateCollectionView()
+        
     }
     func updateAccounts(accounts: [MXAccount]) {
-        //        for account in accounts {
-        //            if let index = self.accounts.firstIndex(of: account) {
-        //                self.accounts[index] = account
-        //            }
-        //        }
-        //        updateCollectionView()
+        
     }
 }
 
 extension FinanceViewController: EndedWebViewDelegate {
     func updateMXMembers() {
+        sections.removeAll(where: { $0 == .issues })
+        members.removeAll()
         getMXData()
     }
 }

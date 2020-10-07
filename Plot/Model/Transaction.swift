@@ -440,6 +440,35 @@ struct TransactionDetails: Codable, Equatable, Hashable {
     var group: TransactionGroup
 }
 
+struct MXTransactionRuleResult: Codable {
+    let transaction_rule: TransactionRule
+}
+
+struct TransactionRule: Codable, Equatable, Hashable {
+    let category_guid: String
+    let created_at: String
+    let description: String
+    let guid: String
+    let match_description: String
+    let updated_at: String
+    let user_guid: String
+}
+
+struct MXTransactionCategoryResult: Codable {
+    let category: TransactionCategoryFull
+}
+
+struct TransactionCategoryFull: Codable, Equatable, Hashable {
+    let created_at: String
+    let name: String
+    let guid: String
+    let parent_guid: String
+    let updated_at: String
+    let is_default: Bool
+    let is_income: Bool?
+    let metadata: String?
+}
+
 func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date?, type: TransactionCatLevel?, completion: @escaping ([TransactionDetails], [TransactionDetails: [Transaction]]) -> ()) {
     var transactionsList = [TransactionDetails]()
     var transactionsDict = [TransactionDetails: [Transaction]]()

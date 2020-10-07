@@ -641,10 +641,10 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
     }
     
-    func getMXMemberStatus(guid: String, member_guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
+    func getMXMember(guid: String, member_guid: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid+"/status")!
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid)!
         }()
         
         var urlRequest = URLRequest(url: baseURL)
@@ -653,7 +653,6 @@ class Service {
                                         "Accept": MXAPI.version,
                                         "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
-        
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
@@ -843,6 +842,152 @@ class Service {
         let encodedURLRequest = urlRequest.encode(with: parameters)
                 
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+    }
+    
+    func createMXTransactionRule(guid: String, category_guid: String, match_description: String, description: String?, completion: @escaping ((MXTransactionRuleResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/transaction_rules")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        
+        var parameters = ["category_guid": "\(category_guid)",
+        "match_description": "\(match_description)"]
+        //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
+        if let description = description {
+            parameters["description"] = "\(description)"
+        }
+        
+        urlRequest.httpMethod = "POST"
+        
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
+    func deleteMXTransactionRule(guid: String, transaction_rule_guid: String, completion: @escaping ((MXTransactionRuleResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/transaction_rules/"+transaction_rule_guid)!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        
+        urlRequest.httpMethod = "DELETE"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+                        
+    }
+    
+    func updateMXTransactionRule(guid: String, transaction_rule_guid: String, category_guid: String?, match_description: String?, description: String?, completion: @escaping ((MXTransactionRuleResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"users/"+guid+"/transaction_rules/"+transaction_rule_guid)!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        
+        var parameters = [String: String]()
+        //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
+        if let category_guid = category_guid {
+            parameters["category_guid"] = "\(category_guid)"
+        }
+        if let match_description = match_description {
+            parameters["match_description"] = "\(match_description)"
+        }
+        if let description = description {
+            parameters["description"] = "\(description)"
+        }
+        
+        urlRequest.httpMethod = "PUT"
+        
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
+    func createMXCategory(guid: String, parent_guid: String, name: String, completion: @escaping ((MXTransactionCategoryResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"user/"+guid+"/categories")!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        
+        let parameters = ["parent_guid": "\(parent_guid)",
+        "name": "\(name)"]
+        //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
+        
+        urlRequest.httpMethod = "POST"
+        
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
+    }
+    
+    func deleteMXCategory(guid: String, category_guid: String, completion: @escaping ((MXTransactionCategoryResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"user/"+guid+"/categories/"+category_guid)!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        
+        //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
+        
+        urlRequest.httpMethod = "DELETE"
+        
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+                        
+    }
+    
+    func updateMXCategory(guid: String, category_guid: String, parent_guid: String?, name: String?, completion: @escaping ((MXTransactionCategoryResult?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: MXAPI.baseURL+"user/"+guid+"/categories/"+category_guid)!
+        }()
+        
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+                                        "MX-Client-ID": MXAPI.clientID,
+                                        "Accept": MXAPI.version,
+                                        "Content-Type": MXAPI.contentType]
+        
+        var parameters = [String: String]()
+        //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
+        if let parent_guid = parent_guid {
+            parameters["parent_guid"] = "\(parent_guid)"
+        }
+        if let name = name {
+            parameters["name"] = "\(name)"
+        }
+        
+        urlRequest.httpMethod = "PUT"
+        
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                        
     }
     
     // declare my generic json function here
