@@ -41,6 +41,7 @@ class FinanceAccountViewController: FormViewController {
     }
     
     @IBAction func done(_ sender: AnyObject) {
+        updateTags()
         self.delegate?.updateAccount(account: account)
         self.dismiss(animated: true, completion: nil)
     }
@@ -54,7 +55,7 @@ class FinanceAccountViewController: FormViewController {
         let isodateFormatter = ISO8601DateFormatter()
         let dateFormatterPrint = DateFormatter()
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
-
+        
         
         form +++
             Section()
@@ -86,21 +87,21 @@ class FinanceAccountViewController: FormViewController {
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }
+        }
         
-            if account.subtype != .none {
-                form.last!
-                    <<< TextRow("Subtype") {
-                        $0.cell.isUserInteractionEnabled = false
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.title = $0.tag
-                        $0.value = account.subtype.name
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
+        if account.subtype != .none {
+            form.last!
+                <<< TextRow("Subtype") {
+                    $0.cell.isUserInteractionEnabled = false
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.title = $0.tag
+                    $0.value = account.subtype.name
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
+        }
         
         form.last!
             <<< TextRow("Last Updated On") {
@@ -111,9 +112,9 @@ class FinanceAccountViewController: FormViewController {
                 if let date = isodateFormatter.date(from: account.updated_at) {
                     $0.value = dateFormatterPrint.string(from: date)
                 }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
             
             <<< CheckRow() {
@@ -129,20 +130,20 @@ class FinanceAccountViewController: FormViewController {
                     $0.title = "Not Included in Financial Profile"
                     $0.value = false
                 }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.tintColor = FalconPalette.defaultBlue
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }.onChange { row in
-                    row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
-                    row.updateCell()
-                    self.account.should_link = row.value
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("should_link")
-                        reference.setValue(row.value!)
-                    }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.tintColor = FalconPalette.defaultBlue
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
+                row.updateCell()
+                self.account.should_link = row.value
+                if let currentUser = Auth.auth().currentUser?.uid {
+                    let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("should_link")
+                    reference.setValue(row.value!)
                 }
+            }
             
             <<< TextRow("Balance") {
                 $0.cell.isUserInteractionEnabled = false
@@ -155,55 +156,117 @@ class FinanceAccountViewController: FormViewController {
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }
-            
-            if let availableBalance = account.available_balance {
-                form.last!
-                    <<< TextRow("Available Balance") {
-                        $0.cell.isUserInteractionEnabled = false
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.title = $0.tag
-                        if let balance = numberFormatter.string(from: availableBalance as NSNumber) {
-                            $0.value = "\(balance)"
-                        }
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            }
-            
-            if let paymentDueDate = account.payment_due_at {
-                form.last!
-                    <<< TextRow("Payment Due Date") {
-                        $0.cell.isUserInteractionEnabled = false
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.title = $0.tag
-                        if let date = isodateFormatter.date(from: paymentDueDate) {
-                            $0.value = dateFormatterPrint.string(from: date)
-                        }
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            }
+        }
         
-            if let minimum = account.minimum_payment {
-                form.last!
-                    <<< TextRow("Minimum Payment Due") {
-                        $0.cell.isUserInteractionEnabled = false
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.title = $0.tag
-                        if let minimum = numberFormatter.string(from: minimum as NSNumber) {
-                            $0.value = "\(minimum)"
-                        }
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
+        if let availableBalance = account.available_balance {
+            form.last!
+                <<< TextRow("Available Balance") {
+                    $0.cell.isUserInteractionEnabled = false
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.title = $0.tag
+                    if let balance = numberFormatter.string(from: availableBalance as NSNumber) {
+                        $0.value = "\(balance)"
+                    }
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
+        }
+        
+        if let paymentDueDate = account.payment_due_at {
+            form.last!
+                <<< TextRow("Payment Due Date") {
+                    $0.cell.isUserInteractionEnabled = false
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.title = $0.tag
+                    if let date = isodateFormatter.date(from: paymentDueDate) {
+                        $0.value = dateFormatterPrint.string(from: date)
+                    }
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }
+        }
+        
+        if let minimum = account.minimum_payment {
+            form.last!
+                <<< TextRow("Minimum Payment Due") {
+                    $0.cell.isUserInteractionEnabled = false
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.title = $0.tag
+                    if let minimum = numberFormatter.string(from: minimum as NSNumber) {
+                        $0.value = "\(minimum)"
+                    }
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }
+        }
+        form +++
+            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                               header: "Tags") {
+                                $0.tag = "tagsfields"
+                                $0.addButtonProvider = { section in
+                                    return ButtonRow(){
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.title = "Add New Tag"
+                                    }.cellUpdate { cell, row in
+                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        cell.textLabel?.textAlignment = .left
+                                        
+                                    }
+                                }
+                                $0.multivaluedRowToInsertAt = { index in
+                                    return TextRow() {
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                        $0.placeholder = "Tag"
+                                    }.cellUpdate { cell, row in
+                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                        row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                    }
+                                }
+        }
+        
+        if let items = self.account.tags {
+            for item in items {
+                var mvs = (form.sectionBy(tag: "tagsfields") as! MultivaluedSection)
+                mvs.insert(TextRow(){
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.value = item
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                } , at: mvs.count - 1)
+            }
+        }
+    }
+    
+    fileprivate func updateTags() {
+        if let mvs = (form.values()["tagsfields"] as? [Any?])?.compactMap({ $0 as? String }) {
+            if !mvs.isEmpty {
+                print("mvs \(mvs)")
+                var tagsArray = [String]()
+                for value in mvs {
+                    tagsArray.append(value)
+                }
+                self.account.tags = tagsArray
+            } else {
+                self.account.tags = nil
+            }
+            if let currentUser = Auth.auth().currentUser?.uid {
+                let updatedTags = ["tags": self.account.tags as AnyObject]
+                Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).updateChildValues(updatedTags)
+            }
+        }
     }
     
 }

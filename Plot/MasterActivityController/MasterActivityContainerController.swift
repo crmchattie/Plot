@@ -103,7 +103,7 @@ class MasterActivityContainerController: UIViewController {
     let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
     var index: Int = 2
     
-    let customSegmented = CustomSegmentedControl(buttonImages: ["chat","heart","activity", "money", "list"])
+    let customSegmented = CustomSegmentedControl(buttonImages: ["chat","heart","activity", "money", "list"], buttonTitles: nil)
     let containerView = UIView()
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()

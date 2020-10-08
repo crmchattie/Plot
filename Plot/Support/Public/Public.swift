@@ -1538,20 +1538,30 @@ extension Date {
     var startOfDay: Date {
         return Calendar.current.startOfDay(for: self)
     }
-
-    var startOfMonth: Date {
-
-        let calendar = Calendar(identifier: .gregorian)
-        let components = calendar.dateComponents([.year, .month], from: self)
-
-        return  calendar.date(from: components)!
-    }
-
+    
     var endOfDay: Date {
         var components = DateComponents()
         components.day = 1
         components.second = -1
         return Calendar.current.date(byAdding: components, to: startOfDay)!
+    }
+    
+    var startOfWeek: Date {
+        let gregorian = Calendar(identifier: .gregorian)
+        let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
+        return gregorian.date(byAdding: .day, value: 1, to: sunday!)!
+    }
+
+    var endOfWeek: Date {
+        let gregorian = Calendar(identifier: .gregorian)
+        let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
+        return gregorian.date(byAdding: .day, value: 7, to: sunday)!
+    }
+
+    var startOfMonth: Date {
+        let calendar = Calendar(identifier: .gregorian)
+        let components = calendar.dateComponents([.year, .month], from: self)
+        return  calendar.date(from: components)!
     }
 
     var endOfMonth: Date {
@@ -1559,6 +1569,19 @@ extension Date {
         components.month = 1
         components.second = -1
         return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfMonth)!
+    }
+    
+    var startOfYear: Date {
+        let calendar = Calendar(identifier: .gregorian)
+        let components = calendar.dateComponents([.year], from: self)
+        return  calendar.date(from: components)!
+    }
+
+    var endOfYear: Date {
+        var components = DateComponents()
+        components.year = 1
+        components.day = -1
+        return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfYear)!
     }
 
     func isMonday() -> Bool {

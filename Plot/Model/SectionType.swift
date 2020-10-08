@@ -187,9 +187,9 @@ enum SectionType: Hashable, CaseIterable {
         case .transactionCategories: return "Transactions - Subcategories"
         case .transactionTopLevelCategories: return "Transactions - Categories"
         case .transactionGroups: return "Transactions - Groups"
-        case .incomeStatement: return "Income Statement"
+        case .incomeStatement: return "Cash Flow"
         case .transactions: return "Transactions"
-        case .balanceSheet: return "Balance Sheet"
+        case .balanceSheet: return "Balances"
         case .financialAccounts: return "Accounts"
         case .issues: return "Issues"
         }

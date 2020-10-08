@@ -14,8 +14,14 @@ protocol HomeBaseFinance: class {
     
 }
 
-class FinanceViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class FinanceViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     weak var delegate: HomeBaseFinance?
+    
+    let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
+    let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
+    
+    let customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["Day","Week","Month", "Year"])
+    var index: Int = 2
     
     var transactions = [Transaction]()
     var accounts = [MXAccount]()
@@ -42,85 +48,13 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
-    let startDate = Date().startOfMonth
-    let endDate = Date().endOfMonth
-    
-    //    init() {
-    //        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
-    //            if sectionNumber % 2 != 0 {
-    //                return FinanceViewController.transactionsSection()
-    //            }
-    //            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
-    //            item.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
-    //
-    //            let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(30)), subitems: [item])
-    //            group.contentInsets = .init(top: 10, leading: 0, bottom: 0, trailing: 0)
-    //
-    //            let section = NSCollectionLayoutSection(group: group)
-    //            section.contentInsets.leading = 16
-    //            section.contentInsets.trailing = 16
-    //
-    //            let kind = UICollectionView.elementKindSectionHeader
-    //            section.boundarySupplementaryItems = [
-    //                .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
-    //            ]
-    //            return section
-    //        }
-    //
-    //        super.init(collectionViewLayout: layout)
-    //    }
-    //
-    //    static func transactionsSection() -> NSCollectionLayoutSection {
-    //        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
-    //        item.contentInsets = .init(top: 0, leading: 0, bottom: 20, trailing: 0)
-    //
-    //        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(85)), subitems: [item])
-    //
-    //        let section = NSCollectionLayoutSection(group: group)
-    //        section.contentInsets.leading = 16
-    //        section.contentInsets.trailing = 16
-    //
-    //        let kind = UICollectionView.elementKindSectionHeader
-    //        section.boundarySupplementaryItems = [
-    //            .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: kind, alignment: .topLeading)
-    //        ]
-    //
-    //        return section
-    //    }
-    //
-    
-    init() {
-        super.init(collectionViewLayout: UICollectionViewFlowLayout())
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    var startDate = Date().startOfMonth
+    var endDate = Date().endOfMonth
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(activityIndicatorView)
-        activityIndicatorView.centerInSuperview()
-        
-        navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
-        
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
-        
-        extendedLayoutIncludesOpaqueBars = true
-        definesPresentationContext = true
-        edgesForExtendedLayout = UIRectEdge.top
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
-        collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kHeaderCell)
-        collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
-        collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
+        setupMainView()
         
         addObservers()
         
@@ -153,6 +87,43 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.reloadData()
         
+    }
+    
+    fileprivate func setupMainView() {
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
+        extendedLayoutIncludesOpaqueBars = true
+        definesPresentationContext = true
+        edgesForExtendedLayout = UIRectEdge.top
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        customSegmented.constrainHeight(30)
+        customSegmented.delegate = self
+                
+        layout.scrollDirection = UICollectionView.ScrollDirection.vertical
+        collectionView.setCollectionViewLayout(layout, animated: true)
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kHeaderCell)
+        collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
+        collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
+        collectionView.isUserInteractionEnabled = true
+        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        view.addSubview(customSegmented)
+        view.addSubview(collectionView)
+                        
+        customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
+        
+
     }
     
     func getFinancialData() {
@@ -195,7 +166,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                                 if let member = search?.member {
                                     dispatchGroup.enter()
                                     self.pollMemberStatus(guid: user.guid, member_guid: member.guid) { (member) in
-                                        print("moving on")
                                         dispatchGroup.enter()
                                         self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
                                             updatedAccounts.append(contentsOf: accounts)
@@ -246,7 +216,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         }
         
         dispatchGroup.notify(queue: .main) {
-            print("dispatchGroup.notify")
             self.accounts = updatedAccounts
             self.updateCollectionView()
             self.updateFirebase(accounts: updatedAccounts, transactions: [])
@@ -254,7 +223,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     }
     
     func getMXTransactions(user: MXUser, account: MXAccount?, date: Date?) {
-        print("getMXTransactions")
         let dispatchGroup = DispatchGroup()
         var newTransactions = [Transaction]()
         dispatchGroup.enter()
@@ -298,7 +266,6 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                 }
             }
         } else {
-            print("grabbing all transactions")
             dispatchGroup.enter()
             let account = self.accounts.min(by:{ self.isodateFormatter.date(from: $0.updated_at)! < self.isodateFormatter.date(from: $1.updated_at)! })
             let date = self.isodateFormatter.date(from: account!.updated_at) ?? Date()
@@ -476,9 +443,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     func pollMemberStatus(guid: String, member_guid: String, completion: @escaping (MXMember) -> ()) {
         Service.shared.getMXMember(guid: guid, member_guid: member_guid) { (search, err) in
             if let member = search?.member {
-                print("poll member \(member.name)")
                 if member.connection_status == .challenged {
-                    print("challenged")
                     if !self.sections.contains(.issues) {
                         self.sections.insert(.issues, at: 0)
                     }
@@ -487,12 +452,10 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
                         completion(member)
                     }
                 } else if member.is_being_aggregated {
-                    print("is_being_aggregated")
                     self.pollMemberStatus(guid: guid, member_guid: member_guid) { member in
                         completion(member)
                     }
                 } else {
-                    print("completion")
                     completion(member)
                 }
             }
@@ -682,16 +645,16 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         }
     }
     
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         sections.count
     }
     
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sec = sections[section]
         return groups[sec]?.count ?? 0
     }
     
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = sections[indexPath.section]
         let object = groups[section]
         if section != .issues {
@@ -756,7 +719,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
         return CGSize(width: view.frame.width, height: 30)
     }
     
-    override func collectionView(_ collectionView: UICollectionView,
+    func collectionView(_ collectionView: UICollectionView,
         viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let section = sections[indexPath.section]
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
@@ -803,7 +766,7 @@ class FinanceViewController: UICollectionViewController, UICollectionViewDelegat
     //        return nil
     //    }
     //
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let section = sections[indexPath.section]
         let object = groups[section]
         if let object = object as? [TransactionDetails] {
@@ -868,5 +831,26 @@ extension FinanceViewController: EndedWebViewDelegate {
         sections.removeAll(where: { $0 == .issues })
         members.removeAll()
         getMXData()
+    }
+}
+
+extension FinanceViewController: CustomSegmentedControlDelegate {
+    func changeToIndex(index:Int) {
+        if index == 0 {
+            startDate = Date().startOfDay
+            endDate = Date().endOfDay
+        } else if index == 1 {
+            startDate = Date().startOfWeek
+            endDate = Date().endOfWeek
+        } else if index == 2 {
+            startDate = Date().startOfMonth
+            endDate = Date().endOfMonth
+        } else {
+            startDate = Date().startOfYear
+            endDate = Date().endOfYear
+        }
+        self.index = index
+        updateCollectionView()
+        
     }
 }
