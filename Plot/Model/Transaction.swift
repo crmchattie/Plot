@@ -8,6 +8,13 @@
 
 let userFinancialTransactionsEntity = "user-financial-transactions"
 let financialTransactionsEntity = "financial-transactions"
+let financialTransactionsCategoriesEntity = "financial-transactions-categories"
+let financialTransactionsTopLevelCategoriesEntity = "financial-transactions-top-level-categories"
+let financialTransactionsGroupsEntity = "user-financial-transactions-groups"
+let userFinancialTransactionsCategoriesEntity = "user-financial-transactions-categories"
+let userFinancialTransactionsTopLevelCategoriesEntity = "user-financial-transactions-top-level-categories"
+let userFinancialTransactionsGroupsEntity = "user-financial-transactions-groups"
+let userFinancialTransactionRulesEntity = "user-financial-transaction-rules"
 
 struct MXTransactionResult: Codable {
     let transaction: Transaction?
@@ -16,36 +23,36 @@ struct MXTransactionResult: Codable {
 }
 
 struct Transaction: Codable, Equatable, Hashable {
-    let account_guid: String
-    let amount: Double
+    let account_guid: String?
+    var amount: Double
     var category: TransactionCategory
     let check_number: Int?
     let check_number_string: String?
     let created_at: String
-    let currency_code: String?
+    var currency_code: String?
     let date: String
     var description: String
     let guid: String
-    let is_bill_pay: Bool
-    let is_direct_deposit: Bool
-    let is_expense: Bool
-    let is_fee: Bool
-    let is_income: Bool
+    let is_bill_pay: Bool?
+    let is_direct_deposit: Bool?
+    let is_expense: Bool?
+    let is_fee: Bool?
+    let is_income: Bool?
     let is_international: Bool?
-    let is_overdraft_fee: Bool
-    let is_payroll_advance: Bool
+    let is_overdraft_fee: Bool?
+    let is_payroll_advance: Bool?
     let latitude: Double?
     let longitude: Double?
-    let member_guid: String
+    let member_guid: String?
     let memo: String?
-    let merchant_category_code: Int
+    let merchant_category_code: Int?
     let merchant_guid: String?
-    let original_description: String
-    let posted_at: String
+    let original_description: String?
+    let posted_at: String?
     let status: TransactionStatus
     var top_level_category: TransactionTopLevelCategory
     let transacted_at: String
-    let type: String
+    let type: String?
     let updated_at: String
     let user_guid: String
     //user defined tags
@@ -117,6 +124,20 @@ struct Transaction: Codable, Equatable, Hashable {
             _group = newValue
         }
     }
+    
+//    init(description: String, amount: Double, created_at: String, guid: String, user_guid: String, status: TransactionStatus, category: TransactionCategory, top_level_category: TransactionTopLevelCategory) {
+//        self.description = description
+//        self.amount = amount
+//        self.created_at = created_at
+//        self.date = created_at
+//        self.transacted_at = created_at
+//        self.updated_at = created_at
+//        self.guid = guid
+//        self.user_guid = user_guid
+//        self.status = status
+//        self.category = category
+//        self.top_level_category = top_level_category
+//    }
 }
 
 func ==(lhs: Transaction, rhs: Transaction) -> Bool {
@@ -445,13 +466,16 @@ struct MXTransactionRuleResult: Codable {
 }
 
 struct TransactionRule: Codable, Equatable, Hashable {
-    let category_guid: String
     let created_at: String
-    let description: String
     let guid: String
-    let match_description: String
+    var match_description: String
+    var description: String?
     let updated_at: String
     let user_guid: String
+    var category: TransactionCategory?
+    var top_level_category: TransactionTopLevelCategory?
+    var group: TransactionGroup?
+    var amount: Double?
 }
 
 struct MXTransactionCategoryResult: Codable {

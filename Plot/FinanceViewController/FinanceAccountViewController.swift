@@ -205,6 +205,7 @@ class FinanceAccountViewController: FormViewController {
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
         }
+        
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Tags") {

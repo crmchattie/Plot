@@ -16,13 +16,35 @@ protocol UpdateTransactionDelegate: class {
 
 class FinanceTransactionViewController: FormViewController {
     var transaction: Transaction!
+    var user: MXUser!
+    var accounts: [MXAccount]!
+    
+    var active: Bool = false
     
     weak var delegate : UpdateTransactionDelegate?
     
     var status = false
     
+    let numberFormatter = NumberFormatter()
+    
+    // create dateFormatter with UTC time format
+    let isodateFormatter = ISO8601DateFormatter()
+    let dateFormatterPrint = DateFormatter()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if let _ = transaction {
+            active = true
+        } else if let currentUser = Auth.auth().currentUser?.uid {
+            let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).childByAutoId().key ?? ""
+            let date = isodateFormatter.string(from: Date())
+            transaction = Transaction
+        }
+        
+        dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
+        numberFormatter.currencyCode = transaction.currency_code
+        numberFormatter.numberStyle = .currency
         
         status = transaction.status == .posted
         
@@ -46,28 +68,26 @@ class FinanceTransactionViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationItem.title = "Transaction"
-        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
-        navigationItem.rightBarButtonItem = doneBarButton
+        
+        if active {
+            let barButton = UIBarButtonItem(title: "Update", style: .plain, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = barButton
+        } else {
+            let barButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = barButton
+        }
+        let ruleBarButton = UIBarButtonItem(title: "Add Rule", style: .plain, target: self, action: #selector(createRule))
+        navigationItem.leftBarButtonItem = ruleBarButton
         
     }
     
-    @IBAction func done(_ sender: AnyObject) {
+    @IBAction func create(_ sender: AnyObject) {
         updateTags()
         self.delegate?.updateTransaction(transaction: transaction)
         self.dismiss(animated: true, completion: nil)
     }
     
     fileprivate func initializeForm() {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.currencyCode = transaction.currency_code
-        numberFormatter.numberStyle = .currency
-        
-        // create dateFormatter with UTC time format
-        let isodateFormatter = ISO8601DateFormatter()
-        let dateFormatterPrint = DateFormatter()
-        dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
-        
-        
         form +++
             Section()
             
@@ -114,26 +134,31 @@ class FinanceTransactionViewController: FormViewController {
                     $0.value = date
                 }
                 
-            }
-            .onChange { row in
+            }.onChange { row in
                 if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
-                    let date = isodateFormatter.string(from: value)
+                    let date = self.isodateFormatter.string(from: value)
                     let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("date_for_reports")
                     reference.setValue(date)
                 }
             }
             
-            <<< TextRow("Amount") {
+            <<< DecimalRow("Amount") {
                 $0.cell.isUserInteractionEnabled = false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
-                if let balance = numberFormatter.string(from: transaction.amount as NSNumber) {
-                    $0.value = "\(balance)"
-                }
+                $0.value = transaction.amount
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                if let value = row.value {
+                    self.transaction.amount = value
+                    if let currentUser = Auth.auth().currentUser?.uid {
+                        let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("amount")
+                        reference.setValue(value)
+                    }
+                }
             }
             
             <<< TextRow("Status") {
@@ -286,10 +311,14 @@ class FinanceTransactionViewController: FormViewController {
             }.onPresent { from, to in
                 to.dismissOnSelection = false
                 to.dismissOnChange = false
+                
+                to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .plain, target: from, action: #selector(FinanceTransactionViewController.selected(_:)))
+                
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Subcategory"
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
+                    
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -360,7 +389,6 @@ class FinanceTransactionViewController: FormViewController {
     fileprivate func updateTags() {
         if let mvs = (form.values()["tagsfields"] as? [Any?])?.compactMap({ $0 as? String }) {
             if !mvs.isEmpty {
-                print("mvs \(mvs)")
                 var tagsArray = [String]()
                 for value in mvs {
                     tagsArray.append(value)
@@ -374,6 +402,18 @@ class FinanceTransactionViewController: FormViewController {
                 Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).updateChildValues(updatedTags)
             }
         }
+    }
+    
+    @objc func selected(_ item:UIBarButtonItem) {
+        let destination = FinanceTransactionNewLevelViewController()
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    @objc func createRule(_ item:UIBarButtonItem) {
+        let destination = FinanceTransactionRuleViewController()
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
 }

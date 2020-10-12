@@ -96,8 +96,7 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let participantsIDsDict = dictionary?["participantsIDs"] as? [String: String] {
             participantsIDs = Array(participantsIDsDict.keys)
-        }
-        else if let participantsIDsArray = dictionary?["participantsIDs"] as? [String] {
+        } else if let participantsIDsArray = dictionary?["participantsIDs"] as? [String] {
             participantsIDs = participantsIDsArray
         } else {
             participantsIDs = []

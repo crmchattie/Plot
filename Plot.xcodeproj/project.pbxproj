@@ -110,6 +110,8 @@
 		10C50FA22274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */; };
 		10C50FA42274EF9100111033 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA32274EF9000111033 /* Activity.swift */; };
 		10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */; };
+		10C766E325321732003C8E1F /* FinanceTransactionRuleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */; };
+		10C766E525321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */; };
 		10C83340249AC2F00037F638 /* SygicPlacesSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C8333F249AC2F00037F638 /* SygicPlacesSearchResult.swift */; };
 		10C83342249ACC8F0037F638 /* SygicToursSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C83341249ACC8F0037F638 /* SygicToursSearchResult.swift */; };
 		10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C83343249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift */; };
@@ -478,6 +480,8 @@
 		10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
 		10C50FA32274EF9000111033 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityCell+ConfigureCell.swift"; sourceTree = "<group>"; };
+		10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionRuleViewController.swift; sourceTree = "<group>"; };
+		10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionNewLevelViewController.swift; sourceTree = "<group>"; };
 		10C8333F249AC2F00037F638 /* SygicPlacesSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SygicPlacesSearchResult.swift; sourceTree = "<group>"; };
 		10C83341249ACC8F0037F638 /* SygicToursSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SygicToursSearchResult.swift; sourceTree = "<group>"; };
 		10C83343249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoursquareVenueRecSearchResult.swift; sourceTree = "<group>"; };
@@ -838,6 +842,8 @@
 				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
 				105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */,
 				105CB18D2512A3830000D3D8 /* FinanceTableViewController.swift */,
+				10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */,
+				10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */,
 				10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */,
 				10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */,
 				10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */,
@@ -2236,6 +2242,7 @@
 				4BAEE5B7212735E50045AB10 /* INSPhotosTransitionAnimator.swift in Sources */,
 				4BAEE46D21272B380045AB10 /* SwitchObject.swift in Sources */,
 				103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */,
+				10C766E325321732003C8E1F /* FinanceTransactionRuleViewController.swift in Sources */,
 				4BAEE49821272C5E0045AB10 /* ViewPlaceholder.swift in Sources */,
 				4BAEE5D2212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift in Sources */,
 				108BDE6F24B5107A00BE2CBA /* RecreationTypeViewController.swift in Sources */,
@@ -2391,6 +2398,7 @@
 				109FEB3D22A7003000621D2F /* Schedule.swift in Sources */,
 				4BAEE4EC21272D890045AB10 /* UserInfoCreateContactTableViewController.swift in Sources */,
 				10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */,
+				10C766E525321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift in Sources */,
 				1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */,
 				4BAEE46621272B380045AB10 /* PrivacyTableViewController.swift in Sources */,
 				10196EFF24411B5600B6AFDF /* LocationFinderTableViewController.swift in Sources */,
