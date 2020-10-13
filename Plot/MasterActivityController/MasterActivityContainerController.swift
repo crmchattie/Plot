@@ -394,7 +394,6 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
             // Don't do anything if healthVC is hidden and not initialized. We don't to access healthVC so that its viewDidAppear execute
         } else {
             healthVC.delegate = self
-            healthVC.healthActivitiesDelegate = activitiesVC
             healthVC.view.isHidden = !(index == 1)
         }
         

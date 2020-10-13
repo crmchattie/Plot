@@ -1225,12 +1225,6 @@ extension ActivityViewController: ChooseChatDelegate {
     }
 }
 
-extension ActivityViewController: HealthViewControllerActivitiesDelegate {
-    func update(_ healthViewController: HealthViewController, _ shouldFetchActivities: Bool) {
-        activitiesFetcher.fetchActivities()
-    }
-}
-
 class UITableViewWithReloadCompletion: UITableView {
     
     var reloadDataCompletionBlock: (() -> Void)?

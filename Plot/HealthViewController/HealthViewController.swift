@@ -20,7 +20,6 @@ protocol HealthViewControllerActivitiesDelegate: class {
 
 class HealthViewController: UIViewController {
     weak var delegate: HomeBaseHealth?
-    weak var healthActivitiesDelegate: HealthViewControllerActivitiesDelegate?
     
     var hasViewAppeared = false
     let healhKitManager = HealthKitManager()
@@ -73,10 +72,7 @@ class HealthViewController: UIViewController {
                 self?.healhKitManager.loadHealthKitActivities { [weak self] metrics, shouldFetchActivities in
                     DispatchQueue.main.async {
                         self?.healthMetrics = metrics
-                        if let _self = self {
-                            _self.healthActivitiesDelegate?.update(_self, shouldFetchActivities)
-                            _self.spinner.stopAnimating()
-                        }
+                        self?.spinner.stopAnimating()
                     }
                 }
             }
