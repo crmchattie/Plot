@@ -23,43 +23,45 @@ struct MXTransactionResult: Codable {
 }
 
 struct Transaction: Codable, Equatable, Hashable {
-    let account_guid: String?
+    var account_guid: String?
     var amount: Double
     var category: TransactionCategory
-    let check_number: Int?
-    let check_number_string: String?
-    let created_at: String
+    var check_number: Int?
+    var check_number_string: String?
+    var created_at: String
     var currency_code: String?
-    let date: String
+    var date: String
     var description: String
-    let guid: String
-    let is_bill_pay: Bool?
-    let is_direct_deposit: Bool?
-    let is_expense: Bool?
-    let is_fee: Bool?
-    let is_income: Bool?
-    let is_international: Bool?
-    let is_overdraft_fee: Bool?
-    let is_payroll_advance: Bool?
-    let latitude: Double?
-    let longitude: Double?
-    let member_guid: String?
-    let memo: String?
-    let merchant_category_code: Int?
-    let merchant_guid: String?
-    let original_description: String?
-    let posted_at: String?
-    let status: TransactionStatus
+    var guid: String
+    var is_bill_pay: Bool?
+    var is_direct_deposit: Bool?
+    var is_expense: Bool?
+    var is_fee: Bool?
+    var is_income: Bool?
+    var is_international: Bool?
+    var is_overdraft_fee: Bool?
+    var is_payroll_advance: Bool?
+    var latitude: Double?
+    var longitude: Double?
+    var member_guid: String?
+    var memo: String?
+    var merchant_category_code: Int?
+    var merchant_guid: String?
+    var original_description: String?
+    var posted_at: String?
+    var status: TransactionStatus
     var top_level_category: TransactionTopLevelCategory
-    let transacted_at: String
-    let type: String?
-    let updated_at: String
-    let user_guid: String
-    //user defined tags
+    var transacted_at: String
+    var type: String?
+    var updated_at: String
+    var user_guid: String
     var tags: [String]?
     var should_link: Bool?
     var participantsIDs: [String]?
     var date_for_reports: String?
+    var user_created: Bool?
+    var admin: String?
+    var activityID: String?
     var cash_flow_type: String {
         if type == "CREDIT" {
             return "Inflow"
@@ -125,19 +127,20 @@ struct Transaction: Codable, Equatable, Hashable {
         }
     }
     
-//    init(description: String, amount: Double, created_at: String, guid: String, user_guid: String, status: TransactionStatus, category: TransactionCategory, top_level_category: TransactionTopLevelCategory) {
-//        self.description = description
-//        self.amount = amount
-//        self.created_at = created_at
-//        self.date = created_at
-//        self.transacted_at = created_at
-//        self.updated_at = created_at
-//        self.guid = guid
-//        self.user_guid = user_guid
-//        self.status = status
-//        self.category = category
-//        self.top_level_category = top_level_category
-//    }
+    init(description: String, amount: Double, created_at: String, guid: String, user_guid: String, status: TransactionStatus, category: TransactionCategory, top_level_category: TransactionTopLevelCategory, user_created: Bool?, admin: String) {
+        self.description = description
+        self.amount = amount
+        self.created_at = created_at
+        self.date = created_at
+        self.transacted_at = created_at
+        self.updated_at = created_at
+        self.guid = guid
+        self.user_guid = user_guid
+        self.status = status
+        self.category = category
+        self.top_level_category = top_level_category
+        self.user_created = user_created
+    }
 }
 
 func ==(lhs: Transaction, rhs: Transaction) -> Bool {

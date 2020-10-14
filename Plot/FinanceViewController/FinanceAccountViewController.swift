@@ -16,11 +16,59 @@ protocol UpdateAccountDelegate: class {
 
 class FinanceAccountViewController: FormViewController {
     var account: MXAccount!
+    var user: MXUser!
+    
+    var users = [User]()
+    var filteredUsers = [User]()
+    var selectedFalconUsers = [User]()
+    
+    var userNames : [String] = []
+    var userNamesString: String = ""
+    
+    var active: Bool = false
     
     weak var delegate : UpdateAccountDelegate?
     
+    let numberFormatter = NumberFormatter()
+    
+    // create dateFormatter with UTC time format
+    let isodateFormatter = ISO8601DateFormatter()
+    let dateFormatterPrint = DateFormatter()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        numberFormatter.numberStyle = .currency
+        dateFormatterPrint.dateFormat = "MMM dd, yyyy"
+        
+        if let _ = account {
+            active = true
+            numberFormatter.currencyCode = account.currency_code
+            
+            var participantCount = self.selectedFalconUsers.count
+            // If user is creating this activity (admin)
+            if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
+                participantCount += 1
+            }
+            
+            if participantCount > 1 {
+                self.userNamesString = "\(participantCount) participants"
+            } else {
+                self.userNamesString = "1 participant"
+            }
+            
+            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
+            }
+            
+        } else if let currentUser = Auth.auth().currentUser?.uid {
+            let ID = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).childByAutoId().key ?? ""
+            let date = isodateFormatter.string(from: Date())
+            account = MXAccount(name: "", balance: 0.0, created_at: date, guid: ID, user_guid: user.guid, type: .any, subtype: .any, user_created: true, admin: currentUser)
+            numberFormatter.currencyCode = "USD"
+        }
+        
         configureTableView()
         initializeForm()
     }
@@ -35,28 +83,31 @@ class FinanceAccountViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationItem.title = "Account"
-        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
-        navigationItem.rightBarButtonItem = doneBarButton
+        
+        if active {
+            let barButton = UIBarButtonItem(title: "Update", style: .plain, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = barButton
+        } else {
+            let barButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = barButton
+        }
         
     }
     
-    @IBAction func done(_ sender: AnyObject) {
+    @IBAction func create(_ sender: AnyObject) {
+        if account.user_created ?? false, let currentUser = Auth.auth().currentUser?.uid {
+            let date = isodateFormatter.string(from: Date())
+            let reference = Database.database().reference()
+            reference.child(financialAccountsEntity).child(self.account.guid).child("updated_at").setValue(date)
+            reference.child(userFinancialAccountsEntity).child(currentUser).child(account.guid).child("balances").child(date).setValue(account.balance)
+        }
+        
         updateTags()
         self.delegate?.updateAccount(account: account)
         self.dismiss(animated: true, completion: nil)
     }
     
     fileprivate func initializeForm() {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.currencyCode = account.currency_code
-        numberFormatter.numberStyle = .currency
-        
-        // create dateFormatter with UTC time format
-        let isodateFormatter = ISO8601DateFormatter()
-        let dateFormatterPrint = DateFormatter()
-        dateFormatterPrint.dateFormat = "MMM dd, yyyy"
-        
-        
         form +++
             Section()
             
@@ -79,7 +130,7 @@ class FinanceAccountViewController: FormViewController {
             }
             
             <<< TextRow("Type") {
-                $0.cell.isUserInteractionEnabled = false
+                $0.cell.isUserInteractionEnabled = account.user_created ?? false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
@@ -92,7 +143,7 @@ class FinanceAccountViewController: FormViewController {
         if account.subtype != .none {
             form.last!
                 <<< TextRow("Subtype") {
-                    $0.cell.isUserInteractionEnabled = false
+                    $0.cell.isUserInteractionEnabled = account.user_created ?? false
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.title = $0.tag
@@ -146,7 +197,7 @@ class FinanceAccountViewController: FormViewController {
             }
             
             <<< TextRow("Balance") {
-                $0.cell.isUserInteractionEnabled = false
+                $0.cell.isUserInteractionEnabled = account.user_created ?? false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
@@ -161,7 +212,7 @@ class FinanceAccountViewController: FormViewController {
         if let availableBalance = account.available_balance {
             form.last!
                 <<< TextRow("Available Balance") {
-                    $0.cell.isUserInteractionEnabled = false
+                    $0.cell.isUserInteractionEnabled = account.user_created ?? false
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.title = $0.tag
@@ -177,7 +228,7 @@ class FinanceAccountViewController: FormViewController {
         if let paymentDueDate = account.payment_due_at {
             form.last!
                 <<< TextRow("Payment Due Date") {
-                    $0.cell.isUserInteractionEnabled = false
+                    $0.cell.isUserInteractionEnabled = account.user_created ?? false
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.title = $0.tag
@@ -193,7 +244,7 @@ class FinanceAccountViewController: FormViewController {
         if let minimum = account.minimum_payment {
             form.last!
                 <<< TextRow("Minimum Payment Due") {
-                    $0.cell.isUserInteractionEnabled = false
+                    $0.cell.isUserInteractionEnabled = account.user_created ?? false
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.title = $0.tag
@@ -205,6 +256,31 @@ class FinanceAccountViewController: FormViewController {
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
         }
+        
+        form +++
+            Section()
+            <<< ButtonRow("Participants") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
+                if active {
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.title = self.userNamesString
+                }
+                }.onCellSelection({ _,_ in
+                    self.openParticipantsInviter()
+                }).cellUpdate { cell, row in
+                    cell.accessoryType = .disclosureIndicator
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textAlignment = .left
+                    if row.title == "Participants" {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    } else {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }
+                }
         
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
@@ -270,4 +346,108 @@ class FinanceAccountViewController: FormViewController {
         }
     }
     
+    @objc fileprivate func openParticipantsInviter() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = SelectActivityMembersViewController()
+        var uniqueUsers = users
+        for participant in selectedFalconUsers {
+            if let userIndex = users.firstIndex(where: { (user) -> Bool in
+                return user.id == participant.id }) {
+                uniqueUsers[userIndex] = participant
+            } else {
+                uniqueUsers.append(participant)
+            }
+        }
+        destination.users = uniqueUsers
+        destination.filteredUsers = uniqueUsers
+        if !selectedFalconUsers.isEmpty {
+            destination.priorSelectedUsers = selectedFalconUsers
+        }
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    func getSelectedFalconUsers(forAccount account: MXAccount, completion: @escaping ([User])->()) {
+        guard let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        var selectedFalconUsers = [User]()
+        let group = DispatchGroup()
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if account.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    selectedFalconUsers.append(user)
+                }
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            completion(selectedFalconUsers)
+        }
+    }
+    
+    func showActivityIndicator() {
+        if let tabController = self.tabBarController {
+            self.showSpinner(onView: tabController.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
+    
+}
+
+extension FinanceAccountViewController: UpdateInvitees {
+    func updateInvitees(selectedFalconUsers: [User]) {
+        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
+            if !selectedFalconUsers.isEmpty {
+                self.selectedFalconUsers = selectedFalconUsers
+                
+                var participantCount = self.selectedFalconUsers.count
+                // If user is creating this activity (admin)
+                if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
+                    participantCount += 1
+                }
+                
+                if participantCount > 1 {
+                    self.userNamesString = "\(participantCount) participants"
+                } else {
+                    self.userNamesString = "1 participant"
+                }
+                
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
+                
+            } else {
+                self.selectedFalconUsers = selectedFalconUsers
+                inviteesRow.title = "1 participant"
+                inviteesRow.updateCell()
+            }
+            
+            if active {
+//                showActivityIndicator()
+//                let createChecklist = ChecklistActions(checklist: checklist, active: active, selectedFalconUsers: selectedFalconUsers)
+//                createChecklist.updateChecklistParticipants()
+//                hideActivityIndicator()
+
+            }
+            
+        }
+    }
 }

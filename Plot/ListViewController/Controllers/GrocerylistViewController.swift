@@ -147,6 +147,7 @@ class GrocerylistViewController: FormViewController {
             grocerylist.lastModifiedDate = Date()
             delegate?.updateGrocerylist(grocerylist: grocerylist)
             self.navigationController?.popViewController(animated: true)
+            
         }
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)

@@ -105,31 +105,6 @@ class GrocerylistActions: NSObject {
         
     }
     
-//    func updateGrocerylist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-//        guard let _ = grocerylist, let ID = ID else {
-//            return
-//        }
-//
-//        let groupGrocerylistReference = Database.database().reference().child(grocerylistsEntity).child(ID)
-//        groupGrocerylistReference.updateChildValues(firebaseDictionary)
-//
-//
-//    }
-//
-//    func newGrocerylist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-//        guard let _ = grocerylist, let ID = ID else {
-//            return
-//        }
-//
-//        let groupGrocerylistReference = Database.database().reference().child(grocerylistsEntity).child(ID)
-//
-//        self.dispatchGroup.enter()
-//        self.dispatchGroup.enter()
-//        createGroupGrocerylistNode(reference: groupGrocerylistReference, childValues: firebaseDictionary)
-//        connectMembersToGroupGrocerylist(memberIDs: membersIDs.0, ID: ID)
-//
-//    }
-    
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()

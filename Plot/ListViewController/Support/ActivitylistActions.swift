@@ -110,31 +110,6 @@ class ActivitylistActions: NSObject {
         
     }
     
-//    func updateActivitylist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-//        guard let _ = activitylist, let ID = ID else {
-//            return
-//        }
-//
-//        let groupActivitylistReference = Database.database().reference().child(activitylistsEntity).child(ID)
-//        groupActivitylistReference.updateChildValues(firebaseDictionary)
-//
-//
-//    }
-//
-//    func newActivitylist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-//        guard let _ = activitylist, let ID = ID else {
-//            return
-//        }
-//
-//        let groupActivitylistReference = Database.database().reference().child(activitylistsEntity).child(ID)
-//
-//        self.dispatchGroup.enter()
-//        self.dispatchGroup.enter()
-//        createGroupActivitylistNode(reference: groupActivitylistReference, childValues: firebaseDictionary)
-//        connectMembersToGroupActivitylist(memberIDs: membersIDs.0, ID: ID)
-//
-//    }
-    
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()

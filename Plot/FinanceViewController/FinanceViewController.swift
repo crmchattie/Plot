@@ -28,6 +28,9 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     var members = [MXMember]()
     var user: MXUser!
     
+    var users = [User]()
+    var filteredUsers = [User]()
+    
     var transactionsAcctDict = [MXAccount: [Transaction]]()
     
     var transactionDict = [TransactionDetails: [Transaction]]()
@@ -50,6 +53,8 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     
     var startDate = Date().startOfMonth
     var endDate = Date().endOfMonth
+    
+    var participants: [String: [User]] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -774,6 +779,9 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                 let destination = FinanceTableViewController()
                 destination.delegate = self
                 destination.transactions = transactions
+                destination.user = user
+                destination.users = users
+                destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             }
@@ -782,24 +790,38 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                 let destination = FinanceTableViewController()
                 destination.delegate = self
                 destination.accounts = accounts
+                destination.user = user
+                destination.users = users
+                destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         } else if let object = object as? [Transaction] {
             if section.subType == "Transactions" {
                 let destination = FinanceTransactionViewController()
+                destination.user = user
                 destination.transaction = object[indexPath.item]
+                destination.users = users
+                destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.getParticipants(transaction: object[indexPath.item], account: nil) { (participants) in
+                    destination.selectedFalconUsers = participants
+                    let navigationViewController = UINavigationController(rootViewController: destination)
+                    self.present(navigationViewController, animated: true, completion: nil)
+                }
             }
         } else if let object = object as? [MXAccount] {
             if section.subType == "Accounts" {
                 let destination = FinanceAccountViewController()
                 destination.account = object[indexPath.item]
+                destination.users = users
+                destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.getParticipants(transaction: nil, account: object[indexPath.item]) { (participants) in
+                    destination.selectedFalconUsers = participants
+                    let navigationViewController = UINavigationController(rootViewController: destination)
+                    self.present(navigationViewController, animated: true, completion: nil)
+                }
             }
         } else if let object = object as? [MXMember] {
             if section.type == "Issues", let user = user {
@@ -807,6 +829,76 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             }
         }
         collectionView.deselectItem(at: indexPath, animated: true)
+    }
+    
+    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
+        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = transaction.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if transaction.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = account.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if account.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else {
+            return
+        }
     }
     
 }
@@ -854,3 +946,5 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
         
     }
 }
+
+

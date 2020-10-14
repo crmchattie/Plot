@@ -110,31 +110,6 @@ class ChecklistActions: NSObject {
         
     }
     
-//    func updateChecklist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-//        guard let _ = checklist, let ID = ID else {
-//            return
-//        }
-//
-//        let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
-//        groupChecklistReference.updateChildValues(firebaseDictionary)
-//
-//
-//    }
-//
-//    func newChecklist(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-//        guard let _ = checklist, let ID = ID else {
-//            return
-//        }
-//
-//        let groupChecklistReference = Database.database().reference().child(checklistsEntity).child(ID)
-//
-//        self.dispatchGroup.enter()
-//        self.dispatchGroup.enter()
-//        createGroupChecklistNode(reference: groupChecklistReference, childValues: firebaseDictionary)
-//        connectMembersToGroupChecklist(memberIDs: membersIDs.0, ID: ID)
-//
-//    }
-    
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()

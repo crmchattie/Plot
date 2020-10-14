@@ -38,7 +38,8 @@ class FinanceTransactionRuleViewController: FormViewController {
         if transactionRule == nil, let currentUser = Auth.auth().currentUser?.uid {
             active = false
             let ID = Database.database().reference().child(userFinancialTransactionRulesEntity).child(currentUser).childByAutoId().key ?? ""
-            transactionRule = TransactionRule(created_at: isodateFormatter.string(from: Date()), guid: ID, match_description: "", description: nil, updated_at: isodateFormatter.string(from: Date()), user_guid: transaction.user_guid, category: nil, top_level_category: nil, group: nil, amount: nil)
+            let date = isodateFormatter.string(from: Date())
+            transactionRule = TransactionRule(created_at: date, guid: ID, match_description: "", description: nil, updated_at: date, user_guid: transaction.user_guid, category: nil, top_level_category: nil, group: nil, amount: nil)
         }
         
         configureTableView()
@@ -86,13 +87,13 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     fileprivate func initializeForm() {
         form +++
-            Section(header: "Set-up transaction rule", footer: nil)
+            Section(header: "", footer: "Set-up a rule to automatically categorize transactions that contain a certain description and/or meet a certain amount")
             
             <<< TextRow("Transaction name contains") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
-                if let transactionRule = transactionRule {
+                if transactionRule.match_description != "" {
                     $0.value = transactionRule.match_description
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else if let transaction = transaction {
@@ -170,6 +171,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 to.dismissOnChange = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Group"
+                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -205,6 +207,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 to.dismissOnChange = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Category"
+                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -239,11 +242,9 @@ class FinanceTransactionRuleViewController: FormViewController {
             }.onPresent { from, to in
                 to.dismissOnSelection = false
                 to.dismissOnChange = false
-                
-                to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .plain, target: from, action: #selector(FinanceTransactionViewController.selected(_:)))
-                
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Subcategory"
+                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     

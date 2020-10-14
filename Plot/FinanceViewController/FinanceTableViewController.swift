@@ -12,6 +12,7 @@ protocol UpdateFinancialsDelegate: class {
 }
 
 import UIKit
+import Firebase
 
 class FinanceTableViewController: UITableViewController {
     
@@ -21,6 +22,7 @@ class FinanceTableViewController: UITableViewController {
     
     var transactions: [Transaction]!
     var accounts: [MXAccount]!
+    var user: MXUser!
     
     var filteredTransactions: [Transaction]!
     var filteredAccounts: [MXAccount]!
@@ -30,6 +32,11 @@ class FinanceTableViewController: UITableViewController {
     
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
+    
+    var users = [User]()
+    var filteredUsers = [User]()
+    
+    var participants: [String: [User]] = [:]
         
     deinit {
         print("STORAGE DID DEINIT")
@@ -138,21 +145,100 @@ class FinanceTableViewController: UITableViewController {
             let transaction = filteredTransactions[indexPath.row]
             let destination = FinanceTransactionViewController()
             destination.transaction = transaction
+            destination.user = user
+            destination.users = users
+            destination.filteredUsers = filteredUsers
             destination.delegate = self
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-//            navigationController?.pushViewController(destination, animated: true)
+            self.getParticipants(transaction: transaction, account: nil) { (participants) in
+                destination.selectedFalconUsers = participants
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
+            }
         } else if let filteredAccounts = filteredAccounts {
             let account = filteredAccounts[indexPath.row]
             let destination = FinanceAccountViewController()
             destination.account = account
+            destination.user = user
+            destination.users = users
+            destination.filteredUsers = filteredUsers
             destination.delegate = self
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-//            navigationController?.pushViewController(destination, animated: true)
-            
+            self.getParticipants(transaction: nil, account: account) { (participants) in
+                destination.selectedFalconUsers = participants
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
+            }
         }
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
+        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = transaction.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if transaction.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = account.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if account.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else {
+            return
+        }
     }
 }
 

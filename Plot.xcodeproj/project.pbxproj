@@ -47,6 +47,7 @@
 		10314113230D712E00DB471B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 10314109230D712E00DB471B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
+		103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */; };
 		103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103E968922C2B309007D6668 /* PurchaseRow.swift */; };
 		1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1040E582242AA05D00304D05 /* MessageViewController.swift */; };
 		1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */; };
@@ -120,6 +121,8 @@
 		10C8334A24A400620037F638 /* FlightSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C8334924A400620037F638 /* FlightSearchResult.swift */; };
 		10C8334C24A50A8A0037F638 /* FlightDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C8334B24A50A8A0037F638 /* FlightDetailViewController.swift */; };
 		10C8334E24A520580037F638 /* FlightSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C8334D24A520580037F638 /* FlightSearchViewController.swift */; };
+		10CA911725367D8D003CEAF7 /* FinancialTransactionActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CA911625367D8D003CEAF7 /* FinancialTransactionActions.swift */; };
+		10CA911925367D9E003CEAF7 /* FinancialAccountActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */; };
 		10CD68792486AEE400DC02E0 /* PLNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CD68782486AEE400DC02E0 /* PLNotification.swift */; };
 		10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */; };
 		10D3410024ABD741009269B7 /* ActivityContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D340FF24ABD741009269B7 /* ActivityContainer.swift */; };
@@ -416,6 +419,7 @@
 		10314110230D712E00DB471B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		10323D5D2479A58500749706 /* GrocerylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistActions.swift; sourceTree = "<group>"; };
 		10367D42230B126800D25885 /* ActivityImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityImageCell.swift; sourceTree = "<group>"; };
+		103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionLevelViewController.swift; sourceTree = "<group>"; };
 		103E968922C2B309007D6668 /* PurchaseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseRow.swift; sourceTree = "<group>"; };
 		1040E582242AA05D00304D05 /* MessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
 		1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterActivityContainerController.swift; sourceTree = "<group>"; };
@@ -490,6 +494,8 @@
 		10C8334924A400620037F638 /* FlightSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightSearchResult.swift; sourceTree = "<group>"; };
 		10C8334B24A50A8A0037F638 /* FlightDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDetailViewController.swift; sourceTree = "<group>"; };
 		10C8334D24A520580037F638 /* FlightSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightSearchViewController.swift; sourceTree = "<group>"; };
+		10CA911625367D8D003CEAF7 /* FinancialTransactionActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionActions.swift; sourceTree = "<group>"; };
+		10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialAccountActions.swift; sourceTree = "<group>"; };
 		10CD68782486AEE400DC02E0 /* PLNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PLNotification.swift; sourceTree = "<group>"; };
 		10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistViewController.swift; sourceTree = "<group>"; };
 		10D340FF24ABD741009269B7 /* ActivityContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityContainer.swift; sourceTree = "<group>"; };
@@ -839,17 +845,20 @@
 			isa = PBXGroup;
 			children = (
 				1082C89424F0A8F500CF6491 /* FinanceViewController.swift */,
+				105CB18D2512A3830000D3D8 /* FinanceTableViewController.swift */,
 				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
 				105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */,
-				105CB18D2512A3830000D3D8 /* FinanceTableViewController.swift */,
 				10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */,
 				10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */,
+				103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */,
 				10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */,
 				10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */,
 				10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */,
 				10E4DB0925217C3200898D6E /* HeaderCell.swift */,
 				100458942517D50D00065872 /* FinancialTransactionFetcher.swift */,
+				10CA911625367D8D003CEAF7 /* FinancialTransactionActions.swift */,
 				10173605251924120073D283 /* FinancialAccountFetcher.swift */,
+				10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */,
 			);
 			path = FinanceViewController;
 			sourceTree = "<group>";
@@ -2308,6 +2317,7 @@
 				4B6521FA219B3A4400FF655E /* GroupMembersManager.swift in Sources */,
 				10C83342249ACC8F0037F638 /* SygicToursSearchResult.swift in Sources */,
 				4BAEE46521272B380045AB10 /* AccountSettingsController.swift in Sources */,
+				10CA911725367D8D003CEAF7 /* FinancialTransactionActions.swift in Sources */,
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
 				10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */,
 				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
@@ -2460,8 +2470,10 @@
 				4BAEE5D8212735E50045AB10 /* CameraOverlayView.swift in Sources */,
 				4BAEE5CC212735E50045AB10 /* ParticipantTableViewCell.swift in Sources */,
 				4BAEE5D5212735E50045AB10 /* AnnouncementShowing.swift in Sources */,
+				10CA911925367D9E003CEAF7 /* FinancialAccountActions.swift in Sources */,
 				4BAEE5BD212735E50045AB10 /* INSPhoto.swift in Sources */,
 				4BAEE49921272C5E0045AB10 /* ContactsController+SearchHandlers.swift in Sources */,
+				103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */,
 				4BAEE5CF212735E50045AB10 /* CollectionViewLeftAlignFlowLayout.swift in Sources */,
 				4BA1E77F2152518700391BCB /* ChatLogController+MessageSenderDelegate.swift in Sources */,
 				4BB46C6A2136E6F8005405BB /* ChatLogHistoryFetcher.swift in Sources */,

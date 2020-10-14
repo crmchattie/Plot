@@ -16,44 +16,46 @@ struct MXAccountResult: Codable {
 }
 
 struct MXAccount: Codable, Equatable, Hashable {
-    let account_number: String
-    let apr: Double?
-    let apy: Double?
-    let available_balance: Double?
-    let available_credit: Double?
-    let balance: Double
-    let cash_balance: Double?
-    let cash_surrender_value: Double?
-    let created_at: String
-    let credit_limit: Double?
-    let currency_code: String
-    let day_payment_is_due: Int?
-    let death_benefit: Double?
-    let guid: String
-    let holdings_value: Double?
-    let institution_code: String
-    let interest_rate: Double?
-    let is_closed: Bool
-    let last_payment: Double?
-    let last_payment_at: String?
-    let loan_balance: Double?
-    let matures_on: String?
-    let member_guid: String
-    let minimum_balance: Double?
-    let minimum_payment: Double?
+    var account_number: String?
+    var apr: Double?
+    var apy: Double?
+    var available_balance: Double?
+    var available_credit: Double?
+    var balance: Double
+    var cash_balance: Double?
+    var cash_surrender_value: Double?
+    var created_at: String
+    var credit_limit: Double?
+    var currency_code: String?
+    var day_payment_is_due: Int?
+    var death_benefit: Double?
+    var guid: String
+    var holdings_value: Double?
+    var institution_code: String?
+    var interest_rate: Double?
+    var is_closed: Bool?
+    var last_payment: Double?
+    var last_payment_at: String?
+    var loan_balance: Double?
+    var matures_on: String?
+    var member_guid: String?
+    var minimum_balance: Double?
+    var minimum_payment: Double?
     var name: String
-    let original_balance: Double?
-    let payment_due_at: String?
-    let payoff_balance: Double?
-    let started_on: String?
-    let subtype: MXAccountSubType
-    let total_account_value: Double?
-    let type: MXAccountType
-    let updated_at: String
-    let user_guid: String
+    var original_balance: Double?
+    var payment_due_at: String?
+    var payoff_balance: Double?
+    var started_on: String?
+    var subtype: MXAccountSubType
+    var total_account_value: Double?
+    var type: MXAccountType
+    var updated_at: String
+    var user_guid: String
     var should_link: Bool?
     var tags: [String]?
     var participantsIDs: [String]?
+    var user_created: Bool?
+    var admin: String?
     var bs_type: BalanceSheetType {
         switch self.type {
         case .checking, .savings, .investment, .property, .cash, .insurance, .prepaid:
@@ -63,6 +65,18 @@ struct MXAccount: Codable, Equatable, Hashable {
         case .any:
             return .None
         }
+    }
+    
+    init(name: String, balance: Double, created_at: String, guid: String, user_guid: String, type: MXAccountType, subtype: MXAccountSubType, user_created: Bool?, admin: String) {
+        self.name = name
+        self.balance = balance
+        self.created_at = created_at
+        self.updated_at = created_at
+        self.guid = guid
+        self.user_guid = user_guid
+        self.type = type
+        self.subtype = subtype
+        self.user_created = user_created
     }
 }
 
@@ -273,6 +287,7 @@ enum MXAccountSubType: String, CaseIterable, Codable {
     case corporateAccount = "CORPORATE_ACCOUNT"
     case limitedLiabilityAccount = "LIMITED_LIABILITY_ACCOUNT"
     case none = "NONE"
+    case any = "ANY"
     
     var name: String {
         switch self {
@@ -382,6 +397,7 @@ enum MXAccountSubType: String, CaseIterable, Codable {
         case .corporateAccount: return "Corporate Account"
         case .limitedLiabilityAccount: return "Limited Liability Account"
         case .none: return "None"
+        case .any: return "Any"
         }
     }
     
@@ -493,6 +509,7 @@ enum MXAccountSubType: String, CaseIterable, Codable {
         case .corporateAccount: return .investment
         case .limitedLiabilityAccount: return .investment
         case .none: return .any
+        case .any: return .any
         }
     }
 }

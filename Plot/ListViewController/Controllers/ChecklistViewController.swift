@@ -148,6 +148,7 @@ class ChecklistViewController: FormViewController {
             self.hideActivityIndicator()
             delegate?.updateChecklist(checklist: checklist)
             self.navigationController?.popViewController(animated: true)
+            
         }
                 
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)

@@ -23,6 +23,7 @@ class MasterActivityContainerController: UIViewController {
             activitiesVC.users = users
             chatsVC.users = users
             listsVC.users = users
+            financeVC.users = users
         }
     }
     var filteredUsers = [User]() {
@@ -30,6 +31,7 @@ class MasterActivityContainerController: UIViewController {
             activitiesVC.filteredUsers = filteredUsers
             chatsVC.filteredUsers = filteredUsers
             listsVC.filteredUsers = filteredUsers
+            financeVC.filteredUsers = filteredUsers
         }
     }
     var conversations = [Conversation]() {

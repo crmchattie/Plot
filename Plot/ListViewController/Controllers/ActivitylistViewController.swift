@@ -147,6 +147,7 @@ class ActivitylistViewController: FormViewController {
             self.hideActivityIndicator()
             delegate?.updateActivitylist(activitylist: activitylist)
             self.navigationController?.popViewController(animated: true)
+            
         }
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
