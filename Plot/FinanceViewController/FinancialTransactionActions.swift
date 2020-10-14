@@ -100,8 +100,8 @@ class TransactionActions: NSObject {
             let groupTransactionReference = Database.database().reference().child(financialTransactionsEntity).child(ID)
             updateParticipants(membersIDs: membersIDs)
             groupTransactionReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
-            let date = Date().timeIntervalSinceReferenceDate
-            groupTransactionReference.updateChildValues(["lastModifiedDate": date as AnyObject])
+            let date = isodateFormatter.string(from: Date())
+            groupTransactionReference.updateChildValues(["updated_at": date as AnyObject])
         }
         
     }
@@ -141,7 +141,7 @@ class TransactionActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userFinancialTransactionsEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["isGroupTransaction": true]
+            let values:[String : Any] = ["description": transaction.description]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
             })
@@ -149,7 +149,6 @@ class TransactionActions: NSObject {
     }
 
     func createGroupTransactionNode(reference: DatabaseReference, childValues: [String: Any]) {
-        print("child values \(childValues)")
         let nodeCreationGroup = DispatchGroup()
         nodeCreationGroup.enter()
         nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {

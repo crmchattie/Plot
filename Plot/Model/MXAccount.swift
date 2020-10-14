@@ -22,6 +22,7 @@ struct MXAccount: Codable, Equatable, Hashable {
     var available_balance: Double?
     var available_credit: Double?
     var balance: Double
+    var balances: [String: Double]?
     var cash_balance: Double?
     var cash_surrender_value: Double?
     var created_at: String
@@ -56,6 +57,9 @@ struct MXAccount: Codable, Equatable, Hashable {
     var participantsIDs: [String]?
     var user_created: Bool?
     var admin: String?
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
     var bs_type: BalanceSheetType {
         switch self.type {
         case .checking, .savings, .investment, .property, .cash, .insurance, .prepaid:
@@ -88,6 +92,9 @@ struct UserAccount: Codable, Equatable, Hashable {
     var name: String?
     var tags: [String]?
     var should_link: Bool?
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
 }
 
 struct AccountDetails: Codable, Equatable, Hashable {

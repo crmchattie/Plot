@@ -534,12 +534,18 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         }
         let ref = Database.database().reference()
         for account in accounts {
+            var _account = account
             do {
+                if _account.balances != nil {
+                    _account.balances![_account.updated_at] = _account.balance
+                } else {
+                    _account.balances = [_account.updated_at: _account.balance]
+                }
                 // store account info
-                let value = try FirebaseEncoder().encode(account)
-                ref.child(financialAccountsEntity).child(account.guid).setValue(value)
+                let value = try FirebaseEncoder().encode(_account)
+                ref.child(financialAccountsEntity).child(_account.guid).setValue(value)
                 // store account balance at given date
-                ref.child(userFinancialAccountsEntity).child(currentUserID).child(account.guid).child("balances").child(account.updated_at).setValue(account.balance)
+                ref.child(userFinancialAccountsEntity).child(currentUserID).child(_account.guid).child("name").setValue(_account.name)
             } catch let error {
                 print(error)
             }

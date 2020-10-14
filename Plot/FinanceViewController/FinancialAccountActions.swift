@@ -94,8 +94,8 @@ class AccountActions: NSObject {
             let groupAccountReference = Database.database().reference().child(financialAccountsEntity).child(ID)
             updateParticipants(membersIDs: membersIDs)
             groupAccountReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
-            let date = Date().timeIntervalSinceReferenceDate
-            groupAccountReference.updateChildValues(["lastModifiedDate": date as AnyObject])
+            let date = isodateFormatter.string(from: Date())
+            groupAccountReference.updateChildValues(["updated_at": date as AnyObject])
         }
         
     }
@@ -135,7 +135,7 @@ class AccountActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userFinancialAccountsEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["isGroupAccount": true]
+            let values:[String : Any] = ["name": "\(account.name)"]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
             })

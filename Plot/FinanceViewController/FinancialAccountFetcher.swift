@@ -51,6 +51,9 @@ class FinancialAccountFetcher: NSObject {
                                     if let value = userAccount.tags {
                                         _account.tags = value
                                     }
+                                    _account.badge = userAccount.badge
+                                    _account.muted = userAccount.muted
+                                    _account.pinned = userAccount.pinned
                                     accounts.append(_account)
                                 }
                             }
@@ -129,6 +132,9 @@ class FinancialAccountFetcher: NSObject {
                                     if let value = userAccount.tags {
                                         _account.tags = value
                                     }
+                                    _account.badge = userAccount.badge
+                                    _account.muted = userAccount.muted
+                                    _account.pinned = userAccount.pinned
                                     accounts.append(_account)
                                 }
                             }

@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import Firebase
+import CodableFirebase
 
 protocol UpdateTransactionDelegate: class {
     func updateTransaction(transaction: Transaction)
@@ -18,6 +19,10 @@ class FinanceTransactionViewController: FormViewController {
     var transaction: Transaction!
     var user: MXUser!
     var accounts: [MXAccount]!
+    
+    var categories = TransactionCategory.allCases
+    var topLevelCategories = TransactionTopLevelCategory.allCases
+    var groups = TransactionGroup.allCases.filter({ $0 != .difference || $0 != .expense })
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -43,7 +48,18 @@ class FinanceTransactionViewController: FormViewController {
         
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
+        setupVariables()
+        configureTableView()
+        initializeForm()
         
+        if !status {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
+    }
+    
+    fileprivate func setupVariables() {
         if let _ = transaction {
             active = true
             numberFormatter.currencyCode = transaction.currency_code
@@ -70,15 +86,58 @@ class FinanceTransactionViewController: FormViewController {
             transaction = Transaction(description: "", amount: 0.0, created_at: date, guid: ID, user_guid: user.guid, status: .posted, category: .uncategorized, top_level_category: .uncategorized, user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
         }
-                
+        
         status = transaction.status == .posted
         
-        configureTableView()
-        initializeForm()
-        
-        if !status {
-            for row in form.rows {
-                row.baseCell.isUserInteractionEnabled = false
+        if let currentUser = Auth.auth().currentUser?.uid {
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            var reference = Database.database().reference().child(userFinancialTransactionsCategoriesEntity).child(currentUser)
+            reference.observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                    do {
+                        let array = Array(values.values)
+                        let object = try FirebaseDecoder().decode([TransactionCategory].self, from: array)
+                        self.categories.append(contentsOf: object)
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+                dispatchGroup.leave()
+            })
+            
+            dispatchGroup.enter()
+            reference = Database.database().reference().child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser)
+            reference.observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                    do {
+                        let array = Array(values.values)
+                        let object = try FirebaseDecoder().decode([TransactionTopLevelCategory].self, from: array)
+                        self.topLevelCategories.append(contentsOf: object)
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+                dispatchGroup.leave()
+            })
+            
+            dispatchGroup.enter()
+            reference = Database.database().reference().child(userFinancialTransactionsGroupsEntity).child(currentUser)
+            reference.observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                    do {
+                        let array = Array(values.values)
+                        let object = try FirebaseDecoder().decode([TransactionGroup].self, from: array)
+                        self.groups.append(contentsOf: object)
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+                dispatchGroup.leave()
+            })
+            
+            dispatchGroup.notify(queue: .main) {
+                self.tableView.reloadData()
             }
         }
     }
@@ -108,9 +167,10 @@ class FinanceTransactionViewController: FormViewController {
     
     @IBAction func create(_ sender: AnyObject) {
         if transaction.user_created ?? false {
-            let date = isodateFormatter.string(from: Date())
-            let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("updated_at")
-            reference.setValue(date)
+            self.showActivityIndicator()
+            let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createTransaction.createNewTransaction()
+            self.hideActivityIndicator()
         }
         
         updateTags()
@@ -181,14 +241,17 @@ class FinanceTransactionViewController: FormViewController {
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }.onChange { row in
-                if let value = row.value {
-                    self.transaction.amount = value
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("amount")
-                        reference.setValue(value)
-                    }
-                }
+            }
+            
+            <<< IntRow("Split amount between") {
+                $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.title = $0.tag
+                $0.value = transaction.splitNumber ?? transaction.participantsIDs?.count ?? 0
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
             
             <<< TextRow("Status") {
@@ -237,10 +300,8 @@ class FinanceTransactionViewController: FormViewController {
                 row.title = row.tag
                 row.value = transaction.group.rawValue.capitalized
                 row.options = []
-                TransactionGroup.allCases.forEach {
-                    if $0 != .expense && $0 != .difference {
-                        row.options?.append($0.rawValue.capitalized)
-                    }
+                groups.forEach {
+                    row.options?.append($0.rawValue.capitalized)
                 }
             }.onPresent { from, to in
                 to.dismissOnSelection = false
@@ -275,7 +336,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.title = row.tag
                 row.value = transaction.top_level_category.rawValue.capitalized
                 row.options = []
-                TransactionTopLevelCategory.allCases.forEach {
+                topLevelCategories.forEach {
                     row.options?.append($0.rawValue.capitalized)
                 }
             }.onPresent { from, to in
@@ -311,7 +372,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.title = row.tag
                 row.value = transaction.category.rawValue.capitalized
                 row.options = []
-                TransactionCategory.allCases.forEach {
+                categories.forEach {
                     row.options?.append($0.rawValue.capitalized)
                 }
                 row.options?.sort()
@@ -542,13 +603,11 @@ extension FinanceTransactionViewController: UpdateInvitees {
             }
             
             if active {
-//                showActivityIndicator()
-//                let createChecklist = ChecklistActions(checklist: checklist, active: active, selectedFalconUsers: selectedFalconUsers)
-//                createChecklist.updateChecklistParticipants()
-//                hideActivityIndicator()
-
+                self.showActivityIndicator()
+                let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createTransaction.updateTransactionParticipants()
+                self.hideActivityIndicator()
             }
-            
         }
     }
 }

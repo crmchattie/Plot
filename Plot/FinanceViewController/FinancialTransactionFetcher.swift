@@ -64,6 +64,9 @@ class FinancialTransactionFetcher: NSObject {
                                     if let value = userTransaction.date_for_reports, value != "" {
                                         _transaction.date_for_reports = value
                                     }
+                                    _transaction.badge = userTransaction.badge
+                                    _transaction.muted = userTransaction.muted
+                                    _transaction.pinned = userTransaction.pinned
                                     transactions.append(_transaction)
                                 }
                             }
@@ -155,6 +158,9 @@ class FinancialTransactionFetcher: NSObject {
                                     if let value = userTransaction.date_for_reports, value != "" {
                                         _transaction.date_for_reports = value
                                     }
+                                    _transaction.badge = userTransaction.badge
+                                    _transaction.muted = userTransaction.muted
+                                    _transaction.pinned = userTransaction.pinned
                                     transactions.append(_transaction)
                                 }
                             }

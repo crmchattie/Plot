@@ -95,11 +95,11 @@ class FinanceAccountViewController: FormViewController {
     }
     
     @IBAction func create(_ sender: AnyObject) {
-        if account.user_created ?? false, let currentUser = Auth.auth().currentUser?.uid {
-            let date = isodateFormatter.string(from: Date())
-            let reference = Database.database().reference()
-            reference.child(financialAccountsEntity).child(self.account.guid).child("updated_at").setValue(date)
-            reference.child(userFinancialAccountsEntity).child(currentUser).child(account.guid).child("balances").child(date).setValue(account.balance)
+        if account.user_created ?? false {
+            self.showActivityIndicator()
+            let createAccount = AccountActions(account: self.account, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createAccount.createNewAccount()
+            self.hideActivityIndicator()
         }
         
         updateTags()
@@ -196,18 +196,25 @@ class FinanceAccountViewController: FormViewController {
                 }
             }
             
-            <<< TextRow("Balance") {
+            <<< DecimalRow("Balance") {
                 $0.cell.isUserInteractionEnabled = account.user_created ?? false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
-                if let balance = numberFormatter.string(from: account.balance as NSNumber) {
-                    $0.value = "\(balance)"
-                }
+                $0.value = account.balance
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }
+            }.onChange { row in
+                if let value = row.value {
+                    self.account.balance = value
+                    if self.account.balances != nil {
+                        self.account.balances![self.account.updated_at] = self.account.balance
+                    } else {
+                        self.account.balances = [self.account.updated_at: self.account.balance]
+                    }
+                }
+            }
         
         if let availableBalance = account.available_balance {
             form.last!
@@ -441,10 +448,10 @@ extension FinanceAccountViewController: UpdateInvitees {
             }
             
             if active {
-//                showActivityIndicator()
-//                let createChecklist = ChecklistActions(checklist: checklist, active: active, selectedFalconUsers: selectedFalconUsers)
-//                createChecklist.updateChecklistParticipants()
-//                hideActivityIndicator()
+                self.showActivityIndicator()
+                let createAccount = AccountActions(account: self.account, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createAccount.updateAccountParticipants()
+                self.hideActivityIndicator()
 
             }
             

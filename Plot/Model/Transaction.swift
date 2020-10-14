@@ -62,6 +62,10 @@ struct Transaction: Codable, Equatable, Hashable {
     var user_created: Bool?
     var admin: String?
     var activityID: String?
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
+    var splitNumber: Int?
     var cash_flow_type: String {
         if type == "CREDIT" {
             return "Inflow"
@@ -155,6 +159,9 @@ struct UserTransaction: Codable, Equatable, Hashable {
     var tags: [String]?
     var should_link: Bool?
     var date_for_reports: String?
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
 }
 
 enum TransactionCatLevel: String, Codable {
@@ -702,7 +709,15 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     transactionsList = Array(transactionsDict.keys)
     var sortedTransactionsList = [TransactionDetails]()
     if !transactionsList.isEmpty {
-        for group in TransactionGroup.allCases {
+        var groupArray = transactionsList.map({ $0.group })
+        if let index = groupArray.firstIndex(of: .income) {
+            groupArray.remove(at: index)
+            groupArray.insert(.income, at: 0)
+            groupArray.insert(.expense, at: 1)
+        } else {
+            groupArray.insert(.expense, at: 0)
+        }
+        for group in groupArray {
             if group == .expense {
                 var amount = 0.0
                 var transactions = [Transaction]()
@@ -732,16 +747,17 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     transactionsDict[diffTransactionDetail] = diffTransactions
                 }
             }
+            
             if let transactionDetail = transactionsList.first(where: {$0.level == .group && $0.group == group}) {
                 if transactionDetail.amount != 0 {
                     sortedTransactionsList.append(transactionDetail)
                 }
-                for top in TransactionTopLevelCategory.allCases {
+                for top in transactionsList.map({ $0.topLevelCategory }) {
                     if let transactionDetail = transactionsList.first(where: {$0.level == .top && $0.group == group && $0.topLevelCategory == top}) {
                         if transactionDetail.amount != 0 {
                             sortedTransactionsList.append(transactionDetail)
                         }
-                        for cat in TransactionCategory.allCases {
+                        for cat in transactionsList.map({ $0.category }) {
                             if let transactionDetail = transactionsList.first(where: {$0.level == .category && $0.group == group && $0.topLevelCategory == top && $0.category == cat}) {
                                 if transactionDetail.amount != 0 {
                                     sortedTransactionsList.append(transactionDetail)

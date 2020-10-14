@@ -21,6 +21,10 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     var active: Bool = true
     
+    var categories = TransactionCategory.allCases
+    var topLevelCategories = TransactionTopLevelCategory.allCases
+    var groups = TransactionGroup.allCases.filter({ $0 != .difference || $0 != .expense })
+    
     weak var delegate : UpdateTransactionRuleDelegate?
     
     let numberFormatter = NumberFormatter()
@@ -34,7 +38,12 @@ class FinanceTransactionRuleViewController: FormViewController {
         super.viewDidLoad()
         
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
-        
+        setupVariables()
+        configureTableView()
+        initializeForm()
+    }
+    
+    fileprivate func setupVariables() {
         if transactionRule == nil, let currentUser = Auth.auth().currentUser?.uid {
             active = false
             let ID = Database.database().reference().child(userFinancialTransactionRulesEntity).child(currentUser).childByAutoId().key ?? ""
@@ -42,8 +51,57 @@ class FinanceTransactionRuleViewController: FormViewController {
             transactionRule = TransactionRule(created_at: date, guid: ID, match_description: "", description: nil, updated_at: date, user_guid: transaction.user_guid, category: nil, top_level_category: nil, group: nil, amount: nil)
         }
         
-        configureTableView()
-        initializeForm()
+        if let currentUser = Auth.auth().currentUser?.uid {
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            var reference = Database.database().reference().child(userFinancialTransactionsCategoriesEntity).child(currentUser)
+            reference.observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                    do {
+                        let array = Array(values.values)
+                        let object = try FirebaseDecoder().decode([TransactionCategory].self, from: array)
+                        self.categories.append(contentsOf: object)
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+                dispatchGroup.leave()
+            })
+            
+            dispatchGroup.enter()
+            reference = Database.database().reference().child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser)
+            reference.observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                    do {
+                        let array = Array(values.values)
+                        let object = try FirebaseDecoder().decode([TransactionTopLevelCategory].self, from: array)
+                        self.topLevelCategories.append(contentsOf: object)
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+                dispatchGroup.leave()
+            })
+            
+            dispatchGroup.enter()
+            reference = Database.database().reference().child(userFinancialTransactionsGroupsEntity).child(currentUser)
+            reference.observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                    do {
+                        let array = Array(values.values)
+                        let object = try FirebaseDecoder().decode([TransactionGroup].self, from: array)
+                        self.groups.append(contentsOf: object)
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+                dispatchGroup.leave()
+            })
+            
+            dispatchGroup.notify(queue: .main) {
+                self.tableView.reloadData()
+            }
+        }
     }
     
     fileprivate func configureTableView() {
@@ -161,10 +219,8 @@ class FinanceTransactionRuleViewController: FormViewController {
                     row.value = transaction.group.rawValue.capitalized
                 }
                 row.options = []
-                TransactionGroup.allCases.forEach {
-                    if $0 != .expense && $0 != .difference {
-                        row.options?.append($0.rawValue.capitalized)
-                    }
+                groups.forEach {
+                    row.options?.append($0.rawValue.capitalized)
                 }
             }.onPresent { from, to in
                 to.dismissOnSelection = false
@@ -199,7 +255,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     row.value = transaction.top_level_category.rawValue.capitalized
                 }
                 row.options = []
-                TransactionTopLevelCategory.allCases.forEach {
+                topLevelCategories.forEach {
                     row.options?.append($0.rawValue.capitalized)
                 }
             }.onPresent { from, to in
@@ -235,7 +291,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     row.value = transaction.category.rawValue.capitalized
                 }
                 row.options = []
-                TransactionCategory.allCases.forEach {
+                categories.forEach {
                     row.options?.append($0.rawValue.capitalized)
                 }
                 row.options?.sort()
