@@ -11,7 +11,7 @@ import Firebase
 import CodableFirebase
 
 protocol HomeBaseFinance: class {
-    
+    func sendUser(user: MXUser)
 }
 
 class FinanceViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -54,17 +54,16 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     var startDate = Date().startOfMonth
     var endDate = Date().endOfMonth
     
+    var hasViewAppeared = false
+    
     var participants: [String: [User]] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupMainView()
-        
         addObservers()
         
         getFinancialData()
-        
     }
     
     deinit {
@@ -161,6 +160,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             dispatchGroup.enter()
             if let user = user {
                 dispatchGroup.enter()
+                self.delegate?.sendUser(user: user)
                 self.getMXTransactions(user: user, account: nil, date: nil)
                 self.getMXMembers(guid: user.guid) { (members) in
                     for member in members {
@@ -567,6 +567,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         guard currentReachabilityStatus != .notReachable else {
             return
         }
+        activityIndicatorView.startAnimating()
         
         let dispatchGroup = DispatchGroup()
         
@@ -651,6 +652,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             }
             
             dispatchGroup.notify(queue: .main) {
+                activityIndicatorView.stopAnimating()
                 self.collectionView.reloadData()
             }
         }
@@ -875,6 +877,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             let ID = account.guid
             let olderParticipants = self.participants[ID]
             var participants: [User] = []
+            
             for id in participantsIDs {
                 if account.admin == currentUserID && id == currentUserID {
                     continue
@@ -903,7 +906,8 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                 completion(participants)
             }
         } else {
-            return
+            let participants: [User] = []
+            completion(participants)
         }
     }
     

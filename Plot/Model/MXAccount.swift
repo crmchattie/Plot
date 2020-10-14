@@ -585,17 +585,18 @@ func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDe
             let accountDetail = AccountDetails(name: "Net Worth", balance: balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
             sortedAccountsList.insert(accountDetail, at: 0)
             accountsDict[accountDetail] = accounts
-        } else if let assetAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Asset}) {
-            let assetAccounts = accountsDict[assetAccountDetail] ?? []
-            let accountDetail = AccountDetails(name: "Net Worth", balance: assetAccountDetail.balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
-            sortedAccountsList.insert(accountDetail, at: 0)
-            accountsDict[accountDetail] = assetAccounts
-        } else if let liabilityAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Liability}) {
-            let liabilityAccounts = accountsDict[liabilityAccountDetail] ?? []
-            let accountDetail = AccountDetails(name: "Net Worth", balance: liabilityAccountDetail.balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
-            sortedAccountsList.insert(accountDetail, at: 0)
-            accountsDict[accountDetail] = liabilityAccounts
         }
+//        else if let assetAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Asset}) {
+//            let assetAccounts = accountsDict[assetAccountDetail] ?? []
+//            let accountDetail = AccountDetails(name: "Net Worth", balance: assetAccountDetail.balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
+//            sortedAccountsList.insert(accountDetail, at: 0)
+//            accountsDict[accountDetail] = assetAccounts
+//        } else if let liabilityAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Liability}) {
+//            let liabilityAccounts = accountsDict[liabilityAccountDetail] ?? []
+//            let accountDetail = AccountDetails(name: "Net Worth", balance: liabilityAccountDetail.balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
+//            sortedAccountsList.insert(accountDetail, at: 0)
+//            accountsDict[accountDetail] = liabilityAccounts
+//        }
         for bs_type in BalanceSheetType.allCases {
             if let accountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == bs_type}) {
                 sortedAccountsList.append(accountDetail)

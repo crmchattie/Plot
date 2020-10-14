@@ -90,6 +90,14 @@ class FinanceAccountViewController: FormViewController {
         } else {
             let barButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = barButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
+        }
+        
+        if !(account.user_created ?? false) {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
         }
         
     }
@@ -104,6 +112,10 @@ class FinanceAccountViewController: FormViewController {
         
         updateTags()
         self.delegate?.updateAccount(account: account)
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -129,28 +141,70 @@ class FinanceAccountViewController: FormViewController {
                 }
             }
             
-            <<< TextRow("Type") {
-                $0.cell.isUserInteractionEnabled = account.user_created ?? false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.title = $0.tag
-                $0.value = account.type.name
+            <<< PushRow<String>("Type") { row in
+                row.cell.isUserInteractionEnabled = account.user_created ?? false
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.title = row.tag
+                row.value = account.type.name
+                row.options = []
+                MXAccountType.allCases.forEach {
+                    row.options?.append($0.name)
+                }
+            }.onPresent { from, to in
+                to.dismissOnSelection = false
+                to.dismissOnChange = false
+                to.selectableRowCellUpdate = { cell, row in
+                    to.title = "Type"
+                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.tableView.separatorStyle = .none
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                if let value = row.value, let type = MXAccountType(rawValue: value) {
+                    self.account.type = type
+                }
+            }
         
         if account.subtype != .none {
             form.last!
-                <<< TextRow("Subtype") {
-                    $0.cell.isUserInteractionEnabled = account.user_created ?? false
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.title = $0.tag
-                    $0.value = account.subtype.name
-                }.cellUpdate { cell, row in
+            <<< PushRow<String>("Subtype") { row in
+                row.cell.isUserInteractionEnabled = account.user_created ?? false
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.title = row.tag
+                row.value = account.subtype.name
+                row.options = []
+                MXAccountSubType.allCases.forEach {
+                    row.options?.append($0.name)
+                }
+            }.onPresent { from, to in
+                to.dismissOnSelection = false
+                to.dismissOnChange = false
+                to.selectableRowCellUpdate = { cell, row in
+                    to.title = "Subtype"
+                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                if let value = row.value, let subtype = MXAccountSubType(rawValue: value) {
+                    self.account.subtype = subtype
+                }
             }
         }
         
@@ -202,6 +256,7 @@ class FinanceAccountViewController: FormViewController {
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
                 $0.value = account.balance
+                $0.formatter = numberFormatter
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -218,14 +273,13 @@ class FinanceAccountViewController: FormViewController {
         
         if let availableBalance = account.available_balance {
             form.last!
-                <<< TextRow("Available Balance") {
+                <<< DecimalRow("Available Balance") {
                     $0.cell.isUserInteractionEnabled = account.user_created ?? false
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.title = $0.tag
-                    if let balance = numberFormatter.string(from: availableBalance as NSNumber) {
-                        $0.value = "\(balance)"
-                    }
+                    $0.formatter = numberFormatter
+                    $0.value = availableBalance
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor

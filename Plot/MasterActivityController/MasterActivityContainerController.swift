@@ -100,6 +100,7 @@ class MasterActivityContainerController: UIViewController {
             }
         }
     }
+    var mxUser: MXUser!
     var selectedDate = Date()
     
     let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
@@ -111,6 +112,8 @@ class MasterActivityContainerController: UIViewController {
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
     weak var delegate: ManageAppearanceHome?
+    
+    var financeVCInitialized = false
     
     lazy var activitiesVC: ActivityViewController = {
         let vc = ActivityViewController()
@@ -132,6 +135,7 @@ class MasterActivityContainerController: UIViewController {
     
     lazy var financeVC: FinanceViewController = {
         let vc = FinanceViewController()
+        financeVCInitialized = true
         self.addAsChildVC(childVC: vc)
         return vc
     }()
@@ -388,6 +392,7 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
         activitiesVC.view.isHidden = !(index == 2)
         financeVC.view.isHidden = !(index == 3)
         listsVC.view.isHidden = !(index == 4)
+        
         self.index = index
         setNavBar()
     }
@@ -519,19 +524,41 @@ extension MasterActivityContainerController {
     
     @objc fileprivate func newFinanceItem() {
         let alertController = UIAlertController(title: "New Item", message: nil, preferredStyle: .actionSheet)
-        let transaction = UIAlertAction(title: "Transaction", style: .default) { (action:UIAlertAction) in
-            
-        }
-        let account = UIAlertAction(title: "Account", style: .default) { (action:UIAlertAction) in
-            self.financeVC.getMXUser { (user) in
-                if let user = user {
-                    self.openMXConnect(guid: user.guid, current_member_guid: nil)
-                }
-            }
-        }
         let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
             print("You've pressed cancel")
-            
+        }
+        let transaction = UIAlertAction(title: "Transaction", style: .default) { (action:UIAlertAction) in
+            print("transaction")
+            if let user = self.mxUser {
+                print("transaction user passed")
+                let destination = FinanceTransactionViewController()
+                destination.user = user
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
+            }
+        }
+        let account = UIAlertAction(title: "Account", style: .default) { (action:UIAlertAction) in
+            if let user = self.mxUser {
+                let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
+                let custom = UIAlertAction(title: "Manual", style: .default) { (action:UIAlertAction) in
+                    let destination = FinanceAccountViewController()
+                    destination.user = user
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    let navigationViewController = UINavigationController(rootViewController: destination)
+                    self.present(navigationViewController, animated: true, completion: nil)
+                }
+                let automatic = UIAlertAction(title: "Automatic", style: .default) { (action:UIAlertAction) in
+                    self.openMXConnect(guid: user.guid, current_member_guid: nil)
+                }
+                accountAlertController.addAction(custom)
+                accountAlertController.addAction(automatic)
+                accountAlertController.addAction(cancelAlert)
+                self.present(accountAlertController, animated: true, completion: nil)
+                
+            }
         }
         
         alertController.addAction(transaction)
@@ -596,12 +623,15 @@ extension MasterActivityContainerController: HomeBaseLists {
 }
 
 extension MasterActivityContainerController: HomeBaseFinance {
-    
+    func sendUser(user: MXUser) {
+        self.mxUser = user
+    }
 }
 
 extension MasterActivityContainerController: HomeBaseHealth {
     
 }
+
 
 extension MasterActivityContainerController: EndedWebViewDelegate {
     func updateMXMembers() {

@@ -182,7 +182,11 @@ enum TransactionStatus: String, Codable {
     }
 }
 
-enum TransactionGroup: String, CaseIterable, Codable {
+enum TransactionGroup: String, CaseIterable, Codable, Comparable {
+    static func < (lhs: TransactionGroup, rhs: TransactionGroup) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+    
     case difference = "Difference"
     case income = "Income"
     case expense = "Expenses"
@@ -196,7 +200,11 @@ enum TransactionGroup: String, CaseIterable, Codable {
     
 }
 
-enum TransactionTopLevelCategory: String, CaseIterable, Codable {
+enum TransactionTopLevelCategory: String, CaseIterable, Codable, Comparable {
+    static func < (lhs: TransactionTopLevelCategory, rhs: TransactionTopLevelCategory) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+    
     case autoTransport = "Auto & Transport"
     case billsUtilities = "Bills & Utilities"
     case businessServices = "Business Services"
@@ -248,7 +256,11 @@ enum TransactionTopLevelCategory: String, CaseIterable, Codable {
     }
 }
 
-enum TransactionCategory: String, CaseIterable, Codable {
+enum TransactionCategory: String, CaseIterable, Codable, Comparable {
+    static func < (lhs: TransactionCategory, rhs: TransactionCategory) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+    
     case autoInsurance = "Auto Insurance"
     case autoPayment = "Auto Payment"
     case gas = "Gas"
@@ -709,7 +721,13 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     transactionsList = Array(transactionsDict.keys)
     var sortedTransactionsList = [TransactionDetails]()
     if !transactionsList.isEmpty {
-        var groupArray = transactionsList.map({ $0.group })
+        var groupArray = Array(Set(transactionsList.compactMap({ $0.group })))
+        groupArray.sort()
+        var topLevelCategoryArray = Array(Set(transactionsList.compactMap({ $0.topLevelCategory })))
+        topLevelCategoryArray.sort()
+        var categoryArray = Array(Set(transactionsList.compactMap({ $0.category })))
+        categoryArray.sort()
+        
         if let index = groupArray.firstIndex(of: .income) {
             groupArray.remove(at: index)
             groupArray.insert(.income, at: 0)
@@ -739,25 +757,26 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     let diffTransactionDetail = TransactionDetails(name: "Difference", amount: diffAmount, level: .group, category: nil, topLevelCategory: nil, group: .difference)
                     sortedTransactionsList.insert(diffTransactionDetail, at: 0)
                     transactionsDict[diffTransactionDetail] = diffTransactions
-                } else {
-                    let diffAmount = expenseTransactionDetail.amount
-                    let diffTransactions = transactions
-                    let diffTransactionDetail = TransactionDetails(name: "Difference", amount: diffAmount, level: .group, category: nil, topLevelCategory: nil, group: .difference)
-                    sortedTransactionsList.insert(diffTransactionDetail, at: 0)
-                    transactionsDict[diffTransactionDetail] = diffTransactions
                 }
+//                else {
+//                    let diffAmount = expenseTransactionDetail.amount
+//                    let diffTransactions = transactions
+//                    let diffTransactionDetail = TransactionDetails(name: "Difference", amount: diffAmount, level: .group, category: nil, topLevelCategory: nil, group: .difference)
+//                    sortedTransactionsList.insert(diffTransactionDetail, at: 0)
+//                    transactionsDict[diffTransactionDetail] = diffTransactions
+//                }
             }
             
             if let transactionDetail = transactionsList.first(where: {$0.level == .group && $0.group == group}) {
                 if transactionDetail.amount != 0 {
                     sortedTransactionsList.append(transactionDetail)
                 }
-                for top in transactionsList.map({ $0.topLevelCategory }) {
+                for top in Array(Set(transactionsList.map({ $0.topLevelCategory }))) {
                     if let transactionDetail = transactionsList.first(where: {$0.level == .top && $0.group == group && $0.topLevelCategory == top}) {
                         if transactionDetail.amount != 0 {
                             sortedTransactionsList.append(transactionDetail)
                         }
-                        for cat in transactionsList.map({ $0.category }) {
+                        for cat in Array(Set(transactionsList.map({ $0.category }))) {
                             if let transactionDetail = transactionsList.first(where: {$0.level == .category && $0.group == group && $0.topLevelCategory == top && $0.category == cat}) {
                                 if transactionDetail.amount != 0 {
                                     sortedTransactionsList.append(transactionDetail)

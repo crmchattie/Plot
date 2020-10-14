@@ -227,7 +227,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 to.dismissOnChange = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Group"
-                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
+//                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -263,7 +263,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 to.dismissOnChange = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Category"
-                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
+//                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -300,7 +300,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 to.dismissOnChange = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Subcategory"
-                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
+//                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     

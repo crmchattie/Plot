@@ -51,12 +51,6 @@ class FinanceTransactionViewController: FormViewController {
         setupVariables()
         configureTableView()
         initializeForm()
-        
-        if !status {
-            for row in form.rows {
-                row.baseCell.isUserInteractionEnabled = false
-            }
-        }
     }
     
     fileprivate func setupVariables() {
@@ -88,6 +82,12 @@ class FinanceTransactionViewController: FormViewController {
         }
         
         status = transaction.status == .posted
+        
+        if !status {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
         
         if let currentUser = Auth.auth().currentUser?.uid {
             let dispatchGroup = DispatchGroup()
@@ -161,6 +161,8 @@ class FinanceTransactionViewController: FormViewController {
         } else {
             let barButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = barButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
         }
         
     }
@@ -175,6 +177,10 @@ class FinanceTransactionViewController: FormViewController {
         
         updateTags()
         self.delegate?.updateTransaction(transaction: transaction)
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -237,6 +243,7 @@ class FinanceTransactionViewController: FormViewController {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
+                $0.formatter = numberFormatter
                 $0.value = transaction.amount
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -244,7 +251,6 @@ class FinanceTransactionViewController: FormViewController {
             }
             
             <<< IntRow("Split amount between") {
-                $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
@@ -308,7 +314,7 @@ class FinanceTransactionViewController: FormViewController {
                 to.dismissOnChange = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Group"
-                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
+//                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -344,7 +350,7 @@ class FinanceTransactionViewController: FormViewController {
                 to.dismissOnChange = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Category"
-                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
+//                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -381,7 +387,7 @@ class FinanceTransactionViewController: FormViewController {
                 to.dismissOnChange = false                
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Subcategory"
-                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
+//                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     
