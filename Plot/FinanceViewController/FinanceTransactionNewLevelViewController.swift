@@ -11,13 +11,13 @@ import Eureka
 import Firebase
 
 protocol UpdateTransactionLevelDelegate: class {
-    func update(category: TransactionCategory?, topLevelCategory: TransactionTopLevelCategory?, group: TransactionGroup?)
+    func update(category: String?, topLevelCategory: String?, group: String?)
 }
 
 class FinanceTransactionNewLevelViewController: FormViewController {
-    var category: TransactionCategory?
-    var topLevelCategory: TransactionTopLevelCategory?
-    var group: TransactionGroup?
+    var category: String?
+    var topLevelCategory: String?
+    var group: String?
     
     var name: String? = nil
     
@@ -26,11 +26,11 @@ class FinanceTransactionNewLevelViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if let name = self.category {
-            self.name = name.rawValue
+            self.name = name
         } else if let name = self.topLevelCategory {
-            self.name = name.rawValue
+            self.name = name
         } else if let name = self.group {
-            self.name = name.rawValue
+            self.name = name
         }
         
         configureTableView()

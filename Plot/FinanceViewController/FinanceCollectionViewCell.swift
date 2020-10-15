@@ -35,7 +35,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
                     categoryLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
-                    if transactionDetails.group == .income, let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
+                    if transactionDetails.group == "Income", let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = "\(amount)"
                     } else if let amount = numberFormatter.string(from: transactionDetails.amount * -1 as NSNumber) {
                         categoryLabel.text = "\(amount)"
@@ -44,7 +44,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .callout)
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .callout)
                     
-                    if transactionDetails.group == .income, let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
+                    if transactionDetails.group == "Income", let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = "\(amount)"
                         heightConstraint = 20
 
@@ -55,7 +55,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     }
                 case .group:
                     heightConstraint = 20
-                    if (transactionDetails.group == .income || transactionDetails.group == .expense || transactionDetails.group == .difference) {
+                    if (transactionDetails.group == "Income" || transactionDetails.group == "Expense" || transactionDetails.group == "Difference") {
                         nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                         categoryLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                     } else {
@@ -63,7 +63,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                         categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
                     }
                     
-                    if (transactionDetails.group == .income || transactionDetails.group == .difference), let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
+                    if (transactionDetails.group == "Income" || transactionDetails.group == "Difference"), let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = "\(amount)"
                     } else if let amount = numberFormatter.string(from: transactionDetails.amount * -1 as NSNumber) {
                         categoryLabel.text = "\(amount)"

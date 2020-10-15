@@ -237,7 +237,8 @@ class FinanceTableViewController: UITableViewController {
                 completion(participants)
             }
         } else {
-            return
+            let participants: [User] = []
+            completion(participants)
         }
     }
 }

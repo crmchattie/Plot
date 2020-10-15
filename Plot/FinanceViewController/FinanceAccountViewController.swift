@@ -65,12 +65,20 @@ class FinanceAccountViewController: FormViewController {
         } else if let currentUser = Auth.auth().currentUser?.uid {
             let ID = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
-            account = MXAccount(name: "", balance: 0.0, created_at: date, guid: ID, user_guid: user.guid, type: .any, subtype: .any, user_created: true, admin: currentUser)
+            account = MXAccount(name: "Account Name", balance: 0.0, created_at: date, guid: ID, user_guid: user.guid, type: .any, subtype: .any, user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
         }
         
         configureTableView()
         initializeForm()
+        
+        if !(account.user_created ?? false) {
+            for row in form.rows {
+                if ((row as? CheckRow) == nil) {
+                    row.baseCell.isUserInteractionEnabled = false
+                }
+            }
+        }
     }
     
     fileprivate func configureTableView() {
@@ -84,33 +92,26 @@ class FinanceAccountViewController: FormViewController {
         definesPresentationContext = true
         navigationItem.title = "Account"
         
+        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        navigationItem.leftBarButtonItem = cancelBarButton
+        
         if active {
             let barButton = UIBarButtonItem(title: "Update", style: .plain, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = barButton
         } else {
             let barButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = barButton
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-            navigationItem.leftBarButtonItem = cancelBarButton
-        }
-        
-        if !(account.user_created ?? false) {
-            for row in form.rows {
-                row.baseCell.isUserInteractionEnabled = false
-            }
         }
         
     }
     
     @IBAction func create(_ sender: AnyObject) {
-        if account.user_created ?? false {
+        if account.user_created ?? false, !active {
             self.showActivityIndicator()
             let createAccount = AccountActions(account: self.account, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createAccount.createNewAccount()
             self.hideActivityIndicator()
         }
-        
-        updateTags()
         self.delegate?.updateAccount(account: account)
         self.dismiss(animated: true, completion: nil)
     }
@@ -133,8 +134,8 @@ class FinanceAccountViewController: FormViewController {
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }.onChange { row in
                 if let value = row.value {
-                    self.account.name = value
                     if let currentUser = Auth.auth().currentUser?.uid {
+                        self.account.name = value
                         let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("name")
                         reference.setValue(value)
                     }
@@ -142,7 +143,6 @@ class FinanceAccountViewController: FormViewController {
             }
             
             <<< PushRow<String>("Type") { row in
-                row.cell.isUserInteractionEnabled = account.user_created ?? false
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -155,6 +155,7 @@ class FinanceAccountViewController: FormViewController {
             }.onPresent { from, to in
                 to.dismissOnSelection = false
                 to.dismissOnChange = false
+                to.enableDeselection = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Type"
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -170,13 +171,14 @@ class FinanceAccountViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value, let type = MXAccountType(rawValue: value) {
                     self.account.type = type
+                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("type")
+                    reference.setValue(value)
                 }
             }
         
         if account.subtype != .none {
             form.last!
             <<< PushRow<String>("Subtype") { row in
-                row.cell.isUserInteractionEnabled = account.user_created ?? false
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -189,6 +191,7 @@ class FinanceAccountViewController: FormViewController {
             }.onPresent { from, to in
                 to.dismissOnSelection = false
                 to.dismissOnChange = false
+                to.enableDeselection = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Subtype"
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -204,13 +207,14 @@ class FinanceAccountViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value, let subtype = MXAccountSubType(rawValue: value) {
                     self.account.subtype = subtype
+                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("subtype")
+                    reference.setValue(value)
                 }
             }
         }
         
         form.last!
             <<< TextRow("Last Updated On") {
-                $0.cell.isUserInteractionEnabled = false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
@@ -243,15 +247,14 @@ class FinanceAccountViewController: FormViewController {
             }.onChange { row in
                 row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
                 row.updateCell()
-                self.account.should_link = row.value
                 if let currentUser = Auth.auth().currentUser?.uid {
+                    self.account.should_link = row.value
                     let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("should_link")
                     reference.setValue(row.value!)
                 }
             }
             
             <<< DecimalRow("Balance") {
-                $0.cell.isUserInteractionEnabled = account.user_created ?? false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
@@ -262,19 +265,22 @@ class FinanceAccountViewController: FormViewController {
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }.onChange { row in
                 if let value = row.value {
+                    self.updateTheDate()
                     self.account.balance = value
                     if self.account.balances != nil {
-                        self.account.balances![self.account.updated_at] = self.account.balance
+                        self.account.balances![self.isodateFormatter.string(from: Date())] = self.account.balance
                     } else {
-                        self.account.balances = [self.account.updated_at: self.account.balance]
+                        self.account.balances = [self.isodateFormatter.string(from: Date()): self.account.balance]
                     }
+                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid)
+                    reference.child("balance").setValue(self.account.balance)
+                    reference.child("balances").setValue(self.account.balances)
                 }
             }
         
         if let availableBalance = account.available_balance {
             form.last!
                 <<< DecimalRow("Available Balance") {
-                    $0.cell.isUserInteractionEnabled = account.user_created ?? false
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.title = $0.tag
@@ -283,38 +289,54 @@ class FinanceAccountViewController: FormViewController {
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                if let value = row.value {
+                    self.updateTheDate()
+                    self.account.available_balance = value
+                    Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("available_balance").setValue(value)
+                }
             }
         }
         
         if let paymentDueDate = account.payment_due_at {
             form.last!
-                <<< TextRow("Payment Due Date") {
-                    $0.cell.isUserInteractionEnabled = account.user_created ?? false
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.title = $0.tag
-                    if let date = isodateFormatter.date(from: paymentDueDate) {
-                        $0.value = dateFormatterPrint.string(from: date)
-                    }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            <<< DateInlineRow("Payment Due Date") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.title = $0.tag
+                $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
+                if let date = isodateFormatter.date(from: paymentDueDate) {
+                    $0.value = date
+                }
+            }.onChange { row in
+                if let value = row.value {
+                    self.updateTheDate()
+                    let date = self.isodateFormatter.string(from: value)
+                    self.account.payment_due_at = date
+                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("payment_due_at")
+                    reference.setValue(date)
+                }
             }
         }
         
         if let minimum = account.minimum_payment {
             form.last!
-                <<< TextRow("Minimum Payment Due") {
-                    $0.cell.isUserInteractionEnabled = account.user_created ?? false
+            <<< DecimalRow("Minimum Payment Due") {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.title = $0.tag
-                    if let minimum = numberFormatter.string(from: minimum as NSNumber) {
-                        $0.value = "\(minimum)"
-                    }
+                    $0.formatter = numberFormatter
+                    $0.value = minimum
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                if let value = row.value {
+                    self.updateTheDate()
+                    self.account.minimum_payment = value
+                    Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("minimum_payment").setValue(value)
+                }
             }
         }
         
@@ -367,6 +389,8 @@ class FinanceAccountViewController: FormViewController {
                                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                         cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                                         row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                    }.onChange() { _ in
+                                        self.updateTags()
                                     }
                                 }
         }
@@ -383,6 +407,8 @@ class FinanceAccountViewController: FormViewController {
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                }.onChange() { _ in
+                    self.updateTags()
                 } , at: mvs.count - 1)
             }
         }
@@ -404,6 +430,16 @@ class FinanceAccountViewController: FormViewController {
                 let updatedTags = ["tags": self.account.tags as AnyObject]
                 Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).updateChildValues(updatedTags)
             }
+        }
+    }
+    
+    fileprivate func updateTheDate() {
+        if let row: TextRow = form.rowBy(tag: "Last Updated On") {
+            let date = self.isodateFormatter.string(from: Date())
+            row.value = date
+            row.updateCell()
+            self.account.updated_at = date
+            Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("updated_at").setValue(date)
         }
     }
     
