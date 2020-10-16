@@ -10,19 +10,13 @@ import UIKit
 import Eureka
 import Firebase
 
-protocol UpdateTransactionLevelDelegate: class {
-    func update(category: String?, topLevelCategory: String?, group: String?)
-}
-
 class FinanceTransactionNewLevelViewController: FormViewController {
     var category: String?
     var topLevelCategory: String?
     var group: String?
     
     var name: String? = nil
-    
-    weak var delegate : UpdateTransactionLevelDelegate?
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         if let name = self.category {
@@ -98,7 +92,6 @@ class FinanceTransactionNewLevelViewController: FormViewController {
                 })
             }
         }
-        self.delegate?.update(category: category, topLevelCategory: topLevelCategory, group: group)
         self.dismiss(animated: true, completion: nil)
     }
     

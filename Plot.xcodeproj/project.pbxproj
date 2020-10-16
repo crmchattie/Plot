@@ -53,6 +53,7 @@
 		1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */; };
 		1051AC9B244F8C5F0066761C /* ListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9A244F8C5F0066761C /* ListsViewController.swift */; };
 		1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */; };
+		1058E61D2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */; };
 		105AA1372481B56B009DD09B /* NewUserChecklists.json in Resources */ = {isa = PBXBuildFile; fileRef = 105AA1362481B56B009DD09B /* NewUserChecklists.json */; };
 		105CB18C25129F130000D3D8 /* FinanceTransactionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */; };
 		105CB18E2512A3830000D3D8 /* FinanceTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18D2512A3830000D3D8 /* FinanceTableViewController.swift */; };
@@ -426,6 +427,7 @@
 		1051AC9A244F8C5F0066761C /* ListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsViewController.swift; sourceTree = "<group>"; };
 		1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSegmentedControl.swift; sourceTree = "<group>"; };
 		1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.release.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.release.xcconfig"; sourceTree = "<group>"; };
+		1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionRuleFetcher.swift; sourceTree = "<group>"; };
 		105AA1362481B56B009DD09B /* NewUserChecklists.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = NewUserChecklists.json; sourceTree = "<group>"; };
 		105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionViewController.swift; sourceTree = "<group>"; };
 		105CB18D2512A3830000D3D8 /* FinanceTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTableViewController.swift; sourceTree = "<group>"; };
@@ -849,8 +851,8 @@
 				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
 				105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */,
 				10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */,
-				10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */,
 				103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */,
+				10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */,
 				10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */,
 				10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */,
 				10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */,
@@ -859,6 +861,7 @@
 				10CA911625367D8D003CEAF7 /* FinancialTransactionActions.swift */,
 				10173605251924120073D283 /* FinancialAccountFetcher.swift */,
 				10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */,
+				1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */,
 			);
 			path = FinanceViewController;
 			sourceTree = "<group>";
@@ -2246,6 +2249,7 @@
 				4BAEE4FF21272D890045AB10 /* VoiceRecordingContainerView.swift in Sources */,
 				10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */,
 				10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */,
+				1058E61D2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift in Sources */,
 				4BAEE5EC212735E50045AB10 /* SelectNewAdminTableViewController.swift in Sources */,
 				4BAEE550212735880045AB10 /* MediaObject.swift in Sources */,
 				4BAEE5B7212735E50045AB10 /* INSPhotosTransitionAnimator.swift in Sources */,

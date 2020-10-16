@@ -13,9 +13,9 @@ let userFinancialTransactionsTopLevelCategoriesEntity = "user-financial-transact
 let userFinancialTransactionsGroupsEntity = "user-financial-transactions-groups"
 let userFinancialTransactionRulesEntity = "user-financial-transaction-rules"
 
-let financialTransactionsCategories = ["Auto Payment", "Auto Insurance", "Gas", "Parking", "Public Transportation", "Service & Parts", "Auto & Transport", "Domain Names", "Fraud Protection", "Home Phone", "Hosting", "Internet", "Mobile Phone", "Television", "Utilities", "Bills & Utilities", "Advertising", "Legal", "Office Supplies", "Printing", "Shipping", "Business Services", "Book Supplies", "Student Loans", "Tuition", "Education", "Amusement", "Arts", "Movies & DVDs", "Music", "Newspapers & Magazines", "Entertainment", "ATM Fee", "Banking Fee", "Finance Charge", "Late Fee", "Service Fee", "Trade Commissions", "Fees & Charges", "Financial Advisor", "Life Insurance", "Financial", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining", "Charity", "Gift", "Gifts & Donations", "Dentist", "Doctor", "Eyecase", "Gym", "Health Insurance", "Pharmacy", "Sports", "Furnishings", "Home Improvement", "Home Services", "Home Supplies", "Lawn Garden", "Home", "Home Insurance", "Mortgage & Rent", "Bonus", "Interest Income", "Paycheck", "Reimbursement", "Rental Income", "Income", "Buy", "Dividend & Cap Gains", "Sell", "Deposit", "Withdrawal", "Allowance", "Baby Supplies", "Babysitter Daycare", "Child Support", "Kids Activities", "Toys", "Kids", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Health & Fitness", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Pets", "Books", "Clothing", "Hobbies", "Sporting Goods", "Shopping", "Federal Tax", "Local Tax", "Property Tax", "Sales Tax", "State Tax", "Taxes", "Credit Card Payment", "Transfer for Cash Spending", "Transfer", "Mortgage Payment", "Air Travel", "Hotel", "Rental Car & Taxi", "Vacation", "Travel", "Cash", "Check", "Uncategorized", "Investments", "Electronics & Software"]
-let financialTransactionsTopLevelCategories = ["Auto & Transport", "Bills & Utilities", "Business Services", "Education", "Electronics & Software", "Entertainment", "Fees & Charges", "Financial", "Food & Dining", "Gifts & Donations", "Health & Fitness", "Home", "Income", "Invesments", "Kids", "Personal Care", "Pets", "Shopping", "Taxes", "Transfer", "Travel", "Uncategorized"]
-let financialTransactionsGroups = ["Income", "Bills", "Discretionary", "Kids", "Living", "Transfer", "Work", "Uncategorized"]
+var financialTransactionsCategories = ["Auto Payment", "Auto Insurance", "Gas", "Parking", "Public Transportation", "Service & Parts", "Auto & Transport", "Domain Names", "Fraud Protection", "Home Phone", "Hosting", "Internet", "Mobile Phone", "Television", "Utilities", "Bills & Utilities", "Advertising", "Legal", "Office Supplies", "Printing", "Shipping", "Business Services", "Book Supplies", "Student Loans", "Tuition", "Education", "Amusement", "Arts", "Movies & DVDs", "Music", "Newspapers & Magazines", "Entertainment", "ATM Fee", "Banking Fee", "Finance Charge", "Late Fee", "Service Fee", "Trade Commissions", "Fees & Charges", "Financial Advisor", "Life Insurance", "Financial", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining", "Charity", "Gift", "Gifts & Donations", "Dentist", "Doctor", "Eyecase", "Gym", "Health Insurance", "Pharmacy", "Sports", "Furnishings", "Home Improvement", "Home Services", "Home Supplies", "Lawn Garden", "Home", "Home Insurance", "Mortgage & Rent", "Bonus", "Interest Income", "Paycheck", "Reimbursement", "Rental Income", "Income", "Buy", "Dividend & Cap Gains", "Sell", "Deposit", "Withdrawal", "Allowance", "Baby Supplies", "Babysitter Daycare", "Child Support", "Kids Activities", "Toys", "Kids", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Health & Fitness", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Pets", "Books", "Clothing", "Hobbies", "Sporting Goods", "Shopping", "Federal Tax", "Local Tax", "Property Tax", "Sales Tax", "State Tax", "Taxes", "Credit Card Payment", "Transfer for Cash Spending", "Transfer", "Mortgage Payment", "Air Travel", "Hotel", "Rental Car & Taxi", "Vacation", "Travel", "Cash", "Check", "Uncategorized", "Investments", "Electronics & Software"]
+var financialTransactionsTopLevelCategories = ["Auto & Transport", "Bills & Utilities", "Business Services", "Education", "Electronics & Software", "Entertainment", "Fees & Charges", "Financial", "Food & Dining", "Gifts & Donations", "Health & Fitness", "Home", "Income", "Invesments", "Kids", "Personal Care", "Pets", "Shopping", "Taxes", "Transfer", "Travel", "Uncategorized"]
+var financialTransactionsGroups = ["Income", "Bills", "Discretionary", "Kids", "Living", "Transfer", "Work", "Uncategorized"]
 
 struct MXTransactionResult: Codable {
     let transaction: Transaction?
@@ -224,6 +224,7 @@ struct TransactionRule: Codable, Equatable, Hashable {
     var top_level_category: String?
     var group: String?
     var amount: Double?
+    var should_link: Bool?
 }
 
 struct MXTransactionCategoryResult: Codable {
@@ -517,4 +518,39 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     completion(sortedTransactionsList, transactionsDict)
 }
 
+func updateTransaction(transaction: Transaction, transactionRules: [TransactionRule], completion: @escaping (Transaction) -> ()) {
+    var _transaction = transaction
+    for rule in transactionRules {
+        if rule.amount != nil, rule.amount == _transaction.amount, transaction.description.lowercased().contains(rule.match_description.lowercased()) {
+            if rule.description != nil {
+                _transaction.description = rule.description!
+            }
+            if rule.should_link != nil {
+                _transaction.should_link = rule.should_link
+                _transaction.group = rule.group ?? "Uncategorized"
+                _transaction.top_level_category = rule.top_level_category ?? "Uncategorized"
+                _transaction.category = rule.category ?? "Uncategorized"
+            } else {
+                _transaction.group = rule.group ?? "Uncategorized"
+                _transaction.top_level_category = rule.top_level_category ?? "Uncategorized"
+                _transaction.category = rule.category ?? "Uncategorized"
+            }
+        } else if transaction.description.lowercased().contains(rule.match_description.lowercased()) {
+            if rule.description != nil {
+                _transaction.description = rule.description!
+            }
+            if rule.should_link != nil {
+                _transaction.should_link = rule.should_link
+                _transaction.group = rule.group ?? "Uncategorized"
+                _transaction.top_level_category = rule.top_level_category ?? "Uncategorized"
+                _transaction.category = rule.category ?? "Uncategorized"
+            } else {
+                _transaction.group = rule.group ?? "Uncategorized"
+                _transaction.top_level_category = rule.top_level_category ?? "Uncategorized"
+                _transaction.category = rule.category ?? "Uncategorized"
+            }
+        }
+    }
+    completion(_transaction)
+}
 

@@ -24,6 +24,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     var index: Int = 2
     
     var transactions = [Transaction]()
+    var transactionRules = [TransactionRule]()
     var accounts = [MXAccount]()
     var members = [MXMember]()
     var user: MXUser!
@@ -42,6 +43,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     var groups = [SectionType: [AnyHashable]]()
     
     let transactionFetcher = FinancialTransactionFetcher()
+    let transactionRuleFetcher = FinancialTransactionRuleFetcher()
     let accountFetcher = FinancialAccountFetcher()
     
     private let kHeaderCell = "HeaderCell"
@@ -140,10 +142,14 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         }
         
         dispatchGroup.enter()
-        self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
-            self.transactions = firebaseTransactions
-            self.observeTransactionsForCurrentUser()
-            dispatchGroup.leave()
+        self.transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
+            self.transactionRules = firebaseTransactionRules
+            self.observeTransactionRulesForCurrentUser()
+            self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
+                self.transactions = firebaseTransactions
+                self.observeTransactionsForCurrentUser()
+                dispatchGroup.leave()
+            }
         }
         
         dispatchGroup.notify(queue: .main) {
@@ -239,12 +245,23 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     for transaction in transactions {
                         dispatchGroup.enter()
                         let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
-                        if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
-                            self.transactions.append(transaction)
-                            if transaction.status != .pending {
-                                newTransactions.append(transaction)
+                        if !self.transactions.contains(transaction) {
+                            updateTransaction(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
+                                if finalAccount?.should_link ?? true {
+                                    self.transactions.append(transaction)
+                                    if transaction.status != .pending {
+                                        newTransactions.append(transaction)
+                                    }
+                                } else {
+                                    var _transaction = transaction
+                                    self.transactions.append(_transaction)
+                                    _transaction.should_link = false
+                                    if transaction.status != .pending {
+                                        newTransactions.append(transaction)
+                                    }
+                                }
+                                dispatchGroup.leave()
                             }
-                            dispatchGroup.leave()
                         } else {
                             dispatchGroup.leave()
                         }
@@ -257,12 +274,23 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     for transaction in transactions {
                         dispatchGroup.enter()
                         let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
-                        if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
-                            self.transactions.append(transaction)
-                            if transaction.status != .pending {
-                                newTransactions.append(transaction)
+                        if !self.transactions.contains(transaction) {
+                            updateTransaction(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
+                                if finalAccount?.should_link ?? true {
+                                    self.transactions.append(transaction)
+                                    if transaction.status != .pending {
+                                        newTransactions.append(transaction)
+                                    }
+                                } else {
+                                    var _transaction = transaction
+                                    self.transactions.append(_transaction)
+                                    _transaction.should_link = false
+                                    if transaction.status != .pending {
+                                        newTransactions.append(transaction)
+                                    }
+                                }
+                                dispatchGroup.leave()
                             }
-                            dispatchGroup.leave()
                         } else {
                             dispatchGroup.leave()
                         }
@@ -278,12 +306,23 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                 for transaction in transactions {
                     dispatchGroup.enter()
                     let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
-                    if !self.transactions.contains(transaction), finalAccount?.should_link ?? true {
-                        self.transactions.append(transaction)
-                        if transaction.status != .pending {
-                            newTransactions.append(transaction)
+                    if !self.transactions.contains(transaction) {
+                        updateTransaction(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
+                            if finalAccount?.should_link ?? true {
+                                self.transactions.append(transaction)
+                                if transaction.status != .pending {
+                                    newTransactions.append(transaction)
+                                }
+                            } else {
+                                var _transaction = transaction
+                                self.transactions.append(_transaction)
+                                _transaction.should_link = false
+                                if transaction.status != .pending {
+                                    newTransactions.append(transaction)
+                                }
+                            }
+                            dispatchGroup.leave()
                         }
-                        dispatchGroup.leave()
                     } else {
                         dispatchGroup.leave()
                     }
@@ -522,6 +561,32 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     if let index = self!.transactions.firstIndex(where: {$0 == transaction}) {
                         self!.transactions[index] = transaction
                         self!.updateCollectionView()
+                    }
+                }
+            }
+        )
+    }
+    
+    func observeTransactionRulesForCurrentUser() {
+        self.transactionRuleFetcher.observeTransactionRuleForCurrentUser(transactionRulesAdded: { [weak self] transactionRulesAdded in
+            for transactionRule in transactionRulesAdded {
+                if !self!.transactionRules.contains(transactionRule) {
+                    self!.transactionRules.append(transactionRule)
+//                    self!.updateCollectionView()
+                }
+            }
+            }, transactionRulesRemoved: { [weak self] transactionRulesRemoved in
+                for transactionRule in transactionRulesRemoved {
+                    if let index = self!.transactionRules.firstIndex(where: {$0 == transactionRule}) {
+                        self!.transactionRules.remove(at: index)
+//                        self!.updateCollectionView()
+                    }
+                }
+            }, transactionRulesChanged: { [weak self] transactionRulesChanged in
+                for transactionRule in transactionRulesChanged {
+                    if let index = self!.transactionRules.firstIndex(where: {$0 == transactionRule}) {
+                        self!.transactionRules[index] = transactionRule
+//                        self!.updateCollectionView()
                     }
                 }
             }

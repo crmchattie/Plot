@@ -20,10 +20,6 @@ class FinanceTransactionViewController: FormViewController {
     var user: MXUser!
     var accounts: [MXAccount]!
     
-    var categories = financialTransactionsCategories
-    var topLevelCategories = financialTransactionsTopLevelCategories
-    var groups = financialTransactionsGroups
-    
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
@@ -91,42 +87,6 @@ class FinanceTransactionViewController: FormViewController {
         
         status = transaction.status == .posted
         
-        if let currentUser = Auth.auth().currentUser?.uid {
-            let dispatchGroup = DispatchGroup()
-            dispatchGroup.enter()
-            var reference = Database.database().reference().child(userFinancialTransactionsCategoriesEntity).child(currentUser)
-            reference.observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                    let array = Array(values.values)
-                    self.categories.append(contentsOf: array)
-                }
-                dispatchGroup.leave()
-            })
-            
-            dispatchGroup.enter()
-            reference = Database.database().reference().child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser)
-            reference.observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                    let array = Array(values.values)
-                    self.topLevelCategories.append(contentsOf: array)
-                }
-                dispatchGroup.leave()
-            })
-            
-            dispatchGroup.enter()
-            reference = Database.database().reference().child(userFinancialTransactionsGroupsEntity).child(currentUser)
-            reference.observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                    let array = Array(values.values)
-                    self.groups.append(contentsOf: array)
-                }
-                dispatchGroup.leave()
-            })
-            
-            dispatchGroup.notify(queue: .main) {
-                self.tableView.reloadData()
-            }
-        }
     }
     
     fileprivate func configureTableView() {
@@ -242,24 +202,25 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }
             
-            <<< IntRow("Split amount between") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.title = $0.tag
-                $0.value = transaction.splitNumber ?? transaction.participantsIDs?.count ?? 0
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }.onChange { row in
-                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("splitNumber")
-                if let value = row.value {
-                    self.transaction.splitNumber = value
-                    reference.setValue(value)
-                } else {
-                    self.transaction.splitNumber = nil
-                    reference.removeValue()
-                }
-            }
+            //need to add change to amount or amount per rows
+//            <<< IntRow("Split amount between") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.title = $0.tag
+//                $0.value = transaction.splitNumber ?? transaction.participantsIDs?.count ?? 0
+//            }.cellUpdate { cell, row in
+//                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            }.onChange { row in
+//                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("splitNumber")
+//                if let value = row.value {
+//                    self.transaction.splitNumber = value
+//                    reference.setValue(value)
+//                } else {
+//                    self.transaction.splitNumber = nil
+//                    reference.removeValue()
+//                }
+//            }
             
             <<< TextRow("Status") {
                 $0.cell.isUserInteractionEnabled = false
@@ -300,110 +261,56 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }
             
-            <<< PushRow<String>("Group") { row in
+            <<< LabelRow("Group") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
                 row.value = transaction.group
-                row.options = groups
-            }.onPresent { from, to in
-                to.dismissOnSelection = false
-                to.dismissOnChange = false
-                to.enableDeselection = false
-                to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Group"
-                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            }.cellUpdate { cell, row in
+            }.onCellSelection({ _, row in
+                self.openLevel(level: row.tag!, value: row.value!)
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }.onChange { row in
-                if let value = row.value {
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        self.transaction.group = value
-                        let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("group")
-                        reference.setValue(value)
-                    }
-                }
             }
-            
-            <<< PushRow<String>("Category") { row in
+        
+            <<< LabelRow("Category") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
                 row.value = transaction.top_level_category
-                row.options = topLevelCategories
-            }.onPresent { from, to in
-                to.dismissOnSelection = false
-                to.dismissOnChange = false
-                to.enableDeselection = false
-                to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Category"
-                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            }.cellUpdate { cell, row in
+            }.onCellSelection({ _, row in
+                self.openLevel(level: row.tag!, value: row.value!)
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }.onChange { row in
-                if let value = row.value {
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        self.transaction.top_level_category = value
-                        let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("top_level_category")
-                        reference.setValue(value)
-                    }
-                }
             }
-            
-            <<< PushRow<String>("Subcategory") { row in
+        
+            <<< LabelRow("Subcategory") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
                 row.value = transaction.category
-                row.options = categories
-                row.options?.sort()
-            }.onPresent { from, to in
-                to.dismissOnSelection = false
-                to.dismissOnChange = false
-                to.enableDeselection = false
-                to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Subcategory"
-                    to.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New Item", style: .plain, target: from, action: #selector(FinanceTransactionViewController.newLevel(_:)))
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    to.tableView.separatorStyle = .none
-                    
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            }.cellUpdate { cell, row in
+            }.onCellSelection({ _, row in
+                self.openLevel(level: row.tag!, value: row.value!)
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }.onChange { row in
-                if let value = row.value {
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        self.transaction.category = value
-                        let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("category")
-                        reference.setValue(value)
-                    }
-                }
-        }
+            }
         
+            
+            
         form +++
             Section()
             <<< ButtonRow("Participants") { row in
@@ -507,8 +414,11 @@ class FinanceTransactionViewController: FormViewController {
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
-    @objc func newLevel(_ item:UIBarButtonItem) {
-        let destination = FinanceTransactionNewLevelViewController()
+    @objc fileprivate func openLevel(level: String, value: String) {
+        let destination = FinanceTransactionLevelViewController()
+        destination.delegate = self
+        destination.level = level
+        destination.value = value
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -578,6 +488,25 @@ class FinanceTransactionViewController: FormViewController {
         self.removeSpinner()
     }
     
+}
+
+extension FinanceTransactionViewController: UpdateTransactionLevelDelegate {
+    func update(value: String, level: String) {
+        if let row: LabelRow = form.rowBy(tag: level), let currentUser = Auth.auth().currentUser?.uid {
+            row.value = value
+            row.updateCell()
+            if level == "Subcategory" {
+                transaction.category = value
+                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("category").setValue(value)
+            } else if level == "Category" {
+                transaction.top_level_category = value
+                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("top_level_category").setValue(value)
+            } else {
+                transaction.group = value
+                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("group").setValue(value)
+            }
+        }
+    }
 }
 
 extension FinanceTransactionViewController: UpdateInvitees {
