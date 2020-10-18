@@ -184,7 +184,8 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 heightConstraint = 20
                 
                 nameLabel.text = account.name
-                if let balance = numberFormatter.string(from: account.balance as NSNumber) {
+                let currentBalance = account.available_balance ?? account.balance
+                if let balance = numberFormatter.string(from: currentBalance as NSNumber) {
                     middleLabel.text = "Balance: \(balance)"
                 }
                 if let date = isodateFormatter.date(from: account.updated_at) {

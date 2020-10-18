@@ -17,7 +17,7 @@ target 'Plot' do
   pod 'FLAnimatedImage', :modular_headers => true
   pod 'FTPopOverMenu_Swift', '~> 0.2.0'
   pod 'CropViewController'
-  pod 'Eureka'
+  pod 'Eureka' 
   pod 'SplitRow'
   pod 'ViewRow'
   pod 'FSCalendar'

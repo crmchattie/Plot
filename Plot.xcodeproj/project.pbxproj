@@ -138,7 +138,7 @@
 		10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */; };
 		10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB0925217C3200898D6E /* HeaderCell.swift */; };
 		10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */; };
-		10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */ = {isa = PBXBuildFile; productRef = 10E93D4824BE2E7A00F6EE18 /* LBTATools */; };
+		10E93D4924BE2E7A00F6EE18 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 10E93D4824BE2E7A00F6EE18 /* SwiftPackageProductDependency */; };
 		10E93D4E24BE41B500F6EE18 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D4B24BE41B400F6EE18 /* MapViewController.swift */; };
 		10E93D4F24BE41B500F6EE18 /* LocationsCarouselController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D4C24BE41B400F6EE18 /* LocationsCarouselController.swift */; };
 		10E93D5724BE43B700F6EE18 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5324BE43B600F6EE18 /* Extensions.swift */; };
@@ -747,7 +747,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E6985A6EF59641559135D26 /* libPods-Plot.a in Frameworks */,
-				10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */,
+				10E93D4924BE2E7A00F6EE18 /* BuildFile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1978,7 +1978,7 @@
 			);
 			name = Plot;
 			packageProductDependencies = (
-				10E93D4824BE2E7A00F6EE18 /* LBTATools */,
+				10E93D4824BE2E7A00F6EE18 /* SwiftPackageProductDependency */,
 			);
 			productName = "Pigeon-project";
 			productReference = 4B4F452B1F32230C00A6FF96 /* Plot.app */;
@@ -1991,7 +1991,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1020;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Immature Creations";
 				TargetAttributes = {
 					10314108230D712E00DB471B = {
@@ -2039,7 +2039,7 @@
 			);
 			mainGroup = 4B4F45221F32230C00A6FF96;
 			packageReferences = (
-				10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */,
+				10E93D4724BE2E7A00F6EE18 /* RemoteSwiftPackageReference */,
 			);
 			productRefGroup = 4B4F452C1F32230C00A6FF96 /* Products */;
 			projectDirPath = "";
@@ -2130,15 +2130,12 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Plot/Pods-Plot-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/CropViewController/TOCropViewControllerBundle.bundle",
-				"${PODS_ROOT}/PhoneNumberKit/PhoneNumberKit/Resources/PhoneNumberMetadata.json",
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Plot/Pods-Plot-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PhoneNumberMetadata.json",
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Plot/Pods-Plot-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -2595,6 +2592,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -2621,7 +2619,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "";
@@ -2659,6 +2657,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -2681,7 +2680,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2792,7 +2791,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */ = {
+		10E93D4724BE2E7A00F6EE18 /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bhlvoong/LBTATools.git";
 			requirement = {
@@ -2803,9 +2802,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		10E93D4824BE2E7A00F6EE18 /* LBTATools */ = {
+		10E93D4824BE2E7A00F6EE18 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */;
+			package = 10E93D4724BE2E7A00F6EE18 /* RemoteSwiftPackageReference */;
 			productName = LBTATools;
 		};
 /* End XCSwiftPackageProductDependency section */

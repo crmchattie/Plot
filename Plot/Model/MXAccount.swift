@@ -528,7 +528,7 @@ func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDe
         if account.should_link ?? true == false {
             continue
         }
-        let accountDetail = AccountDetails(name: account.name, balance: account.balance, level: .account, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+        let accountDetail = AccountDetails(name: account.name, balance: account.available_balance ?? account.balance, level: .account, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
         accountsDict[accountDetail] = [account]
         if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype.name && $0.level == .subtype && $0.subtype == account.subtype && $0.type == account.type && $0.bs_type == account.bs_type}) {
             var accountDetail = accountsDict.keys[index]
@@ -536,12 +536,12 @@ func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDe
             
             accountsDict[accountDetail] = nil
             
-            accountDetail.balance += account.balance
+            accountDetail.balance += account.available_balance ?? account.balance
             accounts!.append(account)
             
             accountsDict[accountDetail] = accounts
         } else {
-            let accountDetail = AccountDetails(name: account.subtype.name, balance: account.balance, level: .subtype, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+            let accountDetail = AccountDetails(name: account.subtype.name, balance: account.available_balance ?? account.balance, level: .subtype, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
             accountsDict[accountDetail] = [account]
         }
         if let index = accountsDict.keys.firstIndex(where: {$0.name == account.type.name && $0.level == .type && $0.type == account.type && $0.bs_type == account.bs_type}) {
@@ -550,12 +550,12 @@ func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDe
             
             accountsDict[accountDetail] = nil
             
-            accountDetail.balance = account.balance
+            accountDetail.balance = account.available_balance ?? account.balance
             accounts!.append(account)
             
             accountsDict[accountDetail] = accounts
         } else {
-            let accountDetail = AccountDetails(name: account.type.name, balance: account.balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type)
+            let accountDetail = AccountDetails(name: account.type.name, balance: account.available_balance ?? account.balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type)
             accountsDict[accountDetail] = [account]
         }
         if let index = accountsDict.keys.firstIndex(where: {$0.name == account.bs_type.name && $0.level == .bs_type && $0.bs_type == account.bs_type}) {
@@ -564,12 +564,12 @@ func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDe
             
             accountsDict[accountDetail] = nil
             
-            accountDetail.balance += account.balance
+            accountDetail.balance += account.available_balance ?? account.balance
             accounts!.append(account)
             
             accountsDict[accountDetail] = accounts
         } else {
-            let accountDetail = AccountDetails(name: account.bs_type.name, balance: account.balance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type)
+            let accountDetail = AccountDetails(name: account.bs_type.name, balance: account.available_balance ?? account.balance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type)
             accountsDict[accountDetail] = [account]
         }
     }

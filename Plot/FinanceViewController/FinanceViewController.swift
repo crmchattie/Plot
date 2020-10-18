@@ -197,6 +197,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                         } else if member.connection_status == .connected && !member.is_being_aggregated {
                             dispatchGroup.enter()
                             self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
+                                print("accountName #1 \(account.name)")
                                 updatedAccounts.append(contentsOf: accounts)
                                 for account in accounts {
                                     dispatchGroup.enter()
@@ -227,6 +228,9 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         }
         
         dispatchGroup.notify(queue: .main) {
+            for account in updatedAccounts {
+                print("accountName #2 \(account.name)")
+            }
             self.accounts = updatedAccounts
             self.updateCollectionView()
             self.updateFirebase(accounts: updatedAccounts, transactions: [])
