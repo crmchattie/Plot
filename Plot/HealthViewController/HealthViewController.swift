@@ -100,9 +100,9 @@ class HealthViewController: UIViewController {
     private func configureView() {
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+            tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
             spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
@@ -130,5 +130,12 @@ extension HealthViewController: UITableViewDelegate, UITableViewDataSource {
         let metric = healthMetrics[indexPath.row]
         cell.configure(metric)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let metric = healthMetrics[indexPath.row]
+        let healthDetailViewController = HealthDetailViewController()
+        healthDetailViewController.title = metric.type.name
+        navigationController?.pushViewController(healthDetailViewController, animated: true)
     }
 }
