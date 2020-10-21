@@ -8,8 +8,11 @@
 
 import UIKit
 import Charts
+import HealthKit
 
 class HealthDetailViewController: UIViewController {
+    
+    var healthMetric: HealthMetric?
     
     lazy var chartView: BarChartView = {
         let chartView = BarChartView()
@@ -39,18 +42,21 @@ class HealthDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         addObservers()
         changeTheme()
         
-        view.addSubview(segmentedControl)
         view.addSubview(chartView)
         chartView.delegate = self
+        
+        view.addSubview(segmentedControl)
+        segmentedControl.selectedSegmentIndex = 0
         
         configureView()
         configureChart()
         
-        updateChartData()
+        //updateChartData()
+        fetchHealthKitData()
     }
     
     private func configureView() {
@@ -86,7 +92,7 @@ class HealthDetailViewController: UIViewController {
         xAxis.labelPosition = .bottom
         xAxis.labelFont = .systemFont(ofSize: 10)
         xAxis.granularity = 1
-        xAxis.labelCount = 7
+        xAxis.labelCount = 5
         xAxis.valueFormatter = DayAxisValueFormatter(chart: chartView)
         
         let leftAxisFormatter = NumberFormatter()
@@ -156,7 +162,7 @@ class HealthDetailViewController: UIViewController {
             chartView.data?.notifyDataChanged()
             chartView.notifyDataSetChanged()
         } else {
-            set1 = BarChartDataSet(entries: yVals, label: "2019-2020")
+            set1 = BarChartDataSet(entries: yVals, label: "Today")
             set1.colors = ChartColorTemplates.material()
             set1.drawValuesEnabled = false
             
@@ -177,6 +183,61 @@ class HealthDetailViewController: UIViewController {
         break // Tres
         default:
             break
+        }
+    }
+    
+    // MARK: HealthKit Data
+    func fetchHealthKitData() {
+        guard let healthMetric = healthMetric else {
+            return
+        }
+        
+        let endDate = Date()
+        let calendar = Calendar.current
+        var startDate = calendar.startOfDay(for: endDate)
+        switch (segmentedControl.selectedSegmentIndex) {
+        case 0:
+            break
+        case 1:
+            startDate = endDate.dayBefore
+        case 2:
+            startDate = endDate.weekBefore
+        case 3:
+            startDate = endDate.lastYear
+        default:
+            break
+        }
+        
+        if healthMetric.type == .steps {
+            guard let stepCountSampleType = HKSampleType.quantityType(forIdentifier: .stepCount) else {
+                return
+            }
+            
+            HealthKitService.getAllTheSamples(for: stepCountSampleType, startDate: startDate, endDate: endDate) { (samples, error) in
+                if let samples = samples {
+                    var i = 0
+                    var entries: [BarChartDataEntry] = []
+                    for sample in samples {
+                        if let quantitySample = sample as? HKQuantitySample {
+                            let steps = quantitySample.quantity.doubleValue(for: .count())
+                            let entry = BarChartDataEntry(x: Double(i), y: steps, data: quantitySample.endDate)
+                            entries.append(entry)
+                            i += 1
+                        }
+                    }
+                    
+                    let dataSet = BarChartDataSet(entries: entries, label: "")
+                    dataSet.colors = ChartColorTemplates.material()
+                    dataSet.drawValuesEnabled = false
+                    
+                    let data = BarChartData(dataSet: dataSet)
+                    data.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
+                    data.barWidth = 0.9
+                    DispatchQueue.main.async {
+                        self.chartView.data = data
+                    }
+                }
+            }
         }
     }
 }

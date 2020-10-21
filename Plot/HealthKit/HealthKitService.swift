@@ -107,6 +107,29 @@ class HealthKitService {
         healthStore.execute(sampleQuery)
     }
     
+    class func getAllTheSamples(for sampleType: HKSampleType,
+                                startDate: Date,
+                                endDate: Date,
+                                completion: @escaping ([HKSample]?, Error?) -> Swift.Void) {
+        
+        // Use HKQuery to load the most recent samples.
+        let mostRecentPredicate = HKQuery.predicateForSamples(withStart: startDate,
+                                                              end: endDate,
+                                                              options: .strictEndDate)
+        
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate,
+                                              ascending: false)
+        
+        let sampleQuery = HKSampleQuery(sampleType: sampleType,
+                                        predicate: mostRecentPredicate,
+                                        limit: Int(HKObjectQueryNoLimit),
+                                        sortDescriptors: [sortDescriptor]) { (query, samples, error) in
+                                            completion(samples, error)
+        }
+        
+        healthStore.execute(sampleQuery)
+    }
+    
     class func getCumulativeSumSample(forIdentifier identifier: HKQuantityTypeIdentifier,
                                       unit: HKUnit,
                                       date: Date,

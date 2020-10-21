@@ -57,6 +57,7 @@ class WorkoutOperation: AsyncOperation {
                         activity.activityDescription = "\(totalEnergyBurned.clean) calories"
                         activity.startDateTime = NSNumber(value: workout.startDate.timeIntervalSince1970)
                         activity.endDateTime = NSNumber(value: workout.endDate.timeIntervalSince1970)
+                        activity.allDay = false
                         activities.append(activity)
                     }
                 }

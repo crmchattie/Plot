@@ -135,6 +135,7 @@ extension HealthViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let metric = healthMetrics[indexPath.row]
         let healthDetailViewController = HealthDetailViewController()
+        healthDetailViewController.healthMetric = metric
         healthDetailViewController.title = metric.type.name
         navigationController?.pushViewController(healthDetailViewController, animated: true)
     }
