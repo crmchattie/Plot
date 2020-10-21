@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 
 struct MessageSubtitle {
+  static let activity = "Attachment: Activity"
   static let video = "Attachment: Video"
   static let image = "Attachment: Image"
   static let audio = "Audio message"

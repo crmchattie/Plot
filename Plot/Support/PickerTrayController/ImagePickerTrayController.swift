@@ -304,9 +304,9 @@ public class ImagePickerTrayController: UIViewController {
 							fatalError()
 					}
         }
-			@unknown default:
-				fatalError()
-			}
+      @unknown default:
+            fatalError()
+        }
     }
 }
 

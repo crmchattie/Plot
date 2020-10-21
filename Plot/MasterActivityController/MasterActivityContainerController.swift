@@ -148,7 +148,6 @@ class MasterActivityContainerController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("viewDidLoad")
         setupViews()
         setNavBar()
         activitiesVC.delegate = self
@@ -528,9 +527,7 @@ extension MasterActivityContainerController {
             print("You've pressed cancel")
         }
         let transaction = UIAlertAction(title: "Transaction", style: .default) { (action:UIAlertAction) in
-            print("transaction")
             if let user = self.mxUser {
-                print("transaction user passed")
                 let destination = FinanceTransactionViewController()
                 destination.user = user
                 destination.users = self.users
@@ -542,7 +539,7 @@ extension MasterActivityContainerController {
         let account = UIAlertAction(title: "Account", style: .default) { (action:UIAlertAction) in
             if let user = self.mxUser {
                 let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
-                let custom = UIAlertAction(title: "Manual", style: .default) { (action:UIAlertAction) in
+                let custom = UIAlertAction(title: "Manual Entry", style: .default) { (action:UIAlertAction) in
                     let destination = FinanceAccountViewController()
                     destination.user = user
                     destination.users = self.users
@@ -550,7 +547,7 @@ extension MasterActivityContainerController {
                     let navigationViewController = UINavigationController(rootViewController: destination)
                     self.present(navigationViewController, animated: true, completion: nil)
                 }
-                let automatic = UIAlertAction(title: "Automatic", style: .default) { (action:UIAlertAction) in
+                let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
                     self.openMXConnect(guid: user.guid, current_member_guid: nil)
                 }
                 accountAlertController.addAction(custom)
@@ -560,9 +557,14 @@ extension MasterActivityContainerController {
                 
             }
         }
-        
-        alertController.addAction(transaction)
+        let transactionRule = UIAlertAction(title: "Transaction Rule", style: .default) { (action:UIAlertAction) in
+            let destination = FinanceTransactionRuleViewController()
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
         alertController.addAction(account)
+        alertController.addAction(transaction)
+        alertController.addAction(transactionRule)
         alertController.addAction(cancelAlert)
         self.present(alertController, animated: true, completion: nil)
     }

@@ -98,7 +98,6 @@ struct UserAccount: Codable, Equatable, Hashable {
 }
 
 struct AccountDetails: Codable, Equatable, Hashable {
-    let uuid = UUID().uuidString
     var name: String
     var balance: Double
     var level: AccountCatLevel

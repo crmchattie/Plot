@@ -27,46 +27,51 @@ class FinanceTransactionLevelViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTableView()
-        initializeForm()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
+        updateLevels()
+    }
+    
+    fileprivate func updateLevels() {
+        form.removeAll()
         if let currentUser = Auth.auth().currentUser?.uid {
             let dispatchGroup = DispatchGroup()
-            var reference = Database.database().reference().child(userFinancialTransactionsCategoriesEntity).child(currentUser)
+            let reference = Database.database().reference()
             if level == "Subcategory" {
                 dispatchGroup.enter()
-                reference.observeSingleEvent(of: .value, with: { snapshot in
+                reference.child(userFinancialTransactionsCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
                         let array = Array(values.values)
                         self.categories.append(contentsOf: array)
+                        self.categories = self.categories.sorted()
                     }
                     dispatchGroup.leave()
                 })
             } else if level == "Category" {
                 dispatchGroup.enter()
-                reference = Database.database().reference().child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser)
-                reference.observeSingleEvent(of: .value, with: { snapshot in
+                reference.child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
                         let array = Array(values.values)
                         self.topLevelCategories.append(contentsOf: array)
+                        self.topLevelCategories = self.topLevelCategories.sorted()
                     }
                     dispatchGroup.leave()
                 })
             } else {
                 dispatchGroup.enter()
-                reference = Database.database().reference().child(userFinancialTransactionsGroupsEntity).child(currentUser)
-                reference.observeSingleEvent(of: .value, with: { snapshot in
+                reference.child(userFinancialTransactionsGroupsEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
                         let array = Array(values.values)
                         self.groups.append(contentsOf: array)
+                        self.groups = self.groups.sorted()
                     }
                     dispatchGroup.leave()
                 })
             }
             
             dispatchGroup.notify(queue: .main) {
-                self.tableView.reloadData()
+                self.initializeForm()
             }
         }
     }
@@ -81,30 +86,32 @@ class FinanceTransactionLevelViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        let newLevelBarButton = UIBarButtonItem(title: "New Item", style: .plain, target: self, action: #selector(newLevel))
+        let newLevelBarButton = UIBarButtonItem(title: "New \(level)", style: .plain, target: self, action: #selector(newLevel))
         navigationItem.leftBarButtonItem = newLevelBarButton
-        let updateBarButton = UIBarButtonItem(title: "Update", style: .plain, target: self, action: #selector(update))
-        navigationItem.rightBarButtonItem = updateBarButton
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+        navigationItem.rightBarButtonItem = addBarButton
     }
     
-    @IBAction func update(_ sender: AnyObject) {
+    @IBAction func create(_ sender: AnyObject) {
         self.delegate?.update(value: value, level: level)
         self.dismiss(animated: true, completion: nil)
     }
     
     @objc func newLevel(_ item:UIBarButtonItem) {
         let destination = FinanceTransactionNewLevelViewController()
+        destination.level = level
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
     fileprivate func initializeForm() {
+        print("initializeForm")
         form +++ SelectableSection<ListCheckRow<String>>(level, selectionType: .singleSelection(enableDeselection: false))
         
         if level == "Subcategory" {
             for title in categories {
                 form.last!
-                    <<< ListCheckRow<String>(title) {
+                    <<< ListCheckRow<String>() {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         $0.cell.tintColor = FalconPalette.defaultBlue
                         $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -128,8 +135,9 @@ class FinanceTransactionLevelViewController: FormViewController {
             }
         } else if level == "Category" {
             for title in topLevelCategories {
+                print("title \(title)")
                 form.last!
-                    <<< ListCheckRow<String>(title) {
+                    <<< ListCheckRow<String>() {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         $0.cell.tintColor = FalconPalette.defaultBlue
                         $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -154,7 +162,7 @@ class FinanceTransactionLevelViewController: FormViewController {
         } else {
             for title in groups {
                 form.last!
-                    <<< ListCheckRow<String>(title) {
+                    <<< ListCheckRow<String>() {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         $0.cell.tintColor = FalconPalette.defaultBlue
                         $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

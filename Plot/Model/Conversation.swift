@@ -30,12 +30,14 @@ class Conversation: NSObject {
     var packinglists: [String]?
     
     func messageText() -> String {
-        
+                
+        let isActivityMessage = lastMessage?.activityType != nil || lastMessage?.activityID != nil
         let isImageMessage = (lastMessage?.imageUrl != nil || lastMessage?.localImage != nil) && lastMessage?.videoUrl == nil
         let isVideoMessage = (lastMessage?.imageUrl != nil || lastMessage?.localImage != nil) && lastMessage?.videoUrl != nil
         let isVoiceMessage = lastMessage?.voiceEncodedString != nil
         let isTextMessage = lastMessage?.text != nil
         
+        guard !isActivityMessage else { return  MessageSubtitle.activity }
         guard !isImageMessage else { return  MessageSubtitle.image }
         guard !isVideoMessage else { return MessageSubtitle.video }
         guard !isVoiceMessage else { return MessageSubtitle.audio }

@@ -11,22 +11,11 @@ import Eureka
 import Firebase
 
 class FinanceTransactionNewLevelViewController: FormViewController {
-    var category: String?
-    var topLevelCategory: String?
-    var group: String?
-    
+    var level = String()
     var name: String? = nil
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let name = self.category {
-            self.name = name
-        } else if let name = self.topLevelCategory {
-            self.name = name
-        } else if let name = self.group {
-            self.name = name
-        }
-        
         configureTableView()
         initializeForm()
     }
@@ -42,13 +31,8 @@ class FinanceTransactionNewLevelViewController: FormViewController {
         definesPresentationContext = true
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
         navigationItem.leftBarButtonItem = cancelBarButton
-        if let _ = name {
-            let barButton = UIBarButtonItem(title: "Update", style: .plain, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = barButton
-        } else {
-            let barButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = barButton
-        }
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+        navigationItem.rightBarButtonItem = addBarButton
     }
     
     @IBAction func cancel(_ sender: AnyObject) {
@@ -57,39 +41,12 @@ class FinanceTransactionNewLevelViewController: FormViewController {
     
     @IBAction func create(_ sender: AnyObject) {
         if let row: TextRow = self.form.rowBy(tag: "Name"), let value = row.value, let currentUser = Auth.auth().currentUser?.uid {
-            if let _ = self.category {
-                let reference = Database.database().reference().child(userFinancialTransactionsCategoriesEntity).child(currentUser)
-                reference.observeSingleEvent(of: .value, with: { snapshot in
-                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                        var array = Array(values.values)
-                        array.append(value)
-                        reference.setValue(array)
-                    } else {
-                        reference.setValue([value])
-                    }
-                })
-            } else if let _ = self.topLevelCategory {
-                let reference = Database.database().reference().child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser)
-                reference.observeSingleEvent(of: .value, with: { snapshot in
-                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                        var array = Array(values.values)
-                        array.append(value)
-                        reference.setValue(array)
-                    } else {
-                        reference.setValue([value])
-                    }
-                })
-            } else if let _ = self.group {
-                let reference = Database.database().reference().child(userFinancialTransactionsGroupsEntity).child(currentUser)
-                reference.observeSingleEvent(of: .value, with: { snapshot in
-                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                        var array = Array(values.values)
-                        array.append(value)
-                        reference.setValue(array)
-                    } else {
-                        reference.setValue([value])
-                    }
-                })
+            if level == "Subcategory" {
+                Database.database().reference().child(userFinancialTransactionsCategoriesEntity).child(currentUser).child(value).setValue(value)
+            } else if level == "Category" {
+                Database.database().reference().child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser).child(value).setValue(value)
+            } else {
+                Database.database().reference().child(userFinancialTransactionsGroupsEntity).child(currentUser).child(value).setValue(value)
             }
         }
         self.dismiss(animated: true, completion: nil)

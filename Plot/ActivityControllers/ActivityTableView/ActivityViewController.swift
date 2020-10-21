@@ -322,7 +322,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         if !isAppLoaded {
             activityView.tableView.reloadDataWithCompletion() {
                 self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, animated: false)
-                
             }
 //            configureTabBarBadge()
         } else {
@@ -336,11 +335,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             checkIfThereAnyActivities(isEmpty: false)
         }
         
+//        compileActivityDates(activities: allActivities)
+        
         guard !isAppLoaded else { return }
         delegate?.manageAppearanceActivity(self, didFinishLoadingWith: true)
         isAppLoaded = true
-        
-//        compileActivityDates(activities: allActivities)
         
     }
     

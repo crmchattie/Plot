@@ -95,13 +95,8 @@ class FinanceAccountViewController: FormViewController {
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
         navigationItem.leftBarButtonItem = cancelBarButton
         
-        if active {
-            let barButton = UIBarButtonItem(title: "Update", style: .plain, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = barButton
-        } else {
-            let barButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = barButton
-        }
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+        navigationItem.rightBarButtonItem = addBarButton
         
     }
     

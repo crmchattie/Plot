@@ -55,8 +55,8 @@ class CustomSegmentedControl: UIView {
             btn.tintColor = buttonColor
             if btn == sender {
                 selectedIndex = buttonIndex
-                delegate?.changeToIndex(index: selectedIndex)
                 btn.tintColor = selectedButtonColor
+                delegate?.changeToIndex(index: selectedIndex)
             }
         }
     }

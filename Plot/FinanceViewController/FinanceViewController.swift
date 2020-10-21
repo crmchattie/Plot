@@ -21,7 +21,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
     
     let customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["Day","Week","Month", "Year"])
-    var index: Int = 2
     
     var transactions = [Transaction]()
     var transactionRules = [TransactionRule]()
@@ -39,7 +38,8 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     
     var institutionDict = [String: String]()
     
-    var sections: [SectionType] = [.balanceSheet, .financialAccounts, .incomeStatement, .transactions]
+    var setSections: [SectionType] = [.issues, .balanceSheet, .financialAccounts, .incomeStatement, .transactions]
+    var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
     
     let transactionFetcher = FinancialTransactionFetcher()
@@ -62,10 +62,12 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupMainView()
         addObservers()
         
         getFinancialData()
+        
     }
     
     deinit {
@@ -125,9 +127,12 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         
         view.addSubview(customSegmented)
         view.addSubview(collectionView)
+        view.addSubview(activityIndicatorView)
                         
         customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
+        
+        activityIndicatorView.centerInSuperview()
         
 
     }
@@ -197,7 +202,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                         } else if member.connection_status == .connected && !member.is_being_aggregated {
                             dispatchGroup.enter()
                             self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
-                                print("accountName #1 \(account.name)")
                                 updatedAccounts.append(contentsOf: accounts)
                                 for account in accounts {
                                     dispatchGroup.enter()
@@ -208,11 +212,8 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                 }
                                 dispatchGroup.leave()
                             }
-                        } else if (member.connection_status == .prevented || member.connection_status == .denied) && !member.is_being_aggregated {
+                        } else if member.connection_status != .connected && !member.is_being_aggregated {
                             dispatchGroup.enter()
-                            if !self.sections.contains(.issues) {
-                                self.sections.insert(.issues, at: 0)
-                            }
                             self.members.append(member)
                             self.getInsitutionalDetails(institution_code: member.institution_code) {
                                 dispatchGroup.leave()
@@ -228,9 +229,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         }
         
         dispatchGroup.notify(queue: .main) {
-            for account in updatedAccounts {
-                print("accountName #2 \(account.name)")
-            }
             self.accounts = updatedAccounts
             self.updateCollectionView()
             self.updateFirebase(accounts: updatedAccounts, transactions: [])
@@ -492,9 +490,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         Service.shared.getMXMember(guid: guid, member_guid: member_guid) { (search, err) in
             if let member = search?.member {
                 if member.connection_status == .challenged {
-                    if !self.sections.contains(.issues) {
-                        self.sections.insert(.issues, at: 0)
-                    }
                     self.members.append(member)
                     self.getInsitutionalDetails(institution_code: member.institution_code) {
                         completion(member)
@@ -576,21 +571,21 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             for transactionRule in transactionRulesAdded {
                 if !self!.transactionRules.contains(transactionRule) {
                     self!.transactionRules.append(transactionRule)
-//                    self!.updateCollectionView()
+                    self!.updateCollectionView()
                 }
             }
             }, transactionRulesRemoved: { [weak self] transactionRulesRemoved in
                 for transactionRule in transactionRulesRemoved {
                     if let index = self!.transactionRules.firstIndex(where: {$0 == transactionRule}) {
                         self!.transactionRules.remove(at: index)
-//                        self!.updateCollectionView()
+                        self!.updateCollectionView()
                     }
                 }
             }, transactionRulesChanged: { [weak self] transactionRulesChanged in
                 for transactionRule in transactionRulesChanged {
                     if let index = self!.transactionRules.firstIndex(where: {$0 == transactionRule}) {
                         self!.transactionRules[index] = transactionRule
-//                        self!.updateCollectionView()
+                        self!.updateCollectionView()
                     }
                 }
             }
@@ -636,21 +631,26 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         guard currentReachabilityStatus != .notReachable else {
             return
         }
-        activityIndicatorView.startAnimating()
+                
+        self.sections = []
+        self.groups = [SectionType: [AnyHashable]]()
         
+        activityIndicatorView.startAnimating()
+                
         let dispatchGroup = DispatchGroup()
         
-        for section in sections {
+        for section in setSections {
+            dispatchGroup.enter()
             if section.type == "Issues" {
                 dispatchGroup.enter()
                 if !members.isEmpty {
+                    sections.append(.issues)
                     members.sort { (member1, member2) -> Bool in
                         return member1.name < member2.name
                     }
                     self.groups[section] = members
                     dispatchGroup.leave()
                 } else {
-                    self.sections.removeAll(where: {$0 == section})
                     dispatchGroup.leave()
                 }
             } else if section.type == "Accounts" {
@@ -658,23 +658,22 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     dispatchGroup.enter()
                     categorizeAccounts(accounts: accounts) { (accountsList, accountsDict) in
                         if !accountsList.isEmpty {
+                            self.sections.append(.balanceSheet)
                             self.groups[section] = accountsList
                             self.accountDict = accountsDict
-                        } else {
-                            self.sections.removeAll(where: {$0 == section})
                         }
                         dispatchGroup.leave()
                     }
                 } else if section.subType == "Accounts" {
                     dispatchGroup.enter()
                     if !accounts.isEmpty {
+                        self.sections.append(.financialAccounts)
                         accounts.sort { (account1, account2) -> Bool in
                             return account1.name < account2.name
                         }
                         self.groups[section] = accounts
                         dispatchGroup.leave()
                     } else {
-                        self.sections.removeAll(where: {$0 == section})
                         dispatchGroup.leave()
                     }
                 }
@@ -683,16 +682,15 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     dispatchGroup.enter()
                     categorizeTransactions(transactions: transactions, start: startDate, end: endDate, type: .none) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
+                            self.sections.append(.incomeStatement)
                             self.groups[section] = transactionsList
                             self.transactionDict = transactionsDict
-                        } else {
-                            self.sections.removeAll(where: {$0 == section})
                         }
                         dispatchGroup.leave()
                     }
                 } else if section.subType == "Transactions" {
-                    dispatchGroup.enter()
                     if !transactions.isEmpty {
+                        dispatchGroup.enter()
                         var filteredTransactions = transactions.filter { (transaction) -> Bool in
                             if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
                                 if transactionDate > startDate.stripTime() && endDate.stripTime() > transactionDate {
@@ -705,30 +703,33 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                             }
                             return false
                         }
-                        filteredTransactions = filteredTransactions.sorted(by: { (transaction1, transaction2) -> Bool in
-                            if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
-                                return date1 > date2
-                            }
-                            return transaction1.description < transaction2.description
-                        })
-                        self.groups[section] = filteredTransactions
-                        dispatchGroup.leave()
-                    } else {
-                        self.sections.removeAll(where: {$0 == section})
-                        dispatchGroup.leave()
+                        if !filteredTransactions.isEmpty {
+                            self.sections.append(.transactions)
+                            filteredTransactions = filteredTransactions.sorted(by: { (transaction1, transaction2) -> Bool in
+                                if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
+                                    return date1 > date2
+                                }
+                                return transaction1.description < transaction2.description
+                            })
+                            self.groups[section] = filteredTransactions
+                            dispatchGroup.leave()
+                        } else {
+                            dispatchGroup.leave()
+                        }
                     }
                 }
             }
-            
-            dispatchGroup.notify(queue: .main) {
-                activityIndicatorView.stopAnimating()
-                self.collectionView.reloadData()
-            }
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            activityIndicatorView.stopAnimating()
+            self.collectionView.reloadData()
         }
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        sections.count
+        return sections.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -999,7 +1000,6 @@ extension FinanceViewController: UpdateFinancialsDelegate {
 
 extension FinanceViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        sections.removeAll(where: { $0 == .issues })
         members.removeAll()
         getMXData()
     }
@@ -1020,7 +1020,6 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
             startDate = Date().startOfYear
             endDate = Date().endOfYear
         }
-        self.index = index
         updateCollectionView()
         
     }

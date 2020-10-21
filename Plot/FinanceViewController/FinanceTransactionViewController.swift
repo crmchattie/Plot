@@ -100,14 +100,13 @@ class FinanceTransactionViewController: FormViewController {
         definesPresentationContext = true
         navigationItem.title = "Transaction"
         
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+        navigationItem.rightBarButtonItem = addBarButton
+        
         if active {
-            let barButton = UIBarButtonItem(title: "Update", style: .plain, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = barButton
             let ruleBarButton = UIBarButtonItem(title: "New Rule", style: .plain, target: self, action: #selector(createRule))
             navigationItem.leftBarButtonItem = ruleBarButton
         } else {
-            let barButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = barButton
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
             navigationItem.leftBarButtonItem = cancelBarButton
         }
