@@ -11,6 +11,7 @@ import Charts
 
 public class DayAxisValueFormatter: NSObject, IAxisValueFormatter {
     weak var chart: BarLineChartViewBase?
+    var formatType = 0
     let months = ["Jan", "Feb", "Mar",
                   "Apr", "May", "Jun",
                   "Jul", "Aug", "Sep",
@@ -25,7 +26,18 @@ public class DayAxisValueFormatter: NSObject, IAxisValueFormatter {
             return ""
         }
         
-        return date.getTimeStringFromUTC()
+        switch formatType {
+        case 0:
+            return date.getTimeString()
+        case 1:
+            return date.getShortDayName()
+        case 2:
+            return date.getDayDigit()
+        case 3:
+            return date.getDayDigit()
+        default:
+            return ""
+        }
     }
     
     private func days(forMonth month: Int, year: Int) -> Int {

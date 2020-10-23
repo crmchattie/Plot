@@ -311,10 +311,31 @@ extension Date {
         return dateFormatter.string(from: self)
     }
     
+    func getShortDayName() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEE"
+        return dateFormatter.string(from: self)
+    }
+    
+    func getDayDigit() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd"
+        return dateFormatter.string(from: self)
+    }
+    
     func getTimeStringFromUTC() -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.locale = locale
+        dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "hh:mm a"
+        dateFormatter.amSymbol = "AM"
+        dateFormatter.pmSymbol = "PM"
+        return dateFormatter.string(from: self)
+    }
+    
+    func getTimeString() -> String {
+        let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         dateFormatter.dateFormat = "hh:mm a"
         dateFormatter.amSymbol = "AM"

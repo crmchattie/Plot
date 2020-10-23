@@ -13,6 +13,7 @@ import HealthKit
 class HealthDetailViewController: UIViewController {
     
     var healthMetric: HealthMetric?
+    var dayAxisValueFormatter: DayAxisValueFormatter?
     
     lazy var chartView: BarChartView = {
         let chartView = BarChartView()
@@ -93,7 +94,11 @@ class HealthDetailViewController: UIViewController {
         xAxis.labelFont = .systemFont(ofSize: 10)
         xAxis.granularity = 1
         xAxis.labelCount = 5
-        xAxis.valueFormatter = DayAxisValueFormatter(chart: chartView)
+        
+        dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
+        dayAxisValueFormatter?.formatType = segmentedControl.selectedSegmentIndex
+        
+        xAxis.valueFormatter = dayAxisValueFormatter
         
         let leftAxisFormatter = NumberFormatter()
         leftAxisFormatter.minimumFractionDigits = 0
@@ -181,9 +186,14 @@ class HealthDetailViewController: UIViewController {
         break // Dos
         case 2:
         break // Tres
+        case 3:
+            // not implemented
+            return
         default:
             break
         }
+        
+        fetchHealthKitData()
     }
     
     // MARK: HealthKit Data
@@ -192,6 +202,7 @@ class HealthDetailViewController: UIViewController {
             return
         }
         
+        var barWidth: Double = 0.85
         let endDate = Date()
         let calendar = Calendar.current
         var startDate = calendar.startOfDay(for: endDate)
@@ -199,9 +210,9 @@ class HealthDetailViewController: UIViewController {
         case 0:
             break
         case 1:
-            startDate = endDate.dayBefore
-        case 2:
             startDate = endDate.weekBefore
+        case 2:
+            startDate = endDate.monthBefore
         case 3:
             startDate = endDate.lastYear
         default:
@@ -226,14 +237,22 @@ class HealthDetailViewController: UIViewController {
                         }
                     }
                     
+                    if entries.count <= 2 {
+                        barWidth = 0.1
+                    }
+                    else if entries.count <= 10 {
+                        barWidth = 0.5
+                    }
+
                     let dataSet = BarChartDataSet(entries: entries, label: "")
                     dataSet.colors = ChartColorTemplates.material()
                     dataSet.drawValuesEnabled = false
                     
                     let data = BarChartData(dataSet: dataSet)
                     data.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
-                    data.barWidth = 0.9
+                    data.barWidth = barWidth
                     DispatchQueue.main.async {
+                        self.dayAxisValueFormatter?.formatType = self.segmentedControl.selectedSegmentIndex
                         self.chartView.data = data
                     }
                 }
