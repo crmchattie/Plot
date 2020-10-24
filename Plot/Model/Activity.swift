@@ -37,6 +37,7 @@ class Activity: NSObject, NSCopying, Codable {
     var checklistIDs: [String]?
     var activitylistIDs: [String]?
     var packinglistIDs: [String]?
+    var transactionIDs: [String]?
     var grocerylistID: String?
     var isGroupActivity: Bool?
     var admin: String?
@@ -74,6 +75,7 @@ class Activity: NSObject, NSCopying, Codable {
         case activitylistIDs
         case packinglistIDs
         case grocerylistID
+        case transactionIDs
         case calendarExport
         case recipeID
         case servings
@@ -176,6 +178,7 @@ class Activity: NSObject, NSCopying, Codable {
         checklistIDs = dictionary?["checklistIDs"] as? [String]
         activitylistIDs = dictionary?["activitylistIDs"] as? [String]
         packinglistIDs = dictionary?["packinglistIDs"] as? [String]
+        transactionIDs = dictionary?["transactionIDs"] as? [String]
         calendarExport = dictionary?["calendarExport"] as? Bool
         recipeID = dictionary?["recipeID"] as? String
         servings = dictionary?["servings"] as? Int
@@ -321,6 +324,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.packinglistIDs as AnyObject? {
             dictionary["packinglistIDs"] = value
+        }
+        
+        if let value = self.transactionIDs as AnyObject? {
+            dictionary["transactionIDs"] = value
         }
         
         if let value = self.recipeID as AnyObject? {

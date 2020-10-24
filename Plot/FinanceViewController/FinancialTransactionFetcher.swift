@@ -93,13 +93,11 @@ class FinancialTransactionFetcher: NSObject {
         })
     }
     
-    func observeTransactionForCurrentUser(transactionsAdded: @escaping ([Transaction])->(), transactionsRemoved: @escaping ([Transaction])->(), transactionsChanged: @escaping ([Transaction])->()) {
+    func observeTransactionForCurrentUser(transactionsAdded: @escaping ([Transaction])->()) {
         guard let _ = Auth.auth().currentUser?.uid else {
             return
         }
         self.transactionsAdded = transactionsAdded
-        self.transactionsRemoved = transactionsRemoved
-        self.transactionsChanged = transactionsChanged
         currentUserTransactionsAddHandle = userTransactionsDatabaseRef.observe(.childAdded, with: { snapshot in
             if let completion = self.transactionsAdded {
                 let transactionID = snapshot.key
@@ -111,13 +109,6 @@ class FinancialTransactionFetcher: NSObject {
                 }
             }
         })
-        
-        currentUserTransactionsChangeHandle = userTransactionsDatabaseRef.observe(.childChanged, with: { snapshot in
-            if let completion = self.transactionsChanged {
-                self.getTransactionsFromSnapshot(snapshot: snapshot, completion: completion)
-            }
-        })
-        
     }
     
     func getTransactionsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Transaction])->()) {

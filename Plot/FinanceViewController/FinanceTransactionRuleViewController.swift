@@ -11,17 +11,11 @@ import Eureka
 import Firebase
 import CodableFirebase
 
-protocol UpdateTransactionRuleDelegate: class {
-    
-}
-
 class FinanceTransactionRuleViewController: FormViewController {
     var transactionRule: TransactionRule!
     var transaction: Transaction!
     
     var active: Bool = true
-    
-    weak var delegate : UpdateTransactionRuleDelegate?
     
     let numberFormatter = NumberFormatter()
     //        numberFormatter.currencyCode = account.currency_code

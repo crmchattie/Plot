@@ -334,7 +334,7 @@ class ChecklistViewController: FormViewController {
 
         }
         
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
 
@@ -383,7 +383,7 @@ class ChecklistViewController: FormViewController {
 //            self.share()
 //        }))
 
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
 
@@ -468,7 +468,7 @@ class ChecklistViewController: FormViewController {
 //                }))
 //
 //
-//                alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+//                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
 //                    print("User click Dismiss button")
 //                }))
 //

@@ -527,25 +527,19 @@ extension MasterActivityContainerController {
             print("You've pressed cancel")
         }
         let transaction = UIAlertAction(title: "Transaction", style: .default) { (action:UIAlertAction) in
-            if let user = self.mxUser {
-                let destination = FinanceTransactionViewController()
-                destination.user = user
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
-            }
+            let destination = FinanceTransactionViewController()
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            self.navigationController?.pushViewController(destination, animated: true)
         }
         let account = UIAlertAction(title: "Account", style: .default) { (action:UIAlertAction) in
             if let user = self.mxUser {
                 let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
                 let custom = UIAlertAction(title: "Manual Entry", style: .default) { (action:UIAlertAction) in
                     let destination = FinanceAccountViewController()
-                    destination.user = user
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
-                    let navigationViewController = UINavigationController(rootViewController: destination)
-                    self.present(navigationViewController, animated: true, completion: nil)
+                    self.navigationController?.pushViewController(destination, animated: true)
                 }
                 let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
                     self.openMXConnect(guid: user.guid, current_member_guid: nil)

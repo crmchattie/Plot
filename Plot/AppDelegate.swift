@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         registerForPushNotifications(application: application)
         
-        RunLoop.current.run(until: NSDate(timeIntervalSinceNow:5) as Date)
+        RunLoop.current.run(until: NSDate(timeIntervalSinceNow:3) as Date)
         
         return true
     }

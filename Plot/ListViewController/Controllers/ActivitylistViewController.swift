@@ -333,7 +333,7 @@ class ActivitylistViewController: FormViewController {
             
         }
         
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
         
@@ -382,7 +382,7 @@ class ActivitylistViewController: FormViewController {
         //            self.share()
         //        }))
         
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
         
@@ -467,7 +467,7 @@ class ActivitylistViewController: FormViewController {
         //                }))
         //
         //
-        //                alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        //                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
         //                    print("User click Dismiss button")
         //                }))
         //

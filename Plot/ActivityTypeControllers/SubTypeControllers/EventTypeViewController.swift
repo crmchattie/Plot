@@ -797,7 +797,7 @@ extension EventTypeViewController: ActivityTypeCellDelegate {
             
         }
         
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
         
@@ -851,7 +851,7 @@ extension EventTypeViewController: ActivityTypeCellDelegate {
         }))
         
 
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
 

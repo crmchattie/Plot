@@ -17,8 +17,6 @@ protocol UpdateTransactionDelegate: class {
 
 class FinanceTransactionViewController: FormViewController {
     var transaction: Transaction!
-    var user: MXUser!
-    var accounts: [MXAccount]!
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -28,6 +26,9 @@ class FinanceTransactionViewController: FormViewController {
     var userNamesString: String = ""
     
     var active: Bool = false
+    
+    //added for CreateActivityViewController
+    var movingBackwards: Bool = false
     
     weak var delegate : UpdateTransactionDelegate?
     
@@ -41,7 +42,6 @@ class FinanceTransactionViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
         setupVariables()
@@ -50,10 +50,16 @@ class FinanceTransactionViewController: FormViewController {
                 
         if !status {
             for row in form.rows {
-                if ((row as? CheckRow) == nil) {
+                if row.tag != "Should Link" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        if movingBackwards {
+            self.delegate?.updateTransaction(transaction: transaction)
         }
     }
     
@@ -81,7 +87,7 @@ class FinanceTransactionViewController: FormViewController {
         } else if let currentUser = Auth.auth().currentUser?.uid {
             let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
-            transaction = Transaction(description: "Transaction Name", amount: 0.0, created_at: date, guid: ID, user_guid: user.guid, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: currentUser)
+            transaction = Transaction(description: "Transaction Name", amount: 0.0, created_at: date, guid: ID, user_guid: currentUser, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
         }
         
@@ -100,20 +106,19 @@ class FinanceTransactionViewController: FormViewController {
         definesPresentationContext = true
         navigationItem.title = "Transaction"
         
-        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-        navigationItem.rightBarButtonItem = addBarButton
-        
-        if active {
-            let ruleBarButton = UIBarButtonItem(title: "New Rule", style: .plain, target: self, action: #selector(createRule))
-            navigationItem.leftBarButtonItem = ruleBarButton
+        if !active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
         } else {
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-            navigationItem.leftBarButtonItem = cancelBarButton
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            let dotsBarButton = UIBarButtonItem(image: UIImage(named: "dots"), style: .plain, target: self, action: #selector(goToExtras))
+            navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
         }
         
     }
     
     @IBAction func create(_ sender: AnyObject) {
+        movingBackwards = false
         if transaction.user_created ?? false, !active {
             self.showActivityIndicator()
             let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
@@ -121,16 +126,12 @@ class FinanceTransactionViewController: FormViewController {
             self.hideActivityIndicator()
         }
         self.delegate?.updateTransaction(transaction: transaction)
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    @IBAction func cancel(_ sender: AnyObject) {
-        self.dismiss(animated: true, completion: nil)
+        self.navigationController?.popViewController(animated: true)
     }
     
     fileprivate func initializeForm() {
         form +++
-            Section()
+            Section(footer: "If status is pending, values cannot be changed")
             
             <<< TextRow("Name") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -202,24 +203,43 @@ class FinanceTransactionViewController: FormViewController {
             }
             
             //need to add change to amount or amount per rows
-//            <<< IntRow("Split amount between") {
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                $0.title = $0.tag
-//                $0.value = transaction.splitNumber ?? transaction.participantsIDs?.count ?? 0
-//            }.cellUpdate { cell, row in
-//                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            }.onChange { row in
-//                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("splitNumber")
-//                if let value = row.value {
-//                    self.transaction.splitNumber = value
-//                    reference.setValue(value)
-//                } else {
-//                    self.transaction.splitNumber = nil
-//                    reference.removeValue()
-//                }
-//            }
+            <<< IntRow("splitNumber") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.title = "Split amount by"
+                $0.value = transaction.splitNumber ?? transaction.participantsIDs?.count
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("splitNumber")
+                if let value = row.value {
+                    self.transaction.splitNumber = value
+                    reference.setValue(value)
+                    if let row: DecimalRow = self.form.rowBy(tag: "Per Person Amount"), self.transaction.amount != 0, value != 0 {
+                        row.value = self.transaction.amount / Double(value)
+                        row.updateCell()
+                    }
+                } else {
+                    self.transaction.splitNumber = nil
+                    reference.removeValue()
+                }
+            }
+            
+            <<< DecimalRow("Per Person Amount") {
+                $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.title = $0.tag
+                $0.formatter = numberFormatter
+                $0.hidden = "$splitNumber == nil || $splitNumber == 0"
+                if let splitNumber = transaction.splitNumber, splitNumber != 0 {
+                    $0.value = transaction.amount / Double(splitNumber)
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }
             
             <<< TextRow("Status") {
                 $0.cell.isUserInteractionEnabled = false
@@ -232,7 +252,7 @@ class FinanceTransactionViewController: FormViewController {
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
             
-            <<< CheckRow() {
+            <<< CheckRow("Should Link") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.tintColor = FalconPalette.defaultBlue
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -308,6 +328,21 @@ class FinanceTransactionViewController: FormViewController {
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
         
+            <<< LabelRow("Tags") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
+            }.onCellSelection({ _, row in
+                self.openTags()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }
+        
             
             
         form +++
@@ -315,11 +350,10 @@ class FinanceTransactionViewController: FormViewController {
             <<< ButtonRow("Participants") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
                 if active {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.title = self.userNamesString
                 }
                 }.onCellSelection({ _,_ in
@@ -327,86 +361,44 @@ class FinanceTransactionViewController: FormViewController {
                 }).cellUpdate { cell, row in
                     cell.accessoryType = .disclosureIndicator
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.textLabel?.textAlignment = .left
-                    if row.title == "Participants" {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    } else {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
                 }
         
-        form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Tags",
-                               footer: """
-                               If status is posted, the Name, Financial Profile Date, Group, Category, Subcategory and Tag values can be changed
-                               If status is pending, values cannot be changed
-                               """) {
-                                $0.tag = "tagsfields"
-                                $0.addButtonProvider = { section in
-                                    return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        $0.title = "Add New Tag"
-                                    }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        cell.textLabel?.textAlignment = .left
-                                        
-                                    }
-                                }
-                                $0.multivaluedRowToInsertAt = { index in
-                                    return TextRow() {
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                        $0.placeholder = "Tag"
-                                    }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                    }.onChange() { _ in
-                                        self.updateTags()
-                                    }
-                                }
-        }
-        
-        if let items = self.transaction.tags {
-            for item in items {
-                var mvs = (form.sectionBy(tag: "tagsfields") as! MultivaluedSection)
-                mvs.insert(TextRow(){
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                    $0.value = item
-                }.cellUpdate { cell, row in
+            <<< TextAreaRow("Description") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                $0.value = transaction.transactionDescription
+                }.cellUpdate({ (cell, row) in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                }.onChange() { _ in
-                    self.updateTags()
-                } , at: mvs.count - 1)
-            }
-        }
-    }
-    
-    fileprivate func updateTags() {
-        if let mvs = (form.values()["tagsfields"] as? [Any?])?.compactMap({ $0 as? String }) {
-            if !mvs.isEmpty {
-                var tagsArray = [String]()
-                for value in mvs {
-                    tagsArray.append(value)
+                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }).onChange { row in
+                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transactionDescription")
+                    self.transaction.transactionDescription = row.value
+                    reference.setValue(row.value)
                 }
-                self.transaction.tags = tagsArray
-            } else {
-                self.transaction.tags = nil
-            }
-            if let currentUser = Auth.auth().currentUser?.uid {
-                let updatedTags = ["tags": self.transaction.tags as AnyObject]
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).updateChildValues(updatedTags)
-            }
-        }
     }
     
-    @objc func createRule(_ item:UIBarButtonItem) {
+    @objc func goToExtras() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Create Transaction Rule", style: .default, handler: { (_) in
+            self.createRule()
+        }))
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+        }))
+
+        self.present(alert, animated: true)
+        
+    }
+    
+    func createRule() {
         let destination = FinanceTransactionRuleViewController()
         destination.transaction = transaction
         let navigationViewController = UINavigationController(rootViewController: destination)
@@ -418,8 +410,16 @@ class FinanceTransactionViewController: FormViewController {
         destination.delegate = self
         destination.level = level
         destination.value = value
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    @objc fileprivate func openTags() {
+        let destination = FinanceTagsViewController()
+        destination.delegate = self
+        destination.tags = transaction.tags
+        destination.ID = transaction.guid
+        destination.type = "transaction"
+        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     @objc fileprivate func openParticipantsInviter() {
@@ -542,5 +542,34 @@ extension FinanceTransactionViewController: UpdateInvitees {
                 self.hideActivityIndicator()
             }
         }
+    }
+}
+
+extension FinanceTransactionViewController: UITextViewDelegate {
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == FalconPalette.defaultBlue {
+            textView.text = nil
+            textView.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+        
+        
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Description"
+        }
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        
+    }
+    
+}
+
+extension FinanceTransactionViewController: UpdateTagsDelegate {
+    func updateTags(tags: [String]?) {
+        transaction.tags = tags
     }
 }

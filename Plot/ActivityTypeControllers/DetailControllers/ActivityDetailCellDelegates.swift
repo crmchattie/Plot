@@ -291,7 +291,7 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
 
         }
         
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
 
@@ -371,7 +371,7 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
             }))
             
 
-            alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 print("User click Dismiss button")
             }))
 
@@ -439,7 +439,7 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
         }
            
 
-       alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+       alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
            print("User click Dismiss button")
        }))
 
@@ -845,7 +845,7 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
 
         }
         
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
 
@@ -925,7 +925,7 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
             }))
             
 
-            alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 print("User click Dismiss button")
             }))
 
@@ -992,7 +992,7 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
         }
            
 
-       alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+       alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
            print("User click Dismiss button")
        }))
 
@@ -1404,7 +1404,7 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
 
         }
         
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
 
@@ -1492,7 +1492,7 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
             }))
             
 
-            alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 print("User click Dismiss button")
             }))
 
@@ -1560,7 +1560,7 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
         }
            
 
-       alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+       alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
            print("User click Dismiss button")
        }))
 
@@ -1966,7 +1966,7 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
 
         }
         
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
 
@@ -2062,7 +2062,7 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
             }))
             
 
-            alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 print("User click Dismiss button")
             }))
 
@@ -2129,7 +2129,7 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
         }
            
 
-       alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+       alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
            print("User click Dismiss button")
        }))
 

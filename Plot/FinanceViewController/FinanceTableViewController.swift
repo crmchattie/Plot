@@ -54,14 +54,14 @@ class FinanceTableViewController: UITableViewController {
         
     }
     
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//        if let transactions = transactions {
-//            self.delegate?.updateTransactions(transactions: transactions)
-//        } else if let accounts = accounts {
-//            self.delegate?.updateAccounts(accounts: accounts)
-//        }
-//    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if let transactions = transactions {
+            self.delegate?.updateTransactions(transactions: transactions)
+        } else if let accounts = accounts {
+            self.delegate?.updateAccounts(accounts: accounts)
+        }
+    }
     
     fileprivate func setupSearchController() {
         
@@ -146,27 +146,23 @@ class FinanceTableViewController: UITableViewController {
             let transaction = filteredTransactions[indexPath.row]
             let destination = FinanceTransactionViewController()
             destination.transaction = transaction
-            destination.user = user
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.delegate = self
             self.getParticipants(transaction: transaction, account: nil) { (participants) in
                 destination.selectedFalconUsers = participants
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         } else if let filteredAccounts = filteredAccounts {
             let account = filteredAccounts[indexPath.row]
             let destination = FinanceAccountViewController()
             destination.account = account
-            destination.user = user
             destination.users = users
             destination.filteredUsers = filteredUsers
             destination.delegate = self
             self.getParticipants(transaction: nil, account: account) { (participants) in
                 destination.selectedFalconUsers = participants
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         }
         tableView.deselectRow(at: indexPath, animated: true)

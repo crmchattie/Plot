@@ -8,16 +8,13 @@
 
 import Eureka
 
-final class PurchaseCell: Cell<Purchase>, CellType {
+final class PurchaseCell: Cell<Transaction>, CellType {
         
     lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .callout)
-        label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        
         return label
     }()
     
@@ -25,12 +22,9 @@ final class PurchaseCell: Cell<Purchase>, CellType {
     lazy var participantsLabal: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        
         return label
     }()
     
@@ -38,12 +32,8 @@ final class PurchaseCell: Cell<Purchase>, CellType {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .callout)
-        label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.isUserInteractionEnabled = true
-        label.sizeToFit()
-        
         return label
     }()
     
@@ -77,14 +67,14 @@ final class PurchaseCell: Cell<Purchase>, CellType {
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
         
-        guard let purchase = row.value else { return }
+        guard let transaction = row.value else { return }
         
         // set the texts to the labels
-        nameLabel.text = purchase.name
-        costLabel.text = String(format: "$%.02f", purchase.cost!)
-        if let purchaseRowCount = purchase.purchaseRowCount {
+        nameLabel.text = transaction.description
+        costLabel.text = String(format: "$%.02f", transaction.amount)
+        if let purchaseRowCount = transaction.splitNumber {
             participantsLabal.text = "Purchase split among \(purchaseRowCount) participants"
-        } else if let participants = purchase.participantsIDs, participants.count > 1 {
+        } else if let participants = transaction.participantsIDs, participants.count > 1 {
             participantsLabal.text = "Purchase split among \(participants.count) participants"
         } else {
             participantsLabal.text = "Purchase not split"

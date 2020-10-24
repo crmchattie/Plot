@@ -104,6 +104,8 @@
 		10B4AE3524FEC5BC005B967B /* FinanceAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */; };
 		10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CB24AF761F006686FA /* CompositionalHeader.swift */; };
 		10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CD24AFB0E7006686FA /* SectionType.swift */; };
+		10B6B31625410D37008037AD /* FinanceTagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B6B31525410D37008037AD /* FinanceTagsViewController.swift */; };
+		10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */; };
 		10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */; };
 		10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */; };
 		10C32861248D8B9300E4475B /* ChatsTableViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */; };
@@ -138,7 +140,7 @@
 		10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */; };
 		10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB0925217C3200898D6E /* HeaderCell.swift */; };
 		10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */; };
-		10E93D4924BE2E7A00F6EE18 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 10E93D4824BE2E7A00F6EE18 /* SwiftPackageProductDependency */; };
+		10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */ = {isa = PBXBuildFile; productRef = 10E93D4824BE2E7A00F6EE18 /* LBTATools */; };
 		10E93D4E24BE41B500F6EE18 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D4B24BE41B400F6EE18 /* MapViewController.swift */; };
 		10E93D4F24BE41B500F6EE18 /* LocationsCarouselController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D4C24BE41B400F6EE18 /* LocationsCarouselController.swift */; };
 		10E93D5724BE43B700F6EE18 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5324BE43B600F6EE18 /* Extensions.swift */; };
@@ -478,6 +480,8 @@
 		10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceAccountViewController.swift; sourceTree = "<group>"; };
 		10B656CB24AF761F006686FA /* CompositionalHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionalHeader.swift; sourceTree = "<group>"; };
 		10B656CD24AFB0E7006686FA /* SectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionType.swift; sourceTree = "<group>"; };
+		10B6B31525410D37008037AD /* FinanceTagsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTagsViewController.swift; sourceTree = "<group>"; };
+		10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseTransactionTableViewController.swift; sourceTree = "<group>"; };
 		10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
 		10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatsTableViewController+Migration.swift"; sourceTree = "<group>"; };
@@ -747,7 +751,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E6985A6EF59641559135D26 /* libPods-Plot.a in Frameworks */,
-				10E93D4924BE2E7A00F6EE18 /* BuildFile in Frameworks */,
+				10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -850,6 +854,7 @@
 				105CB18D2512A3830000D3D8 /* FinanceTableViewController.swift */,
 				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
 				105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */,
+				10B6B31525410D37008037AD /* FinanceTagsViewController.swift */,
 				10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */,
 				103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */,
 				10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */,
@@ -862,6 +867,7 @@
 				10173605251924120073D283 /* FinancialAccountFetcher.swift */,
 				10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */,
 				1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */,
+				10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */,
 			);
 			path = FinanceViewController;
 			sourceTree = "<group>";
@@ -1978,7 +1984,7 @@
 			);
 			name = Plot;
 			packageProductDependencies = (
-				10E93D4824BE2E7A00F6EE18 /* SwiftPackageProductDependency */,
+				10E93D4824BE2E7A00F6EE18 /* LBTATools */,
 			);
 			productName = "Pigeon-project";
 			productReference = 4B4F452B1F32230C00A6FF96 /* Plot.app */;
@@ -2039,7 +2045,7 @@
 			);
 			mainGroup = 4B4F45221F32230C00A6FF96;
 			packageReferences = (
-				10E93D4724BE2E7A00F6EE18 /* RemoteSwiftPackageReference */,
+				10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */,
 			);
 			productRefGroup = 4B4F452C1F32230C00A6FF96 /* Products */;
 			projectDirPath = "";
@@ -2278,6 +2284,7 @@
 				10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */,
 				109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */,
 				4BAEE5BB212735E50045AB10 /* INSPhotosOverlayView.swift in Sources */,
+				10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */,
 				4BAEE50C21272D890045AB10 /* UserInfoTableViewController+handlers.swift in Sources */,
 				4BAEE50921272D890045AB10 /* SelectedMediaCollectionCell+timerHandlers.swift in Sources */,
 				10196F0024411B5600B6AFDF /* PlacesAnnotation.swift in Sources */,
@@ -2347,6 +2354,7 @@
 				10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */,
 				26B975ED2365374A003BFBE3 /* InvitationsFetcher.swift in Sources */,
 				4BAEE47121272B380045AB10 /* AccountSettingsAvatarOpenerDelegate.swift in Sources */,
+				10B6B31625410D37008037AD /* FinanceTagsViewController.swift in Sources */,
 				10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */,
 				26E8E3A6238B2CA9000F30C8 /* NotificationsViewController.swift in Sources */,
 				10F3032C24EC6FD300C04B8F /* MXInstitution.swift in Sources */,
@@ -2791,7 +2799,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		10E93D4724BE2E7A00F6EE18 /* RemoteSwiftPackageReference */ = {
+		10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bhlvoong/LBTATools.git";
 			requirement = {
@@ -2802,9 +2810,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		10E93D4824BE2E7A00F6EE18 /* SwiftPackageProductDependency */ = {
+		10E93D4824BE2E7A00F6EE18 /* LBTATools */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 10E93D4724BE2E7A00F6EE18 /* RemoteSwiftPackageReference */;
+			package = 10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */;
 			productName = LBTATools;
 		};
 /* End XCSwiftPackageProductDependency section */

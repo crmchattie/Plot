@@ -35,7 +35,7 @@ class CreateActivityViewController: FormViewController {
     var locationName : String = "locationName"
     var locationAddress = [String : [Double]]()
     var scheduleList = [Activity]()
-    var purchaseList = [Purchase]()
+    var purchaseList = [Transaction]()
     var purchaseDict = [User: Double]()
     var listList = [ListContainer]()
     var scheduleIndex: Int = 0
@@ -135,32 +135,6 @@ class CreateActivityViewController: FormViewController {
         }
         
         purchaseUsers = self.acceptedParticipant
-        
-        if let currentUserID = Auth.auth().currentUser?.uid, activity.admin == currentUserID {
-            let participantReference = Database.database().reference().child("users").child(currentUserID)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    self.purchaseUsers.append(user)
-                    for user in self.purchaseUsers {
-                        self.purchaseDict[user] = 0.00
-                    }
-                    
-                    self.decimalRowFunc()
-                    self.purchaseBreakdown()
-                    self.updateDecimalRow()
-                }
-            })
-        } else {
-            for user in self.purchaseUsers {
-                self.purchaseDict[user] = 0.00
-            }
-            
-            self.decimalRowFunc()
-            self.purchaseBreakdown()
-            self.updateDecimalRow()
-        }
         
         if let showExtras = activity.showExtras {
             if !showExtras, let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
@@ -689,7 +663,7 @@ class CreateActivityViewController: FormViewController {
         <<< SwitchRow("showExtras") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.title = "Show Schedule, Lists & Purchases"
+                row.title = "Show Schedule, Lists & Transactions"
                 if let showExtras = activity.showExtras {
                     row.value = showExtras
                 } else {
@@ -718,7 +692,7 @@ class CreateActivityViewController: FormViewController {
                 } else {
                     // Fallback on earlier versions
                 }
-                $0.options = ["Schedule", "Lists", "Purchases"]
+                $0.options = ["Schedule", "Lists", "Transactions"]
                 $0.value = "Schedule"
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -799,14 +773,14 @@ class CreateActivityViewController: FormViewController {
 
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Purchases",
-                               footer: "Add a purchase that can be split among participants") {
+                               header: "Transactions",
+                               footer: "Add a transaction that can be split among participants") {
                                 $0.tag = "purchasefields"
-                                $0.hidden = "$sections != 'Purchases'"
+                                $0.hidden = "$sections != 'Transactions'"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        $0.title = "Add New Purchase"
+                                        $0.title = "Add New Transaction"
                                         }.cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                             cell.textLabel?.textAlignment = .left
@@ -826,24 +800,12 @@ class CreateActivityViewController: FormViewController {
                                     
                                 }
             }
-                                for purchase in purchaseList {
-                                    var mvs = (form.sectionBy(tag: "purchasefields") as! MultivaluedSection)
-                                    mvs.insert(PurchaseRow() {
-                                        $0.value = purchase
-                                        }.onCellSelection() { cell, row in
-                                            self.purchaseIndex = row.indexPath!.row
-                                            self.openPurchases()
-                                            cell.cellResignFirstResponder()
-    //                                                self.tableView.endEditing(true)
-                                    }, at: mvs.count - 1)
-                                    
-                                }
 
                                 form +++
                                     Section(header: "Balances",
                                             footer: "Positive Balance = Owe; Negative Balance = Owed") {
                                                 $0.tag = "Balances"
-                                                $0.hidden = "$sections != 'Purchases'"
+                                                $0.hidden = "$sections != 'Transactions'"
                                 }
     }
     
@@ -856,7 +818,7 @@ class CreateActivityViewController: FormViewController {
                 purchaseDict[user] = 0.00
                 if let mvsValue = mvs {
                     mvs?.insert(DecimalRow(user.name) {
-                        $0.hidden = "$sections != 'Purchases'"
+                        $0.hidden = "$sections != 'Transactions'"
                         $0.tag = user.name
                         $0.useFormatterDuringInput = true
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -881,7 +843,7 @@ class CreateActivityViewController: FormViewController {
         for (key, _) in purchaseDict {
             if !purchaseUsers.contains(key) {
                 let sectionMVS : SegmentedRow<String> = form.rowBy(tag: "sections")!
-                sectionMVS.value = "Purchases"
+                sectionMVS.value = "Transactions"
                 sectionMVS.updateCell()
                 purchaseDict[key] = nil
                 if let decimalRow : DecimalRow = form.rowBy(tag: "\(key.name!)") {
@@ -896,22 +858,19 @@ class CreateActivityViewController: FormViewController {
         for user in purchaseUsers {
             purchaseDict[user] = 0.00
         }
-        guard let currentUser = Auth.auth().currentUser else { return }
         for purchase in purchaseList {
-            if let purchaser = purchase.purchaser {
+            if let purchaser = purchase.admin {
                 var costPerPerson: Double = 0.00
-                if let purchaseRowCount = purchase.purchaseRowCount {
-                    costPerPerson = purchase.cost! / Double(purchaseRowCount)
+                if let purchaseRowCount = purchase.splitNumber {
+                    costPerPerson = purchase.amount / Double(purchaseRowCount)
                 } else if let participants = purchase.participantsIDs {
-                    costPerPerson = purchase.cost! / Double(participants.count)
+                    costPerPerson = purchase.amount / Double(participants.count)
                 }
                 // minus cost from purchaser's balance
-                for ID in purchaser {
-                    if let user = purchaseUsers.first(where: {$0.id == ID}) {
-                        var value = purchaseDict[user] ?? 0.00
-                        value -= costPerPerson
-                        purchaseDict[user] = value
-                    }
+                if let user = purchaseUsers.first(where: {$0.id == purchaser}) {
+                    var value = purchaseDict[user] ?? 0.00
+                    value -= costPerPerson
+                    purchaseDict[user] = value
                 }
                 // add cost to non-purchasers balance
                 if let participants = purchase.participantsIDs {
@@ -930,24 +889,6 @@ class CreateActivityViewController: FormViewController {
                             value += costPerPerson
                             purchaseDict[user] = value
                         }
-                    }
-                }
-            } else {
-                let costPerPerson = purchase.cost! / Double(purchase.participantsIDs!.count)
-                if purchase.participantsIDs![0] == currentUser.uid {
-                    for ID in purchase.participantsIDs!{
-                        if let user = purchaseUsers.first(where: {$0.id == ID}) {
-                            var value = purchaseDict[user] ?? 0.00
-                            value += costPerPerson
-                            purchaseDict[user] = value
-                        }
-                    }
-                } else {
-                    let ID = purchase.participantsIDs![0]
-                    if let user = purchaseUsers.first(where: {$0.id == ID}) {
-                        var value = purchaseDict[user] ?? 0.00
-                        value -= costPerPerson
-                        purchaseDict[user] = value
                     }
                 }
             }
@@ -1132,6 +1073,72 @@ class CreateActivityViewController: FormViewController {
                 })
             }
         }
+        if activity.transactionIDs != nil {
+            for transactionID in activity.transactionIDs! {
+                dispatchGroup.enter()
+                let dataReference = Database.database().reference().child(financialTransactionsEntity).child(transactionID)
+                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let snapshotValue = snapshot.value {
+                        if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue) {
+                            self.purchaseList.append(transaction)
+                        }
+                    }
+                    if let currentUserID = Auth.auth().currentUser?.uid, self.activity.admin == currentUserID {
+                        let participantReference = Database.database().reference().child("users").child(currentUserID)
+                        participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                                dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                                let user = User(dictionary: dictionary)
+                                self.purchaseUsers.append(user)
+                                for user in self.purchaseUsers {
+                                    self.purchaseDict[user] = 0.00
+                                }
+                                
+                                self.decimalRowFunc()
+                                self.purchaseBreakdown()
+                                self.updateDecimalRow()
+                            }
+                        })
+                    } else {
+                        for user in self.purchaseUsers {
+                            self.purchaseDict[user] = 0.00
+                        }
+                        
+                        self.decimalRowFunc()
+                        self.purchaseBreakdown()
+                        self.updateDecimalRow()
+                    }
+                    
+                    self.dispatchGroup.leave()
+                })
+            }
+        } else {
+            if let currentUserID = Auth.auth().currentUser?.uid, self.activity.admin == currentUserID {
+                let participantReference = Database.database().reference().child("users").child(currentUserID)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        self.purchaseUsers.append(user)
+                        for user in self.purchaseUsers {
+                            self.purchaseDict[user] = 0.00
+                        }
+                        
+                        self.decimalRowFunc()
+                        self.purchaseBreakdown()
+                        self.updateDecimalRow()
+                    }
+                })
+            } else {
+                for user in self.purchaseUsers {
+                    self.purchaseDict[user] = 0.00
+                }
+                
+                self.decimalRowFunc()
+                self.purchaseBreakdown()
+                self.updateDecimalRow()
+            }
+        }
          dispatchGroup.notify(queue: .main) {
             self.listRow()
         }
@@ -1203,6 +1210,18 @@ class CreateActivityViewController: FormViewController {
                         cell.textLabel?.textAlignment = .left
                     }, at: mvs.count - 1)
             }
+        }
+        
+        for purchase in purchaseList {
+            var mvs = (form.sectionBy(tag: "purchasefields") as! MultivaluedSection)
+            mvs.insert(PurchaseRow() {
+                $0.value = purchase
+                }.onCellSelection() { cell, row in
+                    self.purchaseIndex = row.indexPath!.row
+                    self.openPurchases()
+                    cell.cellResignFirstResponder()
+            }, at: mvs.count - 1)
+            
         }
     }
     
@@ -1311,17 +1330,16 @@ class CreateActivityViewController: FormViewController {
             }
         } else if type == "purchases" {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-            if purchaseList.isEmpty {
-                activity.purchases = [Purchase]()
-                groupActivityReference.child("purchases").removeValue()
+            var transactionIDs = [String]()
+            for transaction in purchaseList {
+                transactionIDs.append(transaction.guid)
+            }
+            if !transactionIDs.isEmpty {
+                activity.transactionIDs = transactionIDs
+                groupActivityReference.updateChildValues(["transactionIDs": transactionIDs as AnyObject])
             } else {
-                var firebasePurchaseList = [[String: AnyObject?]]()
-                for purchase in purchaseList {
-                    let firebasePurchase = purchase.toAnyObject()
-                    firebasePurchaseList.append(firebasePurchase)
-                }
-                activity.purchases = purchaseList
-                groupActivityReference.updateChildValues(["purchases": firebasePurchaseList as AnyObject])
+                activity.transactionIDs = nil
+                groupActivityReference.child("transactionIDs").removeValue()
             }
         } else {
             let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
@@ -1736,14 +1754,37 @@ class CreateActivityViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        let destination = PurchasesViewController()
-        destination.users = purchaseUsers
-        destination.filteredUsers = purchaseUsers
         if purchaseList.indices.contains(purchaseIndex) {
-            destination.purchase = purchaseList[purchaseIndex]
+            let destination = FinanceTransactionViewController()
+            destination.delegate = self
+            destination.movingBackwards = true
+            destination.users = purchaseUsers
+            destination.filteredUsers = purchaseUsers
+            destination.transaction = purchaseList[purchaseIndex]
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "Create New Transaction", style: .default, handler: { (_) in
+                let destination = FinanceTransactionViewController()
+                destination.delegate = self
+                destination.movingBackwards = true
+                destination.users = self.purchaseUsers
+                destination.filteredUsers = self.purchaseUsers
+                self.navigationController?.pushViewController(destination, animated: true)
+            }))
+            alert.addAction(UIAlertAction(title: "Choose Existing Transaction", style: .default, handler: { (_) in
+                let destination = ChooseTransactionTableViewController()
+                destination.delegate = self
+                let navController = UINavigationController(rootViewController: destination)
+                self.present(navController, animated: true, completion: nil)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
+                    mvs.remove(at: self.purchaseIndex)
+                }
+            }))
+            self.present(alert, animated: true)
         }
-        destination.delegate = self
-        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     @objc fileprivate func openList() {
@@ -1751,7 +1792,6 @@ class CreateActivityViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        
         if listIndex == grocerylistIndex, let grocerylist = listList[listIndex].grocerylist {
             let destination = GrocerylistViewController()
             destination.grocerylist = grocerylist
@@ -1846,7 +1886,7 @@ class CreateActivityViewController: FormViewController {
             }))
             
         }
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
         
@@ -1959,7 +1999,7 @@ class CreateActivityViewController: FormViewController {
             self.share()
         }))
 
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
 
@@ -2063,7 +2103,7 @@ class CreateActivityViewController: FormViewController {
                 }))
                 
 
-                alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                     print("User click Dismiss button")
                 }))
 
@@ -2409,17 +2449,42 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdatePurchasesDelegate {
-    func updatePurchases(purchase: Purchase) {
+extension CreateActivityViewController: UpdateTransactionDelegate {
+    func updateTransaction(transaction: Transaction) {
+        print("transaction \(transaction.description)")
         if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
             let purchaseRow = mvs.allRows[purchaseIndex]
-            if purchase.name != "Purchase Name" {
-                purchaseRow.baseValue = purchase
+            if transaction.description != "Transaction Name" {
+                purchaseRow.baseValue = transaction
                 purchaseRow.updateCell()
                 if purchaseList.indices.contains(purchaseIndex) {
-                    purchaseList[purchaseIndex] = purchase
+                    purchaseList[purchaseIndex] = transaction
                 } else {
-                    purchaseList.append(purchase)
+                    purchaseList.append(transaction)
+                }
+                updateLists(type: "purchases")
+            }
+            else {
+                mvs.remove(at: purchaseIndex)
+            }
+            purchaseBreakdown()
+            updateDecimalRow()
+        }
+    }
+}
+
+extension CreateActivityViewController: ChooseTransactionDelegate {
+    func chosenTransaction(transaction: Transaction) {
+        print("transaction \(transaction.description)")
+        if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
+            let purchaseRow = mvs.allRows[purchaseIndex]
+            if transaction.description != "Transaction Name" {
+                purchaseRow.baseValue = transaction
+                purchaseRow.updateCell()
+                if purchaseList.indices.contains(purchaseIndex) {
+                    purchaseList[purchaseIndex] = transaction
+                } else {
+                    purchaseList.append(transaction)
                 }
                 updateLists(type: "purchases")
             }

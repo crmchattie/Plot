@@ -841,7 +841,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
             
         }
         
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
         
@@ -895,7 +895,7 @@ extension NightlifeTypeViewController: ActivityTypeCellDelegate {
         }))
         
 
-        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
 

@@ -60,6 +60,7 @@ struct MXAccount: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var description: String?
     var bs_type: BalanceSheetType {
         switch self.type {
         case .checking, .savings, .investment, .property, .cash, .insurance, .prepaid:

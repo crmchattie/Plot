@@ -67,6 +67,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var pinned: Bool?
     var muted: Bool?
     var splitNumber: Int?
+    var transactionDescription: String?
     var cash_flow_type: String {
         if type == "CREDIT" {
             return "Inflow"
@@ -132,6 +133,7 @@ struct Transaction: Codable, Equatable, Hashable {
         self.category = category
         self.top_level_category = top_level_category
         self.user_created = user_created
+        self.admin = admin
     }
 }
 
@@ -518,7 +520,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     completion(sortedTransactionsList, transactionsDict)
 }
 
-func updateTransaction(transaction: Transaction, transactionRules: [TransactionRule], completion: @escaping (Transaction) -> ()) {
+func updateTransactionWRule(transaction: Transaction, transactionRules: [TransactionRule], completion: @escaping (Transaction) -> ()) {
     var _transaction = transaction
     for rule in transactionRules {
         if rule.amount != nil, rule.amount == _transaction.amount, transaction.description.lowercased().contains(rule.match_description.lowercased()) {

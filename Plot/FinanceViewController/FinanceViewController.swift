@@ -184,12 +184,18 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                     self.pollMemberStatus(guid: user.guid, member_guid: member.guid) { (member) in
                                         dispatchGroup.enter()
                                         self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
-                                            updatedAccounts.append(contentsOf: accounts)
                                             for account in accounts {
                                                 dispatchGroup.enter()
-                                                if !self.accounts.contains(account) {
-                                                    self.getMXTransactions(user: user, account: account, date: nil)
+                                                var _account = account
+                                                if !self.accounts.contains(_account) {
+                                                    self.accounts.append(_account)
+                                                    self.getMXTransactions(user: user, account: _account, date: nil)
+                                                } else if let index = self.accounts.firstIndex(of: account) {
+                                                    _account.balances = self.accounts[index].balances
+                                                    _account.description = self.accounts[index].description
+                                                    self.accounts[index] = _account
                                                 }
+                                                updatedAccounts.append(_account)
                                                 dispatchGroup.leave()
                                             }
                                             dispatchGroup.leave()
@@ -202,12 +208,18 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                         } else if member.connection_status == .connected && !member.is_being_aggregated {
                             dispatchGroup.enter()
                             self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
-                                updatedAccounts.append(contentsOf: accounts)
                                 for account in accounts {
                                     dispatchGroup.enter()
-                                    if !self.accounts.contains(account) {
-                                        self.getMXTransactions(user: user, account: account, date: nil)
+                                    var _account = account
+                                    if !self.accounts.contains(_account) {
+                                        self.accounts.append(_account)
+                                        self.getMXTransactions(user: user, account: _account, date: nil)
+                                    } else if let index = self.accounts.firstIndex(of: account) {
+                                        _account.balances = self.accounts[index].balances
+                                        _account.description = self.accounts[index].description
+                                        self.accounts[index] = _account
                                     }
+                                    updatedAccounts.append(_account)
                                     dispatchGroup.leave()
                                 }
                                 dispatchGroup.leave()
@@ -229,7 +241,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         }
         
         dispatchGroup.notify(queue: .main) {
-            self.accounts = updatedAccounts
             self.updateCollectionView()
             self.updateFirebase(accounts: updatedAccounts, transactions: [])
         }
@@ -248,7 +259,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                         dispatchGroup.enter()
                         let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
                         if !self.transactions.contains(transaction) {
-                            updateTransaction(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
+                            updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
                                 if finalAccount?.should_link ?? true {
                                     self.transactions.append(transaction)
                                     if transaction.status != .pending {
@@ -277,7 +288,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                         dispatchGroup.enter()
                         let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
                         if !self.transactions.contains(transaction) {
-                            updateTransaction(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
+                            updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
                                 if finalAccount?.should_link ?? true {
                                     self.transactions.append(transaction)
                                     if transaction.status != .pending {
@@ -309,7 +320,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     dispatchGroup.enter()
                     let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
                     if !self.transactions.contains(transaction) {
-                        updateTransaction(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
+                        updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
                             if finalAccount?.should_link ?? true {
                                 self.transactions.append(transaction)
                                 if transaction.status != .pending {
@@ -522,20 +533,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     self!.updateCollectionView()
                 }
             }
-            }, accountsRemoved: { [weak self] accountsRemoved in
-                for account in accountsRemoved {
-                    if let index = self!.accounts.firstIndex(where: {$0 == account}) {
-                        self!.accounts.remove(at: index)
-                        self!.updateCollectionView()
-                    }
-                }
-            }, accountsChanged: { [weak self] accountsChanged in
-                for account in accountsChanged {
-                    if let index = self!.accounts.firstIndex(where: {$0 == account}) {
-                        self!.accounts[index] = account
-                        self!.updateCollectionView()
-                    }
-                }
             }
         )
     }
@@ -548,20 +545,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     self!.updateCollectionView()
                 }
             }
-            }, transactionsRemoved: { [weak self] transactionsRemoved in
-                for transaction in transactionsRemoved {
-                    if let index = self!.transactions.firstIndex(where: {$0 == transaction}) {
-                        self!.transactions.remove(at: index)
-                        self!.updateCollectionView()
-                    }
-                }
-            }, transactionsChanged: { [weak self] transactionsChanged in
-                for transaction in transactionsChanged {
-                    if let index = self!.transactions.firstIndex(where: {$0 == transaction}) {
-                        self!.transactions[index] = transaction
-                        self!.updateCollectionView()
-                    }
-                }
             }
         )
     }
@@ -598,8 +581,8 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         }
         let ref = Database.database().reference()
         for account in accounts {
-            var _account = account
             do {
+                var _account = account
                 if _account.balances != nil {
                     _account.balances![_account.updated_at] = _account.balance
                 } else {
@@ -616,9 +599,11 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         }
         for transaction in transactions {
             do {
+                var _transaction = transaction
+                _transaction.admin = currentUserID
                 // store transaction info
-                let value = try FirebaseEncoder().encode(transaction)
-                ref.child(financialTransactionsEntity).child(transaction.guid).setValue(value)
+                let value = try FirebaseEncoder().encode(_transaction)
+                ref.child(financialTransactionsEntity).child(_transaction.guid).setValue(value)
                 // store transaction description (name) just to put something there
                 ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction.guid).child("description").setValue(transaction.description)
             } catch let error {
@@ -877,28 +862,27 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         } else if let object = object as? [Transaction] {
             if section.subType == "Transactions" {
                 let destination = FinanceTransactionViewController()
-                destination.user = user
+                destination.delegate = self
                 destination.transaction = object[indexPath.item]
                 destination.users = users
                 destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
                 self.getParticipants(transaction: object[indexPath.item], account: nil) { (participants) in
                     destination.selectedFalconUsers = participants
-                    let navigationViewController = UINavigationController(rootViewController: destination)
-                    self.present(navigationViewController, animated: true, completion: nil)
+                    self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
         } else if let object = object as? [MXAccount] {
             if section.subType == "Accounts" {
                 let destination = FinanceAccountViewController()
+                destination.delegate = self
                 destination.account = object[indexPath.item]
                 destination.users = users
                 destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
                 self.getParticipants(transaction: nil, account: object[indexPath.item]) { (participants) in
                     destination.selectedFalconUsers = participants
-                    let navigationViewController = UINavigationController(rootViewController: destination)
-                    self.present(navigationViewController, animated: true, completion: nil)
+                    self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
         } else if let object = object as? [MXMember] {
@@ -980,7 +964,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             completion(participants)
         }
     }
-    
 }
 
 extension FinanceViewController: HeaderCellDelegate {
@@ -991,10 +974,38 @@ extension FinanceViewController: HeaderCellDelegate {
 
 extension FinanceViewController: UpdateFinancialsDelegate {
     func updateTransactions(transactions: [Transaction]) {
-        
+        for transaction in transactions {
+            if let index = self.transactions.firstIndex(of: transaction) {
+                self.transactions[index] = transaction
+            }
+        }
+        updateCollectionView()
     }
     func updateAccounts(accounts: [MXAccount]) {
-        
+        for account in accounts {
+            if let index = self.accounts.firstIndex(of: account) {
+                self.accounts[index] = account
+            }
+        }
+        updateCollectionView()
+    }
+}
+
+extension FinanceViewController: UpdateAccountDelegate {
+    func updateAccount(account: MXAccount) {
+        if let index = accounts.firstIndex(of: account) {
+            accounts[index] = account
+            updateCollectionView()
+        }
+    }
+}
+
+extension FinanceViewController: UpdateTransactionDelegate {
+    func updateTransaction(transaction: Transaction) {
+        if let index = transactions.firstIndex(of: transaction) {
+            transactions[index] = transaction
+            updateCollectionView()
+        }
     }
 }
 

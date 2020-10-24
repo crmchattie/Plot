@@ -17,9 +17,9 @@ protocol UpdateTransactionLevelDelegate: class {
 class FinanceTransactionLevelViewController: FormViewController {
     weak var delegate : UpdateTransactionLevelDelegate?
     
-    var categories = financialTransactionsCategories.sorted()
-    var topLevelCategories = financialTransactionsTopLevelCategories.sorted()
-    var groups = financialTransactionsGroups.sorted()
+    var categories = [String]()
+    var topLevelCategories = [String]()
+    var groups = [String]()
     
     var value = String()
     var level = String()
@@ -30,6 +30,7 @@ class FinanceTransactionLevelViewController: FormViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        print("viewDidAppear")
         updateLevels()
     }
     
@@ -39,6 +40,7 @@ class FinanceTransactionLevelViewController: FormViewController {
             let dispatchGroup = DispatchGroup()
             let reference = Database.database().reference()
             if level == "Subcategory" {
+                categories = financialTransactionsCategories.sorted()
                 dispatchGroup.enter()
                 reference.child(userFinancialTransactionsCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
@@ -49,6 +51,7 @@ class FinanceTransactionLevelViewController: FormViewController {
                     dispatchGroup.leave()
                 })
             } else if level == "Category" {
+                topLevelCategories = financialTransactionsTopLevelCategories.sorted()
                 dispatchGroup.enter()
                 reference.child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
@@ -59,6 +62,7 @@ class FinanceTransactionLevelViewController: FormViewController {
                     dispatchGroup.leave()
                 })
             } else {
+                groups = financialTransactionsGroups.sorted()
                 dispatchGroup.enter()
                 reference.child(userFinancialTransactionsGroupsEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
@@ -86,26 +90,25 @@ class FinanceTransactionLevelViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        let newLevelBarButton = UIBarButtonItem(title: "New \(level)", style: .plain, target: self, action: #selector(newLevel))
-        navigationItem.leftBarButtonItem = newLevelBarButton
+        let newLevelBarButton = UIBarButtonItem(title: "New Item", style: .plain, target: self, action: #selector(newLevel))
         let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-        navigationItem.rightBarButtonItem = addBarButton
+        navigationItem.rightBarButtonItems = [addBarButton, newLevelBarButton]
     }
     
     @IBAction func create(_ sender: AnyObject) {
         self.delegate?.update(value: value, level: level)
-        self.dismiss(animated: true, completion: nil)
+        self.navigationController?.popViewController(animated: true)
     }
     
     @objc func newLevel(_ item:UIBarButtonItem) {
         let destination = FinanceTransactionNewLevelViewController()
         destination.level = level
         let navigationViewController = UINavigationController(rootViewController: destination)
+        navigationViewController.modalPresentationStyle = .fullScreen
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
     fileprivate func initializeForm() {
-        print("initializeForm")
         form +++ SelectableSection<ListCheckRow<String>>(level, selectionType: .singleSelection(enableDeselection: false))
         
         if level == "Subcategory" {

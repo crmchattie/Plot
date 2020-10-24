@@ -156,6 +156,7 @@ class ActivitiesFetcher: NSObject {
             activity.activitylistIDs = metaInfo.activitylistIDs
             activity.grocerylistID = metaInfo.grocerylistID
             activity.packinglistIDs = metaInfo.packinglistIDs
+            activity.transactionIDs = metaInfo.transactionIDs
             activity.admin = metaInfo.admin
             activity.schedule = metaInfo.schedule
             activity.purchases = metaInfo.purchases
@@ -267,7 +268,8 @@ class ActivitiesFetcher: NSObject {
                                        checklistIDsKey: "checklistIDs",
                                        activitylistIDsKey: "activitylistIDs",
                                        grocerylistIDKey: "grocerylistID",
-                                       packinglistIDsKey: "packinglistIDs")
+                                       packinglistIDsKey: "packinglistIDs",
+                                       transactionIDsKey: "transactionsIDKey")
         })
     }
     
@@ -312,7 +314,8 @@ class ActivitiesFetcher: NSObject {
                                        checklistIDsKey: "checklistIDs",
                                        activitylistIDsKey: "activitylistIDs",
                                        grocerylistIDKey: "grocerylistID",
-                                       packinglistIDsKey: "packinglistIDs")
+                                       packinglistIDsKey: "packinglistIDs",
+                                       transactionIDsKey: "transactionsIDKey")
         })
     }
     
@@ -357,7 +360,8 @@ class ActivitiesFetcher: NSObject {
                                        checklistIDsKey: "checklistIDs",
                                        activitylistIDsKey: "activitylistIDs",
                                        grocerylistIDKey: "grocerylistID",
-                                       packinglistIDsKey: "packinglistIDs")
+                                       packinglistIDsKey: "packinglistIDs",
+                                       transactionIDsKey: "transactionsIDKey")
         })
     }
     
@@ -392,7 +396,8 @@ class ActivitiesFetcher: NSObject {
                                            checklistIDsKey: String,
                                            activitylistIDsKey: String,
                                            grocerylistIDKey: String,
-                                           packinglistIDsKey: String) {
+                                           packinglistIDsKey: String,
+                                           transactionIDsKey: String) {
         
         guard let index = activities.firstIndex(where: { (activity) -> Bool in
             return activity.activityID == activityID
@@ -568,6 +573,11 @@ class ActivitiesFetcher: NSObject {
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
+        if snapshot.key == transactionIDsKey {
+            activities[index].transactionIDs = snapshot.value as? [String]
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
     }
     
     fileprivate func handleActivityRemovals(from snapshot: DataSnapshot,
@@ -601,7 +611,8 @@ class ActivitiesFetcher: NSObject {
                                            checklistIDsKey: String,
                                            activitylistIDsKey: String,
                                            grocerylistIDKey: String,
-                                           packinglistIDsKey: String) {
+                                           packinglistIDsKey: String,
+                                           transactionIDsKey: String) {
         
         guard let index = activities.firstIndex(where: { (activity) -> Bool in
             return activity.activityID == activityID
@@ -729,6 +740,11 @@ class ActivitiesFetcher: NSObject {
         
         if snapshot.key == packinglistIDsKey {
             activities[index].packinglistIDs = [String]()
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == transactionIDsKey {
+            activities[index].transactionIDs = [String]()
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
     }
