@@ -57,10 +57,8 @@ class TransactionActions: NSObject {
             return
         }
         
-        if !active {
-            if transaction.admin == nil {
-                transaction.admin = Auth.auth().currentUser?.uid
-            }
+        if transaction.admin == nil {
+            transaction.admin = Auth.auth().currentUser?.uid
         }
         
         let membersIDs = fetchMembersIDs()
@@ -68,7 +66,6 @@ class TransactionActions: NSObject {
         transaction.updated_at = isodateFormatter.string(from: Date())
         
         let groupTransactionReference = Database.database().reference().child(financialTransactionsEntity).child(ID)
-
         do {
             let value = try FirebaseEncoder().encode(transaction)
             groupTransactionReference.setValue(value)
@@ -96,14 +93,23 @@ class TransactionActions: NSObject {
             return
         }
         let membersIDs = fetchMembersIDs()
-        if Set(transaction.participantsIDs!) != Set(membersIDs.0) {
+        if let participantsIDs = transaction.participantsIDs, Set(participantsIDs) != Set(membersIDs.0) {
             let groupTransactionReference = Database.database().reference().child(financialTransactionsEntity).child(ID)
             updateParticipants(membersIDs: membersIDs)
             groupTransactionReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
             let date = isodateFormatter.string(from: Date())
             groupTransactionReference.updateChildValues(["updated_at": date as AnyObject])
+        } else if transaction.participantsIDs == nil {
+            let groupTransactionReference = Database.database().reference().child(financialTransactionsEntity).child(ID)
+            groupTransactionReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
+            let date = isodateFormatter.string(from: Date())
+            groupTransactionReference.updateChildValues(["updated_at": date as AnyObject])
+            for memberID in membersIDs.0.filter({$0 != transaction.admin}) {
+                let userReference = Database.database().reference().child(userFinancialTransactionsEntity).child(memberID).child(ID)
+                let values:[String : Any] = ["description": transaction.description]
+                userReference.setValue(values)
+            }
         }
-        
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {

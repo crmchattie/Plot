@@ -84,6 +84,12 @@ class FinanceTransactionViewController: FormViewController {
                 inviteesRow.title = self.userNamesString
                 inviteesRow.updateCell()
             }
+            
+            if transaction.admin == nil, let currentUser = Auth.auth().currentUser?.uid {
+                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("admin")
+                reference.setValue(currentUser)
+                transaction.admin = currentUser
+            }
         } else if let currentUser = Auth.auth().currentUser?.uid {
             let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
@@ -510,10 +516,9 @@ extension FinanceTransactionViewController: UpdateTransactionLevelDelegate {
 
 extension FinanceTransactionViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
+        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants"), let currentUser = Auth.auth().currentUser?.uid {
             if !selectedFalconUsers.isEmpty {
                 self.selectedFalconUsers = selectedFalconUsers
-                
                 var participantCount = self.selectedFalconUsers.count
                 // If user is creating this activity (admin)
                 if transaction.admin == nil || transaction.admin == Auth.auth().currentUser?.uid {
@@ -534,12 +539,20 @@ extension FinanceTransactionViewController: UpdateInvitees {
                 inviteesRow.title = "1 participant"
                 inviteesRow.updateCell()
             }
-            
             if active {
                 self.showActivityIndicator()
                 let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createTransaction.updateTransactionParticipants()
                 self.hideActivityIndicator()
+            }
+            
+            transaction.participantsIDs = []
+            if transaction.admin == currentUser {
+                transaction.participantsIDs!.append(currentUser)
+            }
+            for selectedUser in selectedFalconUsers {
+                guard let id = selectedUser.id else { continue }
+                transaction.participantsIDs!.append(id)
             }
         }
     }

@@ -31,17 +31,32 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     }
 }
 
+protocol ChooseListDelegate: class {
+    func chosenList(list: ListContainer)
+}
+
 class ChooseListTableViewController: UITableViewController {
     
-    let listCellID = "listCellID"
+    let checklistFetcher = ChecklistFetcher()
+    let activitylistFetcher = ActivitylistFetcher()
+    let grocerylistFetcher = GrocerylistFetcher()
+    var checklists = [Checklist]()
+    var activitylists = [Activitylist]()
+    var grocerylists = [Grocerylist]()
+    var packinglists = [Packinglist]()
     
-    fileprivate var isAppLoaded = false
+    weak var delegate : ChooseListDelegate?
+    
+    let listCellID = "listCellID"
+    var needDelegate = false
+    var grocerylistExists = false
     
     var searchBar: UISearchBar?
     var searchActivityController: UISearchController?
     
     var lists = [ListContainer]()
     var filteredLists = [ListContainer]()
+    var listList = [ListContainer]()
     
     var list: ListContainer?
     var listID: String?
@@ -69,18 +84,7 @@ class ChooseListTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if recipe != nil {
-            lists = lists.filter({ (list) in
-                return list.checklist == nil && list.packinglist == nil
-            })
-            filteredLists = lists
-        } else {
-            lists = lists.filter({ (list) in
-                return list.checklist == nil && list.grocerylist == nil && list.packinglist == nil
-            })
-            filteredLists = lists
-        }
-        
+        fetchLists()
         configureTableView()
         setupSearchController()
         
@@ -101,11 +105,12 @@ class ChooseListTableViewController: UITableViewController {
         tableView.backgroundColor = view.backgroundColor
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeList))
         
-        let rightBarButton = UIButton(type: .system)
-        rightBarButton.setTitle("New List", for: .normal)
-        rightBarButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        rightBarButton.titleLabel?.adjustsFontForContentSizeCategory = true
-        rightBarButton.addTarget(self, action: #selector(newList), for: .touchUpInside)
+        
+        if !needDelegate {
+            let rightBarButton = UIButton(type: .system)
+            rightBarButton.setTitle("New List", for: .normal)
+            rightBarButton.addTarget(self, action: #selector(newList), for: .touchUpInside)
+        }
         
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -115,6 +120,10 @@ class ChooseListTableViewController: UITableViewController {
     }
     
     @objc fileprivate func closeList() {
+        if needDelegate {
+            let newList = ListContainer()
+            delegate?.chosenList(list: newList)
+        }
         dismiss(animated: true, completion: nil)
     }
     
@@ -177,18 +186,78 @@ class ChooseListTableViewController: UITableViewController {
         }
     }
     
+    func fetchLists() {
+        if lists.isEmpty {
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            checklistFetcher.fetchChecklists { (checklists) in
+                for checklist in checklists {
+                    if checklist.name == "nothing" { continue }
+                    if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
+                    self.checklists.append(checklist)
+                }
+                dispatchGroup.leave()
+            }
+            dispatchGroup.enter()
+            activitylistFetcher.fetchActivitylists { (activitylists) in
+                for activitylist in activitylists {
+                    if activitylist.name == "nothing" { continue }
+                    if let items = activitylist.items, Array(items.keys)[0] == "name" { continue }
+                    self.activitylists.append(activitylist)
+                }
+                dispatchGroup.leave()
+            }
+            dispatchGroup.enter()
+            grocerylistFetcher.fetchGrocerylists { (grocerylists) in
+                for grocerylist in grocerylists {
+                    if grocerylist.name == "nothing" { continue }
+                    self.grocerylists.append(grocerylist)
+                }
+                dispatchGroup.leave()
+            }
+            dispatchGroup.notify(queue: .main) {
+                self.lists = (self.checklists.map { ListContainer(grocerylist: nil, checklist: $0, activitylist: nil, packinglist: nil) } + self.activitylists.map { ListContainer(grocerylist: nil, checklist: nil, activitylist: $0, packinglist: nil) } + self.grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, activitylist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
+                self.handleReloadLists()
+                return
+            }
+            
+        }
+        
+        handleReloadLists()
+    }
+    
     
     func handleReloadLists() {
-        lists.sort { (list1, list2) -> Bool in
+        if recipe != nil {
+            lists = lists.filter({ (list) in
+                return list.checklist == nil && list.packinglist == nil
+            })
+            filteredLists = lists
+        } else if needDelegate {
+            if grocerylistExists {
+                filteredLists = lists.filter{ !listList.contains($0) }
+                filteredLists = filteredLists.filter({ (list) -> Bool in
+                    list.grocerylist == nil
+                })
+            } else {
+                filteredLists = lists.filter{ !listList.contains($0) }
+            }
+        } else {
+            lists = lists.filter({ (list) in
+                return list.checklist == nil && list.grocerylist == nil && list.packinglist == nil
+            })
+            filteredLists = lists
+        }
+        
+        filteredLists.sort { (list1, list2) -> Bool in
             return list1.lastModifiedDate < list2.lastModifiedDate
         }
         
-        filteredLists = lists
+        self.tableView.reloadData()
     }
     
     func handleReloadTableAftersearchBarCancelButtonClicked() {
         handleReloadLists()
-        self.tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
@@ -252,11 +321,10 @@ class ChooseListTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("didSelectRow")
-        self.navigationItem.searchController?.isActive = false
         let list = filteredLists[indexPath.row]
-        
-        if let grocerylist = list.grocerylist {
+        if needDelegate {
+            delegate?.chosenList(list: list)
+        } else if let grocerylist = list.grocerylist {
             if recipe.extendedIngredients != nil {
                 print("extendedIngredients does not equal nil")
                 updateGrocerylist(grocerylist: grocerylist, recipe: recipe, active: true)

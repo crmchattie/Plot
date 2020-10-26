@@ -57,10 +57,8 @@ class AccountActions: NSObject {
             return
         }
         
-        if !active {
-            if account.admin == nil {
-                account.admin = Auth.auth().currentUser?.uid
-            }
+        if account.admin == nil {
+            account.admin = Auth.auth().currentUser?.uid
         }
         
         let membersIDs = fetchMembersIDs()
@@ -90,12 +88,22 @@ class AccountActions: NSObject {
             return
         }
         let membersIDs = fetchMembersIDs()
-        if Set(account.participantsIDs!) != Set(membersIDs.0) {
+        if let participantsIDs = account.participantsIDs, Set(participantsIDs) != Set(membersIDs.0) {
             let groupAccountReference = Database.database().reference().child(financialAccountsEntity).child(ID)
             updateParticipants(membersIDs: membersIDs)
             groupAccountReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
             let date = isodateFormatter.string(from: Date())
             groupAccountReference.updateChildValues(["updated_at": date as AnyObject])
+        } else if account.participantsIDs == nil {
+            let groupAccountReference = Database.database().reference().child(financialAccountsEntity).child(ID)
+            groupAccountReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
+            let date = isodateFormatter.string(from: Date())
+            groupAccountReference.updateChildValues(["updated_at": date as AnyObject])
+            for memberID in membersIDs.0.filter({$0 != account.admin}) {
+                let userReference = Database.database().reference().child(userFinancialAccountsEntity).child(memberID).child(ID)
+                let values:[String : Any] = ["name": "\(account.name)"]
+                userReference.setValue(values)
+            }
         }
         
     }

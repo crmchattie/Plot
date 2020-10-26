@@ -56,7 +56,6 @@ extension CreateActivityViewController: UpdateInvitees {
                 }
                 hideActivityIndicator()
             }
-            
             decimalRowFunc()
         }
     }

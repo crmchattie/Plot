@@ -60,7 +60,6 @@ class CreateActivityViewController: FormViewController {
     var active = false
     var sentActivity = false
     
-    
     typealias CompletionHandler = (_ success: Bool) -> Void
     
     override func viewDidLoad() {
@@ -135,6 +134,24 @@ class CreateActivityViewController: FormViewController {
         }
         
         purchaseUsers = self.acceptedParticipant
+        
+        if let currentUserID = Auth.auth().currentUser?.uid, self.activity.admin == currentUserID {
+            let participantReference = Database.database().reference().child("users").child(currentUserID)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    self.purchaseUsers.append(user)
+                    for user in self.purchaseUsers {
+                        self.purchaseDict[user] = 0.00
+                    }
+                }
+            })
+        } else {
+            for user in self.purchaseUsers {
+                self.purchaseDict[user] = 0.00
+            }
+        }
         
         if let showExtras = activity.showExtras {
             if !showExtras, let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
@@ -702,13 +719,13 @@ class CreateActivityViewController: FormViewController {
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Schedule",
-                               footer: "Add a new point in the schedule") {
+                               footer: "Add an activity to the schedule") {
                                 $0.tag = "schedulefields"
                                 $0.hidden = "!$sections == 'Schedule'"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        $0.title = "Add New Point"
+                                        $0.title = "Add Activity"
                                         }.cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                             cell.textLabel?.textAlignment = .left
@@ -745,7 +762,7 @@ class CreateActivityViewController: FormViewController {
                             $0.addButtonProvider = { section in
                                 return ButtonRow(){
                                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                    $0.title = "Add New List"
+                                    $0.title = "Add List"
                                     }.cellUpdate { cell, row in
                                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                         cell.textLabel?.textAlignment = .left
@@ -780,7 +797,7 @@ class CreateActivityViewController: FormViewController {
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        $0.title = "Add New Transaction"
+                                        $0.title = "Add Transaction"
                                         }.cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                             cell.textLabel?.textAlignment = .left
@@ -884,7 +901,7 @@ class CreateActivityViewController: FormViewController {
                 // add cost to non-purchasers balance based on custom input
                 } else {
                     for user in purchaseUsers {
-                        if let ID = user.id, !purchaser.contains(ID) {
+                        if let ID = user.id, ID != purchaser {
                             var value = purchaseDict[user] ?? 0.00
                             value += costPerPerson
                             purchaseDict[user] = value
@@ -893,9 +910,11 @@ class CreateActivityViewController: FormViewController {
                 }
             }
         }
+        updateDecimalRow()
     }
     
     func updateDecimalRow() {
+        print("purchaseDict \(purchaseDict)")
         for (user, value) in purchaseDict {
             if let userName = user.name, let decimalRow : DecimalRow = form.rowBy(tag: "\(userName)") {
                 decimalRow.value = value
@@ -994,7 +1013,6 @@ class CreateActivityViewController: FormViewController {
                 if self!.purchaseList.indices.contains(self!.purchaseIndex) {
                     self!.purchaseList.remove(at: rowNumber)
                     self!.purchaseBreakdown()
-                    self!.updateDecimalRow()
                 }
                 self!.updateLists(type: "purchases")
             } else if rowType is ButtonRow {
@@ -1083,64 +1101,15 @@ class CreateActivityViewController: FormViewController {
                             self.purchaseList.append(transaction)
                         }
                     }
-                    if let currentUserID = Auth.auth().currentUser?.uid, self.activity.admin == currentUserID {
-                        let participantReference = Database.database().reference().child("users").child(currentUserID)
-                        participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                            if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                                dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                                let user = User(dictionary: dictionary)
-                                self.purchaseUsers.append(user)
-                                for user in self.purchaseUsers {
-                                    self.purchaseDict[user] = 0.00
-                                }
-                                
-                                self.decimalRowFunc()
-                                self.purchaseBreakdown()
-                                self.updateDecimalRow()
-                            }
-                        })
-                    } else {
-                        for user in self.purchaseUsers {
-                            self.purchaseDict[user] = 0.00
-                        }
-                        
-                        self.decimalRowFunc()
-                        self.purchaseBreakdown()
-                        self.updateDecimalRow()
-                    }
-                    
                     self.dispatchGroup.leave()
                 })
             }
-        } else {
-            if let currentUserID = Auth.auth().currentUser?.uid, self.activity.admin == currentUserID {
-                let participantReference = Database.database().reference().child("users").child(currentUserID)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        self.purchaseUsers.append(user)
-                        for user in self.purchaseUsers {
-                            self.purchaseDict[user] = 0.00
-                        }
-                        
-                        self.decimalRowFunc()
-                        self.purchaseBreakdown()
-                        self.updateDecimalRow()
-                    }
-                })
-            } else {
-                for user in self.purchaseUsers {
-                    self.purchaseDict[user] = 0.00
-                }
-                
-                self.decimalRowFunc()
-                self.purchaseBreakdown()
-                self.updateDecimalRow()
-            }
         }
-         dispatchGroup.notify(queue: .main) {
+        
+        dispatchGroup.notify(queue: .main) {
             self.listRow()
+            self.decimalRowFunc()
+            self.purchaseBreakdown()
         }
     }
     
@@ -1572,8 +1541,8 @@ class CreateActivityViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        showActivityIndicator()
         if scheduleList.indices.contains(scheduleIndex) {
+            showActivityIndicator()
             let dispatchGroup = DispatchGroup()
             let scheduleItem = scheduleList[scheduleIndex]
             if let recipeString = scheduleItem.recipeID, let recipeID = Int(recipeString) {
@@ -1592,8 +1561,11 @@ class CreateActivityViewController: FormViewController {
                             destination.umbrellaActivity = self.activity
                             destination.schedule = true
                             destination.delegate = self
-                            self.hideActivityIndicator()
-                            self.navigationController?.pushViewController(destination, animated: true)
+                            self.getParticipants(forActivity: scheduleItem) { (participants) in
+                                    destination.selectedFalconUsers = participants
+                                    self.hideActivityIndicator()
+                                    self.navigationController?.pushViewController(destination, animated: true)
+                            }
                         }
                     } else {
                         dispatchGroup.leave()
@@ -1622,8 +1594,11 @@ class CreateActivityViewController: FormViewController {
                             destination.umbrellaActivity = self.activity
                             destination.schedule = true
                             destination.delegate = self
-                            self.hideActivityIndicator()
-                            self.navigationController?.pushViewController(destination, animated: true)
+                            self.getParticipants(forActivity: scheduleItem) { (participants) in
+                                    destination.selectedFalconUsers = participants
+                                    self.hideActivityIndicator()
+                                    self.navigationController?.pushViewController(destination, animated: true)
+                            }
                         }
                     } else {
                         dispatchGroup.leave()
@@ -1654,8 +1629,11 @@ class CreateActivityViewController: FormViewController {
                             destination.umbrellaActivity = self.activity
                             destination.schedule = true
                             destination.delegate = self
-                            self.hideActivityIndicator()
-                            self.navigationController?.pushViewController(destination, animated: true)
+                            self.getParticipants(forActivity: scheduleItem) { (participants) in
+                                    destination.selectedFalconUsers = participants
+                                    self.hideActivityIndicator()
+                                    self.navigationController?.pushViewController(destination, animated: true)
+                            }
                         }
                     }
                   })
@@ -1677,8 +1655,11 @@ class CreateActivityViewController: FormViewController {
                             destination.umbrellaActivity = self.activity
                             destination.schedule = true
                             destination.delegate = self
-                            self.hideActivityIndicator()
-                            self.navigationController?.pushViewController(destination, animated: true)
+                            self.getParticipants(forActivity: scheduleItem) { (participants) in
+                                    destination.selectedFalconUsers = participants
+                                    self.hideActivityIndicator()
+                                    self.navigationController?.pushViewController(destination, animated: true)
+                            }
                         }
                     } else {
                         dispatchGroup.leave()
@@ -1706,8 +1687,11 @@ class CreateActivityViewController: FormViewController {
                             destination.umbrellaActivity = self.activity
                             destination.schedule = true
                             destination.delegate = self
-                            self.hideActivityIndicator()
-                            self.navigationController?.pushViewController(destination, animated: true)
+                            self.getParticipants(forActivity: scheduleItem) { (participants) in
+                                    destination.selectedFalconUsers = participants
+                                    self.hideActivityIndicator()
+                                    self.navigationController?.pushViewController(destination, animated: true)
+                            }
                         }
                     } else {
                         dispatchGroup.leave()
@@ -1737,15 +1721,32 @@ class CreateActivityViewController: FormViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         } else {
-            let destination = ActivityTypeViewController()
-            destination.users = acceptedParticipant
-            destination.filteredUsers = acceptedParticipant
-            destination.umbrellaActivity = activity
-            destination.schedule = true
-            destination.delegate = self
-            self.hideActivityIndicator()
-            self.navigationController?.pushViewController(destination, animated: true)
-
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "New Activity", style: .default, handler: { (_) in
+                let destination = ActivityTypeViewController()
+                destination.users = self.acceptedParticipant
+                destination.filteredUsers = self.acceptedParticipant
+                destination.umbrellaActivity = self.activity
+                destination.schedule = true
+                destination.delegate = self
+                self.navigationController?.pushViewController(destination, animated: true)
+            }))
+            alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
+                let destination = ChooseActivityTableViewController()
+                destination.needDelegate = true
+                destination.delegate = self
+                destination.activities = self.activities
+                destination.filteredActivities = self.activities
+                destination.activity = self.activity
+                let navController = UINavigationController(rootViewController: destination)
+                self.present(navController, animated: true, completion: nil)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
+                    mvs.remove(at: self.purchaseIndex)
+                }
+            }))
+            self.present(alert, animated: true)
         }
     }
     
@@ -1761,10 +1762,13 @@ class CreateActivityViewController: FormViewController {
             destination.users = purchaseUsers
             destination.filteredUsers = purchaseUsers
             destination.transaction = purchaseList[purchaseIndex]
-            self.navigationController?.pushViewController(destination, animated: true)
+            self.getParticipants(transaction: purchaseList[purchaseIndex]) { (participants) in
+                destination.selectedFalconUsers = participants
+                self.navigationController?.pushViewController(destination, animated: true)
+            }
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "Create New Transaction", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "New Transaction", style: .default, handler: { (_) in
                 let destination = FinanceTransactionViewController()
                 destination.delegate = self
                 destination.movingBackwards = true
@@ -1772,9 +1776,10 @@ class CreateActivityViewController: FormViewController {
                 destination.filteredUsers = self.purchaseUsers
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
-            alert.addAction(UIAlertAction(title: "Choose Existing Transaction", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
                 let destination = ChooseTransactionTableViewController()
                 destination.delegate = self
+                destination.existingTransactions = self.purchaseList
                 let navController = UINavigationController(rootViewController: destination)
                 self.present(navController, animated: true, completion: nil)
             }))
@@ -1816,53 +1821,67 @@ class CreateActivityViewController: FormViewController {
             }
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
-            let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
-            let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
-                self.grocerylistIndex = self.listIndex
-                let destination = GrocerylistViewController()
-                destination.delegate = self
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
-            let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
-                let destination = PackinglistViewController()
-                destination.delegate = self
-                if let weather = self.weather {
-                    destination.weather = weather
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "New List", style: .default, handler: { (_) in
+                let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
+                let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
+                    self.grocerylistIndex = self.listIndex
+                    let destination = GrocerylistViewController()
+                    destination.delegate = self
+                    self.navigationController?.pushViewController(destination, animated: true)
                 }
-
-            }
-            let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
-                let destination = ChecklistViewController()
-                destination.delegate = self
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
-            let activityList = UIAlertAction(title: "Activity List", style: .default) { (action:UIAlertAction) in
-                let destination = ActivitylistViewController()
-                destination.delegate = self
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
-            let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
-                print("You've pressed cancel")
-                if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
-                    print("listsfields")
-                    mvs.remove(at: self.listIndex)
+//                let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
+//                    let destination = PackinglistViewController()
+//                    destination.delegate = self
+//                    
+//                }
+                let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
+                    let destination = ChecklistViewController()
+                    destination.delegate = self
+                    self.navigationController?.pushViewController(destination, animated: true)
                 }
-            }
-            
-            if activity.grocerylistID == nil {
-                alertController.addAction(groceryList)
-                alertController.addAction(activityList)
-//                alertController.addAction(packingList)
-                alertController.addAction(checkList)
-                alertController.addAction(cancelAlert)
-                self.present(alertController, animated: true, completion: nil)
-            } else {
-                alertController.addAction(activityList)
-//                alertController.addAction(packingList)
-                alertController.addAction(checkList)
-                alertController.addAction(cancelAlert)
-                self.present(alertController, animated: true, completion: nil)
-            }
+                let activityList = UIAlertAction(title: "Activity List", style: .default) { (action:UIAlertAction) in
+                    let destination = ActivitylistViewController()
+                    destination.delegate = self
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
+                let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
+                    print("You've pressed cancel")
+                    if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+                        print("listsfields")
+                        mvs.remove(at: self.listIndex)
+                    }
+                }
+                
+                if self.activity.grocerylistID == nil {
+                    alertController.addAction(groceryList)
+                    alertController.addAction(activityList)
+    //                alertController.addAction(packingList)
+                    alertController.addAction(checkList)
+                    alertController.addAction(cancelAlert)
+                    self.present(alertController, animated: true, completion: nil)
+                } else {
+                    alertController.addAction(activityList)
+    //                alertController.addAction(packingList)
+                    alertController.addAction(checkList)
+                    alertController.addAction(cancelAlert)
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Existing List", style: .default, handler: { (_) in
+                let destination = ChooseListTableViewController()
+                destination.delegate = self
+                destination.needDelegate = true
+                destination.grocerylistExists = self.grocerylistIndex != -1
+                let navController = UINavigationController(rootViewController: destination)
+                self.present(navController, animated: true, completion: nil)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
+                    mvs.remove(at: self.purchaseIndex)
+                }
+            }))
+            self.present(alert, animated: true)
         }
     }
     
@@ -2330,6 +2349,37 @@ class CreateActivityViewController: FormViewController {
             })
         })
     }
+    
+    func getParticipants(transaction: Transaction?, completion: @escaping ([User])->()) {
+        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            var participants: [User] = []
+            for id in participantsIDs {
+                if transaction.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                completion(participants)
+            }
+        } else {
+            let participants: [User] = []
+            completion(participants)
+        }
+    }
 }
 
 extension CreateActivityViewController: UITextFieldDelegate {
@@ -2406,7 +2456,6 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
         if let _: LabelRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
             mvs.remove(at: mvs.count - 2)
         }
-        
         if let _ = schedule.name {
             if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
                 let scheduleRow = mvs.allRows[scheduleIndex]
@@ -2449,9 +2498,77 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
     }
 }
 
+extension CreateActivityViewController: ChooseActivityDelegate {
+    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
+        guard let _ = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let group = DispatchGroup()
+        var participants: [User] = []
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if activity.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    participants.append(user)
+                }
+                
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            completion(participants)
+        }
+    }
+    
+    func chosenActivity(mergeActivity: Activity) {
+        if let _: LabelRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+            mvs.remove(at: mvs.count - 2)
+        }
+        if let _ = mergeActivity.name {
+            self.getParticipants(forActivity: mergeActivity) { (participants) in
+                let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
+                deleteActivity.deleteActivity()
+            }
+            
+            var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+            mvs.insert(ScheduleRow() {
+                $0.value = mergeActivity
+                }.onCellSelection() { cell, row in
+                    self.scheduleIndex = row.indexPath!.row
+                    self.openSchedule()
+                    cell.cellResignFirstResponder()
+            }, at: mvs.count - 1)
+            
+            Analytics.logEvent("new_schedule", parameters: [
+                "schedule_name": mergeActivity.name ?? "name" as NSObject,
+                "schedule_type": mergeActivity.activityType ?? "basic" as NSObject
+            ])
+            scheduleList.append(mergeActivity)
+            
+            sortSchedule()
+            if let localAddress = mergeActivity.locationAddress {
+                for (key, value) in localAddress {
+                    locationAddress[key] = value
+                }
+            }
+            setupRightBarButton(with: "Update")
+            updateLists(type: "schedule")
+        }
+    }
+}
+
 extension CreateActivityViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
-        print("transaction \(transaction.description)")
         if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
             let purchaseRow = mvs.allRows[purchaseIndex]
             if transaction.description != "Transaction Name" {
@@ -2468,7 +2585,6 @@ extension CreateActivityViewController: UpdateTransactionDelegate {
                 mvs.remove(at: purchaseIndex)
             }
             purchaseBreakdown()
-            updateDecimalRow()
         }
     }
 }
@@ -2492,7 +2608,6 @@ extension CreateActivityViewController: ChooseTransactionDelegate {
                 mvs.remove(at: purchaseIndex)
             }
             purchaseBreakdown()
-            updateDecimalRow()
         }
     }
 }
@@ -2587,6 +2702,95 @@ extension CreateActivityViewController: UpdateGrocerylistDelegate {
             } else {
                 mvs.remove(at: grocerylistIndex)
                 activity.grocerylistID = nil
+            }
+        }
+    }
+}
+
+extension CreateActivityViewController: ChooseListDelegate {
+    func chosenList(list: ListContainer) {
+        if let checklist = list.checklist {
+            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+                let listRow = mvs.allRows[listIndex]
+                if checklist.name != "CheckListName" {
+                    listRow.baseValue = checklist
+                    listRow.title = checklist.name
+                    listRow.updateCell()
+                    if listList.indices.contains(listIndex) {
+                        listList[listIndex].checklist = checklist
+                    } else {
+                        var list = ListContainer()
+                        list.checklist = checklist
+                        listList.append(list)
+                    }
+                    updateLists(type: "lists")
+                }
+                else {
+                    mvs.remove(at: listIndex)
+                }
+            }
+        } else if let activitylist = list.activitylist {
+            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+                let listRow = mvs.allRows[listIndex]
+                if activitylist.name != "ActivityListName" {
+                    listRow.baseValue = activitylist
+                    listRow.title = activitylist.name
+                    listRow.updateCell()
+                    if listList.indices.contains(listIndex) {
+                        listList[listIndex].activitylist = activitylist
+                    } else {
+                        var list = ListContainer()
+                        list.activitylist = activitylist
+                        listList.append(list)
+                    }
+                    updateLists(type: "lists")
+                }
+                else {
+                    mvs.remove(at: listIndex)
+                }
+            }
+        } else if let grocerylist = list.grocerylist {
+            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+                let listRow = mvs.allRows[listIndex]
+                if grocerylist.name != "GroceryListName" {
+                    listRow.title = grocerylist.name
+                    listRow.baseValue = grocerylist
+                    listRow.updateCell()
+                    if listList.indices.contains(listIndex) {
+                        listList[listIndex].grocerylist = grocerylist
+                    } else {
+                        var list = ListContainer()
+                        list.grocerylist = grocerylist
+                        listList.append(list)
+                    }
+                    grocerylistIndex = listIndex
+                    updateLists(type: "lists")
+                } else {
+                    mvs.remove(at: listIndex)
+                }
+            }
+        } else if let packinglist = list.packinglist {
+            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+                let listRow = mvs.allRows[listIndex]
+                if packinglist.name != "PackingListName" {
+                    listRow.title = packinglist.name
+                    listRow.baseValue = packinglist
+                    listRow.updateCell()
+                    if listList.indices.contains(listIndex) {
+                        listList[listIndex].packinglist = packinglist
+                    } else {
+                        var list = ListContainer()
+                        list.packinglist = packinglist
+                        listList.append(list)
+                    }
+                    updateLists(type: "lists")
+                } else {
+                    mvs.remove(at: listIndex)
+                }
+            }
+        } else {
+            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+                mvs.remove(at: listIndex)
             }
         }
     }

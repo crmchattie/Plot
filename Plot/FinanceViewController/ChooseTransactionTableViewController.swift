@@ -15,6 +15,7 @@ class ChooseTransactionTableViewController: UITableViewController {
     
     private let kFinanceTableViewCell = "FinanceTableViewCell"
       
+    var existingTransactions = [Transaction]()
     var transactions: [Transaction]!
     var filteredTransactions: [Transaction]!
     
@@ -72,13 +73,13 @@ class ChooseTransactionTableViewController: UITableViewController {
     
     func handleReloadTable() {
         if transactions != nil {
-            transactions.sort { (transaction1, transaction2) -> Bool in
+            filteredTransactions = transactions.filter{ !existingTransactions.contains($0) }
+            filteredTransactions.sort { (transaction1, transaction2) -> Bool in
                 if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
                     return date1 > date2
                 }
                 return transaction1.description < transaction2.description
             }
-            filteredTransactions = transactions
         }
         tableView.reloadData()
         

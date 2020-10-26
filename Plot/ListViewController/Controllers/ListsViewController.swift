@@ -29,7 +29,6 @@ class ListsViewController: UIViewController {
     
     let listCellID = "listCellID"
     
-    var listListCopy = [ListContainer]()
     var listList = [ListContainer]()
     var filteredlistList = [ListContainer]()
     var checklists = [Checklist]()
@@ -146,6 +145,8 @@ class ListsViewController: UIViewController {
     }
     
     func fetchLists() {
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
         checklistFetcher.fetchChecklists { (checklists) in
             for checklist in checklists {
                 if checklist.name == "nothing" { continue }
@@ -153,7 +154,9 @@ class ListsViewController: UIViewController {
                 self.checklists.append(checklist)
             }
             self.observeChecklistsForCurrentUser()
+            dispatchGroup.leave()
         }
+        dispatchGroup.enter()
         activitylistFetcher.fetchActivitylists { (activitylists) in
             for activitylist in activitylists {
                 if activitylist.name == "nothing" { continue }
@@ -161,16 +164,20 @@ class ListsViewController: UIViewController {
                 self.activitylists.append(activitylist)
             }
             self.observeActivitylistsForCurrentUser()
+            dispatchGroup.leave()
         }
+        dispatchGroup.enter()
         grocerylistFetcher.fetchGrocerylists { (grocerylists) in
             for grocerylist in grocerylists {
                 if grocerylist.name == "nothing" { continue }
                 self.grocerylists.append(grocerylist)
             }
             self.observeGrocerylistsForCurrentUser()
+            dispatchGroup.leave()
         }
-        
-        sortandreload()
+        dispatchGroup.notify(queue: .main) {
+            self.sortandreload()
+        }
     }
     
     func observeChecklistsForCurrentUser() {
@@ -180,7 +187,6 @@ class ListsViewController: UIViewController {
                         self!.checklists[index] = checklist
                         if let ID = checklist.ID {
                             self!.updateCellForCLID(ID: ID, checklist: checklist)
-                            self!.sortandreload()
                         }
                     } else {
                         self!.checklists.append(checklist)
@@ -200,7 +206,6 @@ class ListsViewController: UIViewController {
                         self!.checklists[index] = checklist
                         if let ID = checklist.ID {
                             self!.updateCellForCLID(ID: ID, checklist: checklist)
-                            self!.sortandreload()
                         }
                     }
                 }
@@ -215,7 +220,6 @@ class ListsViewController: UIViewController {
                         self!.activitylists[index] = activitylist
                         if let ID = activitylist.ID {
                             self!.updateCellForALID(ID: ID, activitylist: activitylist)
-                            self!.sortandreload()
                         }
                     } else {
                         self!.activitylists.append(activitylist)
@@ -235,7 +239,6 @@ class ListsViewController: UIViewController {
                         self!.activitylists[index] = activitylist
                         if let ID = activitylist.ID {
                             self!.updateCellForALID(ID: ID, activitylist: activitylist)
-                            self!.sortandreload()
                         }
                     }
                 }
@@ -250,7 +253,6 @@ class ListsViewController: UIViewController {
                     self!.grocerylists[index] = grocerylist
                     if let ID = grocerylist.ID {
                         self!.updateCellForGLID(ID: ID, grocerylist: grocerylist)
-                        self!.sortandreload()
                     }
                 } else {
                     self!.grocerylists.append(grocerylist)
@@ -270,7 +272,6 @@ class ListsViewController: UIViewController {
                         self!.grocerylists[index] = grocerylist
                         if let ID = grocerylist.ID {
                             self!.updateCellForGLID(ID: ID, grocerylist: grocerylist)
-                            self!.sortandreload()
                         }
                     }
                 }
@@ -281,24 +282,21 @@ class ListsViewController: UIViewController {
     func updateCellForCLID(ID: String, checklist: Checklist) {
         if let index = listList.firstIndex(where: {$0.ID == ID}) {
             listList[index].checklist = checklist
-            let indexPath = IndexPath(row: index, section: 0)
-            updateCell(at: indexPath)
+            handleReloadTableAfterSearch()
         }
     }
     
     func updateCellForALID(ID: String, activitylist: Activitylist) {
         if let index = listList.firstIndex(where: {$0.ID == ID}) {
             listList[index].activitylist = activitylist
-            let indexPath = IndexPath(row: index, section: 0)
-            updateCell(at: indexPath)
+            handleReloadTableAfterSearch()
         }
     }
     
     func updateCellForGLID(ID: String, grocerylist: Grocerylist) {
         if let index = listList.firstIndex(where: {$0.ID == ID}) {
             listList[index].grocerylist = grocerylist
-            let indexPath = IndexPath(row: index, section: 0)
-            updateCell(at: indexPath)
+            handleReloadTableAfterSearch()
         }
     }
     
@@ -323,17 +321,18 @@ class ListsViewController: UIViewController {
     }
     
     func sortandreload() {
+        listList = []
         listList = (checklists.map { ListContainer(grocerylist: nil, checklist: $0, activitylist: nil, packinglist: nil) } + activitylists.map { ListContainer(grocerylist: nil, checklist: nil, activitylist: $0, packinglist: nil) } + grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, activitylist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
+        filteredlistList = listList
         delegate?.sendLists(lists: listList)
-        listListCopy = listList
         tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
-        filteredlistList.sort { (list1, list2) -> Bool in
+        listList.sort { (list1, list2) -> Bool in
             return list1.lastModifiedDate > list2.lastModifiedDate
         }
-        listList = filteredlistList
+        filteredlistList = listList
         tableView.reloadData()
         
     }
@@ -355,12 +354,12 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if listList.count == 0 {
+        if filteredlistList.count == 0 {
             checkIfThereAreAnyResults(isEmpty: true)
         } else {
             checkIfThereAreAnyResults(isEmpty: false)
         }
-        return listList.count
+        return filteredlistList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -368,7 +367,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         cell.delegate = self
         cell.listViewControllerDataStore = self
         cell.selectionStyle = .none
-        let list = listList[indexPath.row]
+        let list = filteredlistList[indexPath.row]
         if let grocerylist = list.grocerylist {
             cell.configureCell(for: indexPath, grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil)
         } else if let checklist = list.checklist {
@@ -383,7 +382,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let list = listList[indexPath.row]
+        let list = filteredlistList[indexPath.row]
         if let grocerylist = list.grocerylist {
             let destination = GrocerylistViewController()
             destination.hidesBottomBarWhenPushed = true

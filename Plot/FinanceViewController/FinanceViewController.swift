@@ -142,6 +142,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         dispatchGroup.enter()
         accountFetcher.fetchAccounts { (firebaseAccounts) in
             self.accounts = firebaseAccounts
+            print("accounts \(self.accounts)")
             self.observeAccountsForCurrentUser()
             dispatchGroup.leave()
         }
@@ -193,6 +194,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                                 } else if let index = self.accounts.firstIndex(of: account) {
                                                     _account.balances = self.accounts[index].balances
                                                     _account.description = self.accounts[index].description
+                                                    _account.admin = self.accounts[index].admin
                                                     self.accounts[index] = _account
                                                 }
                                                 updatedAccounts.append(_account)
@@ -217,6 +219,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                     } else if let index = self.accounts.firstIndex(of: account) {
                                         _account.balances = self.accounts[index].balances
                                         _account.description = self.accounts[index].description
+                                        _account.admin = self.accounts[index].admin
                                         self.accounts[index] = _account
                                     }
                                     updatedAccounts.append(_account)
@@ -313,8 +316,9 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             }
         } else {
             dispatchGroup.enter()
+            print("accounts \(self.accounts)")
             let account = self.accounts.min(by:{ self.isodateFormatter.date(from: $0.updated_at)! < self.isodateFormatter.date(from: $1.updated_at)! })
-            let date = self.isodateFormatter.date(from: account!.updated_at) ?? Date()
+            let date = self.isodateFormatter.date(from: account?.updated_at ?? "") ?? Date()
             self.getTransactions(guid: user.guid, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
                 for transaction in transactions {
                     dispatchGroup.enter()

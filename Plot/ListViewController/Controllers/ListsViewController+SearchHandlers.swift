@@ -21,8 +21,8 @@ extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        filteredlistList = searchText.isEmpty ? listListCopy :
-            listListCopy.filter({ (list) -> Bool in
+        filteredlistList = searchText.isEmpty ? listList :
+            listList.filter({ (list) -> Bool in
                 return list.name.lowercased().contains(searchText.lowercased())
             })
         
