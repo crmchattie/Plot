@@ -12,7 +12,7 @@ import HealthKit
 
 class HealthDetailViewController: UIViewController {
     
-    var healthMetric: HealthMetric?
+    private var viewModel: HealthDetailViewModelInterface
     var dayAxisValueFormatter: DayAxisValueFormatter?
     
     lazy var chartView: LineChartView = {
@@ -27,6 +27,16 @@ class HealthDetailViewController: UIViewController {
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
         return segmentedControl
     }()
+    
+    init(viewModel: HealthDetailViewModelInterface) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+        //self.viewModel.delegate = self
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -44,6 +54,8 @@ class HealthDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.title = viewModel.healthMetric.type.name
+        
         addObservers()
         changeTheme()
         
@@ -56,7 +68,6 @@ class HealthDetailViewController: UIViewController {
         configureView()
         configureChart()
         
-        //updateChartData()
         fetchHealthKitData()
     }
     
@@ -130,84 +141,14 @@ class HealthDetailViewController: UIViewController {
     
     // MARK: HealthKit Data
     func fetchHealthKitData() {
-        guard let healthMetric = healthMetric else {
-            return
-        }
+        guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        let endDate = Date()
-        let calendar = Calendar.current
-        var startDate = calendar.startOfDay(for: endDate)
-        switch (segmentedControl.selectedSegmentIndex) {
-        case 0:
-            break
-        case 1:
-            startDate = endDate.weekBefore
-        case 2:
-            startDate = endDate.monthBefore
-        case 3:
-            startDate = endDate.lastYear
-        default:
-            break
-        }
-        
-        if healthMetric.type == .steps {
-            guard let stepCountSampleType = HKSampleType.quantityType(forIdentifier: .stepCount) else {
-                return
-            }
+        viewModel.fetchChartData(for: segmentType) { (data, maxValue) in
+            guard let data = data else { return }
             
-//            let count = 45
-//            let range: UInt32 = 100
-//            let values = (0..<count).map { (i) -> ChartDataEntry in
-//                let val = Double(arc4random_uniform(range) + 3)
-//                return ChartDataEntry(x: Double(i), y: val)
-//            }
-            
-            HealthKitService.getAllTheSamples(for: stepCountSampleType, startDate: startDate, endDate: endDate) { (samples, error) in
-                if let samples = samples {
-                    var i = 0
-                    var entries: [ChartDataEntry] = []
-                    var maxValue: Double = 0
-                    for sample in samples {
-                        if let quantitySample = sample as? HKQuantitySample {
-                            let steps = quantitySample.quantity.doubleValue(for: .count())
-                            maxValue = max(maxValue, steps)
-                            let entry = ChartDataEntry(x: Double(i), y: steps, data: quantitySample.endDate)
-                            entries.append(entry)
-                            i += 1
-                        }
-                    }
-                    
-                    let dataSet = LineChartDataSet(entries: entries, label: "")
-                    dataSet.drawIconsEnabled = false
-                    dataSet.mode = .cubicBezier
-                    dataSet.setColor(.black)
-                    dataSet.setCircleColor(.black)
-                    dataSet.drawCirclesEnabled = false
-                    dataSet.drawValuesEnabled = false
-                    dataSet.circleRadius = 3
-                    dataSet.drawCircleHoleEnabled = false
-                    dataSet.valueFont = .systemFont(ofSize: 9)
-                    dataSet.formSize = 15
-                    dataSet.lineWidth = 0
-                    
-                    let gradientColors = [ChartColorTemplates.colorFromString("#00ff0000").cgColor,
-                                          ChartColorTemplates.colorFromString("#ffff0000").cgColor]
-                    let gradient = CGGradient(colorsSpace: nil, colors: gradientColors as CFArray, locations: nil)!
-                    
-                    dataSet.fillAlpha = 1
-                    dataSet.fill = Fill(linearGradient: gradient, angle: 90)
-                    dataSet.drawFilledEnabled = true
-                    
-                    let data = LineChartData(dataSet: dataSet)
-                    data.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
-                    maxValue *= 1.2
-                    DispatchQueue.main.async {
-                        self.dayAxisValueFormatter?.formatType = self.segmentedControl.selectedSegmentIndex
-                        self.chartView.rightAxis.axisMaximum = maxValue
-                        self.chartView.data = data
-                    }
-                }
-            }
+            self.chartView.data = data
+            self.chartView.rightAxis.axisMaximum = maxValue
+            self.dayAxisValueFormatter?.formatType = self.segmentedControl.selectedSegmentIndex
         }
     }
 }
@@ -228,4 +169,11 @@ extension HealthDetailViewController: ChartViewDelegate {
     func chartTranslated(_ chartView: ChartViewBase, dX: CGFloat, dY: CGFloat) {
         
     }
+}
+
+enum TimeSegmentType: Int {
+    case day = 0
+    case week
+    case month
+    case year
 }
