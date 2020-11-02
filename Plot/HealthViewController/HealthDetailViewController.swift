@@ -121,21 +121,7 @@ class HealthDetailViewController: UIViewController {
         chartView.animate(xAxisDuration: 2.5)
     }
     
-    @objc func changeSegment(_ segmentedControl: UISegmentedControl) {
-        switch (segmentedControl.selectedSegmentIndex) {
-        case 0:
-        break // Uno
-        case 1:
-        break // Dos
-        case 2:
-        break // Tres
-        case 3:
-            // not implemented
-            return
-        default:
-            break
-        }
-        
+    @objc func changeSegment(_ segmentedControl: UISegmentedControl) {        
         fetchHealthKitData()
     }
     

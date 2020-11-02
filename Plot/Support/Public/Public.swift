@@ -323,6 +323,18 @@ extension Date {
         return dateFormatter.string(from: self)
     }
     
+    func getShortMonth() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM"
+        return dateFormatter.string(from: self)
+    }
+    
+    func getShortMonthAndYear() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM, yy"
+        return dateFormatter.string(from: self)
+    }
+    
     func getTimeStringFromUTC() -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")

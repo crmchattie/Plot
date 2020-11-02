@@ -129,6 +129,147 @@ class HealthKitService {
         
         healthStore.execute(sampleQuery)
     }
+
+    class func getHourlyStepsForToday(statisticsOptions: HKStatisticsOptions, completion: @escaping ([HKStatistics]?, Error?) -> Void) {
+        let calendar = NSCalendar.current
+         
+        var interval = DateComponents()
+        interval.hour = 1
+        
+        var anchorComponents = calendar.dateComponents([.day, .month, .year, .weekday], from: Date())
+        anchorComponents.hour = 0
+        
+        guard let anchorDate = calendar.date(from: anchorComponents) else {
+            print("*** unable to create a valid date from the given components ***")
+            completion(nil, nil)
+            return
+        }
+        
+        let endDate = Date()
+        let startDate = calendar.startOfDay(for: endDate)
+         
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
+            print("*** Unable to create a step count type ***")
+            completion(nil, nil)
+            return
+        }
+        
+        getIntervalBasedSamples(for: quantityType, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval, completion: completion)
+    }
+    
+    class func getDailyStepsForCurrentWeek(statisticsOptions: HKStatisticsOptions, completion: @escaping ([HKStatistics]?, Error?) -> Void) {
+        let calendar = NSCalendar.current
+         
+        var interval = DateComponents()
+        interval.day = 1
+        
+        var anchorComponents = calendar.dateComponents([.day, .month, .year, .weekday], from: Date())
+        anchorComponents.day! -= 7
+        anchorComponents.hour = 0
+        
+        guard let anchorDate = calendar.date(from: anchorComponents) else {
+            print("*** unable to create a valid date from the given components ***")
+            completion(nil, nil)
+            return
+        }
+        
+        let endDate = Date()
+        let startDate = endDate.weekBefore
+        
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
+            print("*** Unable to create a step count type ***")
+            completion(nil, nil)
+            return
+        }
+        
+        getIntervalBasedSamples(for: quantityType, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval, completion: completion)
+    }
+    
+    class func getDailyStepsForCurrentMonth(statisticsOptions: HKStatisticsOptions, completion: @escaping ([HKStatistics]?, Error?) -> Void) {
+        let calendar = NSCalendar.current
+         
+        var interval = DateComponents()
+        interval.day = 1
+        
+        var anchorComponents = calendar.dateComponents([.day, .month, .year, .weekday], from: Date())
+        anchorComponents.month! -= 1
+        anchorComponents.hour = 0
+        
+        guard let anchorDate = calendar.date(from: anchorComponents) else {
+            print("*** unable to create a valid date from the given components ***")
+            completion(nil, nil)
+            return
+        }
+        
+        let endDate = Date()
+        let startDate = endDate.monthBefore
+        
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
+            print("*** Unable to create a step count type ***")
+            completion(nil, nil)
+            return
+        }
+        
+        getIntervalBasedSamples(for: quantityType, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval, completion: completion)
+    }
+    
+    class func getMonthlyStepsForCurrentYear(statisticsOptions: HKStatisticsOptions, completion: @escaping ([HKStatistics]?, Error?) -> Void) {
+        let calendar = NSCalendar.current
+         
+        var interval = DateComponents()
+        interval.day = 1
+        
+        var anchorComponents = calendar.dateComponents([.day, .month, .year, .weekday], from: Date())
+        anchorComponents.year! -= 1
+        anchorComponents.hour = 0
+        
+        guard let anchorDate = calendar.date(from: anchorComponents) else {
+            print("*** unable to create a valid date from the given components ***")
+            completion(nil, nil)
+            return
+        }
+        
+        let endDate = Date()
+        let startDate = endDate.lastYear
+        
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
+            print("*** Unable to create a step count type ***")
+            completion(nil, nil)
+            return
+        }
+        
+        getIntervalBasedSamples(for: quantityType, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval, completion: completion)
+    }
+    
+    class func getIntervalBasedSamples(for quantityType: HKQuantityType, statisticsOptions: HKStatisticsOptions, startDate: Date, endDate: Date, anchorDate: Date, interval: DateComponents, completion: @escaping ([HKStatistics]?, Error?) -> Void) {
+         
+        // Create the query
+        let query = HKStatisticsCollectionQuery(quantityType: quantityType,
+                                                quantitySamplePredicate: nil,
+                                                options: statisticsOptions,
+                                                anchorDate: anchorDate,
+                                                intervalComponents: interval)
+        // Set the results handler
+        query.initialResultsHandler = {
+            query, results, error in
+                guard let statsCollection = results else {
+                    // Perform proper error handling here
+                    print("*** An error occurred while calculating the statistics: \(String(describing: error?.localizedDescription)) ***")
+                    completion(nil, nil)
+                    return
+                }
+            
+                // Plot the weekly step counts over the past 3 months
+                var data: [HKStatistics] = []
+                statsCollection.enumerateStatistics(from: startDate, to: endDate) {statistics, stop in
+                    data.append(statistics)
+                }
+                
+                completion(data, nil)
+        }
+         
+        healthStore.execute(query)
+    }
     
     class func getCumulativeSumSample(forIdentifier identifier: HKQuantityTypeIdentifier,
                                       unit: HKUnit,

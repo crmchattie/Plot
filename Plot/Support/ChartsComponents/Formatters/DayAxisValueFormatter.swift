@@ -34,7 +34,7 @@ public class DayAxisValueFormatter: NSObject, IAxisValueFormatter {
         case 2:
             return date.getDayDigit()
         case 3:
-            return date.getDayDigit()
+            return date.getShortMonth()
         default:
             return ""
         }
