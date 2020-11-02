@@ -92,7 +92,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             cell.imageURL = self.sections[indexPath.section].image
             cell.sygicPlace = object
             return cell
-        } else if let object = object as? Workout {
+        } else if let object = object as? PreBuiltWorkout {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
             cell.delegate = self
             if let workouts = self.favAct["workouts"], workouts.contains(object.identifier) {
@@ -199,7 +199,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
             destination.listType = self.listType
             destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
-        } else if let workout = object as? Workout {
+        } else if let workout = object as? PreBuiltWorkout {
             print("workout \(String(describing: workout.title))")
             let destination = WorkoutDetailViewController()
             destination.hidesBottomBarWhenPushed = true
@@ -610,7 +610,7 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
             activity.allDay = false
             activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
-        } else if let workout = type as? Workout {
+        } else if let workout = type as? PreBuiltWorkout {
             activity.name = workout.title
             activity.activityType = section?.image
             activity.workoutID = "\(workout.identifier)"
@@ -827,7 +827,7 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
                     destination.recipe = object
                 } else if let object = type as? Event {
                     destination.event = object
-                } else if let object = type as? Workout {
+                } else if let object = type as? PreBuiltWorkout {
                     destination.workout = object
                 } else if let object = type as? FSVenue {
                     destination.fsVenue = object
@@ -927,7 +927,7 @@ extension ShoppingTypeViewController: ActivityTypeCellDelegate {
                         databaseReference.updateChildValues(["recipes": ["\(recipe.id)"]])
                     }
                 })
-            } else if let workout = type as? Workout {
+            } else if let workout = type as? PreBuiltWorkout {
                 print(workout.title)
                 databaseReference.child("workouts").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {

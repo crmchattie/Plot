@@ -651,7 +651,7 @@ class ActivitylistViewController: FormViewController {
                         reference = Database.database().reference().child("workouts").child("workouts")
                         reference.child(ID).observeSingleEvent(of: .value, with: { (snapshot) in
                             if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
-                                if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                if let workout = try? FirebaseDecoder().decode(PreBuiltWorkout.self, from: workoutSnapshotValue) {
                                     dispatchGroup.leave()
                                     let destination = WorkoutDetailViewController()
                                     destination.workout = workout
@@ -833,7 +833,7 @@ extension ActivitylistViewController: UpdateListDelegate {
     func updateRecipe(recipe: Recipe?) {
         
     }
-    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?) {
+    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
         if let _: LabelRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "activitylistfields") as? MultivaluedSection {
             mvs.remove(at: mvs.count - 2)
         }

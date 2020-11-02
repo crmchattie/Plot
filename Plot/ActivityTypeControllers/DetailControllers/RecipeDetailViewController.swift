@@ -54,7 +54,7 @@ class RecipeDetailViewController: ActivityDetailViewController {
             fetchDetails()
         }
         
-        title = "Meal"
+        title = "Recipe"
         
         collectionView.register(ActivityDetailCell.self, forCellWithReuseIdentifier: kActivityDetailCell)
         collectionView.register(ActivityExpandedDetailCell.self, forCellWithReuseIdentifier: kActivityExpandedDetailCell)

@@ -19,7 +19,7 @@ class WorkoutDetailViewController: ActivityDetailViewController {
     private let kWorkoutDetailCell = "WorkoutDetailCell"
     private let kExerciseDetailCell = "ExerciseDetailCell"
         
-    var workout: Workout?
+    var workout: PreBuiltWorkout?
     var intColor: Int = 0
     
     

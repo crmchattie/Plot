@@ -62,7 +62,7 @@ class ChooseListTableViewController: UITableViewController {
     var listID: String?
     var recipe: Recipe!
     var event: Event!
-    var workout: Workout!
+    var workout: PreBuiltWorkout!
     var fsVenue: FSVenue!
     var sygicPlace: SygicPlace!
     var activityType: String!

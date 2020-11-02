@@ -392,7 +392,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                             reference = Database.database().reference().child("workouts").child("workouts")
                             reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                                 if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
-                                    if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                    if let workout = try? FirebaseDecoder().decode(PreBuiltWorkout.self, from: workoutSnapshotValue) {
                                         dispatchGroup.leave()
                                         let destination = WorkoutDetailViewController()
                                         destination.hidesBottomBarWhenPushed = true

@@ -81,7 +81,7 @@ class ActivityTypeCell: UICollectionViewCell {
         }
     }
     
-    var workout: Workout! {
+    var workout: PreBuiltWorkout! {
         didSet {
             if let workout = workout {
                 nameLabel.text = workout.title

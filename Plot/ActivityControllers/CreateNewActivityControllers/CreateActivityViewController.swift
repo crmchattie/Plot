@@ -1618,7 +1618,7 @@ class CreateActivityViewController: FormViewController {
                 reference = Database.database().reference().child("workouts").child("workouts")
                 reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
-                        if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                        if let workout = try? FirebaseDecoder().decode(PreBuiltWorkout.self, from: workoutSnapshotValue) {
                             dispatchGroup.leave()
                             destination.activity = scheduleItem
                             destination.workout = workout
@@ -1742,8 +1742,8 @@ class CreateActivityViewController: FormViewController {
                 self.present(navController, animated: true, completion: nil)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
-                    mvs.remove(at: self.purchaseIndex)
+                if let _: LabelRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
                 }
             }))
             self.present(alert, animated: true)
@@ -2534,11 +2534,14 @@ extension CreateActivityViewController: ChooseActivityDelegate {
         if let _: LabelRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
             mvs.remove(at: mvs.count - 2)
         }
-        if let _ = mergeActivity.name {
+        if let _ = mergeActivity.name, let currentUserID = Auth.auth().currentUser?.uid {
             self.getParticipants(forActivity: mergeActivity) { (participants) in
                 let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
                 deleteActivity.deleteActivity()
             }
+            
+            mergeActivity.participantsIDs = [currentUserID]
+            mergeActivity.admin = currentUserID
             
             var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {

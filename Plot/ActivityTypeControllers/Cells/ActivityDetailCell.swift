@@ -59,7 +59,7 @@ class ActivityDetailCell: UICollectionViewCell {
         }
     }
     
-    var workout: Workout! {
+    var workout: PreBuiltWorkout! {
         didSet {
             if let _ = workout {
                 imageView.image = UIImage(named: "workout")!.withRenderingMode(.alwaysTemplate)

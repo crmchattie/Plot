@@ -14,7 +14,7 @@ protocol WorkoutDetailCellDelegate: class {
 
 class WorkoutDetailCell: UICollectionViewCell {
     
-    var workout: Workout! {
+    var workout: PreBuiltWorkout! {
         didSet {
             if let notes = workout.notes {
                 print("set notes")

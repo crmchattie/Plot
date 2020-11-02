@@ -1,0 +1,535 @@
+//
+//  MealDetailViewController.swift
+//  Plot
+//
+//  Created by Cory McHattie on 10/26/20.
+//  Copyright © 2020 Immature Creations. All rights reserved.
+//
+
+import UIKit
+import Eureka
+import SplitRow
+import Firebase
+import CodableFirebase
+
+protocol UpdateMealDelegate: class {
+    func updateMeal(meal: Meal)
+}
+
+class MealViewController: FormViewController {
+    weak var delegate : UpdateMealDelegate?
+    
+    var meal: Meal!
+    
+    var users = [User]()
+    var filteredUsers = [User]()
+    var selectedFalconUsers = [User]()
+    
+    var activities = [Activity]()
+    var conversations = [Conversation]()
+    
+    var activity: Activity!
+    
+    var userNames : [String] = []
+    var userNamesString: String = ""
+    
+    fileprivate var active: Bool = false
+    fileprivate var movingBackwards: Bool = true
+    
+    fileprivate var productIndex: Int = 0
+    
+    var chatLogController: ChatLogController? = nil
+    var messagesFetcher: MessagesFetcher? = nil
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        configureTableView()
+        
+        if meal != nil {
+            active = true
+            
+            var participantCount = self.selectedFalconUsers.count
+            
+            // If user is creating this activity (admin)
+            if meal.admin == nil || meal.admin == Auth.auth().currentUser?.uid {
+                participantCount += 1
+            }
+            
+            if participantCount > 1 {
+                self.userNamesString = "\(participantCount) participants"
+            } else {
+                self.userNamesString = "1 participant"
+            }
+            
+            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
+            }
+            resetBadgeForSelf()
+        } else {
+            if let currentUserID = Auth.auth().currentUser?.uid {
+                let ID = Database.database().reference().child(userMealsEntity).child(currentUserID).childByAutoId().key ?? ""
+                meal = Meal(id: ID, name: "MealName", admin: currentUserID)
+            }
+        }
+        setupRightBarButton()
+        initializeForm()
+        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if self.movingBackwards {
+            delegate?.updateMeal(meal: meal)
+        }
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return ThemeManager.currentTheme().statusBarStyle
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        guard tableView.isEditing else { return }
+        tableView.endEditing(true)
+        tableView.reloadData()
+    }
+    
+    fileprivate func configureTableView() {
+        tableView.allowsMultipleSelectionDuringEditing = false
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.backgroundColor = view.backgroundColor
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = UIRectEdge.top
+        tableView.separatorStyle = .none
+        definesPresentationContext = true
+        navigationItem.title = "Meal"
+    }
+    
+    func setupRightBarButton() {
+        if !active || self.selectedFalconUsers.count == 0 {
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = plusBarButton
+        } else {
+            let dotsImage = UIImage(named: "dots")
+            if #available(iOS 11.0, *) {
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+                
+                let dotsBarButton = UIButton(type: .system)
+                dotsBarButton.setImage(dotsImage, for: .normal)
+                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
+                
+                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
+            } else {
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
+            }
+        }
+    }
+    
+    @objc fileprivate func close() {
+        movingBackwards = false
+        
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if active {
+            alert.addAction(UIAlertAction(title: "Update Meal", style: .default, handler: { (_) in
+                print("User click Approve button")
+                
+                // update
+                //                self.showActivityIndicator()
+                //                let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                //                createMeal.createNewMeal()
+                //                self.hideActivityIndicator()
+                //
+                //                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Duplicate Meal", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new meal with updated time
+                guard self.currentReachabilityStatus != .notReachable else {
+                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+                    return
+                }
+                
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    //                    self.showActivityIndicator()
+                    //                    let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    //                    createMeal.createNewMeal()
+                    //
+                    //                    //duplicate meal
+                    //                    let newMealID = Database.database().reference().child(userMealsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    //                    let newMeal = self.meal.copy() as! Meal
+                    //                    newMeal.ID = newMealID
+                    //                    newMeal.admin = currentUserID
+                    //                    newMeal.participantsIDs = nil
+                    //                    newMeal.conversationID = nil
+                    //                    newMeal.activityID = nil
+                    //
+                    //                    let createNewMeal = MealActions(meal: newMeal, active: false, selectedFalconUsers: [])
+                    //                    createNewMeal.createNewMeal()
+                    //                    self.hideActivityIndicator()
+                    //
+                    //                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                }
+                
+                
+            }))
+            
+        } else {
+            alert.addAction(UIAlertAction(title: "Create New Meal", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new activity
+                
+                //                self.showActivityIndicator()
+                //                let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                //                createMeal.createNewMeal()
+                //                self.hideActivityIndicator()
+                //
+                //                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                //
+            }))
+            
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        
+    }
+    
+    @objc func goToExtras() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        
+        
+        //        alert.addAction(UIAlertAction(title: "Share Grocery List", style: .default, handler: { (_) in
+        //            print("User click Edit button")
+        //            self.share()
+        //        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        print("shareButtonTapped")
+        
+    }
+    
+    func initializeForm() {
+        print("initializing form")
+        form +++
+            Section()
+            
+            <<< TextRow("Name") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                if active, let meal = meal {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                    $0.value = meal.name
+                } else {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+                    $0.cell.textField.becomeFirstResponder()
+                }
+            }.onChange() { [unowned self] row in
+                if let rowValue = row.value {
+                    self.meal.name = rowValue
+                }
+                if row.value == nil {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+                } else {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        
+            <<< ButtonRow("Participants") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
+                if active {
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.title = self.userNamesString
+                }
+            }.onCellSelection({ _,_ in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textLabel?.textAlignment = .left
+                if row.title == "Participants" {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                } else {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+            }
+        
+        form +++
+            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                               header: "Items",
+                               footer: "Add a item") {
+                $0.tag = "itemfields"
+                $0.addButtonProvider = { section in
+                    return ButtonRow(){
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.title = "Add New Item"
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textAlignment = .left
+                        
+                    }
+                }
+                $0.multivaluedRowToInsertAt = { index in
+                    self.productIndex = index
+                    self.openProduct()
+                    return LabelRow("label"){ row in
+                        
+                    }
+                }
+                
+            }
+        if let products = self.meal.productContainer {
+            for product in products {
+                var mvs = (form.sectionBy(tag: "itemfields") as! MultivaluedSection)
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.title = product.title
+                }.onCellSelection({ cell, row in
+                    self.productIndex = row.indexPath!.row
+                    self.openProduct()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textAlignment = .left
+                }, at: mvs.count - 1)
+            }
+        }
+    }
+    
+    fileprivate func openProduct() {
+        if let products = self.meal.productContainer, products.indices.contains(productIndex) {
+            let product = products[productIndex]
+            if let groceryProduct = product.groceryProduct {
+                let destination = GroceryProductDetailViewController()
+                destination.delegate = self
+                destination.active = true
+                destination.product = groceryProduct
+                self.navigationController?.pushViewController(destination, animated: true)
+            } else if let menuProduct = product.menuProduct {
+                let destination = MenuProductDetailViewController()
+                destination.delegate = self
+                destination.active = true
+                destination.product = menuProduct
+                self.navigationController?.pushViewController(destination, animated: true)
+            }
+        } else {
+            let destination = MealProductSearchViewController()
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
+    override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
+        super.rowsHaveBeenRemoved(rows, at: indexes)
+        let rowNumber : Int = indexes.first!.row
+        
+        DispatchQueue.main.async { [weak self] in
+            
+        }
+    }
+    
+    @objc fileprivate func openParticipantsInviter() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = SelectActivityMembersViewController()
+        var uniqueUsers = users
+        for participant in selectedFalconUsers {
+            if let userIndex = users.firstIndex(where: { (user) -> Bool in
+                                                    return user.id == participant.id }) {
+                uniqueUsers[userIndex] = participant
+            } else {
+                uniqueUsers.append(participant)
+            }
+        }
+        
+        destination.users = uniqueUsers
+        destination.filteredUsers = uniqueUsers
+        if !selectedFalconUsers.isEmpty {
+            destination.priorSelectedUsers = selectedFalconUsers
+        }
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    func showActivityIndicator() {
+        if let navController = self.navigationController {
+            self.showSpinner(onView: navController.view)
+        } else {
+            self.showSpinner(onView: self.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+    
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
+    
+    func getSelectedFalconUsers(forMeal meal: Meal, completion: @escaping ([User])->()) {
+        guard let participantsIDs = meal.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        var selectedFalconUsers = [User]()
+        let group = DispatchGroup()
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if meal.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    selectedFalconUsers.append(user)
+                }
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            completion(selectedFalconUsers)
+        }
+    }
+    
+    fileprivate func resetBadgeForSelf() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        let badgeRef = Database.database().reference().child(userMealsEntity).child(currentUserID).child(meal.id).child("badge")
+        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+            var value = mutableData.value as? Int
+            value = 0
+            mutableData.value = value!
+            return TransactionResult.success(withValue: mutableData)
+        })
+    }
+}
+
+extension MealViewController: UpdateInvitees {
+    func updateInvitees(selectedFalconUsers: [User]) {
+        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
+            if !selectedFalconUsers.isEmpty {
+                self.selectedFalconUsers = selectedFalconUsers
+                var participantCount = self.selectedFalconUsers.count
+                // If user is creating this activity (admin)
+                if meal.admin == nil || meal.admin == Auth.auth().currentUser?.uid {
+                    participantCount += 1
+                }
+                if participantCount > 1 {
+                    self.userNamesString = "\(participantCount) participants"
+                } else {
+                    self.userNamesString = "1 participant"
+                }
+                
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
+                
+            } else {
+                self.selectedFalconUsers = selectedFalconUsers
+                inviteesRow.title = "1 participant"
+                inviteesRow.updateCell()
+            }
+            
+            if active {
+                //                showActivityIndicator()
+                //                let createMeal = MealActions(meal: meal, active: active, selectedFalconUsers: selectedFalconUsers)
+                //                createMeal.updateMealParticipants()
+                //                hideActivityIndicator()
+                
+            }
+            
+        }
+    }
+}
+
+extension MealViewController: MessagesDelegate {
+    
+    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
+        chatLogController?.updateMessageStatus(messageRef: reference)
+    }
+    
+    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
+        
+        chatLogController?.hidesBottomBarWhenPushed = true
+        chatLogController?.messagesFetcher = messagesFetcher
+        chatLogController?.messages = messages
+        chatLogController?.conversation = conversation
+        
+        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
+            chatLogController?.observeTypingIndicator()
+            chatLogController?.configureTitleViewWithOnlineStatus()
+        }
+        
+        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
+        guard let destination = chatLogController else { return }
+        
+        self.chatLogController?.startCollectionViewAtBottom()
+        
+        
+        // If we're presenting a modal sheet
+        if let presentedViewController = presentedViewController as? UINavigationController {
+            presentedViewController.pushViewController(destination, animated: true)
+        } else {
+            navigationController?.pushViewController(destination, animated: true)
+        }
+        
+        chatLogController = nil
+        messagesFetcher?.delegate = nil
+        messagesFetcher = nil
+    }
+}
+
+extension MealViewController: UpdateGroceryProductDelegate {
+    func updateGroceryProduct(groceryProduct: GroceryProduct, close: Bool?) {
+        
+    }
+}
+
+extension MealViewController: UpdateMenuProductDelegate {
+    func updateMenuProduct(menuProduct: MenuProduct, close: Bool?) {
+        
+    }
+}
+
+extension MealViewController: UpdateListDelegate {
+    func updateRecipe(recipe: Recipe?) {
+        
+    }
+    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
+        
+    }
+}

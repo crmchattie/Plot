@@ -47,6 +47,9 @@
 		10314113230D712E00DB471B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 10314109230D712E00DB471B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
+		1037E42D254F605400F4EE42 /* FoodProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1037E42C254F605400F4EE42 /* FoodProductDetailViewController.swift */; };
+		1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103946892549FD4B005CED3A /* FoodProductContainer.swift */; };
+		1039468E254F13DA005CED3A /* FoodProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1039468D254F13DA005CED3A /* FoodProduct.swift */; };
 		103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */; };
 		103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103E968922C2B309007D6668 /* PurchaseRow.swift */; };
 		1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1040E582242AA05D00304D05 /* MessageViewController.swift */; };
@@ -102,6 +105,13 @@
 		10A2AE9F2508131700D49A0C /* FinanceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */; };
 		10B4AE3324FE9CBA005B967B /* FinancialAccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */; };
 		10B4AE3524FEC5BC005B967B /* FinanceAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */; };
+		10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541C925476D8B00CC9023 /* GroceryProduct.swift */; };
+		10B541D025476DA700CC9023 /* MenuProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541CF25476DA700CC9023 /* MenuProduct.swift */; };
+		10B541D4254780B800CC9023 /* Meal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541D3254780B800CC9023 /* Meal.swift */; };
+		10B541DE25479D0700CC9023 /* MealProductSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541DD25479D0700CC9023 /* MealProductSearchViewController.swift */; };
+		10B541E225479D3100CC9023 /* MealViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541E125479D3100CC9023 /* MealViewController.swift */; };
+		10B541E625479D4300CC9023 /* GroceryProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */; };
+		10B541EA25479D6500CC9023 /* MenuProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */; };
 		10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CB24AF761F006686FA /* CompositionalHeader.swift */; };
 		10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CD24AFB0E7006686FA /* SectionType.swift */; };
 		10B6B31625410D37008037AD /* FinanceTagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B6B31525410D37008037AD /* FinanceTagsViewController.swift */; };
@@ -422,6 +432,9 @@
 		10314110230D712E00DB471B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		10323D5D2479A58500749706 /* GrocerylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistActions.swift; sourceTree = "<group>"; };
 		10367D42230B126800D25885 /* ActivityImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityImageCell.swift; sourceTree = "<group>"; };
+		1037E42C254F605400F4EE42 /* FoodProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodProductDetailViewController.swift; sourceTree = "<group>"; };
+		103946892549FD4B005CED3A /* FoodProductContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodProductContainer.swift; sourceTree = "<group>"; };
+		1039468D254F13DA005CED3A /* FoodProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodProduct.swift; sourceTree = "<group>"; };
 		103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionLevelViewController.swift; sourceTree = "<group>"; };
 		103E968922C2B309007D6668 /* PurchaseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseRow.swift; sourceTree = "<group>"; };
 		1040E582242AA05D00304D05 /* MessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
@@ -478,6 +491,13 @@
 		10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewCell.swift; sourceTree = "<group>"; };
 		10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialAccountCell.swift; sourceTree = "<group>"; };
 		10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceAccountViewController.swift; sourceTree = "<group>"; };
+		10B541C925476D8B00CC9023 /* GroceryProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryProduct.swift; sourceTree = "<group>"; };
+		10B541CF25476DA700CC9023 /* MenuProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuProduct.swift; sourceTree = "<group>"; };
+		10B541D3254780B800CC9023 /* Meal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meal.swift; sourceTree = "<group>"; };
+		10B541DD25479D0700CC9023 /* MealProductSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealProductSearchViewController.swift; sourceTree = "<group>"; };
+		10B541E125479D3100CC9023 /* MealViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealViewController.swift; sourceTree = "<group>"; };
+		10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryProductDetailViewController.swift; sourceTree = "<group>"; };
+		10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuProductDetailViewController.swift; sourceTree = "<group>"; };
 		10B656CB24AF761F006686FA /* CompositionalHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionalHeader.swift; sourceTree = "<group>"; };
 		10B656CD24AFB0E7006686FA /* SectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionType.swift; sourceTree = "<group>"; };
 		10B6B31525410D37008037AD /* FinanceTagsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTagsViewController.swift; sourceTree = "<group>"; };
@@ -876,6 +896,11 @@
 			isa = PBXGroup;
 			children = (
 				1082C89624F0A91500CF6491 /* HealthViewController.swift */,
+				10B541E125479D3100CC9023 /* MealViewController.swift */,
+				10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */,
+				10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */,
+				1037E42C254F605400F4EE42 /* FoodProductDetailViewController.swift */,
+				10B541DD25479D0700CC9023 /* MealProductSearchViewController.swift */,
 			);
 			path = HealthViewController;
 			sourceTree = "<group>";
@@ -1629,6 +1654,11 @@
 				10CD68782486AEE400DC02E0 /* PLNotification.swift */,
 				10D340FF24ABD741009269B7 /* ActivityContainer.swift */,
 				26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */,
+				10B541C925476D8B00CC9023 /* GroceryProduct.swift */,
+				10B541CF25476DA700CC9023 /* MenuProduct.swift */,
+				1039468D254F13DA005CED3A /* FoodProduct.swift */,
+				10B541D3254780B800CC9023 /* Meal.swift */,
+				103946892549FD4B005CED3A /* FoodProductContainer.swift */,
 				102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */,
 				10C8333F249AC2F00037F638 /* SygicPlacesSearchResult.swift */,
 				10C83341249ACC8F0037F638 /* SygicToursSearchResult.swift */,
@@ -2169,6 +2199,7 @@
 				4BAEE5C1212735E50045AB10 /* FalconTextView.swift in Sources */,
 				4BAEE49521272C5E0045AB10 /* ContactsTableViewCell.swift in Sources */,
 				4BAEE5DD212735E50045AB10 /* ImagePickerAction.swift in Sources */,
+				10B541D4254780B800CC9023 /* Meal.swift in Sources */,
 				10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */,
 				10C8334824A3A43F0037F638 /* SygicCollectionsSearchResult.swift in Sources */,
 				105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */,
@@ -2190,6 +2221,7 @@
 				4B4F45431F32246000A6FF96 /* GeneralTabBarController.swift in Sources */,
 				10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */,
 				4BAEE46E21272B380045AB10 /* Biometrics.swift in Sources */,
+				1037E42D254F605400F4EE42 /* FoodProductDetailViewController.swift in Sources */,
 				4BAEE4F221272D890045AB10 /* SelectChatTableViewController.swift in Sources */,
 				10FBC8B724BFE58F00D0E6B5 /* Activitylist.swift in Sources */,
 				10B4AE3524FEC5BC005B967B /* FinanceAccountViewController.swift in Sources */,
@@ -2212,6 +2244,7 @@
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				101B90902457999600EDDB90 /* Weather.swift in Sources */,
+				10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */,
 				1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */,
 				4B5E99DE212CC0C0001F067F /* InAppNotificationManager.swift in Sources */,
 				4BAEE5D1212735E50045AB10 /* SelectedParticipantsCollectionView.swift in Sources */,
@@ -2225,6 +2258,7 @@
 				4BAEE4FB21272D890045AB10 /* InputBlockerContainerView.swift in Sources */,
 				10C50F972274E21900111033 /* ActivityViewController+SearchHandlers.swift in Sources */,
 				4BAEE4F321272D890045AB10 /* GroupProfileTableHeaderContainer.swift in Sources */,
+				1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */,
 				4BAEE46421272B380045AB10 /* AccountSettingsTableViewCell.swift in Sources */,
 				4BAEE49721272C5E0045AB10 /* FalconUsersFetcher.swift in Sources */,
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
@@ -2245,6 +2279,7 @@
 				10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */,
 				1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */,
 				105F66F724171A3C00F6EDB6 /* WorkoutDetailViewController.swift in Sources */,
+				10B541E225479D3100CC9023 /* MealViewController.swift in Sources */,
 				4BAEE48721272C4F0045AB10 /* OnboardingContainerView.swift in Sources */,
 				4BAEE5CE212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift in Sources */,
 				4BAEE4EA21272D890045AB10 /* InformationMessageSender.swift in Sources */,
@@ -2301,6 +2336,7 @@
 				4BAEE48621272C4F0045AB10 /* OnboardingController.swift in Sources */,
 				10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
+				10B541DE25479D0700CC9023 /* MealProductSearchViewController.swift in Sources */,
 				1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */,
 				102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */,
 				4B4F452F1F32230C00A6FF96 /* AppDelegate.swift in Sources */,
@@ -2346,6 +2382,7 @@
 				4BAEE5D9212735E50045AB10 /* ActionCell.swift in Sources */,
 				4BAEE5F5212735E50045AB10 /* NavigationItemActivityIndicator.swift in Sources */,
 				4BAEE51C21272D890045AB10 /* BaseMessageCell+CellDeletionHandlers.swift in Sources */,
+				10B541E625479D4300CC9023 /* GroceryProductDetailViewController.swift in Sources */,
 				4BA1E778215250BF00391BCB /* MessageSender.swift in Sources */,
 				4BAEE4F021272D890045AB10 /* AddGroupMembersController.swift in Sources */,
 				4BAEE51D21272D890045AB10 /* BaseMessageCell.swift in Sources */,
@@ -2362,11 +2399,13 @@
 				105F66F32415A83300F6EDB6 /* EventTypeViewController.swift in Sources */,
 				10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */,
 				4BAEE50021272D890045AB10 /* UserInfoTableViewController.swift in Sources */,
+				10B541D025476DA700CC9023 /* MenuProduct.swift in Sources */,
 				10F3032A24EC6FBC00C04B8F /* MXUser.swift in Sources */,
 				4BAEE5D6212735E50045AB10 /* Announcement.swift in Sources */,
 				10196F0724411B5600B6AFDF /* SelectActivityMembersViewController.swift in Sources */,
 				4BAEE5E4212735E50045AB10 /* EnterVerificationContainerView+timerHandlers.swift in Sources */,
 				10EE27F3245DFA8E00C80AAF /* PackinglistViewController.swift in Sources */,
+				10B541EA25479D6500CC9023 /* MenuProductDetailViewController.swift in Sources */,
 				4BAEE5DE212735E50045AB10 /* TransitionController.swift in Sources */,
 				4BAEE4F721272D890045AB10 /* SelectChatTableViewController+SearchHandlers.swift in Sources */,
 				10C83340249AC2F00037F638 /* SygicPlacesSearchResult.swift in Sources */,
@@ -2466,6 +2505,7 @@
 				10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */,
 				10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */,
 				10F3032724EC622000C04B8F /* FinancialAccountsViewController.swift in Sources */,
+				1039468E254F13DA005CED3A /* FoodProduct.swift in Sources */,
 				4BAEE50321272D890045AB10 /* ChatInputContainerView.swift in Sources */,
 				4BAEE5E9212735E50045AB10 /* EnterPhoneNumberContainerView.swift in Sources */,
 				4BAEE4F821272D890045AB10 /* MessagesFetcher.swift in Sources */,

@@ -459,13 +459,13 @@ class Activity: NSObject, NSCopying, Codable {
 }
 
 enum ActivityType: String, Equatable, Hashable {
-    case basic, complex, recipe, workout, event, flight
+    case basic, complex, meal, workout, event, flight
     
     var activityCategoryText: String {
         switch self {
             case .basic: return "Build your own basic activity"
             case .complex: return "Build your own complex activity"
-            case .recipe: return "Build your own recipe"
+            case .meal: return "Build your own meal"
             case .workout: return "Build your own workout"
             case .event: return "Build your own event"
             case .flight: return "Look up your flight"
@@ -476,10 +476,10 @@ enum ActivityType: String, Equatable, Hashable {
         switch self {
             case .basic: return "Includes basic calendar activity fields"
             case .complex: return "Includes basic activity fields plus a schedule, a checklist and purchases fields"
-            case .recipe: return "Includes sections for photo, name, ingredients, preparation and steps"
-            case .workout: return "Able to pick and choose exercises, sets and weights"
+            case .meal: return "Build a meal by looking up grocery products and/or restaurant menu items"
+            case .workout: return "Build a workout by setting type, duration and intensity"
             case .event: return ""
-            case .flight: return "Able to look up your flight details based on flight number, airline or airport"
+            case .flight: return "Look up your flight details based on flight number, airline or airport"
         }
     }
     
@@ -487,7 +487,7 @@ enum ActivityType: String, Equatable, Hashable {
         switch self {
             case .basic: return "activityLarge"
             case .complex: return "activityLarge"
-            case .recipe: return "recipe"
+            case .meal: return "food"
             case .workout: return "workout"
             case .event: return "event"
             case .flight: return "plane"

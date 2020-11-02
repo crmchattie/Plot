@@ -8,8 +8,33 @@
 
 import Foundation
 
-// MARK: - Response
+let workoutsEntity = "workouts"
+let userWorkoutsEntity = "user-workouts"
+
 struct Workout: Codable, Equatable, Hashable {
+    let id: String
+    var name: String
+    var type: String
+    var intensity: String?
+    var length: Double?
+    var calories: Int?
+    var participantsIDs: [String]?
+    var lastModifiedDate: Date?
+    var createdDate: Date?
+    var startDateTime: String?
+    var endDateTime: String?
+    var admin: String?
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
+}
+
+func ==(lhs: Workout, rhs: Workout) -> Bool {
+    return lhs.id == rhs.id
+}
+
+// MARK: - Response
+struct PreBuiltWorkout: Codable, Equatable, Hashable {
     let uuid = UUID().uuidString
     let id, identifier: String
     var title: String
@@ -30,7 +55,7 @@ struct Workout: Codable, Equatable, Hashable {
     }
 }
 
-func ==(lhs: Workout, rhs: Workout) -> Bool {
+func ==(lhs: PreBuiltWorkout, rhs: PreBuiltWorkout) -> Bool {
     return lhs.uuid == rhs.uuid
 }
 

@@ -18,6 +18,7 @@ class Grocerylist: NSObject, NSCopying, Codable {
     var ID: String?
     var recipes: [String: String]?
     var ingredients: [ExtendedIngredient]?
+    var groceryProducts: [GroceryProduct]?
     var servings: [String: Int]?
     var participantsIDs: [String]?
     var activity: Activity?
@@ -29,6 +30,7 @@ class Grocerylist: NSObject, NSCopying, Codable {
     var muted: Bool?
     var lastModifiedDate: Date?
     var createdDate: Date?
+    var notes: String?
 
     init(dictionary: [String: AnyObject]?) {
         super.init()
@@ -45,6 +47,15 @@ class Grocerylist: NSObject, NSCopying, Codable {
             }
             ingredients = ingredientsList
         }
+        if let productsFirebaseList = dictionary?["groceryProducts"] as? [AnyObject] {
+            var groceryProductsList = [GroceryProduct]()
+            for product in productsFirebaseList {
+                if let prod = try? FirebaseDecoder().decode(GroceryProduct.self, from: product) {
+                    groceryProductsList.append(prod)
+                }
+            }
+            groceryProducts = groceryProductsList
+        }
         servings = dictionary?["servings"] as? [String: Int]
         
         conversationID = dictionary?["conversationID"] as? String
@@ -55,6 +66,7 @@ class Grocerylist: NSObject, NSCopying, Codable {
         muted = dictionary?["muted"] as? Bool
         lastModifiedDate = dictionary?["lastModifiedDate"] as? Date
         createdDate = dictionary?["lastModifiedDate"] as? Date
+        notes = dictionary?["notes"] as? String
         
         if let participantsIDsDict = dictionary?["participantsIDs"] as? [String: String] {
             participantsIDs = Array(participantsIDsDict.keys)
@@ -96,6 +108,16 @@ class Grocerylist: NSObject, NSCopying, Codable {
             dictionary["ingredients"] = firebaseIngredientsList as AnyObject
         }
         
+        if let value = self.groceryProducts {
+            var firebaseGroceryProductsList = [Any]()
+            for product in value {
+                if let prod = try? FirebaseEncoder().encode(product) {
+                    firebaseGroceryProductsList.append(prod)
+                }
+            }
+            dictionary["groceryProducts"] = firebaseGroceryProductsList as AnyObject
+        }
+        
         if let value = self.servings as AnyObject? {
             dictionary["servings"] = value
         }
@@ -114,6 +136,10 @@ class Grocerylist: NSObject, NSCopying, Codable {
         
         if let value = self.activityID as AnyObject? {
             dictionary["activityID"] = value
+        }
+        
+        if let value = self.notes as AnyObject? {
+            dictionary["notes"] = value
         }
         
         if let value = self.lastModifiedDate {

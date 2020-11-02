@@ -13,7 +13,7 @@
 //    var recipe: Recipe?
 //    var event: Event?
 //    var attraction: Attraction?
-//    var workout: Workout?
+//    var workout: PreBuiltWorkout?
 //    var fsVenue: FSVenue?
 //    var sygicPlace: SygicPlace?
 //    
@@ -47,7 +47,7 @@
 //    var recipes: [Recipe]?
 //    var events: [Event]?
 //    var attractions: [Attraction]?
-//    var workouts: [Workout]?
+//    var workouts: [PreBuiltWorkout]?
 //    var fsVenues: [GroupItem]?
 //    var sygicPlaces: [SygicPlace]?
 //    

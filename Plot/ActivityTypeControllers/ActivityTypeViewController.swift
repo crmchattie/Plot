@@ -14,7 +14,7 @@ import SwiftUI
 
 protocol UpdateListDelegate: class {
     func updateRecipe(recipe: Recipe?)
-    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?)
+    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?)
 }
 
 class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, CLLocationManagerDelegate {
@@ -29,10 +29,10 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
     var attractionsString = [String]()
-    var customTypes: [ActivityType] = [.basic]
+    var customTypes: [ActivityType] = [.basic, .meal, .workout]
     var favAct = [String: [String]]()
     
-    var sections: [SectionType] = [.custom, .food, .nightlife, .events, .sightseeing, .recreation, .shopping, .workouts, .recipes]
+    var sections: [SectionType] = [.custom, .customMeal, .customWorkout, .food, .nightlife, .events, .sightseeing, .recreation, .shopping, .workouts, .recipes]
     var groups = [SectionType: [AnyHashable]]()
     
     var workoutIDs: [String] = ["ZB9Gina","E5YrL4F","lhNZOX1","LWampEt","5jbuzns","ltrgYTF","Z37OGjs","7GdJQBG","RKrXsHn","GwxLrim","nspLcIX","nHWkOhp","0ym6yNn","6VLf2M7","n8g5auz","CM5o2rv","ufiyRQc","N7aHlCw","gIeTbVT","lGaFbQK"]
@@ -336,7 +336,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             cell.imageURL = self.sections[indexPath.section].image
             cell.sygicPlace = object
             return cell
-        } else if let object = object as? Workout {
+        } else if let object = object as? PreBuiltWorkout {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
             cell.delegate = self
             if let workouts = self.favAct["workouts"], workouts.contains(object.identifier) {
@@ -399,7 +399,12 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 destination.conversations = self.conversations
                 self.navigationController?.pushViewController(destination, animated: true)
             case "meal":
-                print("meal")
+                let destination = MealViewController()
+                destination.hidesBottomBarWhenPushed = true
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.conversations = self.conversations
+                self.navigationController?.pushViewController(destination, animated: true)
             case "workout":
                 print("workout")
             default:
@@ -443,7 +448,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             destination.listType = self.listType
             destination.activityType = section?.image
             self.navigationController?.pushViewController(destination, animated: true)
-        } else if let workout = object as? Workout {
+        } else if let workout = object as? PreBuiltWorkout {
             print("workout \(String(describing: workout.title))")
             let destination = WorkoutDetailViewController()
             destination.hidesBottomBarWhenPushed = true
@@ -592,13 +597,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         dispatchGroup.leave()
                     }
                 } else if section.type == "Workout" {
-                    var workouts = [Workout]()
+                    var workouts = [PreBuiltWorkout]()
                     for workoutID in self.workoutIDs {
                         dispatchGroup.enter()
                         self.reference = Database.database().reference().child("workouts").child("workouts")
                         self.reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                             if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
-                                if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                if let workout = try? FirebaseDecoder().decode(PreBuiltWorkout.self, from: workoutSnapshotValue) {
                                     workouts.append(workout)
                                     self.groups[section] = workouts
                                     dispatchGroup.leave()
@@ -652,13 +657,13 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                         dispatchGroup.leave()
                     }
                 } else if section.type == "Workout" {
-                    var workouts = [Workout]()
+                    var workouts = [PreBuiltWorkout]()
                     for workoutID in self.workoutIDs {
                         dispatchGroup.enter()
                         self.reference = Database.database().reference().child("workouts").child("workouts")
                         self.reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
                             if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
-                                if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
+                                if let workout = try? FirebaseDecoder().decode(PreBuiltWorkout.self, from: workoutSnapshotValue) {
                                     workouts.append(workout)
                                     self.groups[section] = workouts
                                     dispatchGroup.leave()
@@ -946,7 +951,7 @@ extension ActivityTypeViewController: UpdateListDelegate {
         self.listDelegate?.updateRecipe(recipe: recipe)
     }
     
-    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?) {
+    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
         if let object = recipe {
             self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil, activityType: activityType)
         } else if let object = workout {
@@ -973,7 +978,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
                 self.listDelegate!.updateList(recipe: nil, workout: nil, event: updatedObject, place: nil, activityType: section?.image)
-            } else if let object = type as? Workout {
+            } else if let object = type as? PreBuiltWorkout {
                 var updatedObject = object
                 updatedObject.title = updatedObject.title.removeCharacters()
                 self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil, activityType: section?.image)
@@ -1033,7 +1038,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             activity.allDay = false
             activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
             activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
-        } else if let workout = type as? Workout {
+        } else if let workout = type as? PreBuiltWorkout {
             activity.name = workout.title
             activity.activityType = section?.image
             activity.workoutID = "\(workout.identifier)"
@@ -1250,7 +1255,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                     destination.recipe = object
                 } else if let object = type as? Event {
                     destination.event = object
-                } else if let object = type as? Workout {
+                } else if let object = type as? PreBuiltWorkout {
                     destination.workout = object
                 } else if let object = type as? FSVenue {
                     destination.fsVenue = object
@@ -1350,7 +1355,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                         databaseReference.updateChildValues(["recipes": ["\(recipe.id)"]])
                     }
                 })
-            } else if let workout = type as? Workout {
+            } else if let workout = type as? PreBuiltWorkout {
                 print(workout.title)
                 databaseReference.child("workouts").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {

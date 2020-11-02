@@ -20,6 +20,7 @@ class GrocerylistViewController: FormViewController {
     weak var delegate : UpdateGrocerylistDelegate?
     
     var grocerylist: Grocerylist!
+    var productContainer = [FoodProductContainer]()
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -47,11 +48,19 @@ class GrocerylistViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        configureTableView()
                 
         if grocerylist != nil {
             active = true
+            
+            if let ingredients = grocerylist.ingredients {
+                let ingredientsProducts = ingredients.map { FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: $0, basicIngredient: nil) }
+                self.productContainer.append(contentsOf: ingredientsProducts)
+            }
+            
+            if let groceries = grocerylist.groceryProducts {
+                let groceryProducts = groceries.map { FoodProductContainer(groceryProduct: $0, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil) }
+                self.productContainer.append(contentsOf: groceryProducts)
+            }
                         
             var participantCount = self.selectedFalconUsers.count
             
@@ -79,6 +88,7 @@ class GrocerylistViewController: FormViewController {
                 grocerylist.name = "GroceryListName"
             }
         }
+        configureTableView()
         setupRightBarButton()
         initializeForm()
         
@@ -240,7 +250,7 @@ class GrocerylistViewController: FormViewController {
             }))
             
         } else if connectedToAct {
-            alert.addAction(UIAlertAction(title: "Update Grocerylist", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Update Grocery List", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.showActivityIndicator()
                 let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
@@ -249,7 +259,7 @@ class GrocerylistViewController: FormViewController {
                 self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
             }))
             
-            alert.addAction(UIAlertAction(title: "Duplicate Grocerylist", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Duplicate Grocery List", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new grocerylist with updated time
                 guard self.currentReachabilityStatus != .notReachable else {
@@ -300,7 +310,7 @@ class GrocerylistViewController: FormViewController {
             
             
         } else if !connectedToAct {
-            alert.addAction(UIAlertAction(title: "Create New Grocerylist", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Create New Grocery List", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new activity
                 
@@ -538,7 +548,25 @@ class GrocerylistViewController: FormViewController {
             }
         }
         
+        form.last!
+        <<< TextAreaRow("Notes") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.placeholder = $0.tag
+            $0.value = grocerylist.notes
+            }.cellUpdate({ (cell, row) in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }).onChange { row in
+                self.grocerylist.notes = row.value
+            }
+        
         form +++
+            
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Recipe(s)",
                                footer: "Add a recipe") {
@@ -608,105 +636,212 @@ class GrocerylistViewController: FormViewController {
     }
     
     fileprivate func addIngredients() {
-        if let items = self.grocerylist.ingredients, items.count > 0 {
-            for index in 0...items.count - 1 {
-                if items[index].amount ?? 0.0 < 0.0 {
-                    self.grocerylist.ingredients?.remove(at: index)
-                    continue
-                }
-                var aisle = items[index].aisle!.capitalized
-                aisle = aisle.replacingOccurrences(of: ";", with: "; ")
-                if form.sectionBy(tag: "\(aisle)") != nil {
-                    var section = form.sectionBy(tag: "\(aisle)") as? MultivaluedSection
-                    section!.insert(SplitRow<ButtonRow, CheckRow>("\(items[index].name!)"){
-                        $0.rowLeftPercentage = 0.75
-                        $0.rowLeft = ButtonRow(){ row in
-                            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            row.cell.textLabel?.textAlignment = .left
-                            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            row.cell.textLabel?.numberOfLines = 0
-                            row.title = "\(items[index].amount ?? 0.0) \(items[index].unit ?? "") of \(items[index].name?.capitalized ?? "")"
-                        }.onCellSelection({ cell, row in
-                            self.ingredientIndex = index
-                            self.openIngredient()
-                        }).cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            cell.textLabel?.textAlignment = .left
-                            cell.textLabel?.numberOfLines = 0
+        if !productContainer.isEmpty {
+            for index in 0...productContainer.count - 1 {
+                if let product = productContainer[index].complexIngredient {
+                    if product.amount ?? 0.0 < 0.0 {
+                        if let index = self.grocerylist.ingredients?.firstIndex(of: product) {
+                            self.grocerylist.ingredients?.remove(at: index)
+                            continue
                         }
-                        
-                        $0.rowRight = CheckRow() {
-                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            $0.cell.tintColor = FalconPalette.defaultBlue
-                            $0.value = items[index].bool ?? false
-                            $0.cell.accessoryType = .checkmark
-                            $0.cell.tintAdjustmentMode = .dimmed
-                        }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.tintColor = FalconPalette.defaultBlue
-                            if row.value == false {
-                                cell.accessoryType = .checkmark
-                                cell.tintAdjustmentMode = .dimmed
-                            } else {
-                                cell.tintAdjustmentMode = .automatic
-                            }
-                        }.onCellSelection({ (cell, row) in
-                            self.grocerylist.ingredients![index].bool = row.value
-                        })
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    } , at: section!.count - 1)
-                } else {
-                    var aisle = items[index].aisle!.capitalized
-                    aisle = aisle.replacingOccurrences(of: ";", with: "; ")
-                    
-                    form +++
-                        MultivaluedSection(multivaluedOptions: [.Delete],
-                                           header: "\(aisle)") {
-                                            $0.tag = "\(aisle)"
                     }
-                    
-                    var section = form.sectionBy(tag: "\(aisle)") as? MultivaluedSection
-                    section!.insert(SplitRow<ButtonRow, CheckRow>("\(items[index].name!)"){
-                        $0.rowLeftPercentage = 0.75
-                        $0.rowLeft = ButtonRow(){ row in
-                            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            row.cell.textLabel?.textAlignment = .left
-                            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            row.cell.textLabel?.numberOfLines = 0
-                            row.title = "\(items[index].amount ?? 0.0) \(items[index].unit ?? "") of \(items[index].name?.capitalized ?? "")"
-                        }.onCellSelection({ cell, row in
-                            self.ingredientIndex = index
-                            self.openIngredient()
-                        }).cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            cell.textLabel?.textAlignment = .left
-                            cell.textLabel?.numberOfLines = 0
-                        }
-                        
-                        $0.rowRight = CheckRow() {
-                            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            $0.cell.tintColor = FalconPalette.defaultBlue
-                            $0.value = items[index].bool ?? false
-                            $0.cell.accessoryType = .checkmark
-                            $0.cell.tintAdjustmentMode = .dimmed
+                    var aisle = product.aisle?.capitalized ?? ""
+                    aisle = aisle.replacingOccurrences(of: ";", with: "; ")
+                    if form.sectionBy(tag: "\(aisle)") != nil {
+                        var section = form.sectionBy(tag: "\(aisle)") as? MultivaluedSection
+                        section!.insert(SplitRow<ButtonRow, CheckRow>("\(product.name!)"){
+                            $0.rowLeftPercentage = 0.75
+                            $0.rowLeft = ButtonRow(){ row in
+                                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                row.cell.textLabel?.textAlignment = .left
+                                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                row.cell.textLabel?.numberOfLines = 0
+                                row.title = "\(product.amount ?? 0.0) \(product.unit ?? "") of \(product.name?.capitalized ?? "")"
+                            }.onCellSelection({ cell, row in
+                                self.ingredientIndex = index
+                                self.openIngredient()
+                            }).cellUpdate { cell, row in
+                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                cell.textLabel?.textAlignment = .left
+                                cell.textLabel?.numberOfLines = 0
+                            }
+                            
+                            $0.rowRight = CheckRow() {
+                                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                $0.cell.tintColor = FalconPalette.defaultBlue
+                                $0.value = product.bool ?? false
+                                $0.cell.accessoryType = .checkmark
+                                $0.cell.tintAdjustmentMode = .dimmed
+                            }.cellUpdate { cell, row in
+                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                cell.tintColor = FalconPalette.defaultBlue
+                                if row.value == false {
+                                    cell.accessoryType = .checkmark
+                                    cell.tintAdjustmentMode = .dimmed
+                                } else {
+                                    cell.tintAdjustmentMode = .automatic
+                                }
+                            }.onCellSelection({ (cell, row) in
+                                if let index = self.grocerylist.ingredients?.firstIndex(of: product) {
+                                    self.grocerylist.ingredients![index].bool = row.value
+                                }
+                            })
                         }.cellUpdate { cell, row in
                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.tintColor = FalconPalette.defaultBlue
-                            if row.value == false {
-                                cell.accessoryType = .checkmark
-                                cell.tintAdjustmentMode = .dimmed
-                            } else {
-                                cell.tintAdjustmentMode = .automatic
+                        } , at: section!.count - 1)
+                    } else {
+                        var aisle = product.aisle?.capitalized ?? ""
+                        aisle = aisle.replacingOccurrences(of: ";", with: "; ")
+                        
+                        form +++
+                            MultivaluedSection(multivaluedOptions: [.Delete],
+                                               header: "\(aisle)") {
+                                                $0.tag = "\(aisle)"
+                        }
+                        
+                        var section = form.sectionBy(tag: "\(aisle)") as? MultivaluedSection
+                        section!.insert(SplitRow<ButtonRow, CheckRow>("\(product.name!)"){
+                            $0.rowLeftPercentage = 0.75
+                            $0.rowLeft = ButtonRow(){ row in
+                                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                row.cell.textLabel?.textAlignment = .left
+                                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                row.cell.textLabel?.numberOfLines = 0
+                                row.title = "\(product.amount ?? 0.0) \(product.unit ?? "") of \(product.name?.capitalized ?? "")"
+                            }.onCellSelection({ cell, row in
+                                self.ingredientIndex = index
+                                self.openIngredient()
+                            }).cellUpdate { cell, row in
+                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                cell.textLabel?.textAlignment = .left
+                                cell.textLabel?.numberOfLines = 0
                             }
-                        }.onCellSelection({ (cell, row) in
-                            self.grocerylist.ingredients![index].bool = row.value
-                        })
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    } , at: 0)
+                            
+                            $0.rowRight = CheckRow() {
+                                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                $0.cell.tintColor = FalconPalette.defaultBlue
+                                $0.value = product.bool ?? false
+                                $0.cell.accessoryType = .checkmark
+                                $0.cell.tintAdjustmentMode = .dimmed
+                            }.cellUpdate { cell, row in
+                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                cell.tintColor = FalconPalette.defaultBlue
+                                if row.value == false {
+                                    cell.accessoryType = .checkmark
+                                    cell.tintAdjustmentMode = .dimmed
+                                } else {
+                                    cell.tintAdjustmentMode = .automatic
+                                }
+                            }.onCellSelection({ (cell, row) in
+                                if let index = self.grocerylist.ingredients?.firstIndex(of: product) {
+                                    self.grocerylist.ingredients![index].bool = row.value
+                                }
+                            })
+                        }.cellUpdate { cell, row in
+                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        } , at: 0)
+                    }
+                } else if let product = productContainer[index].groceryProduct {
+                    var aisle = product.aisle?.capitalized ?? ""
+                    aisle = aisle.replacingOccurrences(of: ";", with: "; ")
+                    if form.sectionBy(tag: "\(aisle)") != nil {
+                        var section = form.sectionBy(tag: "\(aisle)") as? MultivaluedSection
+                        section!.insert(SplitRow<ButtonRow, CheckRow>("\(product.title)"){
+                            $0.rowLeftPercentage = 0.75
+                            $0.rowLeft = ButtonRow(){ row in
+                                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                row.cell.textLabel?.textAlignment = .left
+                                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                row.cell.textLabel?.numberOfLines = 0
+                                row.title = "\(product.amount ?? 0) \(product.title.capitalized)"
+                            }.onCellSelection({ cell, row in
+                                self.ingredientIndex = index
+                                self.openIngredient()
+                            }).cellUpdate { cell, row in
+                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                cell.textLabel?.textAlignment = .left
+                                cell.textLabel?.numberOfLines = 0
+                            }
+                            
+                            $0.rowRight = CheckRow() {
+                                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                $0.cell.tintColor = FalconPalette.defaultBlue
+                                $0.value = product.bool ?? false
+                                $0.cell.accessoryType = .checkmark
+                                $0.cell.tintAdjustmentMode = .dimmed
+                            }.cellUpdate { cell, row in
+                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                cell.tintColor = FalconPalette.defaultBlue
+                                if row.value == false {
+                                    cell.accessoryType = .checkmark
+                                    cell.tintAdjustmentMode = .dimmed
+                                } else {
+                                    cell.tintAdjustmentMode = .automatic
+                                }
+                            }.onCellSelection({ (cell, row) in
+                                if let index = self.grocerylist.groceryProducts?.firstIndex(of: product) {
+                                    self.grocerylist.groceryProducts![index].bool = row.value
+                                }
+                            })
+                        }.cellUpdate { cell, row in
+                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        } , at: section!.count - 1)
+                    } else {
+                        var aisle = product.aisle?.capitalized ?? ""
+                        aisle = aisle.replacingOccurrences(of: ";", with: "; ")
+                        
+                        form +++
+                            MultivaluedSection(multivaluedOptions: [.Delete],
+                                               header: "\(aisle)") {
+                                                $0.tag = "\(aisle)"
+                        }
+                        
+                        var section = form.sectionBy(tag: "\(aisle)") as? MultivaluedSection
+                        section!.insert(SplitRow<ButtonRow, CheckRow>("\(product.title)"){
+                            $0.rowLeftPercentage = 0.75
+                            $0.rowLeft = ButtonRow(){ row in
+                                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                row.cell.textLabel?.textAlignment = .left
+                                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                row.cell.textLabel?.numberOfLines = 0
+                                row.title = "\(product.amount ?? 0) \(product.title.capitalized)"
+                            }.onCellSelection({ cell, row in
+                                self.ingredientIndex = index
+                                self.openIngredient()
+                            }).cellUpdate { cell, row in
+                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                cell.textLabel?.textAlignment = .left
+                                cell.textLabel?.numberOfLines = 0
+                            }
+                            
+                            $0.rowRight = CheckRow() {
+                                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                $0.cell.tintColor = FalconPalette.defaultBlue
+                                $0.value = product.bool ?? false
+                                $0.cell.accessoryType = .checkmark
+                                $0.cell.tintAdjustmentMode = .dimmed
+                            }.cellUpdate { cell, row in
+                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                cell.tintColor = FalconPalette.defaultBlue
+                                if row.value == false {
+                                    cell.accessoryType = .checkmark
+                                    cell.tintAdjustmentMode = .dimmed
+                                } else {
+                                    cell.tintAdjustmentMode = .automatic
+                                }
+                            }.onCellSelection({ (cell, row) in
+                                if let index = self.grocerylist.groceryProducts?.firstIndex(of: product) {
+                                    self.grocerylist.groceryProducts![index].bool = row.value
+                                }
+                            })
+                        }.cellUpdate { cell, row in
+                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        } , at: 0)
+                    }
                 }
             }
         }
@@ -715,7 +850,8 @@ class GrocerylistViewController: FormViewController {
     fileprivate func openIngredient() {
         if ingredientIndex == -1 {
             let destination = IngredientSearchViewController()
-            destination.delegate = self
+            destination.ingredientDelegate = self
+            destination.groceryDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let items = self.grocerylist.ingredients, items.indices.contains(ingredientIndex) {
             let destination = IngredientDetailViewController()
@@ -779,10 +915,19 @@ class GrocerylistViewController: FormViewController {
                     let id = Array<String>(recipes.keys)[rowNumber]
                     self!.lookupRecipe(recipeID: Int(id)!, add: false)
                 }
-            } else if rowType is SplitRow<ButtonRow, CheckRow>, let ingredients = self!.grocerylist.ingredients, let rowTag = rows[0].tag {
-                if let index = ingredients.firstIndex(where: {$0.name == rowTag}) {
-                    self!.grocerylist.ingredients!.remove(at: index)
-                    if ingredients.count == 1 {
+            } else if rowType is SplitRow<ButtonRow, CheckRow>, !self!.productContainer.isEmpty, let rowTag = rows[0].tag {
+                if let index = self!.productContainer.firstIndex(where: {$0.title == rowTag}) {
+                    if let product = self!.productContainer[index].complexIngredient {
+                        if let index = self!.grocerylist.ingredients!.firstIndex(where: {$0 == product}) {
+                            self!.grocerylist.ingredients!.remove(at: index)
+                        }
+                    } else if let product = self!.productContainer[index].groceryProduct {
+                        if let index = self!.grocerylist.groceryProducts!.firstIndex(where: {$0 == product}) {
+                            self!.grocerylist.ingredients!.remove(at: index)
+                        }
+                    }
+                    self!.productContainer.remove(at: index)
+                    if self!.productContainer.count == 1 {
                         if let ingredientSection = self!.form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
                             if self!.form.allSections.count > 3 {
                                 for _ in 0...self!.form.allSections.count - 2 - ingredientSection.index! {
@@ -996,13 +1141,15 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
             print("no ingredient")
             return
         }
-        if let items = self.grocerylist.ingredients {
-            if items.indices.contains(ingredientIndex) {
+        if !productContainer.isEmpty, let items = self.grocerylist.ingredients {
+            if productContainer.indices.contains(ingredientIndex) {
                 print("active ingredient")
-                self.grocerylist.ingredients![ingredientIndex] = ingredient
-                if let ingredientRow: SplitRow<ButtonRow, CheckRow> = form.rowBy(tag: "\(ingredient.name!)") {
-                    ingredientRow.rowLeft!.title = "\(ingredient.amount ?? 0.0) \(ingredient.unit ?? "") of \(ingredient.name?.capitalized ?? "")"
-                    ingredientRow.updateCell()
+                if let index = self.grocerylist.ingredients?.firstIndex(of: ingredient) {
+                    self.grocerylist.ingredients![index] = ingredient
+                }
+                if let row: SplitRow<ButtonRow, CheckRow> = form.rowBy(tag: "\(ingredient.name!)") {
+                    row.rowLeft!.title = "\(ingredient.amount ?? 0.0) \(ingredient.unit ?? "") of \(ingredient.name?.capitalized ?? "")"
+                    row.updateCell()
                     return
                 }
             } else if let index = items.firstIndex(where: {$0 == ingredient}) {
@@ -1013,6 +1160,7 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
             } else {
                 print("appending ingredient")
                 self.grocerylist.ingredients!.append(ingredient)
+                self.productContainer.append(FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil))
             }
             
             let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
@@ -1028,6 +1176,61 @@ extension GrocerylistViewController: UpdateIngredientDelegate {
             }
         } else if self.grocerylist.ingredients == nil {
             self.grocerylist.ingredients = [ingredient]
+            self.productContainer.append(FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil))
+            
+            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createGrocerylist.createNewGrocerylist()
+            
+            addIngredients()
+        }
+    }
+}
+
+extension GrocerylistViewController: UpdateGroceryProductDelegate {
+    func updateGroceryProduct(groceryProduct: GroceryProduct, close: Bool?) {
+        if ingredientIndex == -1 {
+            if let mvs = self.form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
+                print("removing row")
+                mvs.remove(at: 0)
+            }
+        }
+        if groceryProduct.title == "GroceryProductName" {
+            print("no ingredient")
+            return
+        }
+        if !productContainer.isEmpty, let items = self.grocerylist.groceryProducts {
+            if productContainer.indices.contains(ingredientIndex) {
+                print("active ingredient")
+                if let index = self.grocerylist.groceryProducts?.firstIndex(of: groceryProduct) {
+                    self.grocerylist.groceryProducts![index] = groceryProduct
+                }
+                if let row: SplitRow<ButtonRow, CheckRow> = form.rowBy(tag: "\(groceryProduct.title)") {
+                    row.rowLeft!.title = "\(groceryProduct.amount ?? 0) \(groceryProduct.title.capitalized)"
+                    row.updateCell()
+                    return
+                }
+            } else if let _ = items.firstIndex(where: {$0 == groceryProduct}) {
+                print("ingredient exists")
+            } else {
+                print("appending ingredient")
+                self.grocerylist.groceryProducts!.append(groceryProduct)
+                self.productContainer.append(FoodProductContainer(groceryProduct: groceryProduct, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil))
+            }
+            
+            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createGrocerylist.createNewGrocerylist()
+            
+            if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
+                if form.allSections.count > 3 {
+                    for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
+                        form.remove(at: ingredientSection.index! + 1)
+                    }
+                }
+                addIngredients()
+            }
+        } else if self.grocerylist.ingredients == nil {
+            self.grocerylist.groceryProducts = [groceryProduct]
+            self.productContainer.append(FoodProductContainer(groceryProduct: groceryProduct, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil))
             
             let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createGrocerylist.createNewGrocerylist()
@@ -1075,7 +1278,7 @@ extension GrocerylistViewController: UpdateListDelegate {
             }
         }
     }
-    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?) {
+    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
         
     }
 }
@@ -1324,4 +1527,27 @@ extension GrocerylistViewController: MessagesDelegate {
         messagesFetcher?.delegate = nil
         messagesFetcher = nil
     }
+}
+
+extension GrocerylistViewController: UITextViewDelegate {
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == FalconPalette.defaultBlue {
+            textView.text = nil
+            textView.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+        
+        
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Description"
+        }
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        
+    }
+    
 }

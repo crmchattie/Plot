@@ -38,7 +38,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     
     var institutionDict = [String: String]()
     
-    var setSections: [SectionType] = [.issues, .balanceSheet, .financialAccounts, .incomeStatement, .transactions]
+    var setSections: [SectionType] = [.financialIssues, .balanceSheet, .financialAccounts, .incomeStatement, .transactions]
     var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
     
@@ -195,6 +195,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                                     _account.balances = self.accounts[index].balances
                                                     _account.description = self.accounts[index].description
                                                     _account.admin = self.accounts[index].admin
+                                                    _account.participantsIDs = self.accounts[index].participantsIDs
                                                     self.accounts[index] = _account
                                                 }
                                                 updatedAccounts.append(_account)
@@ -220,6 +221,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                         _account.balances = self.accounts[index].balances
                                         _account.description = self.accounts[index].description
                                         _account.admin = self.accounts[index].admin
+                                        _account.participantsIDs = self.accounts[index].participantsIDs
                                         self.accounts[index] = _account
                                     }
                                     updatedAccounts.append(_account)
@@ -605,6 +607,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             do {
                 var _transaction = transaction
                 _transaction.admin = currentUserID
+                _transaction.participantsIDs = [currentUserID]
                 // store transaction info
                 let value = try FirebaseEncoder().encode(_transaction)
                 ref.child(financialTransactionsEntity).child(_transaction.guid).setValue(value)
@@ -633,7 +636,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             if section.type == "Issues" {
                 dispatchGroup.enter()
                 if !members.isEmpty {
-                    sections.append(.issues)
+                    sections.append(.financialIssues)
                     members.sort { (member1, member2) -> Bool in
                         return member1.name < member2.name
                     }
@@ -729,7 +732,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = sections[indexPath.section]
         let object = groups[section]
-        if section != .issues {
+        if section != .financialIssues {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
             if let object = object as? [TransactionDetails] {
                 cell.transactionDetails = object[indexPath.item]
@@ -757,7 +760,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         var height: CGFloat = 328
         let section = sections[indexPath.section]
         let object = groups[section]
-        if section != .issues {
+        if section != .financialIssues {
             let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: view.frame.width - 32, height: 1000))
             if let object = object as? [TransactionDetails] {
                 dummyCell.transactionDetails = object[indexPath.item]

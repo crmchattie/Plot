@@ -15,7 +15,7 @@ class Service {
     func fetchRecipesSimple(query: String, cuisine: String, completion: @escaping ((RecipeSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: SpoonacularAPI.baseUrlString)!
+            return URL(string: SpoonacularAPI.recipeString + "search")!
         }()
         
         let defaultParameters = ["diet": "", "excludeIngredients": "snails", "offset": "0", "number": "20", "limitLicense": "true", "instructionsRequired": "true", "apiKey": "\(SpoonacularAPI.apiKey)"]
@@ -31,7 +31,7 @@ class Service {
     func fetchRecipesComplex(query: String, cuisine: [String], excludeCuisine: [String], diet: String, intolerances: [String], type: String, completion: @escaping ((RecipeSearchResult?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: SpoonacularAPI.complexUrlString)!
+            return URL(string: SpoonacularAPI.recipeString + "complexSearch")!
         }()
         
         let defaultParameters = ["diet": "", "excludeIngredients": "", "offset": "0", "number": "20", "limitLicense": "true", "instructionsRequired": "true", "addRecipeInformation": "true", "apiKey": "\(SpoonacularAPI.apiKey)"]
@@ -47,7 +47,7 @@ class Service {
     func fetchRecipesInfo(id: Int, completion: @escaping ((Recipe?), Error?) -> ()) {
         
         let baseURL: URL = {
-            return URL(string: "\(SpoonacularAPI.infoUrlString)/\(id)/information")!
+            return URL(string: "\(SpoonacularAPI.recipeString)/\(id)/information")!
         }()
         
         let defaultParameters = ["includeNutrition": "true", "apiKey": "\(SpoonacularAPI.apiKey)"]
@@ -62,6 +62,79 @@ class Service {
         
         let baseURL: URL = {
             return URL(string: "\(SpoonacularAPI.ingredientsString)/\(id)/information")!
+        }()
+        
+        let defaultParameters = ["apiKey": "\(SpoonacularAPI.apiKey)"]
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchGroceryProducts(query: String, completion: @escaping ((GroceryProductSearch?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: SpoonacularAPI.groceryString + "search")!
+        }()
+        
+        let defaultParameters = [ "offset": "0", "number": "100", "apiKey": "\(SpoonacularAPI.apiKey)"]
+        let parameters = ["query": "\(query)"].merging(defaultParameters, uniquingKeysWith: +)
+    
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchGroceryProductInfo(id: Int, completion: @escaping ((GroceryProduct?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "\(SpoonacularAPI.groceryString)\(id)")!
+        }()
+        
+        let defaultParameters = ["apiKey": "\(SpoonacularAPI.apiKey)"]
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchGroceryProductInfoUPC(upc: Int, completion: @escaping ((GroceryProduct?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "\(SpoonacularAPI.groceryString)upc/\(upc)")!
+        }()
+        
+        let defaultParameters = ["apiKey": "\(SpoonacularAPI.apiKey)"]
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: defaultParameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchMenuProducts(query: String, completion: @escaping ((MenuProductSearch?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: SpoonacularAPI.menuString + "search")!
+        }()
+        
+        let defaultParameters = ["offset": "0", "number": "100", "apiKey": "\(SpoonacularAPI.apiKey)"]
+        let parameters = ["query": "\(query)"].merging(defaultParameters, uniquingKeysWith: +)
+        
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func fetchMenuProductInfo(id: Int, completion: @escaping ((MenuProduct?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "\(SpoonacularAPI.menuString)\(id)")!
         }()
         
         let defaultParameters = ["apiKey": "\(SpoonacularAPI.apiKey)"]
@@ -760,6 +833,47 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
+    func foodSearch(query: String, completion: @escaping ((FoodSearch?), Error?) -> ()) {
+        let baseURL: URL = {
+            return URL(string: Edamam.parserURL)!
+        }()
+        
+        let defaultParameters = ["category": "generic-foods", "nutrition-type": "logging", "app_id": "\(Edamam.appID)", "app_key": "\(Edamam.apiKey)"]
+        let parameters = ["ingr": "\(query)"].merging(defaultParameters, uniquingKeysWith: +)
+    
+        let urlRequest = URLRequest(url: baseURL)
+        let encodedURLRequest = urlRequest.encode(with: parameters)
+        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+        
+    }
+    
+    func nutrientsSearch(foodId: String, measureURI: String, quantity: Int?, qualifiers: [String]?, completion: @escaping ((NutrientSearch?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: Edamam.nutrientsURL)!
+        }()
+            
+        var urlRequest = URLRequest(url: baseURL)
+        urlRequest.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
+        
+        urlRequest.httpMethod = "POST"
+        if let qualifiers = qualifiers {
+            let body = ["ingredients": ["quantity": quantity ?? 1, "measureURI": "\(measureURI)", "foodId": "\(foodId)", "qualifiers": qualifiers]]
+            let jsonData = try? JSONSerialization.data(withJSONObject: body)
+            urlRequest.httpBody = jsonData
+        } else {
+            let body = ["ingredients": [["quantity": quantity ?? 1, "measureURI": measureURI, "foodId": "\(foodId)"]]]
+            let jsonData = try? JSONSerialization.data(withJSONObject: body)
+            urlRequest.httpBody = jsonData
+        }
+        
+        let defaultParameters = ["app_id": "\(Edamam.appID)", "app_key": "\(Edamam.apiKey)"]
+        urlRequest = urlRequest.encode(with: defaultParameters)
+        print("urlRequest \(urlRequest)")
+        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+                        
+    }
+    
     func getMXTransactions(guid: String, page: String, records_per_page: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
         
         let baseURL: URL = {
@@ -1015,10 +1129,10 @@ class Service {
 }
 
 struct SpoonacularAPI {
-    static let baseUrlString = "https://api.spoonacular.com/recipes/search"
-    static let complexUrlString = "https://api.spoonacular.com/recipes/complexSearch"
-    static let infoUrlString = "https://api.spoonacular.com/recipes/"
+    static let recipeString = "https://api.spoonacular.com/recipes/"
     static let ingredientsString = "https://api.spoonacular.com/food/ingredients/"
+    static let groceryString = "https://api.spoonacular.com/food/products/"
+    static let menuString = "https://api.spoonacular.com/food/menuItems/"
     static fileprivate let apiKey = "7c1e8c9cd7fc48718c4d903c53aa99d9"
 }
 
@@ -1077,6 +1191,13 @@ struct MXAPI {
     
     static fileprivate let version = "application/vnd.mx.atrium.v1+json"
     static fileprivate let contentType = "application/json"
+}
+
+struct Edamam {
+    static let parserURL = "https://api.edamam.com/api/food-database/v2/parser"
+    static let nutrientsURL = "https://api.edamam.com/api/food-database/v2/nutrients"
+    static fileprivate let appID = "856afa62"
+    static fileprivate let apiKey = "1e8ac5976e246c4e8d05bc9f4cb54aab"
 }
 
 extension URLRequest {

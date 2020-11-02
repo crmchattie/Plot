@@ -43,13 +43,6 @@ class IngredientDetailViewController: FormViewController {
         return ThemeManager.currentTheme().statusBarStyle
     }
 
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        guard tableView.isEditing else { return }
-        tableView.endEditing(true)
-        tableView.reloadData()
-    }
-
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

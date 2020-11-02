@@ -262,7 +262,7 @@ extension ActivitySubTypeViewController: UpdateListDelegate {
         self.listDelegate?.updateRecipe(recipe: recipe)
     }
     
-    func updateList(recipe: Recipe?, workout: Workout?, event: Event?, place: FSVenue?, activityType: String?) {
+    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
         if let object = recipe {
             self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil, activityType: activityType)
         } else if let object = workout {

@@ -232,6 +232,8 @@ struct Nutrition: Codable, Equatable, Hashable {
     let ingredients: [Ient]?
     let caloricBreakdown: CaloricBreakdown?
     let weightPerServing: WeightPerServing?
+    let calories: Double?
+    let fat, protein, carbs: String?
 }
 
 // MARK: - CaloricBreakdown
