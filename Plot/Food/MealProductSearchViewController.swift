@@ -13,17 +13,20 @@ class MealProductSearchViewController: UIViewController {
     weak var groceryDelegate : UpdateGroceryProductDelegate?
     weak var menuDelegate : UpdateMenuProductDelegate?
     weak var listDelegate : UpdateListDelegate?
+    weak var ingredientDelegate : UpdateIngredientDelegate?
     
     var searchBar: UISearchBar?
     let searchResultsTableView = UITableView()
     
     fileprivate var movingBackwards: Bool = true
     
-    var searchResults = [FoodHint]()
+    var searchResults = [FoodProductContainer]()
+    var ingredientDictionary = [String: Int]()
     
     var groceryProduct: GroceryProduct!
     var menuProduct: MenuProduct!
     var recipeProduct: Recipe!
+    var ingredient: ExtendedIngredient!
     
     var viewPlaceholder = ViewPlaceholder()
     
@@ -52,6 +55,8 @@ class MealProductSearchViewController: UIViewController {
             let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancel))
             navigationItem.rightBarButtonItem = cancelBarButton
         }
+        
+        fetchIngredients()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -126,39 +131,44 @@ class MealProductSearchViewController: UIViewController {
     func fetchProducts(query: String) {
         searchResults = []
         let dispatchGroup = DispatchGroup()
-//        dispatchGroup.enter()
-//        Service.shared.fetchGroceryProducts(query: query) { (search, err) in
-//            if let products = search?.products {
-//                let groceryProducts = products.map { FoodProductContainer(groceryProduct: $0, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil) }
-//                self.searchResults.append(contentsOf: groceryProducts)
-//            }
-//            dispatchGroup.leave()
-//        }
-//        
-//        dispatchGroup.enter()
-//        Service.shared.fetchMenuProducts(query: query) { (search, err) in
-//            if let products = search?.menuItems {
-//                let menuProducts = products.map { FoodProductContainer(groceryProduct: nil, menuProduct: $0, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil) }
-//                self.searchResults.append(contentsOf: menuProducts)
-//            }
-//            dispatchGroup.leave()
-//        }
-        
         dispatchGroup.enter()
-        Service.shared.foodSearch(query: query) { (search, err) in
-            if let products = search?.hints {
-                self.searchResults.append(contentsOf: products)
+        Service.shared.fetchGroceryProducts(query: query) { (search, err) in
+            if let products = search?.products {
+                let groceryProducts = products.map { FoodProductContainer(groceryProduct: $0, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil) }
+                self.searchResults.append(contentsOf: groceryProducts)
             }
             dispatchGroup.leave()
         }
         
+        dispatchGroup.enter()
+        Service.shared.fetchMenuProducts(query: query) { (search, err) in
+            if let products = search?.menuItems {
+                let menuProducts = products.map { FoodProductContainer(groceryProduct: nil, menuProduct: $0, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil) }
+                self.searchResults.append(contentsOf: menuProducts)
+            }
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.enter()
+        let basicIngredientsDict = ingredientDictionary.filterDictionaryUsingRegex(withRegex: query)
+        if !basicIngredientsDict.isEmpty {
+            let basicIngredients = basicIngredientsDict.map { key, value in
+                BasicIngredient(title: key, id: value)
+            }
+            let foodProductContainer = basicIngredients.map { FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: $0) }
+            self.searchResults.append(contentsOf: foodProductContainer)
+            dispatchGroup.leave()
+        } else {
+            dispatchGroup.leave()
+        }
+        
         dispatchGroup.notify(queue: .main) {
-            self.searchResults = self.searchResults.sorted(by: { $0.food?.label?.compare($1.food?.label ?? "", options: .caseInsensitive) == .orderedAscending })
+            self.searchResults = self.searchResults.sorted(by: { $0.title.compare($1.title , options: .caseInsensitive) == .orderedAscending })
             self.searchResultsTableView.reloadData()
         }
     }
     
-    func fetchProductInfo(groceryID: Int?, menuID: Int?, recipeID: Int?, foodHint: FoodHint?) {
+    func fetchProductInfo(groceryID: Int?, menuID: Int?, recipeID: Int?, ingredientID: Int?) {
         let dispatchGroup = DispatchGroup()
         if let groceryID = groceryID {
             dispatchGroup.enter()
@@ -207,23 +217,33 @@ class MealProductSearchViewController: UIViewController {
                     }
                 }
             }
-        } else if let foodHint = foodHint, let food = foodHint.food, let foodID = food.foodID, let measures = foodHint.measures, let uri = measures[0].uri {
+        } else if let ingredientID = ingredientID {
             dispatchGroup.enter()
-            Service.shared.nutrientsSearch(foodId: foodID, measureURI: uri, quantity: nil, qualifiers: nil) { (search, err) in
-                if let nutrientSearch = search {
-                    print("nutrient \(nutrientSearch)")
-                    dispatchGroup.leave()
-                    dispatchGroup.notify(queue: .main) {
-                        self.movingBackwards = false
-                        let destination = FoodProductDetailViewController()
-                        destination.delegate = self
-                        destination.active = false
-                        destination.product = nutrientSearch
-                        destination.food = food
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    }
+            Service.shared.fetchIngredientInfo(id: ingredientID, amount: 1, unit: nil) { (search, err) in
+                let ingredient = search
+                dispatchGroup.leave()
+
+                dispatchGroup.notify(queue: .main) {
+                    self.movingBackwards = false
+                    let destination = IngredientDetailViewController()
+                    destination.delegate = self
+                    destination.active = false
+                    destination.ingredient = ingredient
+                    self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
+        }
+    }
+    
+    func fetchIngredients() {
+        reference = Database.database().reference().child("ingredients")
+        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let snapshotValue = snapshot.value {
+                self.ingredientDictionary = snapshotValue as! [String: Int]
+            }
+          })
+        { (error) in
+            print(error.localizedDescription)
         }
     }
     
@@ -245,29 +265,32 @@ extension MealProductSearchViewController: UITableViewDataSource, UITableViewDel
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let product = searchResults[indexPath.row]
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
-        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        cell.textLabel?.text = product.food?.label?.capitalized ?? ""
-//        if product.food?.category != "" {
-//            cell.detailTextLabel?.text = product.subtitle.capitalized
-//        }
+        if !searchResults.isEmpty {
+            let product = searchResults[indexPath.row]
+            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.textLabel?.text = product.title.capitalized
+            if product.subtitle != "" {
+                cell.detailTextLabel?.text = product.subtitle.capitalized
+            }
+        }
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let product = searchResults[indexPath.row]
-        fetchProductInfo(groceryID: nil, menuID: nil, recipeID: nil, foodHint: product)
-//        if let grocery = product.groceryProduct {
-//            fetchProductInfo(groceryID: grocery.id, menuID: nil, recipeID: nil)
-//        } else if let menu = product.menuProduct {
-//            fetchProductInfo(groceryID: nil, menuID: menu.id, recipeID: nil)
-//        } else if let recipe = product.recipeProduct {
-//            fetchProductInfo(groceryID: nil, menuID: nil, recipeID: recipe.id)
-//        }
+        if let grocery = product.groceryProduct {
+            fetchProductInfo(groceryID: grocery.id, menuID: nil, recipeID: nil, ingredientID: nil)
+        } else if let menu = product.menuProduct {
+            fetchProductInfo(groceryID: nil, menuID: menu.id, recipeID: nil, ingredientID: nil)
+        } else if let recipe = product.recipeProduct {
+            fetchProductInfo(groceryID: nil, menuID: nil, recipeID: recipe.id, ingredientID: nil)
+        } else if let ingredient = product.basicIngredient {
+            fetchProductInfo(groceryID: nil, menuID: nil, recipeID: nil, ingredientID: ingredient.id)
+        }
     }
 }
 
@@ -339,6 +362,15 @@ extension MealProductSearchViewController: UpdateListDelegate {
     }
     func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
         
+    }
+}
+
+extension MealProductSearchViewController: UpdateIngredientDelegate {
+    func updateIngredient(ingredient: ExtendedIngredient, close: Bool?) {
+        self.ingredient = ingredient
+        if let _ = close {
+            ingredientDelegate?.updateIngredient(ingredient: ingredient, close: nil)
+        }
     }
 }
 

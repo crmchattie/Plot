@@ -58,13 +58,16 @@ class Service {
         
     }
     
-    func fetchIngredientInfo(id: Int, completion: @escaping ((ExtendedIngredient?), Error?) -> ()) {
+    func fetchIngredientInfo(id: Int, amount: Int?, unit: String?, completion: @escaping ((ExtendedIngredient?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: "\(SpoonacularAPI.ingredientsString)/\(id)/information")!
         }()
         
-        let defaultParameters = ["apiKey": "\(SpoonacularAPI.apiKey)"]
+        var defaultParameters = ["apiKey": "\(SpoonacularAPI.apiKey)","amount": "\(amount ?? 1)"]
+        if unit != nil {
+            defaultParameters["unit"] = unit
+        }
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: defaultParameters)

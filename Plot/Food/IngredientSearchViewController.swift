@@ -54,7 +54,7 @@ class IngredientSearchViewController: UIViewController {
         
         if self.movingBackwards {
             if ingredient == nil {
-                ingredient = ExtendedIngredient(id: nil, aisle: nil, image: nil, consitency: nil, name: "IngredientName", original: nil, originalString: nil, originalName: nil, amount: nil, unit: nil, meta: nil, metaInformation: nil, measures: nil, recipe: nil, bool: nil, unitLong: nil, unitShort: nil, possibleUnits: nil)
+                ingredient = ExtendedIngredient(id: nil, aisle: nil, image: nil, consitency: nil, name: "IngredientName", original: nil, originalString: nil, originalName: nil, amount: nil, unit: nil, meta: nil, metaInformation: nil, measures: nil, recipe: nil, bool: nil, unitLong: nil, unitShort: nil, possibleUnits: nil, nutrition: nil, estimatedCost: nil, consistency: nil, categoryPath: nil)
             }
             ingredientDelegate?.updateIngredient(ingredient: ingredient, close: nil)
         }
@@ -172,7 +172,7 @@ class IngredientSearchViewController: UIViewController {
             }
         } else if let ingredientID = ingredientID {
             dispatchGroup.enter()
-            Service.shared.fetchIngredientInfo(id: ingredientID) { (search, err) in
+            Service.shared.fetchIngredientInfo(id: ingredientID, amount: 1, unit: nil) { (search, err) in
                 let ingredient = search
                 dispatchGroup.leave()
 

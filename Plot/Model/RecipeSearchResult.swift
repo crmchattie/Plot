@@ -100,6 +100,11 @@ struct ExtendedIngredient: Codable, Equatable, Hashable {
     var unitLong: String?
     var unitShort: String?
     var possibleUnits: [String]?
+    var shoppingListUnits: [String]?
+    let nutrition: Nutrition?
+    let estimatedCost: EstimatedCost?
+    let consistency: String?
+    let categoryPath: [String]?
     
     func toAnyObject() -> [String: AnyObject?] {
         var dictionary = [String: AnyObject?]()
@@ -172,6 +177,27 @@ struct ExtendedIngredient: Codable, Equatable, Hashable {
         if let value = self.possibleUnits as AnyObject? {
             dictionary["possibleUnits"] = value
         }
+        
+        if let value = self.shoppingListUnits as AnyObject? {
+            dictionary["shoppingListUnits"] = value
+        }
+        
+        if let value = self.nutrition as AnyObject? {
+            dictionary["nutrition"] = value
+        }
+        
+        if let value = self.estimatedCost {
+            let firebase = value.toAnyObject()
+            dictionary["estimatedCost"] = firebase as AnyObject
+        }
+        
+        if let value = self.consistency as AnyObject? {
+            dictionary["consistency"] = value
+        }
+        
+        if let value = self.categoryPath as AnyObject? {
+            dictionary["categoryPath"] = value
+        }
                         
         return dictionary
     }
@@ -196,6 +222,26 @@ struct Measures: Codable, Equatable, Hashable {
         if let value = self.metric {
             let firebase = value.toAnyObject()
             dictionary["metric"] = firebase as AnyObject
+        }
+        
+        return dictionary
+    }
+}
+
+// MARK: - EstimatedCost
+struct EstimatedCost: Codable, Equatable, Hashable {
+    let value: Double?
+    let unit: String?
+    
+    func toAnyObject() -> [String: AnyObject?] {
+        var dictionary = [String: AnyObject?]()
+        
+        if let value = self.value as AnyObject? {
+            dictionary["value"] = value
+        }
+        
+        if let value = self.unit as AnyObject? {
+            dictionary["unit"] = value
         }
         
         return dictionary
@@ -228,7 +274,7 @@ struct Metric: Codable, Equatable, Hashable {
 
 // MARK: - Nutrition
 struct Nutrition: Codable, Equatable, Hashable {
-    let nutrients: [Nutrient]?
+    let nutrients, properties: [Nutrient]?
     let ingredients: [Ient]?
     let caloricBreakdown: CaloricBreakdown?
     let weightPerServing: WeightPerServing?

@@ -1,23 +1,22 @@
 //
-//  FoodProductDetailViewController.swift
+//  MenuProductDetailViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 11/1/20.
+//  Created by Cory McHattie on 10/26/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import UIKit
 import Eureka
 
-protocol UpdateFoodProductDelegate: class {
-    func updateFoodProduct(foodProduct: NutrientSearch, close: Bool?)
+protocol UpdateMenuProductDelegate: class {
+    func updateMenuProduct(menuProduct: MenuProduct, close: Bool?)
 }
 
-class FoodProductDetailViewController: FormViewController {
-    weak var delegate : UpdateFoodProductDelegate?
+class MenuProductDetailViewController: FormViewController {
+    weak var delegate : UpdateMenuProductDelegate?
     
-    var product: NutrientSearch!
-    var food: Food!
+    var product: MenuProduct!
     
     var active: Bool = false
     fileprivate var movingBackwards: Bool = true
@@ -68,7 +67,7 @@ class FoodProductDetailViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Food Item"
+        navigationItem.title = "Restaurant Item"
     }
 
     @objc fileprivate func close() {
@@ -85,50 +84,53 @@ class FoodProductDetailViewController: FormViewController {
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
-            if let food = food {
-                $0.value = food.label?.capitalized
-            }
-            }.onChange() { [unowned self] row in
-                if row.value == nil {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = false
-                } else {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-                }
+            $0.value = product.title.capitalized
             }.cellUpdate { cell, _ in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
-            
         
-//        if let number_of_servings = product.number_of_servings, let serving_size = product.serving_size {
-//            form.last!
-//            <<< LabelRow("Servings") {
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                $0.title = $0.tag
-//                $0.value = "\(number_of_servings) servings per \(serving_size)"
-//                }.cellUpdate { cell, _ in
-//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                }
-//        }
+        if let restaurantChain = product.restaurantChain, restaurantChain != "" {
+            form.last!
+            <<< LabelRow("Restaurant") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.title = $0.tag
+                $0.value = restaurantChain.capitalized
+                }.cellUpdate { cell, _ in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+        }
         
-        if let nutrition = product.totalNutrients {
-            print("nutrition")
-            var values = Array(nutrition.values)
-            print("values \(values)")
-            values = values.sorted(by: { $0.label?.compare($1.label ?? "", options: .caseInsensitive) == .orderedAscending })
-            for value in values {
-                print("value \(value.label)")
-                if let label = value.label, let quantity = value.quantity, let unit = value.unit, quantity > 0 {
+        if let servingSize = product.servingSize {
+            form.last!
+            <<< LabelRow("Servings") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.title = $0.tag
+                $0.value = "\(servingSize)"
+                }.cellUpdate { cell, _ in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+        }
+        
+        form +++
+        Section(header: "Nutrition", footer: nil)
+        if let nutrition = product.nutrition, nutrition.nutrients != nil {
+            let nutrients = nutrition.nutrients!.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
+            for value in nutrients {
+                if let title = value.title, let amount = value.amount, let unit = value.unit, amount > 0 {
                     form.last!
-                    <<< LabelRow("\(label.capitalized)") {
+                    <<< LabelRow("\(title.capitalized)") {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                        $0.title = "\(label.capitalized)"
-                        $0.value = "\(quantity) \(unit)"
+                        $0.title = "\(title.capitalized)"
+                        $0.value = "\(amount) \(unit)"
                         }.onChange() { [unowned self] row in
                             if row.value == nil {
                                 self.navigationItem.rightBarButtonItem?.isEnabled = false

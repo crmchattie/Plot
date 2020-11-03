@@ -173,7 +173,7 @@ class IngredientDetailViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
-                $0.value = "\(ingredient.unit ?? "")"
+                $0.value = "\(ingredient.unit ?? "g")"
                 }.cellUpdate { cell, _ in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -186,6 +186,7 @@ class IngredientDetailViewController: FormViewController {
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.selectorTitle = "Choose Ingredient Units"
+                $0.value = "g"
                 $0.options = ingredient.possibleUnits ?? [""]
                 }.onPresent { from, to in
                     to.popoverPresentationController?.permittedArrowDirections = .up
@@ -232,6 +233,34 @@ class IngredientDetailViewController: FormViewController {
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     }
             }
+        }
+        
+        form +++
+        Section(header: "Nutrition", footer: nil)
+        if let nutrition = ingredient.nutrition, nutrition.nutrients != nil {
+            let nutrients = nutrition.nutrients!.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
+            for value in nutrients {
+                if let title = value.title, let amount = value.amount, let unit = value.unit, amount > 0 {
+                    form.last!
+                    <<< LabelRow("\(title.capitalized)") {
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.title = "\(title.capitalized)"
+                        $0.value = "\(amount) \(unit)"
+                        }.onChange() { [unowned self] row in
+                            if row.value == nil {
+                                self.navigationItem.rightBarButtonItem?.isEnabled = false
+                            } else {
+                                self.navigationItem.rightBarButtonItem?.isEnabled = true
+                            }
+                        }.cellUpdate { cell, _ in
+                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        }
+                }
+            }
+            
         }
         
     }

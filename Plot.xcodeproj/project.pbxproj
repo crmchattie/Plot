@@ -832,6 +832,20 @@
 			path = ShareExtension;
 			sourceTree = "<group>";
 		};
+		1037E4322550CD7400F4EE42 /* Food */ = {
+			isa = PBXGroup;
+			children = (
+				10B541E125479D3100CC9023 /* MealViewController.swift */,
+				10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */,
+				10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */,
+				1037E42C254F605400F4EE42 /* FoodProductDetailViewController.swift */,
+				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
+				10B541DD25479D0700CC9023 /* MealProductSearchViewController.swift */,
+				10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */,
+			);
+			path = Food;
+			sourceTree = "<group>";
+		};
 		1051AC94244F8AF80066761C /* MasterActivityController */ = {
 			isa = PBXGroup;
 			children = (
@@ -896,11 +910,6 @@
 			isa = PBXGroup;
 			children = (
 				1082C89624F0A91500CF6491 /* HealthViewController.swift */,
-				10B541E125479D3100CC9023 /* MealViewController.swift */,
-				10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */,
-				10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */,
-				1037E42C254F605400F4EE42 /* FoodProductDetailViewController.swift */,
-				10B541DD25479D0700CC9023 /* MealProductSearchViewController.swift */,
 			);
 			path = HealthViewController;
 			sourceTree = "<group>";
@@ -960,8 +969,6 @@
 				10FBC8B824BFECD500D0E6B5 /* ActivitylistViewController.swift */,
 				10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */,
 				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
-				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
-				10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */,
 				10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */,
 			);
 			path = Controllers;
@@ -1155,6 +1162,7 @@
 				1051AC94244F8AF80066761C /* MasterActivityController */,
 				10E93D5B24BE47A600F6EE18 /* MapViewController */,
 				1082C89324F0A8C800CF6491 /* HealthViewController */,
+				1037E4322550CD7400F4EE42 /* Food */,
 				1082C89224F0A8B000CF6491 /* FinanceViewController */,
 				1051AC99244F8C470066761C /* ListViewController */,
 				10C50F932273818D00111033 /* ActivityControllers */,

@@ -27,6 +27,9 @@ struct FoodProductContainer: Codable, Equatable, Hashable {
         if groceryProduct != nil {
             return "Grocery Item"
         } else if menuProduct != nil {
+            if menuProduct!.restaurantChain != "" {
+                return menuProduct!.restaurantChain ?? "Restaurant Item"
+            }
             return "Restaurant Item"
         } else if recipeProduct != nil {
             return "Recipe"

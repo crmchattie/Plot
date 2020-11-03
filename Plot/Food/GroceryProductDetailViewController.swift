@@ -113,6 +113,8 @@ class GroceryProductDetailViewController: FormViewController {
                 }
         }
         
+        form +++
+        Section(header: "Nutrition", footer: nil)
         if let nutrition = product.nutrition, nutrition.nutrients != nil {
             let nutrients = nutrition.nutrients!.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
             for value in nutrients {
