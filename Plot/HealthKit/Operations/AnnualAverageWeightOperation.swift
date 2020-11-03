@@ -22,7 +22,9 @@ class AnnualAverageWeightOperation: AsyncOperation {
     
     private func startFetchRequest() {
         let beatsPerMinuteUnit = HKUnit.pound()
-        HealthKitService.getDiscreteAverageSample(forIdentifier: .bodyMass, unit: beatsPerMinuteUnit, startDate: date.lastYear, endDate: date) { [weak self] weight in
+        var interval = DateComponents()
+        interval.year = 1
+        HealthKitService.getDiscreteAverageSample(forIdentifier: .bodyMass, unit: beatsPerMinuteUnit, startDate: date.lastYear, endDate: date, interval: interval) { [weak self] weight, date in
             guard let weight = weight, let _self = self else {
                 self?.finish()
                 return

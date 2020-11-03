@@ -105,7 +105,7 @@ class HealthMetricCell: UITableViewCell {
             title = hkWorkout.workoutActivityType.name
             timeAgo = timeAgoSinceDate(hkWorkout.endDate)
         }
-        else if healthMetric.type == HealthMetricType.heartRate {
+        else if healthMetric.type == HealthMetricType.heartRate || healthMetric.type == HealthMetricType.weight {
             timeAgo = timeAgoSinceDate(healthMetric.date)
         }
         

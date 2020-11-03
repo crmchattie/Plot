@@ -22,7 +22,9 @@ class AnnualAverageHeartRateOperation: AsyncOperation {
     
     private func startFetchRequest() {
         let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-        HealthKitService.getDiscreteAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit, startDate: date.lastYear, endDate: date) { [weak self] heartRate in
+        var interval = DateComponents()
+        interval.year = 1
+        HealthKitService.getDiscreteAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit, startDate: date.lastYear, endDate: date, interval: interval) { [weak self] heartRate, date in
             guard let heartRate = heartRate, let _self = self else {
                 self?.finish()
                 return

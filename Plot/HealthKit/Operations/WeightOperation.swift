@@ -23,14 +23,14 @@ class WeightOperation: AsyncOperation {
     
     private func startFetchRequest() {
         let beatsPerMinuteUnit = HKUnit.pound()
-        HealthKitService.getDiscreteAverageSample(forIdentifier: .bodyMass, unit: beatsPerMinuteUnit, date: self.startDate) { [weak self] weight in
+        HealthKitService.getLatestDiscreteDailyAverageSample(forIdentifier: .bodyMass, unit: beatsPerMinuteUnit) { [weak self] weight, date in
             
-            guard let weight = weight, let _self = self else {
+            guard let weight = weight, let date = date, let _self = self else {
                 self?.finish()
                 return
             }
 
-            var metric = HealthMetric(type: HealthMetricType.weight, total: weight, date: _self.startDate, unit: "lb", rank: HealthMetricType.weight.rank)
+            var metric = HealthMetric(type: HealthMetricType.weight, total: weight, date: date, unit: "lb", rank: HealthMetricType.weight.rank)
             metric.average = _self.annualAverageWeight
             
             _self.delegate?.insertMetric(_self, metric)

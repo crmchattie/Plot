@@ -27,28 +27,21 @@ class HeartRateOperation: AsyncOperation {
             return
         }
         
-        // Get the recent heart rate sample first
-        HealthKitService.getMostRecentSamples(for: sampleType, startDate: self.startDate.lastYear, endDate: self.startDate) { [weak self] (samples, error) in
-            guard let sample = samples?.last else {
+            
+        let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+        // Get average day heart rate for the most recent heart rate sample endDate
+        HealthKitService.getLatestDiscreteDailyAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit) { [weak self] heartRate, date in
+            
+            guard let heartRate = heartRate, let date = date, let _self = self else {
                 self?.finish()
                 return
             }
-            
-            let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-            // Get average day heart rate for the most recent heart rate sample endDate
-            HealthKitService.getDiscreteAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit, date: sample.endDate) { [weak self] heartRate in
-                
-                guard let heartRate = heartRate, let _self = self else {
-                    self?.finish()
-                    return
-                }
 
-                var metric = HealthMetric(type: HealthMetricType.heartRate, total: heartRate, date: sample.endDate, unit: "bpm", rank: HealthMetricType.heartRate.rank)
-                metric.average = _self.annualAverageHeartRate
-                
-                _self.delegate?.insertMetric(_self, metric)
-                self?.finish()
-            }
+            var metric = HealthMetric(type: HealthMetricType.heartRate, total: heartRate, date: date, unit: "bpm", rank: HealthMetricType.heartRate.rank)
+            metric.average = _self.annualAverageHeartRate
+            
+            _self.delegate?.insertMetric(_self, metric)
+            self?.finish()
         }
     }
 }
