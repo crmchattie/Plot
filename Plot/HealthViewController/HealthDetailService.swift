@@ -20,50 +20,127 @@ class HealthDetailService: HealthDetailServiceInterface {
     }
     
     private func getStatisticalSamples(for healthMetricType: HealthMetricType, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, Error?) -> Void) {
+        let calendar = NSCalendar.current
+        var interval = DateComponents()
+        var anchorComponents = calendar.dateComponents([.day, .month, .year, .weekday], from: Date())
+        var quantityType: HKQuantityType?
+        var statisticsOptions: HKStatisticsOptions = .discreteAverage
+        
+        var unit: HKUnit = HKUnit.count()
         if healthMetricType == .steps {
+            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
+                print("*** Unable to create a step count type ***")
+                completion(nil, nil)
+                return
+            }
             
-            if segmentType == .day {
-                HealthKitService.getHourlyStepsForToday(statisticsOptions: .cumulativeSum) { (results, error) in
-                    let stats = self.perpareCustomStats(from: results)
-                    completion(stats, nil)
+            statisticsOptions = .cumulativeSum
+            quantityType = type
+        }
+        else if healthMetricType == .weight {
+            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass) else {
+                print("*** Unable to create a step count type ***")
+                completion(nil, nil)
+                return
+            }
+            
+            unit = HKUnit.pound()
+            quantityType = type
+        }
+        else if healthMetricType == .heartRate {
+            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate) else {
+                print("*** Unable to create a step count type ***")
+                completion(nil, nil)
+                return
+            }
+            
+            unit = HKUnit.count().unitDivided(by: HKUnit.minute())
+            quantityType = type
+        }
+        
+        var anchorDate = Date()
+        var startDate = anchorDate
+        var endDate = anchorDate
+        
+        if segmentType == .day {
+            interval.hour = 1
+            anchorComponents.hour = 0
+            anchorDate = calendar.date(from: anchorComponents)!
+            endDate = Date()
+            startDate = calendar.startOfDay(for: endDate)
+        }
+        else if segmentType == .week {
+            interval.day = 1
+            anchorComponents.day! -= 7
+            anchorComponents.hour = 0
+            endDate = Date()
+            startDate = endDate.weekBefore
+        }
+        else if segmentType == .month {
+            interval.day = 1
+            anchorComponents.month! -= 1
+            anchorComponents.hour = 0
+            endDate = Date()
+            startDate = endDate.monthBefore
+        }
+        else if segmentType == .year {
+            if healthMetricType == .steps {
+                interval.day = 1
+            } else {
+                interval.month = 1
+            }
+            anchorComponents.year! -= 1
+            anchorComponents.hour = 0
+            endDate = Date()
+            startDate = endDate.lastYear
+        }
+        
+        guard let quantityTypeValue = quantityType else {
+            completion(nil, nil)
+            return
+        }
+        
+        HealthKitService.getIntervalBasedSamples(for: quantityTypeValue, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval) { (results, error) in
+            var stats: [Statistic]?
+            if healthMetricType == .steps {
+                if segmentType == .year {
+                    stats = self.perpareCustomStatsForDailyAverageForAnnualSteps(from: results)
+                } else {
+                    stats = self.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
                 }
             }
-            else if segmentType == .week {
-                HealthKitService.getDailyStepsForCurrentWeek(statisticsOptions: .cumulativeSum) { (results, error) in
-                    let stats = self.perpareCustomStats(from: results)
-                    completion(stats, nil)
-                }
+            else {
+                stats = self.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
             }
-            else if segmentType == .month {
-                HealthKitService.getDailyStepsForCurrentMonth(statisticsOptions: .cumulativeSum) { (results, error) in
-                    let stats = self.perpareCustomStats(from: results)
-                    completion(stats, nil)
-                }
-            }
-            else if segmentType == .year {
-                HealthKitService.getMonthlyStepsForCurrentYear(statisticsOptions: .cumulativeSum) { (results, error) in
-                    let stats = self.perpareCustomStatsForDailyAverageForAnnualSteps(from: results)
-                    completion(stats, nil)
-                }
-            }
+            
+            completion(stats, nil)
         }
     }
     
-    private func perpareCustomStats(from hkStatistics: [HKStatistics]?) -> [Statistic]? {
+    private func perpareCustomStats(from hkStatistics: [HKStatistics]?, unit: HKUnit, statisticsOptions: HKStatisticsOptions) -> [Statistic]? {
         guard let statsCollection = hkStatistics else {
             return nil
         }
         
         var customStats: [Statistic] = []
         for statistics in statsCollection {
-            var value: Double = 0
-            if let sumQuantity = statistics.sumQuantity() {
-                value = sumQuantity.doubleValue(for: HKUnit.count())
+            var value: Double?
+            if statisticsOptions == .cumulativeSum {
+                if let sumQuantity = statistics.sumQuantity() {
+                    value = sumQuantity.doubleValue(for: unit)
+                }
+            }
+            else if statisticsOptions == .discreteAverage {
+                if let sumQuantity = statistics.averageQuantity() {
+                    value = sumQuantity.doubleValue(for: unit)
+                }
             }
             
-            let date = statistics.startDate
-            let statistic = Statistic(date: date, value: value)
-            customStats.append(statistic)
+            if let value = value {
+                let date = statistics.startDate
+                let statistic = Statistic(date: date, value: value)
+                customStats.append(statistic)
+            }
         }
         
         return customStats

@@ -117,8 +117,6 @@ class HealthDetailViewController: UIViewController {
         chartView.marker = marker
         
         chartView.legend.form = .line
-        
-        chartView.animate(xAxisDuration: 2.5)
     }
     
     @objc func changeSegment(_ segmentedControl: UISegmentedControl) {        
@@ -129,12 +127,14 @@ class HealthDetailViewController: UIViewController {
     func fetchHealthKitData() {
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        viewModel.fetchChartData(for: segmentType) { (data, maxValue) in
-            guard let data = data else { return }
+        viewModel.fetchChartData(for: segmentType) { [weak self] (data, maxValue) in
+            guard let data = data, let weakSelf = self else { return }
             
-            self.chartView.data = data
-            self.chartView.rightAxis.axisMaximum = maxValue
-            self.dayAxisValueFormatter?.formatType = self.segmentedControl.selectedSegmentIndex
+            weakSelf.chartView.data = data
+            weakSelf.chartView.rightAxis.axisMaximum = maxValue
+            weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
+            weakSelf.chartView.resetZoom()
+            weakSelf.chartView.animate(xAxisDuration: 1)
         }
     }
 }

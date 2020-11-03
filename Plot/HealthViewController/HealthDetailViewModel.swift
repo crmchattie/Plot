@@ -27,10 +27,11 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
     
     func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double) -> ()) {
         healthDetailService.getSamples(for: healthMetric.type, segmentType: segmentType) { (stats, error) in
-            guard let stats = stats else {
+            guard let stats = stats, stats.count > 0 else {
                 completion(nil, 0)
                 return
             }
+            
             var i = 0
             var entries: [ChartDataEntry] = []
             var maxValue: Double = 0
@@ -64,7 +65,7 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
             
             let data = LineChartData(dataSet: dataSet)
             data.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
-            maxValue *= 1.2
+            maxValue *= 1.3
             DispatchQueue.main.async {
                 completion(data, maxValue)
             }
