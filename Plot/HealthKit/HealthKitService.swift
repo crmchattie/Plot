@@ -110,7 +110,12 @@ class HealthKitService {
         healthStore.execute(sampleQuery)
     }
 
-    class func getIntervalBasedSamples(for quantityType: HKQuantityType, statisticsOptions: HKStatisticsOptions, startDate: Date, endDate: Date, anchorDate: Date, interval: DateComponents, completion: @escaping ([HKStatistics]?, Error?) -> Void) {
+    class func getIntervalBasedSamples(for quantityType: HKQuantityType,
+                                       statisticsOptions: HKStatisticsOptions,
+                                       startDate: Date, endDate: Date,
+                                       anchorDate: Date,
+                                       interval: DateComponents,
+                                       completion: @escaping ([HKStatistics]?, Error?) -> Void) {
          
         // Create the query
         let query = HKStatisticsCollectionQuery(quantityType: quantityType,
@@ -229,7 +234,7 @@ class HealthKitService {
                               startDate: Date,
                               endDate: Date,
                               completion: @escaping ([HKWorkout]?, Error?) -> Void) {
-        // Get all workouts with the "Other" activity type.
+        // Get all workouts with the given workoutActivityType
         let workoutPredicate = HKQuery.predicateForWorkouts(with: workoutActivityType)
         
         let datePredicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)

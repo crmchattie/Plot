@@ -128,7 +128,7 @@ class HealthDetailViewController: UIViewController {
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
         viewModel.fetchChartData(for: segmentType) { [weak self] (data, maxValue) in
-            guard let data = data, let weakSelf = self else { return }
+            guard let weakSelf = self else { return }
             
             weakSelf.chartView.data = data
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
