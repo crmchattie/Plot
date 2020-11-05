@@ -5,7 +5,7 @@ PODS:
   - Charts/Core (3.6.0)
   - CodableFirebase (0.2.1)
   - CropViewController (2.5.3)
-  - Eureka (5.2.1)
+  - Eureka (5.3.2)
   - Firebase/Analytics (6.27.0):
     - Firebase/Core
   - Firebase/Auth (6.27.0):
@@ -189,7 +189,7 @@ SPEC CHECKSUMS:
   Charts: b1e3a1f5a1c9ba5394438ca3b91bd8c9076310af
   CodableFirebase: 0bf201991eeec35eb9fcd987d271ea463cf34a80
   CropViewController: a5c143548a0fabcd6cc25f2d26e40460cfb8c78c
-  Eureka: c883105488e05bc65539f583246ecf9657cabbfe
+  Eureka: 1c2b8b5892bfb0e972d0fe05f8c09fd89f8625ec
   Firebase: fc4cbf6f1592636431821ef9a3c557e4dfd9f268
   FirebaseAnalytics: 0ea640473474f036cabbc2576e20c2d63671c92f
   FirebaseAuth: b85c064e0ac60f82486728d50a4803f235687302
