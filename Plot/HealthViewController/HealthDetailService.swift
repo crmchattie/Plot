@@ -104,7 +104,9 @@ class HealthDetailService: HealthDetailServiceInterface {
                 } else {
                     stats = self?.perpareCustomStatsForDailyWorkouts(from: workouts, segmentType: segmentType)
                 }
-                completion(stats, workouts, nil)
+                
+                let sortedWorkouts = workouts?.sorted(by: {$0.startDate > $1.startDate})
+                completion(stats, sortedWorkouts, nil)
             }
         }
         else {

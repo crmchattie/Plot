@@ -10,7 +10,7 @@ import UIKit
 import Charts
 import HealthKit
 
-fileprivate let sampleCellID = "sampleCellID"
+fileprivate let healthDetailSampleCellID = "HealthDetailSampleCellID"
 
 class HealthDetailViewController: UIViewController {
     
@@ -105,8 +105,8 @@ class HealthDetailViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         ])
         
-        tableView.separatorStyle = .none
-        tableView.register(HealthMetricCell.self, forCellReuseIdentifier: sampleCellID)
+        tableView.separatorStyle = .singleLine
+        tableView.register(HealthDetailSampleCell.self, forCellReuseIdentifier: healthDetailSampleCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
@@ -194,16 +194,10 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: sampleCellID, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: healthDetailSampleCellID, for: indexPath) as! HealthDetailSampleCell
         cell.backgroundColor = tableView.backgroundColor
         let sample = viewModel.samples[indexPath.row]
-        let interval = NSDateInterval(start: sample.startDate, end: sample.endDate)
-        cell.textLabel?.text = interval.duration.stringTime
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd, yyy at hh:mm:ss a"
-        
-        cell.detailTextLabel?.text = dateFormatter.string(from: sample.startDate)
+        cell.configure(sample)
         return cell
     }
 }

@@ -1587,14 +1587,17 @@ extension TimeInterval {
     }
 
     var stringTime: String {
-        if hours != 0 {
-            return "\(hours)h \(minutes)m \(seconds)s"
-        } else if minutes != 0 {
-            return "\(minutes)m \(seconds)s"
-        } else if milliseconds != 0 {
-            return "\(seconds)s \(milliseconds)ms"
-        } else {
-            return "\(seconds)s"
+        var time = ""
+        if hours > 0 {
+            time = "\(hours)h "
         }
+        if minutes > 0 {
+            time += "\(minutes)m "
+        }
+        if seconds > 0 {
+            time += "\(seconds)s"
+        }
+        
+        return time
     }
 }

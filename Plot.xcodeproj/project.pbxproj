@@ -185,6 +185,7 @@
 		26B975ED2365374A003BFBE3 /* InvitationsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */; };
 		26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C4431C250F0CB000A9533C /* HealthMetric.swift */; };
 		26CDFB22239E278200567666 /* NewUserActivities.json in Resources */ = {isa = PBXBuildFile; fileRef = 26CDFB21239E278200567666 /* NewUserActivities.json */; };
+		26D37B6A2556004B00F7131B /* HealthDetailSampleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D37B692556004B00F7131B /* HealthDetailSampleCell.swift */; };
 		26E3179B2379FB72007D1F21 /* ActivityTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E3179A2379FB72007D1F21 /* ActivityTypeViewController.swift */; };
 		26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */; };
 		26E8E3A6238B2CA9000F30C8 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E8E3A5238B2CA9000F30C8 /* NotificationsViewController.swift */; };
@@ -569,6 +570,7 @@
 		26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationsFetcher.swift; sourceTree = "<group>"; };
 		26C4431C250F0CB000A9533C /* HealthMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthMetric.swift; sourceTree = "<group>"; };
 		26CDFB21239E278200567666 /* NewUserActivities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = NewUserActivities.json; sourceTree = "<group>"; };
+		26D37B692556004B00F7131B /* HealthDetailSampleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthDetailSampleCell.swift; sourceTree = "<group>"; };
 		26E3179A2379FB72007D1F21 /* ActivityTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeViewController.swift; sourceTree = "<group>"; };
 		26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeCell.swift; sourceTree = "<group>"; };
 		26E8E3A5238B2CA9000F30C8 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
@@ -880,6 +882,7 @@
 				26B453AA254F8FCA00C63093 /* HealthDetailService.swift */,
 				269105F92549D66800A02C5F /* HealthDetailViewModel.swift */,
 				269105E5253D464300A02C5F /* HealthDetailViewController.swift */,
+				26D37B692556004B00F7131B /* HealthDetailSampleCell.swift */,
 			);
 			path = HealthViewController;
 			sourceTree = "<group>";
@@ -2346,6 +2349,7 @@
 				4BAEE5E6212735E50045AB10 /* EnterVerificationContainerView.swift in Sources */,
 				10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */,
 				4BAEE52021272D890045AB10 /* GroupAdminControlsPictureAvatarOpenerDelegate.swift in Sources */,
+				26D37B6A2556004B00F7131B /* HealthDetailSampleCell.swift in Sources */,
 				4BAEE5F2212735E50045AB10 /* UserDefaultsManager.swift in Sources */,
 				4BAEE50721272D890045AB10 /* ContactDataTableViewCell.swift in Sources */,
 				4BAEE54E212735880045AB10 /* Message.swift in Sources */,
