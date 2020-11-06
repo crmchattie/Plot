@@ -10,16 +10,16 @@ import Foundation
 import HealthKit
 
 protocol HealthDetailServiceInterface {
-    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, Error?) -> Swift.Void)
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
 }
 
 class HealthDetailService: HealthDetailServiceInterface {
-    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, Error?) -> Swift.Void) {
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
         
         getStatisticalSamples(for: healthMetric, segmentType: segmentType, completion: completion)
     }
     
-    private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, Error?) -> Void) {
+    private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
         let healthMetricType = healthMetric.type
         let calendar = NSCalendar.current
         var interval = DateComponents()
@@ -31,7 +31,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         if healthMetricType == .steps {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
                 print("*** Unable to create a step count type ***")
-                completion(nil, nil)
+                completion(nil, nil, nil)
                 return
             }
             
@@ -41,7 +41,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         else if healthMetricType == .weight {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass) else {
                 print("*** Unable to create a step count type ***")
-                completion(nil, nil)
+                completion(nil, nil, nil)
                 return
             }
             
@@ -51,7 +51,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         else if healthMetricType == .heartRate {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate) else {
                 print("*** Unable to create a step count type ***")
-                completion(nil, nil)
+                completion(nil, nil, nil)
                 return
             }
             
@@ -104,12 +104,12 @@ class HealthDetailService: HealthDetailServiceInterface {
                 } else {
                     stats = self?.perpareCustomStatsForDailyWorkouts(from: workouts, segmentType: segmentType)
                 }
-                completion(stats, nil)
+                completion(stats, workouts, nil)
             }
         }
         else {
             guard let quantityTypeValue = quantityType else {
-                completion(nil, nil)
+                completion(nil, nil, nil)
                 return
             }
             
@@ -126,7 +126,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                     stats = self?.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
                 }
                 
-                completion(stats, nil)
+                completion(stats, nil, nil)
             }
         }
     }

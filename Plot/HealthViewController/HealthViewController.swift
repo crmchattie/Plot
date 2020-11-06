@@ -48,6 +48,9 @@ class HealthViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(tableView)
+        tableView.dataSource = self
+        tableView.delegate = self
+        
         view.addSubview(spinner)
         
         configureView()
@@ -108,8 +111,6 @@ class HealthViewController: UIViewController {
         ])
         
         tableView.separatorStyle = .none
-        tableView.dataSource = self
-        tableView.delegate = self
         tableView.register(HealthMetricCell.self, forCellReuseIdentifier: healthMetricCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle

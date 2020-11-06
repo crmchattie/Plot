@@ -10,6 +10,8 @@ import UIKit
 import Charts
 import HealthKit
 
+fileprivate let sampleCellID = "sampleCellID"
+
 class HealthDetailViewController: UIViewController {
     
     private var viewModel: HealthDetailViewModelInterface
@@ -26,6 +28,13 @@ class HealthDetailViewController: UIViewController {
         segmentedControl.addTarget(self, action: #selector(changeSegment(_:)), for: .valueChanged)
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
         return segmentedControl
+    }()
+    
+    lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        return tableView
     }()
     
     init(viewModel: HealthDetailViewModelInterface) {
@@ -54,13 +63,21 @@ class HealthDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.title = viewModel.healthMetric.type.name
+        if viewModel.healthMetric.type == HealthMetricType.workout, let hkWorkout = viewModel.healthMetric.hkWorkout {
+            title = hkWorkout.workoutActivityType.name
+        } else {
+            self.title = viewModel.healthMetric.type.name
+        }
         
         addObservers()
         changeTheme()
         
         view.addSubview(chartView)
         chartView.delegate = self
+        
+        view.addSubview(tableView)
+        tableView.dataSource = self
+        tableView.delegate = self
         
         view.addSubview(segmentedControl)
         segmentedControl.selectedSegmentIndex = 0
@@ -80,8 +97,21 @@ class HealthDetailViewController: UIViewController {
             chartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 10),
             chartView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             chartView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-            chartView.heightAnchor.constraint(equalToConstant: 260)
+            chartView.heightAnchor.constraint(equalToConstant: 260),
+            
+            tableView.topAnchor.constraint(equalTo: chartView.bottomAnchor, constant: 10),
+            tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+            tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         ])
+        
+        tableView.separatorStyle = .none
+        tableView.register(HealthMetricCell.self, forCellReuseIdentifier: sampleCellID)
+        tableView.allowsMultipleSelectionDuringEditing = false
+        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.backgroundColor = view.backgroundColor
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 105
     }
     
     func configureChart() {
@@ -135,6 +165,7 @@ class HealthDetailViewController: UIViewController {
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.animate(xAxisDuration: 1)
+            weakSelf.tableView.reloadData()
         }
     }
 }
@@ -154,6 +185,26 @@ extension HealthDetailViewController: ChartViewDelegate {
     
     func chartTranslated(_ chartView: ChartViewBase, dX: CGFloat, dY: CGFloat) {
         
+    }
+}
+
+extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.samples.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: sampleCellID, for: indexPath)
+        cell.backgroundColor = tableView.backgroundColor
+        let sample = viewModel.samples[indexPath.row]
+        let interval = NSDateInterval(start: sample.startDate, end: sample.endDate)
+        cell.textLabel?.text = interval.duration.stringTime
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM dd, yyy at hh:mm:ss a"
+        
+        cell.detailTextLabel?.text = dateFormatter.string(from: sample.startDate)
+        return cell
     }
 }
 

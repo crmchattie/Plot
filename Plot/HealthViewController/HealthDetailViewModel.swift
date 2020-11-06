@@ -12,6 +12,7 @@ import HealthKit
 
 protocol HealthDetailViewModelInterface {
     var healthMetric: HealthMetric { get }
+    var samples: [HKSample] { get }
     
     func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double) -> ())
 }
@@ -19,6 +20,7 @@ protocol HealthDetailViewModelInterface {
 class HealthDetailViewModel: HealthDetailViewModelInterface {
     let healthMetric: HealthMetric
     let healthDetailService: HealthDetailServiceInterface
+    var samples: [HKSample] = []
     
     init(healthMetric: HealthMetric, healthDetailService: HealthDetailServiceInterface) {
         self.healthMetric = healthMetric
@@ -26,7 +28,9 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
     }
     
     func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double) -> ()) {
-        healthDetailService.getSamples(for: healthMetric, segmentType: segmentType) { (stats, error) in
+        healthDetailService.getSamples(for: healthMetric, segmentType: segmentType) { [weak self] (stats, samples, error) in
+            self?.samples = samples ?? []
+
             var data: LineChartData?
             var maxValue: Double = 0
             if let stats = stats, stats.count > 0 {
