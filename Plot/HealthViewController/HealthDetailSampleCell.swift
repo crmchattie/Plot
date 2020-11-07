@@ -10,7 +10,9 @@ import UIKit
 import HealthKit
 
 class HealthDetailSampleCell: UITableViewCell {
-
+    
+    var healthMetricType: HealthMetricType?
+    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -104,24 +106,56 @@ class HealthDetailSampleCell: UITableViewCell {
     }
     
     func configure(_ sample: HKSample) {
-        let interval = NSDateInterval(start: sample.startDate, end: sample.endDate)
-        titleLabel.text = interval.duration.stringTime
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd, yyy hh:mm:ss a"
-        
-        titleLabelRight.text = dateFormatter.string(from: sample.startDate)
-        
-        if let workout = sample as? HKWorkout {
-            let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
-            subtitleLabel.text = "\(totalEnergyBurned.clean) calories"
-        } else {
-            subtitleLabel.text = ""
-        }
-        
         titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         titleLabelRight.textColor = ThemeManager.currentTheme().generalTitleColor
         subtitleLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
         detailLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        
+        let interval = NSDateInterval(start: sample.startDate, end: sample.endDate)
+        titleLabel.text = interval.duration.stringTime
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM dd, yyy hh:mm a"
+        
+        titleLabelRight.text = dateFormatter.string(from: sample.startDate)
+        
+        guard let type = healthMetricType else {
+            return
+        }
+        
+        if type == .workout, let workout = sample as? HKWorkout {
+            let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
+            subtitleLabel.text = "\(totalEnergyBurned.clean) calories"
+        }
+        else if type == .heartRate, let quantitySample = sample as? HKQuantitySample {
+            let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+            let count = quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit)
+            let string = "\(count) bpm"
+            if let text = titleLabel.text, text.isEmpty {
+                titleLabel.text = string
+            } else {
+                subtitleLabel.text = string
+            }
+        }
+        else if type == .weight, let quantitySample = sample as? HKQuantitySample {
+            let unit = HKUnit.pound()
+            let count = quantitySample.quantity.doubleValue(for: unit)
+            let string = "\(count) lb"
+            if let text = titleLabel.text, text.isEmpty {
+                titleLabel.text = string
+            } else {
+                subtitleLabel.text = string
+            }
+        }
+        else if type == .steps, let quantitySample = sample as? HKQuantitySample {
+            let unit = HKUnit.count()
+            let count = Int(quantitySample.quantity.doubleValue(for: unit))
+            let string = "\(count) steps"
+            if let text = titleLabel.text, text.isEmpty {
+                titleLabel.text = string
+            } else {
+                subtitleLabel.text = string
+            }
+        }
     }
 }

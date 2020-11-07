@@ -29,7 +29,6 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
     
     func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double) -> ()) {
         healthDetailService.getSamples(for: healthMetric, segmentType: segmentType) { [weak self] (stats, samples, error) in
-            self?.samples = samples ?? []
 
             var data: LineChartData?
             var maxValue: Double = 0
@@ -70,6 +69,7 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
             }
             
             DispatchQueue.main.async {
+                self?.samples = samples ?? []
                 completion(data, maxValue)
             }
         }

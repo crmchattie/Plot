@@ -165,6 +165,8 @@ class HealthDetailViewController: UIViewController {
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.animate(xAxisDuration: 1)
+            
+            weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
             weakSelf.tableView.reloadData()
         }
     }
@@ -196,6 +198,7 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: healthDetailSampleCellID, for: indexPath) as! HealthDetailSampleCell
         cell.backgroundColor = tableView.backgroundColor
+        cell.healthMetricType = viewModel.healthMetric.type
         let sample = viewModel.samples[indexPath.row]
         cell.configure(sample)
         return cell

@@ -128,7 +128,9 @@ class HealthDetailService: HealthDetailServiceInterface {
                     stats = self?.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
                 }
                 
-                completion(stats, nil, nil)
+                HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
+                    completion(stats, samples, nil)
+                }
             }
         }
     }
