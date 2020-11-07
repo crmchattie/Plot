@@ -10,8 +10,7 @@ import UIKit
 import Firebase
 
 class IngredientSearchViewController: UIViewController {
-    weak var ingredientDelegate : UpdateIngredientDelegate?
-    weak var groceryDelegate : UpdateGroceryProductDelegate?
+    weak var delegate : UpdateFoodProductContainerDelegate?
     
     var searchBar: UISearchBar?
     let searchResultsTableView = UITableView()
@@ -19,10 +18,11 @@ class IngredientSearchViewController: UIViewController {
     fileprivate var movingBackwards: Bool = true
     
     var ingredientDictionary = [String: Int]()
-    var searchResults = [FoodProductContainer]()
     
-    var ingredient: ExtendedIngredient!
-    var groceryProduct: GroceryProduct!
+    var sections = [SectionType]()
+    var groups = [SectionType: [AnyHashable]]()
+    
+    var foodProductContainer: FoodProductContainer!
     
     var viewPlaceholder = ViewPlaceholder()
     
@@ -47,16 +47,23 @@ class IngredientSearchViewController: UIViewController {
         }
         
         fetchIngredients()
+        
+        if sections.isEmpty {
+            checkIfThereAreAnyResults(isEmpty: true)
+        } else {
+            checkIfThereAreAnyResults(isEmpty: false)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         if self.movingBackwards {
-            if ingredient == nil {
-                ingredient = ExtendedIngredient(id: nil, aisle: nil, image: nil, consitency: nil, name: "IngredientName", original: nil, originalString: nil, originalName: nil, amount: nil, unit: nil, meta: nil, metaInformation: nil, measures: nil, recipe: nil, bool: nil, unitLong: nil, unitShort: nil, possibleUnits: nil, nutrition: nil, estimatedCost: nil, consistency: nil, categoryPath: nil)
+            if foodProductContainer == nil {
+                let ingredient = ExtendedIngredient(id: nil, aisle: nil, image: nil, consitency: nil, name: "IngredientName", original: nil, originalString: nil, originalName: nil, amount: nil, unit: nil, meta: nil, metaInformation: nil, measures: nil, recipe: nil, bool: nil, unitLong: nil, unitShort: nil, possibleUnits: nil, nutrition: nil, estimatedCost: nil, consistency: nil, categoryPath: nil)
+                foodProductContainer = FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil)
             }
-            ingredientDelegate?.updateIngredient(ingredient: ingredient, close: nil)
+            delegate?.updateFoodProductContainer(foodProductContainer: foodProductContainer, close: nil)
         }
     }
     
@@ -123,13 +130,15 @@ class IngredientSearchViewController: UIViewController {
     }
     
     func fetchProducts(query: String) {
-        searchResults = []
+        self.sections = []
+        self.groups = [SectionType: [AnyHashable]]()
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
         Service.shared.fetchGroceryProducts(query: query) { (search, err) in
             if let products = search?.products {
-                let groceryProducts = products.map { FoodProductContainer(groceryProduct: $0, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil) }
-                self.searchResults.append(contentsOf: groceryProducts)
+                let sortedProducts = products.sorted(by: { $0.title.compare($1.title , options: .caseInsensitive) == .orderedAscending })
+                self.sections.append(.groceryItems)
+                self.groups[.groceryItems] = sortedProducts
             }
             dispatchGroup.leave()
         }
@@ -137,18 +146,18 @@ class IngredientSearchViewController: UIViewController {
         dispatchGroup.enter()
         let basicIngredientsDict = ingredientDictionary.filterDictionaryUsingRegex(withRegex: query)
         if !basicIngredientsDict.isEmpty {
-            let basicIngredients = basicIngredientsDict.map { key, value in
+            var basicIngredients = basicIngredientsDict.map { key, value in
                 BasicIngredient(title: key, id: value)
             }
-            let foodProductContainer = basicIngredients.map { FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: $0) }
-            self.searchResults.append(contentsOf: foodProductContainer)
+            basicIngredients = basicIngredients.sorted(by: { $0.title.compare($1.title , options: .caseInsensitive) == .orderedAscending })
+            self.sections.append(.ingredients)
+            self.groups[.ingredients] = basicIngredients
             dispatchGroup.leave()
         } else {
             dispatchGroup.leave()
         }
         
         dispatchGroup.notify(queue: .main) {
-            self.searchResults = self.searchResults.sorted(by: { $0.title.compare($1.title, options: .caseInsensitive) == .orderedAscending })
             self.searchResultsTableView.reloadData()
         }
     }
@@ -166,6 +175,7 @@ class IngredientSearchViewController: UIViewController {
                     destination.delegate = self
                     destination.active = false
                     destination.product = product
+                    destination.searchController = "GroceryListSearch"
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
 
@@ -182,6 +192,7 @@ class IngredientSearchViewController: UIViewController {
                     destination.delegate = self
                     destination.active = false
                     destination.ingredient = ingredient
+                    destination.searchController = "GroceryListSearch"
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
@@ -201,6 +212,65 @@ class IngredientSearchViewController: UIViewController {
     }
 }
 
+extension IngredientSearchViewController: UITableViewDataSource, UITableViewDelegate {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return sections.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if sections.isEmpty {
+            checkIfThereAreAnyResults(isEmpty: true)
+        } else {
+            checkIfThereAreAnyResults(isEmpty: false)
+        }
+        let sec = sections[section]
+        return groups[sec]?.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        let section = sections[indexPath.section]
+        if let object = groups[section] as? [GroceryProduct] {
+            cell.textLabel?.text = object[indexPath.item].title.capitalized
+        } else if let object = groups[section] as? [MenuProduct] {
+            cell.textLabel?.text = object[indexPath.item].title.capitalized
+            if let restaurantChain = object[indexPath.item].restaurantChain, restaurantChain != "" {
+                cell.detailTextLabel?.text = restaurantChain.capitalized
+            }
+        } else if let object = groups[section] as? [BasicIngredient] {
+            cell.textLabel?.text = object[indexPath.item].title.capitalized
+        }
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let section = sections[indexPath.section]
+        if let object = groups[section] as? [GroceryProduct] {
+            fetchProductInfo(groceryID: object[indexPath.item].id, ingredientID: nil)
+        } else if let object = groups[section] as? [BasicIngredient] {
+            fetchProductInfo(groceryID: nil, ingredientID: object[indexPath.item].id)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        sections[section].name
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        if let headerTitle = view as? UITableViewHeaderFooterView {
+            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+    }
+    
+
+}
+
 extension IngredientSearchViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -218,48 +288,13 @@ extension IngredientSearchViewController: UISearchBarDelegate {
     }
 }
 
-extension IngredientSearchViewController: UITableViewDataSource, UITableViewDelegate {
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchResults.count == 0 {
-            checkIfThereAreAnyResults(isEmpty: true)
-        } else {
-            checkIfThereAreAnyResults(isEmpty: false)
-        }
-        return searchResults.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let product = searchResults[indexPath.row]
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
-        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        cell.textLabel?.text = product.title.capitalized
-        if product.subtitle != "" {
-            cell.detailTextLabel?.text = product.subtitle.capitalized
-        }
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let product = searchResults[indexPath.row]
-        if let grocery = product.groceryProduct {
-            fetchProductInfo(groceryID: grocery.id, ingredientID: nil)
-        } else if let ingredient = product.basicIngredient {
-            fetchProductInfo(groceryID: nil, ingredientID: ingredient.id)
-        }
-    }
-    
-
-}
-
 extension IngredientSearchViewController {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.endEditing(true)
+        timer?.invalidate()
+        self.fetchProducts(query: searchBar.text?.lowercased() ?? "")
+    }
     
     func updateSearchResults(for searchController: UISearchController) {}
     
@@ -280,20 +315,11 @@ extension IngredientSearchViewController {
     }
 }
 
-extension IngredientSearchViewController: UpdateIngredientDelegate {
-    func updateIngredient(ingredient: ExtendedIngredient, close: Bool?) {
-        self.ingredient = ingredient
+extension IngredientSearchViewController: UpdateFoodProductContainerDelegate {
+    func updateFoodProductContainer(foodProductContainer: FoodProductContainer?, close: Bool?) {
+        self.foodProductContainer = foodProductContainer
         if let _ = close {
-            ingredientDelegate?.updateIngredient(ingredient: ingredient, close: nil)
-        }
-    }
-}
-
-extension IngredientSearchViewController: UpdateGroceryProductDelegate {
-    func updateGroceryProduct(groceryProduct: GroceryProduct, close: Bool?) {
-        self.groceryProduct = groceryProduct
-        if let _ = close {
-            groceryDelegate?.updateGroceryProduct(groceryProduct: groceryProduct, close: nil)
+            delegate?.updateFoodProductContainer(foodProductContainer: foodProductContainer, close: nil)
         }
     }
 }

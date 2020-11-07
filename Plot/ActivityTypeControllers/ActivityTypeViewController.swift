@@ -569,7 +569,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 if section.type == "FSVenue" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: lat, long: lon) { (search, err) in
-                        if let object = search?.response?.groups?[0].items {
+                        if let object = search?.response?.groups?[0].items, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -579,7 +579,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if section.type == "Event" {
                     dispatchGroup.enter()
                     Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "", lat: lat, long: lon) { (search, err) in
-                        if let object = search?.embedded?.events {
+                        if let object = search?.embedded?.events, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -589,7 +589,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if section.type == "SygicPlace" {
                     dispatchGroup.enter()
                     Service.shared.fetchSygicPlacesLatLong(limit: "30", offset: "", query: "", categories: ["discovering", "sightseeing"], categories_not: [], parent_place_id: "", place_ids: "", tags: "", tags_not: "", prefer_unique: "", city: "", stateCode: "", countryCode: "", lat: lat, long: lon, radius: "1000") { (search, err) in
-                        if let object = search?.data?.places {
+                        if let object = search?.data?.places, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -617,7 +617,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if section.type == "Recipe" {
                     dispatchGroup.enter()
                     Service.shared.fetchRecipesComplex(query: "", cuisine: [section.searchTerm], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-                        if let object = search?.recipes {
+                        if let object = search?.recipes, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -629,7 +629,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 if section.type == "FSVenue" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSExplore(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras) { (search, err) in
-                        if let object = search?.response?.groups?[0].items {
+                        if let object = search?.response?.groups?[0].items, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -639,7 +639,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if section.type == "Event" {
                     dispatchGroup.enter()
                     Service.shared.fetchEventsSegment(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
-                        if let object = search?.embedded?.events {
+                        if let object = search?.embedded?.events, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -649,7 +649,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if section.type == "SygicPlace" {
                     dispatchGroup.enter()
                     Service.shared.fetchSygicPlaces(limit: "30", offset: "", query: "", categories: ["discovering", "sightseeing"], categories_not: [], parent_place_id: "", place_ids: "", tags: "", tags_not: "", prefer_unique: "", city: "", stateCode: "", countryCode: "", radius: "1000") { (search, err) in
-                        if let object = search?.data?.places {
+                        if let object = search?.data?.places, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -677,7 +677,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else if section.type == "Recipe" {
                     dispatchGroup.enter()
                     Service.shared.fetchRecipesComplex(query: "", cuisine: [section.searchTerm], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-                        if let object = search?.recipes {
+                        if let object = search?.recipes, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})

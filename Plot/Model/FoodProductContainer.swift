@@ -8,6 +8,10 @@
 
 import Foundation
 
+protocol UpdateFoodProductContainerDelegate: class {
+    func updateFoodProductContainer(foodProductContainer: FoodProductContainer?, close: Bool?)
+}
+
 struct FoodProductContainer: Codable, Equatable, Hashable {
     var groceryProduct: GroceryProduct?
     var menuProduct: MenuProduct?

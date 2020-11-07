@@ -300,6 +300,21 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
         })
     }
     
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        searchBar.endEditing(true)
+        
+        timer?.invalidate()
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+            self.complexSearch(query: searchBar.text?.lowercased() ?? "", eventType: self.filterDictionary["eventType"]?[0] ?? "", eventStartDate: self.filterDictionary["eventStartDate"]?[0] ?? "", eventEndDate: self.filterDictionary["eventEndDate"]?[0] ?? "", zipcode: self.filterDictionary["zipcode"]?[0] ?? "", city: self.filterDictionary["city"]?[0] ?? "", state: self.filterDictionary["state"]?[0] ?? "", country: self.filterDictionary["country"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+        })
+    }
+    
     func complexSearch(query: String, eventType: String, eventStartDate: String, eventEndDate: String, zipcode: String, city: String, state: String, country: String, favorites: String) {
         print("query \(query), eventType \(eventType), eventStartDate \(eventStartDate), eventEndDate \(eventEndDate), zipcode \(zipcode), city \(city), state \(state), country \(country), favorites \(favorites)")
         
@@ -432,7 +447,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 } else if let lat = self.lat, let lon = self.lon {
                     dispatchGroup.enter()
                     Service.shared.fetchEventsSegmentLatLong(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "", lat: lat, long: lon) { (search, err) in
-                        if let object = search?.embedded?.events {
+                        if let object = search?.embedded?.events, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -443,7 +458,7 @@ class EventTypeViewController: ActivitySubTypeViewController, UISearchBarDelegat
                 } else {
                     dispatchGroup.enter()
                     Service.shared.fetchEventsSegment(size: "30", id: "", keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: section.searchTerm, classificationId: "") { (search, err) in
-                        if let object = search?.embedded?.events {
+                        if let object = search?.embedded?.events, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})

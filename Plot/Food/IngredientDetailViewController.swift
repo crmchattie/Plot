@@ -10,14 +10,14 @@ import UIKit
 import Eureka
 import ViewRow
 
-protocol UpdateIngredientDelegate: class {
-    func updateIngredient(ingredient: ExtendedIngredient, close: Bool?)
-}
-
 class IngredientDetailViewController: FormViewController {
-    weak var delegate : UpdateIngredientDelegate?
+    weak var delegate : UpdateFoodProductContainerDelegate?
           
     var ingredient: ExtendedIngredient!
+    
+    var searchController = ""
+    
+    var timer: Timer?
 
     var active: Bool = false
     fileprivate var movingBackwards: Bool = true
@@ -28,6 +28,7 @@ class IngredientDetailViewController: FormViewController {
         configureTableView()
 
         initializeForm()
+        calcNutrition()
       
     }
     
@@ -35,7 +36,8 @@ class IngredientDetailViewController: FormViewController {
         super.viewWillDisappear(animated)
         
         if self.movingBackwards && active {
-            delegate?.updateIngredient(ingredient: ingredient, close: false)
+            let foodProductContainer = FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil)
+            delegate?.updateFoodProductContainer(foodProductContainer: foodProductContainer, close: false)
         }
     }
 
@@ -49,17 +51,8 @@ class IngredientDetailViewController: FormViewController {
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
 
-        let rightBarButton = UIButton(type: .system)
-        if active {
-            rightBarButton.setTitle("Update", for: .normal)
-        } else {
-            rightBarButton.setTitle("Add", for: .normal)
-        }
-        rightBarButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        rightBarButton.titleLabel?.adjustsFontForContentSizeCategory = true
-        rightBarButton.addTarget(self, action: #selector(close), for: .touchUpInside)
-
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightBarButton)
+        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+        navigationItem.rightBarButtonItem = plusBarButton
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
@@ -70,13 +63,22 @@ class IngredientDetailViewController: FormViewController {
     @objc fileprivate func close() {
         movingBackwards = false
         if active {
-            delegate?.updateIngredient(ingredient: ingredient, close: true)
+            let foodProductContainer = FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil)
+            delegate?.updateFoodProductContainer(foodProductContainer: foodProductContainer, close: true)
             self.navigationController?.popViewController(animated: true)
-        } else {
+        } else if searchController == "MealSearch" {
             if ingredient.recipe == nil {
                 ingredient.recipe = ["No Recipe": ingredient.amount ?? 0.0]
             }
-            delegate?.updateIngredient(ingredient: ingredient, close: true)
+            let foodProductContainer = FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil)
+            delegate?.updateFoodProductContainer(foodProductContainer: foodProductContainer, close: true)
+            self.navigationController?.backToViewController(viewController: MealViewController.self)
+        } else if searchController == "GroceryListSearch" {
+            if ingredient.recipe == nil {
+                ingredient.recipe = ["No Recipe": ingredient.amount ?? 0.0]
+            }
+            let foodProductContainer = FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil)
+            delegate?.updateFoodProductContainer(foodProductContainer: foodProductContainer, close: true)
             self.navigationController?.backToViewController(viewController: GrocerylistViewController.self)
         }
     }
@@ -144,8 +146,6 @@ class IngredientDetailViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.textField.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange() { [unowned self] row in
-                print("row value \(row.value ?? 0.0)")
-                print("subtraction value \((row.value ?? 0.0) - (self.ingredient.amount ?? 0.0))")
                 if self.ingredient.recipe == nil {
                     self.ingredient.recipe = ["No Recipe": self.ingredient.amount ?? 0.0]
                 } else if self.ingredient.recipe!.count == 1, self.ingredient.recipe!["No Recipe"] != nil {
@@ -164,34 +164,49 @@ class IngredientDetailViewController: FormViewController {
                     }
                 }
                 self.ingredient.amount = row.value
+                
+                timer?.invalidate()
+                
+                timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (_) in
+                    self.fetchProductInfo(ingredientID: ingredient.id!, amount: self.ingredient.amount, unit: self.ingredient.unit)
+                })
             }
         
-        if active, let ingredient = ingredient {
+        if active, let ingredient = ingredient, let recipe = self.ingredient.recipe, recipe["No Recipe"] == nil {
             form.last!
             <<< LabelRow("Unit") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
-                $0.value = "\(ingredient.unit ?? "g")"
+                $0.value = "\(ingredient.unit?.capitalized ?? "G")"
                 }.cellUpdate { cell, _ in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
         } else {
             form.last!
-            <<< ActionSheetRow<String>("Unit") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.selectorTitle = "Choose Ingredient Units"
-                $0.value = "g"
-                $0.options = ingredient.possibleUnits ?? [""]
+            <<< ActionSheetRow<String>("Unit") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.title = row.tag
+                row.selectorTitle = "Choose Ingredient Units"
+                row.value = "\(ingredient.unit ?? "g")"
+                row.options = []
+                ingredient.possibleUnits?.sorted().forEach {
+                    row.options?.append($0.capitalized)
+                }
                 }.onPresent { from, to in
                     to.popoverPresentationController?.permittedArrowDirections = .up
                 }.onChange() { [unowned self] row in
+                    row.updateCell()
                     self.ingredient.unit = row.value
+                    timer?.invalidate()
+                    
+                    timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+                        self.fetchProductInfo(ingredientID: ingredient.id!, amount: self.ingredient.amount, unit: self.ingredient.unit)
+                    })
                 }
         }
         
@@ -234,34 +249,48 @@ class IngredientDetailViewController: FormViewController {
                     }
             }
         }
-        
-        form +++
-        Section(header: "Nutrition", footer: nil)
-        if let nutrition = ingredient.nutrition, nutrition.nutrients != nil {
-            let nutrients = nutrition.nutrients!.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
-            for value in nutrients {
-                if let title = value.title, let amount = value.amount, let unit = value.unit, amount > 0 {
-                    form.last!
-                    <<< LabelRow("\(title.capitalized)") {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                        $0.title = "\(title.capitalized)"
-                        $0.value = "\(amount) \(unit)"
-                        }.onChange() { [unowned self] row in
-                            if row.value == nil {
-                                self.navigationItem.rightBarButtonItem?.isEnabled = false
-                            } else {
-                                self.navigationItem.rightBarButtonItem?.isEnabled = true
-                            }
-                        }.cellUpdate { cell, _ in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        }
+    }
+    
+    fileprivate func calcNutrition() {
+        if let section = self.form.sectionBy(tag: "Nutrition") {
+            if form.allSections.count > 1 {
+                for _ in 0...form.allSections.count - 2 - section.index! {
+                    form.remove(at: section.index!)
                 }
             }
-            
         }
         
+        if let nutrition = ingredient.nutrition, nutrition.nutrients != nil {
+            form +++
+            Section(header: "Nutrition", footer: nil) {
+                $0.tag = "Nutrition"
+            }
+            
+            var section = self.form.sectionBy(tag: "Nutrition")
+            let nutrients = nutrition.nutrients!.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
+            for nutrient in nutrients {
+                if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, amount > 0 {
+                    section!.insert(LabelRow() {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.title = "\(title.capitalized)"
+                    $0.value = "\(String(format: "%.2f", amount)) \(unit.capitalized)"
+                    }.cellUpdate { cell, _ in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }, at: section!.count)
+                }
+            }
+        }
+    }
+    
+    func fetchProductInfo(ingredientID: Int, amount: Double?, unit: String?) {
+        Service.shared.fetchIngredientInfo(id: ingredientID, amount: amount, unit: unit) { (search, err) in
+            self.ingredient = search
+            DispatchQueue.main.async { [weak self] in
+                self!.calcNutrition()
+            }
+        }
     }
 }

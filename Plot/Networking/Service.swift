@@ -58,7 +58,7 @@ class Service {
         
     }
     
-    func fetchIngredientInfo(id: Int, amount: Int?, unit: String?, completion: @escaping ((ExtendedIngredient?), Error?) -> ()) {
+    func fetchIngredientInfo(id: Int, amount: Double?, unit: String?, completion: @escaping ((ExtendedIngredient?), Error?) -> ()) {
         
         let baseURL: URL = {
             return URL(string: "\(SpoonacularAPI.ingredientsString)/\(id)/information")!
@@ -836,47 +836,6 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
-    func foodSearch(query: String, completion: @escaping ((FoodSearch?), Error?) -> ()) {
-        let baseURL: URL = {
-            return URL(string: Edamam.parserURL)!
-        }()
-        
-        let defaultParameters = ["category": "generic-foods", "nutrition-type": "logging", "app_id": "\(Edamam.appID)", "app_key": "\(Edamam.apiKey)"]
-        let parameters = ["ingr": "\(query)"].merging(defaultParameters, uniquingKeysWith: +)
-    
-        let urlRequest = URLRequest(url: baseURL)
-        let encodedURLRequest = urlRequest.encode(with: parameters)
-        fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-        
-    }
-    
-    func nutrientsSearch(foodId: String, measureURI: String, quantity: Int?, qualifiers: [String]?, completion: @escaping ((NutrientSearch?), Error?) -> ()) {
-        
-        let baseURL: URL = {
-            return URL(string: Edamam.nutrientsURL)!
-        }()
-            
-        var urlRequest = URLRequest(url: baseURL)
-        urlRequest.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
-        
-        urlRequest.httpMethod = "POST"
-        if let qualifiers = qualifiers {
-            let body = ["ingredients": ["quantity": quantity ?? 1, "measureURI": "\(measureURI)", "foodId": "\(foodId)", "qualifiers": qualifiers]]
-            let jsonData = try? JSONSerialization.data(withJSONObject: body)
-            urlRequest.httpBody = jsonData
-        } else {
-            let body = ["ingredients": [["quantity": quantity ?? 1, "measureURI": measureURI, "foodId": "\(foodId)"]]]
-            let jsonData = try? JSONSerialization.data(withJSONObject: body)
-            urlRequest.httpBody = jsonData
-        }
-        
-        let defaultParameters = ["app_id": "\(Edamam.appID)", "app_key": "\(Edamam.apiKey)"]
-        urlRequest = urlRequest.encode(with: defaultParameters)
-        print("urlRequest \(urlRequest)")
-        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-                        
-    }
-    
     func getMXTransactions(guid: String, page: String, records_per_page: String, from_date: String?, to_date: String?, completion: @escaping ((MXTransactionResult?), Error?) -> ()) {
         
         let baseURL: URL = {
@@ -1194,13 +1153,6 @@ struct MXAPI {
     
     static fileprivate let version = "application/vnd.mx.atrium.v1+json"
     static fileprivate let contentType = "application/json"
-}
-
-struct Edamam {
-    static let parserURL = "https://api.edamam.com/api/food-database/v2/parser"
-    static let nutrientsURL = "https://api.edamam.com/api/food-database/v2/nutrients"
-    static fileprivate let appID = "856afa62"
-    static fileprivate let apiKey = "1e8ac5976e246c4e8d05bc9f4cb54aab"
 }
 
 extension URLRequest {

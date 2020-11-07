@@ -38,6 +38,10 @@ class MealViewController: FormViewController {
     
     fileprivate var productIndex: Int = 0
     
+    let numberFormatter = NumberFormatter()
+    
+    var timer: Timer?
+    
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
@@ -75,6 +79,7 @@ class MealViewController: FormViewController {
         }
         setupRightBarButton()
         initializeForm()
+        calcNutrition()
         
     }
     
@@ -284,6 +289,24 @@ class MealViewController: FormViewController {
                 }
             }
         
+            <<< DecimalRow("Amount") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.title = $0.tag
+                $0.formatter = numberFormatter
+                $0.value = meal.amount
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { row in
+                self.meal.amount = row.value
+                self.timer?.invalidate()
+                
+                self.timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (_) in
+                    self.calcNutrition()
+                })
+            }
+        
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Items",
@@ -296,34 +319,73 @@ class MealViewController: FormViewController {
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.textLabel?.textAlignment = .left
-                        
                     }
                 }
                 $0.multivaluedRowToInsertAt = { index in
                     self.productIndex = index
                     self.openProduct()
-                    return LabelRow("label"){ row in
-                        
+                    return LabelRow(){ row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.textLabel?.textAlignment = .left
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }.onCellSelection({ cell, row in
+                        self.productIndex = index
+                        self.openProduct()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
                     }
                 }
                 
             }
-        if let products = self.meal.productContainer {
+        
+        if let products = self.meal.productContainer, !products.isEmpty {
+            var mvs = (form.sectionBy(tag: "itemfields") as! MultivaluedSection)
             for product in products {
-                var mvs = (form.sectionBy(tag: "itemfields") as! MultivaluedSection)
-                mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = product.title
-                }.onCellSelection({ cell, row in
-                    self.productIndex = row.indexPath!.row
-                    self.openProduct()
-                }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.textLabel?.textAlignment = .left
-                }, at: mvs.count - 1)
+                if product.groceryProduct != nil {
+                    mvs.insert(ButtonRow() { row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.textLabel?.textAlignment = .left
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        row.title = "\(product.groceryProduct!.amount ?? 0) \(product.groceryProduct!.title.capitalized)"
+                    }.onCellSelection({ cell, row in
+                        self.productIndex = row.indexPath!.row
+                        self.openProduct()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: mvs.count - 1)
+                } else if product.menuProduct != nil {
+                    mvs.insert(ButtonRow() { row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.textLabel?.textAlignment = .left
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        row.title = "\(product.menuProduct!.amount ?? 0) \(product.menuProduct!.title.capitalized)"
+                    }.onCellSelection({ cell, row in
+                        self.productIndex = row.indexPath!.row
+                        self.openProduct()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: mvs.count - 1)
+                } else if product.complexIngredient != nil {
+                    mvs.insert(ButtonRow() { row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.textLabel?.textAlignment = .left
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        row.title = "\(product.complexIngredient!.amount ?? 0.0) \(product.complexIngredient!.unit?.capitalized ?? "") of \(product.complexIngredient!.name?.capitalized ?? "")"
+                    }.onCellSelection({ cell, row in
+                        self.productIndex = row.indexPath!.row
+                        self.openProduct()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: mvs.count - 1)
+                }
             }
         }
     }
@@ -343,10 +405,108 @@ class MealViewController: FormViewController {
                 destination.active = true
                 destination.product = menuProduct
                 self.navigationController?.pushViewController(destination, animated: true)
+            } else if let ingredient = product.complexIngredient {
+                let destination = IngredientDetailViewController()
+                destination.delegate = self
+                destination.active = true
+                destination.ingredient = ingredient
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         } else {
             let destination = MealProductSearchViewController()
+            destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
+    fileprivate func calcNutrition() {
+        var nutrients = [Nutrient]()
+        if let productContainerList = meal.productContainer {
+            for productContainer in productContainerList {
+                if let product = productContainer.groceryProduct {
+                    if nutrients.isEmpty {
+                        nutrients = product.nutrition?.nutrients ?? []
+                    } else if let productNutrients = product.nutrition?.nutrients {
+                        for nutrient in productNutrients {
+                            if let index = nutrients.firstIndex(where: {$0.title == nutrient.title}) {
+                                nutrients[index].amount! += nutrient.amount ?? 0
+                                nutrients[index].percentOfDailyNeeds! += nutrient.percentOfDailyNeeds ?? 0
+                            } else {
+                                nutrients.append(nutrient)
+                            }
+                        }
+                    }
+                } else if let product = productContainer.menuProduct {
+                    if nutrients.isEmpty {
+                        nutrients = product.nutrition?.nutrients ?? []
+                    } else if let productNutrients = product.nutrition?.nutrients {
+                        for nutrient in productNutrients {
+                            if let index = nutrients.firstIndex(where: {$0.title == nutrient.title}) {
+                                nutrients[index].amount! += nutrient.amount ?? 0
+                                nutrients[index].percentOfDailyNeeds! += nutrient.percentOfDailyNeeds ?? 0
+                            } else {
+                                nutrients.append(nutrient)
+                            }
+                        }
+                    }
+                } else if let product = productContainer.complexIngredient {
+                    if nutrients.isEmpty {
+                        nutrients = product.nutrition?.nutrients ?? []
+                    } else if let productNutrients = product.nutrition?.nutrients {
+                        for nutrient in productNutrients {
+                            if let index = nutrients.firstIndex(where: {$0.title == nutrient.title}) {
+                                nutrients[index].amount! += nutrient.amount ?? 0
+                                nutrients[index].percentOfDailyNeeds! += nutrient.percentOfDailyNeeds ?? 0
+                            } else {
+                                nutrients.append(nutrient)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        if !nutrients.isEmpty, let amount = meal.amount {
+            for index in 0...nutrients.count - 1 {
+                nutrients[index].amount! = nutrients[index].amount! * amount
+                nutrients[index].percentOfDailyNeeds! = nutrients[index].percentOfDailyNeeds! * amount
+            }
+        }
+        
+        var nutrition = Nutrition()
+        nutrition.nutrients = nutrients
+        meal.nutrition = nutrition
+        
+        if let section = self.form.sectionBy(tag: "Nutrition") {
+            if form.allSections.count > 1 {
+                for _ in 0...form.allSections.count - 1 - section.index! {
+                    form.remove(at: section.index!)
+                }
+            }
+        }
+
+        if !nutrients.isEmpty {
+            form +++
+            Section(header: "Nutrition", footer: nil) {
+                $0.tag = "Nutrition"
+            }
+            
+            var section = self.form.sectionBy(tag: "Nutrition")
+            nutrients = nutrients.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
+            for nutrient in nutrients {
+                if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, amount > 0 {
+                    section!.insert(LabelRow() {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.title = "\(title.capitalized)"
+                    $0.value = "\(String(format: "%.2f", amount)) \(unit.capitalized)"
+                    }.cellUpdate { cell, _ in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }, at: section!.count)
+                }
+            }
         }
     }
     
@@ -513,15 +673,36 @@ extension MealViewController: MessagesDelegate {
     }
 }
 
-extension MealViewController: UpdateGroceryProductDelegate {
-    func updateGroceryProduct(groceryProduct: GroceryProduct, close: Bool?) {
-        
-    }
-}
-
-extension MealViewController: UpdateMenuProductDelegate {
-    func updateMenuProduct(menuProduct: MenuProduct, close: Bool?) {
-        
+extension MealViewController: UpdateFoodProductContainerDelegate {
+    func updateFoodProductContainer(foodProductContainer: FoodProductContainer?, close: Bool?) {
+        if let mvs = self.form.sectionBy(tag: "itemfields") as? MultivaluedSection {
+            if let foodProductContainer = foodProductContainer {
+                let row = mvs.allRows[productIndex]
+                if foodProductContainer.groceryProduct != nil {
+                    row.title = "\(foodProductContainer.groceryProduct!.amount ?? 0) \(foodProductContainer.groceryProduct!.title.capitalized)"
+                } else if foodProductContainer.menuProduct != nil {
+                    row.title = "\(foodProductContainer.menuProduct!.amount ?? 0) \(foodProductContainer.menuProduct!.title.capitalized)"
+                } else if foodProductContainer.complexIngredient != nil {
+                    row.title = "\(foodProductContainer.complexIngredient!.amount ?? 0.0) \(foodProductContainer.complexIngredient!.unit?.capitalized ?? "") of \(foodProductContainer.complexIngredient!.name?.capitalized ?? "")"
+                }
+                row.updateCell()
+                if let productContainer = meal.productContainer {
+                    if productContainer.indices.contains(productIndex) {
+                        self.meal.productContainer![productIndex] = foodProductContainer
+                    } else {
+                        self.meal.productContainer!.append(foodProductContainer)
+                    }
+                } else {
+                    self.meal.productContainer = [foodProductContainer]
+                }
+                calcNutrition()
+            } else {
+                mvs.remove(at: productIndex)
+            }
+            
+//            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+//            createGrocerylist.createNewGrocerylist()
+        }
     }
 }
 

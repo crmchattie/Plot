@@ -15,9 +15,9 @@ struct Meal: Codable, Equatable, Hashable {
     let id: String
     var name: String
     var type: String?
+    var amount: Double?
     var productContainer: [FoodProductContainer]?
     var nutrition: Nutrition?
-    var servings: Servings?
     var participantsIDs: [String]?
     var lastModifiedDate: String?
     var createdDate: String?

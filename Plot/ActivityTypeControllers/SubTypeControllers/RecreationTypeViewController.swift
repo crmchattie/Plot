@@ -16,7 +16,7 @@ class RecreationTypeViewController: ActivitySubTypeViewController, UISearchBarDe
     var groups = [SectionType: [AnyHashable]]()
     var searchActivities = [AnyHashable]()
     
-    var filters: [filter] = [.location, .fsFoodCategoryId]
+    var filters: [filter] = [.location, .fsRecreationCategoryId]
     var filterDictionary = [String: [String]]()
         
     var locationManager = CLLocationManager()
@@ -292,9 +292,25 @@ class RecreationTypeViewController: ActivitySubTypeViewController, UISearchBarDe
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-            self.complexSearch(query: searchText.lowercased(), categories: self.filterDictionary["fsFoodCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+            self.complexSearch(query: searchText.lowercased(), categories: self.filterDictionary["fsRecreationCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         })
     }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        searchBar.endEditing(true)
+        
+        timer?.invalidate()
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+            self.complexSearch(query: searchBar.text?.lowercased() ?? "", categories: self.filterDictionary["fsRecreationCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+        })
+    }
+    
     
     func complexSearch(query: String, categories: [String], lat: String, lon: String, favorites: String) {
         guard currentReachabilityStatus != .notReachable else {
@@ -452,7 +468,7 @@ class RecreationTypeViewController: ActivitySubTypeViewController, UISearchBarDe
                 if section.subType == "Recommend" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSExploreLatLong(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: section.extras, lat: lat, long: lon) { (search, err) in
-                        if let object = search?.response?.groups?[0].items {
+                        if let object = search?.response?.groups?[0].items, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -462,7 +478,7 @@ class RecreationTypeViewController: ActivitySubTypeViewController, UISearchBarDe
                 } else if section.subType == "Browse" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSSearchLatLong(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, lat: lat, long: lon) { (search, err) in
-                        if let object = search?.response?.venues {
+                        if let object = search?.response?.venues, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -474,7 +490,7 @@ class RecreationTypeViewController: ActivitySubTypeViewController, UISearchBarDe
                 if section.subType == "Recommend" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSExplore(limit: "30", offset: "", time: "", day: "", openNow: 0, sortByDistance: 0, sortByPopularity: 1, price: section.price, query: "", radius: "", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm, section: "") { (search, err) in
-                        if let object = search?.response?.groups?[0].items {
+                        if let object = search?.response?.groups?[0].items, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -484,7 +500,7 @@ class RecreationTypeViewController: ActivitySubTypeViewController, UISearchBarDe
                 } else if section.subType == "Browse" {
                     dispatchGroup.enter()
                     Service.shared.fetchFSSearch(limit: "30", query: "", radius: "10000", intent: "browse", city: "", stateCode: "", countryCode: "", categoryId: section.searchTerm) { (search, err) in
-                        if let object = search?.response?.venues {
+                        if let object = search?.response?.venues, !object.isEmpty {
                             self.groups[section] = object
                         } else {
                             self.sections.removeAll(where: {$0 == section})
@@ -1032,7 +1048,7 @@ extension RecreationTypeViewController: UpdateFilter {
         if !filterDictionary.values.isEmpty {
             showGroups = false
             self.filterDictionary = filterDictionary
-            complexSearch(query: "", categories: self.filterDictionary["fsFoodCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+            complexSearch(query: "", categories: self.filterDictionary["fsRecreationCategoryId"] ?? [], lat: self.filterDictionary["lat"]?[0] ?? "", lon: self.filterDictionary["lon"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
         } else {
             searchActivities = []
             self.filterDictionary = filterDictionary

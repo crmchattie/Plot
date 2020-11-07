@@ -274,12 +274,12 @@ struct Metric: Codable, Equatable, Hashable {
 
 // MARK: - Nutrition
 struct Nutrition: Codable, Equatable, Hashable {
-    let nutrients, properties: [Nutrient]?
-    let ingredients: [Ient]?
-    let caloricBreakdown: CaloricBreakdown?
-    let weightPerServing: WeightPerServing?
-    let calories: Double?
-    let fat, protein, carbs: String?
+    var nutrients, properties: [Nutrient]?
+    var ingredients: [Ient]?
+    var caloricBreakdown: CaloricBreakdown?
+    var weightPerServing: WeightPerServing?
+    var calories: Double?
+    var fat, protein, carbs: String?
 }
 
 // MARK: - CaloricBreakdown
@@ -289,18 +289,18 @@ struct CaloricBreakdown: Codable, Equatable, Hashable {
 
 // MARK: - Ient
 struct Ient: Codable, Equatable, Hashable {
-    let name: String?
-    let amount: Double?
-    let unit: String?
-    let nutrients: [Ient]?
+    var name: String?
+    var amount: Double?
+    var unit: String?
+    var nutrients: [Ient]?
 }
 
 // MARK: - Nutrient
 struct Nutrient: Codable, Equatable, Hashable {
-    let title: String?
-    let amount: Double?
-    let unit: String?
-    let percentOfDailyNeeds: Double?
+    var title: String?
+    var amount: Double?
+    var unit: String?
+    var percentOfDailyNeeds: Double?
 }
 
 // MARK: - WeightPerServing

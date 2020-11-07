@@ -21,7 +21,7 @@ struct MenuProduct: Codable, Equatable, Hashable {
     let id: Int
     let title: String
     let restaurantChain: String?
-    let nutrition: Nutrition?
+    var nutrition: Nutrition?
     let badges: [String]?
     let breadcrumbs: [String]?
     let generatedText: String?
@@ -32,6 +32,7 @@ struct MenuProduct: Codable, Equatable, Hashable {
     let price: Double?
     let spoonacularScore: Int?
     let image: String?
+    let amount: Double?
 }
 
 func ==(lhs: MenuProduct, rhs: MenuProduct) -> Bool {

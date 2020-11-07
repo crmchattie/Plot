@@ -185,6 +185,11 @@ extension UINavigationController {
             }
         }
     }
+    
+    func backTwoViewController() {
+        let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
+        self.navigationController!.popToViewController(viewControllers[viewControllers.count - 3], animated: true)
+    }
 }
 
 extension UICollectionView {

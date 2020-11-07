@@ -850,8 +850,7 @@ class GrocerylistViewController: FormViewController {
     fileprivate func openIngredient() {
         if ingredientIndex == -1 {
             let destination = IngredientSearchViewController()
-            destination.ingredientDelegate = self
-            destination.groceryDelegate = self
+            destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if let items = self.grocerylist.ingredients, items.indices.contains(ingredientIndex) {
             let destination = IngredientDetailViewController()
@@ -1129,113 +1128,111 @@ class GrocerylistViewController: FormViewController {
     }
 }
 
-extension GrocerylistViewController: UpdateIngredientDelegate {
-    func updateIngredient(ingredient: ExtendedIngredient, close: Bool?) {
-        if ingredientIndex == -1 {
-            if let mvs = self.form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
-                print("removing row")
-                mvs.remove(at: 0)
+extension GrocerylistViewController: UpdateFoodProductContainerDelegate {
+    func updateFoodProductContainer(foodProductContainer: FoodProductContainer?, close: Bool?) {
+        if let foodProductContainer = foodProductContainer, let ingredient = foodProductContainer.complexIngredient {
+            if ingredientIndex == -1 {
+                if let mvs = self.form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
+                    print("removing row")
+                    mvs.remove(at: 0)
+                }
             }
-        }
-        if ingredient.name == "IngredientName" {
-            print("no ingredient")
-            return
-        }
-        if !productContainer.isEmpty, let items = self.grocerylist.ingredients {
-            if productContainer.indices.contains(ingredientIndex) {
-                print("active ingredient")
-                if let index = self.grocerylist.ingredients?.firstIndex(of: ingredient) {
-                    self.grocerylist.ingredients![index] = ingredient
+            if ingredient.name == "IngredientName" {
+                print("no ingredient")
+                return
+            }
+            if !productContainer.isEmpty, let items = self.grocerylist.ingredients {
+                if productContainer.indices.contains(ingredientIndex) {
+                    print("active ingredient")
+                    if let index = self.grocerylist.ingredients?.firstIndex(of: ingredient) {
+                        self.grocerylist.ingredients![index] = ingredient
+                    }
+                    if let row: SplitRow<ButtonRow, CheckRow> = form.rowBy(tag: "\(ingredient.name!)") {
+                        row.rowLeft!.title = "\(ingredient.amount ?? 0.0) \(ingredient.unit ?? "") of \(ingredient.name?.capitalized ?? "")"
+                        row.updateCell()
+                        return
+                    }
+                } else if let index = items.firstIndex(where: {$0 == ingredient}) {
+                    print("ingredient exists")
+                    if items[index].amount != nil {
+                        self.grocerylist.ingredients![index].amount! += ingredient.amount ?? 0.0
+                    }
+                } else {
+                    print("appending ingredient")
+                    self.grocerylist.ingredients!.append(ingredient)
+                    self.productContainer.append(FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil))
                 }
-                if let row: SplitRow<ButtonRow, CheckRow> = form.rowBy(tag: "\(ingredient.name!)") {
-                    row.rowLeft!.title = "\(ingredient.amount ?? 0.0) \(ingredient.unit ?? "") of \(ingredient.name?.capitalized ?? "")"
-                    row.updateCell()
-                    return
+                
+                let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createGrocerylist.createNewGrocerylist()
+                
+                if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
+                    if form.allSections.count > 3 {
+                        for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
+                            form.remove(at: ingredientSection.index! + 1)
+                        }
+                    }
+                    addIngredients()
                 }
-            } else if let index = items.firstIndex(where: {$0 == ingredient}) {
-                print("ingredient exists")
-                if items[index].amount != nil {
-                    self.grocerylist.ingredients![index].amount! += ingredient.amount ?? 0.0
-                }
-            } else {
-                print("appending ingredient")
-                self.grocerylist.ingredients!.append(ingredient)
+            } else if self.grocerylist.ingredients == nil {
+                self.grocerylist.ingredients = [ingredient]
                 self.productContainer.append(FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil))
-            }
-            
-            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createGrocerylist.createNewGrocerylist()
-            
-            if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
-                if form.allSections.count > 3 {
-                    for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
-                        form.remove(at: ingredientSection.index! + 1)
-                    }
-                }
+                
+                let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createGrocerylist.createNewGrocerylist()
+                
                 addIngredients()
             }
-        } else if self.grocerylist.ingredients == nil {
-            self.grocerylist.ingredients = [ingredient]
-            self.productContainer.append(FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil))
-            
-            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createGrocerylist.createNewGrocerylist()
-            
-            addIngredients()
-        }
-    }
-}
-
-extension GrocerylistViewController: UpdateGroceryProductDelegate {
-    func updateGroceryProduct(groceryProduct: GroceryProduct, close: Bool?) {
-        if ingredientIndex == -1 {
-            if let mvs = self.form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
-                print("removing row")
-                mvs.remove(at: 0)
+        } else if let foodProductContainer = foodProductContainer, let groceryProduct = foodProductContainer.groceryProduct {
+            if ingredientIndex == -1 {
+                if let mvs = self.form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
+                    print("removing row")
+                    mvs.remove(at: 0)
+                }
             }
-        }
-        if groceryProduct.title == "GroceryProductName" {
-            print("no ingredient")
-            return
-        }
-        if !productContainer.isEmpty, let items = self.grocerylist.groceryProducts {
-            if productContainer.indices.contains(ingredientIndex) {
-                print("active ingredient")
-                if let index = self.grocerylist.groceryProducts?.firstIndex(of: groceryProduct) {
-                    self.grocerylist.groceryProducts![index] = groceryProduct
+            if groceryProduct.title == "GroceryProductName" {
+                print("no ingredient")
+                return
+            }
+            if !productContainer.isEmpty, let items = self.grocerylist.groceryProducts {
+                if productContainer.indices.contains(ingredientIndex) {
+                    print("active ingredient")
+                    if let index = self.grocerylist.groceryProducts?.firstIndex(of: groceryProduct) {
+                        self.grocerylist.groceryProducts![index] = groceryProduct
+                    }
+                    if let row: SplitRow<ButtonRow, CheckRow> = form.rowBy(tag: "\(groceryProduct.title)") {
+                        row.rowLeft!.title = "\(groceryProduct.amount ?? 0) \(groceryProduct.title.capitalized)"
+                        row.updateCell()
+                        return
+                    }
+                } else if let _ = items.firstIndex(where: {$0 == groceryProduct}) {
+                    print("ingredient exists")
+                } else {
+                    print("appending ingredient")
+                    self.grocerylist.groceryProducts!.append(groceryProduct)
+                    self.productContainer.append(FoodProductContainer(groceryProduct: groceryProduct, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil))
                 }
-                if let row: SplitRow<ButtonRow, CheckRow> = form.rowBy(tag: "\(groceryProduct.title)") {
-                    row.rowLeft!.title = "\(groceryProduct.amount ?? 0) \(groceryProduct.title.capitalized)"
-                    row.updateCell()
-                    return
+                
+                let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createGrocerylist.createNewGrocerylist()
+                
+                if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
+                    if form.allSections.count > 3 {
+                        for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
+                            form.remove(at: ingredientSection.index! + 1)
+                        }
+                    }
+                    addIngredients()
                 }
-            } else if let _ = items.firstIndex(where: {$0 == groceryProduct}) {
-                print("ingredient exists")
-            } else {
-                print("appending ingredient")
-                self.grocerylist.groceryProducts!.append(groceryProduct)
+            } else if self.grocerylist.groceryProducts == nil {
+                self.grocerylist.groceryProducts = [groceryProduct]
                 self.productContainer.append(FoodProductContainer(groceryProduct: groceryProduct, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil))
-            }
-            
-            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createGrocerylist.createNewGrocerylist()
-            
-            if let ingredientSection = form.sectionBy(tag: "ingredientfields") as? MultivaluedSection {
-                if form.allSections.count > 3 {
-                    for _ in 0...form.allSections.count - 2 - ingredientSection.index! {
-                        form.remove(at: ingredientSection.index! + 1)
-                    }
-                }
+                
+                let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createGrocerylist.createNewGrocerylist()
+                
                 addIngredients()
             }
-        } else if self.grocerylist.ingredients == nil {
-            self.grocerylist.groceryProducts = [groceryProduct]
-            self.productContainer.append(FoodProductContainer(groceryProduct: groceryProduct, menuProduct: nil, recipeProduct: nil, complexIngredient: nil, basicIngredient: nil))
-            
-            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createGrocerylist.createNewGrocerylist()
-            
-            addIngredients()
         }
     }
 }

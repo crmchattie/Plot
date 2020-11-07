@@ -29,7 +29,7 @@ struct GroceryProduct: Codable, Equatable, Hashable {
     let ingredients: [Ingredient]?
     let likes: Int?
     let aisle: String?
-    let nutrition: Nutrition?
+    var nutrition: Nutrition?
     let price: Double?
     let servings: Servings?
     let serving_size: String?
@@ -38,7 +38,7 @@ struct GroceryProduct: Codable, Equatable, Hashable {
     let image: String?
     var recipe: [String: Double]?
     var bool: Bool?
-    var amount: Int?
+    var amount: Double?
 }
 
 func ==(lhs: GroceryProduct, rhs: GroceryProduct) -> Bool {

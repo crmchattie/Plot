@@ -300,6 +300,21 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
         })
     }
     
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        searchBar.endEditing(true)
+        
+        timer?.invalidate()
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+            self.complexSearch(query: searchBar.text?.lowercased() ?? "", cuisine: self.filterDictionary["cuisine"] ?? [], excludeCuisine: self.filterDictionary["excludeCuisine"] ?? [], diet: self.filterDictionary["diet"]?[0] ?? "", intolerances: self.filterDictionary["intolerances"] ?? [""], type: self.filterDictionary["recipeType"]?[0] ?? "", favorites: self.filterDictionary["favorites"]?[0] ?? "")
+        })
+    }
+    
     func complexSearch(query: String, cuisine: [String], excludeCuisine: [String], diet: String, intolerances: [String], type: String, favorites: String) {
         print("query \(query), cuisine \(cuisine), excludeCuisine \(excludeCuisine), diet \(diet), intolerances \(intolerances), type \(type), favorites \(favorites)")
         
@@ -445,7 +460,7 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
             } else if section.subType == "Cuisine" {
                 dispatchGroup.enter()
                 Service.shared.fetchRecipesComplex(query: "", cuisine: [section.searchTerm], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-                    if let object = search?.recipes {
+                    if let object = search?.recipes, !object.isEmpty {
                         self.groups[section] = object
                     } else {
                         self.sections.removeAll(where: {$0 == section})
@@ -455,7 +470,7 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
             } else if section.subType == "Diet" {
                 dispatchGroup.enter()
                 Service.shared.fetchRecipesComplex(query: "", cuisine: [""], excludeCuisine: [""], diet: section.searchTerm, intolerances: [""], type: "") { (search, err) in
-                    if let object = search?.recipes {
+                    if let object = search?.recipes, !object.isEmpty {
                         self.groups[section] = object
                     } else {
                         self.sections.removeAll(where: {$0 == section})
@@ -465,7 +480,7 @@ class RecipeTypeViewController: ActivitySubTypeViewController, UISearchBarDelega
             } else {
                 dispatchGroup.enter()
                 Service.shared.fetchRecipesComplex(query: section.searchTerm, cuisine: [""], excludeCuisine: [""], diet: "", intolerances: [""], type: "") { (search, err) in
-                    if let object = search?.recipes {
+                    if let object = search?.recipes, !object.isEmpty {
                         self.groups[section] = object
                     } else {
                         self.sections.removeAll(where: {$0 == section})

@@ -103,6 +103,9 @@ enum SectionType: Hashable, CaseIterable {
     case financialIssues
     case customMeal
     case customWorkout
+    case ingredients
+    case groceryItems
+    case restaurantItems
     
     var name: String {
         switch self {
@@ -196,6 +199,9 @@ enum SectionType: Hashable, CaseIterable {
         case .financialIssues: return "Issues"
         case .customMeal: return "Meal"
         case .customWorkout: return "Workout"
+        case .ingredients: return "Ingredients"
+        case .groceryItems: return "Grocery Items"
+        case .restaurantItems: return "Restaurant Items"
         }
     }
     
@@ -211,6 +217,7 @@ enum SectionType: Hashable, CaseIterable {
         case .incomeStatement, .transactions, .transactionCategories, .transactionTopLevelCategories, .transactionGroups: return "Transactions"
         case .balanceSheet, .financialAccounts: return "Accounts"
         case .financialIssues: return "Issues"
+        case .ingredients, .groceryItems, .restaurantItems: return "Food Products"
         }
     }
     
@@ -234,12 +241,13 @@ enum SectionType: Hashable, CaseIterable {
         case .balanceSheet: return "Balance Sheet"
         case .financialAccounts: return "Accounts"
         case .financialIssues: return "Issues"
+        case .ingredients, .groceryItems, .restaurantItems: return "Food Products"
         }
     }
     
     var extras: String {
         switch self {
-        case .custom, .cheapEats, .events, .music, .sports, .artstheatre, .family, .film, .miscellaneous, .workouts, .hiit, .cardio, .yoga, .strength, .quick, .medium, .recipes, .american, .italian, .mexican, .breakfast, .dessert, .vegetarian, .search, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .vegetarianFood, .comfortFood, .spanishFood, .customMeal, .customWorkout: return ""
+        case .custom, .cheapEats, .events, .music, .sports, .artstheatre, .family, .film, .miscellaneous, .workouts, .hiit, .cardio, .yoga, .strength, .quick, .medium, .recipes, .american, .italian, .mexican, .breakfast, .dessert, .vegetarian, .search, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .vegetarianFood, .comfortFood, .spanishFood, .customMeal, .customWorkout, .ingredients, .groceryItems, .restaurantItems: return ""
         case .food, .seafoodFood, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .club, .recreation, .games, .active, .sightseeingThemeParks, .recreationThemeParks, .shopping, .parks, .water, .land, .consumerables, .clothes, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites,  .topFood, .topShop, .topRec: return "topPicks"
         case .sightseeing, .topSights: return "sights"
         case .generalShop: return "shops"
@@ -257,14 +265,14 @@ enum SectionType: Hashable, CaseIterable {
     
     var price: [Int] {
         switch self {
-        case .custom, .events, .music, .sports, .artstheatre, .family, .film, .miscellaneous, .workouts, .hiit, .cardio, .yoga, .strength, .quick, .medium, .recipes, .american, .italian, .mexican, .breakfast, .dessert, .vegetarian, .search, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .vegetarianFood, .comfortFood, .spanishFood, .food, .seafoodFood, .nightlife, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .club, .recreation, .games, .active, .sightseeingThemeParks, .recreationThemeParks, .shopping, .parks, .water, .land, .consumerables, .clothes, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites, .sightseeing, .generalShop, .generalFood, .generalDrinks, .generalCoffee, .generalArts, .generalOutdoors, .trending, .topFood, .topShop, .topRec, .topDrinks, .topSights, .activities, .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .transactions, .incomeStatement, .balanceSheet, .financialAccounts, .financialIssues, .customMeal, .customWorkout: return []
+        case .custom, .events, .music, .sports, .artstheatre, .family, .film, .miscellaneous, .workouts, .hiit, .cardio, .yoga, .strength, .quick, .medium, .recipes, .american, .italian, .mexican, .breakfast, .dessert, .vegetarian, .search, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .vegetarianFood, .comfortFood, .spanishFood, .food, .seafoodFood, .nightlife, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .club, .recreation, .games, .active, .sightseeingThemeParks, .recreationThemeParks, .shopping, .parks, .water, .land, .consumerables, .clothes, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites, .sightseeing, .generalShop, .generalFood, .generalDrinks, .generalCoffee, .generalArts, .generalOutdoors, .trending, .topFood, .topShop, .topRec, .topDrinks, .topSights, .activities, .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .transactions, .incomeStatement, .balanceSheet, .financialAccounts, .financialIssues, .customMeal, .customWorkout, .ingredients, .groceryItems, .restaurantItems: return []
         case .cheapEats: return [1]
         }
     }
     
     var searchTerm: String {
         switch self {
-        case .custom, .customMeal, .customWorkout: return ""
+        case .custom, .customMeal, .customWorkout, .ingredients, .groceryItems, .restaurantItems: return ""
         case .food, .topFood: return "4d4b7105d754a06374d81259"
         case .cheapEats: return "4d4b7105d754a06374d81259"
         case .americanFood: return "4bf58dd8d48988d14e941735"
@@ -342,7 +350,7 @@ enum SectionType: Hashable, CaseIterable {
     
     var image: String {
         switch self {
-        case .custom, .search: return ""
+        case .custom, .search, .ingredients, .groceryItems, .restaurantItems: return ""
         case .food, .cheapEats, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .seafoodFood, .vegetarianFood, .comfortFood, .spanishFood, .generalFood, .generalCoffee, .topFood, .customMeal: return "food"
         case .nightlife, .topDrinks, .club, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .generalDrinks: return "nightlife"
         case .recreation, .topRec, .games, .recreationThemeParks, .active, .parks, .water, .land, .generalOutdoors: return "recreation"

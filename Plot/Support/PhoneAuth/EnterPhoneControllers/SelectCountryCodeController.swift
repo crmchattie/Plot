@@ -154,7 +154,7 @@ extension SelectCountryCodeController: UISearchBarDelegate {
 extension SelectCountryCodeController {
   override func scrollViewDidScroll(_ scrollView: UIScrollView) {
     if scrollView.isDecelerating {
-      view.endEditing(true)
+      searchBar.endEditing(true)
     }
   }
 }

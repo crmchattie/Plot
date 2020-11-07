@@ -37,7 +37,7 @@ enum ViewPlaceholderTitle: String {
     case emptyLists = "You don't have any lists yet"
     case emptyIngredients = "Please search for ingredients and grocery items above"
     case emptyAccounts = "You are not connected to any accounts yet"
-    case emptyMealProducts = "Please search for grocery items, restaurant menu items and recipes above"
+    case emptyMealProducts = "Please search for ingredients, grocery items and restaurant menu items above"
 }
 
 enum ViewPlaceholderSubtitle: String {
