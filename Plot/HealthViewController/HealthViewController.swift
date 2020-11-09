@@ -26,16 +26,19 @@ class HealthViewController: UIViewController {
     var healthMetrics: [HealthMetric] = [] {
         didSet {
             if oldValue != healthMetrics {
-                tableView.reloadData()
+                collectionView.reloadData()
             }
         }
     }
     
-    let tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        return tableView
+    let collectionView: UICollectionView = {
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.contentInset.bottom = 20
+        return collectionView
     }()
     
     let spinner: UIActivityIndicatorView = {
@@ -47,11 +50,14 @@ class HealthViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.addSubview(tableView)
-        tableView.dataSource = self
-        tableView.delegate = self
-        
+        view.addSubview(collectionView)
+        collectionView.dataSource = self
+        collectionView.delegate = self
         view.addSubview(spinner)
+        
+        if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        }
         
         configureView()
         addObservers()
@@ -94,46 +100,41 @@ class HealthViewController: UIViewController {
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
         
-        tableView.indicatorStyle = theme.scrollBarStyle
-        tableView.sectionIndexBackgroundColor = theme.generalBackgroundColor
-        tableView.backgroundColor = theme.generalBackgroundColor
-        tableView.reloadData()
+        collectionView.indicatorStyle = theme.scrollBarStyle
+        collectionView.backgroundColor = theme.generalBackgroundColor
+        collectionView.reloadData()
     }
     
     private func configureView() {
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
+            collectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+            collectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
             spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
         
-        tableView.separatorStyle = .none
-        tableView.register(HealthMetricCell.self, forCellReuseIdentifier: healthMetricCellID)
-        tableView.allowsMultipleSelectionDuringEditing = false
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.backgroundColor = view.backgroundColor
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 105
+        collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
+        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.backgroundColor = view.backgroundColor
     }
 }
 
-extension HealthViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return healthMetrics.count
+extension HealthViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        healthMetrics.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
-        cell.backgroundColor = tableView.backgroundColor
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+        cell.backgroundColor = collectionView.backgroundColor
         let metric = healthMetrics[indexPath.row]
         cell.configure(metric)
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let metric = healthMetrics[indexPath.row]
         let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
         let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel)

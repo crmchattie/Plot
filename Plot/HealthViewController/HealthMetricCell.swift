@@ -8,7 +8,7 @@
 
 import UIKit
 
-class HealthMetricCell: UITableViewCell {
+class HealthMetricCell: UICollectionViewCell {
 
     let titleLabel: UILabel = {
         let label = UILabel()
@@ -28,6 +28,7 @@ class HealthMetricCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.sizeToFit()
         label.textAlignment = .left
+        label.numberOfLines = 0
         return label
     }()
     
@@ -36,7 +37,7 @@ class HealthMetricCell: UITableViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.numberOfLines = 1
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -48,42 +49,54 @@ class HealthMetricCell: UITableViewCell {
         return button
     }()
     
+    private var widthConstraint: NSLayoutConstraint?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: .default, reuseIdentifier: reuseIdentifier)
-                
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         contentView.addSubview(titleLabel)
         contentView.addSubview(subtitleLabel)
         contentView.addSubview(detailLabel)
         contentView.addSubview(activityTypeButton)
+
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            contentView.leftAnchor.constraint(equalTo: leftAnchor),
+            contentView.rightAnchor.constraint(equalTo: rightAnchor),
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+        
+        widthConstraint = contentView.widthAnchor.constraint(equalToConstant: 0)
         
         titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
-        titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -40).isActive = true
-        
+        titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
+
         subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4).isActive = true
         subtitleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
-        subtitleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
-        
+        subtitleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
+
         detailLabel.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 4).isActive = true
         detailLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
-        detailLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
-        detailLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
-        
+        detailLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
+        detailLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0).isActive = true
+
         activityTypeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
+    }
+    
+    override func updateConstraints() {
+        // Set width constraint to superview's width.
+        widthConstraint?.constant = superview?.bounds.width ?? 0
+        widthConstraint?.isActive = true
+        super.updateConstraints()
     }
     
     required init?(coder aDecoder: NSCoder) {
