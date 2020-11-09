@@ -105,7 +105,7 @@ class HealthDetailViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         ])
         
-        tableView.separatorStyle = .singleLine
+        tableView.separatorStyle = .none
         tableView.register(HealthDetailSampleCell.self, forCellReuseIdentifier: healthDetailSampleCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
@@ -123,18 +123,19 @@ class HealthDetailViewController: UIViewController {
         
         let xAxis = chartView.xAxis
         xAxis.labelPosition = .bottom
-        xAxis.labelPosition = .bottom
         xAxis.labelFont = .systemFont(ofSize: 10)
-        xAxis.granularity = 1
-        xAxis.labelCount = 5
+        xAxis.setLabelCount(6, force: true)
         dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
         dayAxisValueFormatter?.formatType = segmentedControl.selectedSegmentIndex
         xAxis.valueFormatter = dayAxisValueFormatter
+        xAxis.drawGridLinesEnabled = false
+        xAxis.avoidFirstLastClippingEnabled = true
 
         let rightAxis = chartView.rightAxis
         rightAxis.removeAllLimitLines()
         rightAxis.axisMinimum = 0
         rightAxis.drawLimitLinesBehindDataEnabled = true
+        rightAxis.drawGridLinesEnabled = false
         
         chartView.leftAxis.enabled = false
 

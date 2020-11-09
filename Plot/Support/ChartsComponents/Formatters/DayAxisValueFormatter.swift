@@ -28,7 +28,7 @@ public class DayAxisValueFormatter: NSObject, IAxisValueFormatter {
         
         switch formatType {
         case 0:
-            return date.getTimeString()
+            return date.getHourlyTimeString()
         case 1:
             return date.getShortDayName()
         case 2:

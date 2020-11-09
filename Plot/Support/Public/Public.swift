@@ -352,10 +352,10 @@ extension Date {
         return dateFormatter.string(from: self)
     }
     
-    func getTimeString() -> String {
+    func getHourlyTimeString() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
-        dateFormatter.dateFormat = "hh:mm a"
+        dateFormatter.dateFormat = "hh a"
         dateFormatter.amSymbol = "AM"
         dateFormatter.pmSymbol = "PM"
         return dateFormatter.string(from: self)

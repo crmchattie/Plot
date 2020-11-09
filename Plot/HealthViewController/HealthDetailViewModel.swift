@@ -55,8 +55,10 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
                 dataSet.formSize = 15
                 dataSet.lineWidth = 0
                 
-                let gradientColors = [ChartColorTemplates.colorFromString("#00ff0000").cgColor,
-                                      ChartColorTemplates.colorFromString("#ffff0000").cgColor]
+                let colorTop = UIColor.systemBlue.cgColor
+                let colorBottom = UIColor(red: 16.0/255.0, green: 28.0/255.0, blue: 56.0/255.0, alpha: 1.0).cgColor
+                let gradientColors = [colorBottom, colorTop] as CFArray
+                
                 let gradient = CGGradient(colorsSpace: nil, colors: gradientColors as CFArray, locations: nil)!
                 
                 dataSet.fillAlpha = 1
