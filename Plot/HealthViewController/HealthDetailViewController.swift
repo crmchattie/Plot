@@ -11,11 +11,15 @@ import Charts
 import HealthKit
 
 fileprivate let healthDetailSampleCellID = "HealthDetailSampleCellID"
+fileprivate let chartViewHeight: CGFloat = 260
+fileprivate let chartViewTopMargin: CGFloat = 10
 
 class HealthDetailViewController: UIViewController {
     
     private var viewModel: HealthDetailViewModelInterface
     var dayAxisValueFormatter: DayAxisValueFormatter?
+    var chartViewHeightAnchor: NSLayoutConstraint?
+    var chartViewTopAnchor: NSLayoutConstraint?
     
     lazy var chartView: LineChartView = {
         let chartView = LineChartView()
@@ -63,6 +67,8 @@ class HealthDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "hide-grid"), style: .plain, target: self, action: #selector(hideUnhideTapped))
+        
         if viewModel.healthMetric.type == HealthMetricType.workout, let hkWorkout = viewModel.healthMetric.hkWorkout {
             title = hkWorkout.workoutActivityType.name
         } else {
@@ -89,15 +95,18 @@ class HealthDetailViewController: UIViewController {
     }
     
     private func configureView() {
+        
+        chartViewHeightAnchor = chartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
+        chartViewTopAnchor = chartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
         NSLayoutConstraint.activate([
             segmentedControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
             segmentedControl.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             segmentedControl.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
             
-            chartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 10),
+            chartViewTopAnchor!,
             chartView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             chartView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-            chartView.heightAnchor.constraint(equalToConstant: 260),
+            chartViewHeightAnchor!,
             
             tableView.topAnchor.constraint(equalTo: chartView.bottomAnchor, constant: 10),
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
@@ -154,6 +163,16 @@ class HealthDetailViewController: UIViewController {
         fetchHealthKitData()
     }
     
+    @objc private func hideUnhideTapped() {
+        updateChartViewAppearance(hidden: !chartView.isHidden)
+    }
+    
+    private func updateChartViewAppearance(hidden: Bool) {
+        chartView.isHidden = hidden
+        chartViewHeightAnchor?.constant = hidden ? 0 : chartViewHeight
+        chartViewTopAnchor?.constant = hidden ? 0 : chartViewTopMargin
+    }
+    
     // MARK: HealthKit Data
     func fetchHealthKitData() {
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
@@ -166,6 +185,7 @@ class HealthDetailViewController: UIViewController {
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.animate(xAxisDuration: 1)
+            weakSelf.updateChartViewAppearance(hidden: data == nil)
             
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
             weakSelf.tableView.reloadData()
