@@ -175,6 +175,7 @@
 		269105F7253E8E2E00A02C5F /* DateValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269105F3253E8E2E00A02C5F /* DateValueFormatter.swift */; };
 		269105F8253E8E2E00A02C5F /* LargeValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269105F4253E8E2E00A02C5F /* LargeValueFormatter.swift */; };
 		269105FA2549D66800A02C5F /* HealthDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269105F92549D66800A02C5F /* HealthDetailViewModel.swift */; };
+		26958553255A7355008FEE9B /* NutritionOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26958552255A7355008FEE9B /* NutritionOperation.swift */; };
 		26A29E9A2389FF90008F7351 /* ActivityAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A29E992389FF90008F7351 /* ActivityAnnotation.swift */; };
 		26A5DDD82394CB2400771DC1 /* RecipeSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */; };
 		26B453AB254F8FCA00C63093 /* HealthDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B453AA254F8FCA00C63093 /* HealthDetailService.swift */; };
@@ -560,6 +561,7 @@
 		269105F3253E8E2E00A02C5F /* DateValueFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateValueFormatter.swift; sourceTree = "<group>"; };
 		269105F4253E8E2E00A02C5F /* LargeValueFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeValueFormatter.swift; sourceTree = "<group>"; };
 		269105F92549D66800A02C5F /* HealthDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthDetailViewModel.swift; sourceTree = "<group>"; };
+		26958552255A7355008FEE9B /* NutritionOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionOperation.swift; sourceTree = "<group>"; };
 		26A29E992389FF90008F7351 /* ActivityAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAnnotation.swift; sourceTree = "<group>"; };
 		26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeSearchResult.swift; sourceTree = "<group>"; };
 		26B453AA254F8FCA00C63093 /* HealthDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthDetailService.swift; sourceTree = "<group>"; };
@@ -1084,6 +1086,7 @@
 				261FAF76251C661D008636DF /* AnnualAverageWeightOperation.swift */,
 				261FAF78251C69C0008636DF /* WeightOperation.swift */,
 				26317C2F251DB250007CC315 /* WorkoutOperation.swift */,
+				26958552255A7355008FEE9B /* NutritionOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);
 			path = Operations;
@@ -2301,6 +2304,7 @@
 				10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */,
 				260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */,
 				10D3410024ABD741009269B7 /* ActivityContainer.swift in Sources */,
+				26958553255A7355008FEE9B /* NutritionOperation.swift in Sources */,
 				4BAEE5E5212735E50045AB10 /* EnterVerificationCodeController.swift in Sources */,
 				4BAEE49B21272C5E0045AB10 /* ContactsDetailController.swift in Sources */,
 				26A5DDD82394CB2400771DC1 /* RecipeSearchResult.swift in Sources */,

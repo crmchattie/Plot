@@ -16,7 +16,7 @@ struct HealthMetric: Equatable {
     var unit: String
     var rank: Int
     var average: Double?
-    var hkWorkout: HKWorkout?
+    var hkSample: HKSample?
     init(type: HealthMetricType, total: Double, date: Date, unit: String, rank: Int) {
         self.type = type
         self.total = total

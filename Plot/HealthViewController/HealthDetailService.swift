@@ -96,7 +96,8 @@ class HealthDetailService: HealthDetailServiceInterface {
             startDate = endDate.lastYear
         }
                 
-        if healthMetricType == .workout, let workoutActivityType = healthMetric.hkWorkout?.workoutActivityType {
+        if healthMetricType == .workout, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+            let workoutActivityType = hkWorkout.workoutActivityType
             HealthKitService.getAllWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate, endDate: endDate) { [weak self] workouts, error  in
                 var stats: [Statistic]?
                 if segmentType == .day {

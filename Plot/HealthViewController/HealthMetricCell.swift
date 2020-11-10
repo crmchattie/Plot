@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import HealthKit
 
 class HealthMetricCell: UICollectionViewCell {
 
@@ -114,7 +115,7 @@ class HealthMetricCell: UICollectionViewCell {
     func configure(_ healthMetric: HealthMetric) {
         var timeAgo = "today"
         var title = healthMetric.type.name
-        if healthMetric.type == HealthMetricType.workout, let hkWorkout = healthMetric.hkWorkout {
+        if healthMetric.type == HealthMetricType.workout, let hkWorkout = healthMetric.hkSample as? HKWorkout {
             title = hkWorkout.workoutActivityType.name
             timeAgo = timeAgoSinceDate(hkWorkout.endDate)
         }
@@ -154,7 +155,8 @@ class HealthMetricCell: UICollectionViewCell {
         case .nutrition:
             imageName = "activity"
         case .workout:
-            if let workoutActivityType = healthMetric.hkWorkout?.workoutActivityType {
+            if let hkWorkout = healthMetric.hkSample as? HKWorkout {
+                let workoutActivityType = hkWorkout.workoutActivityType
                 if workoutActivityType == .running {
                     imageName = "running"
                 }

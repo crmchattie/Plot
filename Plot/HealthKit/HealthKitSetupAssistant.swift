@@ -30,6 +30,11 @@ class HealthKitSetupAssistant {
             let bodyMass = HKObjectType.quantityType(forIdentifier: .bodyMass),
             let heartRate = HKObjectType.quantityType(forIdentifier: .heartRate),
             let stepCount = HKObjectType.quantityType(forIdentifier: .stepCount),
+            let dietaryFatTotal = HKObjectType.quantityType(forIdentifier: .dietaryFatTotal),
+            let dietaryCarbohydrates = HKObjectType.quantityType(forIdentifier: .dietaryCarbohydrates),
+            let dietarySugar = HKObjectType.quantityType(forIdentifier: .dietarySugar),
+            let dietaryProtein = HKObjectType.quantityType(forIdentifier: .dietaryProtein),
+            let dietaryEnergyConsumed = HKObjectType.quantityType(forIdentifier: .dietaryEnergyConsumed),
             let distanceWalkingRunning = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning),
             let distanceCycling = HKObjectType.quantityType(forIdentifier: .distanceCycling),
             let activeEnergy = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
@@ -45,6 +50,11 @@ class HealthKitSetupAssistant {
                                                         heartRate,
                                                         bodyMass,
                                                         bodyMassIndex,
+                                                        dietaryFatTotal,
+                                                        dietaryCarbohydrates,
+                                                        dietarySugar,
+                                                        dietaryProtein,
+                                                        dietaryEnergyConsumed,
                                                         HKObjectType.workoutType()]
         
         let healthKitTypesToWrite: Set<HKSampleType> = [

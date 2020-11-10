@@ -36,7 +36,7 @@ class WorkoutOperation: AsyncOperation {
                 let workout = workouts.last {
                 let total = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
                 var metric = HealthMetric(type: HealthMetricType.workout, total: total, date: _self.startDate, unit: "calories", rank: HealthMetricType.workout.rank)
-                metric.hkWorkout = workout
+                metric.hkSample = workout
                 
                 var activities: [Activity] = []
                 var averageEnergyBurned: Double = 0

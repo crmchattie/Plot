@@ -69,7 +69,7 @@ class HealthDetailViewController: UIViewController {
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "hide-grid"), style: .plain, target: self, action: #selector(hideUnhideTapped))
         
-        if viewModel.healthMetric.type == HealthMetricType.workout, let hkWorkout = viewModel.healthMetric.hkWorkout {
+        if viewModel.healthMetric.type == HealthMetricType.workout, let hkWorkout = viewModel.healthMetric.hkSample as? HKWorkout {
             title = hkWorkout.workoutActivityType.name
         } else {
             self.title = viewModel.healthMetric.type.name
