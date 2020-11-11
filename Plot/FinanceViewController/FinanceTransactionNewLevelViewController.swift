@@ -45,7 +45,7 @@ class FinanceTransactionNewLevelViewController: FormViewController {
                 Database.database().reference().child(userFinancialTransactionsCategoriesEntity).child(currentUser).child(value).setValue(value)
             } else if level == "Category" {
                 Database.database().reference().child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser).child(value).setValue(value)
-            } else {
+            } else if level == "Group" {
                 Database.database().reference().child(userFinancialTransactionsGroupsEntity).child(currentUser).child(value).setValue(value)
             }
         }

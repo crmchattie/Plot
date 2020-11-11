@@ -19,10 +19,10 @@ struct Meal: Codable, Equatable, Hashable {
     var productContainer: [FoodProductContainer]?
     var nutrition: Nutrition?
     var participantsIDs: [String]?
-    var lastModifiedDate: String?
-    var createdDate: String?
-    var startDateTime: String?
-    var endDateTime: String?
+    var lastModifiedDate: Date?
+    var createdDate: Date?
+    var startDateTime: Date?
+    var endDateTime: Date?
     var admin: String?
     var badge: Int?
     var pinned: Bool?

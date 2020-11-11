@@ -213,7 +213,7 @@ class FinanceTransactionViewController: FormViewController {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = "Split amount by"
-                $0.value = transaction.splitNumber ?? transaction.participantsIDs?.count
+                $0.value = transaction.splitNumber
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor

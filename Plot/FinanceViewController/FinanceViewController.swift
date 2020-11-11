@@ -264,7 +264,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                         dispatchGroup.enter()
                         let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
                         if !self.transactions.contains(transaction) {
-                            updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
+                            updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction, bool) in
                                 if finalAccount?.should_link ?? true {
                                     self.transactions.append(transaction)
                                     if transaction.status != .pending {
@@ -272,8 +272,8 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                     }
                                 } else {
                                     var _transaction = transaction
-                                    self.transactions.append(_transaction)
                                     _transaction.should_link = false
+                                    self.transactions.append(_transaction)
                                     if transaction.status != .pending {
                                         newTransactions.append(transaction)
                                     }
@@ -293,7 +293,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                         dispatchGroup.enter()
                         let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
                         if !self.transactions.contains(transaction) {
-                            updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
+                            updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction, bool) in
                                 if finalAccount?.should_link ?? true {
                                     self.transactions.append(transaction)
                                     if transaction.status != .pending {
@@ -301,8 +301,8 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                     }
                                 } else {
                                     var _transaction = transaction
-                                    self.transactions.append(_transaction)
                                     _transaction.should_link = false
+                                    self.transactions.append(_transaction)
                                     if transaction.status != .pending {
                                         newTransactions.append(transaction)
                                     }
@@ -326,7 +326,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     dispatchGroup.enter()
                     let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
                     if !self.transactions.contains(transaction) {
-                        updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction) in
+                        updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction, bool) in
                             if finalAccount?.should_link ?? true {
                                 self.transactions.append(transaction)
                                 if transaction.status != .pending {
@@ -334,8 +334,8 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                 }
                             } else {
                                 var _transaction = transaction
-                                self.transactions.append(_transaction)
                                 _transaction.should_link = false
+                                self.transactions.append(_transaction)
                                 if transaction.status != .pending {
                                     newTransactions.append(transaction)
                                 }
@@ -539,8 +539,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     self!.updateCollectionView()
                 }
             }
-            }
-        )
+        })
     }
     
     func observeTransactionsForCurrentUser() {
@@ -551,31 +550,51 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                     self!.updateCollectionView()
                 }
             }
-            }
-        )
+        })
     }
     
     func observeTransactionRulesForCurrentUser() {
         self.transactionRuleFetcher.observeTransactionRuleForCurrentUser(transactionRulesAdded: { [weak self] transactionRulesAdded in
+            var newTransactions = [Transaction]()
             for transactionRule in transactionRulesAdded {
-                if !self!.transactionRules.contains(transactionRule) {
-                    self!.transactionRules.append(transactionRule)
-                    self!.updateCollectionView()
+                self!.transactionRules.append(transactionRule)
+                for index in 0...self!.transactions.count - 1 {
+                    updateTransactionWRule(transaction: self!.transactions[index], transactionRules: self!.transactionRules) { (transaction, bool) in
+                        if bool {
+                            self!.transactions[index] = transaction
+                            newTransactions.append(transaction)
+                        }
+                    }
                 }
+            }
+            if !newTransactions.isEmpty {
+                self!.updateCollectionView()
+                self!.updateExistingTransactionsFB(transactions: newTransactions)
             }
             }, transactionRulesRemoved: { [weak self] transactionRulesRemoved in
                 for transactionRule in transactionRulesRemoved {
                     if let index = self!.transactionRules.firstIndex(where: {$0 == transactionRule}) {
                         self!.transactionRules.remove(at: index)
-                        self!.updateCollectionView()
                     }
                 }
             }, transactionRulesChanged: { [weak self] transactionRulesChanged in
+                var newTransactions = [Transaction]()
                 for transactionRule in transactionRulesChanged {
                     if let index = self!.transactionRules.firstIndex(where: {$0 == transactionRule}) {
                         self!.transactionRules[index] = transactionRule
-                        self!.updateCollectionView()
                     }
+                    for index in 0...self!.transactions.count - 1 {
+                        updateTransactionWRule(transaction: self!.transactions[index], transactionRules: self!.transactionRules) { (transaction, bool) in
+                            if bool {
+                                self!.transactions[index] = transaction
+                                newTransactions.append(transaction)
+                            }
+                        }
+                    }
+                }
+                if !newTransactions.isEmpty {
+                    self!.updateCollectionView()
+                    self!.updateExistingTransactionsFB(transactions: newTransactions)
                 }
             }
         )
@@ -616,6 +635,20 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             } catch let error {
                 print(error)
             }
+        }
+    }
+    
+    private func updateExistingTransactionsFB(transactions: [Transaction]) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference()
+        for transaction in transactions {
+            ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction.guid).child("description").setValue(transaction.description)
+            ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction.guid).child("should_link").setValue(transaction.should_link)
+            ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction.guid).child("category").setValue(transaction.category)
+            ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction.guid).child("top_level_category").setValue(transaction.top_level_category)
+            ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction.guid).child("group").setValue(transaction.group)
         }
     }
     

@@ -456,7 +456,6 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
         topLevelCategoryArray.sort()
         var categoryArray = Array(Set(transactionsList.compactMap({ $0.category })))
         categoryArray.sort()
-        
         if let index = groupArray.firstIndex(of: "Income") {
             groupArray.remove(at: index)
             groupArray.insert("Income", at: 0)
@@ -520,39 +519,35 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     completion(sortedTransactionsList, transactionsDict)
 }
 
-func updateTransactionWRule(transaction: Transaction, transactionRules: [TransactionRule], completion: @escaping (Transaction) -> ()) {
+func updateTransactionWRule(transaction: Transaction, transactionRules: [TransactionRule], completion: @escaping (Transaction, Bool) -> ()) {
+    var bool = false
     var _transaction = transaction
     for rule in transactionRules {
-        if rule.amount != nil, rule.amount == _transaction.amount, transaction.description.lowercased().contains(rule.match_description.lowercased()) {
-            if rule.description != nil {
-                _transaction.description = rule.description!
-            }
-            if rule.should_link != nil {
-                _transaction.should_link = rule.should_link
+        if transaction.description.lowercased().contains(rule.match_description.lowercased()) {
+            bool = true
+            if rule.amount != nil, rule.amount == _transaction.amount {
+                if rule.description != nil {
+                    _transaction.description = rule.description!
+                }
+                if rule.should_link != nil {
+                    _transaction.should_link = rule.should_link
+                }
                 _transaction.group = rule.group ?? "Uncategorized"
                 _transaction.top_level_category = rule.top_level_category ?? "Uncategorized"
                 _transaction.category = rule.category ?? "Uncategorized"
             } else {
-                _transaction.group = rule.group ?? "Uncategorized"
-                _transaction.top_level_category = rule.top_level_category ?? "Uncategorized"
-                _transaction.category = rule.category ?? "Uncategorized"
-            }
-        } else if transaction.description.lowercased().contains(rule.match_description.lowercased()) {
-            if rule.description != nil {
-                _transaction.description = rule.description!
-            }
-            if rule.should_link != nil {
-                _transaction.should_link = rule.should_link
-                _transaction.group = rule.group ?? "Uncategorized"
-                _transaction.top_level_category = rule.top_level_category ?? "Uncategorized"
-                _transaction.category = rule.category ?? "Uncategorized"
-            } else {
+                if rule.description != nil {
+                    _transaction.description = rule.description!
+                }
+                if rule.should_link != nil {
+                    _transaction.should_link = rule.should_link
+                }
                 _transaction.group = rule.group ?? "Uncategorized"
                 _transaction.top_level_category = rule.top_level_category ?? "Uncategorized"
                 _transaction.category = rule.category ?? "Uncategorized"
             }
         }
     }
-    completion(_transaction)
+    completion(_transaction, bool)
 }
 

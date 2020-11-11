@@ -90,6 +90,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else if let transaction = transaction {
                     $0.value = transaction.description
+                    transactionRule.match_description = transaction.description
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -122,7 +123,6 @@ class FinanceTransactionRuleViewController: FormViewController {
             }
             
             <<< DecimalRow("Transaction amount equals") {
-                $0.cell.isUserInteractionEnabled = false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
@@ -130,6 +130,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     $0.value = amount
                 } else if let transaction = transaction {
                     $0.value = transaction.amount
+                    transactionRule.amount = transaction.amount
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -150,9 +151,11 @@ class FinanceTransactionRuleViewController: FormViewController {
                 } else if let should_link = transaction.should_link {
                     $0.title = "Included in Financial Profile"
                     $0.value = should_link
+                    transactionRule.should_link = should_link
                 } else {
                     $0.title = "Not Included in Financial Profile"
-                    $0.value = false
+                    $0.value = true
+                    transactionRule.should_link = true
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -248,13 +251,10 @@ extension FinanceTransactionRuleViewController: UpdateTransactionLevelDelegate {
             row.updateCell()
             if level == "Subcategory" {
                 transactionRule.category = value
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("category").setValue(value)
             } else if level == "Category" {
                 transactionRule.top_level_category = value
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("top_level_category").setValue(value)
             } else {
                 transactionRule.group = value
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("group").setValue(value)
             }
         }
     }

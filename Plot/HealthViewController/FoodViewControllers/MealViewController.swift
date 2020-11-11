@@ -265,6 +265,95 @@ class MealViewController: FormViewController {
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
+            
+            <<< DateTimeInlineRow("Starts") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.title = $0.tag
+                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                $0.dateFormatter?.dateStyle = .medium
+                $0.dateFormatter?.timeStyle = .short
+                if self.active {
+                    $0.value = self.meal!.startDateTime
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    $0.value = rounded.addingTimeInterval(seconds)
+                    self.meal.startDateTime = $0.value
+                }
+                }.onChange { [weak self] row in
+                    let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
+                    if row.value?.compare(endRow.value!) == .orderedDescending {
+                        endRow.value = Date(timeInterval: 0, since: row.value!)
+                        endRow.updateCell()
+                    }
+                    self!.meal.startDateTime = row.value
+                }.onExpandInlineRow { cell, row, inlineRow in
+                    inlineRow.cellUpdate() { cell, row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.datePicker.datePickerMode = .dateAndTime
+                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    }
+                    let color = cell.detailTextLabel?.textColor
+                    row.onCollapseInlineRow { cell, _, _ in
+                        cell.detailTextLabel?.textColor = color
+                    }
+                    cell.detailTextLabel?.textColor = cell.tintColor
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }
+            
+            <<< DateTimeInlineRow("Ends"){
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.title = $0.tag
+                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                $0.dateFormatter?.dateStyle = .medium
+                $0.dateFormatter?.timeStyle = .short
+                if self.active {
+                    $0.value = self.meal!.endDateTime
+                } else {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    let timezone = TimeZone.current
+                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                    $0.value = rounded.addingTimeInterval(seconds)
+                    self.meal.endDateTime = $0.value
+                }
+                }.onChange { [weak self] row in
+                    let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
+                    if row.value?.compare(startRow.value!) == .orderedAscending {
+                        startRow.value = Date(timeInterval: 0, since: row.value!)
+                        startRow.updateCell()
+                    }
+                    self!.meal.endDateTime = row.value
+                }.onExpandInlineRow { cell, row, inlineRow in
+                        inlineRow.cellUpdate() { cell, row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.datePicker.datePickerMode = .dateAndTime
+                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    }
+                    let color = cell.detailTextLabel?.textColor
+                    row.onCollapseInlineRow { cell, _, _ in
+                        cell.detailTextLabel?.textColor = color
+                    }
+                    cell.detailTextLabel?.textColor = cell.tintColor
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        
+                    }
         
             <<< ButtonRow("Participants") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -289,15 +378,15 @@ class MealViewController: FormViewController {
                 }
             }
         
-            <<< DecimalRow("Amount") {
+            <<< DecimalRow("Servings") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
                 $0.value = meal.amount
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 self.meal.amount = row.value
                 self.timer?.invalidate()

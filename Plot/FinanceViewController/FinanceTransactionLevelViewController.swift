@@ -21,17 +21,28 @@ class FinanceTransactionLevelViewController: FormViewController {
     var topLevelCategories = [String]()
     var groups = [String]()
     
+    var oldValue = String()
     var value = String()
     var level = String()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.centerInSuperview()
         configureTableView()
+        oldValue = value
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        print("viewDidAppear")
+        activityIndicatorView.startAnimating()
         updateLevels()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        if value != oldValue {
+            print("value != oldValue")
+            self.delegate?.update(value: value, level: level)
+        }
     }
     
     fileprivate func updateLevels() {
@@ -61,7 +72,7 @@ class FinanceTransactionLevelViewController: FormViewController {
                     }
                     dispatchGroup.leave()
                 })
-            } else {
+            } else if level == "Group" {
                 groups = financialTransactionsGroups.sorted()
                 dispatchGroup.enter()
                 reference.child(userFinancialTransactionsGroupsEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
@@ -75,6 +86,7 @@ class FinanceTransactionLevelViewController: FormViewController {
             }
             
             dispatchGroup.notify(queue: .main) {
+                activityIndicatorView.stopAnimating()
                 self.initializeForm()
             }
         }
@@ -90,14 +102,8 @@ class FinanceTransactionLevelViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        let newLevelBarButton = UIBarButtonItem(title: "New Item", style: .plain, target: self, action: #selector(newLevel))
-        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-        navigationItem.rightBarButtonItems = [addBarButton, newLevelBarButton]
-    }
-    
-    @IBAction func create(_ sender: AnyObject) {
-        self.delegate?.update(value: value, level: level)
-        self.navigationController?.popViewController(animated: true)
+        let newLevelBarButton = UIBarButtonItem(title: "New \(level)", style: .plain, target: self, action: #selector(newLevel))
+        navigationItem.rightBarButtonItem = newLevelBarButton
     }
     
     @objc func newLevel(_ item:UIBarButtonItem) {
@@ -162,7 +168,7 @@ class FinanceTransactionLevelViewController: FormViewController {
                         }
                     })
             }
-        } else {
+        } else if level == "Group" {
             for title in groups {
                 form.last!
                     <<< ListCheckRow<String>() {
