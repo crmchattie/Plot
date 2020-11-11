@@ -7,11 +7,16 @@
 //
 
 import Foundation
+import HealthKit
 
 class NutritionOperation: AsyncOperation {
     weak var delegate: MetricOperationDelegate?
     
-    override init() {
+    private var date: Date
+    private var nutritionTypeIdentifier: HKQuantityTypeIdentifier
+    init(date: Date, nutritionTypeIdentifier: HKQuantityTypeIdentifier) {
+        self.date = date
+        self.nutritionTypeIdentifier = nutritionTypeIdentifier
     }
     
     override func main() {
@@ -19,16 +24,16 @@ class NutritionOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        let startDate = Date()
-        HealthKitService.getCumulativeSumSample(forIdentifier: .dietaryFatTotal, unit: .gram(), date: startDate) { [weak self] stepsResult in
-            guard let stepsResult = stepsResult, stepsResult > 0, let _self = self else {
+        let endDate = date
+        let startDate = endDate.lastYear
+        HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: nutritionTypeIdentifier, unit: .gram(), startDate: startDate, endDate: endDate) { [weak self] annualAverage, dailyTotal in
+            guard let annualAverage = annualAverage, let dailyTotal = dailyTotal, let _self = self else {
                 self?.finish()
                 return
             }
 
-            let steps = stepsResult
-            var metric = HealthMetric(type: HealthMetricType.nutrition, total: steps, date: startDate, unit: "Fat", rank: HealthMetricType.steps.rank)
-            metric.average = 0
+            var metric = HealthMetric(type: HealthMetricType.nutrition, total: dailyTotal, date: endDate, unit: "grams", rank: HealthMetricType.nutrition.rank)
+            metric.average = annualAverage
             
             _self.delegate?.insertMetric(_self, metric)
             self?.finish()

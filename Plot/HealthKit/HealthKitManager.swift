@@ -100,8 +100,12 @@ class HealthKitManager {
             hiitOp.delegate = self
             hiitOp.lastSyncDate = lastSyncDate
             
+            // Nutrition
+            let nutritionOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryFatTotal)
+            nutritionOp.delegate = self
+            
             // Setup queue
-            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp], waitUntilFinished: false)
+            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, nutritionOp], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in

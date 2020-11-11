@@ -144,31 +144,31 @@ class HealthKitService {
         healthStore.execute(query)
     }
     
-    class func getCumulativeSumSample(forIdentifier identifier: HKQuantityTypeIdentifier,
+    class func getCumulativeSumSampleAverageAndRecent(forIdentifier identifier: HKQuantityTypeIdentifier,
                                       unit: HKUnit,
                                       date: Date,
-                                      completion: @escaping (Double?) -> Void) {
+                                      completion: @escaping (Double?, Double?) -> Void) {
         let calendar = Calendar.current
         let startDate = calendar.startOfDay(for: date)
         let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
         
-        getCumulativeSumSample(forIdentifier: identifier, unit: unit, startDate: startDate, endDate: endDate, completion: completion)
+        getCumulativeSumSampleAverageAndRecent(forIdentifier: identifier, unit: unit, startDate: startDate, endDate: endDate, completion: completion)
     }
     
-    class func getCumulativeSumSample(forIdentifier identifier: HKQuantityTypeIdentifier,
+    class func getCumulativeSumSampleAverageAndRecent(forIdentifier identifier: HKQuantityTypeIdentifier,
                                       unit: HKUnit,
                                       startDate: Date,
                                       endDate: Date,
-                                      completion: @escaping (Double?) -> Void) {
+                                      completion: @escaping (Double?, Double?) -> Void) {
         guard let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) else {
-            completion(nil)
+            completion(nil, nil)
             return
         }
         
         //  Set the Predicates & Interval
         let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
         var interval = DateComponents()
-        interval.year = 1
+        interval.day = 1
         
         //  Perform the Query
         let query = HKStatisticsCollectionQuery(
@@ -179,8 +179,19 @@ class HealthKitService {
             intervalComponents: interval)
         
         query.initialResultsHandler = { query, results, error in
-            let count = results?.statistics().first?.sumQuantity()?.doubleValue(for: unit)
-            completion(count)
+            let statistics = results?.statistics() ?? []
+            var total: Double = 0
+            for statistic in statistics {
+                total += statistic.sumQuantity()?.doubleValue(for: unit) ?? 0
+            }
+            
+            if total > 0 {
+                total /= Double(statistics.count)
+            }
+            
+            let recent = statistics.last?.sumQuantity()?.doubleValue(for: unit)
+            
+            completion(total, recent)
         }
 
         healthStore.execute(query)

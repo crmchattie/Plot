@@ -21,14 +21,13 @@ class AnnualAverageStepsOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        HealthKitService.getCumulativeSumSample(forIdentifier: .stepCount, unit: .count(), startDate: startDate.lastYear, endDate: startDate) { [weak self] annualSteps in
+        HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .stepCount, unit: .count(), startDate: startDate.lastYear, endDate: startDate) { [weak self] annualSteps, _ in
             guard let annualSteps = annualSteps, let _self = self else {
                 self?.finish()
                 return
             }
             
-            let totalDays = Calendar.current.dateComponents([.day], from: _self.startDate.lastYear, to: _self.startDate).day ?? 0
-            _self.steps = annualSteps/Double(totalDays)
+            _self.steps = annualSteps
             self?.finish()
         }
     }
