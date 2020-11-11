@@ -220,7 +220,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     row.value = string
                 } else if let transaction = transaction {
                     row.value = transaction.top_level_category
-                    transactionRule.top_level_category = transaction.top_level_category
+                    transactionRule.category = transaction.category
                 }
             }.onCellSelection({ _, row in
                 self.openLevel(level: row.tag!, value: row.value!)

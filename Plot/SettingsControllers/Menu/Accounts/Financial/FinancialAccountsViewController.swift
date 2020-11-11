@@ -18,6 +18,11 @@ class FinancialAccountsViewController: UITableViewController {
     var memberAccountsDict = [MXMember: [MXAccount]]()
     var user: MXUser!
     var institutionDict = [String: String]()
+    var accounts = [MXAccount]()
+    var transactionRules = [TransactionRule]()
+    
+    let transactionRuleFetcher = FinancialTransactionRuleFetcher()
+    let accountFetcher = FinancialAccountFetcher()
     
     let viewPlaceholder = ViewPlaceholder()
     
@@ -36,7 +41,6 @@ class FinancialAccountsViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
-        
         let newAccountBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
         navigationItem.rightBarButtonItem = newAccountBarButton
         
@@ -48,6 +52,26 @@ class FinancialAccountsViewController: UITableViewController {
             return
         }
         viewPlaceholder.add(for: tableView, title: .emptyAccounts, subtitle: .emptyAccounts, priority: .medium, position: .top)
+    }
+    
+    func getFinancialData() {
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
+        accountFetcher.fetchAccounts { (firebaseAccounts) in
+            self.accounts = firebaseAccounts
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.enter()
+        self.transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
+            self.transactionRules = firebaseTransactionRules
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.tableView.reloadData()
+        }
+        
     }
     
     func getMXUser() {

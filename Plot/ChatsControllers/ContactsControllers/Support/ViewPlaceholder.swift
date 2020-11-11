@@ -38,6 +38,7 @@ enum ViewPlaceholderTitle: String {
     case emptyIngredients = "Please search for ingredients and grocery items above"
     case emptyAccounts = "You are not connected to any accounts yet"
     case emptyMealProducts = "Please search for ingredients, grocery items and restaurant menu items above"
+    case emptyTransactionRules = "You have not created any transaction rules"
 }
 
 enum ViewPlaceholderSubtitle: String {
@@ -54,6 +55,7 @@ enum ViewPlaceholderSubtitle: String {
     case emptyMap = "Activities will appear here and on the map as pins"
     case emptyLists = "You can add a list with the plus button in the upper right corner"
     case emptyAccounts = "You can add an account with the plus button in the upper right corner"
+    case emptyTransactionRules = "You can add a transaction rule with the plus button in the upper right corner"
 }
 
 class ViewPlaceholder: UIView {

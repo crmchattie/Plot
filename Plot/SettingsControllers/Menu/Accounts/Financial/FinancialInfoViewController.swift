@@ -1,22 +1,14 @@
 //
-//  AccountsTableViewController.swift
+//  FinancialInfoTableViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/17/20.
+//  Created by Cory McHattie on 11/11/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
-//
-
-//
-//  StorageTableViewController.swift
-//  Avalon-Print
-//
-//  Created by Roman Mizin on 7/4/17.
-//  Copyright © 2017 Roman Mizin. All rights reserved.
 //
 
 import UIKit
 
-class AccountsTableViewController: UITableViewController {
+class FinancialInfoViewController: UITableViewController {
     
     deinit {
         print("STORAGE DID DEINIT")
@@ -25,19 +17,15 @@ class AccountsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Information"
+        title = "Financial Information"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
     }
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 2
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -52,16 +40,12 @@ class AccountsTableViewController: UITableViewController {
         cell.backgroundColor = view.backgroundColor
         
         if indexPath.row == 0 {
-            cell.textLabel?.text = "Calendar Information"
+            cell.textLabel?.text = "Accounts"
             cell.isUserInteractionEnabled = true
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
         if indexPath.row == 1 {
-            cell.textLabel?.text = "Financial Information"
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }
-        if indexPath.row == 2 {
-            cell.textLabel?.text = "Health Information"
+            cell.textLabel?.text = "Transaction Rules"
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
         return cell
@@ -69,16 +53,13 @@ class AccountsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 {
-            
-        }
-        if indexPath.row == 1 {
-            let destination = FinancialInfoViewController()
+            let destination = FinancialAccountsViewController()
             navigationController?.pushViewController(destination, animated: true)
         }
-        if indexPath.row == 2 {
-            
+        if indexPath.row == 1 {
+            let destination = FinancialTransactionRulesViewController()
+            navigationController?.pushViewController(destination, animated: true)
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }
-

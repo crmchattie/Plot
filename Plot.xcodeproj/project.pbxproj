@@ -146,6 +146,8 @@
 		10DE973B2475E4E600D4A7E8 /* ChecklistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */; };
 		10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */; };
 		10DFC3B2255A148F00565DAD /* WorkoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFC3B1255A148E00565DAD /* WorkoutViewController.swift */; };
+		10DFC3DB255C48A500565DAD /* FinancialInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFC3DA255C48A400565DAD /* FinancialInfoViewController.swift */; };
+		10DFC3E3255C495800565DAD /* FinancialTransactionRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFC3E2255C495800565DAD /* FinancialTransactionRulesViewController.swift */; };
 		10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */; };
 		10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB0925217C3200898D6E /* HeaderCell.swift */; };
 		10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */; };
@@ -531,6 +533,8 @@
 		10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistFetcher.swift; sourceTree = "<group>"; };
 		10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsDetailCell.swift; sourceTree = "<group>"; };
 		10DFC3B1255A148E00565DAD /* WorkoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutViewController.swift; sourceTree = "<group>"; };
+		10DFC3DA255C48A400565DAD /* FinancialInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialInfoViewController.swift; sourceTree = "<group>"; };
+		10DFC3E2255C495800565DAD /* FinancialTransactionRulesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionRulesViewController.swift; sourceTree = "<group>"; };
 		10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTableViewCell.swift; sourceTree = "<group>"; };
 		10E4DB0925217C3200898D6E /* HeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderCell.swift; sourceTree = "<group>"; };
 		10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewMemberCell.swift; sourceTree = "<group>"; };
@@ -1071,7 +1075,9 @@
 		10F3032824EC69C200C04B8F /* Financial */ = {
 			isa = PBXGroup;
 			children = (
+				10DFC3DA255C48A400565DAD /* FinancialInfoViewController.swift */,
 				10F3032624EC622000C04B8F /* FinancialAccountsViewController.swift */,
+				10DFC3E2255C495800565DAD /* FinancialTransactionRulesViewController.swift */,
 				10021A1524F1A480006A1B25 /* FinancialMemberView.swift */,
 				10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */,
 			);
@@ -2288,6 +2294,7 @@
 				4BAEE50B21272D890045AB10 /* UserCell+ConfigureCell.swift in Sources */,
 				4BA1E77A215250F900391BCB /* StorageMediaUploader.swift in Sources */,
 				1082C89524F0A8F500CF6491 /* FinanceViewController.swift in Sources */,
+				10DFC3DB255C48A500565DAD /* FinancialInfoViewController.swift in Sources */,
 				10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */,
 				1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */,
 				105F66F724171A3C00F6EDB6 /* WorkoutDetailViewController.swift in Sources */,
@@ -2416,6 +2423,7 @@
 				4BAEE5D6212735E50045AB10 /* Announcement.swift in Sources */,
 				10196F0724411B5600B6AFDF /* SelectActivityMembersViewController.swift in Sources */,
 				4BAEE5E4212735E50045AB10 /* EnterVerificationContainerView+timerHandlers.swift in Sources */,
+				10DFC3E3255C495800565DAD /* FinancialTransactionRulesViewController.swift in Sources */,
 				10EE27F3245DFA8E00C80AAF /* PackinglistViewController.swift in Sources */,
 				10B541EA25479D6500CC9023 /* MenuProductDetailViewController.swift in Sources */,
 				4BAEE5DE212735E50045AB10 /* TransitionController.swift in Sources */,
