@@ -28,7 +28,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         var statisticsOptions: HKStatisticsOptions = .discreteAverage
         
         var unit: HKUnit = HKUnit.count()
-        if healthMetricType == .steps {
+        if case .steps = healthMetricType {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
                 print("*** Unable to create a step count type ***")
                 completion(nil, nil, nil)
@@ -38,7 +38,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             statisticsOptions = .cumulativeSum
             quantityType = type
         }
-        else if healthMetricType == .weight {
+        else if case .weight = healthMetricType {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass) else {
                 print("*** Unable to create a step count type ***")
                 completion(nil, nil, nil)
@@ -48,7 +48,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             unit = HKUnit.pound()
             quantityType = type
         }
-        else if healthMetricType == .heartRate {
+        else if case .heartRate = healthMetricType {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate) else {
                 print("*** Unable to create a step count type ***")
                 completion(nil, nil, nil)
@@ -85,7 +85,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             startDate = endDate.monthBefore
         }
         else if segmentType == .year {
-            if healthMetricType == .steps {
+            if case .steps = healthMetricType {
                 interval.day = 1
             } else {
                 interval.month = 1
@@ -96,7 +96,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             startDate = endDate.lastYear
         }
                 
-        if healthMetricType == .workout, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+        if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
             let workoutActivityType = hkWorkout.workoutActivityType
             HealthKitService.getAllWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate, endDate: endDate) { [weak self] workouts, error  in
                 var stats: [Statistic]?
@@ -118,7 +118,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             
             HealthKitService.getIntervalBasedSamples(for: quantityTypeValue, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval) { [weak self] (results, error) in
                 var stats: [Statistic]?
-                if healthMetricType == .steps {
+                if case .steps = healthMetricType {
                     if segmentType == .year {
                         stats = self?.perpareCustomStatsForDailyAverageForAnnualSteps(from: results)
                     } else {

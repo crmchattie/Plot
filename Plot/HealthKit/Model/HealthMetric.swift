@@ -26,13 +26,21 @@ struct HealthMetric: Equatable {
     }
     
     static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.type == rhs.type && lhs.total == rhs.total && lhs.date == rhs.date && lhs.unit == rhs.unit && lhs.average == rhs.average
+        var type = false
+        switch (lhs.type, rhs.type) {
+        case let (.nutrition(v0), .nutrition(v1)):
+            type = v0 == v1
+        default:
+            type = false
+        }
+        
+        return type && lhs.total == rhs.total && lhs.date == rhs.date && lhs.unit == rhs.unit && lhs.average == rhs.average
     }
 }
 
 enum HealthMetricType {
     case steps
-    case nutrition
+    case nutrition(String)
     case workout
     case heartRate
     case weight
@@ -42,8 +50,8 @@ enum HealthMetricType {
             switch self {
             case .steps:
                 return "Steps"
-            case .nutrition:
-                return "Nutrition"
+            case .nutrition(let value):
+                return value
             case .workout:
                 return "Exercise"
             case .heartRate:
@@ -60,9 +68,9 @@ enum HealthMetricType {
             case .steps:
                 return 3
             case .nutrition:
-                return 4
-            case .workout:
                 return 5
+            case .workout:
+                return 4
             case .heartRate:
                 return 2
             case .weight:

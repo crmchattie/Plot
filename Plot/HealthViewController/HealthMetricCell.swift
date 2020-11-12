@@ -113,20 +113,21 @@ class HealthMetricCell: UICollectionViewCell {
     }
     
     func configure(_ healthMetric: HealthMetric) {
-        var timeAgo = "today"
+        let isToday = NSCalendar.current.isDateInToday(healthMetric.date)
+        var timeAgo = isToday ? "today" : timeAgoSinceDate(healthMetric.date)
         var title = healthMetric.type.name
-        if healthMetric.type == HealthMetricType.workout, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+        if case HealthMetricType.workout = healthMetric.type, let hkWorkout = healthMetric.hkSample as? HKWorkout {
             title = hkWorkout.workoutActivityType.name
-            timeAgo = timeAgoSinceDate(hkWorkout.endDate)
+            timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "" : timeAgoSinceDate(hkWorkout.endDate)
         }
-        else if healthMetric.type == HealthMetricType.heartRate || healthMetric.type == HealthMetricType.weight {
-            timeAgo = timeAgoSinceDate(healthMetric.date)
+        else if case HealthMetricType.nutrition(let value) = healthMetric.type {
+            title = value
         }
         
         titleLabel.text = title
         
         var total = "\(Int(healthMetric.total))"
-        if healthMetric.type == HealthMetricType.weight {
+        if case HealthMetricType.weight = healthMetric.type {
             total = healthMetric.total.clean
         }
         
@@ -134,7 +135,7 @@ class HealthMetricCell: UICollectionViewCell {
         
         if let averageValue = healthMetric.average {
             var average = "\(Int(averageValue))"
-            if healthMetric.type == HealthMetricType.weight {
+            if case HealthMetricType.weight = healthMetric.type {
                 average = averageValue.clean
             }
             detailLabel.text = "\(average) \(healthMetric.unit) on average"

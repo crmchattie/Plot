@@ -101,11 +101,23 @@ class HealthKitManager {
             hiitOp.lastSyncDate = lastSyncDate
             
             // Nutrition
-            let nutritionOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryFatTotal)
-            nutritionOp.delegate = self
+//            let dietaryEnergyConsumedOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryEnergyConsumed)
+//            dietaryEnergyConsumedOp.delegate = self
+            
+            let dietaryFatTotalOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryFatTotal)
+            dietaryFatTotalOp.delegate = self
+            
+            let dietaryProteinOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryProtein)
+            dietaryProteinOp.delegate = self
+            
+            let dietaryCarbohydratesOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryCarbohydrates)
+            dietaryCarbohydratesOp.delegate = self
+            
+            let dietarySugarOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietarySugar)
+            dietarySugarOp.delegate = self
             
             // Setup queue
-            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, nutritionOp], waitUntilFinished: false)
+            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in

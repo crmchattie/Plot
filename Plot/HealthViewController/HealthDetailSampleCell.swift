@@ -123,11 +123,11 @@ class HealthDetailSampleCell: UITableViewCell {
             return
         }
         
-        if type == .workout, let workout = sample as? HKWorkout {
+        if case .workout = type, let workout = sample as? HKWorkout {
             let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
             subtitleLabel.text = "\(totalEnergyBurned.clean) calories"
         }
-        else if type == .heartRate, let quantitySample = sample as? HKQuantitySample {
+        else if case .heartRate = type, let quantitySample = sample as? HKQuantitySample {
             let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
             let count = quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit)
             let string = "\(count) bpm"
@@ -137,7 +137,7 @@ class HealthDetailSampleCell: UITableViewCell {
                 subtitleLabel.text = string
             }
         }
-        else if type == .weight, let quantitySample = sample as? HKQuantitySample {
+        else if case .weight = type, let quantitySample = sample as? HKQuantitySample {
             let unit = HKUnit.pound()
             let count = quantitySample.quantity.doubleValue(for: unit)
             let string = "\(count) lb"
@@ -147,7 +147,7 @@ class HealthDetailSampleCell: UITableViewCell {
                 subtitleLabel.text = string
             }
         }
-        else if type == .steps, let quantitySample = sample as? HKQuantitySample {
+        else if case .steps = type, let quantitySample = sample as? HKQuantitySample {
             let unit = HKUnit.count()
             let count = Int(quantitySample.quantity.doubleValue(for: unit))
             let string = "\(count) steps"
