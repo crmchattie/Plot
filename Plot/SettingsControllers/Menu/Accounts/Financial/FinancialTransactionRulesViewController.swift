@@ -77,7 +77,7 @@ class FinancialTransactionRulesViewController: UITableViewController {
         let rule = transactionRules[indexPath.item]
         cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor
         cell.textLabel!.font = UIFont.preferredFont(forTextStyle: .body)
-        cell.textLabel!.text = rule.description
+        cell.textLabel!.text = rule.match_description
         return cell
     }
     

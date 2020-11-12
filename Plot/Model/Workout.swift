@@ -12,9 +12,10 @@ let workoutsEntity = "workouts"
 let userWorkoutsEntity = "user-workouts"
 
 struct Workout: Codable, Equatable, Hashable {
-    let id: String
+    var id: String
     var name: String
     var type: String?
+    var weight: Int?
     var duration: Double?
     var calories: Double?
     var participantsIDs: [String]?

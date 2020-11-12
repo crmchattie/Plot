@@ -141,20 +141,19 @@ class WorkoutViewController: FormViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         if active {
-            alert.addAction(UIAlertAction(title: "Update Meal", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Update Workout", style: .default, handler: { (_) in
                 print("User click Approve button")
                 
                 // update
-                //                self.showActivityIndicator()
-                //                let createMeal = MealActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                //                createMeal.createNewMeal()
-                //                self.hideActivityIndicator()
-                //
-                //                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                self.showActivityIndicator()
+                let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createWorkout.createNewWorkout()
+                self.hideActivityIndicator()
+                self.navigationController?.popViewController(animated: true)
                 
             }))
             
-            alert.addAction(UIAlertAction(title: "Duplicate Meal", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Duplicate Workout", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new workout with updated time
                 guard self.currentReachabilityStatus != .notReachable else {
@@ -163,41 +162,37 @@ class WorkoutViewController: FormViewController {
                 }
                 
                 if let currentUserID = Auth.auth().currentUser?.uid {
-                    //                    self.showActivityIndicator()
-                    //                    let createMeal = MealActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    //                    createMeal.createNewMeal()
-                    //
-                    //                    //duplicate workout
-                    //                    let newMealID = Database.database().reference().child(userMealsEntity).child(currentUserID).childByAutoId().key ?? ""
-                    //                    let newMeal = self.workout.copy() as! Meal
-                    //                    newMeal.ID = newMealID
-                    //                    newMeal.admin = currentUserID
-                    //                    newMeal.participantsIDs = nil
-                    //                    newMeal.conversationID = nil
-                    //                    newMeal.activityID = nil
-                    //
-                    //                    let createNewMeal = MealActions(workout: newMeal, active: false, selectedFalconUsers: [])
-                    //                    createNewMeal.createNewMeal()
-                    //                    self.hideActivityIndicator()
-                    //
-                    //                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                    self.showActivityIndicator()
+                    let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    createWorkout.createNewWorkout()
+
+                    //duplicate workout
+                    let newWorkoutID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    var newWorkout = self.workout!
+                    newWorkout.id = newWorkoutID
+                    newWorkout.admin = currentUserID
+                    newWorkout.participantsIDs = nil
+
+                    let createNewWorkout = WorkoutActions(workout: newWorkout, active: false, selectedFalconUsers: [])
+                    createNewWorkout.createNewWorkout()
+                    self.hideActivityIndicator()
+
+                    self.navigationController?.popViewController(animated: true)
                 }
                 
                 
             }))
             
         } else {
-            alert.addAction(UIAlertAction(title: "Create New Meal", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Create New Workout", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new activity
+                self.showActivityIndicator()
+                let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createWorkout.createNewWorkout()
+                self.hideActivityIndicator()
+                self.navigationController?.popViewController(animated: true)
                 
-                //                self.showActivityIndicator()
-                //                let createMeal = MealActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                //                createMeal.createNewMeal()
-                //                self.hideActivityIndicator()
-                //
-                //                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
-                //
             }))
             
         }
@@ -265,19 +260,20 @@ class WorkoutViewController: FormViewController {
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-            <<< DecimalRow("Weight") {
+            <<< IntRow("Weight") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
+                $0.value = workout.weight
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange({ row in
                 if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let weightValue = row.value, let duration = self.workout.duration {
-                    caloriesRow.value = duration * workoutType.caloriesBurned * weightValue
+                    caloriesRow.value = duration * workoutType.caloriesBurned * Double(weightValue)
                     caloriesRow.updateCell()
                 }
             })
@@ -306,8 +302,8 @@ class WorkoutViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }.onChange({ row in
                 self.workout.type = row.value
-                if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : DecimalRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let duration = self.workout.duration {
-                    caloriesRow.value = duration * workoutType.caloriesBurned * weightValue
+                if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let duration = self.workout.duration {
+                    caloriesRow.value = duration * workoutType.caloriesBurned * Double(weightValue)
                     caloriesRow.updateCell()
                 }
             })
@@ -329,7 +325,7 @@ class WorkoutViewController: FormViewController {
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 if let duration = workout.duration {
-                    let string = String(format: "%f", duration)
+                    let string = String(format: "%.0f", duration)
                     $0.value = "\(string) minutes"
                 } else {
                     $0.value = "30 minutes"
@@ -339,8 +335,8 @@ class WorkoutViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange({ row in
-                if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : DecimalRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let duration = self.workout.duration {
-                    caloriesRow.value = duration * workoutType.caloriesBurned * weightValue
+                if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let duration = self.workout.duration {
+                    caloriesRow.value = duration * workoutType.caloriesBurned * Double(weightValue)
                     caloriesRow.updateCell()
                 }
             })
@@ -471,15 +467,6 @@ class WorkoutViewController: FormViewController {
             }
         }
         
-        override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
-            super.rowsHaveBeenRemoved(rows, at: indexes)
-            let rowNumber : Int = indexes.first!.row
-            
-            DispatchQueue.main.async { [weak self] in
-                
-            }
-        }
-        
         @objc fileprivate func openParticipantsInviter() {
             guard currentReachabilityStatus != .notReachable else {
                 basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
@@ -586,11 +573,10 @@ class WorkoutViewController: FormViewController {
                 }
                 
                 if active {
-                    //                showActivityIndicator()
-                    //                let createMeal = MealActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
-                    //                createMeal.updateMealParticipants()
-                    //                hideActivityIndicator()
-                    
+                    showActivityIndicator()
+                    let createWorkout = WorkoutActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
+                    createWorkout.updateWorkoutParticipants()
+                    hideActivityIndicator()
                 }
                 
             }

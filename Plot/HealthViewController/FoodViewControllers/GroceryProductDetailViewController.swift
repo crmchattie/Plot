@@ -162,13 +162,13 @@ class GroceryProductDetailViewController: FormViewController {
             var section = self.form.sectionBy(tag: "Nutrition")
             let nutrients = nutrition.nutrients!.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
             for nutrient in nutrients {
-                if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, amount > 0 {
+                if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
                     section!.insert(LabelRow() {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = "\(title.capitalized)"
-                        $0.value = "\(String(format: "%.2f", amount)) \(unit.capitalized)"
+                        $0.value = "\(String(format: "%.0f", amount)) \(unit.capitalized)"
                     }.cellUpdate { cell, _ in
                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

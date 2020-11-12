@@ -12,7 +12,7 @@ let mealsEntity = "meals"
 let userMealsEntity = "user-meals"
 
 struct Meal: Codable, Equatable, Hashable {
-    let id: String
+    var id: String
     var name: String
     var type: String?
     var amount: Double?

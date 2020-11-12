@@ -146,12 +146,12 @@ class MealViewController: FormViewController {
                 print("User click Approve button")
                 
                 // update
-                //                self.showActivityIndicator()
-                //                let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                //                createMeal.createNewMeal()
-                //                self.hideActivityIndicator()
-                //
-                //                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                self.showActivityIndicator()
+                let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createMeal.createNewMeal()
+                self.hideActivityIndicator()
+
+                self.navigationController?.popViewController(animated: true)
                 
             }))
             
@@ -164,24 +164,22 @@ class MealViewController: FormViewController {
                 }
                 
                 if let currentUserID = Auth.auth().currentUser?.uid {
-                    //                    self.showActivityIndicator()
-                    //                    let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    //                    createMeal.createNewMeal()
-                    //
-                    //                    //duplicate meal
-                    //                    let newMealID = Database.database().reference().child(userMealsEntity).child(currentUserID).childByAutoId().key ?? ""
-                    //                    let newMeal = self.meal.copy() as! Meal
-                    //                    newMeal.ID = newMealID
-                    //                    newMeal.admin = currentUserID
-                    //                    newMeal.participantsIDs = nil
-                    //                    newMeal.conversationID = nil
-                    //                    newMeal.activityID = nil
-                    //
-                    //                    let createNewMeal = MealActions(meal: newMeal, active: false, selectedFalconUsers: [])
-                    //                    createNewMeal.createNewMeal()
-                    //                    self.hideActivityIndicator()
-                    //
-                    //                    self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                    self.showActivityIndicator()
+                    let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    createMeal.createNewMeal()
+
+                    //duplicate meal
+                    let newMealID = Database.database().reference().child(userMealsEntity).child(currentUserID).childByAutoId().key ?? ""
+                    var newMeal = self.meal!
+                    newMeal.id = newMealID
+                    newMeal.admin = currentUserID
+                    newMeal.participantsIDs = nil
+
+                    let createNewMeal = MealActions(meal: newMeal, active: false, selectedFalconUsers: [])
+                    createNewMeal.createNewMeal()
+                    self.hideActivityIndicator()
+
+                    self.navigationController?.popViewController(animated: true)
                 }
                 
                 
@@ -191,14 +189,11 @@ class MealViewController: FormViewController {
             alert.addAction(UIAlertAction(title: "Create New Meal", style: .default, handler: { (_) in
                 print("User click Approve button")
                 // create new activity
-                
-                //                self.showActivityIndicator()
-                //                let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                //                createMeal.createNewMeal()
-                //                self.hideActivityIndicator()
-                //
-                //                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
-                //
+                self.showActivityIndicator()
+                let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createMeal.createNewMeal()
+                self.hideActivityIndicator()
+                self.navigationController?.popViewController(animated: true)
             }))
             
         }
@@ -413,7 +408,7 @@ class MealViewController: FormViewController {
                 $0.multivaluedRowToInsertAt = { index in
                     self.productIndex = index
                     self.openProduct()
-                    return LabelRow(){ row in
+                    return ButtonRow(){ row in
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.textLabel?.textAlignment = .left
                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -480,6 +475,7 @@ class MealViewController: FormViewController {
     }
     
     fileprivate func openProduct() {
+        print("openProduct \(productIndex)")
         if let products = self.meal.productContainer, products.indices.contains(productIndex) {
             let product = products[productIndex]
             if let groceryProduct = product.groceryProduct {
@@ -583,13 +579,13 @@ class MealViewController: FormViewController {
             var section = self.form.sectionBy(tag: "Nutrition")
             nutrients = nutrients.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
             for nutrient in nutrients {
-                if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, amount > 0 {
+                if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
                     section!.insert(LabelRow() {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = "\(title.capitalized)"
-                    $0.value = "\(String(format: "%.2f", amount)) \(unit.capitalized)"
+                    $0.value = "\(String(format: "%.0f", amount)) \(unit.capitalized)"
                     }.cellUpdate { cell, _ in
                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -602,9 +598,12 @@ class MealViewController: FormViewController {
     override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
         super.rowsHaveBeenRemoved(rows, at: indexes)
         let rowNumber : Int = indexes.first!.row
-        
+        let rowType = rows[0].self
         DispatchQueue.main.async { [weak self] in
-            
+            if rowType is ButtonRow, let productContainer = self!.meal.productContainer, productContainer.indices.contains(rowNumber) {
+                self!.meal.productContainer!.remove(at: rowNumber)
+                self!.calcNutrition()
+            }
         }
     }
     
@@ -714,10 +713,10 @@ extension MealViewController: UpdateInvitees {
             }
             
             if active {
-                //                showActivityIndicator()
-                //                let createMeal = MealActions(meal: meal, active: active, selectedFalconUsers: selectedFalconUsers)
-                //                createMeal.updateMealParticipants()
-                //                hideActivityIndicator()
+                showActivityIndicator()
+                let createMeal = MealActions(meal: meal, active: active, selectedFalconUsers: selectedFalconUsers)
+                createMeal.updateMealParticipants()
+                hideActivityIndicator()
                 
             }
             
@@ -788,9 +787,6 @@ extension MealViewController: UpdateFoodProductContainerDelegate {
             } else {
                 mvs.remove(at: productIndex)
             }
-            
-//            let createGrocerylist = GrocerylistActions(grocerylist: self.grocerylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-//            createGrocerylist.createNewGrocerylist()
         }
     }
 }
