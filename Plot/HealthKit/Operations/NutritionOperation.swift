@@ -37,7 +37,9 @@ class NutritionOperation: AsyncOperation {
             }
 
             let type = HealthMetricType.nutrition(_self.nutritionTypeIdentifier.name)
-            var metric = HealthMetric(type: type, total: dailyTotal, date: endDate, unit: _self.unitTitle, rank: type.rank)
+            var metric = HealthMetric(type: type, total: dailyTotal, date: endDate, unitName: _self.unitTitle, rank: type.rank)
+            metric.unit = _self.unit
+            metric.quantityTypeIdentifier = _self.nutritionTypeIdentifier
             metric.average = annualAverage
             
             _self.delegate?.insertMetric(_self, metric)

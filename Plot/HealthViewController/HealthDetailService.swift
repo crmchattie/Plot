@@ -58,6 +58,17 @@ class HealthDetailService: HealthDetailServiceInterface {
             unit = HKUnit.count().unitDivided(by: HKUnit.minute())
             quantityType = type
         }
+        else if case .nutrition(_) = healthMetricType {
+            guard let quantityTypeIdentifier = healthMetric.quantityTypeIdentifier, let type = HKObjectType.quantityType(forIdentifier: quantityTypeIdentifier), let healthMetricUnit = healthMetric.unit else {
+                print("*** Unable to create a nutrition type ***")
+                completion(nil, nil, nil)
+                return
+            }
+            
+            statisticsOptions = .cumulativeSum
+            unit = healthMetricUnit
+            quantityType = type
+        }
         
         var anchorDate = Date()
         var startDate = anchorDate

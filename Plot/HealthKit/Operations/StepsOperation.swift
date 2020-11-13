@@ -30,7 +30,7 @@ class StepsOperation: AsyncOperation {
             }
 
             let steps = stepsResult
-            var metric = HealthMetric(type: HealthMetricType.steps, total: steps, date: _self.startDate, unit: "steps", rank: HealthMetricType.steps.rank)
+            var metric = HealthMetric(type: HealthMetricType.steps, total: steps, date: _self.startDate, unitName: "steps", rank: HealthMetricType.steps.rank)
             metric.average = _self.annualAverageSteps
             
             _self.delegate?.insertMetric(_self, metric)

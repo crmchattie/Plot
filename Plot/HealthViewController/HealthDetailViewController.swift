@@ -71,7 +71,11 @@ class HealthDetailViewController: UIViewController {
         
         if case HealthMetricType.workout = viewModel.healthMetric.type, let hkWorkout = viewModel.healthMetric.hkSample as? HKWorkout {
             title = hkWorkout.workoutActivityType.name
-        } else {
+        }
+        else if case HealthMetricType.nutrition(let name) = viewModel.healthMetric.type {
+            title = name
+        }
+        else {
             self.title = viewModel.healthMetric.type.name
         }
         

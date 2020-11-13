@@ -30,7 +30,7 @@ class WeightOperation: AsyncOperation {
                 return
             }
 
-            var metric = HealthMetric(type: HealthMetricType.weight, total: weight, date: date, unit: "lb", rank: HealthMetricType.weight.rank)
+            var metric = HealthMetric(type: HealthMetricType.weight, total: weight, date: date,  unitName: "lb", rank: HealthMetricType.weight.rank)
             metric.average = _self.annualAverageWeight
             
             _self.delegate?.insertMetric(_self, metric)

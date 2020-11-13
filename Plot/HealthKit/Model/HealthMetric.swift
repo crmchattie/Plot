@@ -13,15 +13,17 @@ struct HealthMetric: Equatable {
     let type: HealthMetricType
     let total: Double
     let date: Date
-    var unit: String
+    var unitName: String
     var rank: Int
     var average: Double?
     var hkSample: HKSample?
-    init(type: HealthMetricType, total: Double, date: Date, unit: String, rank: Int) {
+    var unit: HKUnit?
+    var quantityTypeIdentifier: HKQuantityTypeIdentifier?
+    init(type: HealthMetricType, total: Double, date: Date, unitName: String, rank: Int) {
         self.type = type
         self.total = total
         self.date = date
-        self.unit = unit
+        self.unitName = unitName
         self.rank = rank
     }
     

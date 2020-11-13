@@ -131,14 +131,14 @@ class HealthMetricCell: UICollectionViewCell {
             total = healthMetric.total.clean
         }
         
-        subtitleLabel.text = "\(total) \(healthMetric.unit) \(timeAgo)"
+        subtitleLabel.text = "\(total) \(healthMetric.unitName) \(timeAgo)"
         
         if let averageValue = healthMetric.average {
             var average = "\(Int(averageValue))"
             if case HealthMetricType.weight = healthMetric.type {
                 average = averageValue.clean
             }
-            detailLabel.text = "\(average) \(healthMetric.unit) on average"
+            detailLabel.text = "\(average) \(healthMetric.unitName) on average"
         }
 
         updateImage(healthMetric)
