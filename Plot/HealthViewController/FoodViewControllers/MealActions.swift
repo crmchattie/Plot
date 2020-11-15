@@ -94,9 +94,6 @@ class MealActions: NSObject {
         }
         let membersIDs = fetchMembersIDs()
         if Set(meal.participantsIDs!) != Set(membersIDs.0) {
-            print("does not equal")
-            print("Set(meal.participantsIDs!) \(Set(meal.participantsIDs!))")
-            print("Set(meal.participantsIDs!) \(Set(membersIDs.0))")
             let groupMealReference = Database.database().reference().child(mealsEntity).child(ID)
             updateParticipants(membersIDs: membersIDs)
             groupMealReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
@@ -149,7 +146,6 @@ class MealActions: NSObject {
     }
 
     func createGroupMealNode(reference: DatabaseReference, childValues: [String: Any]) {
-        print("child values \(childValues)")
         let nodeCreationGroup = DispatchGroup()
         nodeCreationGroup.enter()
         nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {

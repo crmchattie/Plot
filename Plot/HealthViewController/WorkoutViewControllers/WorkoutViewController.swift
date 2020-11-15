@@ -191,7 +191,19 @@ class WorkoutViewController: FormViewController {
                 let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createWorkout.createNewWorkout()
                 self.hideActivityIndicator()
-                self.navigationController?.popViewController(animated: true)
+                
+                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                if nav.topViewController is MasterActivityContainerController {
+                    let homeTab = nav.topViewController as! MasterActivityContainerController
+                    homeTab.customSegmented.setIndex(index: 1)
+                    homeTab.changeToIndex(index: 1)
+                }
+                self.tabBarController?.selectedIndex = 1
+                if #available(iOS 13.0, *) {
+                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                } else {
+                    // Fallback on earlier versions
+                }
                 
             }))
             

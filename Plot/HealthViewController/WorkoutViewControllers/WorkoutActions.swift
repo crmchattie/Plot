@@ -94,9 +94,6 @@ class WorkoutActions: NSObject {
         }
         let membersIDs = fetchMembersIDs()
         if Set(workout.participantsIDs!) != Set(membersIDs.0) {
-            print("does not equal")
-            print("Set(workout.participantsIDs!) \(Set(workout.participantsIDs!))")
-            print("Set(workout.participantsIDs!) \(Set(membersIDs.0))")
             let groupWorkoutReference = Database.database().reference().child(workoutsEntity).child(ID)
             updateParticipants(membersIDs: membersIDs)
             groupWorkoutReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
@@ -149,7 +146,6 @@ class WorkoutActions: NSObject {
     }
 
     func createGroupWorkoutNode(reference: DatabaseReference, childValues: [String: Any]) {
-        print("child values \(childValues)")
         let nodeCreationGroup = DispatchGroup()
         nodeCreationGroup.enter()
         nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {

@@ -256,8 +256,8 @@ class MasterActivityContainerController: UIViewController {
         } else if index == 1 {
             navigationItem.title = titles[index]
             let newHealthItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newHealthItem))
-            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-            navigationItem.rightBarButtonItems = [newHealthItemBarButton, searchBarButton]
+//            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+            navigationItem.rightBarButtonItems = [newHealthItemBarButton]
         } else if index == 2 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMMM yyyy"
@@ -271,8 +271,8 @@ class MasterActivityContainerController: UIViewController {
         } else if index == 3 {
             navigationItem.title = titles[index]
             let newFinanceItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newFinanceItem))
-            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-            navigationItem.rightBarButtonItems = [newFinanceItemBarButton, searchBarButton]
+//            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+            navigationItem.rightBarButtonItems = [newFinanceItemBarButton]
         } else if index == 4 {
             navigationItem.title = titles[index]
             let newListBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))

@@ -11,7 +11,6 @@ import Firebase
 import CodableFirebase
 
 class Activity: NSObject, NSCopying, Codable {
-    
     var activityID: String?
     var name: String?
     var activityType: String?

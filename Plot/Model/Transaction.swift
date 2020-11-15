@@ -25,6 +25,7 @@ struct MXTransactionResult: Codable {
 
 struct Transaction: Codable, Equatable, Hashable {
     var account_guid: String?
+    var account_name: String?
     var amount: Double
     var category: String
     var check_number: Int?

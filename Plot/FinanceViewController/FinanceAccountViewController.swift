@@ -114,12 +114,12 @@ class FinanceAccountViewController: FormViewController {
             
             <<< TextRow("Name") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.value = account.name.capitalized
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
                     if let currentUser = Auth.auth().currentUser?.uid {
@@ -133,7 +133,7 @@ class FinanceAccountViewController: FormViewController {
             <<< PushRow<String>("Type") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.title = row.tag
                 row.value = account.type.name
                 row.options = []
@@ -155,7 +155,7 @@ class FinanceAccountViewController: FormViewController {
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value, let type = MXAccountType(rawValue: value) {
                     self.account.type = type
@@ -204,14 +204,14 @@ class FinanceAccountViewController: FormViewController {
         form.last!
             <<< TextRow("Last Updated On") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 if let date = isodateFormatter.date(from: account.updated_at) {
                     $0.value = dateFormatterPrint.string(from: date)
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
             <<< CheckRow("Should Link") {
@@ -244,13 +244,13 @@ class FinanceAccountViewController: FormViewController {
             
             <<< DecimalRow("Balance") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.value = account.balance
                 $0.formatter = numberFormatter
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
                     self.updateTheDate()
@@ -270,13 +270,13 @@ class FinanceAccountViewController: FormViewController {
             form.last!
                 <<< DecimalRow("Available Balance") {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = $0.tag
                     $0.formatter = numberFormatter
                     $0.value = availableBalance
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
                     self.updateTheDate()
@@ -290,8 +290,8 @@ class FinanceAccountViewController: FormViewController {
             form.last!
             <<< DateInlineRow("Payment Due Date") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
                 if let date = isodateFormatter.date(from: paymentDueDate) {
@@ -312,13 +312,13 @@ class FinanceAccountViewController: FormViewController {
             form.last!
             <<< DecimalRow("Minimum Payment Due") {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = $0.tag
                     $0.formatter = numberFormatter
                     $0.value = minimum
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
                     self.updateTheDate()
