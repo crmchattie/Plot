@@ -115,25 +115,25 @@ class MealViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if !active || self.selectedFalconUsers.count == 0 {
+//        if !active || self.selectedFalconUsers.count == 0 {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
             navigationItem.rightBarButtonItem = plusBarButton
-        } else {
-            let dotsImage = UIImage(named: "dots")
-            if #available(iOS 11.0, *) {
-                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-                
-                let dotsBarButton = UIButton(type: .system)
-                dotsBarButton.setImage(dotsImage, for: .normal)
-                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-                
-                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
-            } else {
-                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-            }
-        }
+//        } else {
+//            let dotsImage = UIImage(named: "dots")
+//            if #available(iOS 11.0, *) {
+//                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+//                
+//                let dotsBarButton = UIButton(type: .system)
+//                dotsBarButton.setImage(dotsImage, for: .normal)
+//                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
+//                
+//                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
+//            } else {
+//                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+//                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+//                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
+//            }
+//        }
     }
     
     @objc fileprivate func close() {
@@ -197,8 +197,8 @@ class MealViewController: FormViewController {
                 let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
                 if nav.topViewController is MasterActivityContainerController {
                     let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 1)
-                    homeTab.changeToIndex(index: 1)
+                    homeTab.customSegmented.setIndex(index: 0)
+                    homeTab.changeToIndex(index: 0)
                 }
                 self.tabBarController?.selectedIndex = 1
                 if #available(iOS 13.0, *) {

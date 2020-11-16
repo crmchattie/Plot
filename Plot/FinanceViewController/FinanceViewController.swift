@@ -20,7 +20,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
     
-    let customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["Day","Week","Month", "Year"])
+    let customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["Day","Week","Month", "Year"], selectedIndex: 2)
     
     var transactions = [Transaction]()
     var transactionRules = [TransactionRule]()

@@ -248,8 +248,8 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                     let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
                     if nav.topViewController is MasterActivityContainerController {
                         let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 2)
-                        homeTab.changeToIndex(index: 2)
+                        homeTab.customSegmented.setIndex(index: 1)
+                        homeTab.changeToIndex(index: 1)
                     }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
@@ -802,8 +802,8 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                     let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
                     if nav.topViewController is MasterActivityContainerController {
                         let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 2)
-                        homeTab.changeToIndex(index: 2)
+                        homeTab.customSegmented.setIndex(index: 1)
+                        homeTab.changeToIndex(index: 1)
                     }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
@@ -1361,8 +1361,8 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                     let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
                     if nav.topViewController is MasterActivityContainerController {
                         let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 2)
-                        homeTab.changeToIndex(index: 2)
+                        homeTab.customSegmented.setIndex(index: 1)
+                        homeTab.changeToIndex(index: 1)
                     }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
@@ -1923,8 +1923,8 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                     let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
                     if nav.topViewController is MasterActivityContainerController {
                         let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 2)
-                        homeTab.changeToIndex(index: 2)
+                        homeTab.customSegmented.setIndex(index: 1)
+                        homeTab.changeToIndex(index: 1)
                     }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {

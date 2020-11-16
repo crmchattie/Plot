@@ -103,10 +103,11 @@ class MasterActivityContainerController: UIViewController {
     var mxUser: MXUser!
     var selectedDate = Date()
     
-    let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
-    var index: Int = 2
-    
-    let customSegmented = CustomSegmentedControl(buttonImages: ["chat","heart","activity", "money", "list"], buttonTitles: nil)
+//    let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
+    let titles = ["Health", "Activities", "Finances"]
+    var index: Int = 1
+//    let customSegmented = CustomSegmentedControl(buttonImages: ["chat","heart","activity", "money", "list"], buttonTitles: nil)
+    let customSegmented = CustomSegmentedControl(buttonImages: ["heart","activity", "money"], buttonTitles: nil, selectedIndex: 1)
     let containerView = UIView()
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
@@ -247,18 +248,19 @@ class MasterActivityContainerController: UIViewController {
     func setNavBar() {
         navigationItem.leftBarButtonItems = nil
         navigationItem.rightBarButtonItems = nil
+//        if index == 0 {
+//            navigationItem.title = titles[index]
+//            let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
+//            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+//            navigationItem.leftBarButtonItem = editButtonItem
+//            navigationItem.rightBarButtonItems = [newChatBarButton, searchBarButton]
+//        } else
         if index == 0 {
-            navigationItem.title = titles[index]
-            let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
-            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-            navigationItem.leftBarButtonItem = editButtonItem
-            navigationItem.rightBarButtonItems = [newChatBarButton, searchBarButton]
-        } else if index == 1 {
             navigationItem.title = titles[index]
             let newHealthItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newHealthItem))
 //            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.rightBarButtonItems = [newHealthItemBarButton]
-        } else if index == 2 {
+        } else if index == 1 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMMM yyyy"
             let dateString = dateFormatter.string(from: selectedDate)
@@ -268,18 +270,19 @@ class MasterActivityContainerController: UIViewController {
 //            let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
             navigationItem.leftBarButtonItem = editButtonItem
             navigationItem.rightBarButtonItems = [newActivityBarButton, searchBarButton]
-        } else if index == 3 {
+        } else if index == 2 {
             navigationItem.title = titles[index]
             let newFinanceItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newFinanceItem))
 //            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.rightBarButtonItems = [newFinanceItemBarButton]
-        } else if index == 4 {
-            navigationItem.title = titles[index]
-            let newListBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))
-            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-            navigationItem.leftBarButtonItem = editButtonItem
-            navigationItem.rightBarButtonItems = [newListBarButton, searchBarButton]
         }
+//        else if index == 4 {
+//            navigationItem.title = titles[index]
+//            let newListBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))
+//            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+//            navigationItem.leftBarButtonItem = editButtonItem
+//            navigationItem.rightBarButtonItems = [newListBarButton, searchBarButton]
+//        }
     }
     
     func configureTabBarBadge() {
@@ -349,19 +352,20 @@ class MasterActivityContainerController: UIViewController {
 
 extension MasterActivityContainerController: CustomSegmentedControlDelegate {
     func changeToIndex(index:Int) {
-        if self.index == 0 {
-            if chatsVC.tableView.isEditing == true {
-                chatsVC.tableView.setEditing(false, animated: true)
-                editButtonItem.style = .plain
-                editButtonItem.title = "Edit"
-            }
-            if let searchBar = chatsVC.searchBar, searchBar.isFirstResponder {
-                chatsVC.searchBar!.endEditing(true)
-                if let cancelButton : UIButton = chatsVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
-                    cancelButton.isEnabled = true
-                }
-            }
-        } else if self.index == 2 {
+//        if self.index == 0 {
+//            if chatsVC.tableView.isEditing == true {
+//                chatsVC.tableView.setEditing(false, animated: true)
+//                editButtonItem.style = .plain
+//                editButtonItem.title = "Edit"
+//            }
+//            if let searchBar = chatsVC.searchBar, searchBar.isFirstResponder {
+//                chatsVC.searchBar!.endEditing(true)
+//                if let cancelButton : UIButton = chatsVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
+//                    cancelButton.isEnabled = true
+//                }
+//            }
+//        } else
+        if self.index == 1 {
             if activitiesVC.activityView.tableView.isEditing == true {
                 activitiesVC.activityView.tableView.setEditing(false, animated: true)
                 editButtonItem.style = .plain
@@ -373,23 +377,24 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
                     cancelButton.isEnabled = true
                 }
             }
-        } else if self.index == 5 {
-            if listsVC.tableView.isEditing == true {
-                listsVC.tableView.setEditing(false, animated: true)
-                editButtonItem.style = .plain
-                editButtonItem.title = "Edit"
-            }
-            if let searchBar = listsVC.searchBar, searchBar.isFirstResponder {
-                listsVC.searchBar!.endEditing(true)
-                if let cancelButton : UIButton = listsVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
-                    cancelButton.isEnabled = true
-                }
-            }
         }
-        chatsVC.view.isHidden = !(index == 0)
-        healthVC.view.isHidden = !(index == 1)
-        activitiesVC.view.isHidden = !(index == 2)
-        financeVC.view.isHidden = !(index == 3)
+//        else if self.index == 4 {
+//            if listsVC.tableView.isEditing == true {
+//                listsVC.tableView.setEditing(false, animated: true)
+//                editButtonItem.style = .plain
+//                editButtonItem.title = "Edit"
+//            }
+//            if let searchBar = listsVC.searchBar, searchBar.isFirstResponder {
+//                listsVC.searchBar!.endEditing(true)
+//                if let cancelButton : UIButton = listsVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
+//                    cancelButton.isEnabled = true
+//                }
+//            }
+//        }
+        chatsVC.view.isHidden = !(index == 3)
+        healthVC.view.isHidden = !(index == 0)
+        activitiesVC.view.isHidden = !(index == 1)
+        financeVC.view.isHidden = !(index == 2)
         listsVC.view.isHidden = !(index == 4)
         
         self.index = index
@@ -405,17 +410,18 @@ extension MasterActivityContainerController {
     }
     
     @objc func editButtonAction(sender: UIBarButtonItem) {
+//        if index == 1 {
+//            if chatsVC.tableView.isEditing == true {
+//                chatsVC.tableView.setEditing(false, animated: true)
+//                sender.style = .plain
+//                sender.title = "Edit"
+//            } else {
+//                chatsVC.tableView.setEditing(true, animated: true)
+//                sender.style = .done
+//                sender.title = "Done"
+//            }
+//        } else
         if index == 1 {
-            if chatsVC.tableView.isEditing == true {
-                chatsVC.tableView.setEditing(false, animated: true)
-                sender.style = .plain
-                sender.title = "Edit"
-            } else {
-                chatsVC.tableView.setEditing(true, animated: true)
-                sender.style = .done
-                sender.title = "Done"
-            }
-        } else if index == 2 {
             if activitiesVC.activityView.tableView.isEditing == true {
                 activitiesVC.activityView.tableView.setEditing(false, animated: true)
                 sender.style = .plain
@@ -425,17 +431,18 @@ extension MasterActivityContainerController {
                 sender.style = .done
                 sender.title = "Done"
             }
-        } else if index == 3 {
-            if listsVC.tableView.isEditing == true {
-                listsVC.tableView.setEditing(false, animated: true)
-                sender.style = .plain
-                sender.title = "Edit"
-            } else {
-                listsVC.tableView.setEditing(true, animated: true)
-                sender.style = .done
-                sender.title = "Done"
-            }
         }
+//        else if index == 4 {
+//            if listsVC.tableView.isEditing == true {
+//                listsVC.tableView.setEditing(false, animated: true)
+//                sender.style = .plain
+//                sender.title = "Edit"
+//            } else {
+//                listsVC.tableView.setEditing(true, animated: true)
+//                sender.style = .done
+//                sender.title = "Done"
+//            }
+//        }
     }
     
     @objc fileprivate func newActivity() {
@@ -512,13 +519,15 @@ extension MasterActivityContainerController {
     }
     
     @objc fileprivate func search() {
+//        if self.index == 0 {
+//            chatsVC.setupSearchController()
+//        } else
         if self.index == 1 {
-            chatsVC.setupSearchController()
-        } else if self.index == 2 {
             activitiesVC.setupSearchController()
-        } else if self.index == 3 {
-            listsVC.setupSearchController()
         }
+//        else if self.index == 4 {
+//            listsVC.setupSearchController()
+//        }
     }
     
     @objc fileprivate func newFinanceItem() {

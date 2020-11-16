@@ -62,9 +62,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         mapView.showsUserLocation = true
         view.addSubview(mapView)
         mapView.fillSuperview()
-        
-        setupRegionForMap()
-        
+                
         addAnnotations()
         setupLocationsCarousel()
         locationsController.mapViewController = self
@@ -129,14 +127,21 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                 }
             } else if let places = locations[section] as? [FSVenue] {
                 for place in places {
-                    if let location = place.location, let add = location.address, let cat = location.crossStreet, let lat = location.lat, let lon = location.lng, let categories = place.categories, !categories.isEmpty, let sub = categories[0].shortName {
+                    if let location = place.location, let add = location.formattedAddress?[0], let lat = location.lat, let lon = location.lng {
                         name = place.name
                         type = section.image
                         address = add
-                        category = cat
-                        subcategory = sub
+                        category = location.crossStreet ?? "No cross street"
+                        if let categories = place.categories, !categories.isEmpty, let sub = categories[0].shortName {
+                            subcategory = sub
+                        } else {
+                            subcategory = "No category"
+                        }
                         latitude = lat
                         longitude = lon
+                        
+                        print("lat \(lat)")
+                        print("lon \(lon)")
                                                 
                         let annotation = CustomMapItemAnnotation()
                         let placemark = MKPlacemark(coordinate: .init(latitude: latitude, longitude: longitude))
@@ -157,14 +162,21 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
             } else if let items = locations[section] as? [GroupItem] {
                 for item in items {
                     if let place = item.venue {
-                        if let location = place.location, let add = location.address, let cat = location.crossStreet, let lat = location.lat, let lon = location.lng, let categories = place.categories, !categories.isEmpty, let sub = categories[0].shortName {
+                        if let location = place.location, let add = location.formattedAddress?[0], let lat = location.lat, let lon = location.lng {
                             name = place.name
                             type = section.image
                             address = add
-                            category = cat
-                            subcategory = sub
+                            category = location.crossStreet ?? "No cross street"
+                            if let categories = place.categories, !categories.isEmpty, let sub = categories[0].shortName {
+                                subcategory = sub
+                            } else {
+                                subcategory = "No category"
+                            }
                             latitude = lat
                             longitude = lon
+                            
+                            print("latitude \(latitude)")
+                            print("longitude \(longitude)")
                                                         
                             let annotation = CustomMapItemAnnotation()
                             let placemark = MKPlacemark(coordinate: .init(latitude: latitude, longitude: longitude))
@@ -284,7 +296,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
             
         }
             
-        if locations.count != 0 { self.locationsController.collectionView.scrollToItem(at: [0, 0], at: .centeredHorizontally, animated: true)
+        if locations.count != 0 {
+            self.locationsController.collectionView.scrollToItem(at: [0, 0], at: .centeredHorizontally, animated: true)
         }
         
         self.mapView.showAnnotations(self.mapView.annotations, animated: true)
@@ -294,29 +307,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     class CustomMapItemAnnotation: MKPointAnnotation {
         var mapItem: MKMapItem?
         var type: String?
-    }
-    
-    fileprivate func setupAnnotationsForMap() {
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = CLLocationCoordinate2D(latitude: 37.7666, longitude: -122.427290)
-        annotation.title = "San Francisco"
-        annotation.subtitle = "CA"
-        mapView.addAnnotation(annotation)
-        
-        let appleCampusAnnotation = MKPointAnnotation()
-        appleCampusAnnotation.coordinate = .init(latitude: 37.3326, longitude: -122.030024)
-        appleCampusAnnotation.title = "Apple Campus"
-        appleCampusAnnotation.subtitle = "Cupertino, CA"
-        mapView.addAnnotation(appleCampusAnnotation)
-        
-        mapView.showAnnotations(self.mapView.annotations, animated: true)
-    }
-    
-    fileprivate func setupRegionForMap() {
-        let centerCoordinate = CLLocationCoordinate2D(latitude: 37.7666, longitude: -122.427290)
-        let span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-        let region = MKCoordinateRegion(center: centerCoordinate, span: span)
-        mapView.setRegion(region, animated: true)
     }
 }
 

@@ -22,12 +22,13 @@ class CustomSegmentedControl: UIView {
         
     weak var delegate: CustomSegmentedControlDelegate?
     
-    var selectedIndex : Int = 2
+    var selectedIndex : Int = 1
     
-    convenience init(buttonImages:[String]?, buttonTitles:[String]?) {
+    convenience init(buttonImages:[String]?, buttonTitles:[String]?, selectedIndex: Int) {
         self.init()
         self.buttonImages = buttonImages
         self.buttonTitles = buttonTitles
+        self.selectedIndex = selectedIndex
         updateView()
     }
     
