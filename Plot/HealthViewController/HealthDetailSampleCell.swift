@@ -11,7 +11,7 @@ import HealthKit
 
 class HealthDetailSampleCell: UITableViewCell {
     
-    var healthMetricType: HealthMetricType?
+    var healthMetric: HealthMetric?
     
     let titleLabel: UILabel = {
         let label = UILabel()
@@ -119,15 +119,15 @@ class HealthDetailSampleCell: UITableViewCell {
         
         titleLabelRight.text = dateFormatter.string(from: sample.startDate)
         
-        guard let type = healthMetricType else {
+        guard let healthMetric = healthMetric else {
             return
         }
         
-        if case .workout = type, let workout = sample as? HKWorkout {
+        if case .workout = healthMetric.type, let workout = sample as? HKWorkout {
             let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
             subtitleLabel.text = "\(totalEnergyBurned.clean) calories"
         }
-        else if case .heartRate = type, let quantitySample = sample as? HKQuantitySample {
+        else if case .heartRate = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
             let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
             let count = quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit)
             let string = "\(count) bpm"
@@ -137,7 +137,7 @@ class HealthDetailSampleCell: UITableViewCell {
                 subtitleLabel.text = string
             }
         }
-        else if case .weight = type, let quantitySample = sample as? HKQuantitySample {
+        else if case .weight = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
             let unit = HKUnit.pound()
             let count = quantitySample.quantity.doubleValue(for: unit)
             let string = "\(count) lb"
@@ -147,10 +147,19 @@ class HealthDetailSampleCell: UITableViewCell {
                 subtitleLabel.text = string
             }
         }
-        else if case .steps = type, let quantitySample = sample as? HKQuantitySample {
+        else if case .steps = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
             let unit = HKUnit.count()
             let count = Int(quantitySample.quantity.doubleValue(for: unit))
             let string = "\(count) steps"
+            if let text = titleLabel.text, text.isEmpty {
+                titleLabel.text = string
+            } else {
+                subtitleLabel.text = string
+            }
+        }
+        else if case HealthMetricType.nutrition(_) = healthMetric.type, let quantitySample = sample as? HKQuantitySample, let unit = healthMetric.unit {
+            let count = Int(quantitySample.quantity.doubleValue(for: unit))
+            let string = "\(count) \(healthMetric.unitName)"
             if let text = titleLabel.text, text.isEmpty {
                 titleLabel.text = string
             } else {

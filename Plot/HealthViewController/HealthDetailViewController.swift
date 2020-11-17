@@ -223,7 +223,7 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: healthDetailSampleCellID, for: indexPath) as! HealthDetailSampleCell
         cell.backgroundColor = tableView.backgroundColor
-        cell.healthMetricType = viewModel.healthMetric.type
+        cell.healthMetric = viewModel.healthMetric
         let sample = viewModel.samples[indexPath.row]
         cell.configure(sample)
         return cell

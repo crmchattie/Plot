@@ -14,24 +14,24 @@ class HealthKitManager {
     
     private let lock = NSLock()
     private var queue: OperationQueue
-    private var metrics: [HealthMetric]
+    private var metrics: [String: [HealthMetric]]
     private var activities: [Activity]
     private var isRunning: Bool
     private var saveActivitiesDispatchGroup: DispatchGroup!
     
     init() {
         self.isRunning = false
-        self.metrics = []
+        self.metrics = [:]
         self.activities = []
         self.queue = OperationQueue()
         //self.queue.maxConcurrentOperationCount = 1
     }
     
-    func loadHealthKitActivities(_ completion: @escaping ([HealthMetric], Bool) -> Void) {
+    func loadHealthKitActivities(_ completion: @escaping ([String: [HealthMetric]], Bool) -> Void) {
         guard !isRunning else { return }
         
         // Start clean
-        metrics = []
+        metrics = [:]
         activities = []
         isRunning = true
 
@@ -123,11 +123,11 @@ class HealthKitManager {
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in
                 guard let _self = self else {
-                    completion([], false)
+                    completion([:], false)
                     return
                 }
                 
-                _self.metrics.sort(by: {$0.rank < $1.rank})
+                //_self.metrics.sort(by: {$0.rank < $1.rank})
                 
                 // if we properly fetched the items then save
                 if _self.activities.count > 0 {
@@ -218,19 +218,19 @@ class HealthKitManager {
 }
 
 extension HealthKitManager: MetricOperationDelegate {
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric) {
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String) {
         lock.lock(); defer { lock.unlock() }
-        metrics.append(metric)
+        metrics[category, default: []].append(metric)
     }
     
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ activities: [Activity]) {
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String, _ activities: [Activity]) {
         lock.lock(); defer { lock.unlock() }
-        metrics.append(metric)
+        metrics[category, default: []].append(metric)
         self.activities.append(contentsOf: activities)
     }
 }
 
 protocol MetricOperationDelegate: class {
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric)
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ activities: [Activity])
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String)
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String, _ activities: [Activity])
 }

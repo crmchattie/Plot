@@ -42,7 +42,7 @@ class NutritionOperation: AsyncOperation {
             metric.quantityTypeIdentifier = _self.nutritionTypeIdentifier
             metric.average = annualAverage
             
-            _self.delegate?.insertMetric(_self, metric)
+            _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.nutrition.rawValue)
             self?.finish()
         }
     }

@@ -81,3 +81,9 @@ enum HealthMetricType {
         }
     }
 }
+
+enum HealthMetricCategory: String {
+    case general
+    case workouts
+    case nutrition
+}

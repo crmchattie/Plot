@@ -9,6 +9,7 @@
 import UIKit
 
 fileprivate let healthMetricCellID = "HealthMetricCellID"
+fileprivate let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
 
 protocol HomeBaseHealth: class {
 //    func sendLists(lists: [ListContainer])
@@ -23,7 +24,9 @@ class HealthViewController: UIViewController {
     
     var hasViewAppeared = false
     let healhKitManager = HealthKitManager()
-    var healthMetrics: [HealthMetric] = [] {
+    
+    var healthMetricSections: [String] = []
+    var healthMetrics: [String: [HealthMetric]] = [:] {
         didSet {
             if oldValue != healthMetrics {
                 collectionView.reloadData()
@@ -34,10 +37,11 @@ class HealthViewController: UIViewController {
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.contentInset.bottom = 20
+        collectionView.contentInset.bottom = 0
         return collectionView
     }()
     
@@ -57,6 +61,7 @@ class HealthViewController: UIViewController {
         
         if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+            flowLayout.headerReferenceSize = CGSize(width: self.collectionView.frame.size.width, height: 30.0)
         }
         
         configureView()
@@ -81,6 +86,7 @@ class HealthViewController: UIViewController {
                 self?.healhKitManager.loadHealthKitActivities { [weak self] metrics, shouldFetchActivities in
                     DispatchQueue.main.async {
                         self?.healthMetrics = metrics
+                        self?.healthMetricSections = Array(metrics.keys)
                         self?.spinner.stopAnimating()
                     }
                 }
@@ -116,28 +122,82 @@ class HealthViewController: UIViewController {
         ])
         
         collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
+        collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = view.backgroundColor
     }
 }
 
 extension HealthViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return healthMetricSections.count
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        healthMetrics.count
+        let key = healthMetricSections[section]
+        return healthMetrics[key]?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
         cell.backgroundColor = collectionView.backgroundColor
-        let metric = healthMetrics[indexPath.row]
-        cell.configure(metric)
+        
+        let key = healthMetricSections[indexPath.section]
+        if let metrics = healthMetrics[key] {
+            let metric = metrics[indexPath.row]
+            cell.configure(metric)
+        }
+        
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let metric = healthMetrics[indexPath.row]
-        let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
-        let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel)
-        navigationController?.pushViewController(healthDetailViewController, animated: true)
+        let key = healthMetricSections[indexPath.section]
+        if let metrics = healthMetrics[key] {
+            let metric = metrics[indexPath.row]
+            let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
+            let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel)
+            navigationController?.pushViewController(healthDetailViewController, animated: true)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            let key = healthMetricSections[indexPath.section]
+            let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
+            sectionHeader.label.text = key.uppercased()
+            sectionHeader.label.textColor = ThemeManager.currentTheme().generalTitleColor
+            return sectionHeader
+        } else { //No footer in this case but can add option for that
+            return UICollectionReusableView()
+        }
+    }
+    
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+//        return CGSize(width: collectionView.frame.width, height: 40)
+//    }
+}
+
+class SectionHeader: UICollectionReusableView {
+    var label: UILabel = {
+        let label: UILabel = UILabel()
+        label.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
+        label.sizeToFit()
+        return label
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        addSubview(label)
+        
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        label.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 10).isActive = true
+        label.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
