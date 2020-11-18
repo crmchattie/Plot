@@ -245,12 +245,13 @@ struct TransactionCategoryFull: Codable, Equatable, Hashable {
     let metadata: String?
 }
 
-func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date?, type: TransactionCatLevel?, completion: @escaping ([TransactionDetails], [TransactionDetails: [Transaction]]) -> ()) {
+func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date?, completion: @escaping ([TransactionDetails], [TransactionDetails: [Transaction]]) -> ()) {
     var transactionsList = [TransactionDetails]()
     var transactionsDict = [TransactionDetails: [Transaction]]()
     // create dateFormatter with UTC time format
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
+        guard transaction.should_link ?? true else { continue }
         if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date), let start = start, let end = end {
             if transactionDate < start.stripTime() || end.stripTime() < transactionDate {
                 continue
@@ -260,194 +261,99 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                 continue
             }
         }
-        guard transaction.should_link ?? true else { continue }
+        
         switch transaction.type {
         case "DEBIT":
-            switch type {
-            case .category:
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.category && $0.level == .category && $0.category == transaction.category && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount -= transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.category, amount: -transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-            case .top:
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.top_level_category && $0.level == .top && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount -= transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: -transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-            case .group:
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.group && $0.level == .group && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount -= transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.group, amount: -transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-            case .none:
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.category && $0.level == .category && $0.category == transaction.category && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount -= transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.category, amount: -transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.top_level_category && $0.level == .top && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount -= transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: -transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.group && $0.level == .group && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount -= transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.group, amount: -transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
+            if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.category && $0.level == .category && $0.category == transaction.category && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
+                var transactionDetail = transactionsDict.keys[index]
+                var transactions = transactionsDict[transactionDetail]
+                
+                transactionsDict[transactionDetail] = nil
+                
+                transactionDetail.amount -= transaction.amount
+                transactions!.append(transaction)
+                
+                transactionsDict[transactionDetail] = transactions
+            } else {
+                let transactionDetail = TransactionDetails(name: transaction.category, amount: -transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                transactionsDict[transactionDetail] = [transaction]
+            }
+            if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.top_level_category && $0.level == .top && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
+                var transactionDetail = transactionsDict.keys[index]
+                var transactions = transactionsDict[transactionDetail]
+                
+                transactionsDict[transactionDetail] = nil
+                
+                transactionDetail.amount -= transaction.amount
+                transactions!.append(transaction)
+                
+                transactionsDict[transactionDetail] = transactions
+            } else {
+                let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: -transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                transactionsDict[transactionDetail] = [transaction]
+            }
+            if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.group && $0.level == .group && $0.group == transaction.group}) {
+                var transactionDetail = transactionsDict.keys[index]
+                var transactions = transactionsDict[transactionDetail]
+                
+                transactionsDict[transactionDetail] = nil
+                
+                transactionDetail.amount -= transaction.amount
+                transactions!.append(transaction)
+                
+                transactionsDict[transactionDetail] = transactions
+            } else {
+                let transactionDetail = TransactionDetails(name: transaction.group, amount: -transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
+                transactionsDict[transactionDetail] = [transaction]
             }
         case "CREDIT":
-            switch type {
-            case .category:
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.category && $0.level == .category && $0.category == transaction.category && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount += transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.category, amount: transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-            case .top:
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.top_level_category && $0.level == .top && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount += transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-            case .group:
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.group && $0.level == .group && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount += transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.group, amount: transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-            case .none:
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.category && $0.level == .category && $0.category == transaction.category && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount += transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.category, amount: transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.top_level_category && $0.level == .top && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount += transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
-                if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.group && $0.level == .group && $0.group == transaction.group}) {
-                    var transactionDetail = transactionsDict.keys[index]
-                    var transactions = transactionsDict[transactionDetail]
-                    
-                    transactionsDict[transactionDetail] = nil
-                    
-                    transactionDetail.amount += transaction.amount
-                    transactions!.append(transaction)
-                    
-                    transactionsDict[transactionDetail] = transactions
-                } else {
-                    let transactionDetail = TransactionDetails(name: transaction.group, amount: transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
-                    transactionsDict[transactionDetail] = [transaction]
-                }
+            if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.category && $0.level == .category && $0.category == transaction.category && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
+                var transactionDetail = transactionsDict.keys[index]
+                var transactions = transactionsDict[transactionDetail]
+                
+                transactionsDict[transactionDetail] = nil
+                
+                transactionDetail.amount += transaction.amount
+                transactions!.append(transaction)
+                
+                transactionsDict[transactionDetail] = transactions
+            } else {
+                let transactionDetail = TransactionDetails(name: transaction.category, amount: transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                transactionsDict[transactionDetail] = [transaction]
+            }
+            if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.top_level_category && $0.level == .top && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
+                var transactionDetail = transactionsDict.keys[index]
+                var transactions = transactionsDict[transactionDetail]
+                
+                transactionsDict[transactionDetail] = nil
+                
+                transactionDetail.amount += transaction.amount
+                transactions!.append(transaction)
+                
+                transactionsDict[transactionDetail] = transactions
+            } else {
+                let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                transactionsDict[transactionDetail] = [transaction]
+            }
+            if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.group && $0.level == .group && $0.group == transaction.group}) {
+                var transactionDetail = transactionsDict.keys[index]
+                var transactions = transactionsDict[transactionDetail]
+                
+                transactionsDict[transactionDetail] = nil
+                
+                transactionDetail.amount += transaction.amount
+                transactions!.append(transaction)
+                
+                transactionsDict[transactionDetail] = transactions
+            } else {
+                let transactionDetail = TransactionDetails(name: transaction.group, amount: transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
+                transactionsDict[transactionDetail] = [transaction]
             }
         default:
             continue
         }
     }
+    
     transactionsList = Array(transactionsDict.keys)
     var sortedTransactionsList = [TransactionDetails]()
     if !transactionsList.isEmpty {
@@ -487,13 +393,6 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     sortedTransactionsList.insert(diffTransactionDetail, at: 0)
                     transactionsDict[diffTransactionDetail] = diffTransactions
                 }
-//                else {
-//                    let diffAmount = expenseTransactionDetail.amount
-//                    let diffTransactions = transactions
-//                    let diffTransactionDetail = TransactionDetails(name: "Difference", amount: diffAmount, level: .group, category: nil, topLevelCategory: nil, group: .difference)
-//                    sortedTransactionsList.insert(diffTransactionDetail, at: 0)
-//                    transactionsDict[diffTransactionDetail] = diffTransactions
-//                }
             }
             
             if let transactionDetail = transactionsList.first(where: {$0.level == .group && $0.group == group}) {
@@ -518,6 +417,409 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
         }
     }
     completion(sortedTransactionsList, transactionsDict)
+}
+
+func transactionDetailsChartData(transactions: [Transaction], transactionDetails: TransactionDetails, start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([Statistic], [Transaction]) -> ()) {
+    print("start \(start)")
+    print("end \(end)")
+    print("segmentType \(segmentType)")
+    var statistics = [Statistic]()
+    var transactionList = [Transaction]()
+    let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+    let isodateFormatter = ISO8601DateFormatter()
+    for transaction in transactions {
+        print("transaction \(transaction.description)")
+        guard transaction.should_link ?? true else { continue }
+        if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
+            if transactionDate < start.stripTime() || end.stripTime() < transactionDate {
+                continue
+            }
+        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+            if transactionDate < start.stripTime() || end.stripTime() < transactionDate {
+                continue
+            }
+        }
+        var date = start
+        switch segmentType {
+        case .day:
+            let nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
+            // While date <= endDate ...
+            while nextDate.compare(end) != .orderedDescending {
+                if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
+                    if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+                        date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        continue
+                    }
+                } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                    if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+                        date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        continue
+                    }
+                }
+                
+                if transactionDetails.name == "Difference" {
+                    switch transaction.type {
+                    case "DEBIT":
+                        if statistics.isEmpty {
+                            let stat = Statistic(date: nextDate, value: -transaction.amount)
+                            statistics.append(stat)
+                            transactionList.append(transaction)
+                        } else {
+                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                statistics[index].value -= transaction.amount
+                                transactionList.append(transaction)
+                            }
+                        }
+                    case "CREDIT":
+                        if statistics.isEmpty {
+                            let stat = Statistic(date: nextDate, value: transaction.amount)
+                            statistics.append(stat)
+                            transactionList.append(transaction)
+                        } else {
+                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                statistics[index].value += transaction.amount
+                                transactionList.append(transaction)
+                            }
+                        }
+                    default:
+                        continue
+                    }
+                } else if transactionDetails.name == "Expense" && transaction.description != "Bonus" && transaction.description != "Interest Income" && transaction.description != "Paycheck" && transaction.description != "Reimbursement" && transaction.description != "Rental Income" && transaction.description != "Income" {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                } else if transactionDetails.level == .category && transactionDetails.name == transaction.category {
+                    print("transaction is being added \(transaction.description)")
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                } else if transactionDetails.level == .top && transactionDetails.name == transaction.top_level_category {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                    
+                } else if transactionDetails.level == .group && transactionDetails.name == transaction.group {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                    
+                }
+                // Advance by one day:
+                date = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
+            }
+        case .week:
+            let nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+            // While date <= endDate ...
+            while date.compare(end) != .orderedDescending {
+                if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
+                    if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+                        date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        continue
+                    }
+                } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                    if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+                        date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        continue
+                    }
+                }
+                
+                if transactionDetails.name == "Difference" {
+                    switch transaction.type {
+                    case "DEBIT":
+                        if statistics.isEmpty {
+                            let stat = Statistic(date: nextDate, value: -transaction.amount)
+                            statistics.append(stat)
+                            transactionList.append(transaction)
+                        } else {
+                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                statistics[index].value -= transaction.amount
+                                transactionList.append(transaction)
+                            }
+                        }
+                    case "CREDIT":
+                        if statistics.isEmpty {
+                            let stat = Statistic(date: nextDate, value: transaction.amount)
+                            statistics.append(stat)
+                            transactionList.append(transaction)
+                        } else {
+                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                statistics[index].value += transaction.amount
+                                transactionList.append(transaction)
+                            }
+                        }
+                    default:
+                        continue
+                    }
+                } else if transactionDetails.name == "Expense" && transaction.description != "Bonus" && transaction.description != "Interest Income" && transaction.description != "Paycheck" && transaction.description != "Reimbursement" && transaction.description != "Rental Income" && transaction.description != "Income" {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                } else if transactionDetails.level == .category && transactionDetails.name == transaction.category {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                } else if transactionDetails.level == .top && transactionDetails.name == transaction.top_level_category {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                    
+                } else if transactionDetails.level == .group && transactionDetails.name == transaction.group {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                    
+                }
+                
+                // Advance by one day:
+                date = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+            }
+        case .month:
+            let nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+            // While date <= endDate ...
+            while date.compare(end) != .orderedDescending {
+                if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
+                    if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+                        date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        continue
+                    }
+                } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                    if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+                        date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        continue
+                    }
+                }
+                
+                if transactionDetails.name == "Difference" {
+                    switch transaction.type {
+                    case "DEBIT":
+                        if statistics.isEmpty {
+                            let stat = Statistic(date: nextDate, value: -transaction.amount)
+                            statistics.append(stat)
+                            transactionList.append(transaction)
+                        } else {
+                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                statistics[index].value -= transaction.amount
+                                transactionList.append(transaction)
+                            }
+                        }
+                    case "CREDIT":
+                        if statistics.isEmpty {
+                            let stat = Statistic(date: nextDate, value: transaction.amount)
+                            statistics.append(stat)
+                            transactionList.append(transaction)
+                        } else {
+                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                statistics[index].value += transaction.amount
+                                transactionList.append(transaction)
+                            }
+                        }
+                    default:
+                        continue
+                    }
+                } else if transactionDetails.name == "Expense" && transaction.description != "Bonus" && transaction.description != "Interest Income" && transaction.description != "Paycheck" && transaction.description != "Reimbursement" && transaction.description != "Rental Income" && transaction.description != "Income" {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                } else if transactionDetails.level == .category && transactionDetails.name == transaction.category {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                } else if transactionDetails.level == .top && transactionDetails.name == transaction.top_level_category {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                    
+                } else if transactionDetails.level == .group && transactionDetails.name == transaction.group {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                    
+                }
+                
+                // Advance by one day:
+                date = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+            }
+        case .year:
+            let nextDate = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+            // While date <= endDate ...
+            while date.compare(end) != .orderedDescending {
+                if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
+                    if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+                        date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        continue
+                    }
+                } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                    if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+                        date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        continue
+                    }
+                }
+                
+                if transactionDetails.name == "Difference" {
+                    switch transaction.type {
+                    case "DEBIT":
+                        if statistics.isEmpty {
+                            let stat = Statistic(date: nextDate, value: -transaction.amount)
+                            statistics.append(stat)
+                            transactionList.append(transaction)
+                        } else {
+                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                statistics[index].value -= transaction.amount
+                                transactionList.append(transaction)
+                            }
+                        }
+                    case "CREDIT":
+                        if statistics.isEmpty {
+                            let stat = Statistic(date: nextDate, value: transaction.amount)
+                            statistics.append(stat)
+                            transactionList.append(transaction)
+                        } else {
+                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                statistics[index].value += transaction.amount
+                                transactionList.append(transaction)
+                            }
+                        }
+                    default:
+                        continue
+                    }
+                } else if transactionDetails.name == "Expense" && transaction.description != "Bonus" && transaction.description != "Interest Income" && transaction.description != "Paycheck" && transaction.description != "Reimbursement" && transaction.description != "Rental Income" && transaction.description != "Income" {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                } else if transactionDetails.level == .category && transactionDetails.name == transaction.category {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                } else if transactionDetails.level == .top && transactionDetails.name == transaction.top_level_category {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                    
+                } else if transactionDetails.level == .group && transactionDetails.name == transaction.group {
+                    if statistics.isEmpty {
+                        let stat = Statistic(date: nextDate, value: transaction.amount)
+                        statistics.append(stat)
+                        transactionList.append(transaction)
+                    } else {
+                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                            statistics[index].value += transaction.amount
+                            transactionList.append(transaction)
+                        }
+                    }
+                    
+                }
+                
+                // Advance by one day:
+                date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+            }
+        }
+    }
+    completion(statistics, transactionList)
 }
 
 func updateTransactionWRule(transaction: Transaction, transactionRules: [TransactionRule], completion: @escaping (Transaction, Bool) -> ()) {

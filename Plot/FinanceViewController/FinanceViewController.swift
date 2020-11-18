@@ -20,7 +20,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
     
-    let customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["Day","Week","Month", "Year"], selectedIndex: 2)
+    let customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["D","W","M", "Y"], selectedIndex: 2)
     
     var transactions = [Transaction]()
     var transactionRules = [TransactionRule]()
@@ -142,7 +142,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         dispatchGroup.enter()
         accountFetcher.fetchAccounts { (firebaseAccounts) in
             self.accounts = firebaseAccounts
-            print("accounts \(self.accounts)")
             self.observeAccountsForCurrentUser()
             dispatchGroup.leave()
         }
@@ -318,7 +317,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             }
         } else {
             dispatchGroup.enter()
-            print("accounts \(self.accounts)")
             let account = self.accounts.min(by:{ self.isodateFormatter.date(from: $0.updated_at)! < self.isodateFormatter.date(from: $1.updated_at)! })
             let date = self.isodateFormatter.date(from: account?.updated_at ?? "") ?? Date()
             self.getTransactions(guid: user.guid, from_date: date.addingTimeInterval(-604800), to_date: Date().addingTimeInterval(86400)) { (transactions) in
@@ -705,7 +703,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
                     dispatchGroup.enter()
-                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, type: .none) { (transactionsList, transactionsDict) in
+                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
                             self.sections.append(.incomeStatement)
                             self.groups[section] = transactionsList
@@ -878,26 +876,26 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         let section = sections[indexPath.section]
         let object = groups[section]
         if let object = object as? [TransactionDetails] {
-            if section.subType == "Income Statement", let transactions = transactionDict[object[indexPath.item]] {
-                let destination = FinanceTableViewController()
-                destination.delegate = self
-                destination.transactions = transactions
-                destination.user = user
-                destination.users = users
-                destination.filteredUsers = filteredUsers
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+            if section.subType == "Income Statement" {
+                let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: object[indexPath.item], transactions: transactions, financeDetailService: FinanceDetailService())
+                let financeDetailViewController = FinanceDetailViewController(viewModel: financeDetailViewModel)
+                financeDetailViewController.delegate = self
+                financeDetailViewController.user = user
+                financeDetailViewController.users = users
+                financeDetailViewController.filteredUsers = filteredUsers
+                financeDetailViewController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(financeDetailViewController, animated: true)
             }
         } else if let object = object as? [AccountDetails] {
-            if section.subType == "Balance Sheet", let accounts = accountDict[object[indexPath.item]] {
-                let destination = FinanceTableViewController()
-                destination.delegate = self
-                destination.accounts = accounts
-                destination.user = user
-                destination.users = users
-                destination.filteredUsers = filteredUsers
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+            if section.subType == "Balance Sheet" {
+                let financeDetailViewModel = FinanceDetailViewModel(accountDetails: object[indexPath.item], accounts: accounts, transactionDetails: nil, transactions: nil, financeDetailService: FinanceDetailService())
+                let financeDetailViewController = FinanceDetailViewController(viewModel: financeDetailViewModel)
+                financeDetailViewController.delegate = self
+                financeDetailViewController.user = user
+                financeDetailViewController.users = users
+                financeDetailViewController.filteredUsers = filteredUsers
+                financeDetailViewController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(financeDetailViewController, animated: true)
             }
         } else if let object = object as? [Transaction] {
             if section.subType == "Transactions" {

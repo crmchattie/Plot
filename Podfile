@@ -23,6 +23,7 @@ target 'Plot' do
   pod 'FSCalendar'
   pod 'CodableFirebase'
   pod 'FloatingPanel'
+  pod 'Charts'
   
 	pod 'ARSLineProgress'
 

@@ -586,17 +586,6 @@ func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDe
             sortedAccountsList.insert(accountDetail, at: 0)
             accountsDict[accountDetail] = accounts
         }
-//        else if let assetAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Asset}) {
-//            let assetAccounts = accountsDict[assetAccountDetail] ?? []
-//            let accountDetail = AccountDetails(name: "Net Worth", balance: assetAccountDetail.balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
-//            sortedAccountsList.insert(accountDetail, at: 0)
-//            accountsDict[accountDetail] = assetAccounts
-//        } else if let liabilityAccountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == .Liability}) {
-//            let liabilityAccounts = accountsDict[liabilityAccountDetail] ?? []
-//            let accountDetail = AccountDetails(name: "Net Worth", balance: liabilityAccountDetail.balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth)
-//            sortedAccountsList.insert(accountDetail, at: 0)
-//            accountsDict[accountDetail] = liabilityAccounts
-//        }
         for bs_type in BalanceSheetType.allCases {
             if let accountDetail = accountsList.first(where: {$0.level == .bs_type && $0.bs_type == bs_type}) {
                 sortedAccountsList.append(accountDetail)
@@ -622,6 +611,355 @@ func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDe
         }
     }
     completion(sortedAccountsList, accountsDict)
+}
+
+func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetails, start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([Statistic], [MXAccount]) -> ()) {
+    var statistics = [Statistic]()
+    var accountList = [MXAccount]()
+    let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+    let isodateFormatter = ISO8601DateFormatter()
+    if accountDetails.level == .account {
+        if let account = accounts.first(where: { $0.name == accountDetails.name }), let balances = account.balances {
+            accountList.append(account)
+            for (balanceDate, balance) in balances {
+                var date = start
+                switch segmentType {
+                case .day:
+                    let nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
+                    // While date <= endDate ...
+                    while nextDate.compare(end) != .orderedDescending {
+                        if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date.stripTime(), nextDate.stripTime() > balanceDate {
+                            let stat = Statistic(date: nextDate, value: balance)
+                            statistics.append(stat)
+                        }
+                        // Advance by one day:
+                        date = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
+                    }
+                case .week:
+                    let nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+                    // While date <= endDate ...
+                    while date.compare(end) != .orderedDescending {
+                        if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date.stripTime(), nextDate.stripTime() > balanceDate {
+                            let stat = Statistic(date: nextDate, value: balance)
+                            statistics.append(stat)
+                        }
+                        
+                        // Advance by one day:
+                        date = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+                    }
+                case .month:
+                    let nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+                    // While date <= endDate ...
+                    while date.compare(end) != .orderedDescending {
+                        if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date.stripTime(), nextDate.stripTime() > balanceDate {
+                            let stat = Statistic(date: nextDate, value: balance)
+                            statistics.append(stat)
+                        }
+                        
+                        // Advance by one day:
+                        date = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+                    }
+                case .year:
+                    let nextDate = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                    // While date <= endDate ...
+                    while date.compare(end) != .orderedDescending {
+                        if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date.stripTime(), nextDate.stripTime() > balanceDate {
+                            let stat = Statistic(date: nextDate, value: balance)
+                            statistics.append(stat)
+                        }
+                        
+                        // Advance by one day:
+                        date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                    }
+                }
+            }
+        }
+    } else {
+        for account in accounts {
+            if account.should_link ?? true == false {
+                continue
+            }
+            if let balances = account.balances {
+                var date = start
+                for (balanceDate, balance) in balances {
+                    switch segmentType {
+                    case .day:
+                        let nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
+                        // While date <= endDate ...
+                        while nextDate.compare(end) != .orderedDescending {
+                            if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date.stripTime(), nextDate.stripTime() > balanceDate {
+                                if accountDetails.name == "Net Worth" {
+                                    if accountDetails.bs_type == .Asset {
+                                        if statistics.isEmpty {
+                                            let stat = Statistic(date: nextDate, value: balance)
+                                            statistics.append(stat)
+                                            accountList.append(account)
+                                        } else {
+                                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                                statistics[index].value += balance
+                                                accountList.append(account)
+                                            }
+                                        }
+                                    } else if accountDetails.bs_type == .Liability {
+                                        if statistics.isEmpty {
+                                            let stat = Statistic(date: nextDate, value: -balance)
+                                            statistics.append(stat)
+                                            accountList.append(account)
+                                        } else {
+                                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                                statistics[index].value -= balance
+                                                accountList.append(account)
+                                            }
+                                        }
+                                    }
+                                } else if accountDetails.name == account.subtype.name && accountDetails.level == .subtype {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                } else if accountDetails.name == account.type.name && accountDetails.level == .type {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                } else if accountDetails.name == account.bs_type.name && accountDetails.level == .bs_type {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                }
+                            }
+                            // Advance by one day:
+                            date = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
+                        }
+                    case .week:
+                        let nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+                        // While date <= endDate ...
+                        while date.compare(end) != .orderedDescending {
+                            if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date.stripTime(), nextDate.stripTime() > balanceDate {
+                                if accountDetails.name == "Net Worth" {
+                                    if accountDetails.bs_type == .Asset {
+                                        if statistics.isEmpty {
+                                            let stat = Statistic(date: nextDate, value: balance)
+                                            statistics.append(stat)
+                                            accountList.append(account)
+                                        } else {
+                                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                                statistics[index].value += balance
+                                                accountList.append(account)
+                                            }
+                                        }
+                                    } else if accountDetails.bs_type == .Liability {
+                                        if statistics.isEmpty {
+                                            let stat = Statistic(date: nextDate, value: -balance)
+                                            statistics.append(stat)
+                                            accountList.append(account)
+                                        } else {
+                                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                                statistics[index].value -= balance
+                                                accountList.append(account)
+                                            }
+                                        }
+                                    }
+                                } else if accountDetails.name == account.subtype.name && accountDetails.level == .subtype {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                } else if accountDetails.name == account.type.name && accountDetails.level == .type {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                } else if accountDetails.name == account.bs_type.name && accountDetails.level == .bs_type {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Advance by one day:
+                            date = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+                        }
+                    case .month:
+                        let nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+                        // While date <= endDate ...
+                        while date.compare(end) != .orderedDescending {
+                            if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date.stripTime(), nextDate.stripTime() > balanceDate {
+                                if accountDetails.name == "Net Worth" {
+                                    if accountDetails.bs_type == .Asset {
+                                        if statistics.isEmpty {
+                                            let stat = Statistic(date: nextDate, value: balance)
+                                            statistics.append(stat)
+                                            accountList.append(account)
+                                        } else {
+                                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                                statistics[index].value += balance
+                                                accountList.append(account)
+                                            }
+                                        }
+                                    } else if accountDetails.bs_type == .Liability {
+                                        if statistics.isEmpty {
+                                            let stat = Statistic(date: nextDate, value: -balance)
+                                            statistics.append(stat)
+                                            accountList.append(account)
+                                        } else {
+                                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                                statistics[index].value -= balance
+                                                accountList.append(account)
+                                            }
+                                        }
+                                    }
+                                } else if accountDetails.name == account.subtype.name && accountDetails.level == .subtype {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                } else if accountDetails.name == account.type.name && accountDetails.level == .type {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                } else if accountDetails.name == account.bs_type.name && accountDetails.level == .bs_type {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Advance by one day:
+                            date = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+                        }
+                    case .year:
+                        let nextDate = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        // While date <= endDate ...
+                        while date.compare(end) != .orderedDescending {
+                            if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date.stripTime(), nextDate.stripTime() > balanceDate {
+                                if accountDetails.name == "Net Worth" {
+                                    if accountDetails.bs_type == .Asset {
+                                        if statistics.isEmpty {
+                                            let stat = Statistic(date: nextDate, value: balance)
+                                            statistics.append(stat)
+                                            accountList.append(account)
+                                        } else {
+                                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                                statistics[index].value += balance
+                                                accountList.append(account)
+                                            }
+                                        }
+                                    } else if accountDetails.bs_type == .Liability {
+                                        if statistics.isEmpty {
+                                            let stat = Statistic(date: nextDate, value: -balance)
+                                            statistics.append(stat)
+                                            accountList.append(account)
+                                        } else {
+                                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                                statistics[index].value -= balance
+                                                accountList.append(account)
+                                            }
+                                        }
+                                    }
+                                } else if accountDetails.name == account.subtype.name && accountDetails.level == .subtype {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                } else if accountDetails.name == account.type.name && accountDetails.level == .type {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                } else if accountDetails.name == account.bs_type.name && accountDetails.level == .bs_type {
+                                    if statistics.isEmpty {
+                                        let stat = Statistic(date: nextDate, value: balance)
+                                        statistics.append(stat)
+                                        accountList.append(account)
+                                    } else {
+                                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                                            statistics[index].value += balance
+                                            accountList.append(account)
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Advance by one day:
+                            date = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+                        }
+                    }
+                }
+            }
+        }
+    }
+    completion(statistics, accountList)
 }
 
 

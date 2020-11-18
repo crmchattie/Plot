@@ -29,12 +29,12 @@ class FinanceTransactionLevelViewController: FormViewController {
         super.viewDidLoad()
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
+        activityIndicatorView.startAnimating()
         configureTableView()
         oldValue = value
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        activityIndicatorView.startAnimating()
         updateLevels()
     }
     

@@ -1,5 +1,8 @@
 PODS:
   - ARSLineProgress (3.1.0)
+  - Charts (3.6.0):
+    - Charts/Core (= 3.6.0)
+  - Charts/Core (3.6.0)
   - CodableFirebase (0.2.1)
   - CropViewController (2.5.3)
   - Eureka (5.3.1)
@@ -127,6 +130,7 @@ PODS:
 
 DEPENDENCIES:
   - ARSLineProgress
+  - Charts
   - CodableFirebase
   - CropViewController
   - Eureka
@@ -148,6 +152,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - ARSLineProgress
+    - Charts
     - CodableFirebase
     - CropViewController
     - Eureka
@@ -181,6 +186,7 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   ARSLineProgress: 60778657c69491796c3faf5b834c72924c405833
+  Charts: b1e3a1f5a1c9ba5394438ca3b91bd8c9076310af
   CodableFirebase: 0bf201991eeec35eb9fcd987d271ea463cf34a80
   CropViewController: a5c143548a0fabcd6cc25f2d26e40460cfb8c78c
   Eureka: 859877ab1e85661b6b7e810015d430e937d9cc7d
@@ -212,6 +218,6 @@ SPEC CHECKSUMS:
   SplitRow: 921e76fbbd7ef50d005131d6665a6e10f26df04b
   ViewRow: 8da541e9c019f3be63f4e28f311a62cac2045ecf
 
-PODFILE CHECKSUM: 3d5bd962d3a29ac48d257e50fccc0bd1a39b522b
+PODFILE CHECKSUM: d52b81f926a3b1aaabf3852ba33a969f3d3e3eca
 
 COCOAPODS: 1.9.3
