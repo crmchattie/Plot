@@ -23,7 +23,7 @@ class StepsOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .stepCount, unit: .count(), date: self.startDate) { [weak self] stepsResult, _ in
+        HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .stepCount, unit: .count(), date: self.startDate) { [weak self] stepsResult, _, _ in
             guard let stepsResult = stepsResult, stepsResult > 0, let _self = self else {
                 self?.finish()
                 return

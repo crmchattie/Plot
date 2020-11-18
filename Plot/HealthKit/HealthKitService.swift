@@ -147,7 +147,7 @@ class HealthKitService {
     class func getCumulativeSumSampleAverageAndRecent(forIdentifier identifier: HKQuantityTypeIdentifier,
                                       unit: HKUnit,
                                       date: Date,
-                                      completion: @escaping (Double?, Double?) -> Void) {
+                                      completion: @escaping (Double?, Double?, Date?) -> Void) {
         let calendar = Calendar.current
         let startDate = calendar.startOfDay(for: date)
         let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
@@ -159,9 +159,9 @@ class HealthKitService {
                                       unit: HKUnit,
                                       startDate: Date,
                                       endDate: Date,
-                                      completion: @escaping (Double?, Double?) -> Void) {
+                                      completion: @escaping (Double?, Double?, Date?) -> Void) {
         guard let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) else {
-            completion(nil, nil)
+            completion(nil, nil, nil)
             return
         }
         
@@ -190,8 +190,9 @@ class HealthKitService {
             }
             
             let recent = statistics.last?.sumQuantity()?.doubleValue(for: unit)
+            let recentStatDate = statistics.last?.startDate
             
-            completion(total, recent)
+            completion(total, recent, recentStatDate)
         }
 
         healthStore.execute(query)

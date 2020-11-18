@@ -12,12 +12,14 @@ import Firebase
 class WorkoutOperation: AsyncOperation {
     private var startDate: Date
     private var workoutActivityType: HKWorkoutActivityType
+    private var rank: Int
     weak var delegate: MetricOperationDelegate?
     var lastSyncDate: Date?
 
-    init(date: Date, workoutActivityType: HKWorkoutActivityType) {
+    init(date: Date, workoutActivityType: HKWorkoutActivityType, rank: Int) {
         self.startDate = date
         self.workoutActivityType = workoutActivityType
+        self.rank = rank
     }
     
     override func main() {
@@ -35,7 +37,7 @@ class WorkoutOperation: AsyncOperation {
                 // Most recent workout
                 let workout = workouts.last {
                 let total = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
-                var metric = HealthMetric(type: HealthMetricType.workout, total: total, date: _self.startDate, unitName: "calories", rank: HealthMetricType.workout.rank)
+                var metric = HealthMetric(type: HealthMetricType.workout, total: total, date: _self.startDate, unitName: "calories", rank: _self.rank)
                 metric.hkSample = workout
                 
                 var activities: [Activity] = []

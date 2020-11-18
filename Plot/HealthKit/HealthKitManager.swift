@@ -80,41 +80,41 @@ class HealthKitManager {
             weightOperation.addDependency(weightOpAdapter)
             
             // Workouts
-            let functionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .functionalStrengthTraining)
+            let functionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .functionalStrengthTraining, rank: 1)
             functionalStrengthTrainingOp.delegate = self
             functionalStrengthTrainingOp.lastSyncDate = lastSyncDate
             
-            let traditionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .traditionalStrengthTraining)
+            let traditionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .traditionalStrengthTraining, rank: 2)
             traditionalStrengthTrainingOp.delegate = self
             traditionalStrengthTrainingOp.lastSyncDate = lastSyncDate
             
-            let runningOp = WorkoutOperation(date: today, workoutActivityType: .running)
+            let runningOp = WorkoutOperation(date: today, workoutActivityType: .running, rank: 3)
             runningOp.delegate = self
             runningOp.lastSyncDate = lastSyncDate
             
-            let cyclingOp = WorkoutOperation(date: today, workoutActivityType: .cycling)
+            let cyclingOp = WorkoutOperation(date: today, workoutActivityType: .cycling, rank: 4)
             cyclingOp.delegate = self
             cyclingOp.lastSyncDate = lastSyncDate
             
-            let hiitOp = WorkoutOperation(date: today, workoutActivityType: .highIntensityIntervalTraining)
+            let hiitOp = WorkoutOperation(date: today, workoutActivityType: .highIntensityIntervalTraining, rank: 5)
             hiitOp.delegate = self
             hiitOp.lastSyncDate = lastSyncDate
             
             // Nutrition
-            let dietaryEnergyConsumedOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryEnergyConsumed, unit: .kilocalorie(), unitTitle: "calories")
+            let dietaryEnergyConsumedOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryEnergyConsumed, unit: .kilocalorie(), unitTitle: "calories", rank: 1)
             dietaryEnergyConsumedOp.delegate = self
             
             let gramsText = "grams"
-            let dietaryFatTotalOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryFatTotal, unit: .gram(), unitTitle: gramsText)
+            let dietaryFatTotalOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryFatTotal, unit: .gram(), unitTitle: gramsText, rank: 2)
             dietaryFatTotalOp.delegate = self
             
-            let dietaryProteinOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryProtein, unit: .gram(), unitTitle: gramsText)
+            let dietaryProteinOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryProtein, unit: .gram(), unitTitle: gramsText, rank: 3)
             dietaryProteinOp.delegate = self
             
-            let dietaryCarbohydratesOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryCarbohydrates, unit: .gram(), unitTitle: gramsText)
+            let dietaryCarbohydratesOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryCarbohydrates, unit: .gram(), unitTitle: gramsText, rank: 4)
             dietaryCarbohydratesOp.delegate = self
             
-            let dietarySugarOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietarySugar, unit: .gram(), unitTitle: gramsText)
+            let dietarySugarOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietarySugar, unit: .gram(), unitTitle: gramsText, rank: 5)
             dietarySugarOp.delegate = self
             
             // Setup queue
@@ -127,7 +127,10 @@ class HealthKitManager {
                     return
                 }
                 
-                //_self.metrics.sort(by: {$0.rank < $1.rank})
+                // sort each section(items in a category)
+                for (key, val) in _self.metrics {
+                    _self.metrics[key] = val.sorted(by: {$0.rank < $1.rank})
+                }
                 
                 // if we properly fetched the items then save
                 if _self.activities.count > 0 {

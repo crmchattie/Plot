@@ -118,7 +118,7 @@ class HealthMetricCell: UICollectionViewCell {
         var title = healthMetric.type.name
         if case HealthMetricType.workout = healthMetric.type, let hkWorkout = healthMetric.hkSample as? HKWorkout {
             title = hkWorkout.workoutActivityType.name
-            timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "" : timeAgoSinceDate(hkWorkout.endDate)
+            timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "today" : timeAgoSinceDate(hkWorkout.endDate)
         }
         else if case HealthMetricType.nutrition(let value) = healthMetric.type {
             title = value

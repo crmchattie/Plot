@@ -87,6 +87,14 @@ class HealthViewController: UIViewController {
                     DispatchQueue.main.async {
                         self?.healthMetrics = metrics
                         self?.healthMetricSections = Array(metrics.keys)
+                        
+                        self?.healthMetricSections.sort(by: { (v1, v2) -> Bool in
+                            if let cat1 = HealthMetricCategory(rawValue: v1), let cat2 = HealthMetricCategory(rawValue: v2) {
+                                return cat1.rank < cat2.rank
+                            }
+                            return false
+                        })
+                        
                         self?.spinner.stopAnimating()
                     }
                 }

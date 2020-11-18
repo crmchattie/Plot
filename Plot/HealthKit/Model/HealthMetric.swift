@@ -86,4 +86,17 @@ enum HealthMetricCategory: String {
     case general
     case workouts
     case nutrition
+    
+    var rank: Int {
+        get {
+            switch self {
+            case .general:
+                return 1
+            case .workouts:
+                return 2
+            case .nutrition:
+                return 3
+            }
+        }
+    }
 }
