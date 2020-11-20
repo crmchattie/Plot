@@ -29,9 +29,6 @@ class FinanceDetailViewController: UIViewController {
     var filteredTransactions: [Transaction]!
     var filteredAccounts: [MXAccount]!
     
-    var searchBar: UISearchBar?
-    var searchController: UISearchController?
-    
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
@@ -65,7 +62,7 @@ class FinanceDetailViewController: UIViewController {
         return tableView
     }()
     
-    let barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
+    lazy var barButton = UIBarButtonItem()
     
     init(viewModel: FinanceDetailViewModelInterface) {
         self.viewModel = viewModel
@@ -83,8 +80,8 @@ class FinanceDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
+        barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
         navigationItem.rightBarButtonItem = barButton
         
         if let accountDetails = viewModel.accountDetails {
@@ -104,23 +101,20 @@ class FinanceDetailViewController: UIViewController {
         tableView.delegate = self
         
         view.addSubview(segmentedControl)
-        segmentedControl.selectedSegmentIndex = 0
+        segmentedControl.selectedSegmentIndex = 2
         
         configureView()
         configureChart()
         
         fetchData()
-        
-//        setupSearchController()
-//        handleReloadTable()
-        
+                
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if let transactions = viewModel.transactions {
+        if let transactions = viewModel.transactions, !transactions.isEmpty {
             self.delegate?.updateTransactions(transactions: transactions)
-        } else if let accounts = viewModel.accounts {
+        } else if let accounts = viewModel.accounts, !accounts.isEmpty {
             self.delegate?.updateAccounts(accounts: accounts)
         }
     }
@@ -139,7 +133,7 @@ class FinanceDetailViewController: UIViewController {
         chartViewHeightAnchor = chartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
         chartViewTopAnchor = chartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
         NSLayoutConstraint.activate([
-            segmentedControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
+            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             segmentedControl.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             segmentedControl.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
             
@@ -201,50 +195,12 @@ class FinanceDetailViewController: UIViewController {
         chartView.legend.form = .line
     }
     
-    fileprivate func setupSearchController() {
-        
-        if #available(iOS 11.0, *) {
-            searchController = UISearchController(searchResultsController: nil)
-            searchController?.searchResultsUpdater = self
-            searchController?.obscuresBackgroundDuringPresentation = false
-            searchController?.searchBar.delegate = self
-            searchController?.definesPresentationContext = true
-            navigationItem.searchController = searchController
-        } else {
-            searchBar = UISearchBar()
-            searchBar?.delegate = self
-            searchBar?.placeholder = "Search"
-            searchBar?.searchBarStyle = .minimal
-            searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
-            tableView.tableHeaderView = searchBar
-        }
-    }
-    
-    func handleReloadTable() {
-        if viewModel.transactions != nil {
-            viewModel.transactions!.sort { (transaction1, transaction2) -> Bool in
-                if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
-                    return date1 > date2
-                }
-                return transaction1.description < transaction2.description
-            }
-            filteredTransactions = viewModel.transactions
-        } else if viewModel.accounts != nil {
-            viewModel.accounts!.sort { (account1, account2) -> Bool in
-                return account1.name < account2.name
-            }
-            filteredAccounts = viewModel.accounts
-        }
-        tableView.reloadData()
-        
-    }
-    
     @objc func changeSegment(_ segmentedControl: UISegmentedControl) {
         fetchData()
     }
     
     @objc private func hideUnhideTapped() {
-        barButton.title = chartView.isHidden ? "Show Chart" : "Hide Chart"
+        barButton.title = chartView.isHidden ? "Hide Chart" : "Show Chart"
         updateChartViewAppearance(hidden: !chartView.isHidden)
     }
     
@@ -258,11 +214,12 @@ class FinanceDetailViewController: UIViewController {
     func fetchData() {
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        viewModel.fetchChartData(for: segmentType) { [weak self] (data, maxValue) in
+        viewModel.fetchChartData(for: segmentType) { [weak self] (data, maxValue, minValue) in
             guard let weakSelf = self else { return }
             
             weakSelf.chartView.data = data
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
+            weakSelf.chartView.rightAxis.axisMinimum = minValue
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.animate(xAxisDuration: 1)
@@ -270,22 +227,6 @@ class FinanceDetailViewController: UIViewController {
             
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
             weakSelf.tableView.reloadData()
-        }
-    }
-    
-    
-    func handleReloadTableAfterSearch() {
-        if viewModel.transactions != nil {
-            filteredTransactions.sort { (transaction1, transaction2) -> Bool in
-                return transaction1.description < transaction2.description
-            }
-        } else if viewModel.accounts != nil {
-            filteredAccounts.sort { (account1, account2) -> Bool in
-                return account1.name < account2.name
-            }
-        }
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
         }
     }
     
@@ -381,28 +322,27 @@ extension FinanceDetailViewController: ChartViewDelegate {
 
 extension FinanceDetailViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let transactions = viewModel.transactions {
+        if let transactions = viewModel.transactions, !transactions.isEmpty {
             return transactions.count
-        } else if let accounts = viewModel.accounts {
+        } else if let accounts = viewModel.accounts, !accounts.isEmpty {
             return accounts.count
         }
         return 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-                        
         let cell = tableView.dequeueReusableCell(withIdentifier: kFinanceTableViewCell, for: indexPath) as? FinanceTableViewCell ?? FinanceTableViewCell()
         cell.selectionStyle = .none
-        if let transactions = viewModel.transactions {
+        if let transactions = viewModel.transactions, !transactions.isEmpty {
             cell.transaction = transactions[indexPath.row]
-        } else if let accounts = viewModel.accounts {
+        } else if let accounts = viewModel.accounts, !accounts.isEmpty {
             cell.account = accounts[indexPath.row]
         }
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let transactions = viewModel.transactions {
+        if let transactions = viewModel.transactions, !transactions.isEmpty {
             let transaction = transactions[indexPath.row]
             let destination = FinanceTransactionViewController()
             destination.transaction = transaction
@@ -413,7 +353,7 @@ extension FinanceDetailViewController: UITableViewDelegate, UITableViewDataSourc
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
-        } else if let accounts = viewModel.accounts {
+        } else if let accounts = viewModel.accounts, !accounts.isEmpty {
             let account = accounts[indexPath.row]
             let destination = FinanceAccountViewController()
             destination.account = account
@@ -440,7 +380,6 @@ extension FinanceDetailViewController: UpdateAccountDelegate {
     func updateAccount(account: MXAccount) {
         if let index = viewModel.accounts!.firstIndex(of: account) {
             viewModel.accounts![index] = account
-            handleReloadTable()
         }
     }
 }
@@ -449,68 +388,6 @@ extension FinanceDetailViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         if let index = viewModel.transactions!.firstIndex(of: transaction) {
             viewModel.transactions![index] = transaction
-            handleReloadTable()
-        }
-    }
-}
-
-extension FinanceDetailViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
-    
-    func updateSearchResults(for searchController: UISearchController) {}
-    
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.text = nil
-        filteredAccounts = viewModel.accounts
-        filteredTransactions = viewModel.transactions
-        handleReloadTable()
-        guard #available(iOS 11.0, *) else {
-            searchBar.setShowsCancelButton(false, animated: true)
-            searchBar.resignFirstResponder()
-            return
-        }
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if viewModel.transactions != nil {
-            filteredTransactions = searchText.isEmpty ? viewModel.transactions :
-                viewModel.transactions!.filter({ (transaction) -> Bool in
-                return transaction.description.lowercased().contains(searchText.lowercased())
-            })
-        } else if filteredAccounts != nil {
-            filteredAccounts = searchText.isEmpty ? viewModel.accounts :
-                viewModel.accounts!.filter({ (account) -> Bool in
-                return account.name.lowercased().contains(searchText.lowercased())
-            })
-        }
-        handleReloadTableAfterSearch()
-    }
-
-    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        guard #available(iOS 11.0, *) else {
-            searchBar.setShowsCancelButton(true, animated: true)
-            return true
-        }
-        return true
-    }
-}
-
-extension FinanceDetailViewController { /* hiding keyboard */
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        
-        if #available(iOS 11.0, *) {
-            searchController?.searchBar.endEditing(true)
-        } else {
-            self.searchBar?.endEditing(true)
-        }
-    }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        setNeedsStatusBarAppearanceUpdate()
-        if #available(iOS 11.0, *) {
-            searchController?.searchBar.endEditing(true)
-        } else {
-            self.searchBar?.endEditing(true)
         }
     }
 }

@@ -20,41 +20,26 @@ class FinanceDetailService: FinanceDetailServiceInterface {
 
     private func getStatisticalSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
         print("getStatisticalSamples")
-        let calendar = NSCalendar.current
-        var interval = DateComponents()
-        var anchorComponents = calendar.dateComponents([.day, .month, .year, .weekday], from: Date())
 
-        var anchorDate = Date()
+        let anchorDate = Date()
         var startDate = anchorDate
         var endDate = anchorDate
 
         if segmentType == .day {
-            interval.hour = 1
-            anchorComponents.hour = 0
-            anchorDate = calendar.date(from: anchorComponents)!
-            endDate = Date()
-            startDate = calendar.startOfDay(for: endDate)
+            startDate = Date().startOfDay
+            endDate = Date().endOfDay
         }
         else if segmentType == .week {
-            interval.day = 1
-            anchorComponents.day! -= 7
-            anchorComponents.hour = 0
-            endDate = Date()
-            startDate = endDate.weekBefore
+            startDate = Date().startOfWeek
+            endDate = Date().endOfWeek
         }
         else if segmentType == .month {
-            interval.day = 1
-            anchorComponents.month! -= 1
-            anchorComponents.hour = 0
-            endDate = Date()
-            startDate = endDate.monthBefore
+            startDate = Date().startOfMonth
+            endDate = Date().endOfMonth
         }
         else if segmentType == .year {
-            interval.month = 1
-            anchorComponents.year! -= 1
-            anchorComponents.hour = 0
-            endDate = Date()
-            startDate = endDate.lastYear
+            startDate = Date().startOfYear
+            endDate = Date().endOfYear
         }
 
         if let accountDetails = accountDetails, let accounts = accounts {

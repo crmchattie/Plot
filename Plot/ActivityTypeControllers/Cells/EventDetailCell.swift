@@ -64,9 +64,9 @@ class EventDetailCell: UICollectionViewCell {
    
     func setupViews() {
         
-        clickView.constrainHeight(17)
-        clickArrowView.constrainWidth(16)
-        clickArrowView.constrainHeight(16)
+        clickView.constrainHeight(20)
+        clickArrowView.constrainWidth(20)
+        clickArrowView.constrainHeight(20)
         
         clickView.addSubview(getTixLabel)
         clickView.addSubview(clickArrowView)

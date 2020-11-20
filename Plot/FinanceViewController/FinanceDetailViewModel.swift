@@ -15,7 +15,7 @@ protocol FinanceDetailViewModelInterface {
     var accounts: [MXAccount]? { get set }
     var transactions: [Transaction]? { get set }
     
-    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double) -> ())
+    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double, Double) -> ())
 }
 
 class FinanceDetailViewModel: FinanceDetailViewModelInterface {
@@ -23,29 +23,33 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
     
     let accountDetails: AccountDetails?
     let transactionDetails: TransactionDetails?
+    var allAccounts: [MXAccount]?
+    var allTransactions: [Transaction]?
     var accounts: [MXAccount]?
     var transactions: [Transaction]?
     
     init(accountDetails: AccountDetails?, accounts: [MXAccount]?, transactionDetails: TransactionDetails?, transactions: [Transaction]?, financeDetailService: FinanceDetailServiceInterface) {
         self.accountDetails = accountDetails
+        self.allAccounts = accounts
         self.accounts = accounts
         self.transactionDetails = transactionDetails
+        self.allTransactions = transactions
         self.transactions = transactions
         self.financeDetailService = financeDetailService
     }
     
-    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double) -> ()) {
-        print("fetchChartData")
-        financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: accounts, transactions: transactions) { [weak self] (stats, accounts, transactions, err) in
-            print("stats \(stats)")
+    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double, Double) -> ()) {
+        financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: allAccounts, transactions: allTransactions) { [weak self] (stats, accounts, transactions, err) in
             
             var data: LineChartData?
             var maxValue: Double = 0
+            var minValue: Double = 0
             if let stats = stats, stats.count > 0 {
                 var i = 0
                 var entries: [ChartDataEntry] = []
                 for stat in stats {
                     maxValue = max(maxValue, stat.value)
+                    minValue = min(minValue, stat.value)
                     let entry = ChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                     entries.append(entry)
                     i += 1
@@ -82,7 +86,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
             DispatchQueue.main.async {
                 self?.accounts = accounts ?? []
                 self?.transactions = transactions ?? []
-                completion(data, maxValue)
+                completion(data, maxValue, minValue)
             }
         }
     }
