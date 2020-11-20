@@ -607,9 +607,9 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             do {
                 var _account = account
                 if _account.balances != nil {
-                    _account.balances![_account.updated_at] = _account.balance
+                    _account.balances![_account.updated_at] = _account.available_balance ?? _account.balance
                 } else {
-                    _account.balances = [_account.updated_at: _account.balance]
+                    _account.balances = [_account.updated_at: _account.available_balance ?? _account.balance]
                 }
                 // store account info
                 let value = try FirebaseEncoder().encode(_account)

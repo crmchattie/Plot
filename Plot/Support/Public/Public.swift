@@ -1580,45 +1580,50 @@ class TapGesture: UITapGestureRecognizer {
 
 extension Date {
     var startOfDay: Date {
-        return Calendar.current.startOfDay(for: self)
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        return cal.startOfDay(for: self)
     }
     
     var endOfDay: Date {
         var components = DateComponents()
         components.day = 1
-        components.second = -1
         return Calendar.current.date(byAdding: components, to: startOfDay)!
     }
     
     var startOfWeek: Date {
-        let gregorian = Calendar(identifier: .gregorian)
-        let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        return gregorian.date(byAdding: .day, value: 1, to: sunday!)!
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        let sunday = cal.date(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
+        return cal.date(byAdding: .day, value: 1, to: sunday!)!
     }
 
     var endOfWeek: Date {
-        let gregorian = Calendar(identifier: .gregorian)
-        let sunday = gregorian.date(from: gregorian.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
-        return gregorian.date(byAdding: .day, value: 7, to: sunday)!
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        let sunday = cal.date(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
+        return cal.date(byAdding: .day, value: 8, to: sunday)!
     }
 
     var startOfMonth: Date {
-        let calendar = Calendar(identifier: .gregorian)
-        let components = calendar.dateComponents([.year, .month], from: self)
-        return  calendar.date(from: components)!
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        let components = cal.dateComponents([.year, .month], from: self)
+        return cal.date(from: components)!
     }
 
     var endOfMonth: Date {
         var components = DateComponents()
         components.month = 1
-        components.second = -1
+        components.hour = -1
         return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfMonth)!
     }
     
     var startOfYear: Date {
-        let calendar = Calendar(identifier: .gregorian)
-        let components = calendar.dateComponents([.year], from: self)
-        return  calendar.date(from: components)!
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        let components = cal.dateComponents([.year], from: self)
+        return  cal.date(from: components)!
     }
 
     var endOfYear: Date {

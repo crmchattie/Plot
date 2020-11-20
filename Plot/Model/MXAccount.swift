@@ -617,12 +617,13 @@ func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetai
     var statistics = [Statistic]()
     var accountList = [MXAccount]()
     let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
     var date = start
     switch segmentType {
     case .day:
         var nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
         // While date <= endDate ...
-        while date.compare(end) != .orderedDescending {
+        while nextDate.compare(end) != .orderedDescending {
             accountListStats(accounts: accounts, accountDetails: accountDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
                 statistics.append(contentsOf: stats)
                 for account in accounts {
@@ -638,7 +639,7 @@ func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetai
     case .week:
         var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
         // While date <= endDate ...
-        while date.compare(end) != .orderedDescending {
+        while nextDate.compare(end) != .orderedDescending {
             accountListStats(accounts: accounts, accountDetails: accountDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
                 statistics.append(contentsOf: stats)
                 for account in accounts {
@@ -654,7 +655,7 @@ func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetai
     case .month:
         var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
         // While date <= endDate ...
-        while date.compare(end) != .orderedDescending {
+        while nextDate.compare(end) != .orderedDescending {
             accountListStats(accounts: accounts, accountDetails: accountDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
                 statistics.append(contentsOf: stats)
                 for account in accounts {
@@ -671,7 +672,7 @@ func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetai
     case .year:
         var nextDate = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
         // While date <= endDate ...
-        while date.compare(end) != .orderedDescending {
+        while nextDate.compare(end) != .orderedDescending {
             accountListStats(accounts: accounts, accountDetails: accountDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
                 statistics.append(contentsOf: stats)
                 for account in accounts {
@@ -698,7 +699,7 @@ func accountListStats(accounts: [MXAccount], accountDetails: AccountDetails, sta
         }
         if let balances = account.balances {
             for (balanceDate, balance) in balances {
-                if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date.stripTime(), nextDate.stripTime() > balanceDate {
+                if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date, nextDate > balanceDate {
                     if accountDetails.name == "Net Worth" {
                         if accountDetails.bs_type == .Asset {
                             if statistics.isEmpty {

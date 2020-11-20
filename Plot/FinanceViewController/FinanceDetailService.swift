@@ -19,7 +19,6 @@ class FinanceDetailService: FinanceDetailServiceInterface {
     }
 
     private func getStatisticalSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
-        print("getStatisticalSamples")
 
         let anchorDate = Date()
         var startDate = anchorDate
@@ -41,7 +40,7 @@ class FinanceDetailService: FinanceDetailServiceInterface {
             startDate = Date().startOfYear
             endDate = Date().endOfYear
         }
-
+        
         if let accountDetails = accountDetails, let accounts = accounts {
             accountDetailsChartData(accounts: accounts, accountDetails: accountDetails, start: startDate, end: endDate, segmentType: segmentType) { (statistics, accounts) in
                 let sortedAccounts = accounts.sorted(by: {$0.name > $1.name})

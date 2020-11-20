@@ -253,11 +253,11 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     for transaction in transactions {
         guard transaction.should_link ?? true else { continue }
         if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date), let start = start, let end = end {
-            if transactionDate < start.stripTime() || end.stripTime() < transactionDate {
+            if transactionDate < start || end < transactionDate {
                 continue
             }
         } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at), let start = start, let end = end {
-            if transactionDate < start.stripTime() || end.stripTime() < transactionDate {
+            if transactionDate < start || end < transactionDate {
                 continue
             }
         }
@@ -423,12 +423,13 @@ func transactionDetailsChartData(transactions: [Transaction], transactionDetails
     var statistics = [Statistic]()
     var transactionList = [Transaction]()
     let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
     var date = start
     switch segmentType {
     case .day:
         var nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
         // While date <= endDate ...
-        while date.compare(end) != .orderedDescending {
+        while nextDate.compare(end) != .orderedDescending {
             transactionListStats(transactions: transactions, transactionDetails: transactionDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
                 statistics.append(contentsOf: stats)
                 transactionList.append(contentsOf: transactions)
@@ -440,7 +441,7 @@ func transactionDetailsChartData(transactions: [Transaction], transactionDetails
     case .week:
         var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
         // While date <= endDate ...
-        while date.compare(end) != .orderedDescending {
+        while nextDate.compare(end) != .orderedDescending {
             transactionListStats(transactions: transactions, transactionDetails: transactionDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
                 statistics.append(contentsOf: stats)
                 transactionList.append(contentsOf: transactions)
@@ -453,7 +454,7 @@ func transactionDetailsChartData(transactions: [Transaction], transactionDetails
     case .month:
         var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
         // While date <= endDate ...
-        while date.compare(end) != .orderedDescending {
+        while nextDate.compare(end) != .orderedDescending {
             transactionListStats(transactions: transactions, transactionDetails: transactionDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
                 statistics.append(contentsOf: stats)
                 transactionList.append(contentsOf: transactions)
@@ -466,7 +467,7 @@ func transactionDetailsChartData(transactions: [Transaction], transactionDetails
     case .year:
         var nextDate = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
         // While date <= endDate ...
-        while date.compare(end) != .orderedDescending {
+        while nextDate.compare(end) != .orderedDescending {
             transactionListStats(transactions: transactions, transactionDetails: transactionDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
                 statistics.append(contentsOf: stats)
                 transactionList.append(contentsOf: transactions)
@@ -487,20 +488,20 @@ func transactionListStats(transactions: [Transaction], transactionDetails: Trans
     for transaction in transactions {
         guard transaction.should_link ?? true else { continue }
         if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
-            if transactionDate < start.stripTime() || end.stripTime() < transactionDate {
+            if transactionDate < start || end < transactionDate {
                 continue
             }
         } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-            if transactionDate < start.stripTime() || end.stripTime() < transactionDate {
+            if transactionDate < start || end < transactionDate {
                 continue
             }
         }
         if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
-            if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+            if transactionDate < date || nextDate < transactionDate {
                 continue
             }
         } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-            if transactionDate < date.stripTime() || nextDate.stripTime() < transactionDate {
+            if transactionDate < date || nextDate < transactionDate {
                 continue
             }
         }
