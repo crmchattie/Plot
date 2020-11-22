@@ -37,7 +37,7 @@ class HealthViewController: UIViewController {
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +61,7 @@ class HealthViewController: UIViewController {
         
         if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-            flowLayout.headerReferenceSize = CGSize(width: self.collectionView.frame.size.width, height: 30.0)
+            flowLayout.headerReferenceSize = CGSize(width: self.collectionView.frame.size.width, height: 35.0)
         }
         
         configureView()
@@ -173,23 +173,19 @@ extension HealthViewController: UICollectionViewDelegate, UICollectionViewDataSo
         if kind == UICollectionView.elementKindSectionHeader {
             let key = healthMetricSections[indexPath.section]
             let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
-            sectionHeader.label.text = key.uppercased()
-            sectionHeader.label.textColor = ThemeManager.currentTheme().generalTitleColor
+            sectionHeader.titleLabel.text = key.capitalized
             return sectionHeader
         } else { //No footer in this case but can add option for that
             return UICollectionReusableView()
         }
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-//        return CGSize(width: collectionView.frame.width, height: 40)
-//    }
 }
 
 class SectionHeader: UICollectionReusableView {
-    var label: UILabel = {
+    var titleLabel: UILabel = {
         let label: UILabel = UILabel()
-        label.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
+        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.font = .boldSystemFont(ofSize: 30)
         label.sizeToFit()
         return label
     }()
@@ -197,12 +193,17 @@ class SectionHeader: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addSubview(label)
+        addSubview(titleLabel)
         
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-        label.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 10).isActive = true
-        label.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        titleLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 5).isActive = true
+        titleLabel.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
     }
     
     required init?(coder aDecoder: NSCoder) {
