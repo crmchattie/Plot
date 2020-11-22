@@ -168,13 +168,18 @@ class HealthDetailViewController: UIViewController {
     }
     
     @objc private func hideUnhideTapped() {
-        updateChartViewAppearance(hidden: !chartView.isHidden)
+        if chartView.data != nil {
+            updateChartViewAppearance(hidden: !chartView.isHidden)
+        }
     }
     
     private func updateChartViewAppearance(hidden: Bool) {
         chartView.isHidden = hidden
         chartViewHeightAnchor?.constant = hidden ? 0 : chartViewHeight
         chartViewTopAnchor?.constant = hidden ? 0 : chartViewTopMargin
+        
+        let imageName = hidden ? "unhide-grid" : "hide-grid"
+        navigationItem.rightBarButtonItem?.image = UIImage(named: imageName)
     }
     
     // MARK: HealthKit Data

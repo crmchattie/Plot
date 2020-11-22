@@ -154,7 +154,7 @@ class HealthMetricCell: UICollectionViewCell {
         case .steps:
             imageName = "walking"
         case .nutrition:
-            imageName = "activity"
+            imageName = "nutrition"
         case .workout:
             if let hkWorkout = healthMetric.hkSample as? HKWorkout {
                 let workoutActivityType = hkWorkout.workoutActivityType
