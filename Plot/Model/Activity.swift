@@ -10,6 +10,9 @@ import UIKit
 import Firebase
 import CodableFirebase
 
+let activitiesEntity = "activities"
+let userActivitiesEntity = "user-activities"
+
 class Activity: NSObject, NSCopying, Codable {
     var activityID: String?
     var name: String?

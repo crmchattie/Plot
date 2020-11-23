@@ -109,6 +109,7 @@ class MasterActivityContainerController: UIViewController {
             }
         }
     }
+
     var selectedDate = Date()
     
 //    let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
@@ -119,6 +120,8 @@ class MasterActivityContainerController: UIViewController {
     let containerView = UIView()
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
+    
+    var healthVCInitialized = false
     
     weak var delegate: ManageAppearanceHome?
     
@@ -151,6 +154,7 @@ class MasterActivityContainerController: UIViewController {
     
     lazy var healthVC: HealthViewController = {
         let vc = HealthViewController()
+        healthVCInitialized = true
         self.addAsChildVC(childVC: vc)
         return vc
     }()
@@ -163,7 +167,6 @@ class MasterActivityContainerController: UIViewController {
         chatsVC.delegate = self
         listsVC.delegate = self
         financeVC.delegate = self
-        healthVC.delegate = self
         changeToIndex(index: index)
         addObservers()
     }
@@ -386,25 +389,20 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
                 }
             }
         }
-//        else if self.index == 4 {
-//            if listsVC.tableView.isEditing == true {
-//                listsVC.tableView.setEditing(false, animated: true)
-//                editButtonItem.style = .plain
-//                editButtonItem.title = "Edit"
-//            }
-//            if let searchBar = listsVC.searchBar, searchBar.isFirstResponder {
-//                listsVC.searchBar!.endEditing(true)
-//                if let cancelButton : UIButton = listsVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
-//                    cancelButton.isEnabled = true
-//                }
-//            }
-//        }
+        
         chatsVC.view.isHidden = !(index == 3)
-        healthVC.view.isHidden = !(index == 0)
         activitiesVC.view.isHidden = !(index == 1)
         financeVC.view.isHidden = !(index == 2)
         listsVC.view.isHidden = !(index == 4)
         
+        let isHealthVCIsHidden = !(index == 0)
+        if isHealthVCIsHidden && !healthVCInitialized {
+            // Don't do anything if healthVC is hidden and not initialized. We don't to access healthVC so that its viewDidAppear execute
+        } else {
+            healthVC.delegate = self
+            healthVC.view.isHidden = !(index == 0)
+        }
+
         self.index = index
         setNavBar()
     }

@@ -95,5 +95,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Plot would like to use HealthKit to create events for your fitness activities</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Plot would like to use HealthKit to track your workouts better</string>
 </dict>
 </plist>

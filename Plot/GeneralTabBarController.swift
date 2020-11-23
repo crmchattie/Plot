@@ -71,7 +71,6 @@ class GeneralTabBarController: UITabBarController {
         homeController.delegate = self
         setOnlineStatus()
         configureTabBar()
-        
     }
     
     fileprivate func configureTabBar(){
@@ -419,8 +418,6 @@ extension GeneralTabBarController: ManageAppearanceHome {
         }
         grabContacts()
         addNewUserItems()
-        //        appDelegate.registerForPushNotifications(application: UIApplication.shared)
-        
     }
 }
 

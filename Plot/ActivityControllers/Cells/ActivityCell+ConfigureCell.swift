@@ -15,7 +15,8 @@ extension ActivityCell {
     func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
         var value = ""
         var numberOfLines = 1
-        if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval, let allDay = activity.allDay {
+        if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval {
+            let allDay = activity.allDay ?? false
             let startDate = Date(timeIntervalSince1970: startDate)
             let endDate = Date(timeIntervalSince1970: endDate)
             let formatter = DateFormatter()

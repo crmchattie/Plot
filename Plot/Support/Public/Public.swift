@@ -1639,3 +1639,36 @@ extension Date {
         return components.weekday == 2
     }
 }
+
+extension TimeInterval {
+    private var milliseconds: Int {
+        return Int((truncatingRemainder(dividingBy: 1)) * 1000)
+    }
+
+    private var seconds: Int {
+        return Int(self) % 60
+    }
+
+    private var minutes: Int {
+        return (Int(self) / 60 ) % 60
+    }
+
+    private var hours: Int {
+        return Int(self) / 3600
+    }
+
+    var stringTime: String {
+        var time = ""
+        if hours > 0 {
+            time = "\(hours)h "
+        }
+        if minutes > 0 {
+            time += "\(minutes)m "
+        }
+        if seconds > 0 {
+            time += "\(seconds)s"
+        }
+        
+        return time
+    }
+}
