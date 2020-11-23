@@ -128,7 +128,6 @@ class HealthDetailViewController: UIViewController {
     }
     
     func configureChart() {
-        
         chartView.chartDescription?.enabled = false
         chartView.dragEnabled = true
         chartView.setScaleEnabled(true)
@@ -147,7 +146,6 @@ class HealthDetailViewController: UIViewController {
         let rightAxis = chartView.rightAxis
         rightAxis.removeAllLimitLines()
         rightAxis.axisMinimum = 0
-        rightAxis.drawLimitLinesBehindDataEnabled = true
         rightAxis.drawGridLinesEnabled = false
         
         chartView.leftAxis.enabled = false
@@ -190,6 +188,7 @@ class HealthDetailViewController: UIViewController {
             guard let weakSelf = self else { return }
             
             weakSelf.chartView.data = data
+            weakSelf.chartView.rightAxis.axisMinimum = 0
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
