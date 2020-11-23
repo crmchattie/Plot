@@ -21,7 +21,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     var customTypes: [ActivityType] = [.basic, .meal, .workout, .transaction, .financialAccount, .transactionRule]
     
-    var sections: [SectionType] = [.activities, .customMeal, .customWorkout, .customTransaction, .customFinancialAccount, .customTransactionRule]
+    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .customTransaction, .customFinancialAccount, .customTransactionRule]
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0
