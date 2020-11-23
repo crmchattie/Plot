@@ -335,8 +335,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
             return
         }
         let destination = MapViewController()
-        destination.sections = [.activities]
-        destination.locations = [.activities: activity]
+        destination.sections = [.activity]
+        destination.locations = [.activity: activity]
         navigationController?.pushViewController(destination, animated: true)
     }
     

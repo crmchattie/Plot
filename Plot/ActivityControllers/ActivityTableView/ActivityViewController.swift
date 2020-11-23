@@ -1058,8 +1058,8 @@ extension ActivityViewController: ActivityCellDelegate {
         
         let destination = MapViewController()
         destination.hidesBottomBarWhenPushed = true
-        destination.sections = [.activities]
-        destination.locations = [.activities: locations]
+        destination.sections = [.activity]
+        destination.locations = [.activity: locations]
         navigationController?.pushViewController(destination, animated: true)
         
 //        if locationAddress.count > 1 {
@@ -1067,8 +1067,8 @@ extension ActivityViewController: ActivityCellDelegate {
 //            destination.hidesBottomBarWhenPushed = true
 //            var locations = [activity]
 //            locations.append(contentsOf: scheduleList)
-//            destination.sections = [.activities]
-//            destination.locations = [.activities: locations]
+//            destination.sections = [.activity]
+//            destination.locations = [.activity: locations]
 //            navigationController?.pushViewController(destination, animated: true)
 //        } else {
 //            let destination = MapActivityViewController()

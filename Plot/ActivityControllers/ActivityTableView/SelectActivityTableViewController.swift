@@ -611,8 +611,8 @@ extension SelectActivityTableViewController: ActivityCellDelegate {
         
         let destination = MapViewController()
         destination.hidesBottomBarWhenPushed = true
-        destination.sections = [.activities]
-        destination.locations = [.activities: activity]
+        destination.sections = [.activity]
+        destination.locations = [.activity: activity]
         navigationController?.pushViewController(destination, animated: true)
         
 //        let destination = MapActivityViewController()

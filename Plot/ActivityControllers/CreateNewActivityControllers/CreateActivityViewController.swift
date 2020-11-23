@@ -2057,14 +2057,14 @@ class CreateActivityViewController: FormViewController {
         }
         
         let destination = MapViewController()
-        destination.sections = [.activities]
+        destination.sections = [.activity]
         var locations = [activity]
         
         if locationAddress.count > 1 {
             locations.append(contentsOf: scheduleList)
-            destination.locations = [.activities: locations]
+            destination.locations = [.activity: locations]
         } else {
-            destination.locations = [.activities: locations]
+            destination.locations = [.activity: locations]
         }
         navigationController?.pushViewController(destination, animated: true)
     }

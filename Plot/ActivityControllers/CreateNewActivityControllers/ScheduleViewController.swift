@@ -668,8 +668,8 @@ class ScheduleViewController: FormViewController {
         
         
         let destination = MapViewController()
-        destination.sections = [.activities]
-        destination.locations = [.activities: schedule]
+        destination.sections = [.activity]
+        destination.locations = [.activity: schedule]
         navigationController?.pushViewController(destination, animated: true)
         
 //        let destination = MapActivityViewController()
