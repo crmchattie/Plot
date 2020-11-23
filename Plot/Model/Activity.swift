@@ -223,7 +223,7 @@ class Activity: NSObject, NSCopying, Codable {
         if let value = self.locationAddress as AnyObject? {
             dictionary["locationAddress"] = value
         }
-                
+        
         if let value = self.participantsIDs as AnyObject? {
             dictionary["participantsIDs"] = value
         }
@@ -263,7 +263,7 @@ class Activity: NSObject, NSCopying, Codable {
         if let value = self.notes as AnyObject? {
             dictionary["notes"] = value
         }
-
+        
         if let value = self.conversationID as AnyObject? {
             dictionary["conversationID"] = value
         }
@@ -358,7 +358,7 @@ class Activity: NSObject, NSCopying, Codable {
     
     func scheduleToAnyObject() -> [String: AnyObject] {
         var dictionary = [String: AnyObject]()
-                
+        
         if let value = self.name as AnyObject? {
             dictionary["name"] = value
         }
@@ -458,38 +458,45 @@ class Activity: NSObject, NSCopying, Codable {
 }
 
 enum ActivityType: String, Equatable, Hashable {
-    case basic, complex, meal, workout, event, flight
+    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule
     
     var activityCategoryText: String {
         switch self {
-            case .basic: return "Build your own basic activity"
-            case .complex: return "Build your own complex activity"
-            case .meal: return "Build your own meal"
-            case .workout: return "Build your own workout"
-            case .event: return "Build your own event"
-            case .flight: return "Look up your flight"
+        case .basic: return "Build your own basic activity"
+        case .complex: return "Build your own complex activity"
+        case .meal: return "Build your own meal"
+        case .workout: return "Build your own workout"
+        case .event: return "Build your own event"
+        case .flight: return "Look up your flight"
+        case .transaction: return "Create a transaction"
+        case .financialAccount: return "Create a financial account"
+        case .transactionRule: return "Create a transaction rule"
         }
     }
     
     var activitySubcategoryText: String {
         switch self {
-            case .basic: return "Includes basic calendar activity fields"
-            case .complex: return "Includes basic activity fields plus a schedule, a checklist and purchases fields"
-            case .meal: return "Build a meal by looking up grocery products and/or restaurant menu items"
-            case .workout: return "Build a workout by setting type, duration and intensity"
-            case .event: return ""
-            case .flight: return "Look up your flight details based on flight number, airline or airport"
+        case .basic: return "Includes basic calendar activity fields"
+        case .complex: return "Includes basic activity fields plus a schedule, a checklist and purchases fields"
+        case .meal: return "Build a meal by looking up grocery products and/or restaurant menu items"
+        case .workout: return "Build a workout by setting type, duration and intensity"
+        case .event: return ""
+        case .flight: return "Look up your flight details based on flight number, airline or airport"
+        case .transaction, .financialAccount, .transactionRule: return ""
         }
     }
     
     var activityTypeImage: String {
         switch self {
-            case .basic: return "activityLarge"
-            case .complex: return "activityLarge"
-            case .meal: return "food"
-            case .workout: return "workout"
-            case .event: return "event"
-            case .flight: return "plane"
+        case .basic: return "activityLarge"
+        case .complex: return "activityLarge"
+        case .meal: return "food"
+        case .workout: return "workout"
+        case .event: return "event"
+        case .flight: return "plane"
+        case .transaction: return "transaction"
+        case .financialAccount: return "financialAccount"
+        case .transactionRule: return "transactionRule"
         }
     }
 }

@@ -41,7 +41,7 @@ class MasterActivityContainerController: UIViewController {
             listsVC.conversations = conversations
             
             if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
-                if actTypeVC.topViewController is ActivityTypeViewController, let activityTab = actTypeVC.topViewController as? ActivityTypeViewController {
+                if actTypeVC.topViewController is DiscoverViewController, let activityTab = actTypeVC.topViewController as? DiscoverViewController {
                     activityTab.conversations = conversations
                 }
                 if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
@@ -60,7 +60,7 @@ class MasterActivityContainerController: UIViewController {
             listsVC.activityViewController = activitiesVC
             
             if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
-                if actTypeVC.topViewController is ActivityTypeViewController, let activityTab = actTypeVC.topViewController as? ActivityTypeViewController {
+                if actTypeVC.topViewController is DiscoverViewController, let activityTab = actTypeVC.topViewController as? DiscoverViewController {
                     activityTab.activities = activities
                 }
                 if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
@@ -91,7 +91,7 @@ class MasterActivityContainerController: UIViewController {
         didSet {
             configureTabBarBadge()
             if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
-                if actTypeVC.topViewController is ActivityTypeViewController, let activityTab = actTypeVC.topViewController as? ActivityTypeViewController {
+                if actTypeVC.topViewController is DiscoverViewController, let activityTab = actTypeVC.topViewController as? DiscoverViewController {
                     activityTab.listList = listList
                 }
                 if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
@@ -100,7 +100,15 @@ class MasterActivityContainerController: UIViewController {
             }
         }
     }
-    var mxUser: MXUser!
+    var mxUser: MXUser! {
+        didSet {
+            if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController {
+                if actTypeVC.topViewController is DiscoverViewController, let activityTab = actTypeVC.topViewController as? DiscoverViewController {
+                    activityTab.mxUser = mxUser
+                }
+            }
+        }
+    }
     var selectedDate = Date()
     
 //    let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
@@ -531,6 +539,7 @@ extension MasterActivityContainerController {
     }
     
     @objc fileprivate func newFinanceItem() {
+        tabBarController?.selectedIndex = 0
         let alertController = UIAlertController(title: "New Item", message: nil, preferredStyle: .actionSheet)
         let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
             print("You've pressed cancel")

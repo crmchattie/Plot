@@ -29,7 +29,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
     var attractionsString = [String]()
-    var customTypes: [ActivityType] = [.basic, .meal, .workout]
+    var customTypes: [ActivityType] = [.basic]
     var favAct = [String: [String]]()
     
     var sections: [SectionType] = [.custom, .food, .nightlife, .events, .sightseeing, .recreation, .shopping, .workouts, .recipes]

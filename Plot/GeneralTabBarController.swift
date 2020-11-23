@@ -41,7 +41,7 @@ class GeneralTabBarController: UITabBarController {
     fileprivate var isAppLoaded = false
     
     let homeController = MasterActivityContainerController()
-    let discoverController = ActivityTypeViewController()
+    let discoverController = DiscoverViewController()
     let settingsController = AccountSettingsController()
     var window: UIWindow?
     

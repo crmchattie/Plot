@@ -14,6 +14,8 @@ import CodableFirebase
 class FinanceTransactionRuleViewController: FormViewController {
     var transactionRule: TransactionRule!
     var transaction: Transaction!
+    var user: MXUser!
+    
     
     var active: Bool = true
     
@@ -34,11 +36,11 @@ class FinanceTransactionRuleViewController: FormViewController {
     }
     
     fileprivate func setupVariables() {
-        if transactionRule == nil, let currentUser = Auth.auth().currentUser?.uid {
+        if transactionRule == nil, let currentUser = Auth.auth().currentUser?.uid, let user = user {
             active = false
             let ID = Database.database().reference().child(userFinancialTransactionRulesEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
-            transactionRule = TransactionRule(created_at: date, guid: ID, match_description: "", description: nil, updated_at: date, user_guid: transaction.user_guid, category: nil, top_level_category: nil, group: nil, amount: nil)
+            transactionRule = TransactionRule(created_at: date, guid: ID, match_description: "", description: nil, updated_at: date, user_guid: user.guid, category: nil, top_level_category: nil, group: nil, amount: nil, should_link: true)
         }
     }
     
@@ -79,7 +81,7 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     fileprivate func initializeForm() {
         form +++
-            Section(header: "", footer: "Set-up a rule to automatically categorize or ignore transactions that contain a certain description and/or equal a certain amount")
+            Section(header: nil, footer: "Set-up a rule to automatically categorize or ignore transactions that contain a certain description and/or equal a certain amount")
             
             <<< TextRow("Transaction name contains") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

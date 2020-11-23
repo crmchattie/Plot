@@ -202,7 +202,7 @@ class MealViewController: FormViewController {
                 }
                 self.tabBarController?.selectedIndex = 1
                 if #available(iOS 13.0, *) {
-                    self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
                 } else {
                     // Fallback on earlier versions
                 }

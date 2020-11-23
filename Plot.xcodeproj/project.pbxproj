@@ -84,6 +84,7 @@
 		106D758B2442447C0039B534 /* ActivityActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106D758A2442447C0039B534 /* ActivityActions.swift */; };
 		106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */; };
 		10737F8524912BDD00D146D6 /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10737F8424912BDD00D146D6 /* Preview.swift */; };
+		1075ED21256C175A00AB2B0A /* DiscoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */; };
 		1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */; };
@@ -484,6 +485,7 @@
 		106D758A2442447C0039B534 /* ActivityActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityActions.swift; sourceTree = "<group>"; };
 		106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTypeViewController.swift; sourceTree = "<group>"; };
 		10737F8424912BDD00D146D6 /* Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
+		1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListTableViewCell.swift; sourceTree = "<group>"; };
 		1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCell.swift; sourceTree = "<group>"; };
@@ -809,7 +811,7 @@
 		1024ABA523C1255900A5875D /* ActivityTypeControllers */ = {
 			isa = PBXGroup;
 			children = (
-				26E3179A2379FB72007D1F21 /* ActivityTypeViewController.swift */,
+				1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */,
 				1027D09F23EEF7100005D2A7 /* SubTypeControllers */,
 				1082B66523EF25D300A27046 /* DetailControllers */,
 				109F849823D6860D002C0044 /* FilterViewController.swift */,
@@ -824,7 +826,7 @@
 		1027D09F23EEF7100005D2A7 /* SubTypeControllers */ = {
 			isa = PBXGroup;
 			children = (
-				109F848D23D60113002C0044 /* ActivitySubTypeViewController.swift */,
+				26E3179A2379FB72007D1F21 /* ActivityTypeViewController.swift */,
 				109F848F23D607C6002C0044 /* RecipeTypeViewController.swift */,
 				105F66F22415A83300F6EDB6 /* EventTypeViewController.swift */,
 				106F22E62426FBF300AD3158 /* WorkoutTypeViewController.swift */,
@@ -833,6 +835,7 @@
 				108BDE6C24B5106900BE2CBA /* SightseeingTypeViewController.swift */,
 				108BDE6E24B5107A00BE2CBA /* RecreationTypeViewController.swift */,
 				108BDE7024B5108D00BE2CBA /* ShoppingTypeViewController.swift */,
+				109F848D23D60113002C0044 /* ActivitySubTypeViewController.swift */,
 			);
 			path = SubTypeControllers;
 			sourceTree = "<group>";
@@ -2304,6 +2307,7 @@
 				10C8334A24A400620037F638 /* FlightSearchResult.swift in Sources */,
 				101B90972458DA2D00EDDB90 /* WeatherRow.swift in Sources */,
 				10E93D5924BE43B700F6EE18 /* BetterSnappingLayout.swift in Sources */,
+				1075ED21256C175A00AB2B0A /* DiscoverViewController.swift in Sources */,
 				105E12532447955500A278D0 /* ActivityDetailCellDelegates.swift in Sources */,
 				4BAEE4F421272D890045AB10 /* SelectGroupMembersController.swift in Sources */,
 				26E8EFE7237F393900B9067E /* MapActivitiesViewController.swift in Sources */,
