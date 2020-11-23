@@ -716,11 +716,11 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                         dispatchGroup.enter()
                         var filteredTransactions = transactions.filter { (transaction) -> Bool in
                             if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                                if transactionDate > startDate.stripTime() && endDate.stripTime() > transactionDate {
+                                if transactionDate > startDate && endDate > transactionDate {
                                     return true
                                 }
                             } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-                                if transactionDate > startDate.stripTime() && endDate.stripTime() > transactionDate {
+                                if transactionDate > startDate && endDate > transactionDate {
                                     return true
                                 }
                             }

@@ -260,8 +260,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
             if transactionDate < start || end < transactionDate {
                 continue
             }
-        }
-        
+        }        
         switch transaction.type {
         case "DEBIT":
             if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.category && $0.level == .category && $0.category == transaction.category && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
