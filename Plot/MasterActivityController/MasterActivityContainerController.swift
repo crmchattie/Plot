@@ -265,7 +265,7 @@ class MasterActivityContainerController: UIViewController {
 //        } else
         if index == 0 {
             navigationItem.title = titles[index]
-            let newHealthItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newHealthItem))
+            let newHealthItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
 //            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.rightBarButtonItems = [newHealthItemBarButton]
         } else if index == 1 {
@@ -273,14 +273,14 @@ class MasterActivityContainerController: UIViewController {
             dateFormatter.dateFormat = "MMMM yyyy"
             let dateString = dateFormatter.string(from: selectedDate)
             navigationItem.title = dateString
-            let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
+            let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
             let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
 //            let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
             navigationItem.leftBarButtonItem = editButtonItem
             navigationItem.rightBarButtonItems = [newActivityBarButton, searchBarButton]
         } else if index == 2 {
             navigationItem.title = titles[index]
-            let newFinanceItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newFinanceItem))
+            let newFinanceItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
 //            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.rightBarButtonItems = [newFinanceItemBarButton]
         }
@@ -453,10 +453,6 @@ extension MasterActivityContainerController {
 //        }
     }
     
-    @objc fileprivate func newActivity() {
-        tabBarController?.selectedIndex = 0
-    }
-    
     @objc fileprivate func newChat() {
         let destination = ContactsController()
         destination.hidesBottomBarWhenPushed = true
@@ -538,47 +534,8 @@ extension MasterActivityContainerController {
 //        }
     }
     
-    @objc fileprivate func newFinanceItem() {
+    @objc fileprivate func newItem() {
         tabBarController?.selectedIndex = 0
-        let alertController = UIAlertController(title: "New Item", message: nil, preferredStyle: .actionSheet)
-        let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
-            print("You've pressed cancel")
-        }
-        let transaction = UIAlertAction(title: "Transaction", style: .default) { (action:UIAlertAction) in
-            let destination = FinanceTransactionViewController()
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
-        let account = UIAlertAction(title: "Account", style: .default) { (action:UIAlertAction) in
-            if let user = self.mxUser {
-                let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
-                let custom = UIAlertAction(title: "Manual Entry", style: .default) { (action:UIAlertAction) in
-                    let destination = FinanceAccountViewController()
-                    destination.users = self.users
-                    destination.filteredUsers = self.filteredUsers
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
-                let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
-                    self.openMXConnect(guid: user.guid, current_member_guid: nil)
-                }
-                accountAlertController.addAction(custom)
-                accountAlertController.addAction(automatic)
-                accountAlertController.addAction(cancelAlert)
-                self.present(accountAlertController, animated: true, completion: nil)
-                
-            }
-        }
-        let transactionRule = UIAlertAction(title: "Transaction Rule", style: .default) { (action:UIAlertAction) in
-            let destination = FinanceTransactionRuleViewController()
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }
-        alertController.addAction(account)
-        alertController.addAction(transaction)
-        alertController.addAction(transactionRule)
-        alertController.addAction(cancelAlert)
-        self.present(alertController, animated: true, completion: nil)
     }
     
     func openMXConnect(guid: String, current_member_guid: String?) {
@@ -595,10 +552,6 @@ extension MasterActivityContainerController {
                 }
             }
         }
-    }
-    
-    @objc fileprivate func newHealthItem() {
-        
     }
     
     @objc fileprivate func goToMap() {
