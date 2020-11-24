@@ -979,13 +979,13 @@
 			isa = PBXGroup;
 			children = (
 				1082C89624F0A91500CF6491 /* HealthViewController.swift */,
-				1037E4322550CD7400F4EE42 /* FoodViewControllers */,
-				10DFC3B0255A142000565DAD /* WorkoutViewControllers */,
 				26836B542514916B00AFC2D7 /* HealthMetricCell.swift */,
 				26B453AA254F8FCA00C63093 /* HealthDetailService.swift */,
 				269105F92549D66800A02C5F /* HealthDetailViewModel.swift */,
 				269105E5253D464300A02C5F /* HealthDetailViewController.swift */,
 				26D37B692556004B00F7131B /* HealthDetailSampleCell.swift */,
+				1037E4322550CD7400F4EE42 /* FoodViewControllers */,
+				10DFC3B0255A142000565DAD /* WorkoutViewControllers */,
 			);
 			path = HealthViewController;
 			sourceTree = "<group>";

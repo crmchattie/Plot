@@ -12,6 +12,8 @@ import CodableFirebase
 
 class FinancialTransactionRulesViewController: UITableViewController {
     
+    var user: MXUser!
+    
     let financialAccountCellID = "financialAccountCellID"
     
     var transactionRules = [TransactionRule]()
@@ -45,14 +47,16 @@ class FinancialTransactionRulesViewController: UITableViewController {
     }
     
     @objc func newTransactionRule() {
-        let destination = FinanceTransactionRuleViewController()
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        if let user = user {
+            let destination = FinanceTransactionRuleViewController()
+            destination.user = user
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
     }
     
     func getFinancialData() {
         self.transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
-            print("firebaseTransactionRules \(firebaseTransactionRules)")
             self.transactionRules = firebaseTransactionRules
             self.tableView.reloadData()
         }
@@ -83,10 +87,13 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
-        let rule = transactionRules[indexPath.item]
-        let destination = FinanceTransactionRuleViewController()
-        destination.transactionRule = rule
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        if let user = user {
+            let rule = transactionRules[indexPath.item]
+            let destination = FinanceTransactionRuleViewController()
+            destination.user = user
+            destination.transactionRule = rule
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
     }
 }

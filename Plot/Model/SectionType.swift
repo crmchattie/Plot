@@ -203,7 +203,7 @@ enum SectionType: Hashable, CaseIterable {
         case .customMeal: return "Meal"
         case .customWorkout: return "Workout"
         case .customTransaction: return "Transaction"
-        case .customFinancialAccount: return "Financial Account"
+        case .customFinancialAccount: return "Account"
         case .customTransactionRule: return "Transaction Rule"
         case .ingredients: return "Ingredients"
         case .groceryItems: return "Grocery Items"

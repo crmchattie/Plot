@@ -380,7 +380,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
 extension DiscoverViewController: CompositionalHeaderDelegate {
     func viewTapped(labelText: String) {
         switch labelText {
-        case "Activities":
+        case "Activity":
             let destination = ActivityTypeViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.users = users

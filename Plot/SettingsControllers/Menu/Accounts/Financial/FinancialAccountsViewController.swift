@@ -33,8 +33,6 @@ class FinancialAccountsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        getMXUser()
-        
         title = "Financial Accounts"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
@@ -43,6 +41,10 @@ class FinancialAccountsViewController: UITableViewController {
         
         let newAccountBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
         navigationItem.rightBarButtonItem = newAccountBarButton
+        
+        if let user = user {
+            self.getMXMembers(guid: user.guid)
+        }
         
     }
     
@@ -72,31 +74,6 @@ class FinancialAccountsViewController: UITableViewController {
             self.tableView.reloadData()
         }
         
-    }
-    
-    func getMXUser() {
-        if let currentUser = Auth.auth().currentUser?.uid {
-            let reference = Database.database().reference().child(userFinancialEntity).child(currentUser)
-            reference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), let value = snapshot.value, let user = try? FirebaseDecoder().decode(MXUser.self, from: value) {
-                    self.user = user
-                    self.getMXMembers(guid: user.guid)
-                } else if !snapshot.exists() {
-                    let identifier = UUID().uuidString
-                    Service.shared.createMXUser(id: identifier) { (search, err) in
-                        if search?.user != nil {
-                            var user = search?.user
-                            user!.identifier = identifier
-                            if let firebaseUser = try? FirebaseEncoder().encode(user) {
-                                reference.setValue(firebaseUser)
-                            }
-                            self.user = user
-                            self.getMXMembers(guid: user!.guid)
-                        }
-                    }
-                }
-            })
-        }
     }
     
     func getMXMembers(guid: String) {
