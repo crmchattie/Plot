@@ -200,14 +200,17 @@ class FinanceDetailViewController: UIViewController {
     }
     
     @objc private func hideUnhideTapped() {
-        barButton.title = chartView.isHidden ? "Hide Chart" : "Show Chart"
-        updateChartViewAppearance(hidden: !chartView.isHidden)
+        if chartView.data != nil {
+            updateChartViewAppearance(hidden: !chartView.isHidden)
+        }
     }
     
     private func updateChartViewAppearance(hidden: Bool) {
         chartView.isHidden = hidden
         chartViewHeightAnchor?.constant = hidden ? 0 : chartViewHeight
         chartViewTopAnchor?.constant = hidden ? 0 : chartViewTopMargin
+        
+        barButton.title = chartView.isHidden ? "Show Chart" : "Hide Chart"
     }
     
     // MARK: HealthKit Data
@@ -223,7 +226,7 @@ class FinanceDetailViewController: UIViewController {
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.animate(xAxisDuration: 1)
-            weakSelf.updateChartViewAppearance(hidden: data == nil)
+//            weakSelf.updateChartViewAppearance(hidden: data == nil)
             
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
             weakSelf.tableView.reloadData()

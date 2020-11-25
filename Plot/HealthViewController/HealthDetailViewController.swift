@@ -41,6 +41,8 @@ class HealthDetailViewController: UIViewController {
         return tableView
     }()
     
+    lazy var barButton = UIBarButtonItem()
+    
     init(viewModel: HealthDetailViewModelInterface) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -67,7 +69,8 @@ class HealthDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "hide-grid"), style: .plain, target: self, action: #selector(hideUnhideTapped))
+        barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
+        navigationItem.rightBarButtonItem = barButton
         
         if case HealthMetricType.workout = viewModel.healthMetric.type, let hkWorkout = viewModel.healthMetric.hkSample as? HKWorkout {
             title = hkWorkout.workoutActivityType.name
@@ -176,8 +179,7 @@ class HealthDetailViewController: UIViewController {
         chartViewHeightAnchor?.constant = hidden ? 0 : chartViewHeight
         chartViewTopAnchor?.constant = hidden ? 0 : chartViewTopMargin
         
-        let imageName = hidden ? "unhide-grid" : "hide-grid"
-        navigationItem.rightBarButtonItem?.image = UIImage(named: imageName)
+        barButton.title = chartView.isHidden ? "Show Chart" : "Hide Chart"
     }
     
     // MARK: HealthKit Data
@@ -193,8 +195,7 @@ class HealthDetailViewController: UIViewController {
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.animate(xAxisDuration: 1)
-            weakSelf.updateChartViewAppearance(hidden: data == nil)
-            
+//            weakSelf.updateChartViewAppearance(hidden: data == nil)
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
             weakSelf.tableView.reloadData()
         }
