@@ -30,7 +30,7 @@ class EventKitService {
 
         // Create the end date components.
         var oneYearFromNowComponents = DateComponents()
-        oneYearFromNowComponents.year = 1
+        oneYearFromNowComponents.month = 1
         let oneYearFromNow = calendar.date(byAdding: oneYearFromNowComponents, to: Date())
 
         // Create the predicate from the event store's instance method.

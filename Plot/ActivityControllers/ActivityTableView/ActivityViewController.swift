@@ -975,6 +975,22 @@ extension ActivityViewController {
         }
     }
     
+    func cleanCalendarEventActivities() {
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
+            
+            return
+        }
+        
+        for activity in self.activities {
+            if let type = ActivityType(rawValue: activity.activityType ?? ""), type == .calendarEvent, let activityID = activity.activityID {
+                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID)
+                let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID)
+                activityReference.removeValue()
+                userActivityReference.removeValue()
+            }
+        }
+    }
+    
     func observeInvitationForCurrentUser() {
         self.invitationsFetcher.observeInvitationForCurrentUser(invitationsAdded: { [weak self] invitationsAdded in
             for invitation in invitationsAdded {
