@@ -887,7 +887,7 @@ extension ActivityViewController: ActivityUpdatesDelegate {
                                                               activityPriority: .lowMedium, color: ThemeManager.currentTheme().generalTitleColor)
     }
     
-    func activities(didFinishFetching: Bool, activities: [Activity]) {
+    func activities(didFinishFetching: Bool, activities: [Activity], newActivity: Activity?) {
         checkForDataMigration(forActivities: activities)
         
         let (pinned, unpinned) = activities.stablePartition { (element) -> Bool in
@@ -898,7 +898,15 @@ extension ActivityViewController: ActivityUpdatesDelegate {
         self.pinnedActivities = pinned
         self.activities = unpinned
         
-        fetchInvitations()
+        var isActivityCalendarEvent = false
+        if let newActivity = newActivity, let type = ActivityType(rawValue: newActivity.activityType ?? ""), type == .calendarEvent {
+            // don't update and reload for calendar events
+            isActivityCalendarEvent = true
+        }
+        
+        if !isActivityCalendarEvent {
+            fetchInvitations()
+        }
     }
     
     func activities(update activity: Activity, reloadNeeded: Bool) {
@@ -966,6 +974,7 @@ extension ActivityViewController {
                     if let _ = Auth.auth().currentUser {
                         weakSelf.eventKitManager.syncEventKitActivities {
                             DispatchQueue.main.async {
+                                weakSelf.handleReloadTable()
                                 weakSelf.hideActivityIndicator()
                             }
                         }
