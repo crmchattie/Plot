@@ -88,6 +88,15 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var activityDates = [String]()
     
+    var hasLoadedCalendarEventActivities = false
+    
+    var eventKitManager: EventKitManager = {
+        let eventKitSetupAssistant = EventKitSetupAssistant()
+        let eventKitService = EventKitService(setupAssistant: eventKitSetupAssistant)
+        let eventKitManager = EventKitManager(eventKitService: eventKitService)
+        return eventKitManager
+    }()
+    
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd"
@@ -111,7 +120,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
         addObservers()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -942,12 +950,28 @@ extension ActivityViewController: ActivityUpdatesDelegate {
 extension ActivityViewController {
     func fetchInvitations() {
         print("fetchInvitations")
-        invitationsFetcher.fetchInvitations { (invitations, activitiesForInvitations) in
-            self.invitations = invitations
-            self.invitedActivities = activitiesForInvitations
-            self.handleReloadTable()
-            self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .mediumHigh)
-            self.observeInvitationForCurrentUser()
+        invitationsFetcher.fetchInvitations { [weak self] (invitations, activitiesForInvitations) in
+            guard let weakSelf = self else { return }
+            
+            weakSelf.invitations = invitations
+            weakSelf.invitedActivities = activitiesForInvitations
+            weakSelf.handleReloadTable()
+            weakSelf.navigationItemActivityIndicator.hideActivityIndicator(for: weakSelf.navigationItem, activityPriority: .mediumHigh)
+            weakSelf.observeInvitationForCurrentUser()
+            
+            if !weakSelf.hasLoadedCalendarEventActivities {
+                weakSelf.hasLoadedCalendarEventActivities = true
+                DispatchQueue.main.async {
+                    weakSelf.showActivityIndicator()
+                    if let _ = Auth.auth().currentUser {
+                        weakSelf.eventKitManager.syncEventKitActivities {
+                            DispatchQueue.main.async {
+                                weakSelf.hideActivityIndicator()
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     

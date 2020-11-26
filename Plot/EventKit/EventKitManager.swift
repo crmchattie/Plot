@@ -12,11 +12,13 @@ class EventKitManager {
     private let eventKitService: EventKitService
     private var isRunning: Bool
     private var activities: [Activity]
+    private var queue: OperationQueue
     
     init(eventKitService: EventKitService) {
         self.eventKitService = eventKitService
         self.isRunning = false
         self.activities = []
+        self.queue = OperationQueue()
     }
     
     func syncEventKitActivities(_ completion: @escaping () -> Void) {
@@ -35,7 +37,27 @@ class EventKitManager {
                 return
             }
             
-            let yearEvents = weakSelf.eventKitService.fetchEventsOneYearFromNow()
+            let eventsOp = FetchCalendarEventsOp(eventKitService: weakSelf.eventKitService)
+            let syncEventsOp = SyncCalendarEventsOp()
+            let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
+                syncEventsOp.events = eventsOp.events
+            }
+            eventsOpAdapter.addDependency(eventsOp)
+            syncEventsOp.addDependency(eventsOpAdapter)
+            
+            // Setup queue
+            weakSelf.queue.addOperations([eventsOp, eventsOpAdapter, syncEventsOp], waitUntilFinished: false)
+            
+            // Once everything is fetched call the completion block
+            weakSelf.queue.addBarrierBlock { [weak self] in
+                guard let weakSelf = self else {
+                    completion()
+                    return
+                }
+                
+                weakSelf.isRunning = false
+                completion()
+            }
         }
     }
 }

@@ -19,13 +19,13 @@ class EventKitService {
         setupAssistant.authorizeEventKit(completion: completion)
     }
     
-    func fetchEventsOneYearFromNow() -> [EKEvent] {
+    func fetchEventsOneYearFromAPastMonth() -> [EKEvent] {
         // Get the appropriate calendar.
         let calendar = Calendar.current
 
         // Create the start date components
         var oneDayAgoComponents = DateComponents()
-        oneDayAgoComponents.day = -1
+        oneDayAgoComponents.month = -1
         let oneDayAgo = calendar.date(byAdding: oneDayAgoComponents, to: Date())
 
         // Create the end date components.

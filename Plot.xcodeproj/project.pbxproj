@@ -187,6 +187,9 @@
 		26036762256CC4DA00FE9142 /* EventKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036761256CC4DA00FE9142 /* EventKitSetupAssistant.swift */; };
 		26036766256CC88900FE9142 /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036765256CC88900FE9142 /* EventKitService.swift */; };
 		2603676C256CD9A000FE9142 /* EventKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603676B256CD9A000FE9142 /* EventKitManager.swift */; };
+		26036774256DBBAD00FE9142 /* FetchCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036773256DBBAD00FE9142 /* FetchCalendarEventsOp.swift */; };
+		26036778256DC76900FE9142 /* SyncCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036777256DC76800FE9142 /* SyncCalendarEventsOp.swift */; };
+		2603677E256DC86300FE9142 /* CalendarActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603677D256DC86300FE9142 /* CalendarActivityOp.swift */; };
 		260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87C924FF5FE900715A64 /* HealthKitManager.swift */; };
 		260C87CC24FF600900715A64 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CB24FF600900715A64 /* AsyncOperation.swift */; };
 		260C87CE24FF60B200715A64 /* StepsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CD24FF60B100715A64 /* StepsOperation.swift */; };
@@ -612,6 +615,9 @@
 		26036761256CC4DA00FE9142 /* EventKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitSetupAssistant.swift; sourceTree = "<group>"; };
 		26036765256CC88900FE9142 /* EventKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitService.swift; sourceTree = "<group>"; };
 		2603676B256CD9A000FE9142 /* EventKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitManager.swift; sourceTree = "<group>"; };
+		26036773256DBBAD00FE9142 /* FetchCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchCalendarEventsOp.swift; sourceTree = "<group>"; };
+		26036777256DC76800FE9142 /* SyncCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCalendarEventsOp.swift; sourceTree = "<group>"; };
+		2603677D256DC86300FE9142 /* CalendarActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarActivityOp.swift; sourceTree = "<group>"; };
 		260C87C924FF5FE900715A64 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		260C87CB24FF600900715A64 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		260C87CD24FF60B100715A64 /* StepsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsOperation.swift; sourceTree = "<group>"; };
@@ -1200,11 +1206,22 @@
 		26036760256CC4A600FE9142 /* EventKit */ = {
 			isa = PBXGroup;
 			children = (
+				26036771256DB68600FE9142 /* Operations */,
 				2603676B256CD9A000FE9142 /* EventKitManager.swift */,
 				26036765256CC88900FE9142 /* EventKitService.swift */,
 				26036761256CC4DA00FE9142 /* EventKitSetupAssistant.swift */,
 			);
 			path = EventKit;
+			sourceTree = "<group>";
+		};
+		26036771256DB68600FE9142 /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				26036773256DBBAD00FE9142 /* FetchCalendarEventsOp.swift */,
+				26036777256DC76800FE9142 /* SyncCalendarEventsOp.swift */,
+				2603677D256DC86300FE9142 /* CalendarActivityOp.swift */,
+			);
+			path = Operations;
 			sourceTree = "<group>";
 		};
 		2623AA8E24FA2D710020A316 /* HealthKit */ = {
@@ -2393,6 +2410,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26036774256DBBAD00FE9142 /* FetchCalendarEventsOp.swift in Sources */,
 				10A18D3A2458E1A5006990F2 /* PurchasesViewController.swift in Sources */,
 				4BAEE5C1212735E50045AB10 /* FalconTextView.swift in Sources */,
 				4BAEE49521272C5E0045AB10 /* ContactsTableViewCell.swift in Sources */,
@@ -2531,6 +2549,7 @@
 				10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */,
 				109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */,
 				4BAEE5BB212735E50045AB10 /* INSPhotosOverlayView.swift in Sources */,
+				26036778256DC76900FE9142 /* SyncCalendarEventsOp.swift in Sources */,
 				10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */,
 				4BAEE50C21272D890045AB10 /* UserInfoTableViewController+handlers.swift in Sources */,
 				4BAEE50921272D890045AB10 /* SelectedMediaCollectionCell+timerHandlers.swift in Sources */,
@@ -2708,6 +2727,7 @@
 				10F3033224EC700C00C04B8F /* Transaction.swift in Sources */,
 				106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */,
 				4BAEE4ED21272D890045AB10 /* LeaveGroupAndChangeAdminController.swift in Sources */,
+				2603677E256DC86300FE9142 /* CalendarActivityOp.swift in Sources */,
 				10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */,
 				10737F8524912BDD00D146D6 /* Preview.swift in Sources */,
 				1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */,

@@ -8,6 +8,9 @@
 
 import UIKit
 
+let userCalendarEventsEntity = "user-calendar-events"
+let calendarEventsKey = "calendar-events"
+
 class User: NSObject {
     
     var id: String?
