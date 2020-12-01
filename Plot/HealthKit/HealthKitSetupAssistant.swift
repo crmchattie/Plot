@@ -41,9 +41,11 @@ class HealthKitSetupAssistant {
                 completion(false, HealthkitSetupError.dataTypeNotAvailable)
                 return
         }
+        let summaryType = HKObjectType.activitySummaryType()
         
         // Prepare a list of types you want HealthKit to read and write
-        let healthKitTypesToRead: Set<HKObjectType> = [activeEnergy,
+        let healthKitTypesToRead: Set<HKObjectType> = [summaryType,
+                                                        activeEnergy,
                                                         stepCount,
                                                         distanceWalkingRunning,
                                                         distanceCycling,

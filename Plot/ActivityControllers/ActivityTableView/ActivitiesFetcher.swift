@@ -135,6 +135,7 @@ class ActivitiesFetcher: NSObject {
             let metaInfo = Activity(dictionary: dictionary)
             activity.name = metaInfo.name
             activity.activityType = metaInfo.activityType
+            activity.category = metaInfo.category
             activity.activityDescription = metaInfo.activityDescription
             activity.locationName = metaInfo.locationName
             activity.locationAddress = metaInfo.locationAddress
@@ -241,6 +242,7 @@ class ActivitiesFetcher: NSObject {
                                        activityID: activityID,
                                        nameKey: "name",
                                        typeKey: "activityType",
+                                       categoryKey: "category",
                                        descriptionKey: "activityDescription",
                                        locationNameKey: "locationName",
                                        locationAddressKey: "locationAddress",
@@ -287,6 +289,7 @@ class ActivitiesFetcher: NSObject {
                                        activityID: activityID,
                                        nameKey: "name",
                                        typeKey: "activityType",
+                                       categoryKey: "category",
                                        descriptionKey: "activityDescription",
                                        locationNameKey: "locationName",
                                        locationAddressKey: "locationAddress",
@@ -333,6 +336,7 @@ class ActivitiesFetcher: NSObject {
                                        activityID: activityID,
                                        nameKey: "name",
                                        typeKey: "activityType",
+                                       categoryKey: "category",
                                        descriptionKey: "activityDescription",
                                        locationNameKey: "locationName",
                                        locationAddressKey: "locationAddress",
@@ -369,6 +373,7 @@ class ActivitiesFetcher: NSObject {
                                            activityID: String,
                                            nameKey: String,
                                            typeKey: String,
+                                           categoryKey: String,
                                            descriptionKey: String,
                                            locationNameKey: String,
                                            locationAddressKey: String,
@@ -410,6 +415,11 @@ class ActivitiesFetcher: NSObject {
         
         if snapshot.key == typeKey {
             activities[index].activityType = snapshot.value as? String
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == categoryKey {
+            activities[index].category = snapshot.value as? String
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         
@@ -584,6 +594,7 @@ class ActivitiesFetcher: NSObject {
                                            activityID: String,
                                            nameKey: String,
                                            typeKey: String,
+                                           categoryKey: String,
                                            descriptionKey: String,
                                            locationNameKey: String,
                                            locationAddressKey: String,
@@ -625,6 +636,11 @@ class ActivitiesFetcher: NSObject {
         
         if snapshot.key == typeKey {
             activities[index].activityType = String()
+            delegate?.activities(update: activities[index], reloadNeeded: true)
+        }
+        
+        if snapshot.key == categoryKey {
+            activities[index].category = String()
             delegate?.activities(update: activities[index], reloadNeeded: true)
         }
         

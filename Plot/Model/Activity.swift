@@ -17,6 +17,7 @@ class Activity: NSObject, NSCopying, Codable {
     var activityID: String?
     var name: String?
     var activityType: String?
+    var category: String?
     var activityDescription: String?
     var locationName: String?
     var locationAddress: [String : [Double]]?
@@ -59,6 +60,7 @@ class Activity: NSObject, NSCopying, Codable {
     enum CodingKeys: String, CodingKey {
         case name
         case activityType
+        case category
         case activityDescription
         case isGroupActivity
         case locationName
@@ -94,6 +96,7 @@ class Activity: NSObject, NSCopying, Codable {
         activityID = dictionary?["activityID"] as? String
         name = dictionary?["name"] as? String
         activityType = dictionary?["activityType"] as? String
+        category = dictionary?["category"] as? String
         activityDescription = dictionary?["activityDescription"] as? String
         locationName = dictionary?["locationName"] as? String
         locationAddress = dictionary?["locationAddress"] as? [String : [Double]]
@@ -213,6 +216,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.activityType as AnyObject? {
             dictionary["activityType"] = value
+        }
+        
+        if let value = self.category as AnyObject? {
+            dictionary["category"] = value
         }
         
         if let value = self.activityDescription as AnyObject? {
@@ -441,29 +448,12 @@ class Activity: NSObject, NSCopying, Codable {
         
         return dictionary
     }
-    
-    func isBasic() -> Bool {
-        var basic = false
-        if let typeVal = activityType?.lowercased(), let type = ActivityType(rawValue: typeVal), type == .basic {
-            basic = true
-        }
-        
-        return basic
-    }
-    
-    var type: ActivityType {
-        if let activityType = activityType?.lowercased(), let value = ActivityType(rawValue: activityType) {
-            return value
-        } else {
-            return .basic
-        }
-    }
 }
 
-enum ActivityType: String, Equatable, Hashable {
+enum CustomType: String, Equatable, Hashable {
     case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule
     
-    var activityCategoryText: String {
+    var categoryText: String {
         switch self {
         case .basic: return "Build your own basic activity"
         case .complex: return "Build your own complex activity"
@@ -477,7 +467,7 @@ enum ActivityType: String, Equatable, Hashable {
         }
     }
     
-    var activitySubcategoryText: String {
+    var subcategoryText: String {
         switch self {
         case .basic: return "Includes basic calendar activity fields"
         case .complex: return "Includes basic activity fields plus a schedule, a checklist and purchases fields"
@@ -489,7 +479,7 @@ enum ActivityType: String, Equatable, Hashable {
         }
     }
     
-    var activityTypeImage: String {
+    var image: String {
         switch self {
         case .basic: return "activityLarge"
         case .complex: return "activityLarge"
@@ -504,3 +494,49 @@ enum ActivityType: String, Equatable, Hashable {
     }
 }
 
+func categorizeActivities(activities: [Activity], start: Date, end: Date, completion: @escaping ([String: Double], [String: [Activity]]) -> ()) {
+    var categoryDict = [String: Double]()
+    var activitiesDict = [String: [Activity]]()
+    // create dateFormatter with UTC time format
+    for activity in activities {
+        if let startDateTime = activity.startDateTime {
+            let activityDate = Date(timeIntervalSince1970: startDateTime as! TimeInterval)
+            if activityDate < start || end < activityDate {
+                continue
+            }
+        }
+        let duration = Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)
+        if let type = activity.activityType {
+            if categoryDict[type] == nil {
+                categoryDict[type] = duration
+                activitiesDict[type] = [activity]
+            } else {
+                let double = categoryDict[type]
+                categoryDict[type] = double! + duration
+                
+                var activities = activitiesDict[type]
+                activities!.append(activity)
+                activitiesDict[type] = activities
+            }
+        } else {
+            let type = "No Activity Type"
+            if categoryDict[type] == nil {
+                categoryDict[type] = duration
+                activitiesDict[type] = [activity]
+            } else {
+                let double = categoryDict[type]
+                categoryDict[type] = double! + duration
+                
+                var activities = activitiesDict[type]
+                activities!.append(activity)
+                activitiesDict[type] = activities
+            }
+        }
+    }
+    var totalValue: Double = end.timeIntervalSince(start)
+    for (_, value) in categoryDict {
+        totalValue -= value
+    }
+    categoryDict["No Activities"] = totalValue
+    completion(categoryDict, activitiesDict)
+}

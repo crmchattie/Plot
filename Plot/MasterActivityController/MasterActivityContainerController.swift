@@ -53,6 +53,7 @@ class MasterActivityContainerController: UIViewController {
     var activities = [Activity]() {
         didSet {
             configureTabBarBadge()
+            summaryViewModel.activities = activities
 //            mapVC.sections = [.activities]
 //            mapVC.locations = [.activities: activities]
 //            mapVC.addAnnotations()
@@ -109,14 +110,21 @@ class MasterActivityContainerController: UIViewController {
             }
         }
     }
+    
+    var transactions: [Transaction]! {
+        didSet {
+            summaryViewModel.transactions = transactions
+            if !activities.isEmpty {
+                summaryVC.fetchData()
+            }
+        }
+    }
 
     var selectedDate = Date()
     
-//    let titles = ["Chats", "Health", "Activities", "Finances", "Lists"]
-    let titles = ["Health", "Activities", "Finances"]
-    var index: Int = 1
-//    let customSegmented = CustomSegmentedControl(buttonImages: ["chat","heart","activity", "money", "list"], buttonTitles: nil)
-    let customSegmented = CustomSegmentedControl(buttonImages: ["heart","activity", "money"], buttonTitles: nil, selectedIndex: 1)
+    let titles = ["Summary", "Activities", "Health", "Finances"]
+    var index: Int = 0
+    let customSegmented = CustomSegmentedControl(buttonImages: ["activity", "calendar", "heart", "money"], buttonTitles: nil, selectedIndex: 0)
     let containerView = UIView()
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
@@ -124,9 +132,7 @@ class MasterActivityContainerController: UIViewController {
     var healthVCInitialized = false
     
     weak var delegate: ManageAppearanceHome?
-    
-    var financeVCInitialized = false
-    
+        
     lazy var activitiesVC: ActivityViewController = {
         let vc = ActivityViewController()
         self.addAsChildVC(childVC: vc)
@@ -147,7 +153,6 @@ class MasterActivityContainerController: UIViewController {
     
     lazy var financeVC: FinanceViewController = {
         let vc = FinanceViewController()
-        financeVCInitialized = true
         self.addAsChildVC(childVC: vc)
         return vc
     }()
@@ -155,6 +160,14 @@ class MasterActivityContainerController: UIViewController {
     lazy var healthVC: HealthViewController = {
         let vc = HealthViewController()
         healthVCInitialized = true
+        self.addAsChildVC(childVC: vc)
+        return vc
+    }()
+    
+    let summaryViewModel = SummaryViewModel(activities: nil, transactions: nil, summaryService: SummaryService())
+    
+    lazy var summaryVC: SummaryViewController = {
+        let vc = SummaryViewController(viewModel: summaryViewModel)
         self.addAsChildVC(childVC: vc)
         return vc
     }()
@@ -259,41 +272,23 @@ class MasterActivityContainerController: UIViewController {
     func setNavBar() {
         navigationItem.leftBarButtonItems = nil
         navigationItem.rightBarButtonItems = nil
-//        if index == 0 {
-//            navigationItem.title = titles[index]
-//            let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
-//            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-//            navigationItem.leftBarButtonItem = editButtonItem
-//            navigationItem.rightBarButtonItems = [newChatBarButton, searchBarButton]
-//        } else
-        if index == 0 {
-            navigationItem.title = titles[index]
-            let newHealthItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-//            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-            navigationItem.rightBarButtonItems = [newHealthItemBarButton]
-        } else if index == 1 {
+        navigationItem.title = titles[index]
+        if index == 1 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMMM yyyy"
             let dateString = dateFormatter.string(from: selectedDate)
             navigationItem.title = dateString
             let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
             let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-//            let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))
             navigationItem.leftBarButtonItem = editButtonItem
             navigationItem.rightBarButtonItems = [newActivityBarButton, searchBarButton]
         } else if index == 2 {
-            navigationItem.title = titles[index]
+            let newHealthItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
+            navigationItem.rightBarButtonItems = [newHealthItemBarButton]
+        } else if index == 3 {
             let newFinanceItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-//            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
             navigationItem.rightBarButtonItems = [newFinanceItemBarButton]
         }
-//        else if index == 4 {
-//            navigationItem.title = titles[index]
-//            let newListBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))
-//            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-//            navigationItem.leftBarButtonItem = editButtonItem
-//            navigationItem.rightBarButtonItems = [newListBarButton, searchBarButton]
-//        }
     }
     
     func configureTabBarBadge() {
@@ -363,19 +358,6 @@ class MasterActivityContainerController: UIViewController {
 
 extension MasterActivityContainerController: CustomSegmentedControlDelegate {
     func changeToIndex(index:Int) {
-//        if self.index == 0 {
-//            if chatsVC.tableView.isEditing == true {
-//                chatsVC.tableView.setEditing(false, animated: true)
-//                editButtonItem.style = .plain
-//                editButtonItem.title = "Edit"
-//            }
-//            if let searchBar = chatsVC.searchBar, searchBar.isFirstResponder {
-//                chatsVC.searchBar!.endEditing(true)
-//                if let cancelButton : UIButton = chatsVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
-//                    cancelButton.isEnabled = true
-//                }
-//            }
-//        } else
         if self.index == 1 {
             if activitiesVC.activityView.tableView.isEditing == true {
                 activitiesVC.activityView.tableView.setEditing(false, animated: true)
@@ -390,17 +372,18 @@ extension MasterActivityContainerController: CustomSegmentedControlDelegate {
             }
         }
         
-        chatsVC.view.isHidden = !(index == 3)
+        summaryVC.view.isHidden = !(index == 0)
         activitiesVC.view.isHidden = !(index == 1)
-        financeVC.view.isHidden = !(index == 2)
-        listsVC.view.isHidden = !(index == 4)
-        
-        let isHealthVCIsHidden = !(index == 0)
+        let isHealthVCIsHidden = !(index == 2)
+        financeVC.view.isHidden = !(index == 3)
+        chatsVC.view.isHidden = !(index == 5)
+        listsVC.view.isHidden = !(index == 6)
+
         if isHealthVCIsHidden && !healthVCInitialized {
             // Don't do anything if healthVC is hidden and not initialized. We don't to access healthVC so that its viewDidAppear execute
         } else {
             healthVC.delegate = self
-            healthVC.view.isHidden = !(index == 0)
+            healthVC.view.isHidden = isHealthVCIsHidden
         }
 
         self.index = index
@@ -416,17 +399,6 @@ extension MasterActivityContainerController {
     }
     
     @objc func editButtonAction(sender: UIBarButtonItem) {
-//        if index == 1 {
-//            if chatsVC.tableView.isEditing == true {
-//                chatsVC.tableView.setEditing(false, animated: true)
-//                sender.style = .plain
-//                sender.title = "Edit"
-//            } else {
-//                chatsVC.tableView.setEditing(true, animated: true)
-//                sender.style = .done
-//                sender.title = "Done"
-//            }
-//        } else
         if index == 1 {
             if activitiesVC.activityView.tableView.isEditing == true {
                 activitiesVC.activityView.tableView.setEditing(false, animated: true)
@@ -438,17 +410,6 @@ extension MasterActivityContainerController {
                 sender.title = "Done"
             }
         }
-//        else if index == 4 {
-//            if listsVC.tableView.isEditing == true {
-//                listsVC.tableView.setEditing(false, animated: true)
-//                sender.style = .plain
-//                sender.title = "Edit"
-//            } else {
-//                listsVC.tableView.setEditing(true, animated: true)
-//                sender.style = .done
-//                sender.title = "Done"
-//            }
-//        }
     }
     
     @objc fileprivate func newChat() {
@@ -521,15 +482,9 @@ extension MasterActivityContainerController {
     }
     
     @objc fileprivate func search() {
-//        if self.index == 0 {
-//            chatsVC.setupSearchController()
-//        } else
         if self.index == 1 {
             activitiesVC.setupSearchController()
         }
-//        else if self.index == 4 {
-//            listsVC.setupSearchController()
-//        }
     }
     
     @objc fileprivate func newItem() {
@@ -590,6 +545,12 @@ extension MasterActivityContainerController: HomeBaseLists {
 extension MasterActivityContainerController: HomeBaseFinance {
     func sendUser(user: MXUser) {
         self.mxUser = user
+    }
+    func sendTransactions(transactions: [Transaction]) {
+        self.transactions = transactions
+    }
+    func sendAccounts(accounts: [MXAccount]) {
+        
     }
 }
 

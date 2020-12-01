@@ -19,7 +19,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
-    var customTypes: [ActivityType] = [.basic, .meal, .workout, .transaction, .financialAccount]
+    var customTypes: [CustomType] = [.basic, .meal, .workout, .transaction, .financialAccount]
     var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .customTransaction, .customFinancialAccount]
     var groups = [SectionType: [AnyHashable]]()
     
@@ -178,7 +178,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     }
     
     lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
-        if let object = object as? ActivityType {
+        if let object = object as? CustomType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
             cell.intColor = (indexPath.section % 5)
             cell.activityType = object
@@ -189,7 +189,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let object = diffableDataSource.itemIdentifier(for: indexPath)
-        if let activityType = object as? ActivityType {
+        if let activityType = object as? CustomType {
             let activityTypeName = activityType.rawValue
             switch activityTypeName {
             case "basic":
@@ -279,7 +279,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
             header.delegate = self
             let snapshot = self.diffableDataSource.snapshot()
-            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object), let activityType = object as? ActivityType {
+            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object), let activityType = object as? CustomType {
                 header.titleLabel.text = section.name
                 let activityTypeName = activityType.rawValue
                 if activityTypeName == "basic" {

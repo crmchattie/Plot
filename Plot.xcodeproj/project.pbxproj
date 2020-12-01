@@ -39,6 +39,8 @@
 		10217A7723102CA4004CBA9E /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10217A7623102CA4004CBA9E /* ActivityView.swift */; };
 		10217A7B23103661004CBA9E /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10217A7A23103661004CBA9E /* ActivityViewController.swift */; };
 		102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102523EA2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift */; };
+		1026185025756B2400CF6F0A /* SummaryHKChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */; };
+		1026185425756B3300CF6F0A /* SummaryPieChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */; };
 		1028A104230D8F4200619907 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1028A103230D8F4200619907 /* Activity.swift */; };
 		1028A108230DB70F00619907 /* ShareHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1028A107230DB70F00619907 /* ShareHeaderView.swift */; };
 		1028A10B230DFA8B00619907 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1028A10A230DFA8B00619907 /* GoogleService-Info.plist */; };
@@ -53,6 +55,8 @@
 		103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */; };
 		103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103E968922C2B309007D6668 /* PurchaseRow.swift */; };
 		1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1040E582242AA05D00304D05 /* MessageViewController.swift */; };
+		104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1046252F2571B4D40026C214 /* SummaryViewModel.swift */; };
+		104625362571B4FD0026C214 /* SummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104625352571B4FD0026C214 /* SummaryService.swift */; };
 		1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */; };
 		1051AC9B244F8C5F0066761C /* ListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9A244F8C5F0066761C /* ListsViewController.swift */; };
 		1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */; };
@@ -84,6 +88,7 @@
 		1082C89524F0A8F500CF6491 /* FinanceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082C89424F0A8F500CF6491 /* FinanceViewController.swift */; };
 		1082C89724F0A91500CF6491 /* HealthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082C89624F0A91500CF6491 /* HealthViewController.swift */; };
 		10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10868D6C246314C700D6BB4F /* Grocerylist.swift */; };
+		108841D2257004F10064C5F8 /* SummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108841D1257004F10064C5F8 /* SummaryViewController.swift */; };
 		108BDE6924B5104900BE2CBA /* FoodTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108BDE6824B5104900BE2CBA /* FoodTypeViewController.swift */; };
 		108BDE6B24B5105900BE2CBA /* NightlifeTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108BDE6A24B5105900BE2CBA /* NightlifeTypeViewController.swift */; };
 		108BDE6D24B5106900BE2CBA /* SightseeingTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108BDE6C24B5106900BE2CBA /* SightseeingTypeViewController.swift */; };
@@ -458,6 +463,8 @@
 		10217A7923103377004CBA9E /* Plot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Plot-Bridging-Header.h"; sourceTree = "<group>"; };
 		10217A7A23103661004CBA9E /* ActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityViewController.swift; sourceTree = "<group>"; };
 		102523EA2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatActivitiesTableViewCell.swift; sourceTree = "<group>"; };
+		1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryHKChartCell.swift; sourceTree = "<group>"; };
+		1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryPieChartCell.swift; sourceTree = "<group>"; };
 		1028A100230D76CD00619907 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareExtension.entitlements; sourceTree = "<group>"; };
 		1028A103230D8F4200619907 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		1028A107230DB70F00619907 /* ShareHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareHeaderView.swift; sourceTree = "<group>"; };
@@ -474,6 +481,8 @@
 		103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionLevelViewController.swift; sourceTree = "<group>"; };
 		103E968922C2B309007D6668 /* PurchaseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseRow.swift; sourceTree = "<group>"; };
 		1040E582242AA05D00304D05 /* MessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
+		1046252F2571B4D40026C214 /* SummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewModel.swift; sourceTree = "<group>"; };
+		104625352571B4FD0026C214 /* SummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryService.swift; sourceTree = "<group>"; };
 		1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterActivityContainerController.swift; sourceTree = "<group>"; };
 		1051AC9A244F8C5F0066761C /* ListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsViewController.swift; sourceTree = "<group>"; };
 		1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSegmentedControl.swift; sourceTree = "<group>"; };
@@ -506,6 +515,7 @@
 		1082C89424F0A8F500CF6491 /* FinanceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceViewController.swift; sourceTree = "<group>"; };
 		1082C89624F0A91500CF6491 /* HealthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthViewController.swift; sourceTree = "<group>"; };
 		10868D6C246314C700D6BB4F /* Grocerylist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grocerylist.swift; sourceTree = "<group>"; };
+		108841D1257004F10064C5F8 /* SummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewController.swift; sourceTree = "<group>"; };
 		108BDE6824B5104900BE2CBA /* FoodTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodTypeViewController.swift; sourceTree = "<group>"; };
 		108BDE6A24B5105900BE2CBA /* NightlifeTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightlifeTypeViewController.swift; sourceTree = "<group>"; };
 		108BDE6C24B5106900BE2CBA /* SightseeingTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SightseeingTypeViewController.swift; sourceTree = "<group>"; };
@@ -1050,6 +1060,18 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
+		108841D0257003F70064C5F8 /* SummaryViewController */ = {
+			isa = PBXGroup;
+			children = (
+				104625352571B4FD0026C214 /* SummaryService.swift */,
+				1046252F2571B4D40026C214 /* SummaryViewModel.swift */,
+				108841D1257004F10064C5F8 /* SummaryViewController.swift */,
+				1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */,
+				1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */,
+			);
+			path = SummaryViewController;
+			sourceTree = "<group>";
+		};
 		10C50F932273818D00111033 /* ActivityControllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -1332,9 +1354,10 @@
 				4BE9F1DE219B457C00C6768F /* Pigeon-project.entitlements */,
 				4BAEE47221272C4F0045AB10 /* AuthenticationControllers */,
 				1051AC94244F8AF80066761C /* MasterActivityController */,
-				10E93D5B24BE47A600F6EE18 /* MapViewController */,
+				108841D0257003F70064C5F8 /* SummaryViewController */,
 				1082C89324F0A8C800CF6491 /* HealthViewController */,
 				1082C89224F0A8B000CF6491 /* FinanceViewController */,
+				10E93D5B24BE47A600F6EE18 /* MapViewController */,
 				1051AC99244F8C470066761C /* ListViewController */,
 				10C50F932273818D00111033 /* ActivityControllers */,
 				1024ABA523C1255900A5875D /* ActivityTypeControllers */,
@@ -2521,6 +2544,7 @@
 				1092F23E2414587E00E8CE16 /* RecipeExpandedDetailViewController.swift in Sources */,
 				1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */,
 				4BAEE5DF212735E50045AB10 /* UIEdgeInsetsExtensions.swift in Sources */,
+				104625362571B4FD0026C214 /* SummaryService.swift in Sources */,
 				10A2AE9F2508131700D49A0C /* FinanceCollectionViewCell.swift in Sources */,
 				102BE8C6243E47F000722E7B /* AttractionDetailCell.swift in Sources */,
 				4BAEE5E8212735E50045AB10 /* EnterPhoneNumberController.swift in Sources */,
@@ -2556,12 +2580,14 @@
 				10CD68792486AEE400DC02E0 /* PLNotification.swift in Sources */,
 				10E93D4E24BE41B500F6EE18 /* MapViewController.swift in Sources */,
 				269105FA2549D66800A02C5F /* HealthDetailViewModel.swift in Sources */,
+				108841D2257004F10064C5F8 /* SummaryViewController.swift in Sources */,
 				4B6521FA219B3A4400FF655E /* GroupMembersManager.swift in Sources */,
 				10C83342249ACC8F0037F638 /* SygicToursSearchResult.swift in Sources */,
 				4BAEE46521272B380045AB10 /* AccountSettingsController.swift in Sources */,
 				10CA911725367D8D003CEAF7 /* FinancialTransactionActions.swift in Sources */,
 				2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */,
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
+				104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */,
 				10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */,
 				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
 				4BAEE5CD212735E50045AB10 /* SelectParticipantsTableView.swift in Sources */,
@@ -2634,6 +2660,7 @@
 				10DE97372475801400D4A7E8 /* ListCell+ConfigureCell.swift in Sources */,
 				4BAEE4F121272D890045AB10 /* UserinfoHeaderTableViewCell.swift in Sources */,
 				109F849023D607C6002C0044 /* RecipeTypeViewController.swift in Sources */,
+				1026185425756B3300CF6F0A /* SummaryPieChartCell.swift in Sources */,
 				100A53EC23E0DD9C004AA952 /* ActivityHeaderCell.swift in Sources */,
 				4BAEE5E2212735E50045AB10 /* Public.swift in Sources */,
 				261FAF77251C661D008636DF /* AnnualAverageWeightOperation.swift in Sources */,
@@ -2725,6 +2752,7 @@
 				105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */,
 				269105E6253D464300A02C5F /* HealthDetailViewController.swift in Sources */,
 				4BAEE48321272C4F0045AB10 /* UserProfileAvatarOpenerDelegate.swift in Sources */,
+				1026185025756B2400CF6F0A /* SummaryHKChartCell.swift in Sources */,
 				108BDE6924B5104900BE2CBA /* FoodTypeViewController.swift in Sources */,
 				4BAEE46C21272B380045AB10 /* SwitchTableViewCell.swift in Sources */,
 				2670E33A252D2023007A6194 /* UserHealth.swift in Sources */,

@@ -382,8 +382,10 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                 
                 let expenseTransactionDetail = TransactionDetails(name: group, amount: amount, level: .group, category: nil, topLevelCategory: nil, group: group)
                 
-                sortedTransactionsList.append(expenseTransactionDetail)
-                transactionsDict[expenseTransactionDetail] = transactions
+                if amount != 0.0 {
+                    sortedTransactionsList.append(expenseTransactionDetail)
+                    transactionsDict[expenseTransactionDetail] = transactions
+                }
                 
                 if let incomeTransactionDetail = transactionsList.first(where: { ($0.level == .group && $0.group == "Income") }), let incomeTransactions = transactionsDict[incomeTransactionDetail] {
                     let diffAmount = incomeTransactionDetail.amount + expenseTransactionDetail.amount

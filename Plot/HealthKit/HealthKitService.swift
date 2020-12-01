@@ -277,4 +277,24 @@ class HealthKitService {
         
         HKHealthStore().execute(query)
     }
+    
+    class func getSummaryActivityData(startDate: Date,
+                              endDate: Date,
+                              completion: @escaping ([HKActivitySummary]?, Error?) -> Void) {
+        
+        let calendar = Calendar.current
+        var startComponents = calendar.dateComponents([.day, .month, .year], from: startDate)
+        startComponents.calendar = calendar
+        var endComponents = calendar.dateComponents([.day, .month, .year], from: endDate)
+        endComponents.calendar = calendar
+        
+        let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: startComponents, end: endComponents)
+        
+        let query = HKActivitySummaryQuery(predicate: predicate) { (query, summaries, error) in
+            completion(summaries, error)
+        }
+        
+        HKHealthStore().execute(query)
+        
+    }    
 }

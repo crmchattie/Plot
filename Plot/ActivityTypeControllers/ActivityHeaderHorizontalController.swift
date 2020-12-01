@@ -14,7 +14,7 @@ class ActivityHeaderHorizontalController: HorizontalSnappingController, UICollec
     
     var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
     
-    var customActivities = [ActivityType]()
+    var customActivities = [CustomType]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,10 +56,10 @@ class ActivityHeaderHorizontalController: HorizontalSnappingController, UICollec
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ActivityHeaderCell
-        let activityType = self.customActivities[indexPath.item]
-        cell.nameLabel.text = activityType.rawValue.capitalized
+        let customType = self.customActivities[indexPath.item]
+        cell.nameLabel.text = customType.rawValue.capitalized
         cell.imageView.contentMode = .scaleAspectFit
-        cell.imageView.image = UIImage(named: activityType.activityTypeImage)!.withRenderingMode(.alwaysTemplate)
+        cell.imageView.image = UIImage(named: customType.image)!.withRenderingMode(.alwaysTemplate)
         cell.imageView.tintColor = UIColor.white
         cell.imageView.backgroundColor = colors[indexPath.item] 
         return cell

@@ -39,7 +39,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
     }
     
     lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
-        if let object = object as? ActivityType {
+        if let object = object as? CustomType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
             cell.intColor = (indexPath.item % 5)
             cell.activityType = object
@@ -124,7 +124,7 @@ class ShoppingTypeViewController: ActivitySubTypeViewController, UISearchBarDele
         let object = diffableDataSource.itemIdentifier(for: indexPath)
         let snapshot = self.diffableDataSource.snapshot()
         let section = snapshot.sectionIdentifier(containingItem: object!)
-        if let activityType = object as? ActivityType {
+        if let activityType = object as? CustomType {
             let activityTypeName = activityType.rawValue
             switch activityTypeName {
             case "basic":

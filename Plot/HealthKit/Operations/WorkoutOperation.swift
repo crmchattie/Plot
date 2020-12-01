@@ -54,7 +54,7 @@ class WorkoutOperation: AsyncOperation {
                         }
 
                         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-                        activity.activityType = ActivityType.workout.rawValue
+                        activity.activityType = "Workout"
                         activity.name = workout.workoutActivityType.name
                         activity.activityDescription = "\(totalEnergyBurned.clean) calories"
                         activity.startDateTime = NSNumber(value: workout.startDate.timeIntervalSince1970)

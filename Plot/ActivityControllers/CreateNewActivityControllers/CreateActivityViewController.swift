@@ -108,7 +108,6 @@ class CreateActivityViewController: FormViewController {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
                 activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                 activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-//                activity.activityType = newActivityType.rawValue.capitalized
                 setupRightBarButton(with: "Create")
             }
         }
@@ -295,7 +294,7 @@ class CreateActivityViewController: FormViewController {
 //                }
 //            }
             
-            <<< TextRow("Activity Type") {
+            <<< TextRow("Type") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor

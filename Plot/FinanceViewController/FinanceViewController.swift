@@ -12,6 +12,8 @@ import CodableFirebase
 
 protocol HomeBaseFinance: class {
     func sendUser(user: MXUser)
+    func sendAccounts(accounts: [MXAccount])
+    func sendTransactions(transactions: [Transaction])
 }
 
 class FinanceViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -247,6 +249,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         dispatchGroup.notify(queue: .main) {
             self.updateCollectionView()
             self.updateFirebase(accounts: updatedAccounts, transactions: [])
+            self.delegate?.sendAccounts(accounts: self.accounts)
         }
     }
     
@@ -353,6 +356,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         dispatchGroup.notify(queue: .main) {
             self.updateCollectionView()
             self.updateFirebase(accounts: [], transactions: newTransactions)
+            self.delegate?.sendTransactions(transactions: self.transactions)
         }
     }
     
