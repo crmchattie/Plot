@@ -328,6 +328,28 @@ class CreateActivityViewController: FormViewController {
                     self.activity.activityDescription = row.value
                 }
             
+            <<< LabelRow("Category") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
+                if self.active && self.activity.category != nil {
+                    row.title = self.activity.category?.capitalized
+                }
+            }.onCellSelection({ _, row in
+                self.openCategory(value: row.title ?? "Category")
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textLabel?.textAlignment = .left
+                if row.title == "Category" {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                } else {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+            }
+            
             <<< ButtonRow("Media") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
@@ -338,7 +360,6 @@ class CreateActivityViewController: FormViewController {
                     self.openMedia()
                 }).cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.accessoryType = .disclosureIndicator
                     cell.textLabel?.textAlignment = .left
                     if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
@@ -1439,7 +1460,18 @@ class CreateActivityViewController: FormViewController {
         })
     }
     
-    @objc fileprivate func openMedia() {
+    fileprivate func openCategory(value: String) {
+        let destination = ActivityCategoryViewController()
+        destination.delegate = self
+        if value != "Category" {
+            destination.value = value
+        }
+        self.navigationController?.pushViewController(destination, animated: true)
+
+        
+    }
+    
+    fileprivate func openMedia() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
@@ -1459,7 +1491,7 @@ class CreateActivityViewController: FormViewController {
 //        self.present(navigationViewController, animated: true, completion: nil)
     }
     
-    @objc fileprivate func openLocationFinder() {
+    fileprivate func openLocationFinder() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
@@ -1473,7 +1505,7 @@ class CreateActivityViewController: FormViewController {
     }
     
     //update so existing invitees are shown as selected
-    @objc fileprivate func openParticipantsInviter() {
+    fileprivate func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
@@ -1535,7 +1567,7 @@ class CreateActivityViewController: FormViewController {
         }
     }
     
-    @objc fileprivate func openSchedule() {
+    fileprivate func openSchedule() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
@@ -1749,7 +1781,7 @@ class CreateActivityViewController: FormViewController {
         }
     }
     
-    @objc fileprivate func openPurchases() {
+    fileprivate func openPurchases() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
@@ -1791,7 +1823,7 @@ class CreateActivityViewController: FormViewController {
         }
     }
     
-    @objc fileprivate func openList() {
+    fileprivate func openList() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
@@ -2421,6 +2453,16 @@ extension CreateActivityViewController: UITextViewDelegate {
         
     }
     
+}
+
+extension CreateActivityViewController: UpdateActivityCategoryDelegate {
+    func update(value: String) {
+        if let row: LabelRow = form.rowBy(tag: "Category") {
+            row.title = value
+            row.updateCell()
+            self.activity.category = value
+        }
+    }
 }
 
 extension CreateActivityViewController: UpdateLocationDelegate {

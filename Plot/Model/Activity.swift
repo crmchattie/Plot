@@ -13,6 +13,9 @@ import CodableFirebase
 let activitiesEntity = "activities"
 let userActivitiesEntity = "user-activities"
 
+let userActivityCategoriesEntity = "user-activities-categories"
+var activityCategories = ["Sleep", "Meal", "Work", "Social", "Relax", "Exercise", "Family", "Free", "Personal"]
+
 class Activity: NSObject, NSCopying, Codable {
     var activityID: String?
     var name: String?

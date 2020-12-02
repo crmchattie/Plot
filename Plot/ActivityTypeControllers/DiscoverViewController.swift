@@ -279,14 +279,9 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
             header.delegate = self
             let snapshot = self.diffableDataSource.snapshot()
-            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object), let activityType = object as? CustomType {
+            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
                 header.titleLabel.text = section.name
-                let activityTypeName = activityType.rawValue
-                if activityTypeName == "basic" {
-                    header.subTitleLabel.isHidden = false
-                } else {
-                    header.subTitleLabel.isHidden = true
-                }
+                header.subTitleLabel.isHidden = true
             }
             
             return header
