@@ -43,13 +43,13 @@ class SummaryViewModel: SummaryViewModelInterface {
             if let entriesDictionary = calendarEntries, !entriesDictionary.isEmpty {
                 for (key, entries) in entriesDictionary {
                     if entries.count > 0 {
-                        self.createPieChartData(label: key, entries: entries) { (pieChartData) in
+                        let sortedEntries = entries.sorted(by: {$0.label < $1.label})
+                        self.createPieChartData(label: key, entries: sortedEntries) { (pieChartData) in
                             self.sections.insert(.calendarSummary, at: 0)
                             self.groups[.calendarSummary] = [pieChartData]
                         }
                     }
                 }
-                
             }
             
             if let entriesDictionary = financesEntries, !entriesDictionary.isEmpty {

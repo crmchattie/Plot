@@ -113,12 +113,18 @@ class FinanceAccountViewController: FormViewController {
             
             <<< TextRow("Name") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.value = account.name.capitalized
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                if active {
+                    $0.value = account.name.capitalized
+                } else {
+                    $0.cell.textField.becomeFirstResponder()
+                }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
                     if let currentUser = Auth.auth().currentUser?.uid {

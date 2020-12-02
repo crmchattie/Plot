@@ -82,7 +82,6 @@ class SummaryService: SummaryServiceInterface {
                 var entries = [Entry]()
                 if let incomeTransactionDetail = transactionDetailsList.first(where: { ($0.level == .group && $0.group == "Income") }), let expenseTransactionDetail = transactionDetailsList.first(where: { ($0.level == .group && $0.group == "Expense") }) {
                     totalValue = incomeTransactionDetail.amount + abs(expenseTransactionDetail.amount) + incomeTransactionDetail.amount + expenseTransactionDetail.amount
-                                        
                     for transactionDetail in transactionDetailsList {
                         if transactionDetail.level == .group {
                             if transactionDetail.name == "Expense" {
@@ -130,7 +129,7 @@ class SummaryService: SummaryServiceInterface {
 }
 
 struct Entry {
-    var label: String?
+    var label: String
     var value: Double
     var icon: UIImage?
 }

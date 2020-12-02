@@ -31,8 +31,6 @@ class SummaryPieChartCell: UICollectionViewCell {
                 chartView.transparentCircleRadiusPercent = 0.61
                 chartView.chartDescription?.enabled = false
                 chartView.setExtraOffsets(left: 5, top: 10, right: 5, bottom: 5)
-                chartView.backgroundColor = ThemeManager.currentTheme().backgroundColor
-                chartView.holeColor = ThemeManager.currentTheme().backgroundColor
                 
                 chartView.drawHoleEnabled = false
                                         
