@@ -19,24 +19,24 @@ class EventKitService {
         setupAssistant.authorizeEventKit(completion: completion)
     }
     
-    func fetchEventsOneYearFromAPastMonth() -> [EKEvent] {
+    func fetchEventsForCertainTime() -> [EKEvent] {
         // Get the appropriate calendar.
         let calendar = Calendar.current
 
         // Create the start date components
-        var oneDayAgoComponents = DateComponents()
-        oneDayAgoComponents.month = -1
-        let oneDayAgo = calendar.date(byAdding: oneDayAgoComponents, to: Date())
+        var timeDayAgoComponents = DateComponents()
+        timeDayAgoComponents.month = -1
+        let timeAgo = calendar.date(byAdding: timeDayAgoComponents, to: Date())
 
         // Create the end date components.
-        var oneYearFromNowComponents = DateComponents()
-        oneYearFromNowComponents.month = 1
-        let oneYearFromNow = calendar.date(byAdding: oneYearFromNowComponents, to: Date())
+        var timeFromNowComponents = DateComponents()
+        timeFromNowComponents.month = 6
+        let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date())
 
         // Create the predicate from the event store's instance method.
         var predicate: NSPredicate? = nil
-        if let anAgo = oneDayAgo, let aNow = oneYearFromNow {
-            predicate = setupAssistant.eventStore.predicateForEvents(withStart: anAgo, end: aNow, calendars: nil)
+        if let timeAgo = timeAgo, let timeFromNow = timeFromNow {
+            predicate = setupAssistant.eventStore.predicateForEvents(withStart: timeAgo, end: timeFromNow, calendars: nil)
         }
 
         // Fetch all events that match the predicate.

@@ -969,17 +969,25 @@ extension ActivityViewController {
             
             if !weakSelf.hasLoadedCalendarEventActivities {
                 weakSelf.hasLoadedCalendarEventActivities = true
+                // Comment out the block below to stop the sync
                 DispatchQueue.main.async {
-                    weakSelf.showActivityIndicator()
+                    weakSelf.navigationItemActivityIndicator.showActivityIndicator(for: weakSelf.navigationItem, with: .updating,
+                                                                                   activityPriority: .mediumHigh, color:
+                                                                                    ThemeManager.currentTheme().generalTitleColor)
                     if let _ = Auth.auth().currentUser {
                         weakSelf.eventKitManager.syncEventKitActivities {
                             DispatchQueue.main.async {
                                 weakSelf.handleReloadTable()
-                                weakSelf.hideActivityIndicator()
+                                weakSelf.navigationItemActivityIndicator.hideActivityIndicator(for: weakSelf.navigationItem, activityPriority: .mediumHigh)
                             }
                         }
                     }
                 }
+                
+                // Uncomment this line to clean the calendar events. The app might freeze for a bit and/or require a restart
+//                DispatchQueue.global().async {
+//                    weakSelf.cleanCalendarEventActivities()
+//                }
             }
         }
     }
@@ -998,6 +1006,8 @@ extension ActivityViewController {
                 userActivityReference.removeValue()
             }
         }
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
+        reference.removeValue()
     }
     
     func observeInvitationForCurrentUser() {

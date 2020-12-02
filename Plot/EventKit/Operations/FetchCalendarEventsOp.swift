@@ -21,7 +21,7 @@ class FetchCalendarEventsOp: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        events = eventKitService.fetchEventsOneYearFromAPastMonth()
+        events = eventKitService.fetchEventsForCertainTime()
         self.finish()
     }
 }
