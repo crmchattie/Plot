@@ -56,6 +56,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     let activityView = ActivityView()
     
     weak var delegate: HomeBaseActivities?
+    weak var activityIndicatorDelegate: MasterContainerActivityIndicatorDelegate?
     
     var searchBar: UISearchBar?
     var searchController: UISearchController?
@@ -971,14 +972,12 @@ extension ActivityViewController {
                 weakSelf.hasLoadedCalendarEventActivities = true
                 // Comment out the block below to stop the sync
                 DispatchQueue.main.async {
-                    weakSelf.navigationItemActivityIndicator.showActivityIndicator(for: weakSelf.navigationItem, with: .updating,
-                                                                                   activityPriority: .mediumHigh, color:
-                                                                                    ThemeManager.currentTheme().generalTitleColor)
+                    weakSelf.activityIndicatorDelegate?.showActivityIndicator()
                     if let _ = Auth.auth().currentUser {
                         weakSelf.eventKitManager.syncEventKitActivities {
                             DispatchQueue.main.async {
                                 weakSelf.handleReloadTable()
-                                weakSelf.navigationItemActivityIndicator.hideActivityIndicator(for: weakSelf.navigationItem, activityPriority: .mediumHigh)
+                                weakSelf.activityIndicatorDelegate?.hideActivityIndicator()
                             }
                         }
                     }
