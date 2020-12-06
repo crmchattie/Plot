@@ -15,9 +15,6 @@ struct Workout: Codable, Equatable, Hashable {
     var id: String
     var name: String
     var type: String?
-    var weight: Int?
-    var duration: Double?
-    var calories: Double?
     var participantsIDs: [String]?
     var lastModifiedDate: Date?
     var createdDate: Date?

@@ -142,7 +142,7 @@ class SummaryViewController: UIViewController {
     }
     
     func fetchData() {
-        guard let segmentType = TimeSegmentType(rawValue: customSegmented.selectedIndex) else { return }
+        guard let selectedIndex = customSegmented.selectedIndex, let segmentType = TimeSegmentType(rawValue: selectedIndex) else { return }
         
         viewModel.fetchChartData(for: segmentType) { [weak self] in
             guard let weakSelf = self else { return }

@@ -333,9 +333,10 @@ class CreateActivityViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
                 if self.active && self.activity.category != nil {
                     row.title = self.activity.category?.capitalized
+                } else {
+                    row.title = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
                 self.openCategory(value: row.title ?? "Category")
@@ -343,11 +344,7 @@ class CreateActivityViewController: FormViewController {
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textAlignment = .left
-                if row.title == "Category" {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                } else {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
             
             <<< ButtonRow("Media") { row in

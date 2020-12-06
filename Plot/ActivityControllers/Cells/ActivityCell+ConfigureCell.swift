@@ -135,6 +135,8 @@ extension ActivityCell {
             activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
         case "food":
             activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
+        case "meal":
+            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
         case "nightlife":
             activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
         case "recreation":

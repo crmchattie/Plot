@@ -43,7 +43,6 @@ class WorkoutFetcher: NSObject {
                             if workoutSnapshot.exists(), let workoutSnapshotValue = workoutSnapshot.value {
                                 if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
                                     var _workout = workout
-                                    _workout.weight = userWorkout.weight
                                     _workout.badge = userWorkout.badge
                                     _workout.muted = userWorkout.muted
                                     _workout.pinned = userWorkout.pinned
@@ -123,7 +122,6 @@ class WorkoutFetcher: NSObject {
                             if workoutSnapshot.exists(), let workoutSnapshotValue = workoutSnapshot.value {
                                 if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
                                     var _workout = workout
-                                    _workout.weight = userWorkout.weight
                                     _workout.badge = userWorkout.badge
                                     _workout.muted = userWorkout.muted
                                     _workout.pinned = userWorkout.pinned

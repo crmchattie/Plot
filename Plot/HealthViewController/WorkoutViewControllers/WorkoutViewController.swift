@@ -80,6 +80,7 @@ class WorkoutViewController: FormViewController {
         }
         setupRightBarButton()
         initializeForm()
+        updateCalories()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -114,25 +115,25 @@ class WorkoutViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-//        if !active || self.selectedFalconUsers.count == 0 {
-            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-            navigationItem.rightBarButtonItem = plusBarButton
-//        } else {
-//            let dotsImage = UIImage(named: "dots")
-//            if #available(iOS 11.0, *) {
-//                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-//
-//                let dotsBarButton = UIButton(type: .system)
-//                dotsBarButton.setImage(dotsImage, for: .normal)
-//                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-//
-//                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
-//            } else {
-//                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-//                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-//                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-//            }
-//        }
+        //        if !active || self.selectedFalconUsers.count == 0 {
+        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+        navigationItem.rightBarButtonItem = plusBarButton
+        //        } else {
+        //            let dotsImage = UIImage(named: "dots")
+        //            if #available(iOS 11.0, *) {
+        //                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+        //
+        //                let dotsBarButton = UIButton(type: .system)
+        //                dotsBarButton.setImage(dotsImage, for: .normal)
+        //                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
+        //
+        //                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
+        //            } else {
+        //                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+        //                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+        //                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
+        //            }
+        //        }
     }
     
     @objc fileprivate func close() {
@@ -165,18 +166,18 @@ class WorkoutViewController: FormViewController {
                     self.showActivityIndicator()
                     let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     createWorkout.createNewWorkout()
-
+                    
                     //duplicate workout
                     let newWorkoutID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
                     var newWorkout = self.workout!
                     newWorkout.id = newWorkoutID
                     newWorkout.admin = currentUserID
                     newWorkout.participantsIDs = nil
-
+                    
                     let createNewWorkout = WorkoutActions(workout: newWorkout, active: false, selectedFalconUsers: [])
                     createNewWorkout.createNewWorkout()
                     self.hideActivityIndicator()
-
+                    
                     self.navigationController?.popViewController(animated: true)
                 }
                 
@@ -272,21 +273,28 @@ class WorkoutViewController: FormViewController {
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-            <<< IntRow("Weight") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.formatter = numberFormatter
-                $0.value = workout.weight
+            <<< IntRow("Weight") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.title = row.tag
+                row.formatter = numberFormatter
+                if let currentUser = Auth.auth().currentUser?.uid {
+                    let weightReference = Database.database().reference().child("users").child(currentUser).child("weight")
+                    weightReference.observe(.value, with: { (snapshot) in
+                        if let weight = snapshot.value as? Int {
+                            row.value = weight
+                        }
+                    })
+                }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange({ row in
-                if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let weightValue = row.value, let duration = self.workout.duration {
-                    caloriesRow.value = duration * workoutType.caloriesBurned * Double(weightValue)
-                    caloriesRow.updateCell()
+                self.updateCalories()
+                if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
+                    Database.database().reference().child("users").child(currentUser).child("weight").setValue(value)
                 }
             })
             
@@ -314,10 +322,7 @@ class WorkoutViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }.onChange({ row in
                 self.workout.type = row.value
-                if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let duration = self.workout.duration {
-                    caloriesRow.value = duration * workoutType.caloriesBurned * Double(weightValue)
-                    caloriesRow.updateCell()
-                }
+                self.updateCalories()
             })
             
             <<< DecimalRow("Calories Burned") {
@@ -325,7 +330,10 @@ class WorkoutViewController: FormViewController {
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
-                $0.value = workout.calories
+                if let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
+                    let duration = Calendar.current.dateComponents([.minute], from: startRow.value!, to: endRow.value!).minute
+                    $0.value = Double(duration ?? 0) * workoutType.caloriesBurned * Double(weightValue)
+                }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -336,23 +344,25 @@ class WorkoutViewController: FormViewController {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
-                if let duration = workout.duration {
-                    let string = String(format: "%.0f", duration)
-                    $0.value = "\(string) minutes"
+                if let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
+                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: startRow.value!, to: endRow.value!)
+                    let hour = dateComponents.hour
+                    let minutes = dateComponents.minute
+                    if let minutes = minutes, let hour = hour {
+                        $0.value = "\(hour) hours \(minutes) minutes"
+                    } else if let minutes = minutes {
+                        $0.value = "\(minutes) minutes"
+                    }
                 } else {
                     $0.value = "30 minutes"
-                    workout.duration = 30.0
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange({ row in
-                if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let duration = self.workout.duration {
-                    caloriesRow.value = duration * workoutType.caloriesBurned * Double(weightValue)
-                    caloriesRow.updateCell()
-                }
+            }.onChange({ _ in
+                self.updateCalories()
             })
-                    
+            
             <<< DateTimeInlineRow("Starts") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -379,9 +389,14 @@ class WorkoutViewController: FormViewController {
                     endRow.updateCell()
                 }
                 if let durationRow : TextRow = self?.form.rowBy(tag: "Duration") {
-                    let diffInMins = Calendar.current.dateComponents([.minute], from: row.value!, to: endRow.value!).minute
-                    self?.workout.duration = Double(diffInMins ?? 0)
-                    durationRow.value = "\(diffInMins ?? 0) minutes"
+                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: row.value!, to: endRow.value!)
+                    let hour = dateComponents.hour
+                    let minutes = dateComponents.minute
+                    if let minutes = minutes, let hour = hour {
+                        durationRow.value = "\(hour) hours \(minutes) minutes"
+                    } else if let minutes = minutes {
+                        durationRow.value = "\(minutes) minutes"
+                    }
                     durationRow.updateCell()
                 }
                 self!.workout.startDateTime = row.value
@@ -430,9 +445,14 @@ class WorkoutViewController: FormViewController {
                     startRow.updateCell()
                 }
                 if let durationRow : TextRow = self?.form.rowBy(tag: "Duration") {
-                    let diffInMins = Calendar.current.dateComponents([.minute], from: startRow.value!, to: row.value!).minute
-                    self?.workout.duration = Double(diffInMins ?? 0)
-                    durationRow.value = "\(diffInMins ?? 0) minutes"
+                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: startRow.value!, to: row.value!)
+                    let hour = dateComponents.hour
+                    let minutes = dateComponents.minute
+                    if let minutes = minutes, let hour = hour {
+                        durationRow.value = "\(hour) hours \(minutes) minutes"
+                    } else if let minutes = minutes {
+                        durationRow.value = "\(minutes) minutes"
+                    }
                     durationRow.updateCell()
                 }
                 self!.workout.endDateTime = row.value
@@ -477,157 +497,165 @@ class WorkoutViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
             }
+    }
+    
+    fileprivate func updateCalories() {
+        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
+            let duration = Calendar.current.dateComponents([.minute], from: startRow.value!, to: endRow.value!).minute
+            caloriesRow.value = Double(duration ?? 0) * workoutType.caloriesBurned * Double(weightValue)
+            caloriesRow.updateCell()
         }
-        
-        @objc fileprivate func openParticipantsInviter() {
-            guard currentReachabilityStatus != .notReachable else {
-                basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-                return
-            }
-            let destination = SelectActivityMembersViewController()
-            var uniqueUsers = users
-            for participant in selectedFalconUsers {
-                if let userIndex = users.firstIndex(where: { (user) -> Bool in
-                                                        return user.id == participant.id }) {
-                    uniqueUsers[userIndex] = participant
-                } else {
-                    uniqueUsers.append(participant)
-                }
-            }
-            
-            destination.users = uniqueUsers
-            destination.filteredUsers = uniqueUsers
-            if !selectedFalconUsers.isEmpty {
-                destination.priorSelectedUsers = selectedFalconUsers
-            }
-            destination.delegate = self
-            self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    @objc fileprivate func openParticipantsInviter() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
         }
-        
-        func showActivityIndicator() {
-            if let navController = self.navigationController {
-                self.showSpinner(onView: navController.view)
+        let destination = SelectActivityMembersViewController()
+        var uniqueUsers = users
+        for participant in selectedFalconUsers {
+            if let userIndex = users.firstIndex(where: { (user) -> Bool in
+                                                    return user.id == participant.id }) {
+                uniqueUsers[userIndex] = participant
             } else {
-                self.showSpinner(onView: self.view)
+                uniqueUsers.append(participant)
             }
-            self.navigationController?.view.isUserInteractionEnabled = false
         }
         
-        func hideActivityIndicator() {
-            self.navigationController?.view.isUserInteractionEnabled = true
-            self.removeSpinner()
+        destination.users = uniqueUsers
+        destination.filteredUsers = uniqueUsers
+        if !selectedFalconUsers.isEmpty {
+            destination.priorSelectedUsers = selectedFalconUsers
         }
-        
-        func getSelectedFalconUsers(forWorkout workout: Workout, completion: @escaping ([User])->()) {
-            guard let participantsIDs = workout.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-                return
-            }
-            var selectedFalconUsers = [User]()
-            let group = DispatchGroup()
-            for id in participantsIDs {
-                // Only if the current user is created this activity
-                if workout.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        selectedFalconUsers.append(user)
-                    }
-                    group.leave()
-                })
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    func showActivityIndicator() {
+        if let navController = self.navigationController {
+            self.showSpinner(onView: navController.view)
+        } else {
+            self.showSpinner(onView: self.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+    
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
+    
+    func getSelectedFalconUsers(forWorkout workout: Workout, completion: @escaping ([User])->()) {
+        guard let participantsIDs = workout.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        var selectedFalconUsers = [User]()
+        let group = DispatchGroup()
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if workout.admin == currentUserID && id == currentUserID {
+                continue
             }
             
-            group.notify(queue: .main) {
-                completion(selectedFalconUsers)
-            }
-        }
-        
-        fileprivate func resetBadgeForSelf() {
-            guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-            let badgeRef = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).child(workout.id).child("badge")
-            badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
-                var value = mutableData.value as? Int
-                value = 0
-                mutableData.value = value!
-                return TransactionResult.success(withValue: mutableData)
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    selectedFalconUsers.append(user)
+                }
+                group.leave()
             })
         }
+        
+        group.notify(queue: .main) {
+            completion(selectedFalconUsers)
+        }
     }
     
-    extension WorkoutViewController: UpdateInvitees {
-        func updateInvitees(selectedFalconUsers: [User]) {
-            if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
-                if !selectedFalconUsers.isEmpty {
-                    self.selectedFalconUsers = selectedFalconUsers
-                    var participantCount = self.selectedFalconUsers.count
-                    // If user is creating this activity (admin)
-                    if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
-                        participantCount += 1
-                    }
-                    if participantCount > 1 {
-                        self.userNamesString = "\(participantCount) participants"
-                    } else {
-                        self.userNamesString = "1 participant"
-                    }
-                    
-                    inviteesRow.title = self.userNamesString
-                    inviteesRow.updateCell()
-                    
+    fileprivate func resetBadgeForSelf() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        let badgeRef = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).child(workout.id).child("badge")
+        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+            var value = mutableData.value as? Int
+            value = 0
+            mutableData.value = value!
+            return TransactionResult.success(withValue: mutableData)
+        })
+    }
+}
+
+extension WorkoutViewController: UpdateInvitees {
+    func updateInvitees(selectedFalconUsers: [User]) {
+        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
+            if !selectedFalconUsers.isEmpty {
+                self.selectedFalconUsers = selectedFalconUsers
+                var participantCount = self.selectedFalconUsers.count
+                // If user is creating this activity (admin)
+                if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
+                    participantCount += 1
+                }
+                if participantCount > 1 {
+                    self.userNamesString = "\(participantCount) participants"
                 } else {
-                    self.selectedFalconUsers = selectedFalconUsers
-                    inviteesRow.title = "1 participant"
-                    inviteesRow.updateCell()
+                    self.userNamesString = "1 participant"
                 }
                 
-                if active {
-                    showActivityIndicator()
-                    let createWorkout = WorkoutActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
-                    createWorkout.updateWorkoutParticipants()
-                    hideActivityIndicator()
-                }
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
                 
+            } else {
+                self.selectedFalconUsers = selectedFalconUsers
+                inviteesRow.title = "1 participant"
+                inviteesRow.updateCell()
             }
+            
+            if active {
+                showActivityIndicator()
+                let createWorkout = WorkoutActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
+                createWorkout.updateWorkoutParticipants()
+                hideActivityIndicator()
+            }
+            
         }
+    }
+}
+
+extension WorkoutViewController: MessagesDelegate {
+    
+    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
+        chatLogController?.updateMessageStatus(messageRef: reference)
     }
     
-    extension WorkoutViewController: MessagesDelegate {
+    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
         
-        func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
-            chatLogController?.updateMessageStatus(messageRef: reference)
+        chatLogController?.hidesBottomBarWhenPushed = true
+        chatLogController?.messagesFetcher = messagesFetcher
+        chatLogController?.messages = messages
+        chatLogController?.conversation = conversation
+        
+        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
+            chatLogController?.observeTypingIndicator()
+            chatLogController?.configureTitleViewWithOnlineStatus()
         }
         
-        func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-            
-            chatLogController?.hidesBottomBarWhenPushed = true
-            chatLogController?.messagesFetcher = messagesFetcher
-            chatLogController?.messages = messages
-            chatLogController?.conversation = conversation
-            
-            if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
-                chatLogController?.observeTypingIndicator()
-                chatLogController?.configureTitleViewWithOnlineStatus()
-            }
-            
-            chatLogController?.messagesFetcher.collectionDelegate = chatLogController
-            guard let destination = chatLogController else { return }
-            
-            self.chatLogController?.startCollectionViewAtBottom()
-            
-            
-            // If we're presenting a modal sheet
-            if let presentedViewController = presentedViewController as? UINavigationController {
-                presentedViewController.pushViewController(destination, animated: true)
-            } else {
-                navigationController?.pushViewController(destination, animated: true)
-            }
-            
-            chatLogController = nil
-            messagesFetcher?.delegate = nil
-            messagesFetcher = nil
+        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
+        guard let destination = chatLogController else { return }
+        
+        self.chatLogController?.startCollectionViewAtBottom()
+        
+        
+        // If we're presenting a modal sheet
+        if let presentedViewController = presentedViewController as? UINavigationController {
+            presentedViewController.pushViewController(destination, animated: true)
+        } else {
+            navigationController?.pushViewController(destination, animated: true)
         }
+        
+        chatLogController = nil
+        messagesFetcher?.delegate = nil
+        messagesFetcher = nil
     }
+}

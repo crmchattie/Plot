@@ -19,6 +19,8 @@ class User: NSObject {
     var fcmToken: String?
     var badge: Int?
     var onlineStatus: AnyObject?
+    var weight: Int?
+    var height: Int?
     var isSelected: Bool! = false // local only
 
     init(dictionary: [String: AnyObject]) {
