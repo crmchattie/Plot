@@ -121,8 +121,10 @@ class CustomMultiSegmentedControl: UIView {
     private var buttonTitles:[String]!
     private var buttons: [UIButton]!
     
-    var buttonColor: UIColor = ThemeManager.currentTheme().generalTitleColor
-    var selectedButtonColor: UIColor = .systemBlue
+    var unselectedTintColor: UIColor = .systemBlue
+    var unselectedBackgroundColor: UIColor = ThemeManager.currentTheme().generalBackgroundColor
+    var selectedTintColor: UIColor = UIColor.white
+    var selectedBackgroundColor: UIColor = .systemBlue
         
     weak var delegate: CustomMultiSegmentedControlDelegate?
     
@@ -150,26 +152,30 @@ class CustomMultiSegmentedControl: UIView {
     
     func setIndex(indexes:[Int]) {
         buttons.forEach({
-            $0.tintColor = buttonColor
+            $0.tintColor = unselectedTintColor
+            $0.backgroundColor = unselectedBackgroundColor
             $0.clipsToBounds = true
-            $0.layer.cornerRadius = $0.frame.width / 2
+            $0.layer.cornerRadius = min($0.frame.width, $0.frame.height) / 2
         })
         selectedIndex = indexes
         indexes.forEach { (index) in
-            buttons[index].backgroundColor = selectedButtonColor
+            buttons[index].tintColor = selectedTintColor
+            buttons[index].backgroundColor = selectedBackgroundColor
         }
     }
     
     @objc func buttonAction(sender:UIButton) {
         for (buttonIndex, btn) in buttons.enumerated() {
             btn.clipsToBounds = true
-            btn.layer.cornerRadius = btn.frame.width / 2
+            btn.layer.cornerRadius = min(btn.frame.width, btn.frame.height) / 2
             if btn == sender {
                 if !selectedIndex.contains(buttonIndex) {
-                    btn.backgroundColor = selectedButtonColor
+                    btn.tintColor = selectedTintColor
+                    btn.backgroundColor = selectedBackgroundColor
                     self.selectedIndex.append(buttonIndex)
                 } else {
-                    btn.backgroundColor = .clear
+                    btn.tintColor = unselectedTintColor
+                    btn.backgroundColor = unselectedBackgroundColor
                     if let index = self.selectedIndex.firstIndex(of: buttonIndex) {
                         self.selectedIndex.remove(at: index)
                     }
@@ -188,11 +194,15 @@ extension CustomMultiSegmentedControl {
     }
     
     private func configStackView() {
+        for button in buttons {
+            button.heightAnchor.constraint(equalTo: button.widthAnchor, multiplier: 1.0/1.0).isActive = true
+        }
         let stack = UIStackView(arrangedSubviews: buttons)
         stack.axis = .horizontal
         stack.alignment = .fill
-        stack.distribution = .fillEqually
-        stack.spacing = 6
+        stack.distribution = .equalSpacing
+        stack.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        stack.isLayoutMarginsRelativeArrangement = true
         addSubview(stack)
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
@@ -210,7 +220,10 @@ extension CustomMultiSegmentedControl {
                 let button = UIButton(type: .system)
                 button.addTarget(self, action:#selector(CustomSegmentedControl.buttonAction(sender:)), for: .touchUpInside)
                 button.setImage(UIImage(named: buttonImage), for: .normal)
-                button.tintColor = buttonColor
+                button.clipsToBounds = true
+                button.layer.cornerRadius = min(button.frame.width, button.frame.height) / 2
+                button.tintColor = unselectedTintColor
+                button.backgroundColor = unselectedBackgroundColor
                 buttons.append(button)
             }
         } else {
@@ -219,12 +232,16 @@ extension CustomMultiSegmentedControl {
                 button.addTarget(self, action:#selector(CustomSegmentedControl.buttonAction(sender:)), for: .touchUpInside)
                 button.setTitle(buttonTitle, for: .normal)
                 button.titleLabel?.font = .boldSystemFont(ofSize: 20)
-                button.tintColor = buttonColor
+                button.clipsToBounds = true
+                button.layer.cornerRadius = min(button.frame.width, button.frame.height) / 2
+                button.tintColor = unselectedTintColor
+                button.backgroundColor = unselectedBackgroundColor
                 buttons.append(button)
             }
         }
         selectedIndex.forEach { (index) in
-            buttons[index].backgroundColor = selectedButtonColor
+            buttons[index].tintColor = selectedTintColor
+            buttons[index].backgroundColor = selectedBackgroundColor
         }
     }
 }

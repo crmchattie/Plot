@@ -53,13 +53,11 @@ class SchedulerViewController: FormViewController {
         
         customSegmentControl.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         customSegmentControl.delegate = self
-        
-        customSegmentControl.constrainHeight(50)
-        
+                
         view.addSubview(customSegmentControl)
         view.addSubview(tableView)
         
-        customSegmentControl.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        customSegmentControl.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 20, left: 0, bottom: 0, right: 0))
         tableView.anchor(top: customSegmentControl.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         
         let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
