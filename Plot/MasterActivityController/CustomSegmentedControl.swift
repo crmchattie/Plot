@@ -121,7 +121,7 @@ class CustomMultiSegmentedControl: UIView {
     private var buttonTitles:[String]!
     private var buttons: [UIButton]!
     
-    var buttonColor: UIColor = ThemeManager.currentTheme().generalSubtitleColor
+    var buttonColor: UIColor = ThemeManager.currentTheme().generalTitleColor
     var selectedButtonColor: UIColor = .systemBlue
         
     weak var delegate: CustomMultiSegmentedControlDelegate?
@@ -149,21 +149,27 @@ class CustomMultiSegmentedControl: UIView {
     }
     
     func setIndex(indexes:[Int]) {
-        buttons.forEach({ $0.tintColor = buttonColor })
+        buttons.forEach({
+            $0.tintColor = buttonColor
+            $0.clipsToBounds = true
+            $0.layer.cornerRadius = $0.frame.width / 2
+        })
         selectedIndex = indexes
         indexes.forEach { (index) in
-            buttons[index].tintColor = selectedButtonColor
+            buttons[index].backgroundColor = selectedButtonColor
         }
     }
     
     @objc func buttonAction(sender:UIButton) {
         for (buttonIndex, btn) in buttons.enumerated() {
+            btn.clipsToBounds = true
+            btn.layer.cornerRadius = btn.frame.width / 2
             if btn == sender {
                 if !selectedIndex.contains(buttonIndex) {
-                    btn.tintColor = selectedButtonColor
+                    btn.backgroundColor = selectedButtonColor
                     self.selectedIndex.append(buttonIndex)
                 } else {
-                    btn.tintColor = buttonColor
+                    btn.backgroundColor = .clear
                     if let index = self.selectedIndex.firstIndex(of: buttonIndex) {
                         self.selectedIndex.remove(at: index)
                     }
@@ -186,6 +192,7 @@ extension CustomMultiSegmentedControl {
         stack.axis = .horizontal
         stack.alignment = .fill
         stack.distribution = .fillEqually
+        stack.spacing = 6
         addSubview(stack)
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
@@ -217,7 +224,7 @@ extension CustomMultiSegmentedControl {
             }
         }
         selectedIndex.forEach { (index) in
-            buttons[index].tintColor = selectedButtonColor
+            buttons[index].backgroundColor = selectedButtonColor
         }
     }
 }
