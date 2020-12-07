@@ -520,7 +520,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
             }
         }
         let duration = Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)
-        if let type = activity.activityType {
+        if let type = activity.category {
             if categoryDict[type] == nil {
                 categoryDict[type] = duration
                 activitiesDict[type] = [activity]
@@ -533,7 +533,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
                 activitiesDict[type] = activities
             }
         } else {
-            let type = "No Activity Type"
+            let type = "No Category"
             if categoryDict[type] == nil {
                 categoryDict[type] = duration
                 activitiesDict[type] = [activity]

@@ -11,7 +11,7 @@ import Foundation
 class ActivityCategorySelector {
     static var keywordsMap = ["Exercise": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
                        "Work": ["meeting", "assignment", "project", "standup"],
-                       "Social": ["birthday", "party"],
+                       "Social": ["party"],
                        "Family": ["family"],
                        "Personal": ["appointment", "consultation", "therapy"],
                        "Meal": ["dinner", "lunch", "meal", "breakfast"]

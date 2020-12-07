@@ -97,15 +97,15 @@ extension ActivityCell {
         startLabel.text = dateTimeValueArray.1
                 
         if activity.activityType != "nothing" && activity.activityType != nil {
-            activityTypeLabel.text = activity.activityType?.capitalized
+            activityTypeLabel.text = activity.activityType
         } else {
-            activityTypeLabel.text = ""
+            activityTypeLabel.text = nil
         }
         
         if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
             activityAddressLabel.text = activity.locationName
         } else {
-            activityAddressLabel.text = ""
+            activityAddressLabel.text = nil
         }
         
         if let invitation = invitation {
@@ -120,7 +120,6 @@ extension ActivityCell {
             if #available(iOS 13.0, *) {
                 invitationSegmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
             }
-
         } else {
             invitationSegmentedControl.isHidden = true
             invitationSegmentHeightConstraint.constant = 0
@@ -133,6 +132,10 @@ extension ActivityCell {
             activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
         case "event":
             activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+        case "sleep":
+            activityTypeButton.setImage(UIImage(named: "sleep"), for: .normal)
+        case "work":
+            activityTypeButton.setImage(UIImage(named: "work"), for: .normal)
         case "food":
             activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
         case "meal":
@@ -160,10 +163,7 @@ extension ActivityCell {
             newActivityIndicator.isHidden = true
             badgeLabel.isHidden = true
         }
-        
-        let topAnchor = invitationSegmentedControlTopAnchorShowAvatar
-        invitationSegmentedControlTopAnchor.constant = topAnchor
-        
+                
         loadParticipantsThumbnail(activity: activity)
         
         if activity.locationAddress == nil {

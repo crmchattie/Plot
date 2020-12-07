@@ -300,7 +300,7 @@ class CreateActivityViewController: FormViewController {
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
                 if self.active && self.activity.activityType != "nothing" && self.activity.activityType != nil {
-                    $0.value = self.activity.activityType?.capitalized
+                    $0.value = self.activity.activityType!
                 }
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

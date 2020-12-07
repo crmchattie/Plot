@@ -36,7 +36,7 @@ class SummaryViewController: UIViewController {
         return segmentedControl
     }()
     
-    lazy var customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["D","W","M", "Y"], selectedIndex: 3)
+    lazy var customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["D","W","M", "Y"], selectedIndex: 2)
     
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()

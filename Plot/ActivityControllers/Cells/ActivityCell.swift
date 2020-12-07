@@ -19,8 +19,8 @@ class ActivityCell: UITableViewCell {
     
     var invitationSegmentHeightConstraint: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
-    let invitationSegmentedControlTopAnchorShowAvatar: CGFloat = 46
-    let invitationSegmentedControlTopAnchorRegular: CGFloat = 8
+    let invitationSegmentedControlTopAnchorShowAvatar: CGFloat = 35
+    let invitationSegmentedControlTopAnchorRegular: CGFloat = 17
     let invitationSegmentHeightConstant: CGFloat = 29
     var invitation: Invitation?
     var participants: [User] = []
@@ -38,7 +38,7 @@ class ActivityCell: UITableViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         return label
     }()
     
@@ -202,19 +202,19 @@ class ActivityCell: UITableViewCell {
         activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
-        nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -20).isActive = true
         
         startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
-        startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
         startLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
         activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
-        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
         activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
         activityAddressLabel.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: 2).isActive = true
-        activityAddressLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        activityAddressLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
         activityAddressLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
         activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 5).isActive = true
@@ -233,12 +233,11 @@ class ActivityCell: UITableViewCell {
         listButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
         
         mapButton.topAnchor.constraint(equalTo: listButton.bottomAnchor, constant: 5).isActive = true
-        mapButton.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
         mapButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
         mapButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
         mapButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
 
-        var x: CGFloat = 10
+        var x: CGFloat = 5
         for _ in 0..<thumbnailsCount {
             let icon = UIImageView()
             activityImageView.addSubview(icon)
@@ -248,8 +247,8 @@ class ActivityCell: UITableViewCell {
             icon.layer.cornerRadius = 15
             icon.layer.masksToBounds = true
             icon.image = UIImage(named: "UserpicIcon")
-//            icon.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: 8).isActive = true
-            icon.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
+            icon.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: 8).isActive = true
+//            icon.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
             icon.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: x).isActive = true
             icon.widthAnchor.constraint(equalToConstant: 30).isActive = true
             icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
@@ -257,7 +256,8 @@ class ActivityCell: UITableViewCell {
             x += 38
         }
         
-        invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
+        
+        invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: mapButton.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
         invitationSegmentedControlTopAnchor.isActive = true
         invitationSegmentedControl.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
         invitationSegmentedControl.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
@@ -292,10 +292,10 @@ class ActivityCell: UITableViewCell {
         super.prepareForReuse()
         activityImageView.image = nil
         activityImageView.sd_cancelCurrentImageLoad()
-        nameLabel.text = ""
-        startLabel.text = ""
-        activityTypeLabel.text = ""
-        activityAddressLabel.text = ""
+        nameLabel.text = nil
+        startLabel.text = nil
+        activityTypeLabel.text = nil
+        activityAddressLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         newActivityIndicator.isHidden = true

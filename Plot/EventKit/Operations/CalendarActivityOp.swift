@@ -81,13 +81,22 @@ class CalendarActivityOp: AsyncOperation {
     }
     
     private func update(activity: Activity) {
-        activity.activityType = CustomType.iOSCalendarEvent.rawValue
+        activity.activityType = CustomType.iOSCalendarEvent.categoryText
         activity.name = event.title
-        activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
-        activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
         activity.notes = event.notes
         activity.locationName = event.location
         activity.allDay = event.isAllDay
+        let timezone = event.timeZone
+        let seconds = TimeInterval(timezone?.secondsFromGMT(for: Date()) ?? 0)
+        let startDateTime = event.startDate.addingTimeInterval(seconds)
+        let endDateTime = event.endDate.addingTimeInterval(seconds)
+        if event.isAllDay, let endDateTime = Calendar.current.date(byAdding: .day, value: -1, to: endDateTime.startOfDay) {
+            activity.startDateTime = NSNumber(value: startDateTime.startOfDay.timeIntervalSince1970)
+            activity.endDateTime = NSNumber(value: endDateTime.timeIntervalSince1970)
+        } else {
+            activity.startDateTime = NSNumber(value: startDateTime.timeIntervalSince1970)
+            activity.endDateTime = NSNumber(value: endDateTime.timeIntervalSince1970)
+        }
     }
     
     private func deleteActivity() {
