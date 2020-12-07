@@ -14,7 +14,7 @@ import CodableFirebase
 protocol ActivityUpdatesDelegate: class {
     func activities(didStartFetching: Bool)
     func activities(didStartUpdatingData: Bool)
-    func activities(didFinishFetching: Bool, activities: [Activity])
+    func activities(didFinishFetching: Bool, activities: [Activity], newActivity: Activity?)
     func activities(update activities: Activity, reloadNeeded: Bool)
     func activities(remove activity: Activity)
 }
@@ -47,11 +47,11 @@ class ActivitiesFetcher: NSObject {
             self.group.notify(queue: .main, execute: {
                 print("isGroupAlreadyFinished \(self.isGroupAlreadyFinished)")
                 self.isGroupAlreadyFinished = true
-                self.delegate?.activities(didFinishFetching: true, activities: self.activities)
+                self.delegate?.activities(didFinishFetching: true, activities: self.activities, newActivity: nil)
             })
             
             if !snapshot.exists() {
-                self.delegate?.activities(didFinishFetching: true, activities: self.activities)
+                self.delegate?.activities(didFinishFetching: true, activities: self.activities, newActivity: nil)
                 return
             }
         }
@@ -193,7 +193,7 @@ class ActivitiesFetcher: NSObject {
             update(activity: activity, at: index)
         } else {
             activities.append(activity)
-            handleGroupOrReloadTable()
+            handleGroupOrReloadTable(for: activity)
         }
     }
     
@@ -207,7 +207,7 @@ class ActivitiesFetcher: NSObject {
             
             activities[index] = activity
             // I don't think we need this?
-            handleGroupOrReloadTable()
+            handleGroupOrReloadTable(for: activity)
             delegate?.activities(update: activities[index], reloadNeeded: true)
             return
         }
@@ -215,16 +215,17 @@ class ActivitiesFetcher: NSObject {
         delegate?.activities(update: activities[index], reloadNeeded: true)
     }
     
-    fileprivate func handleGroupOrReloadTable() {
+    fileprivate func handleGroupOrReloadTable(for activity: Activity) {
         guard isGroupAlreadyFinished else {
             guard group != nil else {
-                delegate?.activities(didFinishFetching: true, activities: activities)
+                delegate?.activities(didFinishFetching: true, activities: activities, newActivity: activity)
                 return
             }
             group.leave()
             return
         }
-        delegate?.activities(didFinishFetching: true, activities: activities)
+        
+        delegate?.activities(didFinishFetching: true, activities: activities, newActivity: activity)
     }
     
     var activitiesChangesHandle = [(handle: DatabaseHandle, activityID: String)]()

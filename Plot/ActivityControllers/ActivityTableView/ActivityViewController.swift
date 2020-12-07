@@ -56,6 +56,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     let activityView = ActivityView()
     
     weak var delegate: HomeBaseActivities?
+    weak var activityIndicatorDelegate: MasterContainerActivityIndicatorDelegate?
     
     var searchBar: UISearchBar?
     var searchController: UISearchController?
@@ -88,6 +89,15 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var activityDates = [String]()
     
+    var hasLoadedCalendarEventActivities = false
+    
+    var eventKitManager: EventKitManager = {
+        let eventKitSetupAssistant = EventKitSetupAssistant()
+        let eventKitService = EventKitService(setupAssistant: eventKitSetupAssistant)
+        let eventKitManager = EventKitManager(eventKitService: eventKitService)
+        return eventKitManager
+    }()
+    
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd"
@@ -111,7 +121,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
         addObservers()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -879,7 +888,7 @@ extension ActivityViewController: ActivityUpdatesDelegate {
                                                               activityPriority: .lowMedium, color: ThemeManager.currentTheme().generalTitleColor)
     }
     
-    func activities(didFinishFetching: Bool, activities: [Activity]) {
+    func activities(didFinishFetching: Bool, activities: [Activity], newActivity: Activity?) {
         checkForDataMigration(forActivities: activities)
         
         let (pinned, unpinned) = activities.stablePartition { (element) -> Bool in
@@ -890,7 +899,15 @@ extension ActivityViewController: ActivityUpdatesDelegate {
         self.pinnedActivities = pinned
         self.activities = unpinned
         
-        fetchInvitations()
+        var isActivityCalendarEvent = false
+        if let newActivity = newActivity, let type = CustomType(rawValue: newActivity.activityType ?? ""), type == .iOSCalendarEvent {
+            // don't update and reload for calendar events
+            isActivityCalendarEvent = true
+        }
+        
+        if !isActivityCalendarEvent {
+            fetchInvitations()
+        }
     }
     
     func activities(update activity: Activity, reloadNeeded: Bool) {
@@ -942,13 +959,54 @@ extension ActivityViewController: ActivityUpdatesDelegate {
 extension ActivityViewController {
     func fetchInvitations() {
         print("fetchInvitations")
-        invitationsFetcher.fetchInvitations { (invitations, activitiesForInvitations) in
-            self.invitations = invitations
-            self.invitedActivities = activitiesForInvitations
-            self.handleReloadTable()
-            self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .mediumHigh)
-            self.observeInvitationForCurrentUser()
+        invitationsFetcher.fetchInvitations { [weak self] (invitations, activitiesForInvitations) in
+            guard let weakSelf = self else { return }
+            
+            weakSelf.invitations = invitations
+            weakSelf.invitedActivities = activitiesForInvitations
+            weakSelf.handleReloadTable()
+            weakSelf.navigationItemActivityIndicator.hideActivityIndicator(for: weakSelf.navigationItem, activityPriority: .mediumHigh)
+            weakSelf.observeInvitationForCurrentUser()
+            
+            if !weakSelf.hasLoadedCalendarEventActivities {
+                weakSelf.hasLoadedCalendarEventActivities = true
+                // Comment out the block below to stop the sync
+                DispatchQueue.main.async {
+                    weakSelf.activityIndicatorDelegate?.showActivityIndicator()
+                    if let _ = Auth.auth().currentUser {
+                        weakSelf.eventKitManager.syncEventKitActivities {
+                            DispatchQueue.main.async {
+                                weakSelf.handleReloadTable()
+                                weakSelf.activityIndicatorDelegate?.hideActivityIndicator()
+                            }
+                        }
+                    }
+                }
+                
+                // Uncomment this line to clean the calendar events. The app might freeze for a bit and/or require a restart
+//                DispatchQueue.global().async {
+//                    weakSelf.cleanCalendarEventActivities()
+//                }
+            }
         }
+    }
+    
+    func cleanCalendarEventActivities() {
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
+            
+            return
+        }
+        
+        for activity in self.activities {
+            if activity.activityType == "calendarEvent" || activity.activityType == "iOSCalendarEvent", let activityID = activity.activityID {
+                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID)
+                let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID)
+                activityReference.removeValue()
+                userActivityReference.removeValue()
+            }
+        }
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
+        reference.removeValue()
     }
     
     func observeInvitationForCurrentUser() {
