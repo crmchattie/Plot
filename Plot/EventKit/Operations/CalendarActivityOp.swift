@@ -76,6 +76,7 @@ class CalendarActivityOp: AsyncOperation {
     private func createActivity(for activityID: String) -> Activity {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         update(activity: activity)
+        activity.category = ActivityCategorySelector.selectCategory(for: activity)
         return activity
     }
     
