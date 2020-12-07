@@ -24,11 +24,13 @@ class HealthKitManager {
         self.metrics = [:]
         self.activities = []
         self.queue = OperationQueue()
-        //self.queue.maxConcurrentOperationCount = 1
     }
     
     func loadHealthKitActivities(_ completion: @escaping ([String: [HealthMetric]], Bool) -> Void) {
-        guard !isRunning else { return }
+        guard !isRunning else {
+            completion([:], false)
+            return
+        }
         
         // Start clean
         metrics = [:]

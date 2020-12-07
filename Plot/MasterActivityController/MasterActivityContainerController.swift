@@ -14,6 +14,11 @@ protocol ManageAppearanceHome: class {
     func manageAppearanceHome(_ homeController: MasterActivityContainerController, didFinishLoadingWith state: Bool )
 }
 
+protocol MasterContainerActivityIndicatorDelegate: class {
+    func showActivityIndicator()
+    func hideActivityIndicator()
+}
+
 class MasterActivityContainerController: UIViewController {
     
     var contacts = [CNContact]()
@@ -177,6 +182,7 @@ class MasterActivityContainerController: UIViewController {
         setupViews()
         setNavBar()
         activitiesVC.delegate = self
+        activitiesVC.activityIndicatorDelegate = self
         chatsVC.delegate = self
         listsVC.delegate = self
         financeVC.delegate = self
@@ -562,5 +568,17 @@ extension MasterActivityContainerController: HomeBaseHealth {
 extension MasterActivityContainerController: EndedWebViewDelegate {
     func updateMXMembers() {
         financeVC.getMXData()
+    }
+}
+
+extension MasterActivityContainerController: MasterContainerActivityIndicatorDelegate {
+    func showActivityIndicator() {
+        navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .updating,
+                                                              activityPriority: .medium,
+                                                              color: ThemeManager.currentTheme().generalTitleColor)
+    }
+    
+    func hideActivityIndicator() {
+        self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .medium)
     }
 }

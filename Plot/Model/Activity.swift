@@ -454,7 +454,7 @@ class Activity: NSObject, NSCopying, Codable {
 }
 
 enum CustomType: String, Equatable, Hashable {
-    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood
+    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent
     
     var categoryText: String {
         switch self {
@@ -470,6 +470,8 @@ enum CustomType: String, Equatable, Hashable {
         case .sleep: return "Bedtime"
         case .work: return "Start of Work"
         case .mood: return "Add a mood"
+        case .iOSCalendarEvent: return "iOS Calendar Event"
+
         }
     }
     
@@ -483,7 +485,7 @@ enum CustomType: String, Equatable, Hashable {
         case .flight: return "Look up your flight details based on flight number, airline or airport"
         case .sleep: return "Wake Up"
         case .work: return "End of Work"
-        case .transaction, .financialAccount, .transactionRule, .mood: return ""
+        case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent: return ""
         }
     }
     
@@ -501,6 +503,7 @@ enum CustomType: String, Equatable, Hashable {
         case .sleep: return "sleep"
         case .work: return "work"
         case .mood: return "mood"
+        case .iOSCalendarEvent: return ""
         }
     }
 }
