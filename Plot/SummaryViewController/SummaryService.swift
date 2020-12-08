@@ -84,15 +84,11 @@ class SummaryService: SummaryServiceInterface {
                     totalValue = incomeTransactionDetail.amount + abs(expenseTransactionDetail.amount) + incomeTransactionDetail.amount + expenseTransactionDetail.amount
                     for transactionDetail in transactionDetailsList {
                         if transactionDetail.level == .group {
-                            if transactionDetail.name == "Expense" {
-                                continue
-                            }
-                            if transactionDetail.name == "Difference" {
+                            if transactionDetail.name == "Expense" || transactionDetail.name == "Income" || transactionDetail.name == "Difference" {
                                 let entry = Entry(label: transactionDetail.name, value: abs(transactionDetail.amount) / totalValue, icon: nil)
                                 entries.append(entry)
                             } else {
-                                let entry = Entry(label: transactionDetail.name, value: abs(transactionDetail.amount) / totalValue, icon: nil)
-                                entries.append(entry)
+                                continue
                             }
                         }
                     }

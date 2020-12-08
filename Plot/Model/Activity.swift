@@ -14,7 +14,7 @@ let activitiesEntity = "activities"
 let userActivitiesEntity = "user-activities"
 
 let userActivityCategoriesEntity = "user-activities-categories"
-var activityCategories = ["Sleep", "Meal", "Work", "Social", "Relax", "Exercise", "Family", "Free", "Personal", "Uncategorized", "Not Applicable"]
+var activityCategories = ["Sleep", "Meal", "Work", "Social", "Leisure", "Exercise", "Family", "Personal", "Uncategorized", "Not Applicable"]
 
 class Activity: NSObject, NSCopying, Codable {
     var activityID: String?
@@ -520,7 +520,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
             }
         }
         let duration = Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)
-        if let type = activity.category {
+        if let type = activity.category, type != "Not Applicable" {
             if categoryDict[type] == nil {
                 categoryDict[type] = duration
                 activitiesDict[type] = [activity]

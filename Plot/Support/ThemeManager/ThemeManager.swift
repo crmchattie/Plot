@@ -318,15 +318,17 @@ open class ChartColors: NSObject
     {
         return [
             UIColor(red: 0/255.0, green: 127/255.0, blue: 255/255.0, alpha: 1.0),
-            UIColor(red: 123/255.0, green: 104/255.0, blue: 142/255.0, alpha: 1.0),
             UIColor(red: 246/255.0, green: 81/255.0, blue: 29/255.0, alpha: 1.0),
-            UIColor(red: 251/255.0, green: 131/255.0, blue: 31/255.0, alpha: 1.0),
             UIColor(red: 255/255.0, green: 180/255.0, blue: 0/255.0, alpha: 1.0),
-            UIColor(red: 191/255.0, green: 192/255.0, blue: 0/255.0, alpha: 1.0),
             UIColor(red: 127/255.0, green: 184/255.0, blue: 0/255.0, alpha: 1.0),
-            UIColor(red: 70/255.0, green: 114/255.0, blue: 42/255.0, alpha: 1.0),
             UIColor(red: 13/255.0, green: 44/255.0, blue: 84/255.0, alpha: 1.0),
+            
+            UIColor(red: 123/255.0, green: 104/255.0, blue: 142/255.0, alpha: 1.0),
+            UIColor(red: 251/255.0, green: 131/255.0, blue: 31/255.0, alpha: 1.0),
+            UIColor(red: 191/255.0, green: 192/255.0, blue: 0/255.0, alpha: 1.0),
+            UIColor(red: 70/255.0, green: 114/255.0, blue: 42/255.0, alpha: 1.0),
             UIColor(red: 35/255.0, green: 63/255.0, blue: 190/255.0, alpha: 1.0),
+            
             UIColor(red: 187/255.0, green: 118/255.0, blue: 79/255.0, alpha: 1.0),
             UIColor(red: 221/255.0, green: 157/255.0, blue: 8/255.0, alpha: 1.0),
             UIColor(red: 131/255.0, green: 148/255.0, blue: 21/255.0, alpha: 1.0),
