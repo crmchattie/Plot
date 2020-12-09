@@ -146,6 +146,46 @@ extension ActivityViewController {
         }
     }
     
+    func updateCategory(for activities: [Activity]) {
+        categoryUpdateDispatchGroup = DispatchGroup()
+        
+        for activity in activities {
+            if let activityID = activity.activityID, (activity.category == nil || activity.category == "" || activity.category == "Uncategorized") {
+                var category = ""
+                if let type = activity.activityType, !type.isEmpty {
+                    if let activityType = CustomType(rawValue: type) {
+                        switch activityType {
+                        case .workout:
+                            category = "Exercise"
+                        case .work:
+                            category = "Work"
+                        case .meal:
+                            category = "Meal"
+                        default:
+                            category = ""
+                        }
+                    }
+                    
+                }
+                
+                if category.isEmpty {
+                    category = ActivityCategorySelector.selectCategory(for: activity)
+                }
+            
+                activity.category = category
+                let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+                categoryUpdateDispatchGroup?.enter()
+                activityReference.updateChildValues(["category": category]) { [weak self] (error, ref) in
+                    self?.categoryUpdateDispatchGroup?.leave()
+                }
+            }
+        }
+        
+        categoryUpdateDispatchGroup?.notify(queue: .main) { [weak self] in
+            self?.handleReloadTable()
+        }
+    }
+    
     func checkForDataMigration(forActivities activities: [Activity]) {
         let defaults = UserDefaults.standard
         guard let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String else {
@@ -155,21 +195,23 @@ extension ActivityViewController {
         let previousVersion = defaults.string(forKey: kAppVersionKey)
         let minVersion = "1.0.1"
         let maxVersion = "1.0.14"
+        let versionBeforeActivityCategory = "1.0.16"
         //current app version is greater than min version and lesser than max version
         let firstCondition = (previousVersion == nil && currentAppVersion.compare(minVersion, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
+        
+        let activityCategoryCondition = (previousVersion == nil && currentAppVersion.compare(versionBeforeActivityCategory, options: .numeric) == .orderedDescending) || (previousVersion != nil && currentAppVersion.compare(previousVersion!, options: .numeric) == .orderedDescending && previousVersion!.compare(versionBeforeActivityCategory, options: .numeric) == .orderedAscending)
+        
         //current app version is greater than previous version and lesser than max version
         let secondCondition = (previousVersion != nil && currentAppVersion.compare(previousVersion!, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
         if firstCondition || secondCondition {
             // first launch
             createChecklists(forActivities: activities)
-            defaults.setValue(currentAppVersion, forKey: kAppVersionKey)
         }
-        else if currentAppVersion == previousVersion {
-            // same version
+        else if activityCategoryCondition {
+            // Update activity category
         }
-        else {
-            // other version
-            defaults.setValue(currentAppVersion, forKey: kAppVersionKey)
-        }
+        
+        // Always set this
+        defaults.setValue(currentAppVersion, forKey: kAppVersionKey)
     }
 }

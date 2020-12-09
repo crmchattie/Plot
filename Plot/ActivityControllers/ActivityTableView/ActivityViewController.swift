@@ -90,7 +90,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     var activityDates = [String]()
     
     var hasLoadedCalendarEventActivities = false
-    
+    var categoryUpdateDispatchGroup: DispatchGroup?
+        
     var eventKitManager: EventKitManager = {
         let eventKitSetupAssistant = EventKitSetupAssistant()
         let eventKitService = EventKitService(setupAssistant: eventKitSetupAssistant)
