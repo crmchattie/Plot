@@ -14,7 +14,7 @@ let activitiesEntity = "activities"
 let userActivitiesEntity = "user-activities"
 
 let userActivityCategoriesEntity = "user-activities-categories"
-var activityCategories = ["Sleep", "Meal", "Work", "Social", "Leisure", "Exercise", "Family", "Personal", "Uncategorized", "Not Applicable"]
+var activityCategories = ["Sleep", "Meal", "Work", "Social", "Leisure", "Exercise", "Family", "Personal", "Mindfulness", "Uncategorized", "Not Applicable"]
 
 class Activity: NSObject, NSCopying, Codable {
     var activityID: String?
@@ -454,7 +454,7 @@ class Activity: NSObject, NSCopying, Codable {
 }
 
 enum CustomType: String, Equatable, Hashable {
-    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent
+    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness
     
     var categoryText: String {
         switch self {
@@ -471,6 +471,7 @@ enum CustomType: String, Equatable, Hashable {
         case .work: return "Start of Work"
         case .mood: return "Add a mood"
         case .iOSCalendarEvent: return "iOS Calendar Event"
+        case .mindfulness: return "Add mindfulness minutes"
 
         }
     }
@@ -485,7 +486,7 @@ enum CustomType: String, Equatable, Hashable {
         case .flight: return "Look up your flight details based on flight number, airline or airport"
         case .sleep: return "Wake Up"
         case .work: return "End of Work"
-        case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent: return ""
+        case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent, .mindfulness: return ""
         }
     }
     
@@ -504,6 +505,7 @@ enum CustomType: String, Equatable, Hashable {
         case .work: return "work"
         case .mood: return "mood"
         case .iOSCalendarEvent: return ""
+        case .mindfulness: return "mindfulness"
         }
     }
 }

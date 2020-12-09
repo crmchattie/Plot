@@ -103,6 +103,8 @@
 		1092F23E2414587E00E8CE16 /* RecipeExpandedDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23D2414587E00E8CE16 /* RecipeExpandedDetailViewController.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
 		1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */; };
+		10970B0E25803F450027A9EF /* Mindfulness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B0D25803F450027A9EF /* Mindfulness.swift */; };
+		10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B13258060860027A9EF /* MindfulnessViewController.swift */; };
 		109F848E23D60113002C0044 /* ActivitySubTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109F848D23D60113002C0044 /* ActivitySubTypeViewController.swift */; };
 		109F849023D607C6002C0044 /* RecipeTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109F848F23D607C6002C0044 /* RecipeTypeViewController.swift */; };
 		109F849923D6860D002C0044 /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109F849823D6860D002C0044 /* FilterViewController.swift */; };
@@ -544,6 +546,8 @@
 		1092F23D2414587E00E8CE16 /* RecipeExpandedDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeExpandedDetailViewController.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
 		1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectActivityTableViewController.swift; sourceTree = "<group>"; };
+		10970B0D25803F450027A9EF /* Mindfulness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mindfulness.swift; sourceTree = "<group>"; };
+		10970B13258060860027A9EF /* MindfulnessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindfulnessViewController.swift; sourceTree = "<group>"; };
 		109F848D23D60113002C0044 /* ActivitySubTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySubTypeViewController.swift; sourceTree = "<group>"; };
 		109F848F23D607C6002C0044 /* RecipeTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeTypeViewController.swift; sourceTree = "<group>"; };
 		109F849823D6860D002C0044 /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
@@ -1026,6 +1030,7 @@
 				10B2BC04257D389A00E3A798 /* MoodViewControllers */,
 				10B2BC03257D386E00E3A798 /* SchedulerViewControllers */,
 				1037E4322550CD7400F4EE42 /* FoodViewControllers */,
+				10970B122580605D0027A9EF /* MindfulnessViewController */,
 				10DFC3B0255A142000565DAD /* WorkoutViewControllers */,
 			);
 			path = HealthViewController;
@@ -1101,6 +1106,14 @@
 				1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */,
 			);
 			path = SummaryViewController;
+			sourceTree = "<group>";
+		};
+		10970B122580605D0027A9EF /* MindfulnessViewController */ = {
+			isa = PBXGroup;
+			children = (
+				10970B13258060860027A9EF /* MindfulnessViewController.swift */,
+			);
+			path = MindfulnessViewController;
 			sourceTree = "<group>";
 		};
 		10B2BC03257D386E00E3A798 /* SchedulerViewControllers */ = {
@@ -1950,6 +1963,7 @@
 				10F3033124EC700C00C04B8F /* Transaction.swift */,
 				105F66EA2415942B00F6EDB6 /* Workout.swift */,
 				10B2BBAA257ACC7200E3A798 /* Scheduler.swift */,
+				10970B0D25803F450027A9EF /* Mindfulness.swift */,
 				10B2BBAE257ACC9000E3A798 /* Mood.swift */,
 				101B908F2457999600EDDB90 /* Weather.swift */,
 				100A53F223E3BDAC004AA952 /* Filter.swift */,
@@ -2517,6 +2531,7 @@
 				109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */,
 				10DFC3EB255CC3EA00565DAD /* MealActions.swift in Sources */,
 				4BAEE5B5212735E50045AB10 /* INSPhotosDataSource.swift in Sources */,
+				10970B0E25803F450027A9EF /* Mindfulness.swift in Sources */,
 				10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */,
 				4BAEE4FA21272D890045AB10 /* ChatLogController+MediaPickerHandlers.swift in Sources */,
 				1017D32B24F2B746001D7CBE /* MXHolding.swift in Sources */,
@@ -2653,6 +2668,7 @@
 				26036766256CC88900FE9142 /* EventKitService.swift in Sources */,
 				2603676C256CD9A000FE9142 /* EventKitManager.swift in Sources */,
 				4B6521F8219B3A0A00FF655E /* ChatLogController+GroupMembersDelegate.swift in Sources */,
+				10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */,
 				10C83346249AD8EA0037F638 /* FoursquareVenueSearchResult.swift in Sources */,
 				4BAEE49A21272C5E0045AB10 /* ContactsController.swift in Sources */,
 				4BAEE46A21272B380045AB10 /* StorageTableViewController.swift in Sources */,

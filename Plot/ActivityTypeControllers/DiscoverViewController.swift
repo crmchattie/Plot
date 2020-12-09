@@ -19,8 +19,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
-    var customTypes: [CustomType] = [.basic, .meal, .workout, .mood, .sleep, .work, .transaction, .financialAccount]
-    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mood, .sleep, .work, .customTransaction, .customFinancialAccount]
+    var customTypes: [CustomType] = [.basic, .meal, .workout, .mood, .mindfulness, .sleep, .work, .transaction, .financialAccount]
+    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mood, .mindfulness, .sleep, .work, .customTransaction, .customFinancialAccount]
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0
@@ -210,14 +210,18 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 destination.hidesBottomBarWhenPushed = true
                 destination.users = self.users
                 destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
                 self.navigationController?.pushViewController(destination, animated: true)
             case .workout:
                 let destination = WorkoutViewController()
                 destination.hidesBottomBarWhenPushed = true
                 destination.users = self.users
                 destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
+                self.navigationController?.pushViewController(destination, animated: true)
+            case .mindfulness:
+                let destination = MindfulnessViewController()
+                destination.hidesBottomBarWhenPushed = true
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mood:
                 let destination = MoodViewController()

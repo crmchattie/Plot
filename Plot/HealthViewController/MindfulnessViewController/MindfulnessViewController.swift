@@ -1,8 +1,8 @@
 //
-//  WorkoutViewController.swift
+//  MindfulnessViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 11/9/20.
+//  Created by Cory McHattie on 12/8/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
@@ -12,15 +12,16 @@ import SplitRow
 import Firebase
 import CodableFirebase
 
-protocol UpdateWorkoutDelegate: class {
-    func updateWorkout(workout: Workout)
-}
-
-class WorkoutViewController: FormViewController {
-    weak var delegate : UpdateWorkoutDelegate?
+class MindfulnessViewController: FormViewController {
+    var mindfulness: Mindfulness!
     
-    var workout: Workout!
+    fileprivate var active: Bool = true
+    fileprivate var movingBackwards: Bool = true
     
+    fileprivate var productIndex: Int = 0
+    
+    let numberFormatter = NumberFormatter()
+        
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
@@ -28,26 +29,21 @@ class WorkoutViewController: FormViewController {
     var userNames : [String] = []
     var userNamesString: String = ""
     
-    fileprivate var active: Bool = false
-    fileprivate var movingBackwards: Bool = true
-    
-    fileprivate var productIndex: Int = 0
-    
-    let numberFormatter = NumberFormatter()
-    
-    var timer: Timer?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         numberFormatter.numberStyle = .decimal
         
-        if workout != nil {
-            active = true
-            
+        if mindfulness == nil {
+            active = false
+            if let currentUserID = Auth.auth().currentUser?.uid {
+                let ID = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).childByAutoId().key ?? ""
+                mindfulness = Mindfulness(id: ID, name: nil, startDateTime: nil, endDateTime: nil, lastModifiedDate: Date(), createdDate: Date())
+            }
+        } else {
             var participantCount = self.selectedFalconUsers.count
             
             // If user is creating this activity (admin)
-            if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
+            if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
                 participantCount += 1
             }
             
@@ -61,24 +57,14 @@ class WorkoutViewController: FormViewController {
                 inviteesRow.title = self.userNamesString
                 inviteesRow.updateCell()
             }
-        } else {
-            if let currentUserID = Auth.auth().currentUser?.uid {
-                let ID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
-                workout = Workout(id: ID, name: "WorkoutName", admin: currentUserID)
-            }
         }
         configureTableView()
         setupRightBarButton()
         initializeForm()
-        updateCalories()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        if self.movingBackwards {
-            delegate?.updateWorkout(workout: workout)
-        }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return ThemeManager.currentTheme().statusBarStyle
     }
     
     fileprivate func configureTableView() {
@@ -90,156 +76,37 @@ class WorkoutViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Workout"
+        navigationItem.title = "Mindfulness"
     }
     
     func setupRightBarButton() {
-        //        if !active || self.selectedFalconUsers.count == 0 {
         let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
         navigationItem.rightBarButtonItem = plusBarButton
-        //        } else {
-        //            let dotsImage = UIImage(named: "dots")
-        //            if #available(iOS 11.0, *) {
-        //                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-        //
-        //                let dotsBarButton = UIButton(type: .system)
-        //                dotsBarButton.setImage(dotsImage, for: .normal)
-        //                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-        //
-        //                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
-        //            } else {
-        //                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-        //                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-        //                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-        //            }
-        //        }
     }
     
     @objc fileprivate func close() {
-        movingBackwards = false
-        
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        if active {
-            alert.addAction(UIAlertAction(title: "Update Workout", style: .default, handler: { (_) in
-                print("User click Approve button")
-                
-                // update
-                self.showActivityIndicator()
-                let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createWorkout.createNewWorkout()
-                self.hideActivityIndicator()
-                self.navigationController?.popViewController(animated: true)
-                
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Duplicate Workout", style: .default, handler: { (_) in
-                print("User click Approve button")
-                // create new workout with updated time
-                guard self.currentReachabilityStatus != .notReachable else {
-                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-                    return
-                }
-                
-                if let currentUserID = Auth.auth().currentUser?.uid {
-                    self.showActivityIndicator()
-                    let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    createWorkout.createNewWorkout()
-                    
-                    //duplicate workout
-                    let newWorkoutID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
-                    var newWorkout = self.workout!
-                    newWorkout.id = newWorkoutID
-                    newWorkout.admin = currentUserID
-                    newWorkout.participantsIDs = nil
-                    
-                    let createNewWorkout = WorkoutActions(workout: newWorkout, active: false, selectedFalconUsers: [])
-                    createNewWorkout.createNewWorkout()
-                    self.hideActivityIndicator()
-                    
-                    self.navigationController?.popViewController(animated: true)
-                }
-                
-                
-            }))
-            
-        } else {
-            alert.addAction(UIAlertAction(title: "Create New Workout", style: .default, handler: { (_) in
-                print("User click Approve button")
-                // create new activity
-                self.showActivityIndicator()
-                let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createWorkout.createNewWorkout()
-                self.hideActivityIndicator()
-                
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 0)
-                    homeTab.changeToIndex(index: 0)
-                }
-                self.tabBarController?.selectedIndex = 1
-                if #available(iOS 13.0, *) {
-                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-                } else {
-                    // Fallback on earlier versions
-                }
-                
-            }))
-            
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-        
-    }
-    
-    @objc func goToExtras() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        
-        
-        //        alert.addAction(UIAlertAction(title: "Share Grocery List", style: .default, handler: { (_) in
-        //            print("User click Edit button")
-        //            self.share()
-        //        }))
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-        print("shareButtonTapped")
         
     }
     
     func initializeForm() {
-        print("initializing form")
         form +++
-            Section(header: nil, footer: "Calories burned is based on estimates and subject to error as a result")
+            Section()
             
             <<< TextRow("Name") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
-                if active, let workout = workout {
+                if active, let mindfulness = mindfulness {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
-                    $0.value = workout.name
+                    $0.value = mindfulness.name
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                     $0.cell.textField.becomeFirstResponder()
                 }
             }.onChange() { [unowned self] row in
                 if let rowValue = row.value {
-                    self.workout.name = rowValue
+                    self.mindfulness.name = rowValue
                 }
                 if row.value == nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -252,70 +119,27 @@ class WorkoutViewController: FormViewController {
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-            <<< IntRow("Weight") { row in
+            <<< ButtonRow("Participants") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                row.cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
-                row.formatter = numberFormatter
-                if let currentUser = Auth.auth().currentUser?.uid {
-                    let weightReference = Database.database().reference().child("users").child(currentUser).child("weight")
-                    weightReference.observe(.value, with: { (snapshot) in
-                        if let weight = snapshot.value as? Int {
-                            row.value = weight
-                        }
-                    })
+                if active {
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.title = self.userNamesString
                 }
-            }.cellUpdate { cell, row in
+            }.onCellSelection({ _,_ in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange({ row in
-                self.updateCalories()
-                if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
-                    Database.database().reference().child("users").child(currentUser).child("weight").setValue(value)
-                }
-            })
-            
-            <<< PushRow<String>("Type") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.title = row.tag
-                row.value = workout.type?.capitalized
-                row.options = []
-                WorkoutTypes.allCases.sorted().forEach {
-                    row.options?.append($0.rawValue.capitalized)
-                }
-            }.onPresent { from, to in
-                to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Type"
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.textLabel?.textAlignment = .left
+                if row.title == "Participants" {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                } else {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }.onChange({ row in
-                self.workout.type = row.value
-                self.updateCalories()
-            })
-            
-            <<< DecimalRow("Calories Burned") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.formatter = numberFormatter
-                if let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
-                    let duration = Calendar.current.dateComponents([.minute], from: startRow.value!, to: endRow.value!).minute
-                    $0.value = Double(duration ?? 0) * workoutType.caloriesBurned * Double(weightValue)
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
             <<< TextRow("Duration") {
@@ -338,9 +162,7 @@ class WorkoutViewController: FormViewController {
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange({ _ in
-                self.updateCalories()
-            })
+            }
             
             <<< DateTimeInlineRow("Starts") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -351,7 +173,7 @@ class WorkoutViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
-                    $0.value = self.workout!.startDateTime
+                    $0.value = self.mindfulness!.startDateTime
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
@@ -359,7 +181,7 @@ class WorkoutViewController: FormViewController {
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     $0.value = rounded.addingTimeInterval(seconds)
-                    self.workout.startDateTime = $0.value
+                    self.mindfulness.startDateTime = $0.value
                 }
             }.onChange { [weak self] row in
                 let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
@@ -378,7 +200,7 @@ class WorkoutViewController: FormViewController {
                     }
                     durationRow.updateCell()
                 }
-                self!.workout.startDateTime = row.value
+                self!.mindfulness.startDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
                     row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -407,7 +229,7 @@ class WorkoutViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
-                    $0.value = self.workout!.endDateTime
+                    $0.value = self.mindfulness!.endDateTime
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
@@ -415,7 +237,7 @@ class WorkoutViewController: FormViewController {
                     let timezone = TimeZone.current
                     let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
                     $0.value = rounded.addingTimeInterval(seconds + 1800)
-                    self.workout.endDateTime = $0.value
+                    self.mindfulness.endDateTime = $0.value
                 }
             }.onChange { [weak self] row in
                 let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
@@ -434,7 +256,7 @@ class WorkoutViewController: FormViewController {
                     }
                     durationRow.updateCell()
                 }
-                self!.workout.endDateTime = row.value
+                self!.mindfulness.endDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
                     row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -453,37 +275,6 @@ class WorkoutViewController: FormViewController {
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 
             }
-            
-            <<< ButtonRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                if active {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = self.userNamesString
-                }
-            }.onCellSelection({ _,_ in
-                self.openParticipantsInviter()
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textLabel?.textAlignment = .left
-                if row.title == "Participants" {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                } else {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            }
-    }
-    
-    fileprivate func updateCalories() {
-        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
-            let duration = Calendar.current.dateComponents([.minute], from: startRow.value!, to: endRow.value!).minute
-            caloriesRow.value = Double(duration ?? 0) * workoutType.caloriesBurned * Double(weightValue)
-            caloriesRow.updateCell()
-        }
     }
     
     @objc fileprivate func openParticipantsInviter() {
@@ -525,15 +316,15 @@ class WorkoutViewController: FormViewController {
         self.removeSpinner()
     }
     
-    func getSelectedFalconUsers(forWorkout workout: Workout, completion: @escaping ([User])->()) {
-        guard let participantsIDs = workout.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+    func getSelectedFalconUsers(forWorkout mindfulness: Workout, completion: @escaping ([User])->()) {
+        guard let participantsIDs = mindfulness.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         var selectedFalconUsers = [User]()
         let group = DispatchGroup()
         for id in participantsIDs {
             // Only if the current user is created this activity
-            if workout.admin == currentUserID && id == currentUserID {
+            if mindfulness.admin == currentUserID && id == currentUserID {
                 continue
             }
             
@@ -553,16 +344,27 @@ class WorkoutViewController: FormViewController {
             completion(selectedFalconUsers)
         }
     }
+    
+    fileprivate func resetBadgeForSelf() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        let badgeRef = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).child(mindfulness.id).child("badge")
+        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+            var value = mutableData.value as? Int
+            value = 0
+            mutableData.value = value!
+            return TransactionResult.success(withValue: mutableData)
+        })
+    }
 }
 
-extension WorkoutViewController: UpdateInvitees {
+extension MindfulnessViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
             if !selectedFalconUsers.isEmpty {
                 self.selectedFalconUsers = selectedFalconUsers
                 var participantCount = self.selectedFalconUsers.count
                 // If user is creating this activity (admin)
-                if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
+                if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
                     participantCount += 1
                 }
                 if participantCount > 1 {
@@ -582,8 +384,8 @@ extension WorkoutViewController: UpdateInvitees {
             
             if active {
                 showActivityIndicator()
-                let createWorkout = WorkoutActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
-                createWorkout.updateWorkoutParticipants()
+//                let createWorkout = MindfulnessActions(mindfulness: mindfulness, active: active, selectedFalconUsers: selectedFalconUsers)
+//                createWorkout.updateMindfulnessParticipants()
                 hideActivityIndicator()
             }
             

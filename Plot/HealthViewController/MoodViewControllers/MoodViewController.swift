@@ -74,14 +74,14 @@ class MoodViewController: FormViewController {
     fileprivate func initializeForm() {
         form +++ Section()
         
-        <<< DateTimeInlineRow("Day of Mood") {
+        <<< DateTimeInlineRow("Time") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
             $0.minuteInterval = 5
             $0.dateFormatter?.dateStyle = .full
-            $0.dateFormatter?.timeStyle = .none
+            $0.dateFormatter?.timeStyle = .short
             $0.value = mood.moodDate
             }.onChange { [weak self] row in
                 self!.mood.moodDate = row.value
@@ -89,7 +89,7 @@ class MoodViewController: FormViewController {
                 inlineRow.cellUpdate() { cell, row in
                     row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.datePicker.datePickerMode = .date
+                    cell.datePicker.datePickerMode = .dateAndTime
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
                     }

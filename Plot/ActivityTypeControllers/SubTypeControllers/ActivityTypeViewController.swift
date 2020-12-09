@@ -403,14 +403,12 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 destination.hidesBottomBarWhenPushed = true
                 destination.users = self.users
                 destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
                 self.navigationController?.pushViewController(destination, animated: true)
             case "workout":
                 let destination = WorkoutViewController()
                 destination.hidesBottomBarWhenPushed = true
                 destination.users = self.users
                 destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
                 self.navigationController?.pushViewController(destination, animated: true)
             default:
                 print("default")

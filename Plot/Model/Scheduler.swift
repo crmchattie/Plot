@@ -27,8 +27,6 @@ struct Scheduler: Codable, Equatable, Hashable {
     var createdDate: Date?
 }
 
-
-
 func ==(lhs: Scheduler, rhs: Scheduler) -> Bool {
     return lhs.id == rhs.id
 }

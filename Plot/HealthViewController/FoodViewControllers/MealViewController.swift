@@ -24,12 +24,7 @@ class MealViewController: FormViewController {
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
-    
-    var activities = [Activity]()
-    var conversations = [Conversation]()
-    
-    var activity: Activity!
-    
+        
     var userNames : [String] = []
     var userNamesString: String = ""
     
@@ -70,7 +65,6 @@ class MealViewController: FormViewController {
                 inviteesRow.title = self.userNamesString
                 inviteesRow.updateCell()
             }
-            resetBadgeForSelf()
         } else {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userMealsEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -89,17 +83,6 @@ class MealViewController: FormViewController {
         if self.movingBackwards {
             delegate?.updateMeal(meal: meal)
         }
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
-    }
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        guard tableView.isEditing else { return }
-        tableView.endEditing(true)
-        tableView.reloadData()
     }
     
     fileprivate func configureTableView() {
@@ -686,17 +669,6 @@ class MealViewController: FormViewController {
             completion(selectedFalconUsers)
         }
     }
-    
-    fileprivate func resetBadgeForSelf() {
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        let badgeRef = Database.database().reference().child(userMealsEntity).child(currentUserID).child(meal.id).child("badge")
-        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
-            var value = mutableData.value as? Int
-            value = 0
-            mutableData.value = value!
-            return TransactionResult.success(withValue: mutableData)
-        })
-    }
 }
 
 extension MealViewController: UpdateInvitees {
@@ -733,43 +705,6 @@ extension MealViewController: UpdateInvitees {
             }
             
         }
-    }
-}
-
-extension MealViewController: MessagesDelegate {
-    
-    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
-        chatLogController?.updateMessageStatus(messageRef: reference)
-    }
-    
-    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-        
-        chatLogController?.hidesBottomBarWhenPushed = true
-        chatLogController?.messagesFetcher = messagesFetcher
-        chatLogController?.messages = messages
-        chatLogController?.conversation = conversation
-        
-        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
-            chatLogController?.observeTypingIndicator()
-            chatLogController?.configureTitleViewWithOnlineStatus()
-        }
-        
-        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
-        guard let destination = chatLogController else { return }
-        
-        self.chatLogController?.startCollectionViewAtBottom()
-        
-        
-        // If we're presenting a modal sheet
-        if let presentedViewController = presentedViewController as? UINavigationController {
-            presentedViewController.pushViewController(destination, animated: true)
-        } else {
-            navigationController?.pushViewController(destination, animated: true)
-        }
-        
-        chatLogController = nil
-        messagesFetcher?.delegate = nil
-        messagesFetcher = nil
     }
 }
 
