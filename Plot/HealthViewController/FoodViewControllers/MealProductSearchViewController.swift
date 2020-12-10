@@ -182,48 +182,49 @@ class MealProductSearchViewController: UIViewController {
         if let groceryID = groceryID {
             dispatchGroup.enter()
             Service.shared.fetchGroceryProductInfo(id: groceryID) { (search, err) in
-                let product = search
                 dispatchGroup.leave()
-                dispatchGroup.notify(queue: .main) {
-                    self.movingBackwards = false
-                    let destination = GroceryProductDetailViewController()
-                    destination.delegate = self
-                    destination.active = false
-                    destination.product = product
-                    destination.searchController = "MealSearch"
-                    self.navigationController?.pushViewController(destination, animated: true)
+                if let product = search {
+                    dispatchGroup.notify(queue: .main) {
+                        self.movingBackwards = false
+                        let destination = GroceryProductDetailViewController()
+                        destination.delegate = self
+                        destination.active = false
+                        destination.product = product
+                        destination.searchController = "MealSearch"
+                        self.navigationController?.pushViewController(destination, animated: true)
+                    }
                 }
-
             }
         } else if let menuID = menuID {
             dispatchGroup.enter()
             Service.shared.fetchMenuProductInfo(id: menuID) { (search, err) in
-                let product = search
                 dispatchGroup.leave()
-                dispatchGroup.notify(queue: .main) {
-                    self.movingBackwards = false
-                    let destination = MenuProductDetailViewController()
-                    destination.delegate = self
-                    destination.active = false
-                    destination.product = product
-                    destination.searchController = "MealSearch"
-                    self.navigationController?.pushViewController(destination, animated: true)
+                if let product = search {
+                    dispatchGroup.notify(queue: .main) {
+                        self.movingBackwards = false
+                        let destination = MenuProductDetailViewController()
+                        destination.delegate = self
+                        destination.active = false
+                        destination.product = product
+                        destination.searchController = "MealSearch"
+                        self.navigationController?.pushViewController(destination, animated: true)
+                    }
                 }
             }
         } else if let ingredientID = ingredientID {
             dispatchGroup.enter()
             Service.shared.fetchIngredientInfo(id: ingredientID, amount: 1, unit: nil) { (search, err) in
-                let ingredient = search
                 dispatchGroup.leave()
-
-                dispatchGroup.notify(queue: .main) {
-                    self.movingBackwards = false
-                    let destination = IngredientDetailViewController()
-                    destination.delegate = self
-                    destination.active = false
-                    destination.ingredient = ingredient
-                    destination.searchController = "MealSearch"
-                    self.navigationController?.pushViewController(destination, animated: true)
+                if let ingredient = search {
+                    dispatchGroup.notify(queue: .main) {
+                        self.movingBackwards = false
+                        let destination = IngredientDetailViewController()
+                        destination.delegate = self
+                        destination.active = false
+                        destination.ingredient = ingredient
+                        destination.searchController = "MealSearch"
+                        self.navigationController?.pushViewController(destination, animated: true)
+                    }
                 }
             }
         }

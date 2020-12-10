@@ -368,7 +368,7 @@ class MealViewController: FormViewController {
                 }
             }
         
-            <<< DecimalRow("Servings") {
+            <<< DecimalRow("Amount") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag

@@ -31,7 +31,9 @@ class MenuProductDetailViewController: FormViewController {
         initializeForm()
         
         for row in form.rows {
-            row.baseCell.isUserInteractionEnabled = false
+            if row.tag != "Amount" {
+                row.baseCell.isUserInteractionEnabled = false
+            }
         }
       
     }
@@ -90,7 +92,9 @@ class MenuProductDetailViewController: FormViewController {
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
-            $0.value = product.title.capitalized
+            if let product = product {
+                $0.value = product.title.capitalized
+            }
             }.cellUpdate { cell, _ in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -113,14 +117,17 @@ class MenuProductDetailViewController: FormViewController {
         form.last!
         <<< DecimalRow("Amount") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
             $0.formatter = numberFormatter
-            $0.value = product.amount
+            if let product = product {
+                $0.value = product.amount
+            }
         }.cellUpdate { cell, row in
             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }.onChange { _ in
+            cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        }.onChange { row in
+            self.product.amount = row.value
             self.timer?.invalidate()
             
             self.timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (_) in
@@ -128,7 +135,7 @@ class MenuProductDetailViewController: FormViewController {
             })
         }
         
-        if let servingSize = product.servingSize {
+        if let product = product, let servingSize = product.servingSize {
             form.last!
             <<< LabelRow("Servings") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

@@ -31,7 +31,9 @@ class GroceryProductDetailViewController: FormViewController {
         initializeForm()
         
         for row in form.rows {
-            row.baseCell.isUserInteractionEnabled = false
+            if row.tag != "Amount" {
+                row.baseCell.isUserInteractionEnabled = false
+            }
         }
       
     }
@@ -104,25 +106,7 @@ class GroceryProductDetailViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
         
-        <<< DecimalRow("Amount") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.title = $0.tag
-            $0.formatter = numberFormatter
-            $0.value = product.amount
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }.onChange { _ in
-            self.timer?.invalidate()
-            
-            self.timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (_) in
-                self.calcNutrition()
-            })
-        }
-            
-        
-        if let number_of_servings = product.number_of_servings, let serving_size = product.serving_size {
+        if let product = product, let number_of_servings = product.number_of_servings, let serving_size = product.serving_size {
             form.last!
             <<< LabelRow("Servings") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -134,6 +118,27 @@ class GroceryProductDetailViewController: FormViewController {
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
+        }
+        
+        form.last!
+        <<< DecimalRow("Amount") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.title = $0.tag
+            $0.formatter = numberFormatter
+            if let product = product {
+                $0.value = product.amount
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        }.onChange { row in
+            self.product.amount = row.value
+            self.timer?.invalidate()
+            
+            self.timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (_) in
+                self.calcNutrition()
+            })
         }
     }
     

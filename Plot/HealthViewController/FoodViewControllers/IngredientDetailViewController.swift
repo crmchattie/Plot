@@ -129,7 +129,7 @@ class IngredientDetailViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
         
-        <<< DecimalRow("Total Amount") {
+        <<< DecimalRow("Amount") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.textField.textColor = ThemeManager.currentTheme().generalSubtitleColor
