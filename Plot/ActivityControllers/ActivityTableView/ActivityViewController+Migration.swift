@@ -165,7 +165,6 @@ extension ActivityViewController {
                             category = ""
                         }
                     }
-                    
                 }
                 
                 if category.isEmpty {
@@ -199,7 +198,8 @@ extension ActivityViewController {
         //current app version is greater than min version and lesser than max version
         let firstCondition = (previousVersion == nil && currentAppVersion.compare(minVersion, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
         
-        let activityCategoryCondition = (previousVersion == nil && currentAppVersion.compare(versionBeforeActivityCategory, options: .numeric) == .orderedDescending) || (previousVersion != nil && currentAppVersion.compare(previousVersion!, options: .numeric) == .orderedDescending && previousVersion!.compare(versionBeforeActivityCategory, options: .numeric) == .orderedAscending)
+        let comparePrevVerActCat = previousVersion!.compare(versionBeforeActivityCategory, options: .numeric)
+        let activityCategoryCondition = (previousVersion == nil && currentAppVersion.compare(versionBeforeActivityCategory, options: .numeric) == .orderedDescending) || (previousVersion != nil && currentAppVersion.compare(previousVersion!, options: .numeric) == .orderedDescending && (comparePrevVerActCat == .orderedAscending || comparePrevVerActCat == .orderedSame))
         
         //current app version is greater than previous version and lesser than max version
         let secondCondition = (previousVersion != nil && currentAppVersion.compare(previousVersion!, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
@@ -208,7 +208,7 @@ extension ActivityViewController {
             createChecklists(forActivities: activities)
         }
         else if activityCategoryCondition {
-            // Update activity category
+            updateCategory(for: activities)
         }
         
         // Always set this
