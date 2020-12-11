@@ -96,8 +96,8 @@ extension ActivityCell {
         startLabel.numberOfLines = dateTimeValueArray.0
         startLabel.text = dateTimeValueArray.1
                 
-        if activity.activityType != "nothing" && activity.activityType != nil {
-            activityTypeLabel.text = activity.activityType
+        if activity.category != nil {
+            activityTypeLabel.text = activity.category
         } else {
             activityTypeLabel.text = nil
         }

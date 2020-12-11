@@ -86,6 +86,8 @@
 		1075ED21256C175A00AB2B0A /* DiscoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */; };
+		108087172583E72300FB9BB0 /* SummaryBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087162583E72300FB9BB0 /* SummaryBarChartCell.swift */; };
+		1080871B2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1080871A2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift */; };
 		1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */; };
 		1082C89524F0A8F500CF6491 /* FinanceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082C89424F0A8F500CF6491 /* FinanceViewController.swift */; };
 		1082C89724F0A91500CF6491 /* HealthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082C89624F0A91500CF6491 /* HealthViewController.swift */; };
@@ -529,6 +531,8 @@
 		1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListTableViewCell.swift; sourceTree = "<group>"; };
+		108087162583E72300FB9BB0 /* SummaryBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryBarChartCell.swift; sourceTree = "<group>"; };
+		1080871A2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryBarChartGroupedCell.swift; sourceTree = "<group>"; };
 		1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCell.swift; sourceTree = "<group>"; };
 		1082C89424F0A8F500CF6491 /* FinanceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceViewController.swift; sourceTree = "<group>"; };
 		1082C89624F0A91500CF6491 /* HealthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthViewController.swift; sourceTree = "<group>"; };
@@ -1104,6 +1108,8 @@
 				108841D1257004F10064C5F8 /* SummaryViewController.swift */,
 				1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */,
 				1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */,
+				108087162583E72300FB9BB0 /* SummaryBarChartCell.swift */,
+				1080871A2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift */,
 			);
 			path = SummaryViewController;
 			sourceTree = "<group>";
@@ -2835,6 +2841,7 @@
 				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,
 				4BAEE5DC212735E50045AB10 /* AnimationController.swift in Sources */,
 				4BAEE4FD21272D890045AB10 /* BaseVoiceMessageCell.swift in Sources */,
+				1080871B2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift in Sources */,
 				4BAEE5DB212735E50045AB10 /* ImageCell.swift in Sources */,
 				10F3032524EB746E00C04B8F /* AccountsTableViewController.swift in Sources */,
 				2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */,
@@ -2844,6 +2851,7 @@
 				4BAEE5F4212735E50045AB10 /* CenteredCollectionViewFlowLayout.swift in Sources */,
 				4B5E99E0212CC0D5001F067F /* ConversationsFetcher.swift in Sources */,
 				4BAEE547212735200045AB10 /* SplashScreenContainer.swift in Sources */,
+				108087172583E72300FB9BB0 /* SummaryBarChartCell.swift in Sources */,
 				10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */,
 				10DFC3E7255CC3DA00565DAD /* WorkoutActions.swift in Sources */,
 				10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */,
