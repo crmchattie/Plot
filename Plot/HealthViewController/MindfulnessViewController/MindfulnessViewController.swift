@@ -16,7 +16,6 @@ class MindfulnessViewController: FormViewController {
     var mindfulness: Mindfulness!
     
     fileprivate var active: Bool = true
-    fileprivate var movingBackwards: Bool = true
     
     fileprivate var productIndex: Int = 0
     
@@ -61,6 +60,7 @@ class MindfulnessViewController: FormViewController {
         configureTableView()
         setupRightBarButton()
         initializeForm()
+        updateLength()
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -85,7 +85,79 @@ class MindfulnessViewController: FormViewController {
     }
     
     @objc fileprivate func close() {
-        
+        if active {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "Update Mindfulness", style: .default, handler: { (_) in
+                print("User click Approve button")
+                
+                // update
+                self.showActivityIndicator()
+                let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createMindfulness.createNewMindfulness()
+                self.hideActivityIndicator()
+                self.navigationController?.popViewController(animated: true)
+                
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Duplicate Mindfulness", style: .default, handler: { (_) in
+                print("User click Approve button")
+                // create new mindfulness with updated time
+                guard self.currentReachabilityStatus != .notReachable else {
+                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+                    return
+                }
+                
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    self.showActivityIndicator()
+                    let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    createMindfulness.createNewMindfulness()
+                    
+                    //duplicate mindfulness
+                    let newMindfulnessID = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).childByAutoId().key ?? ""
+                    var newMindfulness = self.mindfulness!
+                    newMindfulness.id = newMindfulnessID
+                    newMindfulness.admin = currentUserID
+                    newMindfulness.participantsIDs = nil
+                    
+                    let createNewMindfulness = MindfulnessActions(mindfulness: newMindfulness, active: false, selectedFalconUsers: [])
+                    createNewMindfulness.createNewMindfulness()
+                    self.hideActivityIndicator()
+                    
+                    self.navigationController?.popViewController(animated: true)
+                }
+                
+                
+            }))
+            
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            
+        } else {
+            self.showActivityIndicator()
+            let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createMindfulness.createNewMindfulness()
+            self.hideActivityIndicator()
+            
+            let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+            if nav.topViewController is MasterActivityContainerController {
+                let homeTab = nav.topViewController as! MasterActivityContainerController
+                homeTab.customSegmented.setIndex(index: 2)
+                homeTab.changeToIndex(index: 2)
+            }
+            self.tabBarController?.selectedIndex = 1
+            if #available(iOS 13.0, *) {
+                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
+            } else {
+                // Fallback on earlier versions
+            }
+        }
     }
     
     func initializeForm() {
@@ -142,23 +214,11 @@ class MindfulnessViewController: FormViewController {
                 }
             }
             
-            <<< TextRow("Duration") {
+            <<< TextRow("Length") {
                 $0.cell.isUserInteractionEnabled = false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
-                if let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
-                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: startRow.value!, to: endRow.value!)
-                    let hour = dateComponents.hour
-                    let minutes = dateComponents.minute
-                    if let minutes = minutes, let hour = hour {
-                        $0.value = "\(hour) hours \(minutes) minutes"
-                    } else if let minutes = minutes {
-                        $0.value = "\(minutes) minutes"
-                    }
-                } else {
-                    $0.value = "30 minutes"
-                }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -189,17 +249,7 @@ class MindfulnessViewController: FormViewController {
                     endRow.value = Date(timeInterval: 0, since: row.value!)
                     endRow.updateCell()
                 }
-                if let durationRow : TextRow = self?.form.rowBy(tag: "Duration") {
-                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: row.value!, to: endRow.value!)
-                    let hour = dateComponents.hour
-                    let minutes = dateComponents.minute
-                    if let minutes = minutes, let hour = hour {
-                        durationRow.value = "\(hour) hours \(minutes) minutes"
-                    } else if let minutes = minutes {
-                        durationRow.value = "\(minutes) minutes"
-                    }
-                    durationRow.updateCell()
-                }
+                self!.updateLength()
                 self!.mindfulness.startDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
@@ -207,6 +257,9 @@ class MindfulnessViewController: FormViewController {
                     row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
                     cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    if #available(iOS 13.4, *) {
+                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    }
                 }
                 let color = cell.detailTextLabel?.textColor
                 row.onCollapseInlineRow { cell, _, _ in
@@ -245,17 +298,7 @@ class MindfulnessViewController: FormViewController {
                     startRow.value = Date(timeInterval: 0, since: row.value!)
                     startRow.updateCell()
                 }
-                if let durationRow : TextRow = self?.form.rowBy(tag: "Duration") {
-                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: startRow.value!, to: row.value!)
-                    let hour = dateComponents.hour
-                    let minutes = dateComponents.minute
-                    if let minutes = minutes, let hour = hour {
-                        durationRow.value = "\(hour) hours \(minutes) minutes"
-                    } else if let minutes = minutes {
-                        durationRow.value = "\(minutes) minutes"
-                    }
-                    durationRow.updateCell()
-                }
+                self!.updateLength()
                 self!.mindfulness.endDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
@@ -263,6 +306,9 @@ class MindfulnessViewController: FormViewController {
                     row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
                     cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    if #available(iOS 13.4, *) {
+                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    }
                 }
                 let color = cell.detailTextLabel?.textColor
                 row.onCollapseInlineRow { cell, _, _ in
@@ -275,6 +321,31 @@ class MindfulnessViewController: FormViewController {
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 
             }
+    }
+    
+    fileprivate func updateLength() {
+        if let lengthRow : TextRow = form.rowBy(tag: "Length"), let startRow: DateTimeInlineRow = form.rowBy(tag: "Starts"), let startValue = startRow.value, let endRow: DateTimeInlineRow = form.rowBy(tag: "Ends"), let endValue = endRow.value {
+            let length = Calendar.current.dateComponents([.second], from: startValue, to: endValue).second ?? 0
+            mindfulness.length = length
+            let hour = length / 3600
+            let minutes = (length % 3600) / 60
+            if minutes > 0 && hour > 0 {
+                if hour == 1 {
+                    lengthRow.value = "\(hour) hour \(minutes) minutes"
+                } else {
+                    lengthRow.value = "\(hour) hours \(minutes) minutes"
+                }
+            } else if hour > 0 {
+                if hour == 1 {
+                    lengthRow.value = "\(hour) hour"
+                } else {
+                    lengthRow.value = "\(hour) hours"
+                }
+            } else {
+                lengthRow.value = "\(minutes) minutes"
+            }
+            lengthRow.updateCell()
+        }
     }
     
     @objc fileprivate func openParticipantsInviter() {
@@ -316,7 +387,7 @@ class MindfulnessViewController: FormViewController {
         self.removeSpinner()
     }
     
-    func getSelectedFalconUsers(forWorkout mindfulness: Workout, completion: @escaping ([User])->()) {
+    func getSelectedFalconUsers(forMindfulness mindfulness: Mindfulness, completion: @escaping ([User])->()) {
         guard let participantsIDs = mindfulness.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -347,7 +418,7 @@ class MindfulnessViewController: FormViewController {
     
     fileprivate func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        let badgeRef = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).child(mindfulness.id).child("badge")
+        let badgeRef = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).child(mindfulness.id).child("badge")
         badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
             var value = mutableData.value as? Int
             value = 0
@@ -383,10 +454,10 @@ extension MindfulnessViewController: UpdateInvitees {
             }
             
             if active {
-                showActivityIndicator()
-//                let createWorkout = MindfulnessActions(mindfulness: mindfulness, active: active, selectedFalconUsers: selectedFalconUsers)
-//                createWorkout.updateMindfulnessParticipants()
-                hideActivityIndicator()
+                self.showActivityIndicator()
+                let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createMindfulness.createNewMindfulness()
+                self.hideActivityIndicator()
             }
             
         }

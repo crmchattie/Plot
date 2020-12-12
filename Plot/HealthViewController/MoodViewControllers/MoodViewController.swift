@@ -30,7 +30,13 @@ class MoodViewController: FormViewController {
         if mood == nil, let currentUser = Auth.auth().currentUser?.uid {
             active = false
             let ID = Database.database().reference().child(userMoodsEntity).child(currentUser).childByAutoId().key ?? ""
-            mood = Mood(id: ID, mood: nil, applicableTo: .daily, moodDate: Date(), lastModifiedDate: Date(), createdDate: Date())
+            let original = Date()
+            let rounded = Date(timeIntervalSinceReferenceDate:
+            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+            let timezone = TimeZone.current
+            let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+            let date = rounded.addingTimeInterval(seconds)
+            mood = Mood(id: ID, mood: nil, applicableTo: .specificTime, moodDate: date, lastModifiedDate: date, createdDate: date)
         }
     }
     
@@ -50,13 +56,29 @@ class MoodViewController: FormViewController {
     }
     
     @IBAction func create(_ sender: AnyObject) {
-//        if transaction.user_created ?? false, !active {
-//            self.showActivityIndicator()
-//            let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-//            createTransaction.createNewTransaction()
-//            self.hideActivityIndicator()
-//        }
-        self.navigationController?.popViewController(animated: true)
+        if let currentUser = Auth.auth().currentUser?.uid {
+            self.showActivityIndicator()
+            let createMood = MoodActions(mood: mood, active: active, currentUser: currentUser)
+            createMood.createNewMood()
+            self.hideActivityIndicator()
+            
+            if active {
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                if nav.topViewController is MasterActivityContainerController {
+                    let homeTab = nav.topViewController as! MasterActivityContainerController
+                    homeTab.customSegmented.setIndex(index: 2)
+                    homeTab.changeToIndex(index: 2)
+                }
+                self.tabBarController?.selectedIndex = 1
+                if #available(iOS 13.0, *) {
+                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
+                } else {
+                    // Fallback on earlier versions
+                }
+            }
+        }
     }
     
     func showActivityIndicator() {
@@ -78,6 +100,7 @@ class MoodViewController: FormViewController {
             $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
             $0.title = $0.tag
             $0.minuteInterval = 5
             $0.dateFormatter?.dateStyle = .full
@@ -90,6 +113,7 @@ class MoodViewController: FormViewController {
                     row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
+                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
                     }
@@ -120,6 +144,7 @@ class MoodViewController: FormViewController {
                     $0.selectableValue = mood.rawValue.capitalized
                     if mood.rawValue.capitalized == self.value {
                         $0.value = self.value
+                        self.navigationItem.rightBarButtonItem?.isEnabled = true
                     }
                 }.cellSetup { cell, row in
                     cell.accessoryType = .checkmark
@@ -129,7 +154,7 @@ class MoodViewController: FormViewController {
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }.onChange({ (row) in
                     if let value = row.value {
-                        self.value = value
+                        self.mood.mood = MoodType(rawValue: value)
                         self.navigationItem.rightBarButtonItem?.isEnabled = true
                     }
                 })

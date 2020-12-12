@@ -151,14 +151,33 @@ class FinanceTransactionViewController: FormViewController {
     
     @IBAction func create(_ sender: AnyObject) {
         movingBackwards = false
-        if transaction.user_created ?? false, !active {
+        if transaction.user_created ?? false {
             self.showActivityIndicator()
             let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createTransaction.createNewTransaction()
             self.hideActivityIndicator()
+            
+            if active {
+                self.delegate?.updateTransaction(transaction: transaction)
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                if nav.topViewController is MasterActivityContainerController {
+                    let homeTab = nav.topViewController as! MasterActivityContainerController
+                    homeTab.customSegmented.setIndex(index: 3)
+                    homeTab.changeToIndex(index: 3)
+                }
+                self.tabBarController?.selectedIndex = 1
+                if #available(iOS 13.0, *) {
+                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
+                } else {
+                    // Fallback on earlier versions
+                }
+            }
+        } else {
+            self.delegate?.updateTransaction(transaction: transaction)
+            self.navigationController?.popViewController(animated: true)
         }
-        self.delegate?.updateTransaction(transaction: transaction)
-        self.navigationController?.popViewController(animated: true)
     }
     
     fileprivate func initializeForm() {

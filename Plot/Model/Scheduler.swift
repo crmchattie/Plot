@@ -20,6 +20,7 @@ struct Scheduler: Codable, Equatable, Hashable {
     // day (Monday) :
     var activeDays: [DaysofWeek]?
     // StartTime/Endtime - "HH:mm:ss"
+    var length: Int?
     var startTime: Date?
     var endTime: Date?
     var schedulerDate: Date?

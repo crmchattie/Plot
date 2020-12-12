@@ -8,7 +8,7 @@
 
 import Foundation
 
-let workoutsEntity = "workouts"
+let workoutsEntity = "custom-workouts"
 let userWorkoutsEntity = "user-workouts"
 
 struct Workout: Codable, Equatable, Hashable {
@@ -20,6 +20,7 @@ struct Workout: Codable, Equatable, Hashable {
     var createdDate: Date?
     var startDateTime: Date?
     var endDateTime: Date?
+    var length: Int?
     var admin: String?
     var badge: Int?
     var pinned: Bool?

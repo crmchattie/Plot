@@ -97,14 +97,33 @@ class FinanceAccountViewController: FormViewController {
     }
     
     @IBAction func create(_ sender: AnyObject) {
-        if account.user_created ?? false, !active {
+        if account.user_created ?? false {
             self.showActivityIndicator()
             let createAccount = AccountActions(account: self.account, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createAccount.createNewAccount()
             self.hideActivityIndicator()
+            
+            if active {
+                self.delegate?.updateAccount(account: account)
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+                if nav.topViewController is MasterActivityContainerController {
+                    let homeTab = nav.topViewController as! MasterActivityContainerController
+                    homeTab.customSegmented.setIndex(index: 3)
+                    homeTab.changeToIndex(index: 3)
+                }
+                self.tabBarController?.selectedIndex = 1
+                if #available(iOS 13.0, *) {
+                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
+                } else {
+                    // Fallback on earlier versions
+                }
+            }
+        } else {
+            self.delegate?.updateAccount(account: account)
+            self.navigationController?.popViewController(animated: true)
         }
-        self.delegate?.updateAccount(account: account)
-        self.navigationController?.popViewController(animated: true)
     }
     
     fileprivate func initializeForm() {

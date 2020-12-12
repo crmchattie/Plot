@@ -16,11 +16,14 @@ struct Mindfulness: Codable, Equatable, Hashable {
     var name: String?
     var startDateTime: Date?
     var endDateTime: Date?
+    var length: Int?
     var lastModifiedDate: Date?
     var createdDate: Date?
     var participantsIDs: [String]?
     var admin: String?
-    
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
 }
 
 func ==(lhs: Mindfulness, rhs: Mindfulness) -> Bool {

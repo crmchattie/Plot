@@ -25,17 +25,16 @@ func ==(lhs: Mood, rhs: Mood) -> Bool {
 }
 
 enum MoodType: String, CaseIterable, Codable {
-//    case anxious
-    case content
-    case energized
-    case frustrated
-    case happy
-    case lazy
-    case optimistic
-    case proud
-    case sad
-    case stressed
-    case tired
+    case content = "Content"
+    case energized = "Energized"
+    case frustrated = "Frustrated"
+    case happy = "Happy"
+    case lazy = "Lazy"
+    case optimistic = "Optimistic"
+    case proud = "Proud"
+    case sad = "Sad"
+    case stressed = "Stressed"
+    case tired = "Tired"
     
     var image: String {
         switch self {
@@ -54,6 +53,7 @@ enum MoodType: String, CaseIterable, Codable {
 }
 
 enum ApplicableTo: String, CaseIterable, Codable {
+    case specificTime
     case daily
     case weekly
     case monthly

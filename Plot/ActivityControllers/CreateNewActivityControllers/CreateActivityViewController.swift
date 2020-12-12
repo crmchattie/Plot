@@ -527,6 +527,9 @@ class CreateActivityViewController: FormViewController {
                     inlineRow.cellUpdate() { cell, row in
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        if #available(iOS 13.4, *) {
+                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        }
                         let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                         if allRow.value ?? false {
                             cell.datePicker.datePickerMode = .date
@@ -592,6 +595,9 @@ class CreateActivityViewController: FormViewController {
                         inlineRow.cellUpdate() { cell, row in
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                            if #available(iOS 13.4, *) {
+                                cell.datePicker.preferredDatePickerStyle = .wheels
+                            }
                         let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                         if allRow.value ?? false {
                             cell.datePicker.datePickerMode = .date
@@ -1914,14 +1920,11 @@ class CreateActivityViewController: FormViewController {
     }
     
     @objc func createNewActivity() {
-        
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-
         if !active || sentActivity {
-            alert.addAction(UIAlertAction(title: "Create New Activity", style: .default, handler: { (_) in
-                self.createActivity()
-            }))
+            self.createActivity()
         } else {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
             alert.addAction(UIAlertAction(title: "Update Activity", style: .default, handler: { (_) in
                 print("User click Edit button")
                 self.createActivity()
@@ -1932,15 +1935,15 @@ class CreateActivityViewController: FormViewController {
                 self.duplicateActivity()
             }))
             
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            
         }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-         print("shareButtonTapped")
     }
     
     func createActivity() {

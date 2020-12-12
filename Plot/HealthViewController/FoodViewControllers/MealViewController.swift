@@ -12,13 +12,7 @@ import SplitRow
 import Firebase
 import CodableFirebase
 
-protocol UpdateMealDelegate: class {
-    func updateMeal(meal: Meal)
-}
-
 class MealViewController: FormViewController {
-    weak var delegate : UpdateMealDelegate?
-    
     var meal: Meal!
     
     var users = [User]()
@@ -29,7 +23,6 @@ class MealViewController: FormViewController {
     var userNamesString: String = ""
     
     fileprivate var active: Bool = false
-    fileprivate var movingBackwards: Bool = true
     
     fileprivate var productIndex: Int = 0
     
@@ -77,14 +70,6 @@ class MealViewController: FormViewController {
         
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        if self.movingBackwards {
-            delegate?.updateMeal(meal: meal)
-        }
-    }
-    
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -98,33 +83,14 @@ class MealViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-//        if !active || self.selectedFalconUsers.count == 0 {
-            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-            navigationItem.rightBarButtonItem = plusBarButton
-//        } else {
-//            let dotsImage = UIImage(named: "dots")
-//            if #available(iOS 11.0, *) {
-//                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-//                
-//                let dotsBarButton = UIButton(type: .system)
-//                dotsBarButton.setImage(dotsImage, for: .normal)
-//                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-//                
-//                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
-//            } else {
-//                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-//                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-//                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-//            }
-//        }
+        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+        navigationItem.rightBarButtonItem = plusBarButton
     }
     
     @objc fileprivate func close() {
-        movingBackwards = false
-        
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
         if active {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
             alert.addAction(UIAlertAction(title: "Update Meal", style: .default, handler: { (_) in
                 print("User click Approve button")
                 
@@ -168,39 +134,35 @@ class MealViewController: FormViewController {
                 
             }))
             
-        } else {
-            alert.addAction(UIAlertAction(title: "Create New Meal", style: .default, handler: { (_) in
-                print("User click Approve button")
-                // create new activity
-                self.showActivityIndicator()
-                let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createMeal.createNewMeal()
-                self.hideActivityIndicator()
-                
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 0)
-                    homeTab.changeToIndex(index: 0)
-                }
-                self.tabBarController?.selectedIndex = 1
-                if #available(iOS 13.0, *) {
-                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-                } else {
-                    // Fallback on earlier versions
-                }
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
             }))
             
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            
+        } else {
+            // create new activity
+            self.showActivityIndicator()
+            let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createMeal.createNewMeal()
+            self.hideActivityIndicator()
+            
+            let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+            if nav.topViewController is MasterActivityContainerController {
+                let homeTab = nav.topViewController as! MasterActivityContainerController
+                homeTab.customSegmented.setIndex(index: 2)
+                homeTab.changeToIndex(index: 2)
+            }
+            self.tabBarController?.selectedIndex = 1
+            if #available(iOS 13.0, *) {
+                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
+            } else {
+                // Fallback on earlier versions
+            }
         }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-        
     }
     
     @objc func goToExtras() {
@@ -288,6 +250,9 @@ class MealViewController: FormViewController {
                         row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.datePicker.datePickerMode = .dateAndTime
                         cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        if #available(iOS 13.4, *) {
+                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        }
                     }
                     let color = cell.detailTextLabel?.textColor
                     row.onCollapseInlineRow { cell, _, _ in
@@ -332,6 +297,9 @@ class MealViewController: FormViewController {
                         row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                             cell.datePicker.datePickerMode = .dateAndTime
                             cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            if #available(iOS 13.4, *) {
+                                cell.datePicker.preferredDatePickerStyle = .wheels
+                            }
                     }
                     let color = cell.detailTextLabel?.textColor
                     row.onCollapseInlineRow { cell, _, _ in

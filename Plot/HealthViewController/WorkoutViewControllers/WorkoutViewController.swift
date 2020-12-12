@@ -12,13 +12,7 @@ import SplitRow
 import Firebase
 import CodableFirebase
 
-protocol UpdateWorkoutDelegate: class {
-    func updateWorkout(workout: Workout)
-}
-
-class WorkoutViewController: FormViewController {
-    weak var delegate : UpdateWorkoutDelegate?
-    
+class WorkoutViewController: FormViewController {    
     var workout: Workout!
     
     var users = [User]()
@@ -29,7 +23,6 @@ class WorkoutViewController: FormViewController {
     var userNamesString: String = ""
     
     fileprivate var active: Bool = false
-    fileprivate var movingBackwards: Bool = true
     
     fileprivate var productIndex: Int = 0
     
@@ -70,15 +63,8 @@ class WorkoutViewController: FormViewController {
         configureTableView()
         setupRightBarButton()
         initializeForm()
-        updateCalories()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
         
-        if self.movingBackwards {
-            delegate?.updateWorkout(workout: workout)
-        }
+        updateLength()
     }
     
     fileprivate func configureTableView() {
@@ -94,33 +80,14 @@ class WorkoutViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        //        if !active || self.selectedFalconUsers.count == 0 {
         let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
         navigationItem.rightBarButtonItem = plusBarButton
-        //        } else {
-        //            let dotsImage = UIImage(named: "dots")
-        //            if #available(iOS 11.0, *) {
-        //                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-        //
-        //                let dotsBarButton = UIButton(type: .system)
-        //                dotsBarButton.setImage(dotsImage, for: .normal)
-        //                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-        //
-        //                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
-        //            } else {
-        //                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-        //                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-        //                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-        //            }
-        //        }
     }
     
     @objc fileprivate func close() {
-        movingBackwards = false
-        
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
         if active {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
             alert.addAction(UIAlertAction(title: "Update Workout", style: .default, handler: { (_) in
                 print("User click Approve button")
                 
@@ -163,39 +130,33 @@ class WorkoutViewController: FormViewController {
                 
             }))
             
-        } else {
-            alert.addAction(UIAlertAction(title: "Create New Workout", style: .default, handler: { (_) in
-                print("User click Approve button")
-                // create new activity
-                self.showActivityIndicator()
-                let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createWorkout.createNewWorkout()
-                self.hideActivityIndicator()
-                
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 0)
-                    homeTab.changeToIndex(index: 0)
-                }
-                self.tabBarController?.selectedIndex = 1
-                if #available(iOS 13.0, *) {
-                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-                } else {
-                    // Fallback on earlier versions
-                }
-                
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
             }))
             
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            
+        } else {
+            self.showActivityIndicator()
+            let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createWorkout.createNewWorkout()
+            self.hideActivityIndicator()
+            
+            let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+            if nav.topViewController is MasterActivityContainerController {
+                let homeTab = nav.topViewController as! MasterActivityContainerController
+                homeTab.customSegmented.setIndex(index: 2)
+                homeTab.changeToIndex(index: 2)
+            }
+            self.tabBarController?.selectedIndex = 1
+            if #available(iOS 13.0, *) {
+                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
+            } else {
+                // Fallback on earlier versions
+            }
         }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
         
     }
     
@@ -263,6 +224,7 @@ class WorkoutViewController: FormViewController {
                     weightReference.observe(.value, with: { (snapshot) in
                         if let weight = snapshot.value as? Int {
                             row.value = weight
+                            row.updateCell()
                         }
                     })
                 }
@@ -309,32 +271,16 @@ class WorkoutViewController: FormViewController {
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
-                if let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
-                    let duration = Calendar.current.dateComponents([.minute], from: startRow.value!, to: endRow.value!).minute
-                    $0.value = Double(duration ?? 0) * workoutType.caloriesBurned * Double(weightValue)
-                }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-            <<< TextRow("Duration") {
+            <<< TextRow("Length") {
                 $0.cell.isUserInteractionEnabled = false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
-                if let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
-                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: startRow.value!, to: endRow.value!)
-                    let hour = dateComponents.hour
-                    let minutes = dateComponents.minute
-                    if let minutes = minutes, let hour = hour {
-                        $0.value = "\(hour) hours \(minutes) minutes"
-                    } else if let minutes = minutes {
-                        $0.value = "\(minutes) minutes"
-                    }
-                } else {
-                    $0.value = "30 minutes"
-                }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -367,17 +313,7 @@ class WorkoutViewController: FormViewController {
                     endRow.value = Date(timeInterval: 0, since: row.value!)
                     endRow.updateCell()
                 }
-                if let durationRow : TextRow = self?.form.rowBy(tag: "Duration") {
-                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: row.value!, to: endRow.value!)
-                    let hour = dateComponents.hour
-                    let minutes = dateComponents.minute
-                    if let minutes = minutes, let hour = hour {
-                        durationRow.value = "\(hour) hours \(minutes) minutes"
-                    } else if let minutes = minutes {
-                        durationRow.value = "\(minutes) minutes"
-                    }
-                    durationRow.updateCell()
-                }
+                self!.updateLength()
                 self!.workout.startDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
@@ -385,6 +321,9 @@ class WorkoutViewController: FormViewController {
                     row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
                     cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    if #available(iOS 13.4, *) {
+                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    }
                 }
                 let color = cell.detailTextLabel?.textColor
                 row.onCollapseInlineRow { cell, _, _ in
@@ -423,17 +362,7 @@ class WorkoutViewController: FormViewController {
                     startRow.value = Date(timeInterval: 0, since: row.value!)
                     startRow.updateCell()
                 }
-                if let durationRow : TextRow = self?.form.rowBy(tag: "Duration") {
-                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: startRow.value!, to: row.value!)
-                    let hour = dateComponents.hour
-                    let minutes = dateComponents.minute
-                    if let minutes = minutes, let hour = hour {
-                        durationRow.value = "\(hour) hours \(minutes) minutes"
-                    } else if let minutes = minutes {
-                        durationRow.value = "\(minutes) minutes"
-                    }
-                    durationRow.updateCell()
-                }
+                self!.updateLength()
                 self!.workout.endDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
@@ -441,6 +370,9 @@ class WorkoutViewController: FormViewController {
                     row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
                     cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    if #available(iOS 13.4, *) {
+                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    }
                 }
                 let color = cell.detailTextLabel?.textColor
                 row.onCollapseInlineRow { cell, _, _ in
@@ -478,10 +410,34 @@ class WorkoutViewController: FormViewController {
             }
     }
     
+    fileprivate func updateLength() {
+        if let lengthRow : TextRow = form.rowBy(tag: "Length"), let startRow: DateTimeInlineRow = form.rowBy(tag: "Starts"), let startValue = startRow.value, let endRow: DateTimeInlineRow = form.rowBy(tag: "Ends"), let endValue = endRow.value {
+            let length = Calendar.current.dateComponents([.second], from: startValue, to: endValue).second ?? 0
+            workout.length = length
+            let hour = length / 3600
+            let minutes = (length % 3600) / 60
+            if minutes > 0 && hour > 0 {
+                if hour == 1 {
+                    lengthRow.value = "\(hour) hour \(minutes) minutes"
+                } else {
+                    lengthRow.value = "\(hour) hours \(minutes) minutes"
+                }
+            } else if hour > 0 {
+                if hour == 1 {
+                    lengthRow.value = "\(hour) hour"
+                } else {
+                    lengthRow.value = "\(hour) hours"
+                }
+            } else {
+                lengthRow.value = "\(minutes) minutes"
+            }
+            lengthRow.updateCell()
+        }
+    }
+    
     fileprivate func updateCalories() {
-        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
-            let duration = Calendar.current.dateComponents([.minute], from: startRow.value!, to: endRow.value!).minute
-            caloriesRow.value = Double(duration ?? 0) * workoutType.caloriesBurned * Double(weightValue)
+        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let length = workout.length {
+            caloriesRow.value = Double(length / 60) * workoutType.caloriesBurned * Double(weightValue)
             caloriesRow.updateCell()
         }
     }
