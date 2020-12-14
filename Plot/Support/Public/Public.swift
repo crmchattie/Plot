@@ -1594,15 +1594,14 @@ extension Date {
     var startOfWeek: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        let sunday = cal.date(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        return cal.date(byAdding: .day, value: 1, to: sunday!)!
+        return cal.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date!
     }
 
     var endOfWeek: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        let sunday = cal.date(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
-        return cal.date(byAdding: .day, value: 8, to: sunday)!
+        let startOfWeek = cal.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date!
+        return cal.date(byAdding: .day, value: 7, to: startOfWeek)!
     }
 
     var startOfMonth: Date {

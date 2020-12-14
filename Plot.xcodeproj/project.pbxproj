@@ -38,6 +38,7 @@
 		102076CE23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */; };
 		10217A7723102CA4004CBA9E /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10217A7623102CA4004CBA9E /* ActivityView.swift */; };
 		10217A7B23103661004CBA9E /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10217A7A23103661004CBA9E /* ActivityViewController.swift */; };
+		1024035E2586E92E00A54703 /* FinanceBarChartDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024035D2586E92E00A54703 /* FinanceBarChartDetailViewController.swift */; };
 		102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102523EA2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift */; };
 		1026185025756B2400CF6F0A /* SummaryHKChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */; };
 		1026185425756B3300CF6F0A /* SummaryPieChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */; };
@@ -65,7 +66,7 @@
 		1058E61D2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */; };
 		105AA1372481B56B009DD09B /* NewUserChecklists.json in Resources */ = {isa = PBXBuildFile; fileRef = 105AA1362481B56B009DD09B /* NewUserChecklists.json */; };
 		105CB18C25129F130000D3D8 /* FinanceTransactionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */; };
-		105CB18E2512A3830000D3D8 /* FinanceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18D2512A3830000D3D8 /* FinanceDetailViewController.swift */; };
+		105CB18E2512A3830000D3D8 /* FinanceLineChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18D2512A3830000D3D8 /* FinanceLineChartViewController.swift */; };
 		105E12532447955500A278D0 /* ActivityDetailCellDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */; };
 		105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66E824149DC600F6EDB6 /* EventDetailCell.swift */; };
 		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
@@ -87,7 +88,7 @@
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */; };
 		108087172583E72300FB9BB0 /* SummaryBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087162583E72300FB9BB0 /* SummaryBarChartCell.swift */; };
-		1080871B2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1080871A2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift */; };
+		1080871B2583E73D00FB9BB0 /* SummaryLineChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */; };
 		1080871F2585057400FB9BB0 /* MoodActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1080871E2585057400FB9BB0 /* MoodActions.swift */; };
 		108087232585058100FB9BB0 /* MoodFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087222585058100FB9BB0 /* MoodFetcher.swift */; };
 		108087272585059E00FB9BB0 /* SleepActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087262585059E00FB9BB0 /* SleepActions.swift */; };
@@ -488,6 +489,7 @@
 		10217A7623102CA4004CBA9E /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		10217A7923103377004CBA9E /* Plot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Plot-Bridging-Header.h"; sourceTree = "<group>"; };
 		10217A7A23103661004CBA9E /* ActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityViewController.swift; sourceTree = "<group>"; };
+		1024035D2586E92E00A54703 /* FinanceBarChartDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceBarChartDetailViewController.swift; sourceTree = "<group>"; };
 		102523EA2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatActivitiesTableViewCell.swift; sourceTree = "<group>"; };
 		1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryHKChartCell.swift; sourceTree = "<group>"; };
 		1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryPieChartCell.swift; sourceTree = "<group>"; };
@@ -518,7 +520,7 @@
 		1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionRuleFetcher.swift; sourceTree = "<group>"; };
 		105AA1362481B56B009DD09B /* NewUserChecklists.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = NewUserChecklists.json; sourceTree = "<group>"; };
 		105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionViewController.swift; sourceTree = "<group>"; };
-		105CB18D2512A3830000D3D8 /* FinanceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceDetailViewController.swift; sourceTree = "<group>"; };
+		105CB18D2512A3830000D3D8 /* FinanceLineChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceLineChartViewController.swift; sourceTree = "<group>"; };
 		105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCellDelegates.swift; sourceTree = "<group>"; };
 		105F66E824149DC600F6EDB6 /* EventDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailCell.swift; sourceTree = "<group>"; };
 		105F66EA2415942B00F6EDB6 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
@@ -540,7 +542,7 @@
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListTableViewCell.swift; sourceTree = "<group>"; };
 		108087162583E72300FB9BB0 /* SummaryBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryBarChartCell.swift; sourceTree = "<group>"; };
-		1080871A2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryBarChartGroupedCell.swift; sourceTree = "<group>"; };
+		1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryLineChartCell.swift; sourceTree = "<group>"; };
 		1080871E2585057400FB9BB0 /* MoodActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodActions.swift; sourceTree = "<group>"; };
 		108087222585058100FB9BB0 /* MoodFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodFetcher.swift; sourceTree = "<group>"; };
 		108087262585059E00FB9BB0 /* SleepActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepActions.swift; sourceTree = "<group>"; };
@@ -1024,7 +1026,8 @@
 				1082C89424F0A8F500CF6491 /* FinanceViewController.swift */,
 				100B9F622564539300A80C87 /* FinanceDetailService.swift */,
 				100B9F5C2564536E00A80C87 /* FinanceDetailViewModel.swift */,
-				105CB18D2512A3830000D3D8 /* FinanceDetailViewController.swift */,
+				105CB18D2512A3830000D3D8 /* FinanceLineChartViewController.swift */,
+				1024035D2586E92E00A54703 /* FinanceBarChartDetailViewController.swift */,
 				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
 				105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */,
 				10B6B31525410D37008037AD /* FinanceTagsViewController.swift */,
@@ -1125,7 +1128,7 @@
 				1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */,
 				1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */,
 				108087162583E72300FB9BB0 /* SummaryBarChartCell.swift */,
-				1080871A2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift */,
+				1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */,
 			);
 			path = SummaryViewController;
 			sourceTree = "<group>";
@@ -2816,7 +2819,7 @@
 				4BAEE4FE21272D890045AB10 /* OutgoingVoiceMessageCell.swift in Sources */,
 				108BDE6D24B5106900BE2CBA /* SightseeingTypeViewController.swift in Sources */,
 				4BAEE51321272D890045AB10 /* ChatLogController+PhotoEditorDelegate.swift in Sources */,
-				105CB18E2512A3830000D3D8 /* FinanceDetailViewController.swift in Sources */,
+				105CB18E2512A3830000D3D8 /* FinanceLineChartViewController.swift in Sources */,
 				109F849923D6860D002C0044 /* FilterViewController.swift in Sources */,
 				4BAEE4EF21272D890045AB10 /* IncomingPhotoMessageCell.swift in Sources */,
 				4BAEE5F7212735E50045AB10 /* AvatarOpenerOverlay.swift in Sources */,
@@ -2860,6 +2863,7 @@
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,
 				4BAEE51421272D890045AB10 /* VoiceRecordingViewController.swift in Sources */,
 				1017D32F24F2B8E5001D7CBE /* MXMerchantLocation.swift in Sources */,
+				1024035E2586E92E00A54703 /* FinanceBarChartDetailViewController.swift in Sources */,
 				10F3033024EC6FF800C04B8F /* MXAccount.swift in Sources */,
 				269105ED253E8DD700A02C5F /* BalloonMarker.swift in Sources */,
 				4BAEE51121272D890045AB10 /* BaseMediaMessageCell.swift in Sources */,
@@ -2872,7 +2876,7 @@
 				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,
 				4BAEE5DC212735E50045AB10 /* AnimationController.swift in Sources */,
 				4BAEE4FD21272D890045AB10 /* BaseVoiceMessageCell.swift in Sources */,
-				1080871B2583E73D00FB9BB0 /* SummaryBarChartGroupedCell.swift in Sources */,
+				1080871B2583E73D00FB9BB0 /* SummaryLineChartCell.swift in Sources */,
 				4BAEE5DB212735E50045AB10 /* ImageCell.swift in Sources */,
 				10F3032524EB746E00C04B8F /* AccountsTableViewController.swift in Sources */,
 				2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */,

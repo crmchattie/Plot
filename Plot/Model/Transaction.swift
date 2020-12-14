@@ -420,9 +420,9 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     completion(sortedTransactionsList, transactionsDict)
 }
 
-func transactionDetailsChartData(transactions: [Transaction], transactionDetails: TransactionDetails, start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([Statistic], [Transaction]) -> ()) {
-    var statistics = [Statistic]()
-    var transactionList = [Transaction]()
+func transactionDetailsOverTimeChartData(transactions: [Transaction], transactionDetails: [TransactionDetails], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([TransactionDetails: [Statistic]], [TransactionDetails: [Transaction]]) -> ()) {
+    var statistics = [TransactionDetails: [Statistic]]()
+    var transactionDict = [TransactionDetails: [Transaction]]()
     let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
     calendar.timeZone = TimeZone(secondsFromGMT: 0)!
     var date = start
@@ -431,9 +431,20 @@ func transactionDetailsChartData(transactions: [Transaction], transactionDetails
         var nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
-            transactionListStats(transactions: transactions, transactionDetails: transactionDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
-                statistics.append(contentsOf: stats)
-                transactionList.append(contentsOf: transactions)
+            for transactionDetail in transactionDetails {
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
+                    if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
+                        var tdStats = statistics[transactionDetail]
+                        var tdTransactionList = transactionDict[transactionDetail]
+                        tdStats!.append(contentsOf: stats)
+                        tdTransactionList!.append(contentsOf: transactions)
+                        statistics[transactionDetail] = tdStats
+                        transactionDict[transactionDetail] = tdTransactionList
+                    } else {
+                        statistics[transactionDetail] = stats
+                        transactionDict[transactionDetail] = transactions
+                    }
+                }
             }
             // Advance by one day:
             date = nextDate
@@ -443,9 +454,20 @@ func transactionDetailsChartData(transactions: [Transaction], transactionDetails
         var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
-            transactionListStats(transactions: transactions, transactionDetails: transactionDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
-                statistics.append(contentsOf: stats)
-                transactionList.append(contentsOf: transactions)
+            for transactionDetail in transactionDetails {
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
+                    if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
+                        var tdStats = statistics[transactionDetail]
+                        var tdTransactionList = transactionDict[transactionDetail]
+                        tdStats!.append(contentsOf: stats)
+                        tdTransactionList!.append(contentsOf: transactions)
+                        statistics[transactionDetail] = tdStats
+                        transactionDict[transactionDetail] = tdTransactionList
+                    } else {
+                        statistics[transactionDetail] = stats
+                        transactionDict[transactionDetail] = transactions
+                    }
+                }
             }
             
             // Advance by one day:
@@ -456,9 +478,20 @@ func transactionDetailsChartData(transactions: [Transaction], transactionDetails
         var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
-            transactionListStats(transactions: transactions, transactionDetails: transactionDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
-                statistics.append(contentsOf: stats)
-                transactionList.append(contentsOf: transactions)
+            for transactionDetail in transactionDetails {
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
+                    if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
+                        var tdStats = statistics[transactionDetail]
+                        var tdTransactionList = transactionDict[transactionDetail]
+                        tdStats!.append(contentsOf: stats)
+                        tdTransactionList!.append(contentsOf: transactions)
+                        statistics[transactionDetail] = tdStats
+                        transactionDict[transactionDetail] = tdTransactionList
+                    } else {
+                        statistics[transactionDetail] = stats
+                        transactionDict[transactionDetail] = transactions
+                    }
+                }
             }
             
             // Advance by one day:
@@ -469,9 +502,20 @@ func transactionDetailsChartData(transactions: [Transaction], transactionDetails
         var nextDate = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
-            transactionListStats(transactions: transactions, transactionDetails: transactionDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
-                statistics.append(contentsOf: stats)
-                transactionList.append(contentsOf: transactions)
+            for transactionDetail in transactionDetails {
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, transactions) in
+                    if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
+                        var tdStats = statistics[transactionDetail]
+                        var tdTransactionList = transactionDict[transactionDetail]
+                        tdStats!.append(contentsOf: stats)
+                        tdTransactionList!.append(contentsOf: transactions)
+                        statistics[transactionDetail] = tdStats
+                        transactionDict[transactionDetail] = tdTransactionList
+                    } else {
+                        statistics[transactionDetail] = stats
+                        transactionDict[transactionDetail] = transactions
+                    }
+                }
             }
             
             // Advance by one day:
@@ -479,10 +523,10 @@ func transactionDetailsChartData(transactions: [Transaction], transactionDetails
             nextDate = calendar.date(byAdding: .month, value: 1, to: nextDate, options: [])!
         }
     }
-    completion(statistics, transactionList)
+    completion(statistics, transactionDict)
 }
 
-func transactionListStats(transactions: [Transaction], transactionDetails: TransactionDetails, start: Date, end: Date, date: Date, nextDate: Date, completion: @escaping ([Statistic], [Transaction]) -> ()) {
+func transactionListStats(transactions: [Transaction], transactionDetail: TransactionDetails, start: Date, end: Date, date: Date, nextDate: Date, completion: @escaping ([Statistic], [Transaction]) -> ()) {
     var statistics = [Statistic]()
     var transactionList = [Transaction]()
     let isodateFormatter = ISO8601DateFormatter()
@@ -507,7 +551,7 @@ func transactionListStats(transactions: [Transaction], transactionDetails: Trans
             }
         }
         
-        if transactionDetails.name == "Difference" {
+        if transactionDetail.name == "Difference" {
             switch transaction.type {
             case "DEBIT":
                 if statistics.isEmpty {
@@ -534,7 +578,7 @@ func transactionListStats(transactions: [Transaction], transactionDetails: Trans
             default:
                 continue
             }
-        } else if transactionDetails.name == "Expense" && transaction.group != "Income" {
+        } else if transactionDetail.name == "Expense" && transaction.group != "Income" {
             switch transaction.type {
             case "DEBIT":
                 if statistics.isEmpty {
@@ -561,7 +605,7 @@ func transactionListStats(transactions: [Transaction], transactionDetails: Trans
             default:
                 continue
             }
-        } else if transactionDetails.level == .category && transactionDetails.name == transaction.category {
+        } else if transactionDetail.level == .category && transactionDetail.name == transaction.category {
             if transaction.group == "Income" {
                 switch transaction.type {
                 case "DEBIT":
@@ -617,7 +661,7 @@ func transactionListStats(transactions: [Transaction], transactionDetails: Trans
                     continue
                 }
             }
-        } else if transactionDetails.level == .top && transactionDetails.name == transaction.top_level_category {
+        } else if transactionDetail.level == .top && transactionDetail.name == transaction.top_level_category {
             if transaction.group == "Income" {
                 switch transaction.type {
                 case "DEBIT":
@@ -673,7 +717,7 @@ func transactionListStats(transactions: [Transaction], transactionDetails: Trans
                     continue
                 }
             }
-        } else if transactionDetails.level == .group && transactionDetails.name == transaction.group {
+        } else if transactionDetail.level == .group && transactionDetail.name == transaction.group {
             if transaction.group == "Income" {
                 switch transaction.type {
                 case "DEBIT":

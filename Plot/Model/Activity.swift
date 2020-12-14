@@ -513,6 +513,7 @@ enum CustomType: String, Equatable, Hashable {
 func categorizeActivities(activities: [Activity], start: Date, end: Date, completion: @escaping ([String: Double], [String: [Activity]]) -> ()) {
     var categoryDict = [String: Double]()
     var activitiesDict = [String: [Activity]]()
+    var totalValue: Double = end.timeIntervalSince(start)
     // create dateFormatter with UTC time format
     for activity in activities {
         if let startDateTime = activity.startDateTime {
@@ -522,7 +523,9 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
             }
         }
         let duration = Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)
-        if let type = activity.category, type != "Not Applicable" {
+        if let type = activity.category {
+            guard type != "Not Applicable" else { continue }
+            totalValue -= duration
             if categoryDict[type] == nil {
                 categoryDict[type] = duration
                 activitiesDict[type] = [activity]
@@ -535,6 +538,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
                 activitiesDict[type] = activities
             }
         } else {
+            totalValue -= duration
             let type = "No Category"
             if categoryDict[type] == nil {
                 categoryDict[type] = duration
@@ -549,10 +553,142 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
             }
         }
     }
-    var totalValue: Double = end.timeIntervalSince(start)
-    for (_, value) in categoryDict {
-        totalValue -= value
-    }
     categoryDict["No Activities"] = totalValue
     completion(categoryDict, activitiesDict)
+}
+
+func activitiesOverTimeChartData(activities: [Activity], activityCategories: [String], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([String: [Statistic]], [String: [Activity]]) -> ()) {
+    var statistics = [String: [Statistic]]()
+    var activityDict = [String: [Activity]]()
+    let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+    var date = start
+    switch segmentType {
+    case .day:
+        var nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
+        // While date <= endDate ...
+        while nextDate.compare(end) != .orderedDescending {
+            for activityCategory in activityCategories {
+                activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
+                    if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
+                        var acStats = statistics[activityCategory]
+                        var acActivityList = activityDict[activityCategory]
+                        acStats!.append(contentsOf: stats)
+                        acActivityList!.append(contentsOf: activities)
+                        statistics[activityCategory] = acStats
+                        activityDict[activityCategory] = acActivityList
+                    } else {
+                        statistics[activityCategory] = stats
+                        activityDict[activityCategory] = activities
+                    }
+                }
+            }
+            // Advance by one day:
+            date = nextDate
+            nextDate = calendar.date(byAdding: .hour, value: 1, to: nextDate, options: [])!
+        }
+    case .week:
+        var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+        // While date <= endDate ...
+        while nextDate.compare(end) != .orderedDescending {
+            for activityCategory in activityCategories {
+                activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
+                    if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
+                        var acStats = statistics[activityCategory]
+                        var acActivityList = activityDict[activityCategory]
+                        acStats!.append(contentsOf: stats)
+                        acActivityList!.append(contentsOf: activities)
+                        statistics[activityCategory] = acStats
+                        activityDict[activityCategory] = acActivityList
+                    } else {
+                        statistics[activityCategory] = stats
+                        activityDict[activityCategory] = activities
+                    }
+                }
+            }
+            
+            // Advance by one day:
+            date = nextDate
+            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate, options: [])!
+        }
+    case .month:
+        var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+        // While date <= endDate ...
+        while nextDate.compare(end) != .orderedDescending {
+            for activityCategory in activityCategories {
+                activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
+                    if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
+                        var acStats = statistics[activityCategory]
+                        var acActivityList = activityDict[activityCategory]
+                        acStats!.append(contentsOf: stats)
+                        acActivityList!.append(contentsOf: activities)
+                        statistics[activityCategory] = acStats
+                        activityDict[activityCategory] = acActivityList
+                    } else {
+                        statistics[activityCategory] = stats
+                        activityDict[activityCategory] = activities
+                    }
+                }
+            }
+            
+            // Advance by one day:
+            date = nextDate
+            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate, options: [])!
+        }
+    case .year:
+        var nextDate = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+        // While date <= endDate ...
+        while nextDate.compare(end) != .orderedDescending {
+            for activityCategory in activityCategories {
+                activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
+                    if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
+                        var acStats = statistics[activityCategory]
+                        var acActivityList = activityDict[activityCategory]
+                        acStats!.append(contentsOf: stats)
+                        acActivityList!.append(contentsOf: activities)
+                        statistics[activityCategory] = acStats
+                        activityDict[activityCategory] = acActivityList
+                    } else {
+                        statistics[activityCategory] = stats
+                        activityDict[activityCategory] = activities
+                    }
+                }
+            }
+            
+            // Advance by one day:
+            date = nextDate
+            nextDate = calendar.date(byAdding: .month, value: 1, to: nextDate, options: [])!
+        }
+    }
+    completion(statistics, activityDict)
+}
+
+func activityListStats(activities: [Activity], activityCategory: String, start: Date, end: Date, date: Date, nextDate: Date, completion: @escaping ([Statistic], [Activity]) -> ()) {
+    var statistics = [Statistic]()
+    var activityList = [Activity]()
+    for activity in activities {
+        if let startDateTime = activity.startDateTime {
+            let activityDate = Date(timeIntervalSince1970: startDateTime as! TimeInterval)
+            if activityDate < start || end < activityDate {
+                continue
+            }
+            if activityDate < date || end < nextDate {
+                continue
+            }
+        }
+        if let type = activity.category, type == activityCategory {
+            let duration = Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)
+            if statistics.isEmpty {
+                let stat = Statistic(date: nextDate, value: duration)
+                statistics.append(stat)
+                activityList.append(activity)
+            } else {
+                if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                    statistics[index].value += duration
+                    activityList.append(activity)
+                }
+            }
+        }
+    }
+    completion(statistics, activityList)
 }

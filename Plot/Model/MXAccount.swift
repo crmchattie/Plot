@@ -613,9 +613,9 @@ func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDe
     completion(sortedAccountsList, accountsDict)
 }
 
-func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetails, start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([Statistic], [MXAccount]) -> ()) {
-    var statistics = [Statistic]()
-    var accountList = [MXAccount]()
+func accountDetailsOverTimeChartData(accounts: [MXAccount], accountDetails: [AccountDetails], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([AccountDetails: [Statistic]], [AccountDetails: [MXAccount]]) -> ()) {
+    var statistics = [AccountDetails: [Statistic]]()
+    var accountDict = [AccountDetails: [MXAccount]]()
     let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
     calendar.timeZone = TimeZone(secondsFromGMT: 0)!
     var date = start
@@ -624,11 +624,22 @@ func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetai
         var nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
-            accountListStats(accounts: accounts, accountDetails: accountDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
-                statistics.append(contentsOf: stats)
-                for account in accounts {
-                    if !accountList.contains(account) {
-                        accountList.append(account)
+            for accountDetail in accountDetails {
+                accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
+                    if accountDict[accountDetail] != nil, accountDict[accountDetail] != nil {
+                        var tdStats = statistics[accountDetail]
+                        var tdAccountList = accountDict[accountDetail]
+                        tdStats!.append(contentsOf: stats)
+                        for account in accounts {
+                            if !tdAccountList!.contains(account) {
+                                tdAccountList!.append(account)
+                            }
+                        }
+                        statistics[accountDetail] = tdStats
+                        accountDict[accountDetail] = tdAccountList
+                    } else {
+                        statistics[accountDetail] = stats
+                        accountDict[accountDetail] = accounts
                     }
                 }
             }
@@ -640,11 +651,22 @@ func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetai
         var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
-            accountListStats(accounts: accounts, accountDetails: accountDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
-                statistics.append(contentsOf: stats)
-                for account in accounts {
-                    if !accountList.contains(account) {
-                        accountList.append(account)
+            for accountDetail in accountDetails {
+                accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
+                    if accountDict[accountDetail] != nil, accountDict[accountDetail] != nil {
+                        var tdStats = statistics[accountDetail]
+                        var tdAccountList = accountDict[accountDetail]
+                        tdStats!.append(contentsOf: stats)
+                        for account in accounts {
+                            if !tdAccountList!.contains(account) {
+                                tdAccountList!.append(account)
+                            }
+                        }
+                        statistics[accountDetail] = tdStats
+                        accountDict[accountDetail] = tdAccountList
+                    } else {
+                        statistics[accountDetail] = stats
+                        accountDict[accountDetail] = accounts
                     }
                 }
             }
@@ -656,11 +678,22 @@ func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetai
         var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
-            accountListStats(accounts: accounts, accountDetails: accountDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
-                statistics.append(contentsOf: stats)
-                for account in accounts {
-                    if !accountList.contains(account) {
-                        accountList.append(account)
+            for accountDetail in accountDetails {
+                accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
+                    if accountDict[accountDetail] != nil, accountDict[accountDetail] != nil {
+                        var tdStats = statistics[accountDetail]
+                        var tdAccountList = accountDict[accountDetail]
+                        tdStats!.append(contentsOf: stats)
+                        for account in accounts {
+                            if !tdAccountList!.contains(account) {
+                                tdAccountList!.append(account)
+                            }
+                        }
+                        statistics[accountDetail] = tdStats
+                        accountDict[accountDetail] = tdAccountList
+                    } else {
+                        statistics[accountDetail] = stats
+                        accountDict[accountDetail] = accounts
                     }
                 }
             }
@@ -673,11 +706,22 @@ func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetai
         var nextDate = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
-            accountListStats(accounts: accounts, accountDetails: accountDetails, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
-                statistics.append(contentsOf: stats)
-                for account in accounts {
-                    if !accountList.contains(account) {
-                        accountList.append(account)
+            for accountDetail in accountDetails {
+                accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
+                    if accountDict[accountDetail] != nil, accountDict[accountDetail] != nil {
+                        var tdStats = statistics[accountDetail]
+                        var tdAccountList = accountDict[accountDetail]
+                        tdStats!.append(contentsOf: stats)
+                        for account in accounts {
+                            if !tdAccountList!.contains(account) {
+                                tdAccountList!.append(account)
+                            }
+                        }
+                        statistics[accountDetail] = tdStats
+                        accountDict[accountDetail] = tdAccountList
+                    } else {
+                        statistics[accountDetail] = stats
+                        accountDict[accountDetail] = accounts
                     }
                 }
             }
@@ -686,113 +730,123 @@ func accountDetailsChartData(accounts: [MXAccount], accountDetails: AccountDetai
             nextDate = calendar.date(byAdding: .month, value: 1, to: nextDate, options: [])!
         }
     }
-    completion(statistics, accountList)
+    completion(statistics, accountDict)
 }
 
-func accountListStats(accounts: [MXAccount], accountDetails: AccountDetails, start: Date, end: Date, date: Date, nextDate: Date, completion: @escaping ([Statistic], [MXAccount]) -> ()) {
+func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, start: Date, end: Date, date: Date, nextDate: Date, completion: @escaping ([Statistic], [MXAccount]) -> ()) {
     var statistics = [Statistic]()
     var accountList = [MXAccount]()
     let isodateFormatter = ISO8601DateFormatter()
+    print("date \(date)")
+    print("nextDate \(nextDate)")
     for account in accounts {
         if account.should_link ?? true == false {
             continue
         }
         if let balances = account.balances {
-            let sortedBalances = balances.sorted {$0.key.localizedStandardCompare($1.key) == .orderedDescending}
-            for (balanceDate, balance) in sortedBalances {
-                if let balanceDate = isodateFormatter.date(from: balanceDate), balanceDate > date, nextDate > balanceDate {
-                    if accountDetails.name == "Net Worth" {
-                        if account.bs_type == .Asset {
-                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
-                                statistics[index].value += balance
-                                if !accountList.contains(account) {
-                                    accountList.append(account)
-                                }
-                                break
-                            } else {
-                                let stat = Statistic(date: nextDate, value: balance)
-                                statistics.append(stat)
-                                if !accountList.contains(account) {
-                                    accountList.append(account)
-                                }
-                                break
-                            }
-                        } else if account.bs_type == .Liability {
-                            if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
-                                statistics[index].value -= balance
-                                if !accountList.contains(account) {
-                                    accountList.append(account)
-                                }
-                                break
-                            } else {
-                                let stat = Statistic(date: nextDate, value: -balance)
-                                statistics.append(stat)
-                                if !accountList.contains(account) {
-                                    accountList.append(account)
-                                }
-                                break
-                            }
-                        }
-                    } else if accountDetails.name == account.name && accountDetails.level == .account {
+            let sortedBalances = Array(balances.keys.sorted {$0.localizedStandardCompare($1) == .orderedDescending})
+            let firstBalanceDate = isodateFormatter.date(from: sortedBalances.last!)!
+            let lastBalanceDate = Date().addingTimeInterval(60*60*24)
+            if date > firstBalanceDate, nextDate > firstBalanceDate, date < lastBalanceDate, nextDate < lastBalanceDate {
+                var currentBalance = 0.0
+                if let balanceDate = sortedBalances.first(where: { isodateFormatter.date(from: $0)! > date && nextDate > isodateFormatter.date(from: $0)! }) {
+                    currentBalance = balances[balanceDate] ?? 0
+                } else if let balanceDate = sortedBalances.first(where: { isodateFormatter.date(from: $0)! < date }) {
+                    currentBalance = balances[balanceDate] ?? 0
+                } else {
+                    continue
+                }
+                if accountDetail.name == "Net Worth" {
+                    if account.bs_type == .Asset {
                         if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
-                            statistics[index].value += balance
+                            statistics[index].value += currentBalance
                             if !accountList.contains(account) {
                                 accountList.append(account)
                             }
-                            break
+                            continue
                         } else {
-                            let stat = Statistic(date: nextDate, value: balance)
+                            let stat = Statistic(date: nextDate, value: currentBalance)
                             statistics.append(stat)
                             if !accountList.contains(account) {
                                 accountList.append(account)
                             }
-                            break
+                            continue
                         }
-                    } else if accountDetails.name == account.subtype.name && accountDetails.level == .subtype {
+                    } else if account.bs_type == .Liability {
                         if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
-                            statistics[index].value += balance
+                            statistics[index].value -= currentBalance
                             if !accountList.contains(account) {
                                 accountList.append(account)
                             }
-                            break
+                            continue
                         } else {
-                            let stat = Statistic(date: nextDate, value: balance)
+                            let stat = Statistic(date: nextDate, value: -currentBalance)
                             statistics.append(stat)
                             if !accountList.contains(account) {
                                 accountList.append(account)
                             }
-                            break
+                            continue
                         }
-                    } else if accountDetails.name == account.type.name && accountDetails.level == .type {
-                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
-                            statistics[index].value += balance
-                            if !accountList.contains(account) {
-                                accountList.append(account)
-                            }
-                            break
-                        } else {
-                            let stat = Statistic(date: nextDate, value: balance)
-                            statistics.append(stat)
-                            if !accountList.contains(account) {
-                                accountList.append(account)
-                            }
-                            break
+                    }
+                } else if accountDetail.name == account.name && accountDetail.level == .account {
+                    if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                        statistics[index].value += currentBalance
+                        if !accountList.contains(account) {
+                            accountList.append(account)
                         }
-                    } else if accountDetails.name == account.bs_type.name && accountDetails.level == .bs_type {
-                        if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
-                            statistics[index].value += balance
-                            if !accountList.contains(account) {
-                                accountList.append(account)
-                            }
-                            break
-                        } else {
-                            let stat = Statistic(date: nextDate, value: balance)
-                            statistics.append(stat)
-                            if !accountList.contains(account) {
-                                accountList.append(account)
-                            }
-                            break
+                        continue
+                    } else {
+                        let stat = Statistic(date: nextDate, value: currentBalance)
+                        statistics.append(stat)
+                        if !accountList.contains(account) {
+                            accountList.append(account)
                         }
+                        continue
+                    }
+                } else if accountDetail.name == account.subtype.name && accountDetail.level == .subtype {
+                    if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                        statistics[index].value += currentBalance
+                        if !accountList.contains(account) {
+                            accountList.append(account)
+                        }
+                        continue
+                    } else {
+                        let stat = Statistic(date: nextDate, value: currentBalance)
+                        statistics.append(stat)
+                        if !accountList.contains(account) {
+                            accountList.append(account)
+                        }
+                        continue
+                    }
+                } else if accountDetail.name == account.type.name && accountDetail.level == .type {
+                    if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                        statistics[index].value += currentBalance
+                        if !accountList.contains(account) {
+                            accountList.append(account)
+                        }
+                        continue
+                    } else {
+                        let stat = Statistic(date: nextDate, value: currentBalance)
+                        statistics.append(stat)
+                        if !accountList.contains(account) {
+                            accountList.append(account)
+                        }
+                        continue
+                    }
+                } else if accountDetail.name == account.bs_type.name && accountDetail.level == .bs_type {
+                    if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                        statistics[index].value += currentBalance
+                        if !accountList.contains(account) {
+                            accountList.append(account)
+                        }
+                        continue
+                    } else {
+                        let stat = Statistic(date: nextDate, value: currentBalance)
+                        statistics.append(stat)
+                        if !accountList.contains(account) {
+                            accountList.append(account)
+                        }
+                        continue
                     }
                 }
             }

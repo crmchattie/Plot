@@ -611,7 +611,9 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             do {
                 var _account = account
                 if _account.balances != nil {
-                    _account.balances![_account.updated_at] = _account.available_balance ?? _account.balance
+                    if !_account.balances!.values.contains(_account.available_balance ?? _account.balance) {
+                        _account.balances![_account.updated_at] = _account.available_balance ?? _account.balance
+                    }
                 } else {
                     _account.balances = [_account.updated_at: _account.available_balance ?? _account.balance]
                 }
@@ -851,38 +853,13 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         return 0
     }
     
-    //    lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
-    //        if let object = object as? TransactionDetails {
-    //            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-    //            if object.level != .group {
-    //                cell.transactionDetails = object
-    //            }
-    //            return cell
-    //        } else if let object = object as? AccountDetails {
-    //            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-    //            if object.level != .bs_type {
-    //                cell.accountDetails = object
-    //            }
-    //            return cell
-    //        } else if let object = object as? Transaction {
-    //            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-    //            cell.transaction = object
-    //            return cell
-    //        } else if let object = object as? MXAccount {
-    //            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-    //            cell.account = object
-    //            return cell
-    //        }
-    //        return nil
-    //    }
-    //
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let section = sections[indexPath.section]
         let object = groups[section]
         if let object = object as? [TransactionDetails] {
             if section.subType == "Income Statement" {
                 let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: object[indexPath.item], transactions: transactions, financeDetailService: FinanceDetailService())
-                let financeDetailViewController = FinanceDetailViewController(viewModel: financeDetailViewModel)
+                let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
                 financeDetailViewController.delegate = self
                 financeDetailViewController.user = user
                 financeDetailViewController.users = users
@@ -893,7 +870,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         } else if let object = object as? [AccountDetails] {
             if section.subType == "Balance Sheet" {
                 let financeDetailViewModel = FinanceDetailViewModel(accountDetails: object[indexPath.item], accounts: accounts, transactionDetails: nil, transactions: nil, financeDetailService: FinanceDetailService())
-                let financeDetailViewController = FinanceDetailViewController(viewModel: financeDetailViewModel)
+                let financeDetailViewController = FinanceLineChartViewController(viewModel: financeDetailViewModel)
                 financeDetailViewController.delegate = self
                 financeDetailViewController.user = user
                 financeDetailViewController.users = users

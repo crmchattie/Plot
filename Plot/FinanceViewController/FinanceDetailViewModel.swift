@@ -15,7 +15,9 @@ protocol FinanceDetailViewModelInterface {
     var accounts: [MXAccount]? { get set }
     var transactions: [Transaction]? { get set }
     
-    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double, Double) -> ())
+    func fetchLineChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double, Double) -> ())
+    
+    func fetchBarChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?, Double, Double) -> ())
 }
 
 class FinanceDetailViewModel: FinanceDetailViewModelInterface {
@@ -38,12 +40,12 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
         self.financeDetailService = financeDetailService
     }
     
-    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double, Double) -> ()) {
+    func fetchLineChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double, Double) -> ()) {
         financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: allAccounts, transactions: allTransactions) { [weak self] (stats, accounts, transactions, err) in
             
-            var data: LineChartData?
+            var lineChartData: LineChartData?
             var maxValue: Double = 0
-            var minValue: Double = 0
+            var minValue: Double = 1000000000
             if let stats = stats, stats.count > 0 {
                 var i = 0
                 var entries: [ChartDataEntry] = []
@@ -78,15 +80,50 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 dataSet.fill = Fill(linearGradient: gradient, angle: 90)
                 dataSet.drawFilledEnabled = true
                 
-                data = LineChartData(dataSet: dataSet)
-                data?.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
+                lineChartData = LineChartData(dataSet: dataSet)
+                lineChartData?.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
+                maxValue *= 1.1
+                minValue /= 1.1
+            }
+            
+            DispatchQueue.main.async {
+                self?.accounts = accounts ?? []
+                self?.transactions = transactions ?? []
+                completion(lineChartData, maxValue, minValue)
+            }
+        }
+    }
+    
+    func fetchBarChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?, Double, Double) -> ()) {
+        financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: allAccounts, transactions: allTransactions) { [weak self] (stats, accounts, transactions, err) in
+            
+            var barChartData: BarChartData?
+            var maxValue: Double = 0
+            var minValue: Double = 1000000000
+            if let stats = stats, stats.count > 0 {
+                var i = 0
+                var entries: [BarChartDataEntry] = []
+                for stat in stats {
+                    maxValue = max(maxValue, stat.value)
+                    minValue = min(minValue, stat.value)
+                    let entry = BarChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
+                    entries.append(entry)
+                    i += 1
+                }
+                
+                let dataSet = BarChartDataSet(entries: entries, label: "")
+                dataSet.colors = [UIColor.systemBlue]
+                dataSet.drawValuesEnabled = false
+                
+                barChartData = BarChartData(dataSet: dataSet)
+                barChartData?.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
                 maxValue *= 1.3
             }
             
             DispatchQueue.main.async {
                 self?.accounts = accounts ?? []
                 self?.transactions = transactions ?? []
-                completion(data, maxValue, minValue)
+                completion(barChartData, maxValue, minValue)
             }
         }
     }

@@ -21,8 +21,8 @@ class HealthDetailViewController: UIViewController {
     var chartViewHeightAnchor: NSLayoutConstraint?
     var chartViewTopAnchor: NSLayoutConstraint?
     
-    lazy var chartView: LineChartView = {
-        let chartView = LineChartView()
+    lazy var chartView: BarChartView = {
+        let chartView = BarChartView()
         chartView.translatesAutoresizingMaskIntoConstraints = false
         return chartView
     }()
@@ -132,36 +132,60 @@ class HealthDetailViewController: UIViewController {
     
     func configureChart() {
         chartView.chartDescription?.enabled = false
+        
         chartView.dragEnabled = true
         chartView.setScaleEnabled(true)
         chartView.pinchZoomEnabled = true
         
         let xAxis = chartView.xAxis
         xAxis.labelPosition = .bottom
-        xAxis.labelFont = .systemFont(ofSize: 10)
-        xAxis.setLabelCount(6, force: true)
+        
+        chartView.drawBarShadowEnabled = false
+        chartView.drawValueAboveBarEnabled = false
+        
+        chartView.maxVisibleCount = 60
+        
         dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
-        dayAxisValueFormatter?.formatType = segmentedControl.selectedSegmentIndex
         xAxis.valueFormatter = dayAxisValueFormatter
+        xAxis.labelPosition = .bottom
+        xAxis.labelFont = .systemFont(ofSize: 10)
+        xAxis.granularity = 1
+        xAxis.labelCount = 5
         xAxis.drawGridLinesEnabled = false
-        xAxis.avoidFirstLastClippingEnabled = true
-
+                                
+        chartView.rightAxis.enabled = true
+        chartView.leftAxis.enabled = false
+        
+        let rightAxisFormatter = NumberFormatter()
+        rightAxisFormatter.numberStyle = .decimal
         let rightAxis = chartView.rightAxis
-        rightAxis.removeAllLimitLines()
-        rightAxis.axisMinimum = 0
+        rightAxis.enabled = true
+        rightAxis.labelFont = .systemFont(ofSize: 10)
+        rightAxis.labelCount = 8
+        rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
+        rightAxis.spaceTop = 0.15
         rightAxis.drawGridLinesEnabled = false
         
-        chartView.leftAxis.enabled = false
-
-        let marker = BalloonMarker(color: UIColor(white: 180/255, alpha: 1),
-                                   font: .systemFont(ofSize: 12),
-                                   textColor: .white,
-                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8))
+        chartView.legend.enabled = false
+        let l = chartView.legend
+        l.horizontalAlignment = .left
+        l.verticalAlignment = .bottom
+        l.orientation = .horizontal
+        l.drawInside = false
+        l.form = .circle
+        l.formSize = 9
+        l.font = UIFont(name: "HelveticaNeue-Light", size: 11)!
+        l.xEntrySpace = 4
+        
+        
+        let marker = XYMarkerView(color: UIColor(white: 180/250, alpha: 1),
+                                  font: .systemFont(ofSize: 12),
+                                  textColor: .white,
+                                  insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
+                                  xAxisValueFormatter: chartView.xAxis.valueFormatter!)
         marker.chartView = chartView
         marker.minimumSize = CGSize(width: 80, height: 40)
         chartView.marker = marker
-        
-        chartView.legend.form = .line
     }
     
     @objc func changeSegment(_ segmentedControl: UISegmentedControl) {        
@@ -189,6 +213,7 @@ class HealthDetailViewController: UIViewController {
         viewModel.fetchChartData(for: segmentType) { [weak self] (data, maxValue) in
             guard let weakSelf = self else { return }
             
+            weakSelf.chartView.extraRightOffset = 5
             weakSelf.chartView.data = data
             weakSelf.chartView.rightAxis.axisMinimum = 0
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
@@ -232,5 +257,9 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
         let sample = viewModel.samples[indexPath.row]
         cell.configure(sample)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }

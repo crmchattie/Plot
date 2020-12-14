@@ -178,9 +178,9 @@ extension SummaryViewController: UICollectionViewDelegate, UICollectionViewDataS
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: summaryPieChartCell, for: indexPath) as! SummaryPieChartCell
             cell.backgroundColor = collectionView.backgroundColor
-            if let pieChartDataList = object as? [PieChartData] {
-                let pieChartData = pieChartDataList[indexPath.item]
-                cell.pieChartData = pieChartData
+            if let chartDataList = object as? [PieChartData] {
+                let chartData = chartDataList[indexPath.item]
+                cell.chartData = chartData
                 cell.chartView.delegate = self
             }
             return cell

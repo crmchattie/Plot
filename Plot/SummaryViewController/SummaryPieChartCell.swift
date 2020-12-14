@@ -16,10 +16,10 @@ class SummaryPieChartCell: UICollectionViewCell {
         return chartView
     }()
 
-    var pieChartData: PieChartData! {
+    var chartData: PieChartData! {
         didSet {
-            if let pieChartData = pieChartData {
-                chartView.data = pieChartData
+            if let chartData = chartData {
+                chartView.data = chartData
                 chartView.highlightValues(nil)
                                 
                 // entry label styling

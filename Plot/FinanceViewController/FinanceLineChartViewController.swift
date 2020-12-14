@@ -6,6 +6,10 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
+import UIKit
+import Firebase
+import Charts
+
 fileprivate let chartViewHeight: CGFloat = 260
 fileprivate let chartViewTopMargin: CGFloat = 10
 
@@ -14,20 +18,13 @@ protocol UpdateFinancialsDelegate: class {
     func updateAccounts(accounts: [MXAccount])
 }
 
-import UIKit
-import Firebase
-import Charts
-
-class FinanceDetailViewController: UIViewController {
+class FinanceLineChartViewController: UIViewController {
     
     weak var delegate : UpdateFinancialsDelegate?
     
     private let kFinanceTableViewCell = "FinanceTableViewCell"
     
     var user: MXUser!
-    
-    var filteredTransactions: [Transaction]!
-    var filteredAccounts: [MXAccount]!
     
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
@@ -171,16 +168,18 @@ class FinanceDetailViewController: UIViewController {
         xAxis.labelFont = .systemFont(ofSize: 10)
         xAxis.setLabelCount(6, force: true)
         dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
-        dayAxisValueFormatter?.formatType = segmentedControl.selectedSegmentIndex
         xAxis.valueFormatter = dayAxisValueFormatter
         xAxis.drawGridLinesEnabled = false
         xAxis.avoidFirstLastClippingEnabled = true
 
+        let rightAxisFormatter = NumberFormatter()
+        rightAxisFormatter.numberStyle = .currency
+        rightAxisFormatter.maximumFractionDigits = 0
         let rightAxis = chartView.rightAxis
         rightAxis.removeAllLimitLines()
-        rightAxis.axisMinimum = 0
         rightAxis.drawLimitLinesBehindDataEnabled = true
         rightAxis.drawGridLinesEnabled = false
+        rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
         
         chartView.leftAxis.enabled = false
 
@@ -217,10 +216,10 @@ class FinanceDetailViewController: UIViewController {
     func fetchData() {
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        viewModel.fetchChartData(for: segmentType) { [weak self] (data, maxValue, minValue) in
+        viewModel.fetchLineChartData(for: segmentType) { [weak self] (lineChartData, maxValue, minValue) in
             guard let weakSelf = self else { return }
-            
-            weakSelf.chartView.data = data
+            weakSelf.chartView.extraRightOffset = 5
+            weakSelf.chartView.data = lineChartData
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
             weakSelf.chartView.rightAxis.axisMinimum = minValue
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
@@ -305,7 +304,7 @@ class FinanceDetailViewController: UIViewController {
     }
 }
 
-extension FinanceDetailViewController: ChartViewDelegate {
+extension FinanceLineChartViewController: ChartViewDelegate {
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
         
     }
@@ -323,7 +322,7 @@ extension FinanceDetailViewController: ChartViewDelegate {
     }
 }
 
-extension FinanceDetailViewController: UITableViewDelegate, UITableViewDataSource {
+extension FinanceLineChartViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let transactions = viewModel.transactions, !transactions.isEmpty {
             return transactions.count
@@ -379,7 +378,7 @@ enum TimeSegmentType: Int {
     case year
 }
 
-extension FinanceDetailViewController: UpdateAccountDelegate {
+extension FinanceLineChartViewController: UpdateAccountDelegate {
     func updateAccount(account: MXAccount) {
         if let index = viewModel.accounts!.firstIndex(of: account) {
             viewModel.accounts![index] = account
@@ -387,7 +386,7 @@ extension FinanceDetailViewController: UpdateAccountDelegate {
     }
 }
 
-extension FinanceDetailViewController: UpdateTransactionDelegate {
+extension FinanceLineChartViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         if let index = viewModel.transactions!.firstIndex(of: transaction) {
             viewModel.transactions![index] = transaction
