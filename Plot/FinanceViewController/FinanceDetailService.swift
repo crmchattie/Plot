@@ -41,6 +41,9 @@ class FinanceDetailService: FinanceDetailServiceInterface {
             endDate = Date().endOfYear
         }
         
+        print("startDate \(startDate)")
+        print("endDate \(endDate)")
+        
         if let accountDetails = accountDetails, let accounts = accounts {
             accountDetailsOverTimeChartData(accounts: accounts, accountDetails: [accountDetails], start: startDate, end: endDate, segmentType: segmentType) { (statisticDict, accountDict) in
                 if let statistics = statisticDict[accountDetails], let accounts = accountDict[accountDetails] {

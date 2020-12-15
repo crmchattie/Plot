@@ -40,6 +40,25 @@ public class DayAxisValueFormatter: NSObject, IAxisValueFormatter {
         }
     }
     
+    public func stringForMarker(_ value: Double, axis: AxisBase?) -> String {
+        guard let entry = self.chart?.data?.dataSets.first?.entryForIndex(Int(value)), let date = entry.data as? Date else {
+            return ""
+        }
+        
+        switch formatType {
+        case 0:
+            return date.getHourlyTimeStringForMarker()
+        case 1:
+            return date.getMonthAndDateAndYear()
+        case 2:
+            return date.getMonthAndDateAndYear()
+        case 3:
+            return date.getShortMonthAndYear()
+        default:
+            return ""
+        }
+    }
+    
     private func days(forMonth month: Int, year: Int) -> Int {
         // month is 0-based
         switch month {

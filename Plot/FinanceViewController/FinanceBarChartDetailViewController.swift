@@ -56,6 +56,8 @@ class FinanceBarChartViewController: UIViewController {
     
     lazy var barButton = UIBarButtonItem()
     
+    lazy var units = "currency"
+    
     init(viewModel: FinanceDetailViewModelInterface) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -201,11 +203,11 @@ class FinanceBarChartViewController: UIViewController {
         l.xEntrySpace = 4
         
         
-        let marker = XYMarkerView(color: UIColor(white: 180/250, alpha: 1),
+        let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
                                   font: .systemFont(ofSize: 12),
                                   textColor: .white,
                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
-                                  xAxisValueFormatter: chartView.xAxis.valueFormatter!)
+                                  xAxisValueFormatter: dayAxisValueFormatter!, units: units)
         marker.chartView = chartView
         marker.minimumSize = CGSize(width: 80, height: 40)
         chartView.marker = marker
@@ -233,16 +235,13 @@ class FinanceBarChartViewController: UIViewController {
     func fetchData() {
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        viewModel.fetchBarChartData(for: segmentType) { [weak self] (barChartData, maxValue, minValue) in
+        viewModel.fetchBarChartData(for: segmentType) { [weak self] (barChartData, maxValue) in
             guard let weakSelf = self else { return }
-            weakSelf.chartView.extraRightOffset = 10
             weakSelf.chartView.data = barChartData
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
-            weakSelf.chartView.rightAxis.axisMinimum = minValue
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
-            weakSelf.chartView.animate(xAxisDuration: 1)
-//            weakSelf.updateChartViewAppearance(hidden: data == nil)
+            weakSelf.chartView.notifyDataSetChanged()
             
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
             weakSelf.tableView.reloadData()

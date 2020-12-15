@@ -13,23 +13,31 @@ import Charts
 #endif
 
 public class XYMarkerView: BalloonMarker {
-    public var xAxisValueFormatter: IAxisValueFormatter
+    public var xAxisValueFormatter: DayAxisValueFormatter
     fileprivate var yFormatter = NumberFormatter()
+    fileprivate var units = String()
     
     public init(color: UIColor, font: UIFont, textColor: UIColor, insets: UIEdgeInsets,
-                xAxisValueFormatter: IAxisValueFormatter) {
+                xAxisValueFormatter: DayAxisValueFormatter, units: String) {
         self.xAxisValueFormatter = xAxisValueFormatter
-        yFormatter.minimumFractionDigits = 1
-        yFormatter.maximumFractionDigits = 1
+        self.units = units
+        yFormatter.minimumFractionDigits = 0
+        yFormatter.maximumFractionDigits = 0
         super.init(color: color, font: font, textColor: textColor, insets: insets)
     }
     
     public override func refreshContent(entry: ChartDataEntry, highlight: Highlight) {
-        let string = "x: "
-            + xAxisValueFormatter.stringForValue(entry.x, axis: XAxis())
-            + ", y: "
-            + yFormatter.string(from: NSNumber(floatLiteral: entry.y))!
-        setLabel(string)
+        if units == "currency" {
+            yFormatter.numberStyle = .currency
+            let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + "\n"
+                + xAxisValueFormatter.stringForMarker(entry.x, axis: XAxis())
+            setLabel(string)
+        } else {
+            yFormatter.numberStyle = .decimal
+            let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + " \(units)\n"
+                + xAxisValueFormatter.stringForMarker(entry.x, axis: XAxis())
+            setLabel(string)
+        }
     }
     
 }

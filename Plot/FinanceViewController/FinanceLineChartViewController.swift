@@ -61,6 +61,8 @@ class FinanceLineChartViewController: UIViewController {
     
     lazy var barButton = UIBarButtonItem()
     
+    lazy var units = "currency"
+    
     init(viewModel: FinanceDetailViewModelInterface) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -183,15 +185,17 @@ class FinanceLineChartViewController: UIViewController {
         
         chartView.leftAxis.enabled = false
 
-        let marker = BalloonMarker(color: UIColor(white: 180/255, alpha: 1),
-                                   font: .systemFont(ofSize: 12),
-                                   textColor: .white,
-                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8))
+        let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
+                                  font: .systemFont(ofSize: 12),
+                                  textColor: .white,
+                                  insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
+                                  xAxisValueFormatter: dayAxisValueFormatter!, units: units)
         marker.chartView = chartView
         marker.minimumSize = CGSize(width: 80, height: 40)
         chartView.marker = marker
         
         chartView.legend.form = .line
+        chartView.legend.enabled = false
     }
     
     @objc func changeSegment(_ segmentedControl: UISegmentedControl) {
@@ -216,16 +220,13 @@ class FinanceLineChartViewController: UIViewController {
     func fetchData() {
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        viewModel.fetchLineChartData(for: segmentType) { [weak self] (lineChartData, maxValue, minValue) in
+        viewModel.fetchLineChartData(for: segmentType) { [weak self] (lineChartData, maxValue) in
             guard let weakSelf = self else { return }
-            weakSelf.chartView.extraRightOffset = 5
             weakSelf.chartView.data = lineChartData
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
-            weakSelf.chartView.rightAxis.axisMinimum = minValue
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
-            weakSelf.chartView.animate(xAxisDuration: 1)
-//            weakSelf.updateChartViewAppearance(hidden: data == nil)
+            weakSelf.chartView.notifyDataSetChanged()
             
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
             weakSelf.tableView.reloadData()

@@ -45,10 +45,10 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
                 let dataSet = BarChartDataSet(entries: entries, label: "")
                 dataSet.colors = [UIColor.systemBlue]
                 dataSet.drawValuesEnabled = false
+                dataSet.axisDependency = .right
                 
                 data = BarChartData(dataSet: dataSet)
                 data?.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
-                maxValue *= 1.3
             }
             
             DispatchQueue.main.async {

@@ -284,7 +284,14 @@ extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
         dateFormatter.dateStyle = .medium
-        dateFormatter.dateFormat = "MMM, dd"
+        dateFormatter.dateFormat = "MMM dd"
+        return dateFormatter.string(from: self)
+    }
+    
+    func getMonthAndDateAndYear() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "MMM d, yyyy"
         return dateFormatter.string(from: self)
     }
     
@@ -324,7 +331,7 @@ extension Date {
     
     func getDayDigit() -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd"
+        dateFormatter.dateFormat = "d"
         return dateFormatter.string(from: self)
     }
     
@@ -336,7 +343,7 @@ extension Date {
     
     func getShortMonthAndYear() -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM, yy"
+        dateFormatter.dateFormat = "MMM yyyy"
         return dateFormatter.string(from: self)
     }
     
@@ -360,10 +367,23 @@ extension Date {
     func getHourlyTimeString() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
-        dateFormatter.dateFormat = "hh a"
+        dateFormatter.dateFormat = "h a"
         dateFormatter.amSymbol = "AM"
         dateFormatter.pmSymbol = "PM"
         return dateFormatter.string(from: self)
+    }
+    
+    func getHourlyTimeStringForMarker() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "h a"
+        dateFormatter.amSymbol = "AM"
+        dateFormatter.pmSymbol = "PM"
+        let cal = Calendar(identifier: .gregorian)
+        let startHour = cal.date(byAdding: .hour, value: -1, to: self)!
+        let monthAndDay = startHour.getMonthAndDate()
+        return "\(monthAndDay), \(dateFormatter.string(from: startHour))-\(dateFormatter.string(from: self))"
+
     }
     
     func dayOfWeek() -> String {
@@ -1614,7 +1634,6 @@ extension Date {
     var endOfMonth: Date {
         var components = DateComponents()
         components.month = 1
-        components.hour = -1
         return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfMonth)!
     }
     
@@ -1628,7 +1647,6 @@ extension Date {
     var endOfYear: Date {
         var components = DateComponents()
         components.year = 1
-        components.day = -1
         return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfYear)!
     }
 

@@ -12,7 +12,7 @@
 import Foundation
 import Charts
 #if canImport(UIKit)
-    import UIKit
+import UIKit
 #endif
 
 open class BalloonMarker: MarkerImage
@@ -45,7 +45,7 @@ open class BalloonMarker: MarkerImage
     {
         var offset = self.offset
         var size = self.size
-
+        
         if size.width == 0.0 && image != nil
         {
             size.width = image!.size.width
@@ -54,40 +54,39 @@ open class BalloonMarker: MarkerImage
         {
             size.height = image!.size.height
         }
-
+        
         let width = size.width
         let height = size.height
         let padding: CGFloat = 8.0
-
+        
         var origin = point
         origin.x -= width / 2
         origin.y -= height
-
+        
         if origin.x + offset.x < 0.0
         {
             offset.x = -origin.x + padding
         }
         else if let chart = chartView,
-            origin.x + width + offset.x > chart.bounds.size.width
+                origin.x + width + offset.x > chart.bounds.size.width
         {
             offset.x = chart.bounds.size.width - origin.x - width - padding
         }
-
+        
         if origin.y + offset.y < 0
         {
             offset.y = height + padding;
         }
         else if let chart = chartView,
-            origin.y + height + offset.y > chart.bounds.size.height
+                origin.y + height + offset.y > chart.bounds.size.height
         {
             offset.y = chart.bounds.size.height - origin.y - height - padding
         }
-
+        
         return offset
     }
     
-    open override func draw(context: CGContext, point: CGPoint)
-    {
+    open override func draw(context: CGContext, point: CGPoint) {
         guard let label = label else { return }
         
         let offset = self.offsetForDrawing(atPoint: point)
@@ -102,67 +101,44 @@ open class BalloonMarker: MarkerImage
         rect.origin.y -= size.height
         
         context.saveGState()
-
+        
         context.setFillColor(color.cgColor)
-
-        if offset.y > 0
-        {
+        
+        if offset.y > 0 {
+            
             context.beginPath()
-            context.move(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y + arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + (rect.size.width - arrowSize.width) / 2.0,
-                y: rect.origin.y + arrowSize.height))
-            //arrow vertex
-            context.addLine(to: CGPoint(
-                x: point.x,
-                y: point.y))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + (rect.size.width + arrowSize.width) / 2.0,
-                y: rect.origin.y + arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + rect.size.width,
-                y: rect.origin.y + arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + rect.size.width,
-                y: rect.origin.y + rect.size.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y + rect.size.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y + arrowSize.height))
+            let rect2 = CGRect(x: rect.origin.x, y: rect.origin.y + arrowSize.height, width: rect.size.width, height: rect.size.height - arrowSize.height)
+            let clipPath = UIBezierPath(roundedRect: rect2, cornerRadius: 10).cgPath
+            context.addPath(clipPath)
+            context.closePath()
             context.fillPath()
-        }
-        else
-        {
+            
+            // arraow vertex
             context.beginPath()
-            context.move(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + rect.size.width,
-                y: rect.origin.y))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + rect.size.width,
-                y: rect.origin.y + rect.size.height - arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + (rect.size.width + arrowSize.width) / 2.0,
-                y: rect.origin.y + rect.size.height - arrowSize.height))
-            //arrow vertex
-            context.addLine(to: CGPoint(
-                x: point.x,
-                y: point.y))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + (rect.size.width - arrowSize.width) / 2.0,
-                y: rect.origin.y + rect.size.height - arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y + rect.size.height - arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y))
+            let p1 = CGPoint(x: rect.origin.x + rect.size.width / 2.0 - arrowSize.width / 2.0, y: rect.origin.y + arrowSize.height + 1)
+            context.move(to: p1)
+            context.addLine(to: CGPoint(x: p1.x + arrowSize.width, y: p1.y))
+            context.addLine(to: CGPoint(x: point.x, y: point.y))
+            context.addLine(to: p1)
+            
+            context.fillPath()
+            
+        } else {
+            context.beginPath()
+            let rect2 = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height - arrowSize.height)
+            let clipPath = UIBezierPath(roundedRect: rect2, cornerRadius: 10).cgPath
+            context.addPath(clipPath)
+            context.closePath()
+            context.fillPath()
+            
+            // arraow vertex
+            context.beginPath()
+            let p1 = CGPoint(x: rect.origin.x + rect.size.width / 2.0 - arrowSize.width / 2.0, y: rect.origin.y + rect.size.height - arrowSize.height - 1)
+            context.move(to: p1)
+            context.addLine(to: CGPoint(x: p1.x + arrowSize.width, y: p1.y))
+            context.addLine(to: CGPoint(x: point.x, y: point.y))
+            context.addLine(to: p1)
+            
             context.fillPath()
         }
         
@@ -171,7 +147,7 @@ open class BalloonMarker: MarkerImage
         } else {
             rect.origin.y += self.insets.top
         }
-
+        
         rect.size.height -= self.insets.top + self.insets.bottom
         
         UIGraphicsPushContext(context)

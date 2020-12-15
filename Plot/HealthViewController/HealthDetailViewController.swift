@@ -42,7 +42,7 @@ class HealthDetailViewController: UIViewController {
     }()
     
     lazy var barButton = UIBarButtonItem()
-    
+        
     init(viewModel: HealthDetailViewModelInterface) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -177,12 +177,11 @@ class HealthDetailViewController: UIViewController {
         l.font = UIFont(name: "HelveticaNeue-Light", size: 11)!
         l.xEntrySpace = 4
         
-        
-        let marker = XYMarkerView(color: UIColor(white: 180/250, alpha: 1),
+        let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
                                   font: .systemFont(ofSize: 12),
                                   textColor: .white,
                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
-                                  xAxisValueFormatter: chartView.xAxis.valueFormatter!)
+                                  xAxisValueFormatter: dayAxisValueFormatter!, units: title?.lowercased() ?? "")
         marker.chartView = chartView
         marker.minimumSize = CGSize(width: 80, height: 40)
         chartView.marker = marker
@@ -213,14 +212,12 @@ class HealthDetailViewController: UIViewController {
         viewModel.fetchChartData(for: segmentType) { [weak self] (data, maxValue) in
             guard let weakSelf = self else { return }
             
-            weakSelf.chartView.extraRightOffset = 5
             weakSelf.chartView.data = data
             weakSelf.chartView.rightAxis.axisMinimum = 0
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
-            weakSelf.chartView.animate(xAxisDuration: 1)
-//            weakSelf.updateChartViewAppearance(hidden: data == nil)
+            weakSelf.chartView.notifyDataSetChanged()
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
             weakSelf.tableView.reloadData()
         }
