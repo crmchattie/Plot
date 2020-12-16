@@ -190,9 +190,11 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
                                                 dispatchGroup.enter()
                                                 var _account = account
                                                 if !self.accounts.contains(_account) {
-                                                    self.accounts.append(_account)
                                                     self.getMXTransactions(user: user, account: _account, date: nil)
+                                                    self.accounts.append(_account)
                                                 } else if let index = self.accounts.firstIndex(of: account) {
+                                                    let date = self.isodateFormatter.date(from: _account.updated_at ) ?? Date()
+                                                    self.getMXTransactions(user: user, account: _account, date: date.addingTimeInterval(-604800))
                                                     _account.balances = self.accounts[index].balances
                                                     _account.description = self.accounts[index].description
                                                     _account.admin = self.accounts[index].admin

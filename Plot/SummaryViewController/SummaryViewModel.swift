@@ -41,10 +41,10 @@ class SummaryViewModel: SummaryViewModelInterface {
             }
             
             if let entriesDictionary = calendarEntries, !entriesDictionary.isEmpty {
-                for (key, entries) in entriesDictionary {
+                for (_, entries) in entriesDictionary {
                     if entries.count > 0 {
                         let sortedEntries = entries.sorted(by: {$0.label < $1.label})
-                        self.createPieChartData(label: key, entries: sortedEntries) { (pieChartData) in
+                        self.createPieChartData(entries: sortedEntries) { (pieChartData) in
                             self.sections.insert(.calendarSummary, at: 0)
                             self.groups[.calendarSummary] = [pieChartData]
                         }
@@ -55,7 +55,7 @@ class SummaryViewModel: SummaryViewModelInterface {
             if let entriesDictionary = financesEntries, !entriesDictionary.isEmpty {
                 for key in Array(entriesDictionary.keys).sorted() {
                     if let entries = entriesDictionary[key], entries.count > 0 {
-                        self.createPieChartData(label: key, entries: entries) { (pieChartData) in
+                        self.createPieChartData(entries: entries) { (pieChartData) in
                             if key == "Financial Summary" {
                                 self.sections.append(.financialSummary)
                                 self.groups[.financialSummary] = [pieChartData]
@@ -74,7 +74,7 @@ class SummaryViewModel: SummaryViewModelInterface {
         }
     }
     
-    func createPieChartData(label: String, entries: [Entry], completion: @escaping (PieChartData) -> Void) {
+    func createPieChartData(entries: [Entry], completion: @escaping (PieChartData) -> Void) {
         var i = 0
         var chartEntries: [ChartDataEntry] = []
         for entry in entries {
@@ -101,6 +101,81 @@ class SummaryViewModel: SummaryViewModelInterface {
         data.setValueFormatter(DefaultValueFormatter(formatter: pFormatter))
         data.setValueFont(.systemFont(ofSize: 11, weight: .light))
         data.setValueTextColor(.white)
+        completion(data)
+    }
+    
+    func createBarChartData(statsDictionary: [String: [Statistic]], completion: @escaping (BarChartData) -> Void) {
+        
+        let data = BarChartData()
+        data.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
+        
+        var maxValue: Double = 0
+        var y = 0
+        for (label, stats) in statsDictionary {
+            var i = 0
+            var chartEntries: [BarChartDataEntry] = []
+            for stat in stats {
+                maxValue = max(maxValue, stat.value)
+                let entry = BarChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
+                chartEntries.append(entry)
+                i += 1
+            }
+            let dataSet = BarChartDataSet(entries: chartEntries, label: label)
+            dataSet.setColor(ChartColors.palette()[y])
+            dataSet.drawValuesEnabled = false
+            dataSet.axisDependency = .right
+            data.addDataSet(dataSet)
+            y += 1
+        }
+        maxValue *= 1.2
+        
+        completion(data)
+    }
+    
+    func createLineChartData(statsDictionary: [String: [Statistic]], completion: @escaping (LineChartData) -> Void) {
+        
+        let data = LineChartData()
+        data.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
+        
+        var maxValue: Double = 0
+        var y = 0
+        for (label, stats) in statsDictionary {
+            var i = 0
+            var chartEntries: [ChartDataEntry] = []
+            for stat in stats {
+                maxValue = max(maxValue, stat.value)
+                let entry = ChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
+                chartEntries.append(entry)
+                i += 1
+            }
+            let dataSet = LineChartDataSet(entries: chartEntries, label: label)
+            dataSet.drawIconsEnabled = false
+            dataSet.mode = .cubicBezier
+            dataSet.setColor(UIColor.systemBlue)
+            dataSet.setCircleColor(UIColor.systemBlue)
+            dataSet.drawCirclesEnabled = false
+            dataSet.drawValuesEnabled = false
+            dataSet.circleRadius = 3
+            dataSet.drawCircleHoleEnabled = false
+            dataSet.valueFont = .systemFont(ofSize: 9)
+            dataSet.formSize = 15
+            dataSet.lineWidth = 0
+            
+            let colorTop = UIColor.systemBlue.cgColor
+            let colorBottom = UIColor(red: 16.0/255.0, green: 28.0/255.0, blue: 56.0/255.0, alpha: 1.0).cgColor
+            let gradientColors = [colorBottom, colorTop] as CFArray
+            let gradient = CGGradient(colorsSpace: nil, colors: gradientColors as CFArray, locations: nil)!
+            dataSet.fillAlpha = 1
+            dataSet.fill = Fill(linearGradient: gradient, angle: 90)
+            
+            dataSet.drawFilledEnabled = true
+            dataSet.axisDependency = .right
+            
+            data.addDataSet(dataSet)
+            y += 1
+        }
+        maxValue *= 1.2
+        
         completion(data)
     }
 }

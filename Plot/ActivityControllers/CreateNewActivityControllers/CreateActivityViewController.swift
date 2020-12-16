@@ -216,7 +216,7 @@ class CreateActivityViewController: FormViewController {
                     cell.height = { return CGFloat(44) }
                     
                     row.title = "Cover Photo"
-                    cell.titleLeftMargin = 20.0
+                    cell.titleLeftMargin = 15.0
                     cell.titleLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
 //                    //  Construct the view for the cell

@@ -54,12 +54,13 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     entries.append(entry)
                     i += 1
                 }
+                maxValue *= 1.2
                 
-                let dataSet = LineChartDataSet(entries: entries, label: "")
+                let dataSet = LineChartDataSet(entries: entries, label: nil)
                 dataSet.drawIconsEnabled = false
                 dataSet.mode = .cubicBezier
-                dataSet.setColor(.black)
-                dataSet.setCircleColor(.black)
+                dataSet.setColor(UIColor.systemBlue)
+                dataSet.setCircleColor(UIColor.systemBlue)
                 dataSet.drawCirclesEnabled = false
                 dataSet.drawValuesEnabled = false
                 dataSet.circleRadius = 3
@@ -71,11 +72,10 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 let colorTop = UIColor.systemBlue.cgColor
                 let colorBottom = UIColor(red: 16.0/255.0, green: 28.0/255.0, blue: 56.0/255.0, alpha: 1.0).cgColor
                 let gradientColors = [colorBottom, colorTop] as CFArray
-                
                 let gradient = CGGradient(colorsSpace: nil, colors: gradientColors as CFArray, locations: nil)!
-                
                 dataSet.fillAlpha = 1
                 dataSet.fill = Fill(linearGradient: gradient, angle: 90)
+                
                 dataSet.drawFilledEnabled = true
                 dataSet.axisDependency = .right
                 
@@ -105,9 +105,10 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     entries.append(entry)
                     i += 1
                 }
+                maxValue *= 1.2
                 
                 let dataSet = BarChartDataSet(entries: entries, label: "")
-                dataSet.colors = [UIColor.systemBlue]
+                dataSet.setColor(ChartColors.palette()[0])
                 dataSet.drawValuesEnabled = false
                 dataSet.axisDependency = .right
                 
