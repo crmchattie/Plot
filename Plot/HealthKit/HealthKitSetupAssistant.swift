@@ -37,6 +37,7 @@ class HealthKitSetupAssistant {
             let dietaryEnergyConsumed = HKObjectType.quantityType(forIdentifier: .dietaryEnergyConsumed),
             let distanceWalkingRunning = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning),
             let distanceCycling = HKObjectType.quantityType(forIdentifier: .distanceCycling),
+            let sleepAnalysis = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
             let activeEnergy = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
                 completion(false, HealthkitSetupError.dataTypeNotAvailable)
                 return
@@ -47,11 +48,12 @@ class HealthKitSetupAssistant {
         let healthKitTypesToRead: Set<HKObjectType> = [summaryType,
                                                         activeEnergy,
                                                         stepCount,
-                                                        distanceWalkingRunning,
-                                                        distanceCycling,
+                                                        sleepAnalysis,
                                                         heartRate,
                                                         bodyMass,
                                                         bodyMassIndex,
+                                                        distanceWalkingRunning,
+                                                        distanceCycling,
                                                         dietaryFatTotal,
                                                         dietaryCarbohydrates,
                                                         dietarySugar,

@@ -81,6 +81,10 @@ class HealthKitManager {
             weightOpAdapter.addDependency(annualAverageWeightOperation)
             weightOperation.addDependency(weightOpAdapter)
             
+            // Sleep
+            let sleepOp = SleepOperation(date: today)
+            sleepOp.delegate = self
+            
             // Workouts
             let functionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .functionalStrengthTraining, rank: 1)
             functionalStrengthTrainingOp.delegate = self
@@ -120,7 +124,7 @@ class HealthKitManager {
             dietarySugarOp.delegate = self
             
             // Setup queue
-            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
+            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in

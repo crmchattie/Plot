@@ -130,6 +130,9 @@ class HealthMetricCell: UICollectionViewCell {
         if case HealthMetricType.weight = healthMetric.type {
             total = healthMetric.total.clean
         }
+        else if case HealthMetricType.sleep = healthMetric.type {
+            total = TimeInterval(healthMetric.total).stringTimeShort
+        }
         
         subtitleLabel.text = "\(total) \(healthMetric.unitName) \(timeAgo)"
         
@@ -138,6 +141,10 @@ class HealthMetricCell: UICollectionViewCell {
             if case HealthMetricType.weight = healthMetric.type {
                 average = averageValue.clean
             }
+            else if case HealthMetricType.sleep = healthMetric.type {
+                average = TimeInterval(averageValue).stringTimeShort
+            }
+            
             detailLabel.text = "\(average) \(healthMetric.unitName) on average"
         }
 
@@ -172,6 +179,8 @@ class HealthMetricCell: UICollectionViewCell {
             imageName = "heart-rate"
         case .weight:
             imageName = "body-weight-scales"
+        case .sleep:
+            imageName = "sleep-bedtime"
         }
         
         activityTypeButton.setImage(UIImage(named: imageName), for: .normal)
