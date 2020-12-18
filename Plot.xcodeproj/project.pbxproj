@@ -255,6 +255,7 @@
 		26B975E72363F9C6003BFBE3 /* InvitationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B975E62363F9C6003BFBE3 /* InvitationsViewController.swift */; };
 		26B975E92364009C003BFBE3 /* InvitationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B975E82364009C003BFBE3 /* InvitationCell.swift */; };
 		26B975ED2365374A003BFBE3 /* InvitationsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */; };
+		26BDCDCC2582097700E850CF /* SleepOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26BDCDCB2582097700E850CF /* SleepOperation.swift */; };
 		26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C4431C250F0CB000A9533C /* HealthMetric.swift */; };
 		26CDFB22239E278200567666 /* NewUserActivities.json in Resources */ = {isa = PBXBuildFile; fileRef = 26CDFB21239E278200567666 /* NewUserActivities.json */; };
 		26D37B6A2556004B00F7131B /* HealthDetailSampleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D37B692556004B00F7131B /* HealthDetailSampleCell.swift */; };
@@ -712,6 +713,7 @@
 		26B975E62363F9C6003BFBE3 /* InvitationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationsViewController.swift; sourceTree = "<group>"; };
 		26B975E82364009C003BFBE3 /* InvitationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationCell.swift; sourceTree = "<group>"; };
 		26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationsFetcher.swift; sourceTree = "<group>"; };
+		26BDCDCB2582097700E850CF /* SleepOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepOperation.swift; sourceTree = "<group>"; };
 		26C4431C250F0CB000A9533C /* HealthMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthMetric.swift; sourceTree = "<group>"; };
 		26CDFB21239E278200567666 /* NewUserActivities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = NewUserActivities.json; sourceTree = "<group>"; };
 		26D37B692556004B00F7131B /* HealthDetailSampleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthDetailSampleCell.swift; sourceTree = "<group>"; };
@@ -1369,6 +1371,7 @@
 				261FAF78251C69C0008636DF /* WeightOperation.swift */,
 				26317C2F251DB250007CC315 /* WorkoutOperation.swift */,
 				26958552255A7355008FEE9B /* NutritionOperation.swift */,
+				26BDCDCB2582097700E850CF /* SleepOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);
 			path = Operations;
@@ -2628,6 +2631,7 @@
 				10DFC3DB255C48A500565DAD /* FinancialInfoViewController.swift in Sources */,
 				10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */,
 				1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */,
+				26BDCDCC2582097700E850CF /* SleepOperation.swift in Sources */,
 				105F66F724171A3C00F6EDB6 /* WorkoutDetailViewController.swift in Sources */,
 				10B541E225479D3100CC9023 /* MealViewController.swift in Sources */,
 				4BAEE48721272C4F0045AB10 /* OnboardingContainerView.swift in Sources */,

@@ -1698,4 +1698,16 @@ extension TimeInterval {
         
         return time
     }
+    
+    var stringTimeShort: String {
+        var time = ""
+        if hours > 0 {
+            time = "\(hours)h "
+        }
+        if minutes > 0 {
+            time += "\(minutes)m"
+        }
+        
+        return time
+    }
 }

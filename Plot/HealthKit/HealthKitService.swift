@@ -278,6 +278,33 @@ class HealthKitService {
         HKHealthStore().execute(query)
     }
     
+    class func getAllSleepDataSamples(startDate: Date,
+                                endDate: Date,
+                                completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
+    
+        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+            completion(nil, nil)
+            return
+        }
+        
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
+
+        let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: 0, sortDescriptors: [sortDescriptor]) { (query, result, error) in
+            guard let result = result, error == nil else {
+                completion(nil, error)
+                return
+            }
+            
+            let categorySamples = result.compactMap({ $0 as? HKCategorySample })
+            completion(categorySamples, nil)
+        }
+
+        // finally, we execute our query
+        HKHealthStore().execute(query)
+    }
+    
     class func getSummaryActivityData(startDate: Date,
                               endDate: Date,
                               completion: @escaping ([HKActivitySummary]?, Error?) -> Void) {
