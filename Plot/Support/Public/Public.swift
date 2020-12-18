@@ -1710,4 +1710,8 @@ extension TimeInterval {
         
         return time
     }
+    
+    var totalHours: Double {
+        return self / 3600
+    }
 }

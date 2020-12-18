@@ -121,6 +121,12 @@ class HealthDetailService: HealthDetailServiceInterface {
                 completion(stats, sortedWorkouts, nil)
             }
         }
+        else if case .sleep = healthMetricType {
+            HealthKitService.getAllSleepDataSamples(startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
+                let stats = self?.perpareCustomStatsForSleep(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType)
+                completion(stats, samples, nil)
+            }
+        }
         else {
             guard let quantityTypeValue = quantityType else {
                 completion(nil, nil, nil)
@@ -145,6 +151,50 @@ class HealthDetailService: HealthDetailServiceInterface {
                 }
             }
         }
+    }
+    
+    private func perpareCustomStatsForSleep(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType) -> [Statistic]? {
+        var customStats: [Statistic] = []
+        
+        guard let samples = samples else {
+            return customStats
+        }
+        
+        if segmentType == .day {
+            for sample in samples {
+                let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
+                let hours = TimeInterval(timeSum).totalHours
+                let stat = Statistic(date: sample.startDate, value: hours)
+                customStats.append(stat)
+            }
+        }
+        else {
+            // 12 hours = 43200 seconds
+            var midDay = startDate.dayBefore.startOfDay.advanced(by: 43200)
+            var interval = NSDateInterval(start: midDay, duration: 86400)
+            var map: [Date: Double] = [:]
+            var sum: Double = 0
+            for sample in samples {
+                while !(interval.contains(sample.endDate)) && interval.endDate < endDate {
+                    midDay = midDay.advanced(by: 86400)
+                    interval = NSDateInterval(start: midDay, duration: 86400)
+                }
+                
+                let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
+                map[midDay, default: 0] += timeSum
+                sum += timeSum
+            }
+            
+            let sortedDates = Array(map.sorted(by: { $0.0 < $1.0 }))
+            
+            for item in sortedDates {
+                let hours = TimeInterval(item.value).totalHours
+                let stat = Statistic(date: item.key, value: hours)
+                customStats.append(stat)
+            }
+        }
+        
+        return customStats
     }
     
     private func perpareCustomStatsForHourlyWorkouts(from hkWorkouts: [HKWorkout]?) -> [Statistic]? {

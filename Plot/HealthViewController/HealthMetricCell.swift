@@ -127,25 +127,29 @@ class HealthMetricCell: UICollectionViewCell {
         titleLabel.text = title
         
         var total = "\(Int(healthMetric.total))"
+        var subtitleLabelText = "\(total) \(healthMetric.unitName) \(timeAgo)"
         if case HealthMetricType.weight = healthMetric.type {
             total = healthMetric.total.clean
+            subtitleLabelText = "\(total) \(healthMetric.unitName) \(timeAgo)"
         }
         else if case HealthMetricType.sleep = healthMetric.type {
             total = TimeInterval(healthMetric.total).stringTimeShort
+            subtitleLabelText = "\(total) \(timeAgo)"
         }
         
-        subtitleLabel.text = "\(total) \(healthMetric.unitName) \(timeAgo)"
+        subtitleLabel.text = subtitleLabelText
         
         if let averageValue = healthMetric.average {
-            var average = "\(Int(averageValue))"
+            var averageText = "\(Int(averageValue)) \(healthMetric.unitName) on average"
             if case HealthMetricType.weight = healthMetric.type {
-                average = averageValue.clean
+                averageText = "\(averageValue.clean) \(healthMetric.unitName) on average"
             }
             else if case HealthMetricType.sleep = healthMetric.type {
-                average = TimeInterval(averageValue).stringTimeShort
+                let shortTime = TimeInterval(averageValue).stringTimeShort
+                averageText = "\(shortTime) on average"
             }
             
-            detailLabel.text = "\(average) \(healthMetric.unitName) on average"
+            detailLabel.text = averageText
         }
 
         updateImage(healthMetric)

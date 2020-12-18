@@ -50,7 +50,7 @@ class SleepOperation: AsyncOperation {
             let average = sum / Double(map.count)
             
             if let last = sortedDates.last?.key, let val = map[last] {
-                var metric = HealthMetric(type: .sleep, total: val, date: last, unitName: "", rank: HealthMetricType.sleep.rank)
+                var metric = HealthMetric(type: .sleep, total: val, date: last, unitName: "hrs", rank: HealthMetricType.sleep.rank)
                 metric.average = average
                 _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue)
             }
