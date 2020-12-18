@@ -10,20 +10,21 @@ import Foundation
 import HealthKit
 
 protocol SummaryServiceInterface {
-    func getSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [String: [Entry]]?, [String: [Entry]]?, Error?) -> Swift.Void)
+    func getSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Swift.Void)
 }
 
 class SummaryService: SummaryServiceInterface {
-    func getSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [String: [Entry]]?, [String: [Entry]]?, Error?) -> Swift.Void) {
+    func getSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Swift.Void) {
         getStatisticalSamples(segmentType: segmentType, activities: activities, transactions: transactions, completion: completion)
     }
 
-    private func getStatisticalSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [String: [Entry]]?, [String: [Entry]]?, Error?) -> Void) {
+    private func getStatisticalSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Void) {
 
         let dispatchGroup = DispatchGroup()
         var activitySummary: [HKActivitySummary]?
-        var calendarEntries = [String: [Entry]]()
-        var financesEntries = [String: [Entry]]()
+        var pieChartEntries = [SectionType: [Entry]]()
+        var barChartEntries = [SectionType: [Entry]]()
+        var barChartStats = [SectionType: [String: [Statistic]]]()
         
         let anchorDate = Date()
         var startDate = anchorDate
@@ -59,16 +60,22 @@ class SummaryService: SummaryServiceInterface {
         }
         
         if let activities = activities {
+            var entries = [Entry]()
             dispatchGroup.enter()
             categorizeActivities(activities: activities, start: startDate, end: endDate) { (categoryDict, _) in
+                activitiesOverTimeChartData(activities: activities, activityCategories: Array(categoryDict.keys), start: startDate, end: endDate, segmentType: segmentType) { (statsDict, _) in
+                    if !statsDict.isEmpty {
+                        barChartStats[.calendarSummary] = statsDict
+                    }
+                }
+                
                 let totalValue: Double = endDate.timeIntervalSince(startDate)                
-                var entries = [Entry]()
                 for (key, value) in categoryDict {
                     let entry = Entry(label: key.capitalized, value: value / totalValue, icon: nil)
                     entries.append(entry)
                 }
                 if !entries.isEmpty {
-                    calendarEntries["Calendar Summary"] = entries
+                    pieChartEntries[.calendarMix] = entries
                 }
                 dispatchGroup.leave()
             }
@@ -80,22 +87,29 @@ class SummaryService: SummaryServiceInterface {
                 //total groups excluding 'Expense'
                 var totalValue : Double = 0
                 var entries = [Entry]()
-                if let incomeTransactionDetail = transactionDetailsList.first(where: { ($0.level == .group && $0.group == "Income") }), let expenseTransactionDetail = transactionDetailsList.first(where: { ($0.level == .group && $0.group == "Expense") }) {
-                    totalValue = incomeTransactionDetail.amount + abs(expenseTransactionDetail.amount) + incomeTransactionDetail.amount + expenseTransactionDetail.amount
-                    for transactionDetail in transactionDetailsList {
-                        if transactionDetail.level == .group {
-                            if transactionDetail.name == "Expense" || transactionDetail.name == "Income" || transactionDetail.name == "Difference" {
-                                let entry = Entry(label: transactionDetail.name, value: abs(transactionDetail.amount) / totalValue, icon: nil)
-                                entries.append(entry)
-                            } else {
-                                continue
-                            }
+                for transactionDetail in transactionDetailsList {
+                    if transactionDetail.level == .group {
+                        if transactionDetail.name == "Expense" || transactionDetail.name == "Income" || transactionDetail.name == "Difference" {
+                            let entry = Entry(label: transactionDetail.name, value: transactionDetail.amount, icon: nil)
+                            entries.append(entry)
+                        } else {
+                            continue
                         }
                     }
-                    if !entries.isEmpty {
-                        financesEntries["Financial Summary"] = entries
-                    }
                 }
+                if !entries.isEmpty {
+                    barChartEntries[.cashFlowSummary] = entries
+                }
+                    
+
+                    
+                    
+//                    transactionDetailsOverTimeChartData(transactions: transactions, transactionDetails: [incomeTransactionDetail, expenseTransactionDetail, differenceTransactionDetail], start: startDate, end: endDate, segmentType: segmentType) { (statisticDict, _) in
+//                        if let incomeStatistics = statisticDict[incomeTransactionDetail], let expenseStatistics = statisticDict[expenseTransactionDetail], let differenceStatistics = statisticDict[differenceTransactionDetail] {
+//                            barChartEntries["Financial Summary"] = ["Income": incomeStatistics, "Expense": expenseStatistics, "Difference": differenceStatistics]
+//                        }
+//                    }
+//                }
                 
                 if let expenseTransactionDetail = transactionDetailsList.first(where: { ($0.level == .group && $0.group == "Expense") }) {
                     totalValue = abs(expenseTransactionDetail.amount)
@@ -112,14 +126,14 @@ class SummaryService: SummaryServiceInterface {
                         }
                     }
                     if !entries.isEmpty {
-                        financesEntries["Spending Summary"] = entries
+                        pieChartEntries[.spendingMix] = entries
                     }
                 }
                 dispatchGroup.leave()
             }
         }
         dispatchGroup.notify(queue: .main) {
-            completion(activitySummary, calendarEntries, financesEntries, nil)
+            completion(activitySummary, pieChartEntries, barChartEntries, barChartStats, nil)
         }
     }
 }

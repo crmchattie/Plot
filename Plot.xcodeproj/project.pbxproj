@@ -74,6 +74,9 @@
 		105F66F724171A3C00F6EDB6 /* WorkoutDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F624171A3C00F6EDB6 /* WorkoutDetailViewController.swift */; };
 		105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */; };
 		105F66FB24185B4000F6EDB6 /* ExerciseDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */; };
+		106431D1258AE41800D02658 /* SummaryHorizontalBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */; };
+		106431D5258C10FE00D02658 /* ChartValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D4258C10FE00D02658 /* ChartValueFormatter.swift */; };
+		106431D9258C15B900D02658 /* SummaryTimeBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */; };
 		106618AF24BA37D6003C3F36 /* PlaceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618AE24BA37D6003C3F36 /* PlaceDetailViewController.swift */; };
 		106618B124BA3C59003C3F36 /* PlaceDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618B024BA3C59003C3F36 /* PlaceDetailCell.swift */; };
 		106618B324BB655E003C3F36 /* PlaceExpandedDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618B224BB655E003C3F36 /* PlaceExpandedDetailCell.swift */; };
@@ -87,7 +90,7 @@
 		1075ED21256C175A00AB2B0A /* DiscoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */; };
-		108087172583E72300FB9BB0 /* SummaryBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087162583E72300FB9BB0 /* SummaryBarChartCell.swift */; };
+		108087172583E72300FB9BB0 /* SummaryValueBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087162583E72300FB9BB0 /* SummaryValueBarChartCell.swift */; };
 		1080871B2583E73D00FB9BB0 /* SummaryLineChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */; };
 		1080871F2585057400FB9BB0 /* MoodActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1080871E2585057400FB9BB0 /* MoodActions.swift */; };
 		108087232585058100FB9BB0 /* MoodFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087222585058100FB9BB0 /* MoodFetcher.swift */; };
@@ -528,6 +531,9 @@
 		105F66F624171A3C00F6EDB6 /* WorkoutDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewController.swift; sourceTree = "<group>"; };
 		105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailCell.swift; sourceTree = "<group>"; };
 		105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailCell.swift; sourceTree = "<group>"; };
+		106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryHorizontalBarChart.swift; sourceTree = "<group>"; };
+		106431D4258C10FE00D02658 /* ChartValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartValueFormatter.swift; sourceTree = "<group>"; };
+		106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryTimeBarChartCell.swift; sourceTree = "<group>"; };
 		106618AE24BA37D6003C3F36 /* PlaceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceDetailViewController.swift; sourceTree = "<group>"; };
 		106618B024BA3C59003C3F36 /* PlaceDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceDetailCell.swift; sourceTree = "<group>"; };
 		106618B224BB655E003C3F36 /* PlaceExpandedDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceExpandedDetailCell.swift; sourceTree = "<group>"; };
@@ -541,7 +547,7 @@
 		1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListTableViewCell.swift; sourceTree = "<group>"; };
-		108087162583E72300FB9BB0 /* SummaryBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryBarChartCell.swift; sourceTree = "<group>"; };
+		108087162583E72300FB9BB0 /* SummaryValueBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryValueBarChartCell.swift; sourceTree = "<group>"; };
 		1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryLineChartCell.swift; sourceTree = "<group>"; };
 		1080871E2585057400FB9BB0 /* MoodActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodActions.swift; sourceTree = "<group>"; };
 		108087222585058100FB9BB0 /* MoodFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodFetcher.swift; sourceTree = "<group>"; };
@@ -1127,8 +1133,10 @@
 				108841D1257004F10064C5F8 /* SummaryViewController.swift */,
 				1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */,
 				1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */,
-				108087162583E72300FB9BB0 /* SummaryBarChartCell.swift */,
+				108087162583E72300FB9BB0 /* SummaryValueBarChartCell.swift */,
+				106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */,
 				1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */,
+				106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */,
 			);
 			path = SummaryViewController;
 			sourceTree = "<group>";
@@ -1384,6 +1392,7 @@
 				269105F2253E8E2E00A02C5F /* DayAxisValueFormatter.swift */,
 				269105F3253E8E2E00A02C5F /* DateValueFormatter.swift */,
 				269105F4253E8E2E00A02C5F /* LargeValueFormatter.swift */,
+				106431D4258C10FE00D02658 /* ChartValueFormatter.swift */,
 			);
 			path = Formatters;
 			sourceTree = "<group>";
@@ -2710,6 +2719,7 @@
 				4BAEE49A21272C5E0045AB10 /* ContactsController.swift in Sources */,
 				4BAEE46A21272B380045AB10 /* StorageTableViewController.swift in Sources */,
 				26A29E9A2389FF90008F7351 /* ActivityAnnotation.swift in Sources */,
+				106431D9258C15B900D02658 /* SummaryTimeBarChartCell.swift in Sources */,
 				10FBC8B924BFECD500D0E6B5 /* ActivitylistViewController.swift in Sources */,
 				10CD68792486AEE400DC02E0 /* PLNotification.swift in Sources */,
 				10E93D4E24BE41B500F6EE18 /* MapViewController.swift in Sources */,
@@ -2799,6 +2809,7 @@
 				10DE97372475801400D4A7E8 /* ListCell+ConfigureCell.swift in Sources */,
 				4BAEE4F121272D890045AB10 /* UserinfoHeaderTableViewCell.swift in Sources */,
 				109F849023D607C6002C0044 /* RecipeTypeViewController.swift in Sources */,
+				106431D1258AE41800D02658 /* SummaryHorizontalBarChart.swift in Sources */,
 				1026185425756B3300CF6F0A /* SummaryPieChartCell.swift in Sources */,
 				100A53EC23E0DD9C004AA952 /* ActivityHeaderCell.swift in Sources */,
 				4BAEE5E2212735E50045AB10 /* Public.swift in Sources */,
@@ -2886,7 +2897,7 @@
 				4BAEE5F4212735E50045AB10 /* CenteredCollectionViewFlowLayout.swift in Sources */,
 				4B5E99E0212CC0D5001F067F /* ConversationsFetcher.swift in Sources */,
 				4BAEE547212735200045AB10 /* SplashScreenContainer.swift in Sources */,
-				108087172583E72300FB9BB0 /* SummaryBarChartCell.swift in Sources */,
+				108087172583E72300FB9BB0 /* SummaryValueBarChartCell.swift in Sources */,
 				10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */,
 				10DFC3E7255CC3DA00565DAD /* WorkoutActions.swift in Sources */,
 				10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */,
@@ -2910,6 +2921,7 @@
 				4BAEE5CC212735E50045AB10 /* ParticipantTableViewCell.swift in Sources */,
 				4BAEE5D5212735E50045AB10 /* AnnouncementShowing.swift in Sources */,
 				10CA911925367D9E003CEAF7 /* FinancialAccountActions.swift in Sources */,
+				106431D5258C10FE00D02658 /* ChartValueFormatter.swift in Sources */,
 				4BAEE5BD212735E50045AB10 /* INSPhoto.swift in Sources */,
 				4BAEE49921272C5E0045AB10 /* ContactsController+SearchHandlers.swift in Sources */,
 				103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */,

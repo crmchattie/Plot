@@ -11,6 +11,8 @@ import Charts
 import HealthKit
 
 fileprivate let summaryPieChartCell = "SummaryPieChartCell"
+fileprivate let summaryTimeBarChartCell = "SummaryTimeBarChartCell"
+fileprivate let summaryValueBarChartCell = "SummaryValueBarChartCell"
 fileprivate let summaryHKChartCell = "SummaryHKChartCell"
 fileprivate let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
 
@@ -28,20 +30,13 @@ class SummaryViewController: UIViewController {
     weak var delegate: HomeBaseSummary?
     
     private var viewModel: SummaryViewModelInterface
-    
-    lazy var segmentedControl: UISegmentedControl = {
-        let segmentedControl = UISegmentedControl(items: ["D", "W", "M", "Y"])
-        segmentedControl.addTarget(self, action: #selector(changeSegment(_:)), for: .valueChanged)
-        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
-        return segmentedControl
-    }()
-    
+        
     lazy var customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["D","W","M", "Y"], selectedIndex: 2)
     
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -85,6 +80,7 @@ class SummaryViewController: UIViewController {
         
         addObservers()
         configureView()
+        fetchData()
         
     }
     
@@ -124,6 +120,8 @@ class SummaryViewController: UIViewController {
         collectionView.delegate = self
         collectionView.register(SummaryHKChartCell.self, forCellWithReuseIdentifier: summaryHKChartCell)
         collectionView.register(SummaryPieChartCell.self, forCellWithReuseIdentifier: summaryPieChartCell)
+        collectionView.register(SummaryValueBarChartCell.self, forCellWithReuseIdentifier: summaryValueBarChartCell)
+        collectionView.register(SummaryTimeBarChartCell.self, forCellWithReuseIdentifier: summaryTimeBarChartCell)
         collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
         collectionView.isUserInteractionEnabled = true
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
@@ -135,10 +133,6 @@ class SummaryViewController: UIViewController {
                         
         customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
-    }
-    
-    @objc func changeSegment(_ segmentedControl: UISegmentedControl) {
-        fetchData()
     }
     
     func fetchData() {
@@ -168,20 +162,37 @@ extension SummaryViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = viewModel.sections[indexPath.section]
         let object = viewModel.groups[section]
-        if section == .health {
+        if section == .activitySummary {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: summaryHKChartCell, for: indexPath) as! SummaryHKChartCell
             cell.backgroundColor = collectionView.backgroundColor
             if let activitySummary = object as? [HKActivitySummary], !activitySummary.isEmpty {
                 cell.summary = activitySummary[0]
             }
             return cell
-        } else {
+        } else if let object = object as? [PieChartData]  {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: summaryPieChartCell, for: indexPath) as! SummaryPieChartCell
             cell.backgroundColor = collectionView.backgroundColor
-            if let chartDataList = object as? [PieChartData] {
-                let chartData = chartDataList[indexPath.item]
+            let chartData = object[indexPath.item]
+            cell.chartData = chartData
+            cell.chartView.delegate = self
+            return cell
+        } else if section == .cashFlowSummary {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: summaryValueBarChartCell, for: indexPath) as! SummaryValueBarChartCell
+            cell.backgroundColor = collectionView.backgroundColor
+            if let object = object as? [BarChartData] {
+                let chartData = object[indexPath.item]
                 cell.chartData = chartData
                 cell.chartView.delegate = self
+            }
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: summaryTimeBarChartCell, for: indexPath) as! SummaryTimeBarChartCell
+            cell.backgroundColor = collectionView.backgroundColor
+            if let object = object as? [BarChartData] {
+                let chartData = object[indexPath.item]
+                cell.chartView.delegate = self
+                cell.chartData = chartData
+                cell.dayAxisValueFormatter!.formatType = customSegmented.selectedIndex!
             }
             return cell
         }

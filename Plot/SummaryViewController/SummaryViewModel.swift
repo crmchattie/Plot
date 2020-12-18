@@ -33,36 +33,47 @@ class SummaryViewModel: SummaryViewModelInterface {
     }
     
     func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping () -> ()) {
-        summaryService.getSamples(segmentType: segmentType, activities: activities, transactions: transactions) { (activitySummary, calendarEntries, financesEntries, err) in
+        summaryService.getSamples(segmentType: segmentType, activities: activities, transactions: transactions) { (activitySummary, pieChartEntries, barChartEntries, barChartStats, err) in
             self.sections = []
             if let activitySummary = activitySummary, !activitySummary.isEmpty {
                 self.sections.append(.activitySummary)
                 self.groups[.activitySummary] = activitySummary
             }
             
-            if let entriesDictionary = calendarEntries, !entriesDictionary.isEmpty {
-                for (_, entries) in entriesDictionary {
-                    if entries.count > 0 {
-                        let sortedEntries = entries.sorted(by: {$0.label < $1.label})
-                        self.createPieChartData(entries: sortedEntries) { (pieChartData) in
-                            self.sections.insert(.calendarSummary, at: 0)
-                            self.groups[.calendarSummary] = [pieChartData]
+            if let entriesDictionary = barChartStats, !entriesDictionary.isEmpty {
+                for (key, entries) in entriesDictionary {
+                    self.createBarChartStats(statsDictionary: entries) { (barChartData) in
+                        if key == .calendarSummary {
+                            self.sections.append(.calendarSummary)
+                            self.groups[.calendarSummary] = [barChartData]
                         }
                     }
                 }
             }
             
-            if let entriesDictionary = financesEntries, !entriesDictionary.isEmpty {
-                for key in Array(entriesDictionary.keys).sorted() {
-                    if let entries = entriesDictionary[key], entries.count > 0 {
-                        self.createPieChartData(entries: entries) { (pieChartData) in
-                            if key == "Financial Summary" {
-                                self.sections.append(.financialSummary)
-                                self.groups[.financialSummary] = [pieChartData]
-                            } else {
-                                self.sections.append(.spendingSummary)
-                                self.groups[.spendingSummary] = [pieChartData]
+            if let entriesDictionary = pieChartEntries, !entriesDictionary.isEmpty {
+                for (key, entries) in entriesDictionary {
+                    self.createPieChartData(entries: entries) { (pieChartData) in
+                        if key == .spendingMix {
+                            self.sections.append(.spendingMix)
+                            self.groups[.spendingMix] = [pieChartData]
+                        } else if key == .calendarMix {
+                            let sortedEntries = entries.sorted(by: {$0.label < $1.label})
+                            self.createPieChartData(entries: sortedEntries) { (pieChartData) in
+                                self.sections.append(.calendarMix)
+                                self.groups[.calendarMix] = [pieChartData]
                             }
+                        }
+                    }
+                }
+            }
+            
+            if let entriesDictionary = barChartEntries, !entriesDictionary.isEmpty {
+                for (key, entries) in entriesDictionary {
+                    self.createBarChartEntries(entries: entries) { (barChartData) in
+                        if key == .cashFlowSummary {
+                            self.sections.append(.cashFlowSummary)
+                            self.groups[.cashFlowSummary] = [barChartData]
                         }
                     }
                 }
@@ -79,8 +90,8 @@ class SummaryViewModel: SummaryViewModelInterface {
         var chartEntries: [ChartDataEntry] = []
         for entry in entries {
             let chartEntry = PieChartDataEntry(value: entry.value,
-                              label: entry.label,
-                              icon: entry.icon)
+                                               label: entry.label,
+                                               icon: entry.icon)
             chartEntries.append(chartEntry)
             i += 1
         }
@@ -104,29 +115,60 @@ class SummaryViewModel: SummaryViewModelInterface {
         completion(data)
     }
     
-    func createBarChartData(statsDictionary: [String: [Statistic]], completion: @escaping (BarChartData) -> Void) {
+    func createBarChartEntries(entries: [Entry], completion: @escaping (BarChartData) -> Void) {
         
         let data = BarChartData()
         data.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
         
+        var chartEntries: [BarChartDataEntry] = []
         var maxValue: Double = 0
+        var i = 0
+        for entry in entries {
+            let chartEntry = BarChartDataEntry(x: Double(i),
+                                               y: entry.value,
+                                               data: entry.label)
+            chartEntries.append(chartEntry)
+            i += 1
+        }
+        maxValue *= 1.2
+        
+        let dataSet = BarChartDataSet(entries: chartEntries, label: nil)
+        dataSet.colors = ChartColors.palette()
+        dataSet.drawValuesEnabled = false
+        dataSet.axisDependency = .right
+        data.addDataSet(dataSet)
+        
+        completion(data)
+    }
+    
+    func createBarChartStats(statsDictionary: [String: [Statistic]], completion: @escaping (BarChartData) -> Void) {
+        
+        let data = BarChartData()
+        data.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
+        
         var y = 0
-        for (label, stats) in statsDictionary {
+        var maxValue: Double = 0
+        for (key, stats) in statsDictionary {
+            print("key \(key)")
             var i = 0
-            var chartEntries: [BarChartDataEntry] = []
+            var entries: [BarChartDataEntry] = []
             for stat in stats {
+                print("stat \(stat)")
                 maxValue = max(maxValue, stat.value)
                 let entry = BarChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
-                chartEntries.append(entry)
+                entries.append(entry)
                 i += 1
             }
-            let dataSet = BarChartDataSet(entries: chartEntries, label: label)
+            
+            let dataSet = BarChartDataSet(entries: entries, label: key)
             dataSet.setColor(ChartColors.palette()[y])
             dataSet.drawValuesEnabled = false
             dataSet.axisDependency = .right
             data.addDataSet(dataSet)
+            
             y += 1
         }
+        
         maxValue *= 1.2
         
         completion(data)
@@ -137,18 +179,19 @@ class SummaryViewModel: SummaryViewModelInterface {
         let data = LineChartData()
         data.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
         
-        var maxValue: Double = 0
         var y = 0
-        for (label, stats) in statsDictionary {
+        var maxValue: Double = 0
+        for (key, stats) in statsDictionary {
             var i = 0
-            var chartEntries: [ChartDataEntry] = []
+            var entries: [ChartDataEntry] = []
             for stat in stats {
                 maxValue = max(maxValue, stat.value)
                 let entry = ChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
-                chartEntries.append(entry)
+                entries.append(entry)
                 i += 1
             }
-            let dataSet = LineChartDataSet(entries: chartEntries, label: label)
+            
+            let dataSet = LineChartDataSet(entries: entries, label: key)
             dataSet.drawIconsEnabled = false
             dataSet.mode = .cubicBezier
             dataSet.setColor(UIColor.systemBlue)
@@ -167,11 +210,10 @@ class SummaryViewModel: SummaryViewModelInterface {
             let gradient = CGGradient(colorsSpace: nil, colors: gradientColors as CFArray, locations: nil)!
             dataSet.fillAlpha = 1
             dataSet.fill = Fill(linearGradient: gradient, angle: 90)
-            
             dataSet.drawFilledEnabled = true
             dataSet.axisDependency = .right
-            
             data.addDataSet(dataSet)
+            
             y += 1
         }
         maxValue *= 1.2

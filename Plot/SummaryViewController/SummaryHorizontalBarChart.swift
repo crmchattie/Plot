@@ -1,21 +1,19 @@
 //
-//  SummaryBarChartCell.swift
+//  SummaryHorizontalBarChart.swift
 //  Plot
 //
-//  Created by Cory McHattie on 12/11/20.
+//  Created by Cory McHattie on 12/16/20.
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import Charts
 
-class SummaryBarChartCell: UICollectionViewCell {
+class SummaryHorizontalBarChartCell: UICollectionViewCell {
     
     var units = String()
-    
-    var dayAxisValueFormatter: DayAxisValueFormatter?
-    
-    var chartView: BarChartView = {
-        let chartView = BarChartView()
+        
+    var chartView: HorizontalBarChartView = {
+        let chartView = HorizontalBarChartView()
         chartView.translatesAutoresizingMaskIntoConstraints = false
         return chartView
     }()
@@ -23,28 +21,29 @@ class SummaryBarChartCell: UICollectionViewCell {
     var chartData: BarChartData! {
         didSet {
             if let chartData = chartData {
+                let set = chartData.dataSets[0] as! BarChartDataSet
+                let values = set.entries.map{ $0.data as! String }
+                print("values \(values)")
+                
+                chartData.barWidth = 0.5
                 chartView.data = chartData
                 chartView.chartDescription?.enabled = false
                 
                 chartView.dragEnabled = true
                 chartView.setScaleEnabled(true)
                 chartView.pinchZoomEnabled = true
-                
-                let xAxis = chartView.xAxis
-                xAxis.labelPosition = .bottom
-                
                 chartView.drawBarShadowEnabled = false
                 chartView.drawValueAboveBarEnabled = false
                 
                 chartView.maxVisibleCount = 60
                 
-                dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
-                xAxis.valueFormatter = dayAxisValueFormatter
+                let xAxis = chartView.xAxis
+                xAxis.valueFormatter = IndexAxisValueFormatter(values: values)
                 xAxis.labelPosition = .bottom
                 xAxis.labelFont = .systemFont(ofSize: 10)
-                xAxis.granularity = 1
-                xAxis.labelCount = 5
+                xAxis.drawAxisLineEnabled = true
                 xAxis.drawGridLinesEnabled = false
+                xAxis.granularity = 10
                                         
                 chartView.rightAxis.enabled = true
                 chartView.leftAxis.enabled = false
@@ -53,16 +52,14 @@ class SummaryBarChartCell: UICollectionViewCell {
                 rightAxisFormatter.numberStyle = .currency
                 rightAxisFormatter.maximumFractionDigits = 0
                 let rightAxis = chartView.rightAxis
-                rightAxis.enabled = true
-                rightAxis.labelFont = .systemFont(ofSize: 10)
-                rightAxis.labelCount = 8
                 rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
-                rightAxis.spaceTop = 0.15
+                rightAxis.labelFont = .systemFont(ofSize: 10)
+                rightAxis.drawAxisLineEnabled = true
                 rightAxis.drawGridLinesEnabled = false
                 
                 chartView.legend.enabled = false
                 let l = chartView.legend
-                l.horizontalAlignment = .left
+                l.horizontalAlignment = .center
                 l.verticalAlignment = .bottom
                 l.orientation = .horizontal
                 l.drawInside = false
@@ -70,16 +67,6 @@ class SummaryBarChartCell: UICollectionViewCell {
                 l.formSize = 9
                 l.font = UIFont(name: "HelveticaNeue-Light", size: 11)!
                 l.xEntrySpace = 4
-                
-                
-                let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
-                                          font: .systemFont(ofSize: 12),
-                                          textColor: .white,
-                                          insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
-                                          xAxisValueFormatter: dayAxisValueFormatter!, units: units)
-                marker.chartView = chartView
-                marker.minimumSize = CGSize(width: 80, height: 40)
-                chartView.marker = marker
                 
                 setupViews()
             }

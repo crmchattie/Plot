@@ -161,14 +161,12 @@ class FinanceBarChartViewController: UIViewController {
         chartView.setScaleEnabled(true)
         chartView.pinchZoomEnabled = true
         
-        let xAxis = chartView.xAxis
-        xAxis.labelPosition = .bottom
-        
         chartView.drawBarShadowEnabled = false
         chartView.drawValueAboveBarEnabled = false
         
         chartView.maxVisibleCount = 60
         
+        let xAxis = chartView.xAxis
         dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
         xAxis.valueFormatter = dayAxisValueFormatter
         xAxis.labelPosition = .bottom

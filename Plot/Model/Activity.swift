@@ -569,6 +569,9 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for activityCategory in activityCategories {
+                if activityCategory == "No Activities" {
+                    continue
+                }
                 activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
                     if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                         var acStats = statistics[activityCategory]
@@ -592,6 +595,9 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for activityCategory in activityCategories {
+                if activityCategory == "No Activities" {
+                    continue
+                }
                 activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
                     if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                         var acStats = statistics[activityCategory]
@@ -616,6 +622,9 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for activityCategory in activityCategories {
+                if activityCategory == "No Activities" {
+                    continue
+                }
                 activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
                     if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                         var acStats = statistics[activityCategory]
@@ -640,6 +649,9 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for activityCategory in activityCategories {
+                if activityCategory == "No Activities" {
+                    continue
+                }
                 activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
                     if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                         var acStats = statistics[activityCategory]
@@ -669,15 +681,21 @@ func activityListStats(activities: [Activity], activityCategory: String, start: 
     for activity in activities {
         if let startDateTime = activity.startDateTime {
             let activityDate = Date(timeIntervalSince1970: startDateTime as! TimeInterval)
+            print("activityDate \(activityDate)")
+            print("start \(start)")
+            print("end \(end)")
+            print("date \(date)")
+            print("nextDate \(nextDate)")
             if activityDate < start || end < activityDate {
                 continue
             }
-            if activityDate < date || end < nextDate {
+            if activityDate < date || nextDate < activityDate {
                 continue
             }
         }
         if let type = activity.category, type == activityCategory {
-            let duration = Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)
+            print("not continuing")
+            let duration = (Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)) / 60
             if statistics.isEmpty {
                 let stat = Statistic(date: nextDate, value: duration)
                 statistics.append(stat)
