@@ -20,6 +20,7 @@ protocol SummaryViewModelInterface {
 
 class SummaryViewModel: SummaryViewModelInterface {
     let summaryService: SummaryServiceInterface
+    var fixedSections: [SectionType] = [.calendarSummary, .calendarMix, .activitySummary, .cashFlowSummary, .spendingMix]
     var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
     
@@ -36,15 +37,13 @@ class SummaryViewModel: SummaryViewModelInterface {
         summaryService.getSamples(segmentType: segmentType, activities: activities, transactions: transactions) { (activitySummary, pieChartEntries, barChartEntries, barChartStats, err) in
             self.sections = []
             if let activitySummary = activitySummary, !activitySummary.isEmpty {
-                self.sections.append(.activitySummary)
                 self.groups[.activitySummary] = activitySummary
             }
             
             if let entriesDictionary = barChartStats, !entriesDictionary.isEmpty {
                 for (key, entries) in entriesDictionary {
                     self.createBarChartStats(statsDictionary: entries) { (barChartData) in
-                        if key == .calendarSummary {
-                            self.sections.append(.calendarSummary)
+                        if key == .calendarSummary, barChartData.entryCount > 0 {
                             self.groups[.calendarSummary] = [barChartData]
                         }
                     }
@@ -55,12 +54,10 @@ class SummaryViewModel: SummaryViewModelInterface {
                 for (key, entries) in entriesDictionary {
                     self.createPieChartData(entries: entries) { (pieChartData) in
                         if key == .spendingMix {
-                            self.sections.append(.spendingMix)
                             self.groups[.spendingMix] = [pieChartData]
                         } else if key == .calendarMix {
                             let sortedEntries = entries.sorted(by: {$0.label < $1.label})
                             self.createPieChartData(entries: sortedEntries) { (pieChartData) in
-                                self.sections.append(.calendarMix)
                                 self.groups[.calendarMix] = [pieChartData]
                             }
                         }
@@ -72,7 +69,6 @@ class SummaryViewModel: SummaryViewModelInterface {
                 for (key, entries) in entriesDictionary {
                     self.createBarChartEntries(entries: entries) { (barChartData) in
                         if key == .cashFlowSummary {
-                            self.sections.append(.cashFlowSummary)
                             self.groups[.cashFlowSummary] = [barChartData]
                         }
                     }
@@ -80,6 +76,8 @@ class SummaryViewModel: SummaryViewModelInterface {
             }
             
             DispatchQueue.main.async {
+                self.sections = Array(self.groups.keys)
+                self.sections = self.fixedSections.filter { self.sections.contains($0) }
                 completion()
             }
         }

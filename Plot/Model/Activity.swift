@@ -681,11 +681,6 @@ func activityListStats(activities: [Activity], activityCategory: String, start: 
     for activity in activities {
         if let startDateTime = activity.startDateTime {
             let activityDate = Date(timeIntervalSince1970: startDateTime as! TimeInterval)
-            print("activityDate \(activityDate)")
-            print("start \(start)")
-            print("end \(end)")
-            print("date \(date)")
-            print("nextDate \(nextDate)")
             if activityDate < start || end < activityDate {
                 continue
             }
@@ -694,7 +689,6 @@ func activityListStats(activities: [Activity], activityCategory: String, start: 
             }
         }
         if let type = activity.category, type == activityCategory {
-            print("not continuing")
             let duration = (Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)) / 60
             if statistics.isEmpty {
                 let stat = Statistic(date: nextDate, value: duration)
