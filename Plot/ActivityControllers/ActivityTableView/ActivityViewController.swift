@@ -148,7 +148,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     @objc fileprivate func changeTheme() {
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
-        
         activityView.tableView.indicatorStyle = theme.scrollBarStyle
         activityView.tableView.sectionIndexBackgroundColor = theme.generalBackgroundColor
         activityView.tableView.backgroundColor = theme.generalBackgroundColor

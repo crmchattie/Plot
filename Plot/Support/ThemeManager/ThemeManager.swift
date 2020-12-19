@@ -308,7 +308,7 @@ struct FalconPalette {
     static let defaultGreen = UIColor(red: 127.0/255.0, green: 184.0/255.0, blue: 0.0/255.0, alpha: 1.0)
     static let defaultRed = UIColor(red: 246.0/255.0, green: 81.0/255.0, blue: 29.0/255.0, alpha: 1.0)
     static let defaultOrange = UIColor(red: 255.0/255.0, green: 180.0/255.0, blue: 0.0/255.0, alpha: 1.0)
-    static let defaultDarkBlue = UIColor(red: 13.0/255.0, green: 44.0/255.0, blue: 84.0/255.0, alpha: 1.0)
+    static let defaultDarkBlue = UIColor(red: 123/255.0, green: 104/255.0, blue: 142/255.0, alpha: 1.0)
     static let ticketmaster = UIColor(red: 2.0/255.0, green: 108.0/255.0, blue: 223.0/255.0, alpha: 1.0)
 }
 
@@ -321,9 +321,9 @@ open class ChartColors: NSObject
             UIColor(red: 246/255.0, green: 81/255.0, blue: 29/255.0, alpha: 1.0),
             UIColor(red: 255/255.0, green: 180/255.0, blue: 0/255.0, alpha: 1.0),
             UIColor(red: 127/255.0, green: 184/255.0, blue: 0/255.0, alpha: 1.0),
-            UIColor(red: 13/255.0, green: 44/255.0, blue: 84/255.0, alpha: 1.0),
-            
             UIColor(red: 123/255.0, green: 104/255.0, blue: 142/255.0, alpha: 1.0),
+            
+            UIColor(red: 13/255.0, green: 44/255.0, blue: 84/255.0, alpha: 1.0),
             UIColor(red: 251/255.0, green: 131/255.0, blue: 31/255.0, alpha: 1.0),
             UIColor(red: 191/255.0, green: 192/255.0, blue: 0/255.0, alpha: 1.0),
             UIColor(red: 70/255.0, green: 114/255.0, blue: 42/255.0, alpha: 1.0),

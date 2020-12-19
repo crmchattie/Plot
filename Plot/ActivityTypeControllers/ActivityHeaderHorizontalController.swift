@@ -58,10 +58,10 @@ class ActivityHeaderHorizontalController: HorizontalSnappingController, UICollec
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ActivityHeaderCell
         let customType = self.customActivities[indexPath.item]
         cell.nameLabel.text = customType.rawValue.capitalized
-        cell.imageView.contentMode = .scaleAspectFit
-        cell.imageView.image = UIImage(named: customType.image)!.withRenderingMode(.alwaysTemplate)
-        cell.imageView.tintColor = UIColor.white
-        cell.imageView.backgroundColor = colors[indexPath.item] 
+        cell.logoImageView.contentMode = .scaleAspectFit
+        cell.logoImageView.image = UIImage(named: customType.image)!.withRenderingMode(.alwaysTemplate)
+        cell.logoImageView.tintColor = UIColor.white
+        cell.logoImageView.backgroundColor = colors[indexPath.item] 
         return cell
     }
     

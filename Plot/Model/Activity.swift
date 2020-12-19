@@ -456,6 +456,26 @@ class Activity: NSObject, NSCopying, Codable {
 enum CustomType: String, Equatable, Hashable {
     case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness
     
+    var name: String {
+        switch self {
+        case .basic: return "Activity"
+        case .complex: return "Complex"
+        case .meal: return "Meal"
+        case .workout: return "Workout"
+        case .event: return "Event"
+        case .flight: return "Flight"
+        case .transaction: return "Transaction"
+        case .financialAccount: return "Account"
+        case .transactionRule: return "Transaction Rule"
+        case .sleep: return "Sleep"
+        case .work: return "Work"
+        case .mood: return "Mood"
+        case .iOSCalendarEvent: return "iOS Calendar Event"
+        case .mindfulness: return "Mindfulness"
+
+        }
+    }
+    
     var categoryText: String {
         switch self {
         case .basic: return "Build your own basic activity"

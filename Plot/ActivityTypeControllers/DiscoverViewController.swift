@@ -43,17 +43,17 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
             item.contentInsets.bottom = 16
             
-            let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(175)), subitems: [item])
+            let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(60)), subitems: [item])
             group.contentInsets.trailing = 32
             
             let section = NSCollectionLayoutSection(group: group)
             section.orthogonalScrollingBehavior = .groupPaging
             section.contentInsets.leading = 16
             
-            let kind = UICollectionView.elementKindSectionHeader
-            section.boundarySupplementaryItems = [
-                .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(30)), elementKind: kind, alignment: .topLeading)
-            ]
+//            let kind = UICollectionView.elementKindSectionHeader
+//            section.boundarySupplementaryItems = [
+//                .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(30)), elementKind: kind, alignment: .topLeading)
+//            ]
             
             return section
         }
@@ -136,7 +136,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     @objc fileprivate func changeTheme() {
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
         navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
         navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
         let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
@@ -270,17 +269,17 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         snapshot.deleteAllItems()
         self.diffableDataSource.apply(snapshot)
                         
-        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
-            header.delegate = self
-            let snapshot = self.diffableDataSource.snapshot()
-            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
-                header.titleLabel.text = section.name
-                header.subTitleLabel.isHidden = true
-            }
-            
-            return header
-        })
+//        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
+//            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
+//            header.delegate = self
+//            let snapshot = self.diffableDataSource.snapshot()
+//            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
+//                header.titleLabel.text = section.name
+//                header.subTitleLabel.isHidden = true
+//            }
+//            
+//            return header
+//        })
         
         activityIndicatorView.startAnimating()
                 
