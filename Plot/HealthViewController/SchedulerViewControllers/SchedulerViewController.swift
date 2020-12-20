@@ -9,60 +9,107 @@
 import UIKit
 import Eureka
 import Firebase
+import CodableFirebase
 
 class SchedulerViewController: FormViewController {
     var scheduler: Scheduler!
     var type: CustomType = .sleep
-    var customSegmentControl = CustomMultiSegmentedControl()
     var active: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "\(type.rawValue.capitalized) Schedule"
+
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.centerInSuperview()
+        activityIndicatorView.startAnimating()
+        
         setupVariables()
         configureTableView()
-        initializeForm()
-        updateLength()
     }
     
     fileprivate func setupVariables() {
-        if scheduler == nil, let currentUser = Auth.auth().currentUser?.uid {
-            active = false
-            customSegmentControl = CustomMultiSegmentedControl(buttonImages: nil, buttonTitles: ["M", "T", "W", "T", "F", "S", "S"], selectedIndex: nil)
-            let original = Date()
-            let rounded = Date(timeIntervalSinceReferenceDate:
-            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-            let timezone = TimeZone.current
-            let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-            let date = rounded.addingTimeInterval(seconds)
+        if let currentUser = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ref = Database.database().reference()
             if type == .sleep {
-                let ID = Database.database().reference().child(userSleepEntity).child(currentUser).childByAutoId().key ?? ""
-                var dateComp = DateComponents()
-                dateComp.hour = 23
-                dateComp.minute = 0
-                dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                let startTime = Calendar.current.date(from: dateComp)
-                dateComp.hour = 7
-                dateComp.minute = 0
-                dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                let endTime = Calendar.current.date(from: dateComp)
-                scheduler = Scheduler(id: ID, name: nil, activeDays: nil, length: 8 * 60 * 60, startTime: startTime, endTime: endTime, schedulerDate: date, lastModifiedDate: date, createdDate: date)
+                group.enter()
+                ref.child(userSleepEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
+                    if snapshot.exists(), let sleepIDs = snapshot.value as? [String: AnyObject] {
+                        for (sleepID, _) in sleepIDs {
+                            ref.child(sleepEntity).child(sleepID).observeSingleEvent(of: .value, with: { sleepSnapshot in
+                                if sleepSnapshot.exists(), let sleepSnapshotValue = sleepSnapshot.value {
+                                    if let sleep = try? FirebaseDecoder().decode(Scheduler.self, from: sleepSnapshotValue) {
+                                        self.scheduler = sleep
+                                    }
+                                }
+                                group.leave()
+                            })
+                        }
+                    } else {
+                        self.active = false
+                        let original = Date()
+                        let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        let timezone = TimeZone.current
+                        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                        let date = rounded.addingTimeInterval(seconds)
+                        let ID = Database.database().reference().child(userSleepEntity).child(currentUser).childByAutoId().key ?? ""
+                        var dateComp = DateComponents()
+                        dateComp.hour = 23
+                        dateComp.minute = 0
+                        dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        let startTime = Calendar.current.date(from: dateComp)
+                        dateComp.hour = 7
+                        dateComp.minute = 0
+                        dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        let endTime = Calendar.current.date(from: dateComp)
+                        self.scheduler = Scheduler(id: ID, name: nil, dailyTimes: [DailyTimes(activeDays: nil, length: 8 * 60 * 60, startTime: startTime, endTime: endTime)], schedulerDate: date, lastModifiedDate: date, createdDate: date)
+                        group.leave()
+                    }
+                })
             } else if type == .work {
-                let ID = Database.database().reference().child(userWorkEntity).child(currentUser).childByAutoId().key ?? ""
-                var dateComp = DateComponents()
-                dateComp.hour = 9
-                dateComp.minute = 0
-                dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                let startTime = Calendar.current.date(from: dateComp)
-                dateComp.hour = 17
-                dateComp.minute = 0
-                dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                let endTime = Calendar.current.date(from: dateComp)
-                scheduler = Scheduler(id: ID, name: nil, activeDays: nil, length: 8 * 60 * 60, startTime: startTime, endTime: endTime, schedulerDate: date, lastModifiedDate: date, createdDate: date)
+                group.enter()
+                ref.child(userWorkEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
+                    if snapshot.exists(), let workIDs = snapshot.value as? [String: AnyObject] {
+                        for (workID, _) in workIDs {
+                            ref.child(workEntity).child(workID).observeSingleEvent(of: .value, with: { workSnapshot in
+                                if workSnapshot.exists(), let workSnapshotValue = workSnapshot.value {
+                                    if let work = try? FirebaseDecoder().decode(Scheduler.self, from: workSnapshotValue) {
+                                        self.scheduler = work
+                                    }
+                                }
+                                group.leave()
+                            })
+                        }
+                    } else {
+                        self.active = false
+                        let original = Date()
+                        let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        let timezone = TimeZone.current
+                        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                        let date = rounded.addingTimeInterval(seconds)
+                        let ID = Database.database().reference().child(userWorkEntity).child(currentUser).childByAutoId().key ?? ""
+                        var dateComp = DateComponents()
+                        dateComp.hour = 9
+                        dateComp.minute = 0
+                        dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        let startTime = Calendar.current.date(from: dateComp)
+                        dateComp.hour = 17
+                        dateComp.minute = 0
+                        dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        let endTime = Calendar.current.date(from: dateComp)
+                        self.scheduler = Scheduler(id: ID, name: nil, dailyTimes: [DailyTimes(activeDays: nil, length: 8 * 60 * 60, startTime: startTime, endTime: endTime)], schedulerDate: date, lastModifiedDate: date, createdDate: date)
+                        group.leave()
+                    }
+                })
             }
-        } else {
-            let selectedIndex: [Int] = scheduler!.activeDays?.map({$0.integer}) ?? []
-            customSegmentControl = CustomMultiSegmentedControl(buttonImages: nil, buttonTitles: ["M", "T", "W", "T", "F", "S", "S"], selectedIndex: selectedIndex)
+            
+            group.notify(queue: .main) {
+                activityIndicatorView.stopAnimating()
+                self.initializeForm()
+            }
         }
     }
     
@@ -75,16 +122,6 @@ class SchedulerViewController: FormViewController {
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        
-        customSegmentControl.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        customSegmentControl.delegate = self
-                
-        view.addSubview(customSegmentControl)
-        view.addSubview(tableView)
-        
-        customSegmentControl.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 20, left: 0, bottom: 0, right: 0))
-        tableView.anchor(top: customSegmentControl.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        
         let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
         navigationItem.rightBarButtonItem = addBarButton
     }
@@ -101,21 +138,15 @@ class SchedulerViewController: FormViewController {
             }
             self.hideActivityIndicator()
             
-            if active {
-                self.navigationController?.popViewController(animated: true)
-            } else {
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 2)
-                    homeTab.changeToIndex(index: 2)
-                }
-                self.tabBarController?.selectedIndex = 1
-                if #available(iOS 13.0, *) {
-                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-                } else {
-                    // Fallback on earlier versions
-                }
+            let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+            if nav.topViewController is MasterActivityContainerController {
+                let homeTab = nav.topViewController as! MasterActivityContainerController
+                homeTab.customSegmented.setIndex(index: 2)
+                homeTab.changeToIndex(index: 2)
+            }
+            self.tabBarController?.selectedIndex = 1
+            if #available(iOS 13.0, *) {
+                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
             }
         }
     }
@@ -133,92 +164,220 @@ class SchedulerViewController: FormViewController {
     }
     
     fileprivate func initializeForm() {
-        form +++
-            Section()
-            
-            <<< TextRow("Length") {
-                $0.cell.isUserInteractionEnabled = false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-            
-            <<< DateTimeInlineRow("\(type.categoryText)") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                $0.minuteInterval = 5
-                $0.dateFormatter?.dateStyle = .none
-                $0.dateFormatter?.timeStyle = .short
-                $0.value = self.scheduler.startTime
-            }.onChange { [weak self] row in
-                self!.updateLength()
-                self!.scheduler.startTime = row.value
-            }.onExpandInlineRow { cell, row, inlineRow in
-                inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.datePicker.datePickerMode = .time
-                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
+        if let scheduler = scheduler, scheduler.dailyTimes != nil {
+            let dailyTimes = scheduler.dailyTimes!
+            for index in 0...dailyTimes.count - 1 {
+                form +++
+                    Section()
+                    <<< ActiveDaysRow("\(index)") {
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.delegate = self
+                        $0.value = dailyTimes[index].activeDays ?? []
                     }
-                }
-                let color = cell.detailTextLabel?.textColor
-                row.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = color
-                }
-                cell.detailTextLabel?.textColor = cell.tintColor
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-        
-            <<< DateTimeInlineRow("\(type.subcategoryText)") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                $0.title
-                    = $0.tag
-                $0.minuteInterval = 5
-                $0.dateFormatter?.dateStyle = .none
-                $0.dateFormatter?.timeStyle = .short
-                $0.value = self.scheduler.endTime
-            }.onChange { [weak self] row in
-                self!.updateLength()
-                self!.scheduler.endTime = row.value
-            }.onExpandInlineRow { cell, row, inlineRow in
-                inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.datePicker.datePickerMode = .time
-                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    
+                    <<< TextRow("Length\(index)") {
+                        $0.cell.isUserInteractionEnabled = false
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.title = "Length"
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     }
-                }
-                let color = cell.detailTextLabel?.textColor
-                row.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = color
-                }
-                cell.detailTextLabel?.textColor = cell.tintColor
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    
+                    <<< DateTimeInlineRow("\(type.categoryText)\(index)") {
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.title = "\(type.categoryText)"
+                        $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        $0.minuteInterval = 5
+                        $0.dateFormatter?.dateStyle = .none
+                        $0.dateFormatter?.timeStyle = .short
+                        $0.value = dailyTimes[index].startTime
+                    }.onChange { [weak self] row in
+                        self!.updateLength(lengthRowTag: "Length\(index)", startRowTag: "\(self!.type.categoryText)\(index)", endRowTag: "\(self!.type.subcategoryText)\(index)", index: index)
+                        self!.scheduler.dailyTimes![index].startTime = row.value
+                    }.onExpandInlineRow { cell, row, inlineRow in
+                        inlineRow.cellUpdate() { cell, row in
+                            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.datePicker.datePickerMode = .time
+                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            if #available(iOS 13.4, *) {
+                                cell.datePicker.preferredDatePickerStyle = .wheels
+                            }
+                        }
+                        let color = cell.detailTextLabel?.textColor
+                        row.onCollapseInlineRow { cell, _, _ in
+                            cell.detailTextLabel?.textColor = color
+                        }
+                        cell.detailTextLabel?.textColor = cell.tintColor
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    }
+                
+                    <<< DateTimeInlineRow("\(type.subcategoryText)\(index)") {
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        $0.title = "\(type.subcategoryText)"
+                        $0.minuteInterval = 5
+                        $0.dateFormatter?.dateStyle = .none
+                        $0.dateFormatter?.timeStyle = .short
+                        $0.value = dailyTimes[index].endTime
+                    }.onChange { [weak self] row in
+                        self!.updateLength(lengthRowTag: "Length\(index)", startRowTag: "\(self!.type.categoryText)\(index)", endRowTag: "\(self!.type.subcategoryText)\(index)", index: index)
+                        self!.scheduler.dailyTimes![index].endTime = row.value
+                    }.onExpandInlineRow { cell, row, inlineRow in
+                        inlineRow.cellUpdate() { cell, row in
+                            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.datePicker.datePickerMode = .time
+                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            if #available(iOS 13.4, *) {
+                                cell.datePicker.preferredDatePickerStyle = .wheels
+                            }
+                        }
+                        let color = cell.detailTextLabel?.textColor
+                        row.onCollapseInlineRow { cell, _, _ in
+                            cell.detailTextLabel?.textColor = color
+                        }
+                        cell.detailTextLabel?.textColor = cell.tintColor
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    }
+                
+                <<< ButtonRow("Add Additional Schedule") { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.textLabel?.textAlignment = .center
+                    row.cell.accessoryType = .none
+                    row.title = row.tag
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    }.onCellSelection({ _,_ in
+                        self.addSection()
+                    })
+                
+                self.updateLength(lengthRowTag: "Length\(index)", startRowTag: "\(self.type.categoryText)\(index)", endRowTag: "\(self.type.subcategoryText)\(index)", index: index)
             }
-        
+        }
     }
     
-    fileprivate func updateLength() {
-        if let lengthRow : TextRow = form.rowBy(tag: "Length"), let startRow : DateTimeInlineRow = form.rowBy(tag: "\(type.categoryText)"), let startValue = startRow.value, let endRow : DateTimeInlineRow = form.rowBy(tag: "\(type.subcategoryText)"), let endValue = endRow.value {
+    fileprivate func addSection() {
+        if scheduler.dailyTimes != nil, scheduler.dailyTimes!.count < 7 {
+            var dateComp = DateComponents()
+            dateComp.hour = 9
+            dateComp.minute = 0
+            dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+            let startTime = Calendar.current.date(from: dateComp)
+            dateComp.hour = 17
+            dateComp.minute = 0
+            dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+            let endTime = Calendar.current.date(from: dateComp)
+            
+            let dailyTime = DailyTimes(activeDays: nil, length: 8 * 60 * 60, startTime: startTime, endTime: endTime)
+            scheduler.dailyTimes!.append(dailyTime)
+            let index = scheduler.dailyTimes!.count - 1
+            
+            var section = self.form.allSections[0]
+            if let buttonRow: ButtonRow = self.form.rowBy(tag: "Add Additional Schedule"), let buttonRowIndex = buttonRow.indexPath?.item {
+                section.insert(DateTimeInlineRow("\(type.subcategoryText)\(index)") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    $0.title = "\(type.subcategoryText)"
+                    $0.minuteInterval = 5
+                    $0.dateFormatter?.dateStyle = .none
+                    $0.dateFormatter?.timeStyle = .short
+                    $0.value = scheduler.dailyTimes![index].endTime
+                }.onChange { [weak self] row in
+                    self!.updateLength(lengthRowTag: "Length\(index)", startRowTag: "\(self!.type.categoryText)\(index)", endRowTag: "\(self!.type.subcategoryText)\(index)", index: index)
+                    self!.scheduler.dailyTimes![index].endTime = row.value
+                }.onExpandInlineRow { cell, row, inlineRow in
+                    inlineRow.cellUpdate() { cell, row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.datePicker.datePickerMode = .time
+                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        if #available(iOS 13.4, *) {
+                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        }
+                    }
+                    let color = cell.detailTextLabel?.textColor
+                    row.onCollapseInlineRow { cell, _, _ in
+                        cell.detailTextLabel?.textColor = color
+                    }
+                    cell.detailTextLabel?.textColor = cell.tintColor
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }, at: buttonRowIndex)
+                
+                section.insert(DateTimeInlineRow("\(type.categoryText)\(index)") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.title = "\(type.categoryText)"
+                    $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    $0.minuteInterval = 5
+                    $0.dateFormatter?.dateStyle = .none
+                    $0.dateFormatter?.timeStyle = .short
+                    $0.value = scheduler.dailyTimes![index].startTime
+                }.onChange { [weak self] row in
+                    self!.updateLength(lengthRowTag: "Length\(index)", startRowTag: "\(self!.type.categoryText)\(index)", endRowTag: "\(self!.type.subcategoryText)\(index)", index: index)
+                    self!.scheduler.dailyTimes![index].startTime = row.value
+                }.onExpandInlineRow { cell, row, inlineRow in
+                    inlineRow.cellUpdate() { cell, row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.datePicker.datePickerMode = .time
+                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        if #available(iOS 13.4, *) {
+                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        }
+                    }
+                    let color = cell.detailTextLabel?.textColor
+                    row.onCollapseInlineRow { cell, _, _ in
+                        cell.detailTextLabel?.textColor = color
+                    }
+                    cell.detailTextLabel?.textColor = cell.tintColor
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }, at: buttonRowIndex)
+                
+                section.insert(TextRow("Length\(index)") {
+                    $0.cell.isUserInteractionEnabled = false
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.title = "Length"
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }, at: buttonRowIndex)
+                
+                section.insert(ActiveDaysRow("\(index)") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.delegate = self
+                    $0.value = scheduler.dailyTimes![index].activeDays ?? []
+                }, at: buttonRowIndex)
+                
+                self.updateLength(lengthRowTag: "Length\(index)", startRowTag: "\(self.type.categoryText)\(index)", endRowTag: "\(self.type.subcategoryText)\(index)", index: index)
+            }
+        }
+    }
+    
+    fileprivate func updateLength(lengthRowTag: String, startRowTag: String, endRowTag: String, index: Int) {
+        if let lengthRow : TextRow = form.rowBy(tag: lengthRowTag), let startRow : DateTimeInlineRow = form.rowBy(tag: startRowTag), let startValue = startRow.value, let endRow : DateTimeInlineRow = form.rowBy(tag: endRowTag), let endValue = endRow.value {
             var length = Calendar.current.dateComponents([.second], from: startValue, to: endValue).second ?? 0
             if length < 0 {
                 length += 60*60*24
@@ -241,15 +400,36 @@ class SchedulerViewController: FormViewController {
                 lengthRow.value = "\(minutes) minutes"
             }
             lengthRow.updateCell()
-            scheduler.length = length
+            if scheduler.dailyTimes != nil {
+                scheduler.dailyTimes![index].length = length
+            }
         }
     }
     
 }
 
-extension SchedulerViewController: CustomMultiSegmentedControlDelegate {
-    func changeToIndex(indexes:[Int]) {
-        scheduler.activeDays = getDaysOfWeek(integers: indexes)
+extension SchedulerViewController: ActiveDaysDelegate {
+    func updateIndexes(index: Int, indexes: [Int]) {
+        if scheduler.dailyTimes != nil {
+            for i in 0...scheduler.dailyTimes!.count - 1 {
+                if i != index, let activeDays = scheduler.dailyTimes![i].activeDays {
+                    for ind in indexes {
+                        if let firstIndex = activeDays.firstIndex(of: ind) {
+                            scheduler.dailyTimes![i].activeDays!.remove(at: firstIndex)
+                        }
+                    }
+                    if let row : ActiveDaysRow = form.rowBy(tag: "\(i)") {
+                        row.value = scheduler.dailyTimes![i].activeDays ?? []
+                        row.updateCell()
+                    }
+                }
+            }
+            if let row : ActiveDaysRow = form.rowBy(tag: "\(index)") {
+                row.value = indexes
+                row.updateCell()
+                scheduler.dailyTimes![index].activeDays = indexes
+            }
+        }
     }
 }
 

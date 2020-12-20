@@ -89,6 +89,7 @@
 		10737F8524912BDD00D146D6 /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10737F8424912BDD00D146D6 /* Preview.swift */; };
 		1075ED21256C175A00AB2B0A /* DiscoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */; };
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
+		107BC99B258FB32B008E6DD5 /* ActiveDaysRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107BC99A258FB32B008E6DD5 /* ActiveDaysRow.swift */; };
 		107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */; };
 		108087172583E72300FB9BB0 /* SummaryValueBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087162583E72300FB9BB0 /* SummaryValueBarChartCell.swift */; };
 		1080871B2583E73D00FB9BB0 /* SummaryLineChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */; };
@@ -547,6 +548,7 @@
 		10737F8424912BDD00D146D6 /* Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
 		1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewController.swift; sourceTree = "<group>"; };
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
+		107BC99A258FB32B008E6DD5 /* ActiveDaysRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveDaysRow.swift; sourceTree = "<group>"; };
 		107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListTableViewCell.swift; sourceTree = "<group>"; };
 		108087162583E72300FB9BB0 /* SummaryValueBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryValueBarChartCell.swift; sourceTree = "<group>"; };
 		1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryLineChartCell.swift; sourceTree = "<group>"; };
@@ -1161,6 +1163,7 @@
 				108087262585059E00FB9BB0 /* SleepActions.swift */,
 				10808732258506EC00FB9BB0 /* WorkFetcher.swift */,
 				1080872E258506DF00FB9BB0 /* WorkActions.swift */,
+				107BC99A258FB32B008E6DD5 /* ActiveDaysRow.swift */,
 			);
 			path = SchedulerViewControllers;
 			sourceTree = "<group>";
@@ -2795,6 +2798,7 @@
 				10C83340249AC2F00037F638 /* SygicPlacesSearchResult.swift in Sources */,
 				4BAEE5D0212735E50045AB10 /* SelectParticipantsViewController.swift in Sources */,
 				4BAEE51621272D890045AB10 /* GroupAdminControlsTableViewCell.swift in Sources */,
+				107BC99B258FB32B008E6DD5 /* ActiveDaysRow.swift in Sources */,
 				10196F0324411B5600B6AFDF /* ScheduleViewController.swift in Sources */,
 				10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */,
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,

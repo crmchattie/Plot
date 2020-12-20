@@ -17,12 +17,7 @@ let sleepEntity = "sleep"
 struct Scheduler: Codable, Equatable, Hashable {
     var id: String
     var name: String?
-    // day (Monday) :
-    var activeDays: [DaysofWeek]?
-    // StartTime/Endtime - "HH:mm:ss"
-    var length: Int?
-    var startTime: Date?
-    var endTime: Date?
+    var dailyTimes: [DailyTimes]?
     var schedulerDate: Date?
     var lastModifiedDate: Date?
     var createdDate: Date?
@@ -30,6 +25,15 @@ struct Scheduler: Codable, Equatable, Hashable {
 
 func ==(lhs: Scheduler, rhs: Scheduler) -> Bool {
     return lhs.id == rhs.id
+}
+
+struct DailyTimes: Codable, Equatable, Hashable {
+    // day (Monday) :
+    var activeDays: [Int]?
+    // StartTime/Endtime - "HH:mm:ss"
+    var length: Int?
+    var startTime: Date?
+    var endTime: Date?
 }
 
 enum DaysofWeek: String, CaseIterable, Codable {

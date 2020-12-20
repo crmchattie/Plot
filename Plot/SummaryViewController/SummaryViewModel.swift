@@ -203,7 +203,7 @@ class SummaryViewModel: SummaryViewModelInterface {
             dataSet.lineWidth = 0
             
             let colorTop = UIColor.systemBlue.cgColor
-            let colorBottom = UIColor(red: 16.0/255.0, green: 28.0/255.0, blue: 56.0/255.0, alpha: 1.0).cgColor
+            let colorBottom = UIColor.systemBlue.cgColor
             let gradientColors = [colorBottom, colorTop] as CFArray
             let gradient = CGGradient(colorsSpace: nil, colors: gradientColors as CFArray, locations: nil)!
             dataSet.fillAlpha = 1

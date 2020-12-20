@@ -154,8 +154,6 @@ class CustomMultiSegmentedControl: UIView {
         buttons.forEach({
             $0.tintColor = unselectedTintColor
             $0.backgroundColor = unselectedBackgroundColor
-            $0.clipsToBounds = true
-            $0.layer.cornerRadius = min($0.frame.width, $0.frame.height) / 2
         })
         selectedIndex = indexes
         indexes.forEach { (index) in
@@ -166,8 +164,6 @@ class CustomMultiSegmentedControl: UIView {
     
     @objc func buttonAction(sender:UIButton) {
         for (buttonIndex, btn) in buttons.enumerated() {
-            btn.clipsToBounds = true
-            btn.layer.cornerRadius = min(btn.frame.width, btn.frame.height) / 2
             if btn == sender {
                 if !selectedIndex.contains(buttonIndex) {
                     btn.tintColor = selectedTintColor
@@ -193,6 +189,36 @@ extension CustomMultiSegmentedControl {
         configStackView()
     }
     
+    private func createButton() {
+        buttons = [UIButton]()
+        buttons.removeAll()
+        subviews.forEach({$0.removeFromSuperview()})
+        if buttonImages != nil {
+            for buttonImage in buttonImages {
+                let button = RoundedButton(type: .system)
+                button.addTarget(self, action:#selector(CustomSegmentedControl.buttonAction(sender:)), for: .touchUpInside)
+                button.setImage(UIImage(named: buttonImage), for: .normal)
+                button.tintColor = unselectedTintColor
+                button.backgroundColor = unselectedBackgroundColor
+                buttons.append(button)
+            }
+        } else {
+            for buttonTitle in buttonTitles {
+                let button = RoundedButton(type: .system)
+                button.addTarget(self, action:#selector(CustomSegmentedControl.buttonAction(sender:)), for: .touchUpInside)
+                button.setTitle(buttonTitle, for: .normal)
+                button.titleLabel?.font = .boldSystemFont(ofSize: 20)
+                button.tintColor = unselectedTintColor
+                button.backgroundColor = unselectedBackgroundColor
+                buttons.append(button)
+            }
+        }
+        selectedIndex.forEach { (index) in
+            buttons[index].tintColor = selectedTintColor
+            buttons[index].backgroundColor = selectedBackgroundColor
+        }
+    }
+        
     private func configStackView() {
         for button in buttons {
             button.heightAnchor.constraint(equalTo: button.widthAnchor, multiplier: 1.0/1.0).isActive = true
@@ -210,38 +236,12 @@ extension CustomMultiSegmentedControl {
         stack.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
         stack.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
     }
-    
-    private func createButton() {
-        buttons = [UIButton]()
-        buttons.removeAll()
-        subviews.forEach({$0.removeFromSuperview()})
-        if buttonImages != nil {
-            for buttonImage in buttonImages {
-                let button = UIButton(type: .system)
-                button.addTarget(self, action:#selector(CustomSegmentedControl.buttonAction(sender:)), for: .touchUpInside)
-                button.setImage(UIImage(named: buttonImage), for: .normal)
-                button.clipsToBounds = true
-                button.layer.cornerRadius = min(button.frame.width, button.frame.height) / 2
-                button.tintColor = unselectedTintColor
-                button.backgroundColor = unselectedBackgroundColor
-                buttons.append(button)
-            }
-        } else {
-            for buttonTitle in buttonTitles {
-                let button = UIButton(type: .system)
-                button.addTarget(self, action:#selector(CustomSegmentedControl.buttonAction(sender:)), for: .touchUpInside)
-                button.setTitle(buttonTitle, for: .normal)
-                button.titleLabel?.font = .boldSystemFont(ofSize: 20)
-                button.clipsToBounds = true
-                button.layer.cornerRadius = min(button.frame.width, button.frame.height) / 2
-                button.tintColor = unselectedTintColor
-                button.backgroundColor = unselectedBackgroundColor
-                buttons.append(button)
-            }
-        }
-        selectedIndex.forEach { (index) in
-            buttons[index].tintColor = selectedTintColor
-            buttons[index].backgroundColor = selectedBackgroundColor
-        }
+}
+
+class RoundedButton: UIButton {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        clipsToBounds = true
+        layer.cornerRadius = min(self.frame.width, self.frame.height) / 2
     }
 }
