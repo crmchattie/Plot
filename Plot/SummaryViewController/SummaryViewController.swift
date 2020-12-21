@@ -31,7 +31,7 @@ class SummaryViewController: UIViewController {
     
     private var viewModel: SummaryViewModelInterface
         
-    lazy var customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["D","W","M", "Y"], selectedIndex: 2)
+    lazy var customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["D","W","M", "Y"], selectedIndex: 2, selectedStrings: ["Day", "Week", "Month", "Year"])
     
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -136,7 +136,7 @@ class SummaryViewController: UIViewController {
     }
     
     func fetchData() {
-        guard let selectedIndex = customSegmented.selectedIndex, let segmentType = TimeSegmentType(rawValue: selectedIndex) else { return }
+        guard let segmentType = TimeSegmentType(rawValue: customSegmented.selectedIndex) else { return }
         
         viewModel.fetchChartData(for: segmentType) { [weak self] in
             guard let weakSelf = self else { return }
@@ -192,7 +192,7 @@ extension SummaryViewController: UICollectionViewDelegate, UICollectionViewDataS
                 let chartData = object[indexPath.item]
                 cell.chartView.delegate = self
                 cell.chartData = chartData
-                cell.dayAxisValueFormatter!.formatType = customSegmented.selectedIndex!
+                cell.dayAxisValueFormatter!.formatType = customSegmented.selectedIndex
             }
             return cell
         }
