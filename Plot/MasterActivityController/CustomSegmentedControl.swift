@@ -47,23 +47,18 @@ class CustomSegmentedControl: UIView {
     }
     
     func setIndex(index:Int) {
-        if let selectedStrings = selectedStrings {
-            let selectedButton = buttons[index]
-            selectedButton.tintColor = selectedButtonColor
-            selectedButton.setTitle(selectedStrings[index], for: .normal)
-            
-            let unselectedButton = buttons[selectedIndex]
-            unselectedButton.tintColor = buttonColor
-            unselectedButton.setTitle(buttonTitles[unselectedButton.tag], for: .normal)
-            
+        if buttonImages != nil {
+            buttons[index].tintColor = selectedButtonColor
+            buttons[selectedIndex].tintColor = buttonColor
         } else {
-            let selectedButton = buttons[index]
-            selectedButton.tintColor = selectedButtonColor
-            
-            let unselectedButton = buttons[selectedIndex]
-            unselectedButton.tintColor = buttonColor
-        }
+            buttons[index].setTitleColor(selectedButtonColor, for: .normal)
+            buttons[selectedIndex].setTitleColor(buttonColor, for: .normal)
         
+            if let selectedStrings = selectedStrings {
+                buttons[index].setTitle(selectedStrings[index], for: .normal)
+                buttons[selectedIndex].setTitle(buttonTitles[selectedIndex], for: .normal)
+            }
+        }
         selectedIndex = index
     }
     
@@ -71,22 +66,18 @@ class CustomSegmentedControl: UIView {
         if sender.tag == selectedIndex {
             return
         }
-        if let selectedStrings = selectedStrings {
-            let selectedButton = buttons[sender.tag]
-            selectedButton.tintColor = selectedButtonColor
-            selectedButton.setTitle(selectedStrings[sender.tag], for: .normal)
-
-            let unselectedButton = buttons[selectedIndex]
-            unselectedButton.tintColor = buttonColor
-            unselectedButton.setTitle(buttonTitles[unselectedButton.tag], for: .normal)
-            
+        if buttonImages != nil {
+            buttons[sender.tag].tintColor = selectedButtonColor
+            buttons[selectedIndex].tintColor = buttonColor
         } else {
-            let selectedButton = buttons[sender.tag]
-            selectedButton.tintColor = selectedButtonColor
-            let unselectedButton = buttons[selectedIndex]
-            unselectedButton.tintColor = buttonColor
-        }
+            buttons[sender.tag].setTitleColor(selectedButtonColor, for: .normal)
+            buttons[selectedIndex].setTitleColor(buttonColor, for: .normal)
         
+            if let selectedStrings = selectedStrings {
+                buttons[sender.tag].setTitle(selectedStrings[sender.tag], for: .normal)
+                buttons[selectedIndex].setTitle(buttonTitles[selectedIndex], for: .normal)
+            }
+        }
         selectedIndex = sender.tag
         delegate?.changeToIndex(index: selectedIndex)
     }
@@ -125,19 +116,19 @@ extension CustomSegmentedControl {
                 button.tintColor = buttonColor
                 buttons.append(button)
             }
+            buttons[selectedIndex].tintColor = selectedButtonColor
         } else {
             for index in 0...buttonTitles.count - 1 {
-                let button = UIButton(type: .system)
+                let button = UIButton(type: .custom)
                 button.tag = index
                 button.addTarget(self, action:#selector(CustomSegmentedControl.buttonAction(sender:)), for: .touchUpInside)
                 button.setTitle(buttonTitles[index], for: .normal)
                 button.titleLabel?.font = .boldSystemFont(ofSize: 20)
-                button.tintColor = buttonColor
+                button.setTitleColor(buttonColor, for: .normal)
                 buttons.append(button)
             }
+            buttons[selectedIndex].setTitleColor(selectedButtonColor, for: .normal)
         }
-        
-        buttons[selectedIndex].tintColor = selectedButtonColor
         
         if let selectedStrings = selectedStrings {
             buttons[selectedIndex].setTitle(selectedStrings[selectedIndex], for: .normal)
