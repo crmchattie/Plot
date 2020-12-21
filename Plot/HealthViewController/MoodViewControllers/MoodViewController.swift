@@ -94,43 +94,41 @@ class MoodViewController: FormViewController {
     }
     
     fileprivate func initializeForm() {
-        form +++ Section()
-        
-        <<< DateTimeInlineRow("Time") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-            $0.title = $0.tag
-            $0.minuteInterval = 5
-            $0.dateFormatter?.dateStyle = .full
-            $0.dateFormatter?.timeStyle = .short
-            $0.value = mood.moodDate
-            }.onChange { [weak self] row in
-                self!.mood.moodDate = row.value
-            }.onExpandInlineRow { cell, row, inlineRow in
-                inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.datePicker.datePickerMode = .dateAndTime
-                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
-                    }
-                }
-                let color = cell.detailTextLabel?.textColor
-                row.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = color
-                }
-                cell.detailTextLabel?.textColor = cell.tintColor
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
+        form +++
+            SelectableSection<ListCheckRow<String>>(nil, selectionType: .singleSelection(enableDeselection: false))
             
-        
-        form +++ SelectableSection<ListCheckRow<String>>("Mood", selectionType: .singleSelection(enableDeselection: false))
+            <<< DateTimeInlineRow("Time") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                $0.title = $0.tag
+                $0.minuteInterval = 5
+                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.timeStyle = .short
+                $0.value = mood.moodDate
+                }.onChange { [weak self] row in
+                    self!.mood.moodDate = row.value
+                }.onExpandInlineRow { cell, row, inlineRow in
+                    inlineRow.cellUpdate() { cell, row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.datePicker.datePickerMode = .dateAndTime
+                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        if #available(iOS 13.4, *) {
+                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        }
+                    }
+                    let color = cell.detailTextLabel?.textColor
+                    row.onCollapseInlineRow { cell, _, _ in
+                        cell.detailTextLabel?.textColor = color
+                    }
+                    cell.detailTextLabel?.textColor = cell.tintColor
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }
         
         MoodType.allCases.forEach { mood in
             form.last!
@@ -159,6 +157,23 @@ class MoodViewController: FormViewController {
                     }
                 })
         }
+        
+        form.last!
+            <<< TextAreaRow("Notes") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                $0.value = mood.notes
+                }.cellUpdate({ (cell, row) in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }).onChange() { [weak self] row in
+                    self!.mood.notes = row.value
+                }
         
     }
     

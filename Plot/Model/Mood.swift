@@ -15,6 +15,7 @@ struct Mood: Codable, Equatable, Hashable {
     var id: String
     var mood: MoodType?
     var applicableTo: ApplicableTo?
+    var notes: String?
     var moodDate: Date?
     var lastModifiedDate: Date?
     var createdDate: Date?

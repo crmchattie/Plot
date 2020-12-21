@@ -2429,31 +2429,31 @@ extension CreateActivityViewController: UITextFieldDelegate {
 }
 
 
-extension CreateActivityViewController: UITextViewDelegate {
-    
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        //        createActivityView.activityDescriptionPlaceholderLabel.isHidden = true
-        if textView.textColor == FalconPalette.defaultBlue {
-            textView.text = nil
-            textView.textColor = ThemeManager.currentTheme().generalTitleColor
-        }
-        
-        
-    }
-    
-    func textViewDidEndEditing(_ textView: UITextView) {
-        //        createActivityView.activityDescriptionPlaceholderLabel.isHidden = !textView.text.isEmpty
-        if textView.text.isEmpty {
-            textView.text = "Description"
-            textView.textColor = FalconPalette.defaultBlue
-        }
-    }
-    
-    func textViewDidChange(_ textView: UITextView) {
-        
-    }
-    
-}
+//extension CreateActivityViewController: UITextViewDelegate {
+//    
+//    func textViewDidBeginEditing(_ textView: UITextView) {
+//        //        createActivityView.activityDescriptionPlaceholderLabel.isHidden = true
+//        if textView.textColor == FalconPalette.defaultBlue {
+//            textView.text = nil
+//            textView.textColor = ThemeManager.currentTheme().generalTitleColor
+//        }
+//        
+//        
+//    }
+//    
+//    func textViewDidEndEditing(_ textView: UITextView) {
+//        //        createActivityView.activityDescriptionPlaceholderLabel.isHidden = !textView.text.isEmpty
+//        if textView.text.isEmpty {
+//            textView.text = "Description"
+//            textView.textColor = FalconPalette.defaultBlue
+//        }
+//    }
+//    
+//    func textViewDidChange(_ textView: UITextView) {
+//        
+//    }
+//    
+//}
 
 extension CreateActivityViewController: UpdateActivityCategoryDelegate {
     func update(value: String) {
