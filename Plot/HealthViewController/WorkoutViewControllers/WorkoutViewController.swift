@@ -437,7 +437,8 @@ class WorkoutViewController: FormViewController {
     
     fileprivate func updateCalories() {
         if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let length = workout.length {
-            caloriesRow.value = Double(length / 60) * workoutType.caloriesBurned * Double(weightValue)
+            self.workout.totalEnergyBurned = Double(length / 60) * workoutType.caloriesBurned * Double(weightValue)
+            caloriesRow.value = self.workout.totalEnergyBurned
             caloriesRow.updateCell()
         }
     }

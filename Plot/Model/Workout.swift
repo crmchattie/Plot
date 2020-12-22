@@ -9,7 +9,7 @@
 import Foundation
 
 let workoutsEntity = "custom-workouts"
-let userWorkoutsEntity = "user-workouts"
+let userWorkoutsEntity = "user-custom-workouts"
 
 struct Workout: Codable, Equatable, Hashable {
     var id: String
@@ -21,6 +21,7 @@ struct Workout: Codable, Equatable, Hashable {
     var startDateTime: Date?
     var endDateTime: Date?
     var length: Int?
+    var totalEnergyBurned: Double?
     var admin: String?
     var badge: Int?
     var pinned: Bool?
