@@ -47,6 +47,7 @@ enum HealthMetricType {
     case heartRate
     case weight
     case sleep
+    case mindfulness
     
     var name: String {
         get {
@@ -63,6 +64,8 @@ enum HealthMetricType {
                 return "Weight"
             case .sleep:
                 return "Sleep"
+            case .mindfulness:
+                return "Mindfulness"
             }
         }
     }
@@ -73,15 +76,17 @@ enum HealthMetricType {
             case .steps:
                 return 3
             case .nutrition:
-                return 6
+                return 7
             case .workout:
-                return 5
+                return 6
             case .heartRate:
                 return 2
             case .weight:
                 return 1
-            case .sleep:
+            case .mindfulness:
                 return 4
+            case .sleep:
+                return 5
             }
         }
     }

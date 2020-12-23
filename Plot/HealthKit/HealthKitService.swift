@@ -278,11 +278,12 @@ class HealthKitService {
         HKHealthStore().execute(query)
     }
     
-    class func getAllSleepDataSamples(startDate: Date,
-                                endDate: Date,
-                                completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
+    class func getAllCategoryTypeSamples(forIdentifier identifier: HKCategoryTypeIdentifier,
+                                      startDate: Date,
+                                      endDate: Date,
+                                      completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
     
-        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+        guard let sleepType = HKObjectType.categoryType(forIdentifier: identifier) else {
             completion(nil, nil)
             return
         }

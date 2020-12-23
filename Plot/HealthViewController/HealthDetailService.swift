@@ -122,7 +122,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             }
         }
         else if case .sleep = healthMetricType {
-            HealthKitService.getAllSleepDataSamples(startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
+            HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
                 let stats = self?.perpareCustomStatsForSleep(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType)
                 completion(stats, samples, nil)
             }
