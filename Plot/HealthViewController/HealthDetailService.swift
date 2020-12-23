@@ -123,7 +123,13 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
         else if case .sleep = healthMetricType {
             HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
-                let stats = self?.perpareCustomStatsForSleep(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType)
+                let stats = self?.perpareCustomStatsForCategorySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
+                completion(stats, samples, nil)
+            }
+        }
+        else if case .mindfulness = healthMetricType {
+            HealthKitService.getAllCategoryTypeSamples(forIdentifier:.mindfulSession, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
+                let stats = self?.perpareCustomStatsForCategorySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
                 completion(stats, samples, nil)
             }
         }
@@ -153,7 +159,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
     }
     
-    private func perpareCustomStatsForSleep(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType) -> [Statistic]? {
+    private func perpareCustomStatsForCategorySamples(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType, type: HealthMetricType) -> [Statistic]? {
         var customStats: [Statistic] = []
         
         guard let samples = samples else {
@@ -169,8 +175,13 @@ class HealthDetailService: HealthDetailServiceInterface {
             }
         }
         else {
+            var startAt: Double = 86400
+            if case .sleep = type {
+                startAt = 43200
+            }
+            
             // 12 hours = 43200 seconds
-            var midDay = startDate.dayBefore.startOfDay.advanced(by: 43200)
+            var midDay = startDate.dayBefore.startOfDay.advanced(by: startAt)
             var interval = NSDateInterval(start: midDay, duration: 86400)
             var map: [Date: Double] = [:]
             var sum: Double = 0
