@@ -10,6 +10,8 @@ import Foundation
 
 class FinanceCollectionViewCell: UICollectionViewCell {
     
+    var mode: Mode = .small
+    
     var transactionDetails: TransactionDetails! {
         didSet {
             if let transactionDetails = transactionDetails {
@@ -20,6 +22,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = "USD"
                 numberFormatter.numberStyle = .currency
+                numberFormatter.maximumFractionDigits = 0
                 
                 middleLabel.isHidden = true
                 bottomLabel.isHidden = true
@@ -54,7 +57,12 @@ class FinanceCollectionViewCell: UICollectionViewCell {
 
                     }
                 case .group:
-                    heightConstraint = 20
+                    if mode == .fullscreen {
+                        heightConstraint = 20
+                    } else {
+                        heightConstraint = 5
+                    }
+                    
                     if (transactionDetails.group == "Income" || transactionDetails.group == "Expense" || transactionDetails.group == "Difference") {
                         nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                         categoryLabel.font = UIFont.preferredFont(forTextStyle: .headline)
@@ -84,6 +92,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = "USD"
                 numberFormatter.numberStyle = .currency
+                numberFormatter.maximumFractionDigits = 0
                 
                 middleLabel.isHidden = true
                 bottomLabel.isHidden = true
@@ -119,7 +128,11 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                         categoryLabel.text = "\(amount)"
                     }
                 case .bs_type:
-                    heightConstraint = 20
+                    if mode == .fullscreen {
+                        heightConstraint = 20
+                    } else {
+                        heightConstraint = 5
+                    }
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                     
@@ -142,6 +155,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = "USD"
                 numberFormatter.numberStyle = .currency
+                numberFormatter.maximumFractionDigits = 0
                 
                 let isodateFormatter = ISO8601DateFormatter()
                 let dateFormatterPrint = DateFormatter()
@@ -175,6 +189,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = "USD"
                 numberFormatter.numberStyle = .currency
+                numberFormatter.maximumFractionDigits = 0
                 
                 let isodateFormatter = ISO8601DateFormatter()
                 let dateFormatterPrint = DateFormatter()

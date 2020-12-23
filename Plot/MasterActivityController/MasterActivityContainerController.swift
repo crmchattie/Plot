@@ -9,6 +9,18 @@
 import UIKit
 import Contacts
 import Firebase
+import LBTATools
+
+fileprivate let activitiesControllerCell = "ActivitiesControllerCell"
+fileprivate let healthControllerCell = "HealthControllerCell"
+fileprivate let financeControllerCell = "FinanceControllerCell"
+fileprivate let hostedViewCell = "HostedViewCell"
+fileprivate let headerContainerCell = "HeaderContainerCell"
+
+
+enum Mode {
+    case small, fullscreen
+}
 
 protocol ManageAppearanceHome: class {
     func manageAppearanceHome(_ homeController: MasterActivityContainerController, didFinishLoadingWith state: Bool )
@@ -20,6 +32,9 @@ protocol MasterContainerActivityIndicatorDelegate: class {
 }
 
 class MasterActivityContainerController: UIViewController {
+    
+    let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
+    let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
     
     var contacts = [CNContact]()
     var filteredContacts = [CNContact]()
@@ -58,10 +73,6 @@ class MasterActivityContainerController: UIViewController {
     var activities = [Activity]() {
         didSet {
             configureTabBarBadge()
-            summaryViewModel.activities = activities
-//            mapVC.sections = [.activities]
-//            mapVC.locations = [.activities: activities]
-//            mapVC.addAnnotations()
             listsVC.activities = activities
             listsVC.activityViewController = activitiesVC
             
@@ -116,78 +127,58 @@ class MasterActivityContainerController: UIViewController {
         }
     }
     
-    var transactions: [Transaction]! {
-        didSet {
-            summaryViewModel.transactions = transactions
-            if !activities.isEmpty {
-                summaryVC.fetchData()
-            }
-        }
-    }
-
+    var transactions: [Transaction]!
+    
     var selectedDate = Date()
     
-    let titles = ["Summary", "Activities", "Health", "Finances"]
-    var index: Int = 0
-    let customSegmented = CustomSegmentedControl(buttonImages: ["activity", "calendar", "heart", "money"], buttonTitles: nil, selectedIndex: 0, selectedStrings: nil)
-    let containerView = UIView()
-    
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
-    
-    var healthVCInitialized = false
-    
+        
     weak var delegate: ManageAppearanceHome?
         
+    var viewControllers = [UIViewController]()
+    
     lazy var activitiesVC: ActivityViewController = {
-        let vc = ActivityViewController()
-        self.addAsChildVC(childVC: vc)
+        let vc = ActivityViewController(mode: .small)
         return vc
     }()
     
     lazy var chatsVC: ChatsTableViewController = {
         let vc = ChatsTableViewController()
-        self.addAsChildVC(childVC: vc)
         return vc
     }()
     
     lazy var listsVC: ListsViewController = {
         let vc = ListsViewController()
-        self.addAsChildVC(childVC: vc)
         return vc
     }()
     
     lazy var financeVC: FinanceViewController = {
-        let vc = FinanceViewController()
-        self.addAsChildVC(childVC: vc)
+        let vc = FinanceViewController(mode: .small)
         return vc
     }()
     
     lazy var healthVC: HealthViewController = {
-        let vc = HealthViewController()
-        healthVCInitialized = true
-        self.addAsChildVC(childVC: vc)
+        let vc = HealthViewController(mode: .small)
         return vc
     }()
     
-    let summaryViewModel = SummaryViewModel(activities: nil, transactions: nil, summaryService: SummaryService())
-    
-    lazy var summaryVC: SummaryViewController = {
-        let vc = SummaryViewController(viewModel: summaryViewModel)
-        self.addAsChildVC(childVC: vc)
-        return vc
-    }()
+    var sections: [SectionType] = [.calendar, .health, .finances]
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupViews()
-        setNavBar()
+        viewControllers = [activitiesVC, healthVC, financeVC]
+
         activitiesVC.delegate = self
         activitiesVC.activityIndicatorDelegate = self
-        chatsVC.delegate = self
-        listsVC.delegate = self
         financeVC.delegate = self
-        changeToIndex(index: index)
+        listsVC.delegate = self
+        chatsVC.delegate = self
+        setupViews()
+        setNavBar()
         addObservers()
+                
+        delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -204,20 +195,12 @@ class MasterActivityContainerController: UIViewController {
     func addAsChildVC(childVC: UIViewController) {
         addChild(childVC)
         childVC.view.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        childVC.view.frame = containerView.bounds
-        containerView.addSubview(childVC.view)
         childVC.didMove(toParent: self)
     }
-    
-    private func removeAsChildVC(childVC: UIViewController) {
-        childVC.willMove(toParent: nil)
-        childVC.view.removeFromSuperview()
-        childVC.removeFromParent()
-    }
-    
+
     func setupViews() {
-        navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
@@ -232,18 +215,22 @@ class MasterActivityContainerController: UIViewController {
         tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
         
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
-        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        customSegmented.delegate = self
+        layout.scrollDirection = UICollectionView.ScrollDirection.vertical
+        collectionView.setCollectionViewLayout(layout, animated: true)
+        collectionView.dataSource = self
+        collectionView.delegate = self
         
-        customSegmented.constrainHeight(50)
+        view.addSubview(collectionView)
+        collectionView.fillSuperview()
         
-        view.addSubview(customSegmented)
-        view.addSubview(containerView)
-        
-        customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        containerView.anchor(top: customSegmented.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-                
+        collectionView.register(ActivitiesControllerCell.self, forCellWithReuseIdentifier: activitiesControllerCell)
+        collectionView.register(HealthControllerCell.self, forCellWithReuseIdentifier: healthControllerCell)
+        collectionView.register(FinanceControllerCell.self, forCellWithReuseIdentifier: financeControllerCell)
+        collectionView.register(HostedViewCell.self, forCellWithReuseIdentifier: hostedViewCell)
+        collectionView.register(HeaderContainerCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerContainerCell)
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -261,7 +248,6 @@ class MasterActivityContainerController: UIViewController {
     @objc fileprivate func changeTheme() {
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
-        customSegmented.backgroundColor = theme.generalBackgroundColor
         
         navigationController?.navigationBar.barStyle = theme.barStyle
         navigationController?.navigationBar.barTintColor = theme.barBackgroundColor
@@ -273,28 +259,17 @@ class MasterActivityContainerController: UIViewController {
         tabBarController?.tabBar.barTintColor = theme.barBackgroundColor
         tabBarController?.tabBar.barStyle = theme.barStyle
         
+        collectionView.indicatorStyle = theme.scrollBarStyle
+        collectionView.backgroundColor = theme.generalBackgroundColor
+        collectionView.reloadData()
+        
     }
     
     func setNavBar() {
+        let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         navigationItem.leftBarButtonItems = nil
-        navigationItem.rightBarButtonItems = nil
-        navigationItem.title = titles[index]
-        if index == 1 {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MMMM yyyy"
-            let dateString = dateFormatter.string(from: selectedDate)
-            navigationItem.title = dateString
-            let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-            let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-            navigationItem.leftBarButtonItem = editButtonItem
-            navigationItem.rightBarButtonItems = [newActivityBarButton, searchBarButton]
-        } else if index == 2 {
-            let newHealthItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-            navigationItem.rightBarButtonItems = [newHealthItemBarButton]
-        } else if index == 3 {
-            let newFinanceItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-            navigationItem.rightBarButtonItems = [newFinanceItemBarButton]
-        }
+        navigationItem.rightBarButtonItem = newItemBarButton
+        
     }
     
     func configureTabBarBadge() {
@@ -312,7 +287,7 @@ class MasterActivityContainerController: UIViewController {
             guard let lastMessage = conversation.lastMessage, let conversationBadge = conversation.badge, lastMessage.fromId != uid  else { continue }
             badge += conversationBadge
         }
-
+        
         for list in listList {
             badge += list.badge
         }
@@ -362,137 +337,78 @@ class MasterActivityContainerController: UIViewController {
     }
 }
 
-extension MasterActivityContainerController: CustomSegmentedControlDelegate {
-    func changeToIndex(index:Int) {
-        if self.index == 1 {
-            if activitiesVC.activityView.tableView.isEditing == true {
-                activitiesVC.activityView.tableView.setEditing(false, animated: true)
-                editButtonItem.style = .plain
-                editButtonItem.title = "Edit"
-            }
-            if let searchBar = activitiesVC.searchBar, searchBar.isFirstResponder {
-                activitiesVC.searchBar!.endEditing(true)
-                if let cancelButton : UIButton = activitiesVC.searchBar!.value(forKey: "cancelButton") as? UIButton {
-                    cancelButton.isEnabled = true
-                }
-            }
+extension MasterActivityContainerController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return sections.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: hostedViewCell, for: indexPath) as! HostedViewCell
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//        let VC = viewControllers[indexPath.section]
+//        cell.hostedView = VC.view
+        return cell
+    }
+    
+    static let cellSize: CGFloat = 500
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return .init(width: view.frame.width - 40, height: MasterActivityContainerController.cellSize)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return .init(top: 15, left: 0, bottom: 15, right: 0)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: view.frame.width, height: 30)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerContainerCell, for: indexPath) as! HeaderContainerCell
+            let section = sections[indexPath.section]
+            sectionHeader.titleLabel.text = section.name
+            return sectionHeader
+        } else { //No footer in this case but can add option for that
+            return UICollectionReusableView()
         }
-        
-        summaryVC.view.isHidden = !(index == 0)
-        activitiesVC.view.isHidden = !(index == 1)
-        let isHealthVCIsHidden = !(index == 2)
-        financeVC.view.isHidden = !(index == 3)
-        chatsVC.view.isHidden = !(index == 5)
-        listsVC.view.isHidden = !(index == 6)
-
-        if isHealthVCIsHidden && !healthVCInitialized {
-            // Don't do anything if healthVC is hidden and not initialized. We don't to access healthVC so that its viewDidAppear execute
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        showDailyListFullScreen(indexPath: indexPath)
+    }
+    
+    fileprivate func showDailyListFullScreen(indexPath: IndexPath) {
+        let section = sections[indexPath.section]
+        if section == .calendar {
+            activitiesVC.mode = .fullscreen
+//            let fullController = ActivityViewController(mode: .fullscreen)
+            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: activitiesVC)
+            backEnabledNavigationController.modalPresentationStyle = .fullScreen
+            present(backEnabledNavigationController, animated: true)
+        } else if section == .health {
+            healthVC.mode = .fullscreen
+//            let fullController = HealthViewController(mode: .fullscreen)
+            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: healthVC)
+            backEnabledNavigationController.modalPresentationStyle = .fullScreen
+            present(backEnabledNavigationController, animated: true)
         } else {
-            healthVC.delegate = self
-            healthVC.view.isHidden = isHealthVCIsHidden
+            financeVC.mode = .fullscreen
+//            financeVC.collectionView.reloadData()
+//            let fullController = FinanceViewController(mode: .fullscreen)
+            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: financeVC)
+            backEnabledNavigationController.modalPresentationStyle = .fullScreen
+            present(backEnabledNavigationController, animated: true)
         }
-
-        self.index = index
-        setNavBar()
     }
 }
 
 extension MasterActivityContainerController {
-    override var editButtonItem: UIBarButtonItem {
-        let editButton = super.editButtonItem
-        editButton.action = #selector(editButtonAction)
-        return editButton
-    }
-    
-    @objc func editButtonAction(sender: UIBarButtonItem) {
-        if index == 1 {
-            if activitiesVC.activityView.tableView.isEditing == true {
-                activitiesVC.activityView.tableView.setEditing(false, animated: true)
-                sender.style = .plain
-                sender.title = "Edit"
-            } else {
-                activitiesVC.activityView.tableView.setEditing(true, animated: true)
-                sender.style = .done
-                sender.title = "Done"
-            }
-        }
-    }
-    
-    @objc fileprivate func newChat() {
-        let destination = ContactsController()
-        destination.hidesBottomBarWhenPushed = true
-        let isContactsAccessGranted = destination.checkContactsAuthorizationStatus()
-        if isContactsAccessGranted {
-            destination.users = users
-            destination.filteredUsers = filteredUsers
-            destination.contacts = contacts
-            destination.filteredContacts = filteredContacts
-            destination.conversations = conversations
-        }
-        navigationController?.pushViewController(destination, animated: true)
-    }
-    
-    @objc fileprivate func newList() {
-        let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .actionSheet)
-        let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
-            let destination = GrocerylistViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.connectedToAct = false
-            destination.comingFromLists = true
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.activities = self.activities
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
-//        let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
-//            let destination = PackinglistViewController()
-//            destination.hidesBottomBarWhenPushed = true
-//            destination.connectedToAct = false
-//            destination.comingFromLists = true
-//            destination.users = self.users
-//            destination.filteredUsers = self.filteredUsers
-//            destination.activities = self.activities
-//            self.navigationController?.pushViewController(destination, animated: true)
-//        }
-        let activityList = UIAlertAction(title: "Activity List", style: .default) { (action:UIAlertAction) in
-            let destination = ActivitylistViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.connectedToAct = false
-            destination.comingFromLists = true
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.activities = self.activities
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
-        let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
-            let destination = ChecklistViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.connectedToAct = false
-            destination.comingFromLists = true
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.activities = self.activities
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
-        let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
-            print("You've pressed cancel")
-            
-        }
-        
-        alertController.addAction(groceryList)
-        alertController.addAction(activityList)
-//                alertController.addAction(packingList)
-        alertController.addAction(checkList)
-        alertController.addAction(cancelAlert)
-        self.present(alertController, animated: true, completion: nil)
-    }
-    
-    @objc fileprivate func search() {
-        if self.index == 1 {
-            activitiesVC.setupSearchController()
-        }
-    }
-    
     @objc fileprivate func newItem() {
         tabBarController?.selectedIndex = 0
     }
@@ -512,15 +428,11 @@ extension MasterActivityContainerController {
             }
         }
     }
-    
-    @objc fileprivate func goToMap() {
-        
-    }
 }
 
 extension MasterActivityContainerController: HomeBaseActivities {
     func manageAppearanceActivity(_ activityController: ActivityViewController, didFinishLoadingWith state: Bool) {
-        delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
+//        delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
     }
     
     func sendActivities(activities: [Activity], invitedActivities: [Activity], invitations: [String : Invitation]) {
@@ -559,11 +471,6 @@ extension MasterActivityContainerController: HomeBaseFinance {
         
     }
 }
-
-extension MasterActivityContainerController: HomeBaseHealth {
-    
-}
-
 
 extension MasterActivityContainerController: EndedWebViewDelegate {
     func updateMXMembers() {

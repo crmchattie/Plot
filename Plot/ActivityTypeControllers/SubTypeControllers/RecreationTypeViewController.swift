@@ -814,7 +814,7 @@ extension RecreationTypeViewController: ActivityTypeCellDelegate {
                 self.hideActivityIndicator()
                 
                 self.movingBackwards = false
-                (self.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
+//                (self.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
                 self.tabBarController?.selectedIndex = 1
             }))
             

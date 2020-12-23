@@ -1961,12 +1961,12 @@ class CreateActivityViewController: FormViewController {
             if active {
                 self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
             } else {
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 1)
-                    homeTab.changeToIndex(index: 1)
-                }
+//                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                if nav.topViewController is MasterActivityContainerController {
+//                    let homeTab = nav.topViewController as! MasterActivityContainerController
+//                    homeTab.customSegmented.setIndex(index: 1)
+//                    homeTab.changeToIndex(index: 1)
+//                }
                 self.tabBarController?.selectedIndex = 1
                 self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
             }

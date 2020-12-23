@@ -16,8 +16,10 @@ protocol HomeBaseFinance: class {
     func sendTransactions(transactions: [Transaction])
 }
 
-class FinanceViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class FinanceViewController: UIViewController {
     weak var delegate: HomeBaseFinance?
+    
+    var dismissHandler: (() ->())?
     
     let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
@@ -62,15 +64,84 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     
     var participants: [String: [User]] = [:]
     
+    let closeButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "close"), for: .normal)
+        button.tintColor = .systemBlue
+        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+        return button
+    }()
+    
+    @objc fileprivate func handleDismiss(button: UIButton) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    override var prefersStatusBarHidden: Bool { return true }
+    
+    var closeButtonConstraint: CGFloat = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setupMainView()
+        getFinancialData()
         addObservers()
         
-        getFinancialData()
+        customSegmented.delegate = self
+        layout.scrollDirection = UICollectionView.ScrollDirection.vertical
+        collectionView.setCollectionViewLayout(layout, animated: true)
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kHeaderCell)
+        collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
+        collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
+
         
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("viewWillAppear - FinanceVC \(mode)")
+        if mode == .fullscreen {
+            closeButton.constrainHeight(50)
+            closeButton.constrainWidth(50)
+            closeButtonConstraint = 20
+            collectionView.isUserInteractionEnabled = true
+            collectionView.isScrollEnabled = true
+            customSegmented.isHidden = false
+            customSegmented.constrainHeight(30)
+        } else {
+            closeButton.constrainHeight(0)
+            closeButton.constrainWidth(0)
+            closeButtonConstraint = 0
+            collectionView.isUserInteractionEnabled = false
+            collectionView.isScrollEnabled = false
+            customSegmented.isHidden = true
+            customSegmented.constrainHeight(0)
+        }
+        setupMainView()
+    }
+    
+//    override func viewWillDisappear(_ animated: Bool) {
+//        print("viewWillDisappear - FinanceVC \(mode)")
+//        if mode == .fullscreen {
+//            closeButton.constrainHeight(0)
+//            closeButton.constrainWidth(0)
+//            closeButtonConstraint = 0
+//            collectionView.isUserInteractionEnabled = false
+//            collectionView.isScrollEnabled = false
+//            customSegmented.isHidden = true
+//            customSegmented.constrainHeight(0)
+//        } else {
+//            closeButton.constrainHeight(50)
+//            closeButton.constrainWidth(50)
+//            closeButtonConstraint = 20
+//            collectionView.isUserInteractionEnabled = true
+//            collectionView.isScrollEnabled = true
+//            customSegmented.isHidden = false
+//            customSegmented.constrainHeight(30)
+//        }
+//        setupMainView()
+//    }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -81,61 +152,35 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
     }
     
     @objc fileprivate func changeTheme() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
-        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
-        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
-        navigationController?.navigationBar.titleTextAttributes = textAttributes
-        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
-        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-        
-        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
-        
+        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         collectionView.reloadData()
         
     }
     
     fileprivate func setupMainView() {
-        navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
-        
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
-        
-        extendedLayoutIncludesOpaqueBars = true
-        definesPresentationContext = true
+        navigationController?.isNavigationBarHidden = true
+        navigationController?.navigationBar.isHidden = true
+
         edgesForExtendedLayout = UIRectEdge.top
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
-        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        customSegmented.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         customSegmented.constrainHeight(30)
-        customSegmented.delegate = self
                 
-        layout.scrollDirection = UICollectionView.ScrollDirection.vertical
-        collectionView.setCollectionViewLayout(layout, animated: true)
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kHeaderCell)
-        collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
-        collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
-        collectionView.isUserInteractionEnabled = true
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
+        view.addSubview(closeButton)
         view.addSubview(customSegmented)
         view.addSubview(collectionView)
-        view.addSubview(activityIndicatorView)
-                        
-        customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+
+        closeButton.anchor(top: view.topAnchor, leading: nil, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: closeButtonConstraint, left: 0, bottom: 0, right: closeButtonConstraint))
+
+        customSegmented.anchor(top: closeButton.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
-        
-        activityIndicatorView.centerInSuperview()
-        
+                
 
     }
     
@@ -662,12 +707,22 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         guard currentReachabilityStatus != .notReachable else {
             return
         }
+        var accountLevel: AccountCatLevel!
+        var transactionLevel: TransactionCatLevel!
+        
+        if mode == .fullscreen {
+            setSections = [.financialIssues, .balanceSheet, .financialAccounts, .incomeStatement, .transactions]
+            accountLevel = .none
+            transactionLevel = .none
+        } else {
+            setSections = [.balanceSheet, .incomeStatement]
+            accountLevel = .bs_type
+            transactionLevel = .group
+        }
                 
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()
-        
-        activityIndicatorView.startAnimating()
-                
+                        
         let dispatchGroup = DispatchGroup()
         
         for section in setSections {
@@ -687,7 +742,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             } else if section.type == "Accounts" {
                 if section.subType == "Balance Sheet" {
                     dispatchGroup.enter()
-                    categorizeAccounts(accounts: accounts) { (accountsList, accountsDict) in
+                    categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, accountsDict) in
                         if !accountsList.isEmpty {
                             self.sections.append(.balanceSheet)
                             self.groups[section] = accountsList
@@ -711,7 +766,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
                     dispatchGroup.enter()
-                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate) { (transactionsList, transactionsDict) in
+                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
                             self.sections.append(.incomeStatement)
                             self.groups[section] = transactionsList
@@ -754,11 +809,95 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         }
         
         dispatchGroup.notify(queue: .main) {
-            activityIndicatorView.stopAnimating()
             self.collectionView.reloadData()
         }
     }
     
+    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
+        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = transaction.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if transaction.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = account.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            
+            for id in participantsIDs {
+                if account.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else {
+            let participants: [User] = []
+            completion(participants)
+        }
+    }
+    
+    var mode: Mode
+
+    init(mode: Mode) {
+        self.mode = mode
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return sections.count
     }
@@ -773,6 +912,8 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         let object = groups[section]
         if section != .financialIssues {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.mode = mode
             if let object = object as? [TransactionDetails] {
                 cell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
@@ -785,6 +926,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             if let object = object as? [MXMember] {
                 if let imageURL = institutionDict[object[indexPath.item].institution_code] {
                     cell.imageURL = imageURL
@@ -801,6 +943,7 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
         let object = groups[section]
         if section != .financialIssues {
             let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: view.frame.width - 32, height: 1000))
+            dummyCell.mode = mode
             if let object = object as? [TransactionDetails] {
                 dummyCell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
@@ -912,78 +1055,6 @@ class FinanceViewController: UIViewController, UICollectionViewDelegate, UIColle
             }
         }
         collectionView.deselectItem(at: indexPath, animated: true)
-    }
-    
-    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
-        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = transaction.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if transaction.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = account.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            
-            for id in participantsIDs {
-                if account.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else {
-            let participants: [User] = []
-            completion(participants)
-        }
     }
 }
 

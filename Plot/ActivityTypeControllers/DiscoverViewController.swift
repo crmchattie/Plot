@@ -68,11 +68,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(activityIndicatorView)
-        activityIndicatorView.centerInSuperview()
-        
-        navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = true
         
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
@@ -280,9 +277,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
 //            
 //            return header
 //        })
-        
-        activityIndicatorView.startAnimating()
-                
+                        
         let dispatchGroup = DispatchGroup()
         
         for section in sections {
@@ -295,27 +290,12 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             
             dispatchGroup.notify(queue: .main) {
                 if let object = self.groups[section] {
-                    activityIndicatorView.stopAnimating()
                     snapshot.appendSections([section])
                     snapshot.appendItems(object, toSection: section)
                     self.diffableDataSource.apply(snapshot)
                 }
             }
         }
-    }
-    
-    func showActivityIndicator() {
-        if let navController = self.navigationController {
-            self.showSpinner(onView: navController.view)
-        } else {
-            self.showSpinner(onView: self.view)
-        }
-        self.navigationController?.view.isUserInteractionEnabled = false
-    }
-    
-    func hideActivityIndicator() {
-        self.navigationController?.view.isUserInteractionEnabled = true
-        self.removeSpinner()
     }
     
     func openMXConnect(guid: String, current_member_guid: String?) {

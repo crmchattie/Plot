@@ -284,13 +284,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             print(aps)
             switch response.actionIdentifier {
             case Identifiers.viewChatsAction:
-                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 1)
+//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 1)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             case Identifiers.viewActivitiesAction:
-                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
+//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             case Identifiers.viewListsAction:
-                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 3)
+//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 3)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
                 if let chatID = userInfo["chatID"] as? String {

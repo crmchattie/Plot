@@ -125,9 +125,8 @@ class GeneralTabBarController: UITabBarController {
     }
     
     fileprivate func setTabs() {
-        print("setTabs")
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMMM yyyy"
+        dateFormatter.dateFormat = "EEEE, MMM d"
         let dateString = dateFormatter.string(from: Date())
         
         homeController.title = dateString
@@ -139,9 +138,9 @@ class GeneralTabBarController: UITabBarController {
         let settingsNavigationController = UINavigationController(rootViewController: settingsController)
         
         if #available(iOS 11.0, *) {
-            homeNavigationController.navigationBar.prefersLargeTitles = false
-            settingsNavigationController.navigationBar.prefersLargeTitles = false
-            discoverNavigationController.navigationBar.prefersLargeTitles = false
+            homeNavigationController.navigationBar.prefersLargeTitles = true
+            settingsNavigationController.navigationBar.prefersLargeTitles = true
+            discoverNavigationController.navigationBar.prefersLargeTitles = true
         }
         
         let homeImage = UIImage(named: "home")

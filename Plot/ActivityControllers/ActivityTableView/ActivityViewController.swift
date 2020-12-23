@@ -54,7 +54,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     fileprivate var sharedContainer : UserDefaults?
     
     let activityView = ActivityView()
-    
+        
     weak var delegate: HomeBaseActivities?
     weak var activityIndicatorDelegate: MasterContainerActivityIndicatorDelegate?
     
@@ -114,28 +114,83 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         return panGesture
         }()
     
+    let closeButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "close"), for: .normal)
+        button.tintColor = .systemBlue
+        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+        return button
+    }()
+    
+    @objc fileprivate func handleDismiss(button: UIButton) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    override var prefersStatusBarHidden: Bool { return true }
+    
+    var closeButtonConstraint: CGFloat = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print("activities view did load")
         
         activitiesFetcher.delegate = self
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
-        configureView()
         addObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
         if !isAppLoaded {
             activitiesFetcher.fetchActivities()
         }
+        
+        print("viewWillAppear - ActivitiesVC \(mode)")
+        if mode == .fullscreen {
+            closeButton.constrainHeight(50)
+            closeButton.constrainWidth(50)
+            closeButtonConstraint = 20
+            self.activityView.tableView.isUserInteractionEnabled = true
+            self.weekView()
+            self.activityView.arrowButton.isHidden = false
+            activityView.tableView.isScrollEnabled = true
+        } else {
+            closeButton.constrainHeight(0)
+            closeButton.constrainWidth(0)
+            closeButtonConstraint = 0
+            self.activityView.tableView.isUserInteractionEnabled = false
+            self.listView()
+            self.activityView.arrowButton.isHidden = true
+            activityView.tableView.isScrollEnabled = false
+        }
+        print("calendarHeightConstraint \(self.activityView.calendarHeightConstraint?.constant)")
+//        self.activityView.layoutIfNeeded()
+        configureView()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
+//    override func viewWillDisappear(_ animated: Bool) {
+//        print("viewWillDisappear - ActivitiesVC \(mode)")
+//        if mode == .fullscreen {
+//            closeButton.constrainHeight(0)
+//            closeButton.constrainWidth(0)
+//            closeButtonConstraint = 0
+//            self.activityView.tableView.isUserInteractionEnabled = false
+//            self.activityView.calendar.isHidden = true
+//            self.activityView.arrowButton.isHidden = true
+//            self.activityView.calendarHeightConstraint?.constant = 10
+//            activityView.tableView.isScrollEnabled = false
+//        } else {
+//            closeButton.constrainHeight(50)
+//            closeButton.constrainWidth(50)
+//            closeButtonConstraint = 20
+//            self.activityView.tableView.isUserInteractionEnabled = true
+//            self.activityView.calendar.isHidden = false
+//            self.activityView.arrowButton.isHidden = false
+//            self.activityView.calendarHeightConstraint?.constant = 300
+//            activityView.tableView.isScrollEnabled = true
+//        }
+//        configureView()
+//    }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -147,31 +202,27 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @objc fileprivate func changeTheme() {
         let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
+        view.backgroundColor = theme.cellBackgroundColor
         activityView.tableView.indicatorStyle = theme.scrollBarStyle
-        activityView.tableView.sectionIndexBackgroundColor = theme.generalBackgroundColor
-        activityView.tableView.backgroundColor = theme.generalBackgroundColor
+        activityView.tableView.sectionIndexBackgroundColor = theme.cellBackgroundColor
+        activityView.tableView.backgroundColor = theme.cellBackgroundColor
         activityView.tableView.reloadData()
         applyCalendarTheme()
     }
     
     fileprivate func applyCalendarTheme() {
         let theme = ThemeManager.currentTheme()
-        activityView.calendar.backgroundColor = theme.generalBackgroundColor
+        activityView.calendar.backgroundColor = theme.cellBackgroundColor
         activityView.calendar.appearance.weekdayTextColor = theme.generalTitleColor
         activityView.calendar.appearance.headerTitleColor = theme.generalTitleColor
         activityView.calendar.appearance.eventDefaultColor = theme.generalTitleColor
         activityView.calendar.appearance.titleDefaultColor = theme.generalTitleColor
-        activityView.calendar.appearance.titleSelectionColor = theme.generalBackgroundColor
+        activityView.calendar.appearance.titleSelectionColor = theme.cellBackgroundColor
         activityView.calendar.appearance.selectionColor = theme.generalTitleColor
         activityView.calendar.appearance.todayColor = FalconPalette.defaultBlue
         activityView.calendar.appearance.todaySelectionColor = FalconPalette.defaultBlue
         activityView.arrowButton.tintColor = theme.generalTitleColor
         activityView.calendar.appearance.eventSelectionColor = ThemeManager.currentTheme().generalTitleColor
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -202,23 +253,27 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func configureView() {
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        navigationController?.isNavigationBarHidden = true
+        navigationController?.navigationBar.isHidden = true
+
+        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
+        edgesForExtendedLayout = UIRectEdge.top
+        
+        view.addSubview(closeButton)
         view.addSubview(activityView)
+
+        closeButton.anchor(top: view.topAnchor, leading: nil, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: closeButtonConstraint, left: 0, bottom: 0, right: closeButtonConstraint))
+        
         activityView.translatesAutoresizingMaskIntoConstraints = false
-        activityView.topAnchor.constraint(equalTo:view.safeAreaLayoutGuide.topAnchor).isActive = true
-        activityView.leadingAnchor.constraint(equalTo:view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        activityView.trailingAnchor.constraint(equalTo:view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        activityView.bottomAnchor.constraint(equalTo:view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        activityView.topAnchor.constraint(equalTo: closeButton.bottomAnchor).isActive = true
+        activityView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+        activityView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+        activityView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
         activityView.arrowButton.addTarget(self, action: #selector(arrowButtonTapped), for: .touchUpInside)
         
-        extendedLayoutIncludesOpaqueBars = true
-        edgesForExtendedLayout = UIRectEdge.top
         activityView.tableView.separatorStyle = .none
-        definesPresentationContext = true
         
         activityView.addGestureRecognizer(self.scopeGesture)
         
@@ -229,7 +284,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.calendar.scope = getCalendarScope()
         activityView.calendar.swipeToChooseGesture.isEnabled = true // Swipe-To-Choose
         activityView.calendar.calendarHeaderView.isHidden = true
-        activityView.calendar.headerHeight = 10.0
+        activityView.calendar.headerHeight = 0
         activityView.calendar.appearance.headerMinimumDissolvedAlpha = 0.0
         
         let scopeGesture = UIPanGestureRecognizer(target: activityView.calendar, action: #selector(activityView.calendar.handleScopeGesture(_:)));
@@ -283,7 +338,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @objc fileprivate func listView() {
         UIView.animate(withDuration: 0.35, animations: {
-            self.activityView.calendarHeightConstraint?.constant = 10
+            self.activityView.calendarHeightConstraint?.constant = 0
             self.activityView.layoutIfNeeded()
         }) { result in
             self.activityView.calendar.isHidden = true
@@ -501,29 +556,18 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // MARK: - Table view data source
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        if mode == .fullscreen {
+            return true
+        }
+        return false
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 0 {
-            if filteredPinnedActivities.count == 0 {
-                return ""
-            }
-            return " "//Pinned
-        } else {
-            return " "
-        }
+        return ""
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if section == 0 {
-            return 0
-        } else {
-            if filteredPinnedActivities.count == 0 {
-                return 0
-            }
-            return 0
-        }
+        return 0
     }
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
@@ -538,7 +582,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        
         let delete = setupDeleteAction(at: indexPath)
         //        let pin = setupPinAction(at: indexPath)
         let mute = setupMuteAction(at: indexPath)
@@ -560,10 +603,26 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         } else {
             return filteredActivities.count
         }
+        
+//        if mode == .fullscreen {
+//            if section == 0 {
+//                return filteredPinnedActivities.count
+//            } else {
+//                return filteredActivities.count
+//            }
+//        } else {
+//            if section == 0 {
+//                return min(3, filteredPinnedActivities.count)
+//            } else {
+//                return min(3, filteredActivities.count)
+//            }
+//        }
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.delegate = self
         cell.updateInvitationDelegate = self
         cell.activityViewControllerDataStore = self
@@ -584,13 +643,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
         }
         
-        
         return cell
+    
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var activity: Activity!
-        
         if indexPath.section == 0 {
             let pinnedActivity = filteredPinnedActivities[indexPath.row]
             activity = pinnedActivity
@@ -602,7 +660,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func loadActivity(activity: Activity) {
-        
         let dispatchGroup = DispatchGroup()
         showActivityIndicator()
         
@@ -851,6 +908,16 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         self.removeSpinner()
     }
     
+    var mode: Mode
+
+    init(mode: Mode) {
+        self.mode = mode
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 extension ActivityViewController: DeleteAndExitDelegate {

@@ -37,6 +37,7 @@ class ActivitiesFetcher: NSObject {
     fileprivate var currentUserActivitiesAddingHandle = DatabaseHandle()
     
     func fetchActivities() {
+        print("fetchActivities")
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         delegate?.activities(didStartFetching: true)
         currentUserActivitiesReference = Database.database().reference().child("user-activities").child(currentUserID)
@@ -45,7 +46,6 @@ class ActivitiesFetcher: NSObject {
             for _ in 0 ..< snapshot.childrenCount { self.group.enter() }
             
             self.group.notify(queue: .main, execute: {
-                print("isGroupAlreadyFinished \(self.isGroupAlreadyFinished)")
                 self.isGroupAlreadyFinished = true
                 self.delegate?.activities(didFinishFetching: true, activities: self.activities, newActivity: nil)
             })

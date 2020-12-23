@@ -521,56 +521,111 @@ enum MXAccountSubType: String, CaseIterable, Codable {
     }
 }
 
-func categorizeAccounts(accounts: [MXAccount], completion: @escaping ([AccountDetails], [AccountDetails: [MXAccount]]) -> ()) {
+func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completion: @escaping ([AccountDetails], [AccountDetails: [MXAccount]]) -> ()) {
     var accountsList = [AccountDetails]()
     var accountsDict = [AccountDetails: [MXAccount]]()
     for account in accounts {
         if account.should_link ?? true == false {
             continue
         }
-        let accountDetail = AccountDetails(name: account.name, balance: account.available_balance ?? account.balance, level: .account, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
-        accountsDict[accountDetail] = [account]
-        if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype.name && $0.level == .subtype && $0.subtype == account.subtype && $0.type == account.type && $0.bs_type == account.bs_type}) {
-            var accountDetail = accountsDict.keys[index]
-            var accounts = accountsDict[accountDetail]
-            
-            accountsDict[accountDetail] = nil
-            
-            accountDetail.balance += account.available_balance ?? account.balance
-            accounts!.append(account)
-            
-            accountsDict[accountDetail] = accounts
-        } else {
-            let accountDetail = AccountDetails(name: account.subtype.name, balance: account.available_balance ?? account.balance, level: .subtype, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+        switch level {
+        case .account:
+            let accountDetail = AccountDetails(name: account.name, balance: account.available_balance ?? account.balance, level: .account, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
             accountsDict[accountDetail] = [account]
-        }
-        if let index = accountsDict.keys.firstIndex(where: {$0.name == account.type.name && $0.level == .type && $0.type == account.type && $0.bs_type == account.bs_type}) {
-            var accountDetail = accountsDict.keys[index]
-            var accounts = accountsDict[accountDetail]
             
-            accountsDict[accountDetail] = nil
-            
-            accountDetail.balance = account.available_balance ?? account.balance
-            accounts!.append(account)
-            
-            accountsDict[accountDetail] = accounts
-        } else {
-            let accountDetail = AccountDetails(name: account.type.name, balance: account.available_balance ?? account.balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type)
+        case .subtype:
+            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype.name && $0.level == .subtype && $0.subtype == account.subtype && $0.type == account.type && $0.bs_type == account.bs_type}) {
+                var accountDetail = accountsDict.keys[index]
+                var accounts = accountsDict[accountDetail]
+                
+                accountsDict[accountDetail] = nil
+                
+                accountDetail.balance += account.available_balance ?? account.balance
+                accounts!.append(account)
+                
+                accountsDict[accountDetail] = accounts
+            } else {
+                let accountDetail = AccountDetails(name: account.subtype.name, balance: account.available_balance ?? account.balance, level: .subtype, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+                accountsDict[accountDetail] = [account]
+            }
+        case .type:
+            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.type.name && $0.level == .type && $0.type == account.type && $0.bs_type == account.bs_type}) {
+                var accountDetail = accountsDict.keys[index]
+                var accounts = accountsDict[accountDetail]
+                
+                accountsDict[accountDetail] = nil
+                
+                accountDetail.balance = account.available_balance ?? account.balance
+                accounts!.append(account)
+                
+                accountsDict[accountDetail] = accounts
+            } else {
+                let accountDetail = AccountDetails(name: account.type.name, balance: account.available_balance ?? account.balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type)
+                accountsDict[accountDetail] = [account]
+            }
+        case .bs_type:
+            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.bs_type.name && $0.level == .bs_type && $0.bs_type == account.bs_type}) {
+                var accountDetail = accountsDict.keys[index]
+                var accounts = accountsDict[accountDetail]
+                
+                accountsDict[accountDetail] = nil
+                
+                accountDetail.balance += account.available_balance ?? account.balance
+                accounts!.append(account)
+                
+                accountsDict[accountDetail] = accounts
+            } else {
+                let accountDetail = AccountDetails(name: account.bs_type.name, balance: account.available_balance ?? account.balance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type)
+                accountsDict[accountDetail] = [account]
+            }
+        case .none:
+            let accountDetail = AccountDetails(name: account.name, balance: account.available_balance ?? account.balance, level: .account, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
             accountsDict[accountDetail] = [account]
-        }
-        if let index = accountsDict.keys.firstIndex(where: {$0.name == account.bs_type.name && $0.level == .bs_type && $0.bs_type == account.bs_type}) {
-            var accountDetail = accountsDict.keys[index]
-            var accounts = accountsDict[accountDetail]
             
-            accountsDict[accountDetail] = nil
+            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype.name && $0.level == .subtype && $0.subtype == account.subtype && $0.type == account.type && $0.bs_type == account.bs_type}) {
+                var accountDetail = accountsDict.keys[index]
+                var accounts = accountsDict[accountDetail]
+                
+                accountsDict[accountDetail] = nil
+                
+                accountDetail.balance += account.available_balance ?? account.balance
+                accounts!.append(account)
+                
+                accountsDict[accountDetail] = accounts
+            } else {
+                let accountDetail = AccountDetails(name: account.subtype.name, balance: account.available_balance ?? account.balance, level: .subtype, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+                accountsDict[accountDetail] = [account]
+            }
             
-            accountDetail.balance += account.available_balance ?? account.balance
-            accounts!.append(account)
+            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.type.name && $0.level == .type && $0.type == account.type && $0.bs_type == account.bs_type}) {
+                var accountDetail = accountsDict.keys[index]
+                var accounts = accountsDict[accountDetail]
+                
+                accountsDict[accountDetail] = nil
+                
+                accountDetail.balance = account.available_balance ?? account.balance
+                accounts!.append(account)
+                
+                accountsDict[accountDetail] = accounts
+            } else {
+                let accountDetail = AccountDetails(name: account.type.name, balance: account.available_balance ?? account.balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type)
+                accountsDict[accountDetail] = [account]
+            }
             
-            accountsDict[accountDetail] = accounts
-        } else {
-            let accountDetail = AccountDetails(name: account.bs_type.name, balance: account.available_balance ?? account.balance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type)
-            accountsDict[accountDetail] = [account]
+            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.bs_type.name && $0.level == .bs_type && $0.bs_type == account.bs_type}) {
+                var accountDetail = accountsDict.keys[index]
+                var accounts = accountsDict[accountDetail]
+                
+                accountsDict[accountDetail] = nil
+                
+                accountDetail.balance += account.available_balance ?? account.balance
+                accounts!.append(account)
+                
+                accountsDict[accountDetail] = accounts
+            } else {
+                let accountDetail = AccountDetails(name: account.bs_type.name, balance: account.available_balance ?? account.balance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type)
+                accountsDict[accountDetail] = [account]
+            }
         }
     }
     

@@ -79,10 +79,6 @@ extension ActivityCell {
     
     func configureCell(for indexPath: IndexPath, activity: Activity, withInvitation invitation: Invitation?) {
         
-        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        
         self.invitation = invitation
         self.activity = activity
         

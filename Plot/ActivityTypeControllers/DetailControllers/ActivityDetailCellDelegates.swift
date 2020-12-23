@@ -245,12 +245,12 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                                         
-                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                    if nav.topViewController is MasterActivityContainerController {
-                        let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 1)
-                        homeTab.changeToIndex(index: 1)
-                    }
+//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                    if nav.topViewController is MasterActivityContainerController {
+//                        let homeTab = nav.topViewController as! MasterActivityContainerController
+//                        homeTab.customSegmented.setIndex(index: 1)
+//                        homeTab.changeToIndex(index: 1)
+//                    }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
                         self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
@@ -799,12 +799,12 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                     
-                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                    if nav.topViewController is MasterActivityContainerController {
-                        let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 1)
-                        homeTab.changeToIndex(index: 1)
-                    }
+//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                    if nav.topViewController is MasterActivityContainerController {
+//                        let homeTab = nav.topViewController as! MasterActivityContainerController
+//                        homeTab.customSegmented.setIndex(index: 1)
+//                        homeTab.changeToIndex(index: 1)
+//                    }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
                         self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
@@ -1358,12 +1358,12 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                                         
-                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                    if nav.topViewController is MasterActivityContainerController {
-                        let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 1)
-                        homeTab.changeToIndex(index: 1)
-                    }
+//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                    if nav.topViewController is MasterActivityContainerController {
+//                        let homeTab = nav.topViewController as! MasterActivityContainerController
+//                        homeTab.customSegmented.setIndex(index: 1)
+//                        homeTab.changeToIndex(index: 1)
+//                    }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
                         self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
@@ -1920,12 +1920,12 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                     
-                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                    if nav.topViewController is MasterActivityContainerController {
-                        let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 1)
-                        homeTab.changeToIndex(index: 1)
-                    }
+//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                    if nav.topViewController is MasterActivityContainerController {
+//                        let homeTab = nav.topViewController as! MasterActivityContainerController
+//                        homeTab.customSegmented.setIndex(index: 1)
+//                        homeTab.changeToIndex(index: 1)
+//                    }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
                         self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
