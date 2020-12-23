@@ -194,7 +194,7 @@ class HealthMetricCell: UICollectionViewCell {
         case .sleep:
             imageName = "sleep"
         case .mindfulness:
-            imageName = "sleep"
+            imageName = "mindfulness"
         }
         
         activityTypeButton.setImage(UIImage(named: imageName), for: .normal)
