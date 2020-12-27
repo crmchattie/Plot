@@ -163,7 +163,10 @@ class CreateActivityViewController: FormViewController {
     }
     
     fileprivate func setupMainView() {
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
+        
         navigationItem.title = "Activity"
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
@@ -2044,10 +2047,10 @@ class CreateActivityViewController: FormViewController {
             }))
         }
         
-        alert.addAction(UIAlertAction(title: "Share Activity", style: .default, handler: { (_) in
-            print("User click Edit button")
-            self.share()
-        }))
+//        alert.addAction(UIAlertAction(title: "Share Activity", style: .default, handler: { (_) in
+//            print("User click Edit button")
+//            self.share()
+//        }))
 
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")

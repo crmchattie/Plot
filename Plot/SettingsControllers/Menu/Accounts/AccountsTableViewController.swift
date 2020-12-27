@@ -37,7 +37,7 @@ class AccountsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -52,31 +52,27 @@ class AccountsTableViewController: UITableViewController {
         cell.backgroundColor = view.backgroundColor
         
         if indexPath.row == 0 {
-            cell.textLabel?.text = "Calendar Information"
-            cell.isUserInteractionEnabled = true
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }
-        if indexPath.row == 1 {
             cell.textLabel?.text = "Financial Information"
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
-        if indexPath.row == 2 {
-            cell.textLabel?.text = "Health Information"
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }
+        
+//        if indexPath.row == 0 {
+//            cell.textLabel?.text = "Calendar Information"
+//            cell.isUserInteractionEnabled = true
+//            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//        }
+//
+//        if indexPath.row == 2 {
+//            cell.textLabel?.text = "Health Information"
+//            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//        }
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 {
-            
-        }
-        if indexPath.row == 1 {
             let destination = FinancialInfoViewController()
             navigationController?.pushViewController(destination, animated: true)
-        }
-        if indexPath.row == 2 {
-            
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }

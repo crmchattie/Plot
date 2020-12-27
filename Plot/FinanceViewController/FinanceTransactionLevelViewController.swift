@@ -27,6 +27,10 @@ class FinanceTransactionLevelViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
         activityIndicatorView.startAnimating()

@@ -28,6 +28,9 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
         
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
         setupVariables()

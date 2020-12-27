@@ -73,6 +73,9 @@ class ChooseChatTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
         
         fetchConversations()
         configureTableView()
@@ -94,7 +97,7 @@ class ChooseChatTableViewController: UITableViewController {
     fileprivate func configureTableView() {
         tableView.register(UserCell.self, forCellReuseIdentifier: userCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeChat))

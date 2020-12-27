@@ -44,6 +44,10 @@ class FinanceTransactionViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
         setupVariables()

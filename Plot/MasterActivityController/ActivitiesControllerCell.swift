@@ -69,6 +69,7 @@ class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITabl
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         let activity = activities[indexPath.row]
         delegate?.cellTapped(activity: activity)
     }

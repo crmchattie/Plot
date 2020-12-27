@@ -9,6 +9,7 @@
 import UIKit
 import Contacts
 import Firebase
+import CodableFirebase
 import LBTATools
 
 fileprivate let activitiesControllerCell = "ActivitiesControllerCell"
@@ -63,6 +64,30 @@ class MasterActivityContainerController: UIViewController {
     var sections: [SectionType] = [.calendar, .health, .finances]
     
     var sortedActivities = [Activity]()
+    
+    var chatLogController: ChatLogController? = nil
+    var messagesFetcher: MessagesFetcher? = nil
+    
+    var activities: [Activity] {
+        return networkController.activityService.activities
+    }
+    var users: [User] {
+        return networkController.userService.users
+    }
+    var filteredUsers: [User] {
+        return networkController.userService.users
+    }
+    var conversations: [Conversation] {
+        return networkController.conversationService.conversations
+    }
+    // [ActivityID: Invitation]
+    var invitations: [String: Invitation] {
+        return networkController.activityService.invitations
+    }
+    var invitedActivities: [Activity] {
+        return networkController.activityService.invitedActivities
+    }
+    var activitiesParticipants: [String: [User]] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -384,15 +409,15 @@ extension MasterActivityContainerController: HeaderContainerCellDelegate {
 
 extension MasterActivityContainerController: ActivitiesControllerCellDelegate {
     func cellTapped(activity: Activity) {
-        activitiesVC.loadActivity(activity: activity)
+        loadActivity(activity: activity)
     }
     
     func openMap(forActivity activity: Activity) {
-        activitiesVC.openMap(forActivity: activity)
+        openVCMap(forActivity: activity)
     }
     
     func openChat(forConversation conversationID: String?, activityID: String?) {
-        activitiesVC.openChat(forConversation: conversationID, activityID: activityID)
+        openVCChat(forConversation: conversationID, activityID: activityID)
     }
     
     
@@ -400,22 +425,536 @@ extension MasterActivityContainerController: ActivitiesControllerCellDelegate {
 
 extension MasterActivityContainerController: HealthControllerCellDelegate {
     func cellTapped(metric: HealthMetric) {
-        healthVC.openMetric(metric: metric)
+        let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
+        let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel)
+        navigationController?.pushViewController(healthDetailViewController, animated: true)
     }
 }
 
 extension MasterActivityContainerController: FinanceControllerCellDelegate {
     func openTransactionDetails(transactionDetails: TransactionDetails) {
-        financeVC.openTransactionDetails(transactionDetails: transactionDetails)
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: networkController.financeService.transactions, financeDetailService: FinanceDetailService())
+        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
+        financeDetailViewController.delegate = self
+        financeDetailViewController.users = users
+        financeDetailViewController.filteredUsers = filteredUsers
+        financeDetailViewController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
     
     func openAccountDetails(accountDetails: AccountDetails) {
-        financeVC.openAccountDetails(accountDetails: accountDetails)
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: networkController.financeService.accounts, transactionDetails: nil, transactions: nil, financeDetailService: FinanceDetailService())
+        let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
+        financeDetailViewController.delegate = self
+        financeDetailViewController.users = users
+        financeDetailViewController.filteredUsers = filteredUsers
+        financeDetailViewController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
     
     func openMember(member: MXMember) {
-        financeVC.openMXConnect(guid: networkController.financeService.mxUser.guid, current_member_guid: member.guid)
+        openMXConnect(guid: networkController.financeService.mxUser.guid, current_member_guid: member.guid)
     }
     
+    func openMXConnect(guid: String, current_member_guid: String?) {
+        Service.shared.getMXConnectURL(guid: guid, current_member_guid: current_member_guid ?? nil) { (search, err) in
+            if let url = search?.user?.connect_widget_url {
+                DispatchQueue.main.async {
+                    let destination = WebViewController()
+                    destination.urlString = url
+                    destination.controllerTitle = ""
+                    destination.delegate = self
+                    let navigationViewController = UINavigationController(rootViewController: destination)
+                    navigationViewController.modalPresentationStyle = .fullScreen
+                    self.present(navigationViewController, animated: true, completion: nil)
+                }
+            }
+        }
+    }
     
 }
+
+extension MasterActivityContainerController: UpdateFinancialsDelegate {
+    func updateTransactions(transactions: [Transaction]) {
+//        for transaction in transactions {
+//            if let index = self.transactions.firstIndex(of: transaction) {
+//                self.transactions[index] = transaction
+//            }
+//        }
+//        updateCollectionView()
+    }
+    func updateAccounts(accounts: [MXAccount]) {
+//        for account in accounts {
+//            if let index = self.accounts.firstIndex(of: account) {
+//                self.accounts[index] = account
+//            }
+//        }
+//        updateCollectionView()
+    }
+}
+
+extension MasterActivityContainerController: EndedWebViewDelegate {
+    func updateMXMembers() {
+//        members.removeAll()
+//        getMXData()
+    }
+}
+
+extension MasterActivityContainerController {
+    func showActivityIndicator() {
+        if let tabController = self.tabBarController {
+            self.showSpinner(onView: tabController.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+    
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
+    
+    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
+        guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        
+        let group = DispatchGroup()
+        let olderParticipants = self.activitiesParticipants[activityID]
+        var participants: [User] = []
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if activity.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            if let first = olderParticipants?.filter({$0.id == id}).first {
+                participants.append(first)
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    participants.append(user)
+                }
+                
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            self.activitiesParticipants[activityID] = participants
+            completion(participants)
+        }
+    }
+    
+    func loadActivity(activity: Activity) {
+        let dispatchGroup = DispatchGroup()
+        showActivityIndicator()
+        
+        if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {
+            dispatchGroup.enter()
+            Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
+                if let detailedRecipe = search {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = RecipeDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.recipe = detailedRecipe
+                        destination.detailedRecipe = detailedRecipe
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.activities
+                        destination.conversations = self.conversations
+                        self.getParticipants(forActivity: activity) { (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
+                                self.navigationController?.pushViewController(destination, animated: true)
+                            }
+                        }
+                    }
+                } else {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        self.hideActivityIndicator()
+                        self.activityNotFoundAlert()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.dismiss(animated: true, completion: nil)
+                        })
+                    }
+                }
+            }
+        } else if let eventID = activity.eventID {
+            print("\(eventID)")
+            dispatchGroup.enter()
+            Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
+                if let events = search?.embedded?.events {
+                    let event = events[0]
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        print("\(eventID)")
+                        let destination = EventDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.event = event
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.activities
+                        destination.conversations = self.conversations
+                        self.getParticipants(forActivity: activity) { (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                print("\(eventID)")
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
+                                self.navigationController?.pushViewController(destination, animated: true)
+                            }
+                        }
+                    }
+                } else {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        self.hideActivityIndicator()
+                        self.activityNotFoundAlert()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.dismiss(animated: true, completion: nil)
+                        })
+                    }
+                }
+            }
+        } else if let workoutID = activity.workoutID {
+            var reference = Database.database().reference()
+            dispatchGroup.enter()
+            reference = Database.database().reference().child("workouts").child("workouts")
+            reference.child(workoutID).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let workoutSnapshotValue = snapshot.value {
+                    if let workout = try? FirebaseDecoder().decode(PreBuiltWorkout.self, from: workoutSnapshotValue) {
+                        dispatchGroup.leave()
+                        let destination = WorkoutDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.workout = workout
+                        destination.intColor = 0
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.activities
+                        destination.conversations = self.conversations
+                        self.getParticipants(forActivity: activity) { (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
+                                self.navigationController?.pushViewController(destination, animated: true)
+                            }
+                        }
+                    }
+                }
+            })
+            { (error) in
+                print(error.localizedDescription)
+            }
+        } else if let attractionID = activity.attractionID {
+            dispatchGroup.enter()
+            Service.shared.fetchAttractionsSegment(size: "50", id: attractionID, keyword: "", classificationName: "", classificationId: "") { (search, err) in
+                if let attraction = search?.embedded?.attractions![0] {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = EventDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.attraction = attraction
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.activities
+                        destination.conversations = self.conversations
+                        self.getParticipants(forActivity: activity) { (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
+                                self.navigationController?.pushViewController(destination, animated: true)
+                            }
+                        }
+                    }
+                } else {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        self.hideActivityIndicator()
+                        self.activityNotFoundAlert()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.dismiss(animated: true, completion: nil)
+                        })
+                    }
+                }
+            }
+        } else if let placeID = activity.placeID {
+            dispatchGroup.enter()
+            Service.shared.fetchFSDetails(id: placeID) { (search, err) in
+                if let place = search?.response?.venue {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        let destination = PlaceDetailViewController()
+                        destination.hidesBottomBarWhenPushed = true
+                        destination.place = place
+                        destination.activity = activity
+                        destination.invitation = self.invitations[activity.activityID!]
+                        destination.users = self.users
+                        destination.filteredUsers = self.filteredUsers
+                        destination.activities = self.activities
+                        destination.conversations = self.conversations
+                        self.getParticipants(forActivity: activity) { (participants) in
+                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                destination.acceptedParticipant = acceptedParticipant
+                                destination.selectedFalconUsers = participants
+                                self.hideActivityIndicator()
+                                self.navigationController?.pushViewController(destination, animated: true)
+                            }
+                        }
+                    }
+                } else {
+                    dispatchGroup.leave()
+                    dispatchGroup.notify(queue: .main) {
+                        self.hideActivityIndicator()
+                        self.activityNotFoundAlert()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                            self.dismiss(animated: true, completion: nil)
+                        })
+                    }
+                }
+            }
+        } else {
+            self.hideActivityIndicator()
+            let destination = CreateActivityViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.activity = activity
+            destination.invitation = invitations[activity.activityID ?? ""]
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.activities = self.activities
+            destination.conversations = conversations
+            self.getParticipants(forActivity: activity) { (participants) in
+                InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                    destination.acceptedParticipant = acceptedParticipant
+                    destination.selectedFalconUsers = participants
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
+            }
+        }
+    }
+    
+    func openVCMap(forActivity activity: Activity) {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        guard activity.locationAddress != nil else {
+            return
+        }
+        
+        var locations = [activity]
+        
+        if activity.schedule != nil {
+            var scheduleList = [Activity]()
+            var locationAddress = [String : [Double]]()
+            locationAddress = activity.locationAddress!
+            for schedule in activity.schedule! {
+                if schedule.name == "nothing" { continue }
+                scheduleList.append(schedule)
+                guard let localAddress = schedule.locationAddress else { continue }
+                for (key, value) in localAddress {
+                    locationAddress[key] = value
+                }
+            }
+            locations.append(contentsOf: scheduleList)
+        }
+        
+        let destination = MapViewController()
+        destination.hidesBottomBarWhenPushed = true
+        destination.sections = [.activity]
+        destination.locations = [.activity: locations]
+        navigationController?.pushViewController(destination, animated: true)
+    
+    }
+    
+    func openVCChat(forConversation conversationID: String?, activityID: String?) {
+        if conversationID == nil {
+            let activity = activities.first(where: {$0.activityID == activityID})
+            let destination = ChooseChatTableViewController()
+            let navController = UINavigationController(rootViewController: destination)
+            destination.delegate = self
+            destination.activity = activity
+            destination.conversations = conversations
+            destination.pinnedConversations = conversations
+            destination.filteredConversations = conversations
+            destination.filteredPinnedConversations = conversations
+            present(navController, animated: true, completion: nil)
+        } else {
+            let groupChatDataReference = Database.database().reference().child("groupChats").child(conversationID!).child(messageMetaDataFirebaseFolder)
+            groupChatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
+                dictionary.updateValue(conversationID as AnyObject, forKey: "id")
+                
+                if let membersIDs = dictionary["chatParticipantsIDs"] as? [String:AnyObject] {
+                    dictionary.updateValue(Array(membersIDs.values) as AnyObject, forKey: "chatParticipantsIDs")
+                }
+                
+                let conversation = Conversation(dictionary: dictionary)
+                
+                if conversation.chatName == nil {
+                    if let activityID = activityID, let participants = self.activitiesParticipants[activityID], participants.count > 0 {
+                        let user = participants[0]
+                        conversation.chatName = user.name
+                        conversation.chatPhotoURL = user.photoURL
+                        conversation.chatThumbnailPhotoURL = user.thumbnailPhotoURL
+                    }
+                }
+                
+                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
+                self.messagesFetcher = MessagesFetcher()
+                self.messagesFetcher?.delegate = self
+                self.messagesFetcher?.loadMessagesData(for: conversation)
+            })
+        }
+    }
+}
+
+extension MasterActivityContainerController: MessagesDelegate {
+    
+    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
+        chatLogController?.updateMessageStatus(messageRef: reference)
+    }
+    
+    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
+        
+        chatLogController?.hidesBottomBarWhenPushed = true
+        chatLogController?.messagesFetcher = messagesFetcher
+        chatLogController?.messages = messages
+        chatLogController?.conversation = conversation
+        chatLogController?.deleteAndExitDelegate = self
+        //chatLogController?.activityID = activityID
+        
+        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
+            chatLogController?.observeTypingIndicator()
+            chatLogController?.configureTitleViewWithOnlineStatus()
+        }
+        
+        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
+        guard let destination = chatLogController else { return }
+        
+        self.chatLogController?.startCollectionViewAtBottom()
+        
+        
+        // If we're presenting a modal sheet
+        if let presentedViewController = presentedViewController as? UINavigationController {
+            presentedViewController.pushViewController(destination, animated: true)
+        } else {
+            navigationController?.pushViewController(destination, animated: true)
+        }
+        
+        chatLogController = nil
+        messagesFetcher?.delegate = nil
+        messagesFetcher = nil
+    }
+}
+
+extension MasterActivityContainerController: ChooseChatDelegate {
+    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
+        if let activityID = activityID {
+            let updatedConversationID = ["conversationID": chatID as AnyObject]
+            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+
+            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+                if conversation.activities != nil {
+                    var activities = conversation.activities!
+                    activities.append(activityID)
+                    let updatedActivities = ["activities": activities as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                } else {
+                    let updatedActivities = ["activities": [activityID] as AnyObject]
+                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
+                }
+                if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
+                    let activity = activities[index]
+                    if activity.grocerylistID != nil {
+                        if conversation.grocerylists != nil {
+                            var grocerylists = conversation.grocerylists!
+                            grocerylists.append(activity.grocerylistID!)
+                            let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                        } else {
+                            let updatedGrocerylists = [grocerylistsEntity: [activity.grocerylistID!] as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
+                        }
+                        Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!).updateChildValues(updatedConversationID)
+                    }
+                    if activity.checklistIDs != nil {
+                        if conversation.checklists != nil {
+                            let checklists = conversation.checklists! + activity.checklistIDs!
+                            let updatedChecklists = [checklistsEntity: checklists as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                        } else {
+                            let updatedChecklists = [checklistsEntity: activity.checklistIDs! as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
+                        }
+                        for ID in activity.checklistIDs! {
+                            Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
+
+                        }
+                    }
+                    if activity.packinglistIDs != nil {
+                        if conversation.packinglists != nil {
+                            let packinglists = conversation.packinglists! + activity.packinglistIDs!
+                            let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
+                        } else {
+                            let updatedPackinglists = [packinglistsEntity: activity.packinglistIDs! as AnyObject]
+                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
+                        }
+                       for ID in activity.packinglistIDs! {
+                            Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
+
+                        }
+                    }
+                }
+            }
+            self.connectedToChatAlert()
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+}
+
+extension MasterActivityContainerController: DeleteAndExitDelegate {
+    
+    func deleteAndExit(from otherActivityID: String) {
+        
+//        let pinnedIDs = pinnedActivities.map({$0.activityID ?? ""})
+//        let section = pinnedIDs.contains(otherActivityID) ? 0 : 1
+//        guard let row = activityIndex(for: otherActivityID, at: section) else { return }
+//
+//        let indexPath = IndexPath(row: row, section: section)
+//        section == 0 ? deletePinnedActivity(at: indexPath) : deleteUnPinnedActivity(at: indexPath)
+    }
+    
+    func activityIndex(for otherActivityID: String, at section: Int) -> Int? {
+//        let activitiesArray = section == 0 ? filteredPinnedActivities : filteredActivities
+//        guard let index = activitiesArray.firstIndex(where: { (activity) -> Bool in
+//            guard let activityID = activity.activityID else { return false }
+//            return activityID == otherActivityID
+//        }) else { return nil }
+//        return index
+        return nil
+    }
+}
+

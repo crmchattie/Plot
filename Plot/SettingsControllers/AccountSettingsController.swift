@@ -19,7 +19,7 @@ class AccountSettingsController: UITableViewController {
     
     let accountSettingsCellId = "userProfileCell"
     
-    var firstSection = [( icon: UIImage(named: "Accounts") , title: "Calendar, Financial & Health Info" ), ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
+    var firstSection = [( icon: UIImage(named: "Accounts") , title: "Financial Info" ), ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
                         ( icon: UIImage(named: "Privacy") , title: "Privacy and Security" ),
                         ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
                         ( icon: UIImage(named: "DataStorage") , title: "Data and Storage")]

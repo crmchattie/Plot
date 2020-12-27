@@ -320,10 +320,10 @@ class ChatLogController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupCollectionView()
         setRightBarButtonItem()
         setupTitleName()
-        
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -373,8 +373,11 @@ class ChatLogController: UICollectionViewController {
         print("\n CHATLOG CONTROLLER DE INIT \n")
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
         configureProgressBar()
         guard inputContainerView.inputTextView.isFirstResponder else { return }
         UIView.performWithoutAnimation {
@@ -438,8 +441,8 @@ class ChatLogController: UICollectionViewController {
     fileprivate func configureProgressBar() {
         guard navigationController?.navigationBar != nil else { return }
         guard !uploadProgressBar.isDescendant(of: navigationController!.navigationBar) else { return }
-        
-        navigationController?.navigationBar.addSubview(uploadProgressBar)
+                        
+        navigationController!.navigationBar.addSubview(uploadProgressBar)
         uploadProgressBar.translatesAutoresizingMaskIntoConstraints = false
         uploadProgressBar.bottomAnchor.constraint(equalTo: navigationController!.navigationBar.bottomAnchor).isActive = true
         uploadProgressBar.leftAnchor.constraint(equalTo: navigationController!.navigationBar.leftAnchor).isActive = true

@@ -84,10 +84,11 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     
     override func viewDidLoad() {
         super.viewDidLoad()
-            
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = false
-                
+        
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top

@@ -1008,16 +1008,9 @@ extension ActivityViewController: MessagesDelegate {
         
         chatLogController?.messagesFetcher.collectionDelegate = chatLogController
         guard let destination = chatLogController else { return }
-        
         self.chatLogController?.startCollectionViewAtBottom()
         
-        
-        // If we're presenting a modal sheet
-        if let presentedViewController = presentedViewController as? UINavigationController {
-            presentedViewController.pushViewController(destination, animated: true)
-        } else {
-            navigationController?.pushViewController(destination, animated: true)
-        }
+        self.navigationController?.pushViewController(destination, animated: true)
         
         chatLogController = nil
         messagesFetcher?.delegate = nil
