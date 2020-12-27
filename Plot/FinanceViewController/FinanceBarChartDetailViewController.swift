@@ -18,9 +18,7 @@ class FinanceBarChartViewController: UIViewController {
     weak var delegate : UpdateFinancialsDelegate?
     
     private let kFinanceTableViewCell = "FinanceTableViewCell"
-    
-    var user: MXUser!
-    
+        
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     

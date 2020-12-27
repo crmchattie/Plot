@@ -28,7 +28,7 @@ class MindfulnessActions: NSObject {
     
     }
     
-    public func deleteMindfulness() {
+    func deleteMindfulness() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -46,7 +46,7 @@ class MindfulnessActions: NSObject {
                 
     }
     
-    public func createNewMindfulness() {
+    func createNewMindfulness() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -88,7 +88,7 @@ class MindfulnessActions: NSObject {
         }
     }
     
-    public func updateMindfulnessParticipants() {
+    func updateMindfulnessParticipants() {
         guard let _ = active, let mindfulness = mindfulness, let ID = ID else {
             return
         }

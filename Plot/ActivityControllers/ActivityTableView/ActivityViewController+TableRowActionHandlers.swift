@@ -195,9 +195,9 @@ extension ActivityViewController {
         filteredPinnedActivities.remove(at: indexPath.row)
         pinnedActivities.remove(at: index)
         
-        if let invitation = invitations.removeValue(forKey: activityID) {
-            InvitationsFetcher.remove(invitation: invitation)
-        }
+//        if let invitation = invitations.removeValue(forKey: activityID) {
+//            InvitationsFetcher.remove(invitation: invitation)
+//        }
         
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()
@@ -233,11 +233,11 @@ extension ActivityViewController {
         
         activityView.tableView.beginUpdates()
         filteredActivities.remove(at: indexPath.row)
-        activities.remove(at: index)
+//        activities.remove(at: index)
         
-        if let invitation = invitations.removeValue(forKey: activityID) {
-            InvitationsFetcher.remove(invitation: invitation)
-        }
+//        if let invitation = invitations.removeValue(forKey: activityID) {
+//            InvitationsFetcher.remove(invitation: invitation)
+//        }
         
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()

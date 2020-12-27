@@ -11,6 +11,7 @@ import Firebase
 import ARSLineProgress
 
 class AccountSettingsController: UITableViewController {
+    var networkController = NetworkController()
     
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
@@ -36,9 +37,9 @@ class AccountSettingsController: UITableViewController {
     var filteredUsers = [User]()
     var activities = [Activity]()
     var invitedActivities = [Activity]()
+    var invitations = [String: Invitation]()
     var conversations = [Conversation]()
     var listList = [ListContainer]()
-    var invitations = [String: Invitation]()
     
     override func viewDidLoad() {
         super.viewDidLoad()

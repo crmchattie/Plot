@@ -15,16 +15,25 @@ protocol HealthViewControllerActivitiesDelegate: class {
     func update(_ healthViewController: HealthViewController, _ shouldFetchActivities: Bool)
 }
 
-class HealthViewController: UIViewController {    
+class HealthViewController: UIViewController {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     let healhKitManager = HealthKitManager()
     
-    var healthMetricSections: [String] = []
-    var healthMetrics: [String: [HealthMetric]] = [:] {
-        didSet {
-            if oldValue != healthMetrics {
-                collectionView.reloadData()
-            }
-        }
+    var healthMetricSections: [String] {
+        return networkController.healthService.healthMetricSections
+    }
+    var healthMetrics: [String: [HealthMetric]] {
+        return networkController.healthService.healthMetrics
     }
     
     let collectionView: UICollectionView = {
@@ -36,13 +45,6 @@ class HealthViewController: UIViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.contentInset.bottom = 0
         return collectionView
-    }()
-        
-    let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView()
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        spinner.startAnimating()
-        return spinner
     }()
     
     let closeButton: UIButton = {
@@ -62,9 +64,7 @@ class HealthViewController: UIViewController {
     override var prefersStatusBarHidden: Bool { return true }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        fetchData()
-        
+        super.viewDidLoad()        
         collectionView.dataSource = self
         collectionView.delegate = self
         
@@ -72,74 +72,13 @@ class HealthViewController: UIViewController {
             flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         }
         
+        configureView()
         addObservers()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        print("viewWillAppear - HealthVC \(mode)")
-        if mode == .fullscreen {
-            closeButton.constrainHeight(50)
-            closeButton.constrainWidth(50)
-            closeButtonConstraint = 20
-            collectionView.isScrollEnabled = true
-            collectionView.isUserInteractionEnabled = true
-        } else {
-            closeButton.constrainHeight(0)
-            closeButton.constrainWidth(0)
-            closeButtonConstraint = 0
-            collectionView.isScrollEnabled = false
-            collectionView.isUserInteractionEnabled = false
-        }
-        configureView()
-    }
-    
-//    override func viewWillDisappear(_ animated: Bool) {
-//        print("viewWillDisappear - HealthVC \(mode)")
-//        if mode == .fullscreen {
-//            closeButton.constrainHeight(0)
-//            closeButton.constrainWidth(0)
-//            closeButtonConstraint = 0
-//            collectionView.isScrollEnabled = false
-//            collectionView.isUserInteractionEnabled = false
-//        } else {
-//            closeButton.constrainHeight(50)
-//            closeButton.constrainWidth(50)
-//            closeButtonConstraint = 20
-//            collectionView.isScrollEnabled = true
-//            collectionView.isUserInteractionEnabled = true
-//        }
-//        configureView()
-//    }
-    
-    func fetchData() {
-        HealthKitService.authorizeHealthKit { [weak self] authorized in
-            guard authorized else {
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self?.spinner.startAnimating()
-            }
-            
-            self?.healhKitManager.loadHealthKitActivities { [weak self] metrics, shouldFetchActivities in
-                DispatchQueue.main.async {
-                    self?.healthMetrics = metrics
-                    self?.healthMetricSections = Array(metrics.keys)
-                    
-                    self?.healthMetricSections.sort(by: { (v1, v2) -> Bool in
-                        if let cat1 = HealthMetricCategory(rawValue: v1), let cat2 = HealthMetricCategory(rawValue: v2) {
-                            return cat1.rank < cat2.rank
-                        }
-                        return false
-                    })
-                    
-                    self?.spinner.stopAnimating()
-                    self?.collectionView.reloadData()
-                }
-            }
-        }
+        navigationController?.isNavigationBarHidden = true
+        navigationController?.navigationBar.isHidden = true
     }
     
     deinit {
@@ -159,24 +98,21 @@ class HealthViewController: UIViewController {
     }
     
     private func configureView() {
-        navigationController?.isNavigationBarHidden = true
-        navigationController?.navigationBar.isHidden = true
+        closeButton.constrainHeight(50)
+        closeButton.constrainWidth(50)
         
         view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
         view.addSubview(closeButton)
         view.addSubview(collectionView)
-        view.addSubview(spinner)
         
-        closeButton.anchor(top: view.topAnchor, leading: nil, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: closeButtonConstraint, left: 0, bottom: 0, right: closeButtonConstraint))
+        closeButton.anchor(top: view.topAnchor, leading: nil, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 20, left: 0, bottom: 0, right: 20))
 
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 0),
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
-            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
         
         collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
@@ -185,35 +121,21 @@ class HealthViewController: UIViewController {
         collectionView.backgroundColor = view.backgroundColor
     }
     
-    var mode: Mode
-
-    init(mode: Mode) {
-        self.mode = mode
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    func openMetric(metric: HealthMetric) {
+        let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
+        let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel)
+        navigationController?.pushViewController(healthDetailViewController, animated: true)
     }
 }
 
 extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if mode == .fullscreen {
-            return healthMetricSections.count
-        } else if !healthMetricSections.isEmpty {
-            return 1
-        }
-        return 0
+        return healthMetricSections.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if mode == .fullscreen {
-            let key = healthMetricSections[section]
-            return healthMetrics[key]?.count ?? 0
-        }
         let key = healthMetricSections[section]
-        return min(5, healthMetrics[key]?.count ?? 0)
+        return healthMetrics[key]?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -232,18 +154,12 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
         let key = healthMetricSections[indexPath.section]
         if let metrics = healthMetrics[key] {
             let metric = metrics[indexPath.row]
-            let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
-            let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel)
-            navigationController?.pushViewController(healthDetailViewController, animated: true)
+            openMetric(metric: metric)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        if mode == .fullscreen {
-            return CGSize(width: self.collectionView.frame.size.width, height: 35)
-        } else {
-            return CGSize(width: 0, height: 0)
-        }
+        return CGSize(width: self.collectionView.frame.size.width, height: 35)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

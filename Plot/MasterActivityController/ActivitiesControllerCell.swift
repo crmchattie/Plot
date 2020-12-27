@@ -8,17 +8,35 @@
 
 import UIKit
 
-class ActivitiesControllerCell: BaseContainerCell {
+protocol ActivitiesControllerCellDelegate: class {
+    func cellTapped(activity: Activity)
+    func openMap(forActivity activity: Activity)
+    func openChat(forConversation conversationID: String?, activityID: String?)
+}
+
+class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITableViewDelegate, ActivityCellDelegate {
+    weak var delegate: ActivitiesControllerCellDelegate?
     
-    var activitiesVC: ActivityViewController! {
+    var tableView = UITableViewWithReloadCompletion()
+    var activities = [Activity]() {
         didSet {
-            activitiesVC.activityView.tableView.reloadData()
             setupViews()
+            tableView.reloadData()
         }
     }
+    var invitations: [String: Invitation] = [:]
+    
+    let activityCellID = "activityCellID"
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        layer.cornerRadius = 16
+        tableView.backgroundColor = backgroundColor
+        tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
+        tableView.isScrollEnabled = false
+        tableView.separatorStyle = .none
+        tableView.dataSource = self
+        tableView.delegate = self
         
     }
     
@@ -28,16 +46,40 @@ class ActivitiesControllerCell: BaseContainerCell {
     
     override func setupViews() {
         super.setupViews()
-        layer.cornerRadius = 16
-        
-        let stackView = VerticalStackView(arrangedSubviews: [
-            activitiesVC.view
-            ], spacing: 0)
-        
-        addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 15, left: 5, bottom: 5, right: 10))
+        addSubview(tableView)
+        tableView.fillSuperview(padding: .init(top: 10, left: 5, bottom: 5, right: 5))
     }
     
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return activities.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
+        cell.selectionStyle = .none
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        let activity = activities[indexPath.row]
+        var invitation: Invitation? = nil
+        if let activityID = activity.activityID, let value = invitations[activityID] {
+            invitation = value
+        }
+        cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+        cell.delegate = self
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let activity = activities[indexPath.row]
+        delegate?.cellTapped(activity: activity)
+    }
+    
+    func openMap(forActivity activity: Activity) {
+        delegate?.openMap(forActivity: activity)
+    }
+    
+    func openChat(forConversation conversationID: String?, activityID: String?) {
+        delegate?.openChat(forConversation: conversationID, activityID: activityID)
+    }
 }
 
 

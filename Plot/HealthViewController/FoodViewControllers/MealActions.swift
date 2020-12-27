@@ -28,7 +28,7 @@ class MealActions: NSObject {
     
     }
     
-    public func deleteMeal() {
+    func deleteMeal() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -46,7 +46,7 @@ class MealActions: NSObject {
                 
     }
     
-    public func createNewMeal() {
+    func createNewMeal() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -88,7 +88,7 @@ class MealActions: NSObject {
         }
     }
     
-    public func updateMealParticipants() {
+    func updateMealParticipants() {
         guard let _ = active, let meal = meal, let ID = ID else {
             return
         }

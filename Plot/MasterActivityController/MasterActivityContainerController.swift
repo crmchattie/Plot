@@ -14,8 +14,7 @@ import LBTATools
 fileprivate let activitiesControllerCell = "ActivitiesControllerCell"
 fileprivate let healthControllerCell = "HealthControllerCell"
 fileprivate let financeControllerCell = "FinanceControllerCell"
-fileprivate let hostedViewCell = "HostedViewCell"
-fileprivate let headerContainerCell = "HeaderContainerCell"
+fileprivate let headerContainerCell = "HeaderCellDelegate"
 
 
 enum Mode {
@@ -26,111 +25,18 @@ protocol ManageAppearanceHome: class {
     func manageAppearanceHome(_ homeController: MasterActivityContainerController, didFinishLoadingWith state: Bool )
 }
 
-protocol MasterContainerActivityIndicatorDelegate: class {
-    func showActivityIndicator()
-    func hideActivityIndicator()
-}
-
 class MasterActivityContainerController: UIViewController {
-    
+    var networkController = NetworkController() {
+        didSet {
+            print("didSet")
+            collectionView.reloadData()
+        }
+    }
+
+
     let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
-    
-    var contacts = [CNContact]()
-    var filteredContacts = [CNContact]()
-    var users = [User]() {
-        didSet {
-            activitiesVC.users = users
-            chatsVC.users = users
-            listsVC.users = users
-            financeVC.users = users
-        }
-    }
-    var filteredUsers = [User]() {
-        didSet {
-            activitiesVC.filteredUsers = filteredUsers
-            chatsVC.filteredUsers = filteredUsers
-            listsVC.filteredUsers = filteredUsers
-            financeVC.filteredUsers = filteredUsers
-        }
-    }
-    var conversations = [Conversation]() {
-        didSet {
-            configureTabBarBadge()
-            activitiesVC.conversations = conversations
-            listsVC.conversations = conversations
-            
-            if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
-                if actTypeVC.topViewController is DiscoverViewController, let activityTab = actTypeVC.topViewController as? DiscoverViewController {
-                    activityTab.conversations = conversations
-                }
-                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
-                    settingsTab.conversations = conversations
-                }
-            }
-        }
-    }
-    var activities = [Activity]() {
-        didSet {
-            configureTabBarBadge()
-            listsVC.activities = activities
-            listsVC.activityViewController = activitiesVC
-            
-            if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
-                if actTypeVC.topViewController is DiscoverViewController, let activityTab = actTypeVC.topViewController as? DiscoverViewController {
-                    activityTab.activities = activities
-                }
-                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
-                    settingsTab.activities = activities
-                }
-            }
-        }
-    }
-    var invitations: [String: Invitation] = [:] {
-        didSet {
-            if let nav = self.tabBarController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
-                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
-                    settingsTab.invitations = invitations
-                }
-            }
-        }
-    }
-    var invitedActivities = [Activity]() {
-        didSet {
-            if let nav = self.tabBarController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
-                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
-                    settingsTab.invitedActivities = invitedActivities
-                }
-            }
-        }
-    }
-    var listList = [ListContainer]() {
-        didSet {
-            configureTabBarBadge()
-            if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController, let settingsVC = nav.viewControllers![2] as? UINavigationController {
-                if actTypeVC.topViewController is DiscoverViewController, let activityTab = actTypeVC.topViewController as? DiscoverViewController {
-                    activityTab.listList = listList
-                }
-                if settingsVC.topViewController is AccountSettingsController, let settingsTab = settingsVC.topViewController as? AccountSettingsController {
-                    settingsTab.listList = listList
-                }
-            }
-        }
-    }
-    var mxUser: MXUser! {
-        didSet {
-            if let nav = self.tabBarController, let actTypeVC = nav.viewControllers![0] as? UINavigationController {
-                if actTypeVC.topViewController is DiscoverViewController, let activityTab = actTypeVC.topViewController as? DiscoverViewController {
-                    activityTab.mxUser = mxUser
-                }
-            }
-        }
-    }
-    
-    var transactions: [Transaction]!
-    
-    var selectedDate = Date()
-    
+        
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
         
     weak var delegate: ManageAppearanceHome?
@@ -138,27 +44,17 @@ class MasterActivityContainerController: UIViewController {
     var viewControllers = [UIViewController]()
     
     lazy var activitiesVC: ActivityViewController = {
-        let vc = ActivityViewController(mode: .small)
-        return vc
-    }()
-    
-    lazy var chatsVC: ChatsTableViewController = {
-        let vc = ChatsTableViewController()
-        return vc
-    }()
-    
-    lazy var listsVC: ListsViewController = {
-        let vc = ListsViewController()
+        let vc = ActivityViewController(networkController: networkController)
         return vc
     }()
     
     lazy var financeVC: FinanceViewController = {
-        let vc = FinanceViewController(mode: .small)
+        let vc = FinanceViewController(networkController: networkController)
         return vc
     }()
     
     lazy var healthVC: HealthViewController = {
-        let vc = HealthViewController(mode: .small)
+        let vc = HealthViewController(networkController: networkController)
         return vc
     }()
     
@@ -166,36 +62,16 @@ class MasterActivityContainerController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewControllers = [activitiesVC, healthVC, financeVC]
-
-        activitiesVC.delegate = self
-        activitiesVC.activityIndicatorDelegate = self
-        financeVC.delegate = self
-        listsVC.delegate = self
-        chatsVC.delegate = self
         setupViews()
         setNavBar()
         addObservers()
-                
         delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
         managePresense()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
-    func addAsChildVC(childVC: UIViewController) {
-        addChild(childVC)
-        childVC.view.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        childVC.didMove(toParent: self)
     }
 
     func setupViews() {
@@ -229,7 +105,6 @@ class MasterActivityContainerController: UIViewController {
         collectionView.register(ActivitiesControllerCell.self, forCellWithReuseIdentifier: activitiesControllerCell)
         collectionView.register(HealthControllerCell.self, forCellWithReuseIdentifier: healthControllerCell)
         collectionView.register(FinanceControllerCell.self, forCellWithReuseIdentifier: financeControllerCell)
-        collectionView.register(HostedViewCell.self, forCellWithReuseIdentifier: hostedViewCell)
         collectionView.register(HeaderContainerCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerContainerCell)
     }
     
@@ -273,32 +148,32 @@ class MasterActivityContainerController: UIViewController {
     }
     
     func configureTabBarBadge() {
-        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
-        guard !listList.isEmpty, !activities.isEmpty, !conversations.isEmpty, let uid = Auth.auth().currentUser?.uid else { return }
-        var badge = 0
-        
-        for activity in activities {
-            guard let activityBadge = activity.badge else { continue }
-            badge += activityBadge
-        }
-        
-        for conversation in conversations {
-            guard let lastMessage = conversation.lastMessage, let conversationBadge = conversation.badge, lastMessage.fromId != uid  else { continue }
-            badge += conversationBadge
-        }
-        
-        for list in listList {
-            badge += list.badge
-        }
-        
-        guard badge > 0 else {
-            tabItem.badgeValue = nil
-            setApplicationBadge()
-            return
-        }
-        tabItem.badgeValue = badge.toString()
-        setApplicationBadge()
+//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
+//        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
+//        guard !listList.isEmpty, !activities.isEmpty, !conversations.isEmpty, let uid = Auth.auth().currentUser?.uid else { return }
+//        var badge = 0
+//        
+//        for activity in activities {
+//            guard let activityBadge = activity.badge else { continue }
+//            badge += activityBadge
+//        }
+//        
+//        for conversation in conversations {
+//            guard let lastMessage = conversation.lastMessage, let conversationBadge = conversation.badge, lastMessage.fromId != uid  else { continue }
+//            badge += conversationBadge
+//        }
+//        
+//        for list in listList {
+//            badge += list.badge
+//        }
+//        
+//        guard badge > 0 else {
+//            tabItem.badgeValue = nil
+//            setApplicationBadge()
+//            return
+//        }
+//        tabItem.badgeValue = badge.toString()
+//        setApplicationBadge()
     }
     
     func setApplicationBadge() {
@@ -335,9 +210,68 @@ class MasterActivityContainerController: UIViewController {
             }
         })
     }
+    
+    func scrollToFirstActivityWithDate(_ completion: @escaping ([Activity]) -> Void) {
+        let allActivities = networkController.activityService.activities
+        var activities = [Activity]()
+        let currentDate = Date()
+        var index = 0
+        var activityFound = false
+        for activity in allActivities {
+            if let startInterval = activity.startDateTime?.doubleValue, let endInterval = activity.endDateTime?.doubleValue {
+                let startDate = Date(timeIntervalSince1970: startInterval)
+                let endDate = Date(timeIntervalSince1970: endInterval)
+                if currentDate < startDate || currentDate < endDate {
+                    activityFound = true
+                    break
+                }
+                index += 1
+                
+            }
+        }
+                        
+        if activityFound {
+            let numberOfActivities = networkController.activityService.activities.count
+            if index < numberOfActivities {
+                print("scrollToFirstActivityWithDate \(index)")
+                activities.append(allActivities[index])
+                for i in 0...1 {
+                    activities.append(allActivities[index + i + 1])
+                }
+                
+                completion(activities)
+            }
+        } else {
+            let numberOfRows = networkController.activityService.activities.count
+            if numberOfRows > 2 {
+                activities.append(allActivities[numberOfRows - 3])
+                activities.append(allActivities[numberOfRows - 2])
+                activities.append(allActivities[numberOfRows - 1])
+                completion(activities)
+            } else {
+                completion(allActivities)
+            }
+        }
+    }
+    
+    func goToVC(section: SectionType) {
+        if section == .calendar {
+            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: activitiesVC)
+            backEnabledNavigationController.modalPresentationStyle = .fullScreen
+            present(backEnabledNavigationController, animated: true)
+        } else if section == .health {
+            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: healthVC)
+            backEnabledNavigationController.modalPresentationStyle = .fullScreen
+            present(backEnabledNavigationController, animated: true)
+        } else {
+            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: financeVC)
+            backEnabledNavigationController.modalPresentationStyle = .fullScreen
+            present(backEnabledNavigationController, animated: true)
+        }
+    }
 }
 
-extension MasterActivityContainerController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
+extension MasterActivityContainerController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return sections.count
     }
@@ -347,11 +281,33 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: hostedViewCell, for: indexPath) as! HostedViewCell
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//        let VC = viewControllers[indexPath.section]
-//        cell.hostedView = VC.view
-        return cell
+        let section = sections[indexPath.section]
+        if section == .calendar {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            scrollToFirstActivityWithDate { (activities) in
+                cell.activities = activities
+                cell.invitations = self.networkController.activityService.invitations
+            }
+            cell.delegate = self
+            return cell
+        } else if section == .health {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.healthMetricSections = networkController.healthService.healthMetricSections
+            cell.healthMetrics = networkController.healthService.healthMetrics
+            cell.delegate = self
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.members = networkController.financeService.members
+            cell.institutionDict = networkController.financeService.institutionDict
+            cell.accounts = networkController.financeService.accounts
+            cell.transactions = networkController.financeService.transactions
+            cell.delegate = self
+            return cell
+        }
     }
     
     static let cellSize: CGFloat = 500
@@ -373,6 +329,8 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerContainerCell, for: indexPath) as! HeaderContainerCell
             let section = sections[indexPath.section]
             sectionHeader.titleLabel.text = section.name
+            sectionHeader.sectionType = section
+            sectionHeader.delegate = self
             return sectionHeader
         } else { //No footer in this case but can add option for that
             return UICollectionReusableView()
@@ -380,31 +338,8 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        showDailyListFullScreen(indexPath: indexPath)
-    }
-    
-    fileprivate func showDailyListFullScreen(indexPath: IndexPath) {
         let section = sections[indexPath.section]
-        if section == .calendar {
-            activitiesVC.mode = .fullscreen
-//            let fullController = ActivityViewController(mode: .fullscreen)
-            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: activitiesVC)
-            backEnabledNavigationController.modalPresentationStyle = .fullScreen
-            present(backEnabledNavigationController, animated: true)
-        } else if section == .health {
-            healthVC.mode = .fullscreen
-//            let fullController = HealthViewController(mode: .fullscreen)
-            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: healthVC)
-            backEnabledNavigationController.modalPresentationStyle = .fullScreen
-            present(backEnabledNavigationController, animated: true)
-        } else {
-            financeVC.mode = .fullscreen
-//            financeVC.collectionView.reloadData()
-//            let fullController = FinanceViewController(mode: .fullscreen)
-            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: financeVC)
-            backEnabledNavigationController.modalPresentationStyle = .fullScreen
-            present(backEnabledNavigationController, animated: true)
-        }
+        goToVC(section: section)
     }
 }
 
@@ -412,80 +347,48 @@ extension MasterActivityContainerController {
     @objc fileprivate func newItem() {
         tabBarController?.selectedIndex = 0
     }
-    
-    func openMXConnect(guid: String, current_member_guid: String?) {
-        Service.shared.getMXConnectURL(guid: guid, current_member_guid: current_member_guid ?? nil) { (search, err) in
-            if let url = search?.user?.connect_widget_url {
-                DispatchQueue.main.async {
-                    let destination = WebViewController()
-                    destination.urlString = url
-                    destination.controllerTitle = ""
-                    destination.delegate = self
-                    let navigationViewController = UINavigationController(rootViewController: destination)
-                    navigationViewController.modalPresentationStyle = .fullScreen
-                    self.present(navigationViewController, animated: true, completion: nil)
-                }
-            }
-        }
+}
+
+extension MasterActivityContainerController: HeaderContainerCellDelegate {
+    func viewTapped(sectionType: SectionType) {
+        goToVC(section: sectionType)
     }
 }
 
-extension MasterActivityContainerController: HomeBaseActivities {
-    func manageAppearanceActivity(_ activityController: ActivityViewController, didFinishLoadingWith state: Bool) {
-//        delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
+extension MasterActivityContainerController: ActivitiesControllerCellDelegate {
+    func cellTapped(activity: Activity) {
+        activitiesVC.loadActivity(activity: activity)
     }
     
-    func sendActivities(activities: [Activity], invitedActivities: [Activity], invitations: [String : Invitation]) {
-        self.activities = activities
-        self.invitedActivities = invitedActivities
-        self.invitations = invitations
+    func openMap(forActivity activity: Activity) {
+        activitiesVC.openMap(forActivity: activity)
+    }
+    
+    func openChat(forConversation conversationID: String?, activityID: String?) {
+        activitiesVC.openChat(forConversation: conversationID, activityID: activityID)
     }
     
     
-    func sendDate(selectedDate: Date) {
-        self.selectedDate = selectedDate
-        setNavBar()
+}
+
+extension MasterActivityContainerController: HealthControllerCellDelegate {
+    func cellTapped(metric: HealthMetric) {
+        healthVC.openMetric(metric: metric)
     }
 }
 
-extension MasterActivityContainerController: HomeBaseChats {
-    func sendChats(conversations: [Conversation]) {
-        self.conversations = conversations
-    }
-}
-
-extension MasterActivityContainerController: HomeBaseLists {
-    func sendLists(lists: [ListContainer]) {
-        self.listList = lists
-    }
-}
-
-extension MasterActivityContainerController: HomeBaseFinance {
-    func sendUser(user: MXUser) {
-        self.mxUser = user
-    }
-    func sendTransactions(transactions: [Transaction]) {
-        self.transactions = transactions
-    }
-    func sendAccounts(accounts: [MXAccount]) {
-        
-    }
-}
-
-extension MasterActivityContainerController: EndedWebViewDelegate {
-    func updateMXMembers() {
-        financeVC.getMXData()
-    }
-}
-
-extension MasterActivityContainerController: MasterContainerActivityIndicatorDelegate {
-    func showActivityIndicator() {
-        navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .updating,
-                                                              activityPriority: .medium,
-                                                              color: ThemeManager.currentTheme().generalTitleColor)
+extension MasterActivityContainerController: FinanceControllerCellDelegate {
+    func openTransactionDetails(transactionDetails: TransactionDetails) {
+        financeVC.openTransactionDetails(transactionDetails: transactionDetails)
     }
     
-    func hideActivityIndicator() {
-        self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .medium)
+    func openAccountDetails(accountDetails: AccountDetails) {
+        financeVC.openAccountDetails(accountDetails: accountDetails)
     }
+    
+    func openMember(member: MXMember) {
+        financeVC.openMXConnect(guid: networkController.financeService.mxUser.guid, current_member_guid: member.guid)
+    }
+    
+    
 }

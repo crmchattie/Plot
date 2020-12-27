@@ -77,8 +77,7 @@ extension ActivityCell {
         return (numberOfLines, value)
     }
     
-    func configureCell(for indexPath: IndexPath, activity: Activity, withInvitation invitation: Invitation?) {
-        
+    func configureCell(for indexPath: IndexPath, activity: Activity, withInvitation invitation: Invitation?) {        
         self.invitation = invitation
         self.activity = activity
         

@@ -1715,3 +1715,20 @@ extension TimeInterval {
         return self / 3600
     }
 }
+
+public class UITableViewWithReloadCompletion: UITableView {
+    
+    var reloadDataCompletionBlock: (() -> Void)?
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.reloadDataCompletionBlock?()
+        self.reloadDataCompletionBlock = nil
+    }
+    
+    func reloadDataWithCompletion(completion:@escaping () -> Void) {
+        reloadDataCompletionBlock = completion
+        self.reloadData()
+    }
+}

@@ -41,7 +41,7 @@ class ActivityView: UIView {
         calendar.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         
         NSLayoutConstraint.activate([
-            calendar.topAnchor.constraint(equalTo: topAnchor, constant: -5),
+            calendar.topAnchor.constraint(equalTo: topAnchor, constant: 0),
             calendar.leftAnchor.constraint(equalTo: leftAnchor),
             calendar.rightAnchor.constraint(equalTo: rightAnchor),
 //            calendar.bottomAnchor.constraint(equalTo: arrowButton.topAnchor, constant: 10),
@@ -59,7 +59,6 @@ class ActivityView: UIView {
 
         self.calendarHeightConstraint = NSLayoutConstraint(item: calendar, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 300)
         self.addConstraint(calendarHeightConstraint!)
-        print("calendarHeightConstraint \(calendarHeightConstraint?.constant)")
     }
 
     required init(coder aDecoder: NSCoder) {

@@ -213,7 +213,7 @@ class WorkoutViewController: FormViewController {
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-            <<< IntRow("Weight") { row in
+            <<< IntRow("Body Weight") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -436,7 +436,7 @@ class WorkoutViewController: FormViewController {
     }
     
     fileprivate func updateCalories() {
-        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let length = workout.length {
+        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Body Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let length = workout.length {
             self.workout.totalEnergyBurned = Double(length / 60) * workoutType.caloriesBurned * Double(weightValue)
             caloriesRow.value = self.workout.totalEnergyBurned
             caloriesRow.updateCell()

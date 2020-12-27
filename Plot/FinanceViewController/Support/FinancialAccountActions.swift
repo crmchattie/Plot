@@ -30,7 +30,7 @@ class AccountActions: NSObject {
     
     }
     
-    public func deleteAccount() {
+    func deleteAccount() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -48,7 +48,7 @@ class AccountActions: NSObject {
                 
     }
     
-    public func createNewAccount() {
+    func createNewAccount() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -83,7 +83,7 @@ class AccountActions: NSObject {
         }
     }
     
-    public func updateAccountParticipants() {
+    func updateAccountParticipants() {
         guard let _ = active, let account = account, let ID = ID else {
             return
         }

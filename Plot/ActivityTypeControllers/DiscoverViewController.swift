@@ -27,14 +27,11 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         
     var users = [User]()
     var filteredUsers = [User]()
-    var selectedFalconUsers = [User]()
-    var activities = [Activity]()
-    var conversations = [Conversation]()
-    var conversation: Conversation?
-    var listList = [ListContainer]()
     var mxUser: MXUser!
         
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
+    
+    var networkController = NetworkController()
     
     init() {
         
@@ -64,6 +61,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -172,20 +170,17 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 destination.hidesBottomBarWhenPushed = true
                 destination.users = self.users
                 destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
                 self.navigationController?.pushViewController(destination, animated: true)
             case .flight:
                 let destination = FlightSearchViewController()
                 destination.hidesBottomBarWhenPushed = true
                 destination.users = self.users
                 destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
                 self.navigationController?.pushViewController(destination, animated: true)
             case .meal:
                 let destination = MealViewController()
                 destination.hidesBottomBarWhenPushed = true
                 destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
                 self.navigationController?.pushViewController(destination, animated: true)
             case .workout:
                 let destination = WorkoutViewController()
@@ -353,10 +348,6 @@ extension DiscoverViewController: CompositionalHeaderDelegate {
             destination.hidesBottomBarWhenPushed = true
             destination.users = users
             destination.filteredUsers = filteredUsers
-            destination.conversations = conversations
-            destination.activities = activities
-            destination.conversation = conversation
-            destination.listList = listList
             navigationController?.pushViewController(destination, animated: true)
         default:
             print("Default")
@@ -366,10 +357,6 @@ extension DiscoverViewController: CompositionalHeaderDelegate {
 
 extension DiscoverViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        if let nav = self.tabBarController, let containerVC = nav.viewControllers![1] as? UINavigationController {
-            if containerVC.topViewController is MasterActivityContainerController, let containerTab = containerVC.topViewController as? MasterActivityContainerController {
-                containerTab.financeVC.getMXData()
-            }
-        }
+        
     }
 }

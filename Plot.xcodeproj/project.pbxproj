@@ -66,7 +66,7 @@
 		1058E61D2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */; };
 		105AA1372481B56B009DD09B /* NewUserChecklists.json in Resources */ = {isa = PBXBuildFile; fileRef = 105AA1362481B56B009DD09B /* NewUserChecklists.json */; };
 		105CB18C25129F130000D3D8 /* FinanceTransactionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */; };
-		105CB18E2512A3830000D3D8 /* FinanceLineChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18D2512A3830000D3D8 /* FinanceLineChartViewController.swift */; };
+		105CB18E2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18D2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift */; };
 		105E12532447955500A278D0 /* ActivityDetailCellDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */; };
 		105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66E824149DC600F6EDB6 /* EventDetailCell.swift */; };
 		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
@@ -184,6 +184,12 @@
 		10DFC3EB255CC3EA00565DAD /* MealActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFC3EA255CC3EA00565DAD /* MealActions.swift */; };
 		10DFC3F5255CC63000565DAD /* WorkoutFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFC3F4255CC63000565DAD /* WorkoutFetcher.swift */; };
 		10DFC3F9255CC64000565DAD /* MealFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFC3F8255CC64000565DAD /* MealFetcher.swift */; };
+		10E0D7A32594D0AA00B0F83C /* NetworkController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E0D7A22594D0AA00B0F83C /* NetworkController.swift */; };
+		10E0D7B525959C0800B0F83C /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E0D7B425959C0800B0F83C /* UserService.swift */; };
+		10E0D7BB25959C9000B0F83C /* ActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E0D7BA25959C9000B0F83C /* ActivityService.swift */; };
+		10E0D7C125959D6200B0F83C /* ConversationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E0D7C025959D6200B0F83C /* ConversationService.swift */; };
+		10E0D7C525959DC000B0F83C /* FinanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E0D7C425959DC000B0F83C /* FinanceService.swift */; };
+		10E0D7C925959EF600B0F83C /* HealthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E0D7C825959EF600B0F83C /* HealthService.swift */; };
 		10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */; };
 		10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB0925217C3200898D6E /* HeaderCell.swift */; };
 		10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */; };
@@ -200,7 +206,6 @@
 		10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5424BE43B600F6EE18 /* VerticalStackView.swift */; };
 		10E93D5924BE43B700F6EE18 /* BetterSnappingLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5524BE43B600F6EE18 /* BetterSnappingLayout.swift */; };
 		10E93D5A24BE43B700F6EE18 /* UIView+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5624BE43B700F6EE18 /* UIView+Layout.swift */; };
-		10EB561425939C0E00ABD92E /* HostedViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EB561325939C0E00ABD92E /* HostedViewCell.swift */; };
 		10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */; };
 		10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EE245C5B8000C80AAF /* Checklist.swift */; };
 		10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27F0245C6B6400C80AAF /* Packinglist.swift */; };
@@ -532,7 +537,7 @@
 		1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionRuleFetcher.swift; sourceTree = "<group>"; };
 		105AA1362481B56B009DD09B /* NewUserChecklists.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = NewUserChecklists.json; sourceTree = "<group>"; };
 		105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionViewController.swift; sourceTree = "<group>"; };
-		105CB18D2512A3830000D3D8 /* FinanceLineChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceLineChartViewController.swift; sourceTree = "<group>"; };
+		105CB18D2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceLineChartDetailViewController.swift; sourceTree = "<group>"; };
 		105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCellDelegates.swift; sourceTree = "<group>"; };
 		105F66E824149DC600F6EDB6 /* EventDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailCell.swift; sourceTree = "<group>"; };
 		105F66EA2415942B00F6EDB6 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
@@ -650,6 +655,12 @@
 		10DFC3EA255CC3EA00565DAD /* MealActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealActions.swift; sourceTree = "<group>"; };
 		10DFC3F4255CC63000565DAD /* WorkoutFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutFetcher.swift; sourceTree = "<group>"; };
 		10DFC3F8255CC64000565DAD /* MealFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealFetcher.swift; sourceTree = "<group>"; };
+		10E0D7A22594D0AA00B0F83C /* NetworkController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkController.swift; sourceTree = "<group>"; };
+		10E0D7B425959C0800B0F83C /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
+		10E0D7BA25959C9000B0F83C /* ActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityService.swift; sourceTree = "<group>"; };
+		10E0D7C025959D6200B0F83C /* ConversationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationService.swift; sourceTree = "<group>"; };
+		10E0D7C425959DC000B0F83C /* FinanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceService.swift; sourceTree = "<group>"; };
+		10E0D7C825959EF600B0F83C /* HealthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthService.swift; sourceTree = "<group>"; };
 		10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTableViewCell.swift; sourceTree = "<group>"; };
 		10E4DB0925217C3200898D6E /* HeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderCell.swift; sourceTree = "<group>"; };
 		10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewMemberCell.swift; sourceTree = "<group>"; };
@@ -665,7 +676,6 @@
 		10E93D5424BE43B600F6EE18 /* VerticalStackView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalStackView.swift; sourceTree = "<group>"; };
 		10E93D5524BE43B600F6EE18 /* BetterSnappingLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BetterSnappingLayout.swift; sourceTree = "<group>"; };
 		10E93D5624BE43B700F6EE18 /* UIView+Layout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Layout.swift"; sourceTree = "<group>"; };
-		10EB561325939C0E00ABD92E /* HostedViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedViewCell.swift; sourceTree = "<group>"; };
 		10ED542C22CAEA41003797CF /* Plot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Plot.entitlements; sourceTree = "<group>"; };
 		10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistViewController.swift; sourceTree = "<group>"; };
 		10EE27EE245C5B8000C80AAF /* Checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checklist.swift; sourceTree = "<group>"; };
@@ -1017,7 +1027,6 @@
 				10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */,
 				10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */,
 				10E8E50225923C070076BE42 /* BaseContainerCell.swift */,
-				10EB561325939C0E00ABD92E /* HostedViewCell.swift */,
 				10E8E506259295260076BE42 /* HeaderContainerCell.swift */,
 				1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */,
 				10E8E5302592C7D20076BE42 /* BackEnabledNavigationController.swift */,
@@ -1057,7 +1066,7 @@
 				1082C89424F0A8F500CF6491 /* FinanceViewController.swift */,
 				100B9F622564539300A80C87 /* FinanceDetailService.swift */,
 				100B9F5C2564536E00A80C87 /* FinanceDetailViewModel.swift */,
-				105CB18D2512A3830000D3D8 /* FinanceLineChartViewController.swift */,
+				105CB18D2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift */,
 				1024035D2586E92E00A54703 /* FinanceBarChartDetailViewController.swift */,
 				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
 				105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */,
@@ -1428,6 +1437,12 @@
 			isa = PBXGroup;
 			children = (
 				102076CB23C2D3B5009AEAA4 /* Service.swift */,
+				10E0D7A22594D0AA00B0F83C /* NetworkController.swift */,
+				10E0D7B425959C0800B0F83C /* UserService.swift */,
+				10E0D7BA25959C9000B0F83C /* ActivityService.swift */,
+				10E0D7C025959D6200B0F83C /* ConversationService.swift */,
+				10E0D7C425959DC000B0F83C /* FinanceService.swift */,
+				10E0D7C825959EF600B0F83C /* HealthService.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -1519,10 +1534,10 @@
 				4BAEE541212735200045AB10 /* SplashScreenControllers */,
 				4BAEE548212735880045AB10 /* Model */,
 				10F3033324EE03C600C04B8F /* WebView */,
-				26A5DDD92394CB8E00771DC1 /* Networking */,
 				4BAEE557212735E50045AB10 /* Support */,
 				2623AA8E24FA2D710020A316 /* HealthKit */,
 				26036760256CC4A600FE9142 /* EventKit */,
+				26A5DDD92394CB8E00771DC1 /* Networking */,
 				4B4F45421F32246000A6FF96 /* GeneralTabBarController.swift */,
 				4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */,
 				26CDFB21239E278200567666 /* NewUserActivities.json */,
@@ -2629,7 +2644,6 @@
 				10021A1624F1A480006A1B25 /* FinancialMemberView.swift in Sources */,
 				10E93D5724BE43B700F6EE18 /* Extensions.swift in Sources */,
 				4BAEE4F621272D890045AB10 /* GroupPictureAvatarOpenerDelegate.swift in Sources */,
-				10EB561425939C0E00ABD92E /* HostedViewCell.swift in Sources */,
 				4BAEE4FB21272D890045AB10 /* InputBlockerContainerView.swift in Sources */,
 				10C50F972274E21900111033 /* ActivityViewController+SearchHandlers.swift in Sources */,
 				4BAEE4F321272D890045AB10 /* GroupProfileTableHeaderContainer.swift in Sources */,
@@ -2749,6 +2763,7 @@
 				4B6521F8219B3A0A00FF655E /* ChatLogController+GroupMembersDelegate.swift in Sources */,
 				10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */,
 				10C83346249AD8EA0037F638 /* FoursquareVenueSearchResult.swift in Sources */,
+				10E0D7C525959DC000B0F83C /* FinanceService.swift in Sources */,
 				4BAEE49A21272C5E0045AB10 /* ContactsController.swift in Sources */,
 				4BAEE46A21272B380045AB10 /* StorageTableViewController.swift in Sources */,
 				26A29E9A2389FF90008F7351 /* ActivityAnnotation.swift in Sources */,
@@ -2864,8 +2879,9 @@
 				2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */,
 				4BAEE4FE21272D890045AB10 /* OutgoingVoiceMessageCell.swift in Sources */,
 				108BDE6D24B5106900BE2CBA /* SightseeingTypeViewController.swift in Sources */,
+				10E0D7B525959C0800B0F83C /* UserService.swift in Sources */,
 				4BAEE51321272D890045AB10 /* ChatLogController+PhotoEditorDelegate.swift in Sources */,
-				105CB18E2512A3830000D3D8 /* FinanceLineChartViewController.swift in Sources */,
+				105CB18E2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift in Sources */,
 				109F849923D6860D002C0044 /* FilterViewController.swift in Sources */,
 				4BAEE4EF21272D890045AB10 /* IncomingPhotoMessageCell.swift in Sources */,
 				4BAEE5F7212735E50045AB10 /* AvatarOpenerOverlay.swift in Sources */,
@@ -2912,6 +2928,7 @@
 				1024035E2586E92E00A54703 /* FinanceBarChartDetailViewController.swift in Sources */,
 				10F3033024EC6FF800C04B8F /* MXAccount.swift in Sources */,
 				269105ED253E8DD700A02C5F /* BalloonMarker.swift in Sources */,
+				10E0D7BB25959C9000B0F83C /* ActivityService.swift in Sources */,
 				4BAEE51121272D890045AB10 /* BaseMediaMessageCell.swift in Sources */,
 				10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */,
 				108BDE7124B5108D00BE2CBA /* ShoppingTypeViewController.swift in Sources */,
@@ -2935,6 +2952,7 @@
 				108087172583E72300FB9BB0 /* SummaryValueBarChartCell.swift in Sources */,
 				10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */,
 				10DFC3E7255CC3DA00565DAD /* WorkoutActions.swift in Sources */,
+				10E0D7A32594D0AA00B0F83C /* NetworkController.swift in Sources */,
 				10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */,
 				10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */,
 				10F3032724EC622000C04B8F /* FinancialAccountsViewController.swift in Sources */,
@@ -2957,12 +2975,14 @@
 				4BAEE5D5212735E50045AB10 /* AnnouncementShowing.swift in Sources */,
 				10CA911925367D9E003CEAF7 /* FinancialAccountActions.swift in Sources */,
 				106431D5258C10FE00D02658 /* ChartValueFormatter.swift in Sources */,
+				10E0D7C925959EF600B0F83C /* HealthService.swift in Sources */,
 				10E8E5312592C7D30076BE42 /* BackEnabledNavigationController.swift in Sources */,
 				4BAEE5BD212735E50045AB10 /* INSPhoto.swift in Sources */,
 				4BAEE49921272C5E0045AB10 /* ContactsController+SearchHandlers.swift in Sources */,
 				103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */,
 				4BAEE5CF212735E50045AB10 /* CollectionViewLeftAlignFlowLayout.swift in Sources */,
 				4BA1E77F2152518700391BCB /* ChatLogController+MessageSenderDelegate.swift in Sources */,
+				10E0D7C125959D6200B0F83C /* ConversationService.swift in Sources */,
 				269105F6253E8E2E00A02C5F /* DayAxisValueFormatter.swift in Sources */,
 				10B645432578494D00C49A13 /* SectionHeader.swift in Sources */,
 				4BB46C6A2136E6F8005405BB /* ChatLogHistoryFetcher.swift in Sources */,

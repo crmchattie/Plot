@@ -28,7 +28,7 @@ class WorkoutActions: NSObject {
     
     }
     
-    public func deleteWorkout() {
+    func deleteWorkout() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -46,7 +46,7 @@ class WorkoutActions: NSObject {
                 
     }
     
-    public func createNewWorkout() {
+    func createNewWorkout() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -88,7 +88,7 @@ class WorkoutActions: NSObject {
         }
     }
     
-    public func updateWorkoutParticipants() {
+    func updateWorkoutParticipants() {
         guard let _ = active, let workout = workout, let ID = ID else {
             return
         }

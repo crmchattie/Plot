@@ -150,7 +150,7 @@ class InvitationsFetcher: NSObject {
                 for (invitationID, _) in invitationIDs {
                     group.enter()
                     let invitationIDRef = ref.child(invitationsEntity).child(invitationID)
-                    invitationIDRef.keepSynced(true)
+//                    invitationIDRef.keepSynced(true)
                     invitationIDRef.observeSingleEvent(of: .value, with: { invitationSnapshot in
                         if invitationSnapshot.exists(), let invitationSnapshotValue = invitationSnapshot.value {
                             if let invitation = try? FirebaseDecoder().decode(Invitation.self, from: invitationSnapshotValue) {

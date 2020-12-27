@@ -182,8 +182,6 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.recipe = self.detailedRecipe
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -210,8 +208,6 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.recipe = self.detailedRecipe
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -281,8 +277,6 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.recipe = self.detailedRecipe
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -741,8 +735,6 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.workout = self.workout
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -766,8 +758,6 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.workout = self.workout
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -835,8 +825,6 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.workout = self.workout
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1300,8 +1288,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.event = self.event
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1325,8 +1311,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.event = self.event
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1394,8 +1378,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.event = self.event
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1863,8 +1845,6 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
                 
@@ -1887,8 +1867,6 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.fsVenue = self.place
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1956,8 +1934,6 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.fsVenue = self.place
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)

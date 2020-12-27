@@ -304,13 +304,6 @@ class ContactsController: UITableViewController {
     }
 }
 
-//extension ContactsController: FalconUsersUpdatesDelegate {
-//  func falconUsers(shouldBeUpdatedTo users: [User]) {
-//    globalUsers = users
-//    self.reloadTableView(updatedUsers: users)
-//  }
-//}
-
 extension ContactsController: MessagesDelegate {
     
     func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
