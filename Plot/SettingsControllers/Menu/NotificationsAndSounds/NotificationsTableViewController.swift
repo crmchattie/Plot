@@ -18,6 +18,8 @@ var notificationElements = [SwitchObject]()
   
   override func viewDidLoad() {
       super.viewDidLoad()
+    navigationItem.largeTitleDisplayMode = .never
+    navigationController?.navigationBar.prefersLargeTitles = false
     createDataSource()
     setTitle("Notifications")
     registerCell(for: notificationsTableViewCellID)

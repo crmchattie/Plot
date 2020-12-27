@@ -16,6 +16,9 @@ class SwitchTableViewController: UITableViewController {
   }
   
   fileprivate func configureController() {
+    navigationItem.largeTitleDisplayMode = .never
+    navigationController?.navigationBar.prefersLargeTitles = false
+    
     tableView.separatorStyle = .none
     extendedLayoutIncludesOpaqueBars = true
     edgesForExtendedLayout = UIRectEdge.top

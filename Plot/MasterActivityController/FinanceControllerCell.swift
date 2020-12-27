@@ -30,18 +30,14 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
         return collectionView
     }()
         
-    var transactions = [Transaction]() {
-        didSet {
-            setupViews()
-            updateCollectionView()
-        }
-    }
-    var accounts = [MXAccount]()
-    var members = [MXMember]()
     var institutionDict = [String: String]()
     
     var sections = [SectionType]()
-    var groups = [SectionType: [AnyHashable]]()
+    var groups = [SectionType: [AnyHashable]]() {
+        didSet {
+            setupViews()
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -64,7 +60,7 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
         super.setupViews()
         
         addSubview(collectionView)
-        collectionView.fillSuperview(padding: .init(top: 15, left: 5, bottom: 5, right: 5))
+        collectionView.fillSuperview(padding: .init(top: 15, left: 5, bottom: 0, right: 5))
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -182,66 +178,4 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
             }
         }
     }
-    
-    private func updateCollectionView() {
-        guard currentReachabilityStatus != .notReachable else {
-            return
-        }
-        var accountLevel: AccountCatLevel!
-        var transactionLevel: TransactionCatLevel!
-        accountLevel = .bs_type
-        transactionLevel = .group
-        
-        let setSections: [SectionType] = [.financialIssues, .balanceSheet, .incomeStatement]
-                
-        self.sections = []
-        self.groups = [SectionType: [AnyHashable]]()
-                        
-        let dispatchGroup = DispatchGroup()
-        
-        for section in setSections {
-            dispatchGroup.enter()
-            if section.type == "Issues" {
-                dispatchGroup.enter()
-                if !members.isEmpty {
-                    sections.append(.financialIssues)
-                    members.sort { (member1, member2) -> Bool in
-                        return member1.name < member2.name
-                    }
-                    self.groups[section] = members
-                    dispatchGroup.leave()
-                } else {
-                    dispatchGroup.leave()
-                }
-            } else if section.type == "Accounts" {
-                if section.subType == "Balance Sheet" {
-                    dispatchGroup.enter()
-                    categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, _) in
-                        if !accountsList.isEmpty {
-                            self.sections.append(.balanceSheet)
-                            self.groups[section] = accountsList
-                        }
-                        dispatchGroup.leave()
-                    }
-                }
-            } else if section.type == "Transactions" {
-                if section.subType == "Income Statement" {
-                    dispatchGroup.enter()
-                    categorizeTransactions(transactions: transactions, start: Date().startOfMonth, end: Date().endOfMonth, level: transactionLevel) { (transactionsList, _) in
-                        if !transactionsList.isEmpty {
-                            self.sections.append(.incomeStatement)
-                            self.groups[section] = transactionsList
-                        }
-                        dispatchGroup.leave()
-                    }
-                }
-            }
-            dispatchGroup.leave()
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            self.collectionView.reloadData()
-        }
-    }
-    
 }

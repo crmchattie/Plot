@@ -31,7 +31,11 @@ class MasterActivityContainerController: UIViewController {
         didSet {
             scrollToFirstActivityWithDate({ (activities) in
                 self.sortedActivities = activities
-                self.collectionView.reloadData()
+                self.grabFinancialItems { (sections, groups) in
+                    self.financeSections = sections
+                    self.financeGroups = groups
+                    self.collectionView.reloadData()
+                }
             })
         }
     }
@@ -64,6 +68,8 @@ class MasterActivityContainerController: UIViewController {
     var sections: [SectionType] = [.calendar, .health, .finances]
     
     var sortedActivities = [Activity]()
+    var financeSections = [SectionType]()
+    var financeGroups = [SectionType: [AnyHashable]]()
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -279,6 +285,69 @@ class MasterActivityContainerController: UIViewController {
         }
     }
     
+    func grabFinancialItems(_ completion: @escaping ([SectionType], [SectionType: [AnyHashable]]) -> Void) {
+        guard currentReachabilityStatus != .notReachable else {
+            return
+        }
+        var accountLevel: AccountCatLevel!
+        var transactionLevel: TransactionCatLevel!
+        accountLevel = .bs_type
+        transactionLevel = .group
+        
+        let setSections: [SectionType] = [.financialIssues, .balanceSheet, .incomeStatement]
+        
+        var members = networkController.financeService.members
+        let accounts = networkController.financeService.accounts
+        let transactions = networkController.financeService.transactions
+                
+        var sections: [SectionType] = []
+        var groups = [SectionType: [AnyHashable]]()
+                        
+        let dispatchGroup = DispatchGroup()
+        
+        for section in setSections {
+            dispatchGroup.enter()
+            if section.type == "Issues" {
+                dispatchGroup.enter()
+                if !members.isEmpty {
+                    sections.append(.financialIssues)
+                    members.sort { (member1, member2) -> Bool in
+                        return member1.name < member2.name
+                    }
+                    groups[section] = members
+                    dispatchGroup.leave()
+                } else {
+                    dispatchGroup.leave()
+                }
+            } else if section.type == "Accounts" {
+                if section.subType == "Balance Sheet" {
+                    dispatchGroup.enter()
+                    categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, _) in
+                        if !accountsList.isEmpty {
+                            sections.append(.balanceSheet)
+                            groups[section] = accountsList
+                        }
+                        dispatchGroup.leave()
+                    }
+                }
+            } else if section.type == "Transactions" {
+                if section.subType == "Income Statement" {
+                    dispatchGroup.enter()
+                    categorizeTransactions(transactions: transactions, start: Date().startOfMonth, end: Date().endOfMonth, level: transactionLevel) { (transactionsList, _) in
+                        if !transactionsList.isEmpty {
+                            sections.append(.incomeStatement)
+                            groups[section] = transactionsList
+                        }
+                        dispatchGroup.leave()
+                    }
+                }
+            }
+            dispatchGroup.leave()
+        }
+        
+        completion(sections, groups)
+    }
+    
     func goToVC(section: SectionType) {
         if section == .calendar {
             let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: activitiesVC)
@@ -324,41 +393,46 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.members = networkController.financeService.members
             cell.institutionDict = networkController.financeService.institutionDict
-            cell.accounts = networkController.financeService.accounts
-            cell.transactions = networkController.financeService.transactions
+            cell.sections = financeSections
+            cell.groups = financeGroups
             cell.delegate = self
             return cell
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var height: CGFloat = 500
+        var height: CGFloat = 0
         let section = sections[indexPath.section]
         if section == .calendar {
-            let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
-            dummyCell.activities = sortedActivities
-            dummyCell.invitations = networkController.activityService.invitations
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 500))
-            height = estimatedSize.height
+            height = 500
         } else if section == .health {
-            let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
-            dummyCell.healthMetricSections = networkController.healthService.healthMetricSections
-            dummyCell.healthMetrics = networkController.healthService.healthMetrics
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 500))
-            height = estimatedSize.height
+            let healthMetricSections = networkController.healthService.healthMetricSections
+            let healthMetrics = networkController.healthService.healthMetrics
+            height += CGFloat(healthMetricSections.count * 50)
+            for key in healthMetricSections {
+                print("key \(key)")
+                if let metrics = healthMetrics[key] {
+                    height += CGFloat(metrics.count * 75)
+                }
+            }
+            height += 25
         } else {
-            let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
-            dummyCell.members = networkController.financeService.members
-            dummyCell.institutionDict = networkController.financeService.institutionDict
-            dummyCell.accounts = networkController.financeService.accounts
-            dummyCell.transactions = networkController.financeService.transactions
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 500))
-            height = estimatedSize.height
+            height += CGFloat(financeSections.count * 60)
+            for section in financeSections {
+                if section == .financialIssues {
+                    if let group = financeGroups[section] as? [MXMember] {
+                        height += CGFloat(group.count * 80)
+                    }
+                } else {
+                    if let group = financeGroups[section] as? [AccountDetails] {
+                        height += CGFloat(group.count * 25)
+                    } else if let group = financeGroups[section] as? [TransactionDetails] {
+                        height += CGFloat(group.count * 25)
+                    }
+                }
+            }
+            height += 20
         }
         return CGSize(width: self.collectionView.frame.size.width - 40, height: height)
         
