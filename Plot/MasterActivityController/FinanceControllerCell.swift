@@ -36,6 +36,7 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
     var groups = [SectionType: [AnyHashable]]() {
         didSet {
             setupViews()
+            collectionView.reloadData()
         }
     }
     
@@ -46,6 +47,7 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
         collectionView.delegate = self
         
         collectionView.backgroundColor = backgroundColor
+        
         collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kHeaderCell)
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
         collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
@@ -58,7 +60,6 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
     
     override func setupViews() {
         super.setupViews()
-        
         addSubview(collectionView)
         collectionView.fillSuperview(padding: .init(top: 15, left: 5, bottom: 0, right: 5))
     }

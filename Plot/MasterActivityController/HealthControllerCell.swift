@@ -30,7 +30,6 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
     var healthMetricSections: [String] = []
     var healthMetrics: [String: [HealthMetric]] = [:] {
         didSet {
-            print("healthMetrics \(healthMetrics)")
             setupViews()
             collectionView.reloadData()
         }
@@ -39,10 +38,6 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
     override init(frame: CGRect) {
         super.init(frame: frame)
         layer.cornerRadius = 16
-        
-        if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        }
         
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -82,6 +77,11 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
             cell.configure(metric)
         }
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: self.collectionView.frame.size.width, height: 75)
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {

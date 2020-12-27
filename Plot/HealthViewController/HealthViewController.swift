@@ -68,10 +68,6 @@ class HealthViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         
-        if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        }
-        
         configureView()
         addObservers()
     }
@@ -156,6 +152,11 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
             let metric = metrics[indexPath.row]
             openMetric(metric: metric)
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: self.collectionView.frame.size.width, height: 75)
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {

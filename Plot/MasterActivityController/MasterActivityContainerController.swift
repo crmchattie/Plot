@@ -264,7 +264,6 @@ class MasterActivityContainerController: UIViewController {
         if activityFound {
             let numberOfActivities = networkController.activityService.activities.count
             if index < numberOfActivities {
-                print("scrollToFirstActivityWithDate \(index)")
                 activities.append(allActivities[index])
                 for i in 0...1 {
                     activities.append(allActivities[index + i + 1])
@@ -405,13 +404,12 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         var height: CGFloat = 0
         let section = sections[indexPath.section]
         if section == .calendar {
-            height = 500
+            height = CGFloat(sortedActivities.count * 170)
         } else if section == .health {
             let healthMetricSections = networkController.healthService.healthMetricSections
             let healthMetrics = networkController.healthService.healthMetrics
             height += CGFloat(healthMetricSections.count * 50)
             for key in healthMetricSections {
-                print("key \(key)")
                 if let metrics = healthMetrics[key] {
                     height += CGFloat(metrics.count * 75)
                 }
@@ -663,14 +661,12 @@ extension MasterActivityContainerController {
                 }
             }
         } else if let eventID = activity.eventID {
-            print("\(eventID)")
             dispatchGroup.enter()
             Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
                 if let events = search?.embedded?.events {
                     let event = events[0]
                     dispatchGroup.leave()
                     dispatchGroup.notify(queue: .main) {
-                        print("\(eventID)")
                         let destination = EventDetailViewController()
                         destination.hidesBottomBarWhenPushed = true
                         destination.event = event
@@ -682,7 +678,6 @@ extension MasterActivityContainerController {
                         destination.conversations = self.conversations
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                                print("\(eventID)")
                                 destination.acceptedParticipant = acceptedParticipant
                                 destination.selectedFalconUsers = participants
                                 self.hideActivityIndicator()
