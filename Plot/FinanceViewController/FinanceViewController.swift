@@ -122,6 +122,7 @@ class FinanceViewController: UIViewController {
         view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        customSegmented.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         collectionView.reloadData()
         
     }
@@ -370,7 +371,6 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         let object = groups[section]
         if section != .financialIssues {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             if let object = object as? [TransactionDetails] {
                 cell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
@@ -383,7 +383,6 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             if let object = object as? [MXMember] {
                 if let imageURL = institutionDict[object[indexPath.item].institution_code] {
                     cell.imageURL = imageURL
@@ -399,7 +398,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         let section = sections[indexPath.section]
         let object = groups[section]
         if section != .financialIssues {
-            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 32, height: 1000))
+            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 20, height: 1000))
             if let object = object as? [TransactionDetails] {
                 dummyCell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
@@ -410,10 +409,10 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 dummyCell.account = object[indexPath.item]
             }
             dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 32, height: 1000))
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 20, height: 1000))
             height = estimatedSize.height
         } else {
-            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 32, height: 1000))
+            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 20, height: 1000))
             if let object = object as? [MXMember] {
                 if let imageURL = institutionDict[object[indexPath.item].institution_code] {
                     dummyCell.imageURL = imageURL
@@ -421,10 +420,10 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 }
             }
             dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 32, height: 1000))
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 20, height: 1000))
             height = estimatedSize.height
         }
-        return CGSize(width: self.collectionView.frame.size.width - 32, height: height)
+        return CGSize(width: self.collectionView.frame.size.width - 20, height: height)
         
     }
     

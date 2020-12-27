@@ -25,10 +25,13 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     var intColor: Int = 0
         
-    var users = [User]()
-    var filteredUsers = [User]()
-    var mxUser: MXUser!
-        
+    var users: [User] {
+        return networkController.userService.users
+    }
+    var filteredUsers: [User] {
+        return networkController.userService.users
+    }
+    
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
     var networkController = NetworkController()
@@ -215,35 +218,30 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 destination.filteredUsers = self.filteredUsers
                 self.navigationController?.pushViewController(destination, animated: true)
             case .financialAccount:
-                if let user = self.mxUser {
-                    let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
-                    let custom = UIAlertAction(title: "Manual Entry", style: .default) { (action:UIAlertAction) in
-                        let destination = FinanceAccountViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    }
-                    let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
-                        self.openMXConnect(guid: user.guid, current_member_guid: nil)
-                    }
-                    let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
-                        print("You've pressed cancel")
-                    }
-                    accountAlertController.addAction(custom)
-                    accountAlertController.addAction(automatic)
-                    accountAlertController.addAction(cancelAlert)
-                    self.present(accountAlertController, animated: true, completion: nil)
-                    
-                }
-            case .transactionRule:
-                if let user = self.mxUser {
-                    let destination = FinanceTransactionRuleViewController()
+                let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
+                let custom = UIAlertAction(title: "Manual Entry", style: .default) { (action:UIAlertAction) in
+                    let destination = FinanceAccountViewController()
                     destination.hidesBottomBarWhenPushed = true
-                    destination.user = user
-                    let navigationViewController = UINavigationController(rootViewController: destination)
-                    self.present(navigationViewController, animated: true, completion: nil)
+                    destination.users = self.users
+                    destination.filteredUsers = self.filteredUsers
+                    self.navigationController?.pushViewController(destination, animated: true)
                 }
+                let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
+                    self.openMXConnect(guid: self.networkController.financeService.mxUser.guid, current_member_guid: nil)
+                }
+                let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
+                    print("You've pressed cancel")
+                }
+                accountAlertController.addAction(custom)
+                accountAlertController.addAction(automatic)
+                accountAlertController.addAction(cancelAlert)
+                self.present(accountAlertController, animated: true, completion: nil)
+            case .transactionRule:
+                let destination = FinanceTransactionRuleViewController()
+                destination.hidesBottomBarWhenPushed = true
+                destination.user = networkController.financeService.mxUser
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
             default:
                 print("default")
             }

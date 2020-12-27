@@ -111,7 +111,7 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
         let section = sections[indexPath.section]
         let object = groups[section]
         if section != .financialIssues {
-            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 20, height: 1000))
             dummyCell.mode = .small
             if let object = object as? [TransactionDetails] {
                 dummyCell.transactionDetails = object[indexPath.item]
@@ -123,10 +123,10 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
                 dummyCell.account = object[indexPath.item]
             }
             dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: frame.width, height: 1000))
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: frame.width - 20, height: 1000))
             height = estimatedSize.height
         } else {
-            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 20, height: 1000))
             if let object = object as? [MXMember] {
                 if let imageURL = institutionDict[object[indexPath.item].institution_code] {
                     dummyCell.imageURL = imageURL
@@ -134,10 +134,10 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
                 }
             }
             dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: frame.width, height: 1000))
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: frame.width - 20, height: 1000))
             height = estimatedSize.height
         }
-        return CGSize(width: self.collectionView.frame.size.width, height: height)
+        return CGSize(width: self.collectionView.frame.size.width - 20, height: height)
         
     }
     

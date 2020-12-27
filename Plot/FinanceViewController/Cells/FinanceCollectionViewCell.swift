@@ -269,7 +269,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         stackView.distribution = .fill
 
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: heightConstraint, left: 10, bottom: 0, right: 10))
+        stackView.fillSuperview(padding: .init(top: heightConstraint, left: 0, bottom: 0, right: 0))
     }
     
     override func prepareForReuse() {
