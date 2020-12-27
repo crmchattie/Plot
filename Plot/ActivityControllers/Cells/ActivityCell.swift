@@ -198,12 +198,12 @@ class ActivityCell: UITableViewCell {
         
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4).isActive = true
         activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4).isActive = true
-        activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
-        activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
+        activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 5).isActive = true
+        activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -20).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
         startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true

@@ -28,8 +28,10 @@ protocol ManageAppearanceHome: class {
 class MasterActivityContainerController: UIViewController {
     var networkController = NetworkController() {
         didSet {
-            print("didSet")
-            collectionView.reloadData()
+            scrollToFirstActivityWithDate({ (activities) in
+                self.sortedActivities = activities
+                self.collectionView.reloadData()
+            })
         }
     }
 
@@ -59,6 +61,8 @@ class MasterActivityContainerController: UIViewController {
     }()
     
     var sections: [SectionType] = [.calendar, .health, .finances]
+    
+    var sortedActivities = [Activity]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -285,10 +289,8 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         if section == .calendar {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            scrollToFirstActivityWithDate { (activities) in
-                cell.activities = activities
-                cell.invitations = self.networkController.activityService.invitations
-            }
+            cell.activities = sortedActivities
+            cell.invitations = networkController.activityService.invitations
             cell.delegate = self
             return cell
         } else if section == .health {
@@ -310,10 +312,35 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         }
     }
     
-    static let cellSize: CGFloat = 500
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return .init(width: view.frame.width - 40, height: MasterActivityContainerController.cellSize)
+        var height: CGFloat = 500
+        let section = sections[indexPath.section]
+        if section == .calendar {
+            let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
+            dummyCell.activities = sortedActivities
+            dummyCell.invitations = networkController.activityService.invitations
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 500))
+            height = estimatedSize.height
+        } else if section == .health {
+            let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
+            dummyCell.healthMetricSections = networkController.healthService.healthMetricSections
+            dummyCell.healthMetrics = networkController.healthService.healthMetrics
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 500))
+            height = estimatedSize.height
+        } else {
+            let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
+            dummyCell.members = networkController.financeService.members
+            dummyCell.institutionDict = networkController.financeService.institutionDict
+            dummyCell.accounts = networkController.financeService.accounts
+            dummyCell.transactions = networkController.financeService.transactions
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: view.frame.width, height: 500))
+            height = estimatedSize.height
+        }
+        return CGSize(width: self.collectionView.frame.size.width - 40, height: height)
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {

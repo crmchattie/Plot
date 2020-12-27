@@ -38,10 +38,9 @@ class ActivityService {
                     self.eventKitManager.syncEventKitActivities {
                         self.observeActivitiesForCurrentUser()
                         self.observeInvitationForCurrentUser()
-                        print("activities grabbed #2 \(activities.count)")
-                        completion()
                     }
                 }
+                completion()
             }
         }
         

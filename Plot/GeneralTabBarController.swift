@@ -65,6 +65,7 @@ class GeneralTabBarController: UITabBarController {
             self.discoverController.networkController = self.networkController
             self.settingsController.networkController = self.networkController
         }
+        
         configureTabBar()
     }
     
