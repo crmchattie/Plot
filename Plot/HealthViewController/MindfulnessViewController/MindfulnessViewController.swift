@@ -30,6 +30,10 @@ class MindfulnessViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
         numberFormatter.numberStyle = .decimal
         
         if mindfulness == nil {

@@ -187,8 +187,8 @@ class ActivityCell: UITableViewCell {
         activityImageView.addSubview(chatButton)
         activityImageView.addSubview(mapButton)
         
-        activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4).isActive = true
-        activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4).isActive = true
+        activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true
+        activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0).isActive = true
         activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 5).isActive = true
         activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
         

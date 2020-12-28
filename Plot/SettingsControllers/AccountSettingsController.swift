@@ -49,8 +49,8 @@ class AccountSettingsController: UITableViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView = UITableView(frame: tableView.frame, style: .grouped)
         
-        navigationItem.largeTitleDisplayMode = .always
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()

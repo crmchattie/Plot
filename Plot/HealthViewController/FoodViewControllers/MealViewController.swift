@@ -35,6 +35,9 @@ class MealViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
         
         configureTableView()
         
@@ -356,13 +359,13 @@ class MealViewController: FormViewController {
         
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Items",
-                               footer: "Add a item") {
+                               header: "Ingredients",
+                               footer: "Add an Ingredient") {
                 $0.tag = "itemfields"
                 $0.addButtonProvider = { section in
                     return ButtonRow(){
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        $0.title = "Add New Item"
+                        $0.title = "Add New Ingredient"
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.textLabel?.textAlignment = .left
@@ -438,7 +441,6 @@ class MealViewController: FormViewController {
     }
     
     fileprivate func openProduct() {
-        print("openProduct \(productIndex)")
         if let products = self.meal.productContainer, products.indices.contains(productIndex) {
             let product = products[productIndex]
             if let groceryProduct = product.groceryProduct {

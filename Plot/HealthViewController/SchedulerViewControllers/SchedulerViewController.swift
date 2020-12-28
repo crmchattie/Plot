@@ -18,6 +18,10 @@ class SchedulerViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
         title = "\(type.rawValue.capitalized) Schedule"
 
         view.addSubview(activityIndicatorView)
@@ -169,6 +173,7 @@ class SchedulerViewController: FormViewController {
             for index in 0...dailyTimes.count - 1 {
                 form +++
                     Section()
+                    
                     <<< ActiveDaysRow("\(index)") {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         $0.delegate = self
@@ -253,7 +258,7 @@ class SchedulerViewController: FormViewController {
                         cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     }
                 
-                <<< ButtonRow("Add Additional Schedule") { row in
+                <<< ButtonRow("Add Additional Schedule for Other Days") { row in
                     row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     row.cell.textLabel?.textAlignment = .center
                     row.cell.accessoryType = .none

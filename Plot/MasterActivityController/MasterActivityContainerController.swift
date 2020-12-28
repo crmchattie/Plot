@@ -405,9 +405,9 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         if section == .calendar {
             for activity in sortedActivities {
                 if let activityID = activity.activityID, let _ = invitations[activityID] {
-                    height = CGFloat(sortedActivities.count * 180)
+                    height = CGFloat(sortedActivities.count * 172)
                 } else {
-                    height = CGFloat(sortedActivities.count * 140)
+                    height = CGFloat(sortedActivities.count * 132)
                 }
             }
         } else if section == .health {
