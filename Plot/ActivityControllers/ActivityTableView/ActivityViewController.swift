@@ -378,7 +378,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func scrollToFirstActivityWithDate(date: Date, animated: Bool) {
-        print("scrollToFirstActivityWithDate AV \(filteredActivities.count)")
         let currentDate = date.stripTime()
         var index = 0
         var activityFound = false
@@ -394,7 +393,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 
             }
         }
-        
+                
         let numberOfSections = activityView.tableView.numberOfSections
         if activityFound && numberOfSections > 1 {
             let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)

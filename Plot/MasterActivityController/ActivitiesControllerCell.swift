@@ -14,7 +14,7 @@ protocol ActivitiesControllerCellDelegate: class {
     func openChat(forConversation conversationID: String?, activityID: String?)
 }
 
-class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITableViewDelegate, ActivityCellDelegate {
+class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITableViewDelegate, ActivityCellDelegate, UpdateInvitationDelegate {
     weak var delegate: ActivitiesControllerCellDelegate?
     
     var tableView = UITableViewWithReloadCompletion()
@@ -65,6 +65,7 @@ class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITabl
         }
         cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
         cell.delegate = self
+        cell.updateInvitationDelegate = self
         return cell
     }
     
@@ -81,6 +82,15 @@ class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITabl
     func openChat(forConversation conversationID: String?, activityID: String?) {
         delegate?.openChat(forConversation: conversationID, activityID: activityID)
     }
+    
+    func updateInvitation(invitation: Invitation) {
+        InvitationsFetcher.update(invitation: invitation) { result in
+            if result {
+//                self.invitations[invitation.activityID] = invitation
+            }
+        }
+    }
 }
+
 
 

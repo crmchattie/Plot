@@ -245,9 +245,13 @@ class MasterActivityContainerController: UIViewController {
     func scrollToFirstActivityWithDate(_ completion: @escaping ([Activity]) -> Void) {
         let allActivities = networkController.activityService.activities
         var activities = [Activity]()
-        let currentDate = Date()
+        let currentDate = Date().stripTime()
         var index = 0
         var activityFound = false
+        if allActivities.count < 2 {
+            completion(allActivities)
+            return
+        }
         for activity in allActivities {
             if let startInterval = activity.startDateTime?.doubleValue, let endInterval = activity.endDateTime?.doubleValue {
                 let startDate = Date(timeIntervalSince1970: startInterval)
@@ -260,7 +264,7 @@ class MasterActivityContainerController: UIViewController {
                 
             }
         }
-                        
+                                
         if activityFound {
             let numberOfActivities = networkController.activityService.activities.count
             if index < numberOfActivities {
@@ -268,19 +272,14 @@ class MasterActivityContainerController: UIViewController {
                 for i in 0...1 {
                     activities.append(allActivities[index + i + 1])
                 }
-                
                 completion(activities)
             }
         } else {
             let numberOfRows = networkController.activityService.activities.count
-            if numberOfRows > 2 {
-                activities.append(allActivities[numberOfRows - 3])
-                activities.append(allActivities[numberOfRows - 2])
-                activities.append(allActivities[numberOfRows - 1])
-                completion(activities)
-            } else {
-                completion(allActivities)
-            }
+            activities.append(allActivities[numberOfRows - 3])
+            activities.append(allActivities[numberOfRows - 2])
+            activities.append(allActivities[numberOfRows - 1])
+            completion(activities)
         }
     }
     
@@ -404,7 +403,13 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         var height: CGFloat = 0
         let section = sections[indexPath.section]
         if section == .calendar {
-            height = CGFloat(sortedActivities.count * 170)
+            for activity in sortedActivities {
+                if let activityID = activity.activityID, let _ = invitations[activityID] {
+                    height = CGFloat(sortedActivities.count * 180)
+                } else {
+                    height = CGFloat(sortedActivities.count * 140)
+                }
+            }
         } else if section == .health {
             let healthMetricSections = networkController.healthService.healthMetricSections
             let healthMetrics = networkController.healthService.healthMetrics

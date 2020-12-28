@@ -91,17 +91,17 @@ extension ActivityCell {
         startLabel.numberOfLines = dateTimeValueArray.0
         startLabel.text = dateTimeValueArray.1
                 
-        if activity.category != nil {
-            activityTypeLabel.text = activity.category
-        } else {
-            activityTypeLabel.text = nil
-        }
-        
-        if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
-            activityAddressLabel.text = activity.locationName
-        } else {
-            activityAddressLabel.text = nil
-        }
+//        if activity.category != nil {
+//            activityTypeLabel.text = activity.category
+//        } else {
+//            activityTypeLabel.text = nil
+//        }
+//        
+//        if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
+//            activityAddressLabel.text = activity.locationName
+//        } else {
+//            activityAddressLabel.text = nil
+//        }
         
         if let invitation = invitation {
             invitationSegmentedControl.isHidden = false
@@ -171,12 +171,6 @@ extension ActivityCell {
             chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
         } else {
             chatButton.tintColor = .systemBlue
-        }
-        
-        if activity.grocerylistID == nil && activity.checklistIDs == nil && activity.packinglistIDs == nil {
-            listButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-        } else {
-            listButton.tintColor = .systemBlue
         }
         
     }
