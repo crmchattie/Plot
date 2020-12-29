@@ -137,19 +137,21 @@ class MasterActivityContainerController: UIViewController {
     }
     
     @objc fileprivate func activitiesUpdated() {
-        print("activitiesUpdated")
         scrollToFirstActivityWithDate({ (activities) in
-            print("sortedActivities")
-            self.sortedActivities = activities
-            self.collectionView.reloadData()
+            if self.sortedActivities != activities {
+                self.sortedActivities = activities
+                self.collectionView.reloadData()
+            }
         })
     }
     
     @objc fileprivate func financeUpdated() {
         self.grabFinancialItems { (sections, groups) in
-            self.financeSections = sections
-            self.financeGroups = groups
-            self.collectionView.reloadData()
+            if self.financeSections != sections || self.financeGroups != groups {
+                self.financeSections = sections
+                self.financeGroups = groups
+                self.collectionView.reloadData()
+            }
         }
     }
     
