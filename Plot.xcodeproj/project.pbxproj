@@ -230,6 +230,7 @@
 		2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */; };
 		2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA9124FB67BF0020A316 /* HealthKitService.swift */; };
 		26317C30251DB250007CC315 /* WorkoutOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26317C2F251DB250007CC315 /* WorkoutOperation.swift */; };
+		26336E172593FA1A001A3071 /* HealthKitSampleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26336E162593FA1A001A3071 /* HealthKitSampleBuilder.swift */; };
 		263508AA258D76B000F57ACB /* MindfulnessOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263508A9258D76B000F57ACB /* MindfulnessOperation.swift */; };
 		26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */; };
 		265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */; };
@@ -690,6 +691,7 @@
 		2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSetupAssistant.swift; sourceTree = "<group>"; };
 		2623AA9124FB67BF0020A316 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		26317C2F251DB250007CC315 /* WorkoutOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutOperation.swift; sourceTree = "<group>"; };
+		26336E162593FA1A001A3071 /* HealthKitSampleBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSampleBuilder.swift; sourceTree = "<group>"; };
 		263508A9258D76B000F57ACB /* MindfulnessOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindfulnessOperation.swift; sourceTree = "<group>"; };
 		26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+Migration.swift"; sourceTree = "<group>"; };
@@ -1351,6 +1353,7 @@
 				26C4431B250F0C9200A9533C /* Model */,
 				260C87C924FF5FE900715A64 /* HealthKitManager.swift */,
 				2623AA9124FB67BF0020A316 /* HealthKitService.swift */,
+				26336E162593FA1A001A3071 /* HealthKitSampleBuilder.swift */,
 				2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */,
 			);
 			path = HealthKit;
@@ -2614,6 +2617,7 @@
 				4BAEE4F321272D890045AB10 /* GroupProfileTableHeaderContainer.swift in Sources */,
 				1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */,
 				4BAEE46421272B380045AB10 /* AccountSettingsTableViewCell.swift in Sources */,
+				26336E172593FA1A001A3071 /* HealthKitSampleBuilder.swift in Sources */,
 				4BAEE49721272C5E0045AB10 /* FalconUsersFetcher.swift in Sources */,
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
 				4BA1E7832152582F00391BCB /* ChatLogController+DataSource.swift in Sources */,

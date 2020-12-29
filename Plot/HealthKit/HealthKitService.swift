@@ -275,7 +275,7 @@ class HealthKitService {
                 }
         }
         
-        HKHealthStore().execute(query)
+        healthStore.execute(query)
     }
     
     class func getAllCategoryTypeSamples(forIdentifier identifier: HKCategoryTypeIdentifier,
@@ -303,7 +303,7 @@ class HealthKitService {
         }
 
         // finally, we execute our query
-        HKHealthStore().execute(query)
+        healthStore.execute(query)
     }
     
     class func getSummaryActivityData(startDate: Date,
@@ -322,7 +322,12 @@ class HealthKitService {
             completion(summaries, error)
         }
         
-        HKHealthStore().execute(query)
-        
-    }    
+        healthStore.execute(query)
+    }
+    
+    // MARK:- Storing data
+    
+    class func storeWorkout(workout: HKWorkout, completion: @escaping (Bool, Error?) -> Void) {
+        healthStore.save(workout, withCompletion: completion)
+    }
 }

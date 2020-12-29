@@ -83,6 +83,12 @@ class WorkoutActions: NSObject {
             Analytics.logEvent("new_workout", parameters: [String: Any]())
             dispatchGroup.enter()
             connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
+            
+            // Update healthKit
+            if let hkWorkout = HealthKitSampleBuilder.createHKWorkout(from: workout) {
+                HealthKitService.storeWorkout(workout: hkWorkout) { (_, _) in
+                }
+            }
         } else {
             Analytics.logEvent("update_workout", parameters: [String: Any]())
         }
