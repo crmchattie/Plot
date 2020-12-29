@@ -250,8 +250,7 @@ class FinanceTransactionRuleViewController: FormViewController {
 
 extension FinanceTransactionRuleViewController: UpdateTransactionLevelDelegate {
     func update(value: String, level: String) {
-        if let row: LabelRow = form.rowBy(tag: level), let currentUser = Auth.auth().currentUser?.uid {
-            print("ButtonRow")
+        if let row: LabelRow = form.rowBy(tag: level), let _ = Auth.auth().currentUser?.uid {
             row.value = value
             row.updateCell()
             if level == "Subcategory" {

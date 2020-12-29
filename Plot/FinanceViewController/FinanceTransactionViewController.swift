@@ -48,6 +48,10 @@ class FinanceTransactionViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
         setupVariables()

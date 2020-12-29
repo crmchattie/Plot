@@ -9,12 +9,31 @@
 import Foundation
 import Firebase
 
+extension NSNotification.Name {
+    static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
+}
+
 class ActivityService {
     let activitiesFetcher = ActivitiesFetcher()
     let invitationsFetcher = InvitationsFetcher()
 
-    var activities = [Activity]()
-    var invitations: [String: Invitation] = [:]
+    var activities = [Activity]() {
+        didSet {
+            if oldValue != activities {
+                activities.sort { (activity1, activity2) -> Bool in
+                    return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+                }
+                NotificationCenter.default.post(name: .activitiesUpdated, object: nil)
+            }
+        }
+    }
+    var invitations: [String: Invitation] = [:] {
+        didSet {
+            if oldValue != invitations {
+                NotificationCenter.default.post(name: .activitiesUpdated, object: nil)
+            }
+        }
+    }
     var invitedActivities = [Activity]()
     
     var hasLoadedCalendarEventActivities = false
@@ -29,10 +48,7 @@ class ActivityService {
     func grabActivities(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [unowned self] in
             activitiesFetcher.fetchActivities { (activities) in
-                print("activities grabbed \(activities.count)")
-                self.activities = activities.sorted { (activity1, activity2) -> Bool in
-                    return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
-                }
+                self.activities = activities
                 self.fetchInvitations()
                 if let _ = Auth.auth().currentUser {
                     self.eventKitManager.syncEventKitActivities {
@@ -58,7 +74,7 @@ class ActivityService {
     func observeActivitiesForCurrentUser() {
         activitiesFetcher.observeActivityForCurrentUser(activitiesAdded: { [weak self] activitiesAdded in
                 for activity in activitiesAdded {
-                    if let index = self!.activities.firstIndex(where: {$0 == activity}) {
+                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
                         self!.activities[index] = activity
                     } else {
                         self!.activities.append(activity)
@@ -66,13 +82,13 @@ class ActivityService {
                 }
             }, activitiesRemoved: { [weak self] activitiesRemoved in
                 for activity in activitiesRemoved {
-                    if let index = self!.activities.firstIndex(where: {$0 == activity}) {
+                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
                         self!.activities.remove(at: index)
                     }
                 }
             }, activitiesChanged: { [weak self] activitiesChanged in
                 for activity in activitiesChanged {
-                    if let index = self!.activities.firstIndex(where: {$0 == activity}) {
+                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
                         self!.activities[index] = activity
                     }
                 }
@@ -86,8 +102,6 @@ extension ActivityService {
     func fetchInvitations() {
         invitationsFetcher.fetchInvitations { [weak self] (invitations, activitiesForInvitations) in
             guard let weakSelf = self else { return }
-            print("invitations grabbed \(invitations.count)")
-            
             weakSelf.invitations = invitations
             weakSelf.invitedActivities = activitiesForInvitations
         }

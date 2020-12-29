@@ -10,15 +10,43 @@ import Foundation
 import Firebase
 import CodableFirebase
 
+extension NSNotification.Name {
+    static let financeUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".financeUpdated")
+}
+
 class FinanceService {
     let transactionFetcher = FinancialTransactionFetcher()
     let transactionRuleFetcher = FinancialTransactionRuleFetcher()
     let accountFetcher = FinancialAccountFetcher()
 
-    var transactions = [Transaction]()
+    var transactions = [Transaction]() {
+        didSet {
+            if oldValue != transactions {
+                NotificationCenter.default.post(name: .financeUpdated, object: nil)
+            }
+        }
+    }
+    var accounts = [MXAccount]() {
+        didSet {
+            if oldValue != accounts {
+                accounts.sort { (account1, account2) -> Bool in
+                    return account1.name < account2.name
+                }
+                NotificationCenter.default.post(name: .financeUpdated, object: nil)
+            }
+        }
+    }
+    var members = [MXMember]() {
+        didSet {
+            if oldValue != members {
+                members.sort { (member1, member2) -> Bool in
+                    return member1.name < member2.name
+                }
+                NotificationCenter.default.post(name: .financeUpdated, object: nil)
+            }
+        }
+    }
     var transactionRules = [TransactionRule]()
-    var accounts = [MXAccount]()
-    var members = [MXMember]()
     var institutionDict = [String: String]()
     var mxUser: MXUser!
     
@@ -32,20 +60,14 @@ class FinanceService {
             }
             
             accountFetcher.fetchAccounts { (firebaseAccounts) in
-                print("accounts grabbed \(firebaseAccounts.count)")
                 self.accounts = firebaseAccounts
-                self.accounts.sort { (account1, account2) -> Bool in
-                    return account1.name < account2.name
-                }
                 self.observeAccountsForCurrentUser()
             }
             
             transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
-                print("transaction rules grabbed \(firebaseTransactionRules.count)")
                 self.transactionRules = firebaseTransactionRules
                 self.observeTransactionRulesForCurrentUser()
                 self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
-                    print("transactions grabbed \(firebaseTransactions.count)")
                     self.transactions = firebaseTransactions
                     self.observeTransactionsForCurrentUser()
                     completion()
@@ -123,9 +145,6 @@ class FinanceService {
                         } else if member.connection_status != .connected && !member.is_being_aggregated {
                             dispatchGroup.enter()
                             self.members.append(member)
-                            self.members.sort { (member1, member2) -> Bool in
-                                return member1.name < member2.name
-                            }
                             self.getInsitutionalDetails(institution_code: member.institution_code) {
                                 dispatchGroup.leave()
                             }
@@ -381,9 +400,6 @@ class FinanceService {
             if let member = search?.member {
                 if member.connection_status == .challenged {
                     self.members.append(member)
-                    self.members.sort { (member1, member2) -> Bool in
-                        return member1.name < member2.name
-                    }
                     self.getInsitutionalDetails(institution_code: member.institution_code) {
                         completion(member)
                     }

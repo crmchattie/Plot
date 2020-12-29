@@ -24,13 +24,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0
-        
-    var users: [User] {
-        return networkController.userService.users
-    }
-    var filteredUsers: [User] {
-        return networkController.userService.users
-    }
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
@@ -49,11 +42,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             let section = NSCollectionLayoutSection(group: group)
             section.orthogonalScrollingBehavior = .groupPaging
             section.contentInsets.leading = 16
-            
-//            let kind = UICollectionView.elementKindSectionHeader
-//            section.boundarySupplementaryItems = [
-//                .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(30)), elementKind: kind, alignment: .topLeading)
-//            ]
             
             return section
         }
@@ -171,31 +159,31 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             case .basic:
                 let destination = CreateActivityViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .flight:
                 let destination = FlightSearchViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .meal:
                 let destination = MealViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
+                destination.users = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .workout:
                 let destination = WorkoutViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mindfulness:
                 let destination = MindfulnessViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mood:
                 let destination = MoodViewController()
@@ -214,16 +202,16 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             case .transaction:
                 let destination = FinanceTransactionViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .financialAccount:
                 let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
                 let custom = UIAlertAction(title: "Manual Entry", style: .default) { (action:UIAlertAction) in
                     let destination = FinanceAccountViewController()
                     destination.hidesBottomBarWhenPushed = true
-                    destination.users = self.users
-                    destination.filteredUsers = self.filteredUsers
+                    destination.users = self.networkController.userService.users
+                    destination.filteredUsers = self.networkController.userService.users
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
                 let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
@@ -258,18 +246,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         var snapshot = self.diffableDataSource.snapshot()
         snapshot.deleteAllItems()
         self.diffableDataSource.apply(snapshot)
-                        
-//        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
-//            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
-//            header.delegate = self
-//            let snapshot = self.diffableDataSource.snapshot()
-//            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
-//                header.titleLabel.text = section.name
-//                header.subTitleLabel.isHidden = true
-//            }
-//            
-//            return header
-//        })
                         
         let dispatchGroup = DispatchGroup()
         
@@ -344,8 +320,8 @@ extension DiscoverViewController: CompositionalHeaderDelegate {
         case "Activity":
             let destination = ActivityTypeViewController()
             destination.hidesBottomBarWhenPushed = true
-            destination.users = users
-            destination.filteredUsers = filteredUsers
+            destination.users = networkController.userService.users
+            destination.filteredUsers = networkController.userService.users
             navigationController?.pushViewController(destination, animated: true)
         default:
             print("Default")
@@ -355,6 +331,6 @@ extension DiscoverViewController: CompositionalHeaderDelegate {
 
 extension DiscoverViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        
+        networkController.financeService.getMXData()
     }
 }

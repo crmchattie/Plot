@@ -9,20 +9,25 @@
 import UIKit
 import Firebase
 
+extension NSNotification.Name {
+    static let variablesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".variablesUpdated")
+}
+
 class NetworkController {
     private var isRunning: Bool
     
-    let userService = UserService()
     let activityService = ActivityService()
-    let conversationService = ConversationService()
     let financeService = FinanceService()
     let healthService = HealthService()
+    let userService = UserService()
+    let conversationService = ConversationService()
+    let listService = ListService()
     
     init() {
-        self.isRunning = false
+        isRunning = false
     }
     
-    func setupVariables(_ completion: @escaping () -> Void) {
+    func setupKeyVariables(_ completion: @escaping () -> Void) {
         guard !isRunning else {
             completion()
             return
@@ -43,12 +48,16 @@ class NetworkController {
         healthService.grabHealth {
             dispatchGroup.leave()
         }
-        userService.grabContacts()
-        conversationService.grabConversations()
         
         dispatchGroup.notify(queue: .main) {
             completion()
         }
+    }
+    
+    func setupOtherVariables() {
+        userService.grabContacts()
+        conversationService.grabConversations()
+        listService.grabLists()
     }
 }
 
@@ -202,7 +211,7 @@ extension NetworkController {
         
         dispatchGroup.notify(queue: .main) {
 //            self.homeController.activitiesVC.handleReloadTable()
-//            self.homeController.listsVC.fetchLists()
+//            self.listService.grabLists()
         }
     }
     
@@ -256,7 +265,7 @@ extension NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
-//            self.homeController.chatsVC.conversationsFetcher.fetchConversations()
+            self.conversationService.conversationsFetcher.fetchConversations()
         }
     }
 }

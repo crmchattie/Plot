@@ -40,31 +40,13 @@ class MasterActivityContainerController: UIViewController {
         }
     }
 
-
     let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
         
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
         
     weak var delegate: ManageAppearanceHome?
-        
-    var viewControllers = [UIViewController]()
-    
-    lazy var activitiesVC: ActivityViewController = {
-        let vc = ActivityViewController(networkController: networkController)
-        return vc
-    }()
-    
-    lazy var financeVC: FinanceViewController = {
-        let vc = FinanceViewController(networkController: networkController)
-        return vc
-    }()
-    
-    lazy var healthVC: HealthViewController = {
-        let vc = HealthViewController(networkController: networkController)
-        return vc
-    }()
-    
+            
     var sections: [SectionType] = [.calendar, .health, .finances]
     
     var sortedActivities = [Activity]()
@@ -74,25 +56,6 @@ class MasterActivityContainerController: UIViewController {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
-    var activities: [Activity] {
-        return networkController.activityService.activities
-    }
-    var users: [User] {
-        return networkController.userService.users
-    }
-    var filteredUsers: [User] {
-        return networkController.userService.users
-    }
-    var conversations: [Conversation] {
-        return networkController.conversationService.conversations
-    }
-    // [ActivityID: Invitation]
-    var invitations: [String: Invitation] {
-        return networkController.activityService.invitations
-    }
-    var invitedActivities: [Activity] {
-        return networkController.activityService.invitedActivities
-    }
     var activitiesParticipants: [String: [User]] = [:]
     
     override func viewDidLoad() {
@@ -151,6 +114,8 @@ class MasterActivityContainerController: UIViewController {
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(activitiesUpdated), name: .activitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -171,9 +136,28 @@ class MasterActivityContainerController: UIViewController {
         
     }
     
+    @objc fileprivate func activitiesUpdated() {
+        print("activitiesUpdated")
+        scrollToFirstActivityWithDate({ (activities) in
+            print("sortedActivities")
+            self.sortedActivities = activities
+            self.collectionView.reloadData()
+        })
+    }
+    
+    @objc fileprivate func financeUpdated() {
+        self.grabFinancialItems { (sections, groups) in
+            self.financeSections = sections
+            self.financeGroups = groups
+            self.collectionView.reloadData()
+        }
+    }
+    
     func setNavBar() {
+        let notificationsBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell"), style: .plain, target: self, action: #selector(goToNotifications))
+        navigationItem.leftBarButtonItem = notificationsBarButton
+        
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-        navigationItem.leftBarButtonItems = nil
         navigationItem.rightBarButtonItem = newItemBarButton
         
     }
@@ -268,6 +252,7 @@ class MasterActivityContainerController: UIViewController {
         if activityFound {
             let numberOfActivities = networkController.activityService.activities.count
             if index < numberOfActivities {
+                print("allActivities[index] \(allActivities[index].name)")
                 activities.append(allActivities[index])
                 for i in 0...1 {
                     activities.append(allActivities[index + i + 1])
@@ -309,9 +294,6 @@ class MasterActivityContainerController: UIViewController {
                 dispatchGroup.enter()
                 if !members.isEmpty {
                     sections.append(.financialIssues)
-                    members.sort { (member1, member2) -> Bool in
-                        return member1.name < member2.name
-                    }
                     groups[section] = members
                     dispatchGroup.leave()
                 } else {
@@ -348,15 +330,15 @@ class MasterActivityContainerController: UIViewController {
     
     func goToVC(section: SectionType) {
         if section == .calendar {
-            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: activitiesVC)
+            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: ActivityViewController(networkController: networkController))
             backEnabledNavigationController.modalPresentationStyle = .fullScreen
             present(backEnabledNavigationController, animated: true)
         } else if section == .health {
-            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: healthVC)
+            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: HealthViewController(networkController: networkController))
             backEnabledNavigationController.modalPresentationStyle = .fullScreen
             present(backEnabledNavigationController, animated: true)
         } else {
-            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: financeVC)
+            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: FinanceViewController(networkController: networkController))
             backEnabledNavigationController.modalPresentationStyle = .fullScreen
             present(backEnabledNavigationController, animated: true)
         }
@@ -404,7 +386,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         let section = sections[indexPath.section]
         if section == .calendar {
             for activity in sortedActivities {
-                if let activityID = activity.activityID, let _ = invitations[activityID] {
+                if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
                     height = CGFloat(sortedActivities.count * 172)
                 } else {
                     height = CGFloat(sortedActivities.count * 132)
@@ -469,6 +451,20 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
 }
 
 extension MasterActivityContainerController {
+    @objc func goToNotifications() {
+        let destination = NotificationsViewController()
+        destination.notificationActivities = networkController.activityService.activities
+        destination.invitedActivities = self.networkController.activityService.invitedActivities
+        destination.invitations = self.networkController.activityService.invitations
+        destination.users = networkController.userService.users
+        destination.filteredUsers = networkController.userService.users
+        destination.conversations = networkController.conversationService.conversations
+        destination.listList = networkController.listService.listList
+        destination.sortInvitedActivities()
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
     @objc fileprivate func newItem() {
         tabBarController?.selectedIndex = 0
     }
@@ -493,7 +489,14 @@ extension MasterActivityContainerController: ActivitiesControllerCellDelegate {
         openVCChat(forConversation: conversationID, activityID: activityID)
     }
     
-    
+    func updateInvitation(invitation: Invitation) {
+        InvitationsFetcher.update(invitation: invitation) { result in
+            if result {
+                self.networkController.activityService.invitations[invitation.activityID] = invitation
+                self.activitiesUpdated()
+            }
+        }
+    }
 }
 
 extension MasterActivityContainerController: HealthControllerCellDelegate {
@@ -509,8 +512,8 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: networkController.financeService.transactions, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
         financeDetailViewController.delegate = self
-        financeDetailViewController.users = users
-        financeDetailViewController.filteredUsers = filteredUsers
+        financeDetailViewController.users = networkController.userService.users
+        financeDetailViewController.filteredUsers = networkController.userService.users
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
@@ -519,8 +522,8 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: networkController.financeService.accounts, transactionDetails: nil, transactions: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
         financeDetailViewController.delegate = self
-        financeDetailViewController.users = users
-        financeDetailViewController.filteredUsers = filteredUsers
+        financeDetailViewController.users = networkController.userService.users
+        financeDetailViewController.filteredUsers = networkController.userService.users
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
@@ -549,27 +552,29 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
 
 extension MasterActivityContainerController: UpdateFinancialsDelegate {
     func updateTransactions(transactions: [Transaction]) {
-//        for transaction in transactions {
-//            if let index = self.transactions.firstIndex(of: transaction) {
-//                self.transactions[index] = transaction
-//            }
-//        }
-//        updateCollectionView()
+        for transaction in transactions {
+            if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
+                networkController.financeService.transactions[index] = transaction
+            }
+        }
+        financeUpdated()
     }
     func updateAccounts(accounts: [MXAccount]) {
-//        for account in accounts {
-//            if let index = self.accounts.firstIndex(of: account) {
-//                self.accounts[index] = account
-//            }
-//        }
-//        updateCollectionView()
+        for account in accounts {
+            if let index = networkController.financeService.accounts.firstIndex(of: account) {
+                networkController.financeService.accounts[index] = account
+            }
+        }
+        financeUpdated()
     }
 }
 
 extension MasterActivityContainerController: EndedWebViewDelegate {
     func updateMXMembers() {
-//        members.removeAll()
-//        getMXData()
+        financeSections.removeAll(where: { $0 == .financialIssues })
+        financeGroups[.financialIssues] = nil
+        collectionView.reloadData()
+        networkController.financeService.getMXData()
     }
 }
 
@@ -640,11 +645,11 @@ extension MasterActivityContainerController {
                         destination.recipe = detailedRecipe
                         destination.detailedRecipe = detailedRecipe
                         destination.activity = activity
-                        destination.invitation = self.invitations[activity.activityID!]
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.activities = self.activities
-                        destination.conversations = self.conversations
+                        destination.invitation = self.networkController.activityService.invitations[activity.activityID!]
+                        destination.users = self.networkController.userService.users
+                        destination.filteredUsers = self.networkController.userService.users
+                        destination.activities = self.networkController.activityService.activities
+                        destination.conversations = self.networkController.conversationService.conversations
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 destination.acceptedParticipant = acceptedParticipant
@@ -676,11 +681,11 @@ extension MasterActivityContainerController {
                         destination.hidesBottomBarWhenPushed = true
                         destination.event = event
                         destination.activity = activity
-                        destination.invitation = self.invitations[activity.activityID!]
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.activities = self.activities
-                        destination.conversations = self.conversations
+                        destination.invitation = self.networkController.activityService.invitations[activity.activityID!]
+                        destination.users = self.networkController.userService.users
+                        destination.filteredUsers = self.networkController.userService.users
+                        destination.activities = self.networkController.activityService.activities
+                        destination.conversations = self.networkController.conversationService.conversations
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 destination.acceptedParticipant = acceptedParticipant
@@ -714,11 +719,11 @@ extension MasterActivityContainerController {
                         destination.workout = workout
                         destination.intColor = 0
                         destination.activity = activity
-                        destination.invitation = self.invitations[activity.activityID!]
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.activities = self.activities
-                        destination.conversations = self.conversations
+                        destination.invitation = self.networkController.activityService.invitations[activity.activityID!]
+                        destination.users = self.networkController.userService.users
+                        destination.filteredUsers = self.networkController.userService.users
+                        destination.activities = self.networkController.activityService.activities
+                        destination.conversations = self.networkController.conversationService.conversations
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 destination.acceptedParticipant = acceptedParticipant
@@ -743,11 +748,11 @@ extension MasterActivityContainerController {
                         destination.hidesBottomBarWhenPushed = true
                         destination.attraction = attraction
                         destination.activity = activity
-                        destination.invitation = self.invitations[activity.activityID!]
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.activities = self.activities
-                        destination.conversations = self.conversations
+                        destination.invitation = self.networkController.activityService.invitations[activity.activityID!]
+                        destination.users = self.networkController.userService.users
+                        destination.filteredUsers = self.networkController.userService.users
+                        destination.activities = self.networkController.activityService.activities
+                        destination.conversations = self.networkController.conversationService.conversations
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 destination.acceptedParticipant = acceptedParticipant
@@ -778,11 +783,11 @@ extension MasterActivityContainerController {
                         destination.hidesBottomBarWhenPushed = true
                         destination.place = place
                         destination.activity = activity
-                        destination.invitation = self.invitations[activity.activityID!]
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        destination.activities = self.activities
-                        destination.conversations = self.conversations
+                        destination.invitation = self.networkController.activityService.invitations[activity.activityID!]
+                        destination.users = self.networkController.userService.users
+                        destination.filteredUsers = self.networkController.userService.users
+                        destination.activities = self.networkController.activityService.activities
+                        destination.conversations = self.networkController.conversationService.conversations
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 destination.acceptedParticipant = acceptedParticipant
@@ -808,11 +813,11 @@ extension MasterActivityContainerController {
             let destination = CreateActivityViewController()
             destination.hidesBottomBarWhenPushed = true
             destination.activity = activity
-            destination.invitation = invitations[activity.activityID ?? ""]
-            destination.users = users
-            destination.filteredUsers = filteredUsers
-            destination.activities = self.activities
-            destination.conversations = conversations
+            destination.invitation = self.networkController.activityService.invitations[activity.activityID ?? ""]
+            destination.users = networkController.userService.users
+            destination.filteredUsers = networkController.userService.users
+            destination.activities = self.networkController.activityService.activities
+            destination.conversations = networkController.conversationService.conversations
             self.getParticipants(forActivity: activity) { (participants) in
                 InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                     destination.acceptedParticipant = acceptedParticipant
@@ -860,15 +865,15 @@ extension MasterActivityContainerController {
     
     func openVCChat(forConversation conversationID: String?, activityID: String?) {
         if conversationID == nil {
-            let activity = activities.first(where: {$0.activityID == activityID})
+            let activity = networkController.activityService.activities.first(where: {$0.activityID == activityID})
             let destination = ChooseChatTableViewController()
             let navController = UINavigationController(rootViewController: destination)
             destination.delegate = self
             destination.activity = activity
-            destination.conversations = conversations
-            destination.pinnedConversations = conversations
-            destination.filteredConversations = conversations
-            destination.filteredPinnedConversations = conversations
+            destination.conversations = networkController.conversationService.conversations
+            destination.pinnedConversations = networkController.conversationService.conversations
+            destination.filteredConversations = networkController.conversationService.conversations
+            destination.filteredPinnedConversations = networkController.conversationService.conversations
             present(navController, animated: true, completion: nil)
         } else {
             let groupChatDataReference = Database.database().reference().child("groupChats").child(conversationID!).child(messageMetaDataFirebaseFolder)
@@ -945,7 +950,7 @@ extension MasterActivityContainerController: ChooseChatDelegate {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
 
-            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
+            if let conversation = networkController.conversationService.conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activities != nil {
                     var activities = conversation.activities!
                     activities.append(activityID)
@@ -955,8 +960,8 @@ extension MasterActivityContainerController: ChooseChatDelegate {
                     let updatedActivities = ["activities": [activityID] as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                 }
-                if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
-                    let activity = activities[index]
+                if let index = networkController.activityService.activities.firstIndex(where: {$0.activityID == activityID}) {
+                    let activity = networkController.activityService.activities[index]
                     if activity.grocerylistID != nil {
                         if conversation.grocerylists != nil {
                             var grocerylists = conversation.grocerylists!

@@ -8,6 +8,10 @@
 
 import Foundation
 
+extension NSNotification.Name {
+    static let healthUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".healthUpdated")
+}
+
 class HealthService {
     let healhKitManager = HealthKitManager()
 
@@ -23,7 +27,6 @@ class HealthService {
             
             self?.healhKitManager.loadHealthKitActivities { metrics, shouldFetchActivities in
                 DispatchQueue.main.async {
-                    print("healthMetrics grabbed \(metrics.count)")
                     self?.healthMetrics = metrics
                     self?.healthMetricSections = Array(metrics.keys)
                     

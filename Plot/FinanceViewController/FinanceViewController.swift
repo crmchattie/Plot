@@ -504,16 +504,16 @@ extension FinanceViewController: HeaderCellDelegate {
 extension FinanceViewController: UpdateFinancialsDelegate {
     func updateTransactions(transactions: [Transaction]) {
         for transaction in transactions {
-            if let index = self.transactions.firstIndex(of: transaction) {
-//                self.transactions[index] = transaction
+            if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
+                networkController.financeService.transactions[index] = transaction
             }
         }
         updateCollectionView()
     }
     func updateAccounts(accounts: [MXAccount]) {
         for account in accounts {
-            if let index = self.accounts.firstIndex(of: account) {
-//                self.accounts[index] = account
+            if let index = networkController.financeService.accounts.firstIndex(of: account) {
+                networkController.financeService.accounts[index] = account
             }
         }
         updateCollectionView()
@@ -522,8 +522,8 @@ extension FinanceViewController: UpdateFinancialsDelegate {
 
 extension FinanceViewController: UpdateAccountDelegate {
     func updateAccount(account: MXAccount) {
-        if let index = accounts.firstIndex(of: account) {
-//            accounts[index] = account
+        if let index = networkController.financeService.accounts.firstIndex(of: account) {
+            networkController.financeService.accounts[index] = account
             updateCollectionView()
         }
     }
@@ -531,8 +531,8 @@ extension FinanceViewController: UpdateAccountDelegate {
 
 extension FinanceViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
-        if let index = transactions.firstIndex(of: transaction) {
-//            transactions[index] = transaction
+        if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
+            networkController.financeService.transactions[index] = transaction
             updateCollectionView()
         }
     }
@@ -540,8 +540,10 @@ extension FinanceViewController: UpdateTransactionDelegate {
 
 extension FinanceViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-//        members.removeAll()
-//        getMXData()
+        sections.removeAll(where: { $0 == .financialIssues })
+        groups[.financialIssues] = nil
+        collectionView.reloadData()
+        networkController.financeService.getMXData()
     }
 }
 

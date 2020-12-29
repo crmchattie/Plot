@@ -46,7 +46,6 @@ extension UserService: ContactsUpdatesDelegate {
 
 extension UserService: FalconUsersUpdatesDelegate {
     func falconUsers(shouldBeUpdatedTo users: [User]) {
-        print("users grabbed \(users.count)")
         self.users = users
     }
 }

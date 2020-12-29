@@ -13,14 +13,8 @@ protocol ListViewControllerDataStore: class {
     func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, activitylist: Activitylist?, packinglist: Packinglist?, completion: @escaping ([User])->())
 }
 
-protocol HomeBaseLists: class {
-    func sendLists(lists: [ListContainer])
-}
-
 class ListsViewController: UIViewController {
-    
-    weak var delegate: HomeBaseLists?
-    
+        
     var activities = [Activity]()
     
     weak var activityViewController: ActivityViewController?
@@ -34,15 +28,10 @@ class ListsViewController: UIViewController {
     var checklists = [Checklist]()
     var activitylists = [Activitylist]()
     var grocerylists = [Grocerylist]()
-    var packinglists = [Packinglist]()
+
     var users = [User]()
     var filteredUsers = [User]()
     var conversations = [Conversation]()
-    
-    let checklistFetcher = ChecklistFetcher()
-    let activitylistFetcher = ActivitylistFetcher()
-    let grocerylistFetcher = GrocerylistFetcher()
-    //    let packinglistFetcher = PackinglistFetcher()
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -58,9 +47,7 @@ class ListsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        fetchLists()
-        
+                
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
         
@@ -144,141 +131,6 @@ class ListsViewController: UIViewController {
         tableView.tableHeaderView = searchBar
     }
     
-    func fetchLists() {
-        let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-        checklistFetcher.fetchChecklists { (checklists) in
-            for checklist in checklists {
-                if checklist.name == "nothing" { continue }
-                if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
-                self.checklists.append(checklist)
-            }
-            self.observeChecklistsForCurrentUser()
-            dispatchGroup.leave()
-        }
-        dispatchGroup.enter()
-        activitylistFetcher.fetchActivitylists { (activitylists) in
-            for activitylist in activitylists {
-                if activitylist.name == "nothing" { continue }
-                if let items = activitylist.items, Array(items.keys)[0] == "name" { continue }
-                self.activitylists.append(activitylist)
-            }
-            self.observeActivitylistsForCurrentUser()
-            dispatchGroup.leave()
-        }
-        dispatchGroup.enter()
-        grocerylistFetcher.fetchGrocerylists { (grocerylists) in
-            for grocerylist in grocerylists {
-                if grocerylist.name == "nothing" { continue }
-                self.grocerylists.append(grocerylist)
-            }
-            self.observeGrocerylistsForCurrentUser()
-            dispatchGroup.leave()
-        }
-        dispatchGroup.notify(queue: .main) {
-            self.sortandreload()
-        }
-    }
-    
-    func observeChecklistsForCurrentUser() {
-        self.checklistFetcher.observeChecklistForCurrentUser(checklistsAdded: { [weak self] checklistsAdded in
-                for checklist in checklistsAdded {
-                    if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
-                        self!.checklists[index] = checklist
-                        if let ID = checklist.ID {
-                            self!.updateCellForCLID(ID: ID, checklist: checklist)
-                        }
-                    } else {
-                        self!.checklists.append(checklist)
-                        self!.sortandreload()
-                    }
-                }
-            }, checklistsRemoved: { [weak self] checklistsRemoved in
-                for checklist in checklistsRemoved {
-                    if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
-                        self!.checklists.remove(at: index)
-                        self!.sortandreload()
-                    }
-                }
-            }, checklistsChanged: { [weak self] checklistsChanged in
-                for checklist in checklistsChanged {
-                    if let index = self!.checklists.firstIndex(where: {$0 == checklist}) {
-                        self!.checklists[index] = checklist
-                        if let ID = checklist.ID {
-                            self!.updateCellForCLID(ID: ID, checklist: checklist)
-                        }
-                    }
-                }
-            }
-        )
-    }
-    
-    func observeActivitylistsForCurrentUser() {
-        self.activitylistFetcher.observeActivitylistForCurrentUser(activitylistsAdded: { [weak self] activitylistsAdded in
-                for activitylist in activitylistsAdded {
-                    if let index = self!.activitylists.firstIndex(where: {$0 == activitylist}) {
-                        self!.activitylists[index] = activitylist
-                        if let ID = activitylist.ID {
-                            self!.updateCellForALID(ID: ID, activitylist: activitylist)
-                        }
-                    } else {
-                        self!.activitylists.append(activitylist)
-                        self!.sortandreload()
-                    }
-                }
-            }, activitylistsRemoved: { [weak self] activitylistsRemoved in
-                for activitylist in activitylistsRemoved {
-                    if let index = self!.activitylists.firstIndex(where: {$0 == activitylist}) {
-                        self!.activitylists.remove(at: index)
-                        self!.sortandreload()
-                    }
-                }
-            }, activitylistsChanged: { [weak self] activitylistsChanged in
-                for activitylist in activitylistsChanged {
-                    if let index = self!.activitylists.firstIndex(where: {$0 == activitylist}) {
-                        self!.activitylists[index] = activitylist
-                        if let ID = activitylist.ID {
-                            self!.updateCellForALID(ID: ID, activitylist: activitylist)
-                        }
-                    }
-                }
-            }
-        )
-    }
-    
-    func observeGrocerylistsForCurrentUser() {
-        self.grocerylistFetcher.observeGrocerylistForCurrentUser(grocerylistsAdded: { [weak self] grocerylistsAdded in
-            for grocerylist in grocerylistsAdded {
-                if let index = self!.grocerylists.firstIndex(where: {$0 == grocerylist}) {
-                    self!.grocerylists[index] = grocerylist
-                    if let ID = grocerylist.ID {
-                        self!.updateCellForGLID(ID: ID, grocerylist: grocerylist)
-                    }
-                } else {
-                    self!.grocerylists.append(grocerylist)
-                    self!.sortandreload()
-                }
-            }
-            }, grocerylistsRemoved: { [weak self] grocerylistsRemoved in
-                for grocerylist in grocerylistsRemoved {
-                    if let index = self!.grocerylists.firstIndex(where: {$0 == grocerylist}) {
-                        self!.grocerylists.remove(at: index)
-                        self!.sortandreload()
-                    }
-                }
-            }, grocerylistsChanged: { [weak self] grocerylistsChanged in
-                for grocerylist in grocerylistsChanged {
-                    if let index = self!.grocerylists.firstIndex(where: {$0 == grocerylist}) {
-                        self!.grocerylists[index] = grocerylist
-                        if let ID = grocerylist.ID {
-                            self!.updateCellForGLID(ID: ID, grocerylist: grocerylist)
-                        }
-                    }
-                }
-            }
-        )
-    }
-    
     func updateCellForCLID(ID: String, checklist: Checklist) {
         if let index = listList.firstIndex(where: {$0.ID == ID}) {
             listList[index].checklist = checklist
@@ -324,7 +176,6 @@ class ListsViewController: UIViewController {
         listList = []
         listList = (checklists.map { ListContainer(grocerylist: nil, checklist: $0, activitylist: nil, packinglist: nil) } + activitylists.map { ListContainer(grocerylist: nil, checklist: nil, activitylist: $0, packinglist: nil) } + grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, activitylist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
         filteredlistList = listList
-        delegate?.sendLists(lists: listList)
         tableView.reloadData()
     }
     

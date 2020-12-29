@@ -23,6 +23,10 @@ class MoodViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         title = "Mood"
         setupVariables()
         configureTableView()
@@ -76,11 +80,7 @@ class MoodViewController: FormViewController {
 //                    homeTab.changeToIndex(index: 2)
 //                }
                 self.tabBarController?.selectedIndex = 1
-                if #available(iOS 13.0, *) {
-                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-                } else {
-                    // Fallback on earlier versions
-                }
+                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
             }
         }
     }

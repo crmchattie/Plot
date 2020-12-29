@@ -59,11 +59,10 @@ class GeneralTabBarController: UITabBarController {
         homeController.delegate = self
         setOnlineStatus()
         
-        networkController.setupVariables {
-            print("variables setup")
+        networkController.setupKeyVariables {
             self.homeController.networkController = self.networkController
             self.discoverController.networkController = self.networkController
-            self.settingsController.networkController = self.networkController
+            self.networkController.setupOtherVariables()
         }
         
         configureTabBar()

@@ -154,6 +154,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(activitiesUpdated), name: .activitiesUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -164,6 +165,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.backgroundColor = theme.cellBackgroundColor
         activityView.tableView.reloadData()
         applyCalendarTheme()
+    }
+    
+    @objc fileprivate func activitiesUpdated() {
+        print("activitiesUpdated AVC")
+        handleReloadActivities()
     }
     
     fileprivate func applyCalendarTheme() {
@@ -361,7 +367,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     func handleReloadActivities() {
         filteredPinnedActivities = pinnedActivities
         filteredActivities = activities
-        
+        self.activityView.tableView.reloadData()
     }
     
     func handleReloadTableAftersearchBarCancelButtonClicked() {
@@ -370,6 +376,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func handleReloadTableAfterSearch() {
+        filteredPinnedActivities.sort { (activity1, activity2) -> Bool in
+            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
+        }
+        
         filteredActivities.sort { (activity1, activity2) -> Bool in
             return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
         }
@@ -860,7 +870,8 @@ extension ActivityViewController: UpdateInvitationDelegate {
     func updateInvitation(invitation: Invitation) {
         InvitationsFetcher.update(invitation: invitation) { result in
             if result {
-//                self.invitations[invitation.activityID] = invitation
+                self.networkController.activityService.invitations[invitation.activityID] = invitation
+                NotificationCenter.default.post(name: .activitiesUpdated, object: nil)
             }
         }
     }

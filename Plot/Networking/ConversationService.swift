@@ -36,7 +36,6 @@ extension ConversationService: ConversationUpdatesDelegate {
     }
     
     func conversations(didFinishFetching: Bool, conversations: [Conversation]) {
-        print("conversations grabbed \(conversations.count)")
         self.conversations = conversations
         
     }

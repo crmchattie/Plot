@@ -141,27 +141,6 @@ extension ListsViewController {
                     }
                 })
             }
-        } else if list.type == "packinglist" {
-            if let index = self.packinglists.firstIndex(where: {$0 == list.packinglist}) {
-                tableView.beginUpdates()
-                listList.remove(at: indexPath.row)
-                packinglists.remove(at: index)
-
-                tableView.deleteRows(at: [indexPath], with: .left)
-                tableView.endUpdates()
-            Database.database().reference().child(userPackinglistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
-            Database.database().reference().child(userPackinglistsEntity).child(currentUserID).child(list.ID).removeValue()
-
-                let dataReference = Database.database().reference().child(packinglistsEntity).child(list.ID)
-                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
-                        var varMemberIDs = membersIDs
-                        varMemberIDs[currentUserID] = nil
-                        dataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
-                    }
-                })
-            }
         }
 
 //        configureTabBarBadge()

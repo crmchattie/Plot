@@ -12,6 +12,7 @@ protocol ActivitiesControllerCellDelegate: class {
     func cellTapped(activity: Activity)
     func openMap(forActivity activity: Activity)
     func openChat(forConversation conversationID: String?, activityID: String?)
+    func updateInvitation(invitation: Invitation)
 }
 
 class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITableViewDelegate, ActivityCellDelegate, UpdateInvitationDelegate {
@@ -84,11 +85,7 @@ class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITabl
     }
     
     func updateInvitation(invitation: Invitation) {
-        InvitationsFetcher.update(invitation: invitation) { result in
-            if result {
-//                self.invitations[invitation.activityID] = invitation
-            }
-        }
+        delegate?.updateInvitation(invitation: invitation)
     }
 }
 

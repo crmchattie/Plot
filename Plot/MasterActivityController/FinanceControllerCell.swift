@@ -22,7 +22,7 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 20, right: 16)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 20, right: 10)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false

@@ -10,9 +10,7 @@ import UIKit
 import Firebase
 import ARSLineProgress
 
-class AccountSettingsController: UITableViewController {
-    var networkController = NetworkController()
-    
+class AccountSettingsController: UITableViewController {    
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
@@ -32,14 +30,6 @@ class AccountSettingsController: UITableViewController {
     var currentBio = String()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     let nightMode = UIButton()
-    
-    var users = [User]()
-    var filteredUsers = [User]()
-    var activities = [Activity]()
-    var invitedActivities = [Activity]()
-    var invitations = [String: Invitation]()
-    var conversations = [Conversation]()
-    var listList = [ListContainer]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -130,9 +120,6 @@ class AccountSettingsController: UITableViewController {
         
         let rightBarButton = UIBarButtonItem(customView: nightMode)
         navigationItem.setRightBarButton(rightBarButton, animated: false)
-        
-        let notificationsBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell"), style: .plain, target: self, action: #selector(goToNotifications))
-        navigationItem.leftBarButtonItem = notificationsBarButton
     }
     
     @objc fileprivate func changeTheme() {
@@ -207,20 +194,6 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.name.text = ""
         userProfileContainerView.phone.text = ""
         userProfileContainerView.profileImageView.image = nil
-    }
-    
-    @objc func goToNotifications() {
-        let destination = NotificationsViewController()
-        destination.notificationActivities = activities
-        destination.invitedActivities = invitedActivities
-        destination.invitations = invitations
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        destination.conversations = conversations
-        destination.listList = listList
-        destination.sortInvitedActivities()
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func listenChanges() {
