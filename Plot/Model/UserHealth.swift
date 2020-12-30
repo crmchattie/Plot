@@ -9,6 +9,9 @@
 import Foundation
 
 let userHealthEntity = "user-health"
+let healthkitWorkoutsKey = "healthkit-workouts"
+let lastSyncDateKey = "lastSyncDate"
+let identifierKey = "identifier"
 
 struct UserHealth: Codable, Equatable {
     let identifier: String

@@ -59,6 +59,7 @@ class Activity: NSObject, NSCopying, Codable {
     var placeID: String?
     var attractionID: String?
     var showExtras: Bool?
+    var hkSampleID: String?
     
     enum CodingKeys: String, CodingKey {
         case name
