@@ -83,6 +83,12 @@ class MealActions: NSObject {
             Analytics.logEvent("new_meal", parameters: [String: Any]())
             dispatchGroup.enter()
             connectMembersToGroupMeal(memberIDs: membersIDs.0, ID: ID)
+            
+            if let activity = ActivityBuilder.createActivity(from: meal) {
+                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                activityActions.createNewActivity()
+            }
+            
         } else {
             Analytics.logEvent("update_meal", parameters: [String: Any]())
         }

@@ -87,6 +87,11 @@ class MindfulnessActions: NSObject {
                 HealthKitService.storeSample(sample: hkMindfulness) { (_, _) in
                 }
             }
+            
+            if let activity = ActivityBuilder.createActivity(from: mindfulness) {
+                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                activityActions.createNewActivity()
+            }
         } else {
             Analytics.logEvent("update_mindfulness", parameters: [String: Any]())
         }
