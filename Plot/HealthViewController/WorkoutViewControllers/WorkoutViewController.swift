@@ -29,6 +29,7 @@ class WorkoutViewController: FormViewController {
     let numberFormatter = NumberFormatter()
     
     var timer: Timer?
+    var workoutActions: WorkoutActions?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,7 +95,7 @@ class WorkoutViewController: FormViewController {
                 // update
                 self.showActivityIndicator()
                 let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createWorkout.createNewWorkout()
+                createWorkout.createNewWorkout(shouldCreateActivity: false)
                 self.hideActivityIndicator()
                 self.navigationController?.popViewController(animated: true)
                 
@@ -111,7 +112,7 @@ class WorkoutViewController: FormViewController {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     self.showActivityIndicator()
                     let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    createWorkout.createNewWorkout()
+                    createWorkout.createNewWorkout(shouldCreateActivity: false)
                     
                     //duplicate workout
                     let newWorkoutID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -121,7 +122,7 @@ class WorkoutViewController: FormViewController {
                     newWorkout.participantsIDs = nil
                     
                     let createNewWorkout = WorkoutActions(workout: newWorkout, active: false, selectedFalconUsers: [])
-                    createNewWorkout.createNewWorkout()
+                    createNewWorkout.createNewWorkout(shouldCreateActivity: false)
                     self.hideActivityIndicator()
                     
                     self.navigationController?.popViewController(animated: true)
@@ -140,8 +141,9 @@ class WorkoutViewController: FormViewController {
             
         } else {
             self.showActivityIndicator()
-            let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createWorkout.createNewWorkout()
+            workoutActions = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            workoutActions?.createNewWorkout(shouldCreateActivity: true)
+            
             self.hideActivityIndicator()
             
             let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
