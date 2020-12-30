@@ -144,6 +144,7 @@
 		10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CB24AF761F006686FA /* CompositionalHeader.swift */; };
 		10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CD24AFB0E7006686FA /* SectionType.swift */; };
 		10B6B31625410D37008037AD /* FinanceTagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B6B31525410D37008037AD /* FinanceTagsViewController.swift */; };
+		10BA3BCE259BEDF9005D98EC /* SetupCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3BCD259BEDF9005D98EC /* SetupCell.swift */; };
 		10BA3D64257D6F7D00A81227 /* SchedulerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */; };
 		10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */; };
 		10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */; };
@@ -616,6 +617,7 @@
 		10B656CB24AF761F006686FA /* CompositionalHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionalHeader.swift; sourceTree = "<group>"; };
 		10B656CD24AFB0E7006686FA /* SectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionType.swift; sourceTree = "<group>"; };
 		10B6B31525410D37008037AD /* FinanceTagsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTagsViewController.swift; sourceTree = "<group>"; };
+		10BA3BCD259BEDF9005D98EC /* SetupCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupCell.swift; sourceTree = "<group>"; };
 		10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerViewController.swift; sourceTree = "<group>"; };
 		10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseTransactionTableViewController.swift; sourceTree = "<group>"; };
 		10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
@@ -1028,10 +1030,11 @@
 				10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */,
 				10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */,
 				10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */,
+				10BA3BCD259BEDF9005D98EC /* SetupCell.swift */,
 				10E8E50225923C070076BE42 /* BaseContainerCell.swift */,
 				10E8E506259295260076BE42 /* HeaderContainerCell.swift */,
-				1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */,
 				10E8E5302592C7D20076BE42 /* BackEnabledNavigationController.swift */,
+				1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */,
 			);
 			path = MasterActivityController;
 			sourceTree = "<group>";
@@ -2639,6 +2642,7 @@
 				4B5E99DE212CC0C0001F067F /* InAppNotificationManager.swift in Sources */,
 				4BAEE5D1212735E50045AB10 /* SelectedParticipantsCollectionView.swift in Sources */,
 				26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */,
+				10BA3BCE259BEDF9005D98EC /* SetupCell.swift in Sources */,
 				4BA1E77C2152511B00391BCB /* UploadProgress.swift in Sources */,
 				10E8E4FF25923B4F0076BE42 /* FinanceControllerCell.swift in Sources */,
 				4BAEE5D7212735E50045AB10 /* AnnouncementFactory.swift in Sources */,

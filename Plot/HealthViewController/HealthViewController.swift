@@ -47,14 +47,6 @@ class HealthViewController: UIViewController {
         return collectionView
     }()
     
-    let closeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "close"), for: .normal)
-        button.tintColor = .systemBlue
-        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
-        return button
-    }()
-    
     @objc fileprivate func handleDismiss(button: UIButton) {
         dismiss(animated: true, completion: nil)
     }
@@ -64,17 +56,15 @@ class HealthViewController: UIViewController {
     override var prefersStatusBarHidden: Bool { return true }
     
     override func viewDidLoad() {
-        super.viewDidLoad()        
+        super.viewDidLoad()
+        navigationItem.largeTitleDisplayMode = .never
+        title = "Health"
+        
         collectionView.dataSource = self
         collectionView.delegate = self
         
         configureView()
         addObservers()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        navigationController?.isNavigationBarHidden = true
-        navigationController?.navigationBar.isHidden = true
     }
     
     deinit {
@@ -87,25 +77,22 @@ class HealthViewController: UIViewController {
     
     @objc fileprivate func changeTheme() {
         let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.cellBackgroundColor
+        view.backgroundColor = theme.generalBackgroundColor
         collectionView.indicatorStyle = theme.scrollBarStyle
-        collectionView.backgroundColor = theme.cellBackgroundColor
+        collectionView.backgroundColor = theme.generalBackgroundColor
         collectionView.reloadData()
     }
     
     private func configureView() {
-        closeButton.constrainHeight(50)
-        closeButton.constrainWidth(50)
+        let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
+        navigationItem.rightBarButtonItem = newItemBarButton
         
-        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
-        view.addSubview(closeButton)
         view.addSubview(collectionView)
         
-        closeButton.anchor(top: view.topAnchor, leading: nil, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 20, left: 0, bottom: 0, right: 20))
-
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 0),
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
@@ -115,6 +102,12 @@ class HealthViewController: UIViewController {
         collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = view.backgroundColor
+        
+    }
+    
+    @objc fileprivate func newItem() {
+        self.tabBarController?.selectedIndex = 0
+        self.navigationController?.popViewController(animated: true)
     }
     
     func openMetric(metric: HealthMetric) {
@@ -136,7 +129,7 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         let key = healthMetricSections[indexPath.section]
         if let metrics = healthMetrics[key] {
             let metric = metrics[indexPath.row]
@@ -167,7 +160,7 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
         if kind == UICollectionView.elementKindSectionHeader {
             let key = healthMetricSections[indexPath.section]
             let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
-            sectionHeader.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            sectionHeader.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             sectionHeader.titleLabel.text = key.capitalized
             return sectionHeader
         } else { //No footer in this case but can add option for that

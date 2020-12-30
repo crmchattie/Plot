@@ -118,35 +118,35 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         return panGesture
         }()
     
-    let closeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "close"), for: .normal)
-        button.tintColor = .systemBlue
-        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
-        return button
-    }()
+//    let closeButton: UIButton = {
+//        let button = UIButton(type: .system)
+//        button.setImage(UIImage(named: "close"), for: .normal)
+//        button.tintColor = .systemBlue
+//        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+//        return button
+//    }()
     
     @objc fileprivate func handleDismiss(button: UIButton) {
         dismiss(animated: true, completion: nil)
     }
     
     override var prefersStatusBarHidden: Bool { return true }
-    
-    var closeButtonConstraint: CGFloat = 0
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("activities view did load")
+        navigationItem.largeTitleDisplayMode = .never
+        title = "Calendar"
+        
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
         addObservers()
         handleReloadTable()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        navigationController?.isNavigationBarHidden = true
-        navigationController?.navigationBar.isHidden = true
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        navigationController?.isNavigationBarHidden = true
+//        navigationController?.navigationBar.isHidden = true
+//    }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -159,27 +159,26 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @objc fileprivate func changeTheme() {
         let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.cellBackgroundColor
+        view.backgroundColor = theme.generalBackgroundColor
         activityView.tableView.indicatorStyle = theme.scrollBarStyle
-        activityView.tableView.sectionIndexBackgroundColor = theme.cellBackgroundColor
-        activityView.tableView.backgroundColor = theme.cellBackgroundColor
+        activityView.tableView.sectionIndexBackgroundColor = theme.generalBackgroundColor
+        activityView.tableView.backgroundColor = theme.generalBackgroundColor
         activityView.tableView.reloadData()
         applyCalendarTheme()
     }
     
     @objc fileprivate func activitiesUpdated() {
-        print("activitiesUpdated AVC")
         handleReloadActivities()
     }
     
     fileprivate func applyCalendarTheme() {
         let theme = ThemeManager.currentTheme()
-        activityView.calendar.backgroundColor = theme.cellBackgroundColor
+        activityView.calendar.backgroundColor = theme.generalBackgroundColor
         activityView.calendar.appearance.weekdayTextColor = theme.generalTitleColor
         activityView.calendar.appearance.headerTitleColor = theme.generalTitleColor
         activityView.calendar.appearance.eventDefaultColor = theme.generalTitleColor
         activityView.calendar.appearance.titleDefaultColor = theme.generalTitleColor
-        activityView.calendar.appearance.titleSelectionColor = theme.cellBackgroundColor
+        activityView.calendar.appearance.titleSelectionColor = theme.generalBackgroundColor
         activityView.calendar.appearance.selectionColor = theme.generalTitleColor
         activityView.calendar.appearance.todayColor = FalconPalette.defaultBlue
         activityView.calendar.appearance.todaySelectionColor = FalconPalette.defaultBlue
@@ -194,20 +193,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.reloadData()
     }
     
-    override var editButtonItem: UIBarButtonItem {
-        let editButton = super.editButtonItem
-        editButton.action = #selector(editButtonAction)
-        return editButton
-    }
-    
     @objc func editButtonAction(sender: UIBarButtonItem) {
         if activityView.tableView.isEditing == true {
             activityView.tableView.setEditing(false, animated: true)
-            //activityView.tableView.isEditing = false
             sender.style = .plain
             sender.title = "Edit"
         } else {
-            //activityView.tableView.isEditing = true
             activityView.tableView.setEditing(true, animated: true)
             sender.style = .done
             sender.title = "Done"
@@ -215,20 +206,18 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func configureView() {
-        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
+        let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+        navigationItem.rightBarButtonItems = [newItemBarButton, searchBarButton]
+        
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
         edgesForExtendedLayout = UIRectEdge.top
-        
-        closeButton.constrainHeight(50)
-        closeButton.constrainWidth(50)
-        
-        view.addSubview(closeButton)
-        view.addSubview(activityView)
 
-        closeButton.anchor(top: view.topAnchor, leading: nil, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 20, left: 0, bottom: 0, right: 20))
+        view.addSubview(activityView)
         
         activityView.translatesAutoresizingMaskIntoConstraints = false
-        activityView.topAnchor.constraint(equalTo: closeButton.bottomAnchor).isActive = true
+        activityView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         activityView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         activityView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         activityView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
@@ -264,6 +253,15 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         // apply theme
         applyCalendarTheme()
+    }
+    
+    @objc fileprivate func newItem() {
+        self.tabBarController?.selectedIndex = 0
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    @objc fileprivate func search() {
+        setupSearchController()
     }
     
     // MARK:- action: Selectors
@@ -344,14 +342,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
         
-        if !isAppLoaded {
-            activityView.tableView.reloadDataWithCompletion() {
-                self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, animated: false)
-            }
-//            configureTabBarBadge()
-        } else {
-            activityView.tableView.reloadData()
-//            configureTabBarBadge()
+        activityView.tableView.reloadDataWithCompletion() {
+            self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, animated: false)
         }
         
         if allActivities.count == 0 {
@@ -557,7 +549,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         cell.delegate = self
         cell.updateInvitationDelegate = self
         cell.activityViewControllerDataStore = self

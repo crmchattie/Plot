@@ -190,6 +190,5 @@ extension GeneralTabBarController: ManageAppearanceHome {
         } else {
             splashContainer.showSecuredData()
         }
-        addNewUserItems()
     }
 }

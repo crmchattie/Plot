@@ -470,7 +470,7 @@ enum CustomType: String, Equatable, Hashable {
         case .sleep: return "Sleep"
         case .work: return "Work"
         case .mood: return "Mood"
-        case .iOSCalendarEvent: return "iOS Calendar Event"
+        case .iOSCalendarEvent: return "Apple Calendar Event"
         case .mindfulness: return "Mindfulness"
 
         }
@@ -490,7 +490,7 @@ enum CustomType: String, Equatable, Hashable {
         case .sleep: return "Bedtime"
         case .work: return "Start of Work"
         case .mood: return "Add a mood"
-        case .iOSCalendarEvent: return "iOS Calendar Event"
+        case .iOSCalendarEvent: return "Apple Calendar Event"
         case .mindfulness: return "Add mindfulness minutes"
 
         }

@@ -15,6 +15,7 @@ import LBTATools
 fileprivate let activitiesControllerCell = "ActivitiesControllerCell"
 fileprivate let healthControllerCell = "HealthControllerCell"
 fileprivate let financeControllerCell = "FinanceControllerCell"
+fileprivate let setupCell = "SetupCell"
 fileprivate let headerContainerCell = "HeaderCellDelegate"
 
 
@@ -101,6 +102,7 @@ class MasterActivityContainerController: UIViewController {
         collectionView.register(ActivitiesControllerCell.self, forCellWithReuseIdentifier: activitiesControllerCell)
         collectionView.register(HealthControllerCell.self, forCellWithReuseIdentifier: healthControllerCell)
         collectionView.register(FinanceControllerCell.self, forCellWithReuseIdentifier: financeControllerCell)
+        collectionView.register(SetupCell.self, forCellWithReuseIdentifier: setupCell)
         collectionView.register(HeaderContainerCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerContainerCell)
     }
     
@@ -254,7 +256,6 @@ class MasterActivityContainerController: UIViewController {
         if activityFound {
             let numberOfActivities = networkController.activityService.activities.count
             if index < numberOfActivities {
-                print("allActivities[index] \(allActivities[index].name)")
                 activities.append(allActivities[index])
                 for i in 0...1 {
                     activities.append(allActivities[index + i + 1])
@@ -281,7 +282,7 @@ class MasterActivityContainerController: UIViewController {
         
         let setSections: [SectionType] = [.financialIssues, .balanceSheet, .incomeStatement]
         
-        var members = networkController.financeService.members
+        let members = networkController.financeService.members
         let accounts = networkController.financeService.accounts
         let transactions = networkController.financeService.transactions
                 
@@ -332,17 +333,17 @@ class MasterActivityContainerController: UIViewController {
     
     func goToVC(section: SectionType) {
         if section == .calendar {
-            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: ActivityViewController(networkController: networkController))
-            backEnabledNavigationController.modalPresentationStyle = .fullScreen
-            present(backEnabledNavigationController, animated: true)
+            let destination = ActivityViewController(networkController: networkController)
+            destination.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(destination, animated: true)
         } else if section == .health {
-            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: HealthViewController(networkController: networkController))
-            backEnabledNavigationController.modalPresentationStyle = .fullScreen
-            present(backEnabledNavigationController, animated: true)
+            let destination = HealthViewController(networkController: networkController)
+            destination.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(destination, animated: true)
         } else {
-            let backEnabledNavigationController = BackEnabledNavigationController(rootViewController: FinanceViewController(networkController: networkController))
-            backEnabledNavigationController.modalPresentationStyle = .fullScreen
-            present(backEnabledNavigationController, animated: true)
+            let destination = FinanceViewController(networkController: networkController)
+            destination.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(destination, animated: true)
         }
     }
 }
@@ -359,27 +360,53 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = sections[indexPath.section]
         if section == .calendar {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.activities = sortedActivities
-            cell.invitations = networkController.activityService.invitations
-            cell.delegate = self
-            return cell
+            if !sortedActivities.isEmpty {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.activities = sortedActivities
+                cell.invitations = networkController.activityService.invitations
+                cell.delegate = self
+                return cell
+            } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.intColor = (indexPath.section % 5)
+                cell.sectionType = section
+                return cell
+            }
         } else if section == .health {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.healthMetricSections = networkController.healthService.healthMetricSections
-            cell.healthMetrics = networkController.healthService.healthMetrics
-            cell.delegate = self
-            return cell
+            let healthMetricSections = networkController.healthService.healthMetricSections
+            let healthMetrics = networkController.healthService.healthMetrics
+            if !healthMetrics.isEmpty {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.healthMetricSections = healthMetricSections
+                cell.healthMetrics = healthMetrics
+                cell.delegate = self
+                return cell
+            } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.intColor = (indexPath.section % 5)
+                cell.sectionType = section
+                return cell
+            }
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.institutionDict = networkController.financeService.institutionDict
-            cell.sections = financeSections
-            cell.groups = financeGroups
-            cell.delegate = self
-            return cell
+            if !financeSections.isEmpty {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.institutionDict = networkController.financeService.institutionDict
+                cell.sections = financeSections
+                cell.groups = financeGroups
+                cell.delegate = self
+                return cell
+            } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.intColor = (indexPath.section % 5)
+                cell.sectionType = section
+                return cell
+            }
         }
     }
     
@@ -387,39 +414,51 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         var height: CGFloat = 0
         let section = sections[indexPath.section]
         if section == .calendar {
-            for activity in sortedActivities {
-                if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
-                    height = CGFloat(sortedActivities.count * 172)
-                } else {
-                    height = CGFloat(sortedActivities.count * 132)
+            if !sortedActivities.isEmpty {
+                for activity in sortedActivities {
+                    if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
+                        height = CGFloat(sortedActivities.count * 172)
+                    } else {
+                        height = CGFloat(sortedActivities.count * 132)
+                    }
                 }
+            } else {
+                height = 300
             }
         } else if section == .health {
             let healthMetricSections = networkController.healthService.healthMetricSections
             let healthMetrics = networkController.healthService.healthMetrics
-            height += CGFloat(healthMetricSections.count * 50)
-            for key in healthMetricSections {
-                if let metrics = healthMetrics[key] {
-                    height += CGFloat(metrics.count * 75)
+            if !healthMetrics.isEmpty {
+                height += CGFloat(healthMetricSections.count * 50)
+                for key in healthMetricSections {
+                    if let metrics = healthMetrics[key] {
+                        height += CGFloat(metrics.count * 75)
+                    }
                 }
+                height += 25
+            } else {
+                height = 300
             }
-            height += 25
         } else {
-            height += CGFloat(financeSections.count * 60)
-            for section in financeSections {
-                if section == .financialIssues {
-                    if let group = financeGroups[section] as? [MXMember] {
-                        height += CGFloat(group.count * 80)
-                    }
-                } else {
-                    if let group = financeGroups[section] as? [AccountDetails] {
-                        height += CGFloat(group.count * 25)
-                    } else if let group = financeGroups[section] as? [TransactionDetails] {
-                        height += CGFloat(group.count * 25)
+            if !financeSections.isEmpty {
+                height += CGFloat(financeSections.count * 60)
+                for section in financeSections {
+                    if section == .financialIssues {
+                        if let group = financeGroups[section] as? [MXMember] {
+                            height += CGFloat(group.count * 80)
+                        }
+                    } else {
+                        if let group = financeGroups[section] as? [AccountDetails] {
+                            height += CGFloat(group.count * 25)
+                        } else if let group = financeGroups[section] as? [TransactionDetails] {
+                            height += CGFloat(group.count * 25)
+                        }
                     }
                 }
+                height += 20
+            } else {
+                height = 300
             }
-            height += 20
         }
         return CGSize(width: self.collectionView.frame.size.width - 40, height: height)
         
@@ -439,7 +478,32 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             let section = sections[indexPath.section]
             sectionHeader.titleLabel.text = section.name
             sectionHeader.sectionType = section
-            sectionHeader.delegate = self
+            if section == .calendar {
+                if !sortedActivities.isEmpty {
+                    sectionHeader.subTitleLabel.isHidden = false
+                    sectionHeader.delegate = self
+                } else {
+                    sectionHeader.subTitleLabel.isHidden = true
+                    sectionHeader.delegate = nil
+                }
+            } else if section == .health {
+                let healthMetrics = networkController.healthService.healthMetrics
+                if !healthMetrics.isEmpty {
+                    sectionHeader.subTitleLabel.isHidden = false
+                    sectionHeader.delegate = self
+                } else {
+                    sectionHeader.subTitleLabel.isHidden = true
+                    sectionHeader.delegate = nil
+                }
+            } else {
+                if !financeSections.isEmpty {
+                    sectionHeader.subTitleLabel.isHidden = false
+                    sectionHeader.delegate = self
+                } else {
+                    sectionHeader.subTitleLabel.isHidden = true
+                    sectionHeader.delegate = nil
+                }
+            }
             return sectionHeader
         } else { //No footer in this case but can add option for that
             return UICollectionReusableView()
@@ -448,7 +512,11 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let section = sections[indexPath.section]
-        goToVC(section: section)
+        if let _ = collectionView.cellForItem(at: indexPath) as? SetupCell {
+            
+        } else {
+            goToVC(section: section)
+        }
     }
 }
 

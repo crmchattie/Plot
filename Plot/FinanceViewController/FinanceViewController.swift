@@ -75,14 +75,6 @@ class FinanceViewController: UIViewController {
     
     var participants: [String: [User]] = [:]
     
-    let closeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "close"), for: .normal)
-        button.tintColor = .systemBlue
-        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
-        return button
-    }()
-    
     @objc fileprivate func handleDismiss(button: UIButton) {
         dismiss(animated: true, completion: nil)
     }
@@ -91,6 +83,9 @@ class FinanceViewController: UIViewController {
         
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.largeTitleDisplayMode = .never
+        title = "Finance"
+        
         customSegmented.delegate = self
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -105,11 +100,6 @@ class FinanceViewController: UIViewController {
         
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        navigationController?.isNavigationBarHidden = true
-        navigationController?.navigationBar.isHidden = true
-    }
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -119,36 +109,38 @@ class FinanceViewController: UIViewController {
     }
     
     @objc fileprivate func changeTheme() {
-        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        customSegmented.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.reloadData()
         
     }
     
     fileprivate func setupMainView() {
         edgesForExtendedLayout = UIRectEdge.top
-        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
-        customSegmented.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         customSegmented.constrainHeight(30)
                         
-        closeButton.constrainHeight(50)
-        closeButton.constrainWidth(50)
-        
-        view.addSubview(closeButton)
         view.addSubview(customSegmented)
         view.addSubview(collectionView)
 
-        closeButton.anchor(top: view.topAnchor, leading: nil, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 20, left: 0, bottom: 0, right: 20))
-
-        customSegmented.anchor(top: closeButton.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
+        
+        let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
+        navigationItem.rightBarButtonItem = newItemBarButton
                 
 
+    }
+    
+    @objc fileprivate func newItem() {
+        self.tabBarController?.selectedIndex = 0
+        self.navigationController?.popViewController(animated: true)
     }
     
     func openMXConnect(guid: String, current_member_guid: String?) {

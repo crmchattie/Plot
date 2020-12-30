@@ -50,7 +50,7 @@ class HeaderContainerCell: UICollectionReusableView {
     
     func setupViews() {
                 
-        view.constrainHeight(35)
+        view.constrainHeight(30)
         
         addSubview(view)
         view.addSubview(titleLabel)
@@ -69,6 +69,7 @@ class HeaderContainerCell: UICollectionReusableView {
         super.prepareForReuse()
         titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         subTitleLabel.tintColor = .systemBlue
+        subTitleLabel.isHidden = true
         
     }
     
