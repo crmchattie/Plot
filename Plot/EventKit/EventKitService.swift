@@ -9,14 +9,13 @@
 import EventKit
 
 class EventKitService {
-    let setupAssistant: EventKitSetupAssistant
     
-    init(setupAssistant: EventKitSetupAssistant) {
-        self.setupAssistant = setupAssistant
+    var eventStore: EKEventStore {
+        return EventKitSetupAssistant.eventStore
     }
     
     func authorizeEventKit(completion: @escaping (Bool, Error?) -> Swift.Void) {
-        setupAssistant.authorizeEventKit(completion: completion)
+        EventKitSetupAssistant.authorizeEventKit(completion: completion)
     }
     
     func fetchEventsForCertainTime() -> [EKEvent] {
@@ -36,15 +35,41 @@ class EventKitService {
         // Create the predicate from the event store's instance method.
         var predicate: NSPredicate? = nil
         if let timeAgo = timeAgo, let timeFromNow = timeFromNow {
-            predicate = setupAssistant.eventStore.predicateForEvents(withStart: timeAgo, end: timeFromNow, calendars: nil)
+            predicate = eventStore.predicateForEvents(withStart: timeAgo, end: timeFromNow, calendars: nil)
         }
 
         // Fetch all events that match the predicate.
         var events: [EKEvent] = []
         if let aPredicate = predicate {
-            events = setupAssistant.eventStore.events(matching: aPredicate)
+            events = eventStore.events(matching: aPredicate)
         }
         
         return events
+    }
+    
+    func storeEvent(for activity: Activity) -> EKEvent? {
+        guard let startDate = activity.startDate, let endDate = activity.endDate, let name = activity.name else {
+            return nil
+        }
+        
+        var text = activity.notes ?? ""
+        if text.isEmpty {
+            text = activity.activityDescription ?? ""
+        }
+        
+        let event = EKEvent(eventStore: eventStore)
+        event.title = name
+        event.startDate = startDate
+        event.endDate = endDate
+        event.notes = text
+        event.calendar = eventStore.defaultCalendarForNewEvents
+        do {
+            try eventStore.save(event, span: .thisEvent)
+        }
+        catch let error as NSError {
+            print("Failed to save iOS calendar event with error : \(error)")
+        }
+        
+        return event
     }
 }
