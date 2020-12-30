@@ -327,7 +327,7 @@ class HealthKitService {
     
     // MARK:- Storing data
     
-    class func storeWorkout(workout: HKWorkout, completion: @escaping (Bool, Error?) -> Void) {
-        healthStore.save(workout, withCompletion: completion)
+    class func storeSample(sample: HKSample, completion: @escaping (Bool, Error?) -> Void) {
+        healthStore.save(sample, withCompletion: completion)
     }
 }

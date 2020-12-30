@@ -66,7 +66,7 @@ class HealthKitSetupAssistant {
         let healthKitTypesToWrite: Set<HKSampleType> = [
                                                        distanceWalkingRunning,
                                                        distanceCycling,
-                                                       activeEnergy,
+                                                       mindfulSession,
                                                        HKObjectType.workoutType()]
         
         // Request Authorization

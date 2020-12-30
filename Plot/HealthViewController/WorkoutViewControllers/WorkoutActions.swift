@@ -86,7 +86,7 @@ class WorkoutActions: NSObject {
             
             // Update healthKit
             if let hkWorkout = HealthKitSampleBuilder.createHKWorkout(from: workout) {
-                HealthKitService.storeWorkout(workout: hkWorkout) { (_, _) in
+                HealthKitService.storeSample(sample: hkWorkout) { (_, _) in
                 }
             }
         } else {

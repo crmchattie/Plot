@@ -83,6 +83,10 @@ class MindfulnessActions: NSObject {
             Analytics.logEvent("new_mindfulness", parameters: [String: Any]())
             dispatchGroup.enter()
             connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
+            if let hkMindfulness = HealthKitSampleBuilder.createHKMindfulness(from: mindfulness) {
+                HealthKitService.storeSample(sample: hkMindfulness) { (_, _) in
+                }
+            }
         } else {
             Analytics.logEvent("update_mindfulness", parameters: [String: Any]())
         }
