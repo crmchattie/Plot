@@ -67,6 +67,11 @@ class HealthKitSetupAssistant {
                                                        distanceWalkingRunning,
                                                        distanceCycling,
                                                        mindfulSession,
+                                                       dietaryFatTotal,
+                                                       dietaryCarbohydrates,
+                                                       dietarySugar,
+                                                       dietaryProtein,
+                                                       dietaryEnergyConsumed,
                                                        HKObjectType.workoutType()]
         
         // Request Authorization

@@ -84,11 +84,17 @@ class MealActions: NSObject {
             dispatchGroup.enter()
             connectMembersToGroupMeal(memberIDs: membersIDs.0, ID: ID)
             
+            // Store nutritions in healthkit
+            if let samples = HealthKitSampleBuilder.createHKNutritions(from: meal), samples.count > 0 {
+                HealthKitService.storeSamples(samples: samples) { (_, _) in
+                }
+            }
+            
+            // Create activity
             if let activity = ActivityBuilder.createActivity(from: meal) {
                 let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
                 activityActions.createNewActivity()
             }
-            
         } else {
             Analytics.logEvent("update_meal", parameters: [String: Any]())
         }

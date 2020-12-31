@@ -330,4 +330,8 @@ class HealthKitService {
     class func storeSample(sample: HKSample, completion: @escaping (Bool, Error?) -> Void) {
         healthStore.save(sample, withCompletion: completion)
     }
+    
+    class func storeSamples(samples: [HKSample], completion: @escaping (Bool, Error?) -> Void) {
+        healthStore.save(samples, withCompletion: completion)
+    }
 }
