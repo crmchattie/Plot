@@ -30,7 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     var notifications: [PLNotification] = []
-    var additionalUserInfo: AdditionalUserInfo?
     var participants: [String: [User]] = [:]
     let invitationsFetcher = InvitationsFetcher()
     
@@ -53,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         tabBarController.presentOnboardingController()
         
         //register after user is no longer new user
-        if let newUser = additionalUserInfo?.isNewUser, !newUser {
+        if Auth.auth().currentUser == nil {
             registerForPushNotifications(application: application)
         }
         

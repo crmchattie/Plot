@@ -61,9 +61,9 @@ class GeneralTabBarController: UITabBarController {
         homeController.delegate = self
         setOnlineStatus()
         
-        isNewUser = appDelegate.additionalUserInfo?.isNewUser ?? true
+        isNewUser = Auth.auth().currentUser == nil
         homeController.isNewUser = isNewUser
-                        
+                                
         if !isNewUser {
             networkController.setupKeyVariables {
                 self.homeController.networkController = self.networkController
@@ -163,7 +163,7 @@ class GeneralTabBarController: UITabBarController {
     }
     
     func presentOnboardingController() {
-        guard Auth.auth().currentUser == nil else { return }
+        guard isNewUser else { return }
         let destination = OnboardingController()
         let newNavigationController = UINavigationController(rootViewController: destination)
         newNavigationController.navigationBar.shadowImage = UIImage()
@@ -188,7 +188,5 @@ extension GeneralTabBarController: ManageAppearanceHome {
         } else {
             splashContainer.showSecuredData()
         }
-        
-        print("appDelegate.additionalUserInfo?.isNewUser \(appDelegate.additionalUserInfo?.isNewUser)")
     }
 }

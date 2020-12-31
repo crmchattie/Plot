@@ -380,7 +380,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func scrollToFirstActivityWithDate(date: Date, animated: Bool) {
-        let currentDate = date.stripTime()
+        let currentDate = date        
         var index = 0
         var activityFound = false
         for activity in self.filteredActivities {
