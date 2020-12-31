@@ -52,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         tabBarController.presentOnboardingController()
         
         //register after user is no longer new user
-        if Auth.auth().currentUser == nil {
+        if Auth.auth().currentUser != nil {
             registerForPushNotifications(application: application)
         }
         
@@ -276,7 +276,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         // 2
         if let aps = userInfo["aps"] as? [String: AnyObject] {
-            print(aps)
             switch response.actionIdentifier {
             case Identifiers.viewChatsAction:
 //                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 1)
