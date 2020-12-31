@@ -55,9 +55,7 @@ class FinanceService {
     
     func grabFinances(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [unowned self] in
-            getMXUser() { mxUser in
-                self.mxUser = mxUser
-            }
+            getMXUser() { _ in }
             
             accountFetcher.fetchAccounts { (firebaseAccounts) in
                 self.accounts = firebaseAccounts
@@ -269,11 +267,14 @@ class FinanceService {
     }
     
     func getMXUser(completion: @escaping (MXUser?) -> ()) {
+        print("getMXUser")
         if let currentUser = Auth.auth().currentUser?.uid {
             let mxIDReference = Database.database().reference().child(userFinancialEntity).child(currentUser)
             mxIDReference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value {
                     if let user = try? FirebaseDecoder().decode(MXUser.self, from: value) {
+                        print("self.mxUser = user")
+                        self.mxUser = user
                         completion(user)
                     }
                 } else if !snapshot.exists() {
@@ -285,6 +286,8 @@ class FinanceService {
                             if let firebaseUser = try? FirebaseEncoder().encode(user) {
                                 mxIDReference.setValue(firebaseUser)
                             }
+                            print("self.mxUser = user")
+                            self.mxUser = user
                             completion(user)
                         }
                     }

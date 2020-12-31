@@ -208,6 +208,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if segmentedControl.selectedSegmentIndex == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath)
+            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             if let activityCell = cell as? ActivityCell {
                 activityCell.delegate = self
                 activityCell.updateInvitationDelegate = self
@@ -247,6 +248,9 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
                 button.setImage(UIImage(named: "list"), for: .normal)
                 cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 36, height: 30)
             } else if notification.aps.category == Identifiers.grocerylistCategory {
+                button.setImage(UIImage(named: "list"), for: .normal)
+                cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 36, height: 30)
+            } else if notification.aps.category == Identifiers.activitylistCategory {
                 button.setImage(UIImage(named: "list"), for: .normal)
                 cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 36, height: 30)
             }

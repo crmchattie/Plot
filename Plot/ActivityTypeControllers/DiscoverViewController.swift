@@ -19,8 +19,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
-    var customTypes: [CustomType] = [.basic, .meal, .workout, .mood, .mindfulness, .sleep, .work, .transaction, .financialAccount]
-    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mood, .mindfulness, .sleep, .work, .customTransaction, .customFinancialAccount]
+    var customTypes: [CustomType] = [.basic, .meal, .workout, .mood, .mindfulness, .sleep, .work, .transaction, .financialAccount, .transactionRule]
+    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mood, .mindfulness, .sleep, .work, .customTransaction, .customFinancialAccount, .customTransactionRule]
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0
@@ -215,7 +215,15 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
                 let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
-                    self.openMXConnect(guid: self.networkController.financeService.mxUser.guid, current_member_guid: nil)
+                    if let mxUser = self.networkController.financeService.mxUser {
+                        self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+                    } else {
+                        self.networkController.financeService.getMXUser { (mxUser) in
+                            if let mxUser = self.networkController.financeService.mxUser {
+                                self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+                            }
+                        }
+                    }
                 }
                 let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
                     print("You've pressed cancel")
@@ -227,9 +235,17 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             case .transactionRule:
                 let destination = FinanceTransactionRuleViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.user = networkController.financeService.mxUser
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                if let mxUser = networkController.financeService.mxUser {
+                    destination.user = mxUser
+                    let navigationViewController = UINavigationController(rootViewController: destination)
+                    self.present(navigationViewController, animated: true, completion: nil)
+                } else {
+                    self.networkController.financeService.getMXUser { (mxUser) in
+                        destination.user = mxUser
+                        let navigationViewController = UINavigationController(rootViewController: destination)
+                        self.present(navigationViewController, animated: true, completion: nil)
+                    }
+                }
             default:
                 print("default")
             }

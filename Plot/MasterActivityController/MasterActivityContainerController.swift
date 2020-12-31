@@ -51,6 +51,12 @@ class MasterActivityContainerController: UIViewController {
     var sections: [SectionType] = [.calendar, .health, .finances]
     
     var sortedActivities = [Activity]()
+    var healthMetricSections: [String] {
+        return networkController.healthService.healthMetricSections
+    }
+    var healthMetrics: [String: [HealthMetric]] {
+        return networkController.healthService.healthMetrics
+    }
     var financeSections = [SectionType]()
     var financeGroups = [SectionType: [AnyHashable]]()
     
@@ -58,6 +64,8 @@ class MasterActivityContainerController: UIViewController {
     var messagesFetcher: MessagesFetcher? = nil
     
     var activitiesParticipants: [String: [User]] = [:]
+    
+    var isNewUser: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,6 +78,15 @@ class MasterActivityContainerController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         managePresense()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)        
+        if isNewUser {
+            isNewUser = false
+            // authorize and grab contacts after new user logs in
+            self.networkController.userService.grabContacts()
+        }
     }
 
     func setupViews() {
@@ -142,7 +159,9 @@ class MasterActivityContainerController: UIViewController {
         scrollToFirstActivityWithDate({ (activities) in
             if self.sortedActivities != activities {
                 self.sortedActivities = activities
-                self.collectionView.reloadData()
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
             }
         })
     }
@@ -152,7 +171,9 @@ class MasterActivityContainerController: UIViewController {
             if self.financeSections != sections || self.financeGroups != groups {
                 self.financeSections = sections
                 self.financeGroups = groups
-                self.collectionView.reloadData()
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
             }
         }
     }
@@ -375,8 +396,6 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 return cell
             }
         } else if section == .health {
-            let healthMetricSections = networkController.healthService.healthMetricSections
-            let healthMetrics = networkController.healthService.healthMetrics
             if !healthMetrics.isEmpty {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -426,8 +445,6 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 height = 300
             }
         } else if section == .health {
-            let healthMetricSections = networkController.healthService.healthMetricSections
-            let healthMetrics = networkController.healthService.healthMetrics
             if !healthMetrics.isEmpty {
                 height += CGFloat(healthMetricSections.count * 50)
                 for key in healthMetricSections {
@@ -487,7 +504,6 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                     sectionHeader.delegate = nil
                 }
             } else if section == .health {
-                let healthMetrics = networkController.healthService.healthMetrics
                 if !healthMetrics.isEmpty {
                     sectionHeader.subTitleLabel.isHidden = false
                     sectionHeader.delegate = self
@@ -513,7 +529,25 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let section = sections[indexPath.section]
         if let _ = collectionView.cellForItem(at: indexPath) as? SetupCell {
-            
+            if section == .calendar {
+                networkController.activityService.grabActivities {
+                    collectionView.reloadData()
+                }
+            } else if section == .health {
+                networkController.healthService.grabHealth {
+                    collectionView.reloadData()
+                }
+            } else {
+                if let mxUser = self.networkController.financeService.mxUser {
+                    openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+                } else {
+                    self.networkController.financeService.getMXUser { (mxUser) in
+                        if let mxUser = self.networkController.financeService.mxUser {
+                            self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+                        }
+                    }
+                }
+            }
         } else {
             goToVC(section: section)
         }
@@ -641,10 +675,12 @@ extension MasterActivityContainerController: UpdateFinancialsDelegate {
 
 extension MasterActivityContainerController: EndedWebViewDelegate {
     func updateMXMembers() {
-        financeSections.removeAll(where: { $0 == .financialIssues })
-        financeGroups[.financialIssues] = nil
-        collectionView.reloadData()
-        networkController.financeService.getMXData()
+        self.financeSections.removeAll(where: { $0 == .financialIssues })
+        self.financeGroups[.financialIssues] = nil
+        self.networkController.financeService.getMXData()
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
     }
 }
 

@@ -52,9 +52,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         tabBarController.presentOnboardingController()
         
-        registerForPushNotifications(application: application)
+        //register after user is no longer new user
+        if let newUser = additionalUserInfo?.isNewUser, !newUser {
+            registerForPushNotifications(application: application)
+        }
         
-        RunLoop.current.run(until: NSDate(timeIntervalSinceNow:3) as Date)
+        RunLoop.current.run(until: NSDate(timeIntervalSinceNow:2) as Date)
         
         return true
     }
@@ -100,10 +103,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 identifier: Identifiers.viewListsAction, title: "View Lists",
                 options: [.foreground])
             
-            //                let replyChatAction = UNTextInputNotificationAction(
-            //                    identifier: Identifiers.viewAction, title: "Reply to Message",
-            //                    options: [.foreground])
-            
             // 2
             let activityCategory = UNNotificationCategory(
                 identifier: Identifiers.activityCategory, actions: [viewActivityAction],
@@ -141,9 +140,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self?.getNotificationSettings()
             self?.setFCMToken()
         }
-        
-//            application.registerForRemoteNotifications()
-        
     }
     
     func getNotificationSettings() {

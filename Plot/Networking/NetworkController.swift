@@ -50,6 +50,7 @@ class NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
+            self.isRunning = false
             completion()
         }
     }
@@ -58,6 +59,11 @@ class NetworkController {
         userService.grabContacts()
         conversationService.grabConversations()
         listService.grabLists()
+    }
+    
+    func newUserItems() {
+        createNewUserActivities()
+        sendWelcomeMessage()
     }
 }
 

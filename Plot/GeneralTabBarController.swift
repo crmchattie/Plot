@@ -27,6 +27,8 @@ class GeneralTabBarController: UITabBarController {
     
     fileprivate var isAppLoaded = false
     
+    fileprivate var isNewUser = false
+    
     let homeController = MasterActivityContainerController()
     let discoverController = DiscoverViewController()
     let settingsController = AccountSettingsController()
@@ -59,10 +61,15 @@ class GeneralTabBarController: UITabBarController {
         homeController.delegate = self
         setOnlineStatus()
         
-        networkController.setupKeyVariables {
-            self.homeController.networkController = self.networkController
-            self.discoverController.networkController = self.networkController
-            self.networkController.setupOtherVariables()
+        isNewUser = appDelegate.additionalUserInfo?.isNewUser ?? true
+        homeController.isNewUser = isNewUser
+                        
+        if !isNewUser {
+            networkController.setupKeyVariables {
+                self.homeController.networkController = self.networkController
+                self.discoverController.networkController = self.networkController
+                self.networkController.setupOtherVariables()
+            }
         }
         
         configureTabBar()
@@ -83,7 +90,6 @@ class GeneralTabBarController: UITabBarController {
         super.viewWillAppear(animated)
         
         if onceToken == 0 {
-            print("token equals 0")
             splashContainer.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             splashContainer.navigationBar.barTintColor = ThemeManager.currentTheme().generalBackgroundColor
             splashContainer.viewForSatausbarSafeArea.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -93,7 +99,6 @@ class GeneralTabBarController: UITabBarController {
             splashContainer.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
             splashContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
-        print("token equals 1")
         onceToken = 1
     }
     
@@ -167,13 +172,6 @@ class GeneralTabBarController: UITabBarController {
         newNavigationController.modalPresentationStyle = .fullScreen
         present(newNavigationController, animated: false, completion: nil)
     }
-    
-    fileprivate func addNewUserItems() {
-        if let isNewUser = appDelegate.additionalUserInfo?.isNewUser, isNewUser {
-            networkController.createNewUserActivities()
-            networkController.sendWelcomeMessage()
-        }
-    }
 }
 
 extension GeneralTabBarController: ManageAppearanceHome {
@@ -190,5 +188,7 @@ extension GeneralTabBarController: ManageAppearanceHome {
         } else {
             splashContainer.showSecuredData()
         }
+        
+        print("appDelegate.additionalUserInfo?.isNewUser \(appDelegate.additionalUserInfo?.isNewUser)")
     }
 }

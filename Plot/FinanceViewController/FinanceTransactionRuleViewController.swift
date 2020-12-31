@@ -16,7 +16,6 @@ class FinanceTransactionRuleViewController: FormViewController {
     var transaction: Transaction!
     var user: MXUser!
     
-    
     var active: Bool = true
     
     let numberFormatter = NumberFormatter()

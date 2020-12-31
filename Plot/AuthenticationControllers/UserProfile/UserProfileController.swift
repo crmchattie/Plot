@@ -137,7 +137,6 @@ extension UserProfileController {
                 AnalyticsParameterMethod: self.method
             ])
             self.dismiss(animated: true) {
-                print("dismissed UserProfile Controller")
                 AppUtility.lockOrientation(.allButUpsideDown)
             }
         }
