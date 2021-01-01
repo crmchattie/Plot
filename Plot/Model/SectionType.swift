@@ -203,7 +203,7 @@ enum SectionType: Hashable, CaseIterable {
         case .medium: return "Medium"
         case .strength: return "Strength"
         case .search: return "Search"
-        case .activity: return "Activity"
+        case .activity: return "Event"
         case .transactionCategories: return "Transactions - Subcategories"
         case .transactionTopLevelCategories: return "Transactions - Categories"
         case .transactionGroups: return "Transactions - Groups"

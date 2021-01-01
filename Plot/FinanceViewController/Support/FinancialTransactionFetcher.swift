@@ -73,6 +73,7 @@ class FinancialTransactionFetcher: NSObject {
                             group.leave()
                         })
                     } else {
+                        print("else")
                         group.enter()
                         ref.child(financialTransactionsEntity).child(transactionID).observeSingleEvent(of: .value, with: { transactionSnapshot in
                             if transactionSnapshot.exists(), let transactionSnapshotValue = transactionSnapshot.value {
