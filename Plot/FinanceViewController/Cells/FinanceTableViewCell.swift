@@ -126,7 +126,7 @@ class FinanceTableViewCell: UITableViewCell {
         stackView.distribution = .fill
         
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 0, left: 16, bottom: 20, right: 16))
+        stackView.fillSuperview(padding: .init(top: 0, left: 10, bottom: 20, right: 10))
     }
     
     override func prepareForReuse() {

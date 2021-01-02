@@ -73,7 +73,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
         stackView.spacing = 10
         stackView.alignment = .center
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 10, left: 0, bottom: 0, right: 0))
+        stackView.fillSuperview(padding: .init(top: 10, left: 10, bottom: 0, right: 10))
 
     }
     

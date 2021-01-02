@@ -163,7 +163,14 @@ class CreateActivityViewController: FormViewController {
     }
     
     fileprivate func setupMainView() {
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         navigationItem.title = "Activity"
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
@@ -458,15 +465,15 @@ class CreateActivityViewController: FormViewController {
                     let endDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
                     
                     if row.value ?? false {
-                        startDate.dateFormatter?.dateStyle = .full
+                        startDate.dateFormatter?.dateStyle = .long
                         startDate.dateFormatter?.timeStyle = .none
-                        endDate.dateFormatter?.dateStyle = .full
+                        endDate.dateFormatter?.dateStyle = .long
                         endDate.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        startDate.dateFormatter?.dateStyle = .full
+                        startDate.dateFormatter?.dateStyle = .long
                         startDate.dateFormatter?.timeStyle = .short
-                        endDate.dateFormatter?.dateStyle = .full
+                        endDate.dateFormatter?.dateStyle = .long
                         endDate.dateFormatter?.timeStyle = .short
                     }
                     startDate.updateCell()
@@ -487,16 +494,16 @@ class CreateActivityViewController: FormViewController {
                 $0.title = $0.tag
                 $0.minuteInterval = 5
                 $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.dateStyle = .long
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
                     if self.activity.allDay == true {
-                        $0.dateFormatter?.dateStyle = .full
+                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .full
+                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .short
                     }
                     
@@ -559,16 +566,16 @@ class CreateActivityViewController: FormViewController {
                 $0.title = $0.tag
                 $0.minuteInterval = 5
                 $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.dateStyle = .long
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
                     if self.activity.allDay == true {
-                        $0.dateFormatter?.dateStyle = .full
+                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .full
+                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .short
                     }
                     $0.updateCell()
@@ -1959,16 +1966,16 @@ class CreateActivityViewController: FormViewController {
             createActivity.createNewActivity()
             hideActivityIndicator()
             if active {
-                self.navigationController?.backToViewController(viewController: MasterActivityContainerController.self)
+                self.navigationController?.popViewController(animated: true)
             } else {
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 1)
-                    homeTab.changeToIndex(index: 1)
-                }
+//                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                if nav.topViewController is MasterActivityContainerController {
+//                    let homeTab = nav.topViewController as! MasterActivityContainerController
+//                    homeTab.customSegmented.setIndex(index: 1)
+//                    homeTab.changeToIndex(index: 1)
+//                }
                 self.tabBarController?.selectedIndex = 1
-                self.navigationController?.backToViewController(viewController: ActivityTypeViewController.self)
+                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
             }
         }
     }
@@ -2044,10 +2051,10 @@ class CreateActivityViewController: FormViewController {
             }))
         }
         
-        alert.addAction(UIAlertAction(title: "Share Activity", style: .default, handler: { (_) in
-            print("User click Edit button")
-            self.share()
-        }))
+//        alert.addAction(UIAlertAction(title: "Share Activity", style: .default, handler: { (_) in
+//            print("User click Edit button")
+//            self.share()
+//        }))
 
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")

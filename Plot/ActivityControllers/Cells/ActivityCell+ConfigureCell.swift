@@ -77,12 +77,7 @@ extension ActivityCell {
         return (numberOfLines, value)
     }
     
-    func configureCell(for indexPath: IndexPath, activity: Activity, withInvitation invitation: Invitation?) {
-        
-        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        
+    func configureCell(for indexPath: IndexPath, activity: Activity, withInvitation invitation: Invitation?) {        
         self.invitation = invitation
         self.activity = activity
         
@@ -96,17 +91,17 @@ extension ActivityCell {
         startLabel.numberOfLines = dateTimeValueArray.0
         startLabel.text = dateTimeValueArray.1
                 
-        if activity.category != nil {
-            activityTypeLabel.text = activity.category
-        } else {
-            activityTypeLabel.text = nil
-        }
-        
-        if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
-            activityAddressLabel.text = activity.locationName
-        } else {
-            activityAddressLabel.text = nil
-        }
+//        if activity.category != nil {
+//            activityTypeLabel.text = activity.category
+//        } else {
+//            activityTypeLabel.text = nil
+//        }
+//        
+//        if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
+//            activityAddressLabel.text = activity.locationName
+//        } else {
+//            activityAddressLabel.text = nil
+//        }
         
         if let invitation = invitation {
             invitationSegmentedControl.isHidden = false
@@ -176,12 +171,6 @@ extension ActivityCell {
             chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
         } else {
             chatButton.tintColor = .systemBlue
-        }
-        
-        if activity.grocerylistID == nil && activity.checklistIDs == nil && activity.packinglistIDs == nil {
-            listButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-        } else {
-            listButton.tintColor = .systemBlue
         }
         
     }

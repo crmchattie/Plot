@@ -17,7 +17,7 @@ struct MessageSubtitle {
   static let empty = "No messages here yet."
 }
 
-class Message: NSObject  {
+class Message: NSObject {
   
     var messageUID: String?
     var isInformationMessage: Bool?
@@ -57,6 +57,8 @@ class Message: NSObject  {
     var activityImageURL: String?
     var activityCategory: String?
     var activitySubcategory: String?
+    
+    
       
     func chatPartnerId() -> String? {
         return fromId == Auth.auth().currentUser?.uid ? toId : fromId

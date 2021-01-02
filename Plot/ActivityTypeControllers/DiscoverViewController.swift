@@ -19,22 +19,15 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
-    var customTypes: [CustomType] = [.basic, .meal, .workout, .mood, .mindfulness, .sleep, .work, .transaction, .financialAccount]
-    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mood, .mindfulness, .sleep, .work, .customTransaction, .customFinancialAccount]
+    var customTypes: [CustomType] = [.basic, .meal, .workout, .mindfulness, .mood, .transaction, .financialAccount, .transactionRule]
+    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mindfulness, .mood, .customTransaction, .customFinancialAccount, .customTransactionRule]
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0
-        
-    var users = [User]()
-    var filteredUsers = [User]()
-    var selectedFalconUsers = [User]()
-    var activities = [Activity]()
-    var conversations = [Conversation]()
-    var conversation: Conversation?
-    var listList = [ListContainer]()
-    var mxUser: MXUser!
-        
+    
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
+    
+    var networkController = NetworkController()
     
     init() {
         
@@ -50,11 +43,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             section.orthogonalScrollingBehavior = .groupPaging
             section.contentInsets.leading = 16
             
-//            let kind = UICollectionView.elementKindSectionHeader
-//            section.boundarySupplementaryItems = [
-//                .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(30)), elementKind: kind, alignment: .topLeading)
-//            ]
-            
             return section
         }
         
@@ -65,11 +53,9 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         fatalError("init(coder:) has not been implemented")
     }
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.addSubview(activityIndicatorView)
-        activityIndicatorView.centerInSuperview()
         
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = false
@@ -173,34 +159,31 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             case .basic:
                 let destination = CreateActivityViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .flight:
                 let destination = FlightSearchViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .meal:
                 let destination = MealViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
+                destination.users = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .workout:
                 let destination = WorkoutViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mindfulness:
                 let destination = MindfulnessViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mood:
                 let destination = MoodViewController()
@@ -219,38 +202,49 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             case .transaction:
                 let destination = FinanceTransactionViewController()
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .financialAccount:
-                if let user = self.mxUser {
-                    let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
-                    let custom = UIAlertAction(title: "Manual Entry", style: .default) { (action:UIAlertAction) in
-                        let destination = FinanceAccountViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.users = self.users
-                        destination.filteredUsers = self.filteredUsers
-                        self.navigationController?.pushViewController(destination, animated: true)
-                    }
-                    let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
-                        self.openMXConnect(guid: user.guid, current_member_guid: nil)
-                    }
-                    let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
-                        print("You've pressed cancel")
-                    }
-                    accountAlertController.addAction(custom)
-                    accountAlertController.addAction(automatic)
-                    accountAlertController.addAction(cancelAlert)
-                    self.present(accountAlertController, animated: true, completion: nil)
-                    
-                }
-            case .transactionRule:
-                if let user = self.mxUser {
-                    let destination = FinanceTransactionRuleViewController()
+                let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
+                let custom = UIAlertAction(title: "Manual Entry", style: .default) { (action:UIAlertAction) in
+                    let destination = FinanceAccountViewController()
                     destination.hidesBottomBarWhenPushed = true
-                    destination.user = user
+                    destination.users = self.networkController.userService.users
+                    destination.filteredUsers = self.networkController.userService.users
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
+                let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
+                    if let mxUser = self.networkController.financeService.mxUser {
+                        self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+                    } else {
+                        self.networkController.financeService.getMXUser { (mxUser) in
+                            if let mxUser = self.networkController.financeService.mxUser {
+                                self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+                            }
+                        }
+                    }
+                }
+                let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
+                    print("You've pressed cancel")
+                }
+                accountAlertController.addAction(custom)
+                accountAlertController.addAction(automatic)
+                accountAlertController.addAction(cancelAlert)
+                self.present(accountAlertController, animated: true, completion: nil)
+            case .transactionRule:
+                let destination = FinanceTransactionRuleViewController()
+                destination.hidesBottomBarWhenPushed = true
+                if let mxUser = networkController.financeService.mxUser {
+                    destination.user = mxUser
                     let navigationViewController = UINavigationController(rootViewController: destination)
                     self.present(navigationViewController, animated: true, completion: nil)
+                } else {
+                    self.networkController.financeService.getMXUser { (mxUser) in
+                        destination.user = mxUser
+                        let navigationViewController = UINavigationController(rootViewController: destination)
+                        self.present(navigationViewController, animated: true, completion: nil)
+                    }
                 }
             default:
                 print("default")
@@ -269,20 +263,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         snapshot.deleteAllItems()
         self.diffableDataSource.apply(snapshot)
                         
-//        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
-//            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
-//            header.delegate = self
-//            let snapshot = self.diffableDataSource.snapshot()
-//            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
-//                header.titleLabel.text = section.name
-//                header.subTitleLabel.isHidden = true
-//            }
-//            
-//            return header
-//        })
-        
-        activityIndicatorView.startAnimating()
-                
         let dispatchGroup = DispatchGroup()
         
         for section in sections {
@@ -295,27 +275,12 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             
             dispatchGroup.notify(queue: .main) {
                 if let object = self.groups[section] {
-                    activityIndicatorView.stopAnimating()
                     snapshot.appendSections([section])
                     snapshot.appendItems(object, toSection: section)
                     self.diffableDataSource.apply(snapshot)
                 }
             }
         }
-    }
-    
-    func showActivityIndicator() {
-        if let navController = self.navigationController {
-            self.showSpinner(onView: navController.view)
-        } else {
-            self.showSpinner(onView: self.view)
-        }
-        self.navigationController?.view.isUserInteractionEnabled = false
-    }
-    
-    func hideActivityIndicator() {
-        self.navigationController?.view.isUserInteractionEnabled = true
-        self.removeSpinner()
     }
     
     func openMXConnect(guid: String, current_member_guid: String?) {
@@ -371,12 +336,8 @@ extension DiscoverViewController: CompositionalHeaderDelegate {
         case "Activity":
             let destination = ActivityTypeViewController()
             destination.hidesBottomBarWhenPushed = true
-            destination.users = users
-            destination.filteredUsers = filteredUsers
-            destination.conversations = conversations
-            destination.activities = activities
-            destination.conversation = conversation
-            destination.listList = listList
+            destination.users = networkController.userService.users
+            destination.filteredUsers = networkController.userService.users
             navigationController?.pushViewController(destination, animated: true)
         default:
             print("Default")
@@ -386,10 +347,6 @@ extension DiscoverViewController: CompositionalHeaderDelegate {
 
 extension DiscoverViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        if let nav = self.tabBarController, let containerVC = nav.viewControllers![1] as? UINavigationController {
-            if containerVC.topViewController is MasterActivityContainerController, let containerTab = containerVC.topViewController as? MasterActivityContainerController {
-                containerTab.financeVC.getMXData()
-            }
-        }
+        networkController.financeService.getMXData()
     }
 }

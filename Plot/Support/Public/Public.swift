@@ -1599,10 +1599,17 @@ class TapGesture: UITapGestureRecognizer {
 }
 
 extension Date {
+    var localTime: Date {
+        let timezoneOffset =  TimeZone.current.secondsFromGMT()
+        let epochDate = self.timeIntervalSince1970
+        let timezoneEpochOffset = (epochDate + Double(timezoneOffset))
+        return Date(timeIntervalSince1970: timezoneEpochOffset)
+    }
+    
     var startOfDay: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        return cal.startOfDay(for: self)
+        return cal.startOfDay(for: localTime)
     }
     
     var endOfDay: Date {
@@ -1614,20 +1621,19 @@ extension Date {
     var startOfWeek: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        return cal.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date!
+        return cal.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: localTime).date!
     }
 
     var endOfWeek: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        let startOfWeek = cal.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date!
         return cal.date(byAdding: .day, value: 7, to: startOfWeek)!
     }
 
     var startOfMonth: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        let components = cal.dateComponents([.year, .month], from: self)
+        let components = cal.dateComponents([.year, .month], from: localTime)
         return cal.date(from: components)!
     }
 
@@ -1640,7 +1646,7 @@ extension Date {
     var startOfYear: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        let components = cal.dateComponents([.year], from: self)
+        let components = cal.dateComponents([.year], from: localTime)
         return  cal.date(from: components)!
     }
 
@@ -1713,5 +1719,22 @@ extension TimeInterval {
     
     var totalHours: Double {
         return self / 3600
+    }
+}
+
+public class UITableViewWithReloadCompletion: UITableView {
+    
+    var reloadDataCompletionBlock: (() -> Void)?
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.reloadDataCompletionBlock?()
+        self.reloadDataCompletionBlock = nil
+    }
+    
+    func reloadDataWithCompletion(completion:@escaping () -> Void) {
+        reloadDataCompletionBlock = completion
+        self.reloadData()
     }
 }

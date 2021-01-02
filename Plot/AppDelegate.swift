@@ -30,7 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     var notifications: [PLNotification] = []
-    var additionalUserInfo: AdditionalUserInfo?
     var participants: [String: [User]] = [:]
     let invitationsFetcher = InvitationsFetcher()
     
@@ -52,9 +51,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         tabBarController.presentOnboardingController()
         
-        registerForPushNotifications(application: application)
+        //register after user is no longer new user
+        if Auth.auth().currentUser != nil {
+            registerForPushNotifications(application: application)
+        }
         
-        RunLoop.current.run(until: NSDate(timeIntervalSinceNow:3) as Date)
+        RunLoop.current.run(until: NSDate(timeIntervalSinceNow:2) as Date)
         
         return true
     }
@@ -100,10 +102,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 identifier: Identifiers.viewListsAction, title: "View Lists",
                 options: [.foreground])
             
-            //                let replyChatAction = UNTextInputNotificationAction(
-            //                    identifier: Identifiers.viewAction, title: "Reply to Message",
-            //                    options: [.foreground])
-            
             // 2
             let activityCategory = UNNotificationCategory(
                 identifier: Identifiers.activityCategory, actions: [viewActivityAction],
@@ -141,9 +139,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self?.getNotificationSettings()
             self?.setFCMToken()
         }
-        
-//            application.registerForRemoteNotifications()
-        
     }
     
     func getNotificationSettings() {
@@ -281,16 +276,15 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         // 2
         if let aps = userInfo["aps"] as? [String: AnyObject] {
-            print(aps)
             switch response.actionIdentifier {
             case Identifiers.viewChatsAction:
-                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 1)
+//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 1)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             case Identifiers.viewActivitiesAction:
-                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
+//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             case Identifiers.viewListsAction:
-                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 3)
+//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 3)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
                 if let chatID = userInfo["chatID"] as? String {

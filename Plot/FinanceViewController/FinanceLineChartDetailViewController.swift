@@ -18,13 +18,11 @@ protocol UpdateFinancialsDelegate: class {
     func updateAccounts(accounts: [MXAccount])
 }
 
-class FinanceLineChartViewController: UIViewController {
+class FinanceLineChartDetailViewController: UIViewController {
     
     weak var delegate : UpdateFinancialsDelegate?
     
     private let kFinanceTableViewCell = "FinanceTableViewCell"
-    
-    var user: MXUser!
     
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
@@ -79,6 +77,13 @@ class FinanceLineChartViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
         
         barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
         navigationItem.rightBarButtonItem = barButton
@@ -305,7 +310,7 @@ class FinanceLineChartViewController: UIViewController {
     }
 }
 
-extension FinanceLineChartViewController: ChartViewDelegate {
+extension FinanceLineChartDetailViewController: ChartViewDelegate {
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
         
     }
@@ -323,7 +328,7 @@ extension FinanceLineChartViewController: ChartViewDelegate {
     }
 }
 
-extension FinanceLineChartViewController: UITableViewDelegate, UITableViewDataSource {
+extension FinanceLineChartDetailViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let transactions = viewModel.transactions, !transactions.isEmpty {
             return transactions.count
@@ -379,7 +384,7 @@ enum TimeSegmentType: Int {
     case year
 }
 
-extension FinanceLineChartViewController: UpdateAccountDelegate {
+extension FinanceLineChartDetailViewController: UpdateAccountDelegate {
     func updateAccount(account: MXAccount) {
         if let index = viewModel.accounts!.firstIndex(of: account) {
             viewModel.accounts![index] = account
@@ -387,7 +392,7 @@ extension FinanceLineChartViewController: UpdateAccountDelegate {
     }
 }
 
-extension FinanceLineChartViewController: UpdateTransactionDelegate {
+extension FinanceLineChartDetailViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         if let index = viewModel.transactions!.firstIndex(of: transaction) {
             viewModel.transactions![index] = transaction

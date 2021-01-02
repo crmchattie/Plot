@@ -28,7 +28,7 @@ class GrocerylistActions: NSObject {
     
     }
     
-    public func deleteGrocerylist() {
+    func deleteGrocerylist() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -46,7 +46,7 @@ class GrocerylistActions: NSObject {
                 
     }
     
-    public func createNewGrocerylist() {
+    func createNewGrocerylist() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -90,7 +90,7 @@ class GrocerylistActions: NSObject {
         }
     }
     
-    public func updateGrocerylistParticipants() {
+    func updateGrocerylistParticipants() {
         guard let _ = active, let grocerylist = grocerylist, let ID = ID else {
             return
         }

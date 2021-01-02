@@ -182,8 +182,6 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.recipe = self.detailedRecipe
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -210,8 +208,6 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.recipe = self.detailedRecipe
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -245,12 +241,12 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                                         
-                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                    if nav.topViewController is MasterActivityContainerController {
-                        let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 1)
-                        homeTab.changeToIndex(index: 1)
-                    }
+//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                    if nav.topViewController is MasterActivityContainerController {
+//                        let homeTab = nav.topViewController as! MasterActivityContainerController
+//                        homeTab.customSegmented.setIndex(index: 1)
+//                        homeTab.changeToIndex(index: 1)
+//                    }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
                         self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
@@ -281,8 +277,6 @@ extension RecipeDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.recipe = self.detailedRecipe
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -741,8 +735,6 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.workout = self.workout
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -766,8 +758,6 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.workout = self.workout
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -799,12 +789,12 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                     
-                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                    if nav.topViewController is MasterActivityContainerController {
-                        let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 1)
-                        homeTab.changeToIndex(index: 1)
-                    }
+//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                    if nav.topViewController is MasterActivityContainerController {
+//                        let homeTab = nav.topViewController as! MasterActivityContainerController
+//                        homeTab.customSegmented.setIndex(index: 1)
+//                        homeTab.changeToIndex(index: 1)
+//                    }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
                         self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
@@ -835,8 +825,6 @@ extension WorkoutDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.workout = self.workout
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1300,8 +1288,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.event = self.event
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1325,8 +1311,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.event = self.event
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1358,12 +1342,12 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                                         
-                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                    if nav.topViewController is MasterActivityContainerController {
-                        let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 1)
-                        homeTab.changeToIndex(index: 1)
-                    }
+//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                    if nav.topViewController is MasterActivityContainerController {
+//                        let homeTab = nav.topViewController as! MasterActivityContainerController
+//                        homeTab.customSegmented.setIndex(index: 1)
+//                        homeTab.changeToIndex(index: 1)
+//                    }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
                         self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
@@ -1394,8 +1378,6 @@ extension EventDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.event = self.event
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1863,8 +1845,6 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
                 
@@ -1887,8 +1867,6 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.fsVenue = self.place
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)
@@ -1920,12 +1898,12 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                     createActivity.createNewActivity()
                     self.hideActivityIndicator()
                     
-                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                    if nav.topViewController is MasterActivityContainerController {
-                        let homeTab = nav.topViewController as! MasterActivityContainerController
-                        homeTab.customSegmented.setIndex(index: 1)
-                        homeTab.changeToIndex(index: 1)
-                    }
+//                    let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                    if nav.topViewController is MasterActivityContainerController {
+//                        let homeTab = nav.topViewController as! MasterActivityContainerController
+//                        homeTab.customSegmented.setIndex(index: 1)
+//                        homeTab.changeToIndex(index: 1)
+//                    }
                     self.tabBarController?.selectedIndex = 1
                     if #available(iOS 13.0, *) {
                         self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
@@ -1956,8 +1934,6 @@ extension PlaceDetailViewController: ActivityDetailCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.fsVenue = self.place
                 destination.activityType = self.activityType
                 self.present(navController, animated: true, completion: nil)

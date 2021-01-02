@@ -38,6 +38,10 @@ class MealProductSearchViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
         // Do any additional setup after loading the view, typically from a nib.
         setupSearchController()
         setupMainView()
@@ -92,7 +96,7 @@ class MealProductSearchViewController: UIViewController {
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
         }
-        navigationItem.title = "Item Search"
+        navigationItem.title = "Food Item Search"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     }
     

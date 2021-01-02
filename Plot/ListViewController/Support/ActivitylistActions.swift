@@ -28,7 +28,7 @@ class ActivitylistActions: NSObject {
     
     }
     
-    public func deleteActivitylist() {
+    func deleteActivitylist() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -46,7 +46,7 @@ class ActivitylistActions: NSObject {
                 
     }
     
-    public func createNewActivitylist() {
+    func createNewActivitylist() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -92,7 +92,7 @@ class ActivitylistActions: NSObject {
         }
     }
     
-    public func updateActivitylistParticipants() {
+    func updateActivitylistParticipants() {
         guard let _ = active, let activitylist = activitylist, let ID = ID else {
             return
         }

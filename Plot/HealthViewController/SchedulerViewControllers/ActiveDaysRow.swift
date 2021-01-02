@@ -17,10 +17,9 @@ final class ActiveDaysCell: Cell<[Int]>, CellType {
         textLabel?.textColor = .clear
         selectionStyle = .none
         backgroundColor = .clear
-        
+
         let stackView = UIStackView(arrangedSubviews: [customSegmentControl])
         stackView.alignment = .center
-        
         contentView.addSubview(stackView)
         stackView.fillSuperview()
                         

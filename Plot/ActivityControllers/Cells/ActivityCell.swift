@@ -19,8 +19,7 @@ class ActivityCell: UITableViewCell {
     
     var invitationSegmentHeightConstraint: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
-    let invitationSegmentedControlTopAnchorShowAvatar: CGFloat = 35
-    let invitationSegmentedControlTopAnchorRegular: CGFloat = 17
+    let invitationSegmentedControlTopAnchorRegular: CGFloat = 10
     let invitationSegmentHeightConstant: CGFloat = 29
     var invitation: Invitation?
     var participants: [User] = []
@@ -86,15 +85,15 @@ class ActivityCell: UITableViewCell {
     }()
     
     //activity type label (e.g. drinks, trip)
-    let activityTypeLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.numberOfLines = 1
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+//    let activityTypeLabel: UILabel = {
+//        let label = UILabel()
+//        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+//        label.adjustsFontForContentSizeCategory = true
+//        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//        label.numberOfLines = 1
+//        label.translatesAutoresizingMaskIntoConstraints = false
+//        return label
+//    }()
     
     //activity participants label (e.g. whoever is invited to activity)
     let activityParticipantsLabel: UILabel = {
@@ -108,16 +107,16 @@ class ActivityCell: UITableViewCell {
     }()
     
     //activity address label (e.g. address of restaurant, initial lodgings with trip)
-    let activityAddressLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.numberOfLines = 1
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.isUserInteractionEnabled = true
-        return label
-    }()
+//    let activityAddressLabel: UILabel = {
+//        let label = UILabel()
+//        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+//        label.adjustsFontForContentSizeCategory = true
+//        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//        label.numberOfLines = 1
+//        label.translatesAutoresizingMaskIntoConstraints = false
+//        label.isUserInteractionEnabled = true
+//        return label
+//    }()
     
     let invitationSegmentedControl: UISegmentedControl = {
         let items = ["Accept" , "Decline"]
@@ -172,70 +171,57 @@ class ActivityCell: UITableViewCell {
         return button
     }()
     
-    let listButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "list"), for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
                 
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
         activityImageView.addSubview(startLabel)
-        activityImageView.addSubview(activityTypeLabel)
-        activityImageView.addSubview(activityAddressLabel)
+//        activityImageView.addSubview(activityTypeLabel)
+//        activityImageView.addSubview(activityAddressLabel)
         activityImageView.addSubview(muteIndicator)
         activityImageView.addSubview(newActivityIndicator)
         activityImageView.addSubview(invitationSegmentedControl)
         activityImageView.addSubview(badgeLabel)
         activityImageView.addSubview(activityTypeButton)
         activityImageView.addSubview(chatButton)
-        activityImageView.addSubview(listButton)
         activityImageView.addSubview(mapButton)
         
-        activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4).isActive = true
-        activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4).isActive = true
-        activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
-        activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
+        activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true
+        activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0).isActive = true
+        activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 5).isActive = true
+        activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -20).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
         startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
         startLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
-        
-        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
-        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-        activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
-        
-        activityAddressLabel.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: 2).isActive = true
-        activityAddressLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-        activityAddressLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+//
+//        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
+//        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
+//        activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+//
+//        activityAddressLabel.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: 2).isActive = true
+//        activityAddressLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
+//        activityAddressLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
         activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 5).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        activityTypeButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
-        activityTypeButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
+        activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
-        chatButton.topAnchor.constraint(equalTo: activityTypeButton.bottomAnchor, constant: 5).isActive = true
+        chatButton.topAnchor.constraint(equalTo: activityTypeButton.bottomAnchor, constant: 10).isActive = true
         chatButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        chatButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
-        chatButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
+        chatButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        chatButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
-        listButton.topAnchor.constraint(equalTo: chatButton.bottomAnchor, constant: 5).isActive = true
-        listButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -2).isActive = true
-        listButton.widthAnchor.constraint(equalToConstant: 35).isActive = true
-        listButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
-        
-        mapButton.topAnchor.constraint(equalTo: listButton.bottomAnchor, constant: 5).isActive = true
+        mapButton.topAnchor.constraint(equalTo: chatButton.bottomAnchor, constant: 10).isActive = true
         mapButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        mapButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
-        mapButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
+        mapButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        mapButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
         var x: CGFloat = 5
         for _ in 0..<thumbnailsCount {
@@ -247,7 +233,7 @@ class ActivityCell: UITableViewCell {
             icon.layer.cornerRadius = 15
             icon.layer.masksToBounds = true
             icon.image = UIImage(named: "UserpicIcon")
-            icon.topAnchor.constraint(equalTo: activityAddressLabel.bottomAnchor, constant: 8).isActive = true
+            icon.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 8).isActive = true
 //            icon.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
             icon.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: x).isActive = true
             icon.widthAnchor.constraint(equalToConstant: 30).isActive = true
@@ -294,8 +280,8 @@ class ActivityCell: UITableViewCell {
         activityImageView.sd_cancelCurrentImageLoad()
         nameLabel.text = nil
         startLabel.text = nil
-        activityTypeLabel.text = nil
-        activityAddressLabel.text = nil
+//        activityTypeLabel.text = nil
+//        activityAddressLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         newActivityIndicator.isHidden = true

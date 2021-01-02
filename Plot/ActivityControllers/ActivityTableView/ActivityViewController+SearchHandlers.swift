@@ -32,14 +32,6 @@ extension ActivityViewController: UISearchBarDelegate, UISearchControllerDelegat
                 }
                 return ("").lowercased().contains(searchText.lowercased())
             })
-
-        filteredPinnedActivities = searchText.isEmpty ? pinnedActivities :
-            pinnedActivities.filter({ (activity) -> Bool in
-                if let name = activity.name {
-                    return name.lowercased().contains(searchText.lowercased())
-                }
-                return ("").lowercased().contains(searchText.lowercased())
-            })
         
         handleReloadTableAfterSearch()
     }

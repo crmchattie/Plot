@@ -28,7 +28,7 @@ class MoodActions: NSObject {
     
     }
     
-    public func deleteMood() {
+    func deleteMood() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -42,7 +42,7 @@ class MoodActions: NSObject {
                 
     }
     
-    public func createNewMood() {
+    func createNewMood() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }

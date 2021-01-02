@@ -44,6 +44,14 @@ class FinanceTransactionViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
         setupVariables()
@@ -161,12 +169,12 @@ class FinanceTransactionViewController: FormViewController {
                 self.delegate?.updateTransaction(transaction: transaction)
                 self.navigationController?.popViewController(animated: true)
             } else {
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 3)
-                    homeTab.changeToIndex(index: 3)
-                }
+//                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                if nav.topViewController is MasterActivityContainerController {
+//                    let homeTab = nav.topViewController as! MasterActivityContainerController
+//                    homeTab.customSegmented.setIndex(index: 3)
+//                    homeTab.changeToIndex(index: 3)
+//                }
                 self.tabBarController?.selectedIndex = 1
                 if #available(iOS 13.0, *) {
                     self.navigationController?.backToViewController(viewController: DiscoverViewController.self)

@@ -19,6 +19,14 @@ class MoodViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         title = "Mood"
         setupVariables()
         configureTableView()
@@ -65,18 +73,14 @@ class MoodViewController: FormViewController {
             if active {
                 self.navigationController?.popViewController(animated: true)
             } else {
-                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-                if nav.topViewController is MasterActivityContainerController {
-                    let homeTab = nav.topViewController as! MasterActivityContainerController
-                    homeTab.customSegmented.setIndex(index: 2)
-                    homeTab.changeToIndex(index: 2)
-                }
+//                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
+//                if nav.topViewController is MasterActivityContainerController {
+//                    let homeTab = nav.topViewController as! MasterActivityContainerController
+//                    homeTab.customSegmented.setIndex(index: 2)
+//                    homeTab.changeToIndex(index: 2)
+//                }
                 self.tabBarController?.selectedIndex = 1
-                if #available(iOS 13.0, *) {
-                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-                } else {
-                    // Fallback on earlier versions
-                }
+                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
             }
         }
     }

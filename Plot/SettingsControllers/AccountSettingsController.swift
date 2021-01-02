@@ -10,15 +10,14 @@ import UIKit
 import Firebase
 import ARSLineProgress
 
-class AccountSettingsController: UITableViewController {
-    
+class AccountSettingsController: UITableViewController {    
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
     
     let accountSettingsCellId = "userProfileCell"
     
-    var firstSection = [( icon: UIImage(named: "Accounts") , title: "Calendar, Financial & Health Info" ), ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
+    var firstSection = [( icon: UIImage(named: "Accounts") , title: "Financial Info" ), ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
                         ( icon: UIImage(named: "Privacy") , title: "Privacy and Security" ),
                         ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
                         ( icon: UIImage(named: "DataStorage") , title: "Data and Storage")]
@@ -32,14 +31,6 @@ class AccountSettingsController: UITableViewController {
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     let nightMode = UIButton()
     
-    var users = [User]()
-    var filteredUsers = [User]()
-    var activities = [Activity]()
-    var invitedActivities = [Activity]()
-    var conversations = [Conversation]()
-    var listList = [ListContainer]()
-    var invitations = [String: Invitation]()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -48,6 +39,8 @@ class AccountSettingsController: UITableViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView = UITableView(frame: tableView.frame, style: .grouped)
         
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
@@ -127,9 +120,6 @@ class AccountSettingsController: UITableViewController {
         
         let rightBarButton = UIBarButtonItem(customView: nightMode)
         navigationItem.setRightBarButton(rightBarButton, animated: false)
-        
-        let notificationsBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell"), style: .plain, target: self, action: #selector(goToNotifications))
-        navigationItem.leftBarButtonItem = notificationsBarButton
     }
     
     @objc fileprivate func changeTheme() {
@@ -204,20 +194,6 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.name.text = ""
         userProfileContainerView.phone.text = ""
         userProfileContainerView.profileImageView.image = nil
-    }
-    
-    @objc func goToNotifications() {
-        let destination = NotificationsViewController()
-        destination.notificationActivities = activities
-        destination.invitedActivities = invitedActivities
-        destination.invitations = invitations
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        destination.conversations = conversations
-        destination.listList = listList
-        destination.sortInvitedActivities()
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func listenChanges() {

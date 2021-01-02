@@ -26,7 +26,7 @@ class CompositionalHeader: UICollectionReusableView {
         let label = UILabel()
         label.text = "Activity Type"
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = .boldSystemFont(ofSize: 30)
+        label.font = .boldSystemFont(ofSize: 25)
         label.isUserInteractionEnabled = true
         return label
     }()

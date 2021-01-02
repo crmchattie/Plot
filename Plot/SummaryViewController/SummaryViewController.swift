@@ -67,17 +67,6 @@ class SummaryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.addSubview(customSegmented)
-        view.addSubview(collectionView)
-        customSegmented.delegate = self
-        collectionView.dataSource = self
-        collectionView.delegate = self
-                
-        if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-            flowLayout.headerReferenceSize = CGSize(width: self.collectionView.frame.size.width, height: 35.0)
-        }
-        
         addObservers()
         configureView()
         fetchData()
@@ -115,7 +104,8 @@ class SummaryViewController: UIViewController {
         customSegmented.delegate = self
                 
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = view.backgroundColor
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.isUserInteractionEnabled = true
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(SummaryHKChartCell.self, forCellWithReuseIdentifier: summaryHKChartCell)
@@ -123,9 +113,7 @@ class SummaryViewController: UIViewController {
         collectionView.register(SummaryValueBarChartCell.self, forCellWithReuseIdentifier: summaryValueBarChartCell)
         collectionView.register(SummaryTimeBarChartCell.self, forCellWithReuseIdentifier: summaryTimeBarChartCell)
         collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
-        collectionView.isUserInteractionEnabled = true
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
         
         view.addSubview(customSegmented)
         view.addSubview(collectionView)

@@ -18,9 +18,7 @@ class FinanceBarChartViewController: UIViewController {
     weak var delegate : UpdateFinancialsDelegate?
     
     private let kFinanceTableViewCell = "FinanceTableViewCell"
-    
-    var user: MXUser!
-    
+        
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
@@ -74,6 +72,13 @@ class FinanceBarChartViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
         
         barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
         navigationItem.rightBarButtonItem = barButton

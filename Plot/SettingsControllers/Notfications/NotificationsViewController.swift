@@ -52,6 +52,8 @@ class NotificationsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
         
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
@@ -206,6 +208,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if segmentedControl.selectedSegmentIndex == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath)
+            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             if let activityCell = cell as? ActivityCell {
                 activityCell.delegate = self
                 activityCell.updateInvitationDelegate = self
@@ -247,6 +250,9 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             } else if notification.aps.category == Identifiers.grocerylistCategory {
                 button.setImage(UIImage(named: "list"), for: .normal)
                 cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 36, height: 30)
+            } else if notification.aps.category == Identifiers.activitylistCategory {
+                button.setImage(UIImage(named: "list"), for: .normal)
+                cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 36, height: 30)
             }
             return cell
         }
@@ -260,8 +266,10 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         } else {
             let notification = notifications[indexPath.row]
             if notification.aps.category == Identifiers.chatCategory {
-                if let chatID = notification.chatID {
-                    openChat(forConversation: chatID, activityID: nil)
+                if let chatID = notification.chatID, let chat = conversations.first(where: { (chat) -> Bool in
+                    chat.chatID == chatID
+                }) {
+                    openChatDetailView(forChat: chat)
                 }
             } else if notification.aps.category == Identifiers.activityCategory {
                 if let activityID = notification.activityID {
@@ -336,9 +344,11 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             if sender.tag >= 0 && sender.tag < notifications.count {
                 let notification = notifications[sender.tag]
                 if notification.aps.category == Identifiers.chatCategory {
+                    print("Identifiers.chatCategory")
                     if let chatID = notification.chatID, let chat = conversations.first(where: { (chat) -> Bool in
                         chat.chatID == chatID
                     }) {
+                        print("openChatDetailView")
                         openChatDetailView(forChat: chat)
                     }
                 }
@@ -802,158 +812,16 @@ extension NotificationsViewController: ActivityViewControllerDataStore {
 
 extension NotificationsViewController: ActivityCellDelegate {
     func openMap(forActivity activity: Activity) {
-//        guard currentReachabilityStatus != .notReachable else {
-//            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-//            return
-//        }
-//
-//        guard activity.locationAddress != nil else {
-//            return
-//        }
-//
-//        var locations = [activity]
-//
-//        if activity.schedule != nil {
-//            var scheduleList = [Activity]()
-//            var locationAddress = [String : [Double]]()
-//            locationAddress = activity.locationAddress!
-//            for schedule in activity.schedule! {
-//                if schedule.name == "nothing" { continue }
-//                scheduleList.append(schedule)
-//                guard let localAddress = schedule.locationAddress else { continue }
-//                for (key, value) in localAddress {
-//                    locationAddress[key] = value
-//                }
-//            }
-//            locations.append(contentsOf: scheduleList)
-//        }
-//
-//        let destination = MapViewController()
-//        destination.hidesBottomBarWhenPushed = true
-//        destination.sections = [.activity]
-//        destination.locations = [.activity: locations]
-//        navigationController?.pushViewController(destination, animated: true)
-        
-//        if locationAddress.count > 1 {
-//            let destination = MapViewController()
-//            destination.hidesBottomBarWhenPushed = true
-//            var locations = [activity]
-//            locations.append(contentsOf: scheduleList)
-//            destination.sections = [.activity]
-//            destination.locations = [.activity: locations]
-//            navigationController?.pushViewController(destination, animated: true)
-//        } else {
-//            let destination = MapActivityViewController()
-//            destination.hidesBottomBarWhenPushed = true
-//            destination.locationAddress = locationAddress
-//            navigationController?.pushViewController(destination, animated: true)
-//        }
+
     }
     
     func openChat(forConversation conversationID: String?, activityID: String?) {
-//        if conversationID == nil {
-//            let activity = notificationActivities.first(where: {$0.activityID == activityID})
-//            let destination = ChooseChatTableViewController()
-//            let navController = UINavigationController(rootViewController: destination)
-//            destination.delegate = self
-//            destination.activity = activity
-//            destination.conversations = conversations
-//            destination.pinnedConversations = conversations
-//            destination.filteredConversations = conversations
-//            destination.filteredPinnedConversations = conversations
-//            present(navController, animated: true, completion: nil)
-//        } else {
-//            let groupChatDataReference = Database.database().reference().child("groupChats").child(conversationID!).child(messageMetaDataFirebaseFolder)
-//            groupChatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-//                guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-//                dictionary.updateValue(conversationID as AnyObject, forKey: "id")
-//
-//                if let membersIDs = dictionary["chatParticipantsIDs"] as? [String:AnyObject] {
-//                    dictionary.updateValue(Array(membersIDs.values) as AnyObject, forKey: "chatParticipantsIDs")
-//                }
-//
-//                let conversation = Conversation(dictionary: dictionary)
-//
-//                if conversation.chatName == nil {
-//                    if let activityID = activityID, let participants = self.activitiesParticipants[activityID], participants.count > 0 {
-//                        let user = participants[0]
-//                        conversation.chatName = user.name
-//                        conversation.chatPhotoURL = user.photoURL
-//                        conversation.chatThumbnailPhotoURL = user.thumbnailPhotoURL
-//                    }
-//                }
-//
-//                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-//                self.messagesFetcher = MessagesFetcher()
-//                self.messagesFetcher?.delegate = self
-//                self.messagesFetcher?.loadMessagesData(for: conversation)
-//            })
-//        }
+
     }
 }
 
 extension NotificationsViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
-//        if let activityID = activityID {
-//            let updatedConversationID = ["conversationID": chatID as AnyObject]
-//            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-//
-//            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
-//                if conversation.activities != nil {
-//                    var activities = conversation.activities!
-//                    activities.append(activityID)
-//                    let updatedActivities = ["activities": activities as AnyObject]
-//                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-//                } else {
-//                    let updatedActivities = ["activities": [activityID] as AnyObject]
-//                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-//                }
-//                if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
-//                    let activity = activities[index]
-//                    if activity.grocerylistID != nil {
-//                        if conversation.grocerylists != nil {
-//                            var grocerylists = conversation.grocerylists!
-//                            grocerylists.append(activity.grocerylistID!)
-//                            let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
-//                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-//                        } else {
-//                            let updatedGrocerylists = [grocerylistsEntity: [activity.grocerylistID!] as AnyObject]
-//                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-//                        }
-//                        Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!).updateChildValues(updatedConversationID)
-//                    }
-//                    if activity.checklistIDs != nil {
-//                        if conversation.checklists != nil {
-//                            let checklists = conversation.checklists! + activity.checklistIDs!
-//                            let updatedChecklists = [checklistsEntity: checklists as AnyObject]
-//                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-//                        } else {
-//                            let updatedChecklists = [checklistsEntity: activity.checklistIDs! as AnyObject]
-//                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-//                        }
-//                        for ID in activity.checklistIDs! {
-//                            Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
-//
-//                        }
-//                    }
-//                    if activity.packinglistIDs != nil {
-//                        if conversation.packinglists != nil {
-//                            let packinglists = conversation.packinglists! + activity.packinglistIDs!
-//                            let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
-//                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-//                        } else {
-//                            let updatedPackinglists = [packinglistsEntity: activity.packinglistIDs! as AnyObject]
-//                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-//                        }
-//                       for ID in activity.packinglistIDs! {
-//                            Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
-//
-//                        }
-//                    }
-//                }
-//            }
-//            self.connectedToChatAlert()
-//            self.dismiss(animated: true, completion: nil)
-//        }
+
     }
 }

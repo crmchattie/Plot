@@ -997,7 +997,7 @@ extension WorkoutTypeViewController: ActivityTypeCellDelegate {
                 self.hideActivityIndicator()
                 
                 self.movingBackwards = false
-                (self.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
+//                (self.tabBarController?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
                 self.tabBarController?.selectedIndex = 1
             }))
             
@@ -1019,8 +1019,6 @@ extension WorkoutTypeViewController: ActivityTypeCellDelegate {
                 // ChooseActivityTableViewController
                 let destination = ChooseListTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
-                destination.lists = self.listList
-                destination.filteredLists = self.listList
                 destination.activityType = section?.image
                 if let object = type as? Recipe {
                     destination.recipe = object

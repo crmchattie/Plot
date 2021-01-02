@@ -32,7 +32,7 @@ class ActivityActions: NSObject {
         self.selectedFalconUsers = selectedFalconUsers
     }
     
-    public func deleteActivity() {
+    func deleteActivity() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -53,7 +53,7 @@ class ActivityActions: NSObject {
         
     }
     
-    public func createNewActivity() {
+    func createNewActivity() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -90,7 +90,7 @@ class ActivityActions: NSObject {
         }
     }
     
-    public func updateActivityParticipants() {
+    func updateActivityParticipants() {
         guard let _ = active, let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }

@@ -30,7 +30,7 @@ class TransactionActions: NSObject {
     
     }
     
-    public func deleteTransaction() {
+    func deleteTransaction() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -48,7 +48,7 @@ class TransactionActions: NSObject {
                 
     }
     
-    public func createNewTransaction() {
+    func createNewTransaction() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -88,7 +88,7 @@ class TransactionActions: NSObject {
         }
     }
     
-    public func updateTransactionParticipants() {
+    func updateTransactionParticipants() {
         guard let _ = active, let transaction = transaction, let ID = ID else {
             return
         }

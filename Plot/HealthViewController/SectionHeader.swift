@@ -12,7 +12,7 @@ class SectionHeader: UICollectionReusableView {
     var titleLabel: UILabel = {
         let label: UILabel = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = .boldSystemFont(ofSize: 30)
+        label.font = .boldSystemFont(ofSize: 25)
         label.sizeToFit()
         return label
     }()

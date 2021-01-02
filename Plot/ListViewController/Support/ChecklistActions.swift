@@ -25,10 +25,10 @@ class ChecklistActions: NSObject {
         self.ID = checklist.ID
         self.active = active
         self.selectedFalconUsers = selectedFalconUsers
-    
+        
     }
     
-    public func deleteChecklist() {
+    func deleteChecklist() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -46,7 +46,7 @@ class ChecklistActions: NSObject {
                 
     }
     
-    public func createNewChecklist() {
+    func createNewChecklist() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -92,7 +92,7 @@ class ChecklistActions: NSObject {
         }
     }
     
-    public func updateChecklistParticipants() {
+    func updateChecklistParticipants() {
         guard let _ = active, let checklist = checklist, let ID = ID else {
             return
         }

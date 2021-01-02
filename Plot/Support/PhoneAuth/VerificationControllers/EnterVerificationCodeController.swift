@@ -170,8 +170,6 @@ class EnterVerificationCodeController: UIViewController {
       let destination = UserProfileController()
       AppUtility.lockOrientation(.portrait)
       destination.userProfileContainerView.phone.text = self.enterVerificationContainerView.titleNumber.text
-      let appDelegate = UIApplication.shared.delegate as! AppDelegate
-      appDelegate.additionalUserInfo = authDataResult?.additionalUserInfo
       destination.checkIfUserDataExists(completionHandler: { (isCompleted) in
         guard isCompleted else {self.removeSpinner(); return }
         self.removeSpinner()

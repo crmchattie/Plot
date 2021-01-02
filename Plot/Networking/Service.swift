@@ -1142,7 +1142,7 @@ struct SygicAPI {
 
 struct MXAPI {
     //production environment
-    //static let baseURL = "https://atrium.mx.com/"
+//    static let baseURL = "https://atrium.mx.com/"
     
     //development environment URL
     static let baseURL = "https://vestibule.mx.com/"

@@ -28,7 +28,7 @@ class WorkActions: NSObject {
     
     }
     
-    public func deleteWork() {
+    func deleteWork() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -42,7 +42,7 @@ class WorkActions: NSObject {
                 
     }
     
-    public func createNewWork() {
+    func createNewWork() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }

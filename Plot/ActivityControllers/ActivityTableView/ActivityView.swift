@@ -31,18 +31,17 @@ class ActivityView: UIView {
     }()
 
     override init(frame: CGRect) {
-        super.init(frame: frame)
-        
+        super.init(frame: frame)        
         calendar.translatesAutoresizingMaskIntoConstraints = false
         
-        addSubview(tableView)
         addSubview(calendar)
         calendar.addSubview(arrowButton)
+        addSubview(tableView)
     
         calendar.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         
         NSLayoutConstraint.activate([
-            calendar.topAnchor.constraint(equalTo: topAnchor, constant: -10),
+            calendar.topAnchor.constraint(equalTo: topAnchor, constant: 0),
             calendar.leftAnchor.constraint(equalTo: leftAnchor),
             calendar.rightAnchor.constraint(equalTo: rightAnchor),
 //            calendar.bottomAnchor.constraint(equalTo: arrowButton.topAnchor, constant: 10),
@@ -53,8 +52,8 @@ class ActivityView: UIView {
             arrowButton.centerXAnchor.constraint(equalTo: calendar.centerXAnchor),
             
             tableView.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: 0),
-            tableView.leftAnchor.constraint(equalTo: leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: rightAnchor),
+            tableView.leftAnchor.constraint(equalTo: leftAnchor, constant: 5),
+            tableView.rightAnchor.constraint(equalTo: rightAnchor, constant: -5),
             tableView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 

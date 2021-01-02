@@ -12,23 +12,23 @@ import Firebase
 import SDWebImage
 
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l < r
+    case (nil, _?):
+        return true
+    default:
+        return false
+    }
 }
 
 fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l > r
-  default:
-    return rhs < lhs
-  }
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l > r
+    default:
+        return rhs < lhs
+    }
 }
 
 protocol ChooseChatDelegate: class {
@@ -37,14 +37,14 @@ protocol ChooseChatDelegate: class {
 
 
 class ChooseChatTableViewController: UITableViewController {
-  
+    
     fileprivate let newGroupCellID = "newGroupCellID"
     fileprivate let userCellID = "userCellID"
     fileprivate var isAppLoaded = false
     
     var searchBar: UISearchBar?
     var searchChatsController: UISearchController?
-
+    
     var conversations = [Conversation]()
     var filteredConversations = [Conversation]()
     var pinnedConversations = [Conversation]()
@@ -57,7 +57,7 @@ class ChooseChatTableViewController: UITableViewController {
     var packinglist: Packinglist?
     var users = [User]()
     var filteredUsers = [User]()
-
+    
     let viewPlaceholder = ViewPlaceholder()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
@@ -65,49 +65,57 @@ class ChooseChatTableViewController: UITableViewController {
     
     let activityCreatingGroup = DispatchGroup()
     let informationMessageSender = InformationMessageSender()
-        
+    
     // [chatID: Participants]
     var chatParticipants: [String: [User]] = [:]
     
     var activityObject: ActivityObject?
     
-  override func viewDidLoad() {
-    super.viewDidLoad()
-   
-    configureTableView()
-    setupSearchController()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
+        fetchConversations()
+        configureTableView()
+        setupSearchController()
+        
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 105
+    }
     
-    tableView.rowHeight = UITableView.automaticDimension
-    tableView.estimatedRowHeight = 105
-  }
     
-  
-  override var preferredStatusBarStyle: UIStatusBarStyle {
-    return ThemeManager.currentTheme().statusBarStyle
-  }
-
-  fileprivate func configureTableView() {
-    tableView.register(UserCell.self, forCellReuseIdentifier: userCellID)
-    tableView.allowsMultipleSelectionDuringEditing = false
-    view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-    tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-    tableView.backgroundColor = view.backgroundColor
-    navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeChat))
-
-    let rightBarButton = UIButton(type: .system)
-    rightBarButton.setTitle("New Chat", for: .normal)
-    rightBarButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-    rightBarButton.titleLabel?.adjustsFontForContentSizeCategory = true
-    rightBarButton.addTarget(self, action: #selector(newChat), for: .touchUpInside)
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return ThemeManager.currentTheme().statusBarStyle
+    }
     
-    navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightBarButton)
-    extendedLayoutIncludesOpaqueBars = true
-    edgesForExtendedLayout = UIRectEdge.top
-    tableView.separatorStyle = .none
-    definesPresentationContext = true
-    navigationItem.title = "Choose Chat"
-  }
-  
+    fileprivate func fetchConversations() {
+        
+    }
+    
+    fileprivate func configureTableView() {
+        tableView.register(UserCell.self, forCellReuseIdentifier: userCellID)
+        tableView.allowsMultipleSelectionDuringEditing = false
+        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.backgroundColor = view.backgroundColor
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeChat))
+        
+        let rightBarButton = UIButton(type: .system)
+        rightBarButton.setTitle("New Chat", for: .normal)
+        rightBarButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
+        rightBarButton.titleLabel?.adjustsFontForContentSizeCategory = true
+        rightBarButton.addTarget(self, action: #selector(newChat), for: .touchUpInside)
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightBarButton)
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = UIRectEdge.top
+        tableView.separatorStyle = .none
+        definesPresentationContext = true
+        navigationItem.title = "Choose Chat"
+    }
+    
     @objc fileprivate func closeChat() {
         dismiss(animated: true, completion: nil)
     }
@@ -228,9 +236,9 @@ class ChooseChatTableViewController: UITableViewController {
     func fetchMembersIDs(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?, activity: Activity?) -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
-
+        
         guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
-
+        
         membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
         membersIDs.append(currentUserID)
         
@@ -255,7 +263,7 @@ class ChooseChatTableViewController: UITableViewController {
                 membersIDs.append(participant)
             }
         }
-
+        
         return (membersIDs, membersIDsDictionary)
     }
     
@@ -275,7 +283,7 @@ class ChooseChatTableViewController: UITableViewController {
             })
         }
     }
-
+    
     func createGroupChatNode(reference: DatabaseReference, childValues: [String: Any]) {
         let nodeCreationGroup = DispatchGroup()
         nodeCreationGroup.enter()
@@ -287,79 +295,79 @@ class ChooseChatTableViewController: UITableViewController {
             nodeCreationGroup.leave()
         }
     }
-
-  fileprivate func setupSearchController() {
     
-    if #available(iOS 11.0, *) {
-      searchChatsController = UISearchController(searchResultsController: nil)
-      searchChatsController?.searchResultsUpdater = self
-      searchChatsController?.obscuresBackgroundDuringPresentation = false
-      searchChatsController?.searchBar.delegate = self
-      searchChatsController?.definesPresentationContext = true
-      navigationItem.searchController = searchChatsController
-    } else {
-      searchBar = UISearchBar()
-      searchBar?.delegate = self
-      searchBar?.placeholder = "Search"
-      searchBar?.searchBarStyle = .minimal
-      searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
-      tableView.tableHeaderView = searchBar
-    }
-  }
-  
-  func checkIfThereAnyActiveChats(isEmpty: Bool) {
-    guard isEmpty else {
-      viewPlaceholder.remove(from: view, priority: .medium)
-      return
-    }
-    viewPlaceholder.add(for: view, title: .emptyChat, subtitle: .emptyChat, priority: .medium, position: .top)
-  }
-  
-  func handleReloadTable() {
-    conversations.sort { (conversation1, conversation2) -> Bool in
-        return conversation1.lastMessage?.timestamp?.int64Value > conversation2.lastMessage?.timestamp?.int64Value
+    fileprivate func setupSearchController() {
+        
+        if #available(iOS 11.0, *) {
+            searchChatsController = UISearchController(searchResultsController: nil)
+            searchChatsController?.searchResultsUpdater = self
+            searchChatsController?.obscuresBackgroundDuringPresentation = false
+            searchChatsController?.searchBar.delegate = self
+            searchChatsController?.definesPresentationContext = true
+            navigationItem.searchController = searchChatsController
+        } else {
+            searchBar = UISearchBar()
+            searchBar?.delegate = self
+            searchBar?.placeholder = "Search"
+            searchBar?.searchBarStyle = .minimal
+            searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
+            tableView.tableHeaderView = searchBar
+        }
     }
     
-    
-    filteredConversations = conversations
-
-    tableView.reloadData()
-    
-    if filteredConversations.count == 0  {
-        checkIfThereAnyActiveChats(isEmpty: true)
-    } else {
-        checkIfThereAnyActiveChats(isEmpty: false)
+    func checkIfThereAnyActiveChats(isEmpty: Bool) {
+        guard isEmpty else {
+            viewPlaceholder.remove(from: view, priority: .medium)
+            return
+        }
+        viewPlaceholder.add(for: view, title: .emptyChat, subtitle: .emptyChat, priority: .medium, position: .top)
     }
     
-  }
-  
-  func handleReloadTableAfterSearch() {
-    filteredConversations.sort { (conversation1, conversation2) -> Bool in
-        return conversation1.lastMessage?.timestamp?.int64Value > conversation2.lastMessage?.timestamp?.int64Value
+    func handleReloadTable() {
+        conversations.sort { (conversation1, conversation2) -> Bool in
+            return conversation1.lastMessage?.timestamp?.int64Value > conversation2.lastMessage?.timestamp?.int64Value
+        }
+        
+        
+        filteredConversations = conversations
+        
+        tableView.reloadData()
+        
+        if filteredConversations.count == 0  {
+            checkIfThereAnyActiveChats(isEmpty: true)
+        } else {
+            checkIfThereAnyActiveChats(isEmpty: false)
+        }
         
     }
-    DispatchQueue.main.async {
-      self.tableView.reloadData()
+    
+    func handleReloadTableAfterSearch() {
+        filteredConversations.sort { (conversation1, conversation2) -> Bool in
+            return conversation1.lastMessage?.timestamp?.int64Value > conversation2.lastMessage?.timestamp?.int64Value
+            
+        }
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
-  }
-
+    
     // MARK: - Table view data source  
-  override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    return UITableView.automaticDimension
-  }
-  
-  override func numberOfSections(in tableView: UITableView) -> Int {
-    return 1
-  }
-
-  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-      return filteredConversations.count
+        return filteredConversations.count
+        
+    }
     
-  }
-  
-  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: userCellID, for: indexPath) as? UserCell ?? UserCell()
         
         cell.delegate = self
@@ -367,49 +375,49 @@ class ChooseChatTableViewController: UITableViewController {
         cell.chatsViewControllerDataStore = self
         cell.configureCell(for: indexPath, conversations: filteredConversations)
         return cell
-    
-  }
-  
-  var chatLogController: ChatLogController? = nil
-  var messagesFetcher: MessagesFetcher? = nil
-
-  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let conversation = filteredConversations[indexPath.row]
-    if let chatID = conversation.chatID, let activity = activity, let activityName = activity.name?.trimmingCharacters(in: .whitespaces) {
-        let text = "The \(activityName) activity was connected to this chat"
-        informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: activity.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: activity.activityID!, grocerylistID: nil, checklistID: nil, packinglistID: nil, activitylistID: nil)
-        dismiss(animated: true, completion: nil)
-    } else if let chatID = conversation.chatID, let grocerylist = grocerylist, let listName = grocerylist.name?.trimmingCharacters(in: .whitespaces) {
-        let text = "The \(listName) list was connected to this chat"
-        informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: grocerylist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: grocerylist.ID, checklistID: nil, packinglistID: nil, activitylistID: nil)
-        dismiss(animated: true, completion: nil)
-    } else if let chatID = conversation.chatID, let checklist = checklist, let listName = checklist.name?.trimmingCharacters(in: .whitespaces) {
-        let text = "The \(listName) list was connected to this chat"
-        informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: checklist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: checklist.ID, packinglistID: nil, activitylistID: nil)
-        dismiss(animated: true, completion: nil)
-    } else if let chatID = conversation.chatID, let activitylist = activitylist, let listName = activitylist.name?.trimmingCharacters(in: .whitespaces) {
-        let text = "The \(listName) list was connected to this chat"
-        informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: activitylist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: nil, packinglistID: nil, activitylistID: activitylist.ID)
-        dismiss(animated: true, completion: nil)
-    } else if let chatID = conversation.chatID, let packinglist = packinglist, let listName = packinglist.name?.trimmingCharacters(in: .whitespaces) {
-        let text = "The \(listName) list was connected to this chat"
-        informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: packinglist.participantsIDs!, text: text)
-        delegate?.chosenChat(chatID: chatID, activityID:nil, grocerylistID: nil, checklistID: nil, packinglistID: packinglist.ID, activitylistID: nil)
-        dismiss(animated: true, completion: nil)
-    } else if let activityObject = activityObject {
-        let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
-        messageSender.sendMessage()
-        self.messageSentAlert()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
-            self.removeMessageAlert()
-            self.dismiss(animated: true, completion: nil)
-        })
+        
     }
-  }
+    
+    var chatLogController: ChatLogController? = nil
+    var messagesFetcher: MessagesFetcher? = nil
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let conversation = filteredConversations[indexPath.row]
+        if let chatID = conversation.chatID, let activity = activity, let activityName = activity.name?.trimmingCharacters(in: .whitespaces) {
+            let text = "The \(activityName) activity was connected to this chat"
+            informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: activity.participantsIDs!, text: text)
+            delegate?.chosenChat(chatID: chatID, activityID: activity.activityID!, grocerylistID: nil, checklistID: nil, packinglistID: nil, activitylistID: nil)
+            dismiss(animated: true, completion: nil)
+        } else if let chatID = conversation.chatID, let grocerylist = grocerylist, let listName = grocerylist.name?.trimmingCharacters(in: .whitespaces) {
+            let text = "The \(listName) list was connected to this chat"
+            informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: grocerylist.participantsIDs!, text: text)
+            delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: grocerylist.ID, checklistID: nil, packinglistID: nil, activitylistID: nil)
+            dismiss(animated: true, completion: nil)
+        } else if let chatID = conversation.chatID, let checklist = checklist, let listName = checklist.name?.trimmingCharacters(in: .whitespaces) {
+            let text = "The \(listName) list was connected to this chat"
+            informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: checklist.participantsIDs!, text: text)
+            delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: checklist.ID, packinglistID: nil, activitylistID: nil)
+            dismiss(animated: true, completion: nil)
+        } else if let chatID = conversation.chatID, let activitylist = activitylist, let listName = activitylist.name?.trimmingCharacters(in: .whitespaces) {
+            let text = "The \(listName) list was connected to this chat"
+            informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: activitylist.participantsIDs!, text: text)
+            delegate?.chosenChat(chatID: chatID, activityID: nil, grocerylistID: nil, checklistID: nil, packinglistID: nil, activitylistID: activitylist.ID)
+            dismiss(animated: true, completion: nil)
+        } else if let chatID = conversation.chatID, let packinglist = packinglist, let listName = packinglist.name?.trimmingCharacters(in: .whitespaces) {
+            let text = "The \(listName) list was connected to this chat"
+            informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: packinglist.participantsIDs!, text: text)
+            delegate?.chosenChat(chatID: chatID, activityID:nil, grocerylistID: nil, checklistID: nil, packinglistID: packinglist.ID, activitylistID: nil)
+            dismiss(animated: true, completion: nil)
+        } else if let activityObject = activityObject {
+            let messageSender = MessageSender(conversation, text: activityObject.activityName, media: nil, activity: activityObject)
+            messageSender.sendMessage()
+            self.messageSentAlert()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                self.removeMessageAlert()
+                self.dismiss(animated: true, completion: nil)
+            })
+        }
+    }
 }
 
 extension ChooseChatTableViewController: ChatsViewControllerDataStore {
@@ -417,7 +425,7 @@ extension ChooseChatTableViewController: ChatsViewControllerDataStore {
         guard let chatID = conversation.chatID, let participantsIDs = conversation.chatParticipantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-
+        
         let group = DispatchGroup()
         let olderParticipants = self.chatParticipants[chatID]
         var participants: [User] = []
@@ -462,60 +470,60 @@ extension ChooseChatTableViewController: ChatCellDelegate {
 }
 
 extension ChooseChatTableViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
-  
-  func updateSearchResults(for searchController: UISearchController) {}
-  
-  func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-    searchBar.text = nil
-    filteredConversations = conversations
-    handleReloadTable()
-    guard #available(iOS 11.0, *) else {
-      searchBar.setShowsCancelButton(false, animated: true)
-      searchBar.resignFirstResponder()
-      return
-    }
-  }
-  
-  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
     
-    filteredConversations = searchText.isEmpty ? conversations :
-      conversations.filter({ (conversation) -> Bool in
-        if let chatName = conversation.chatName {
-          return chatName.lowercased().contains(searchText.lowercased())
+    func updateSearchResults(for searchController: UISearchController) {}
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = nil
+        filteredConversations = conversations
+        handleReloadTable()
+        guard #available(iOS 11.0, *) else {
+            searchBar.setShowsCancelButton(false, animated: true)
+            searchBar.resignFirstResponder()
+            return
         }
-        return ("").lowercased().contains(searchText.lowercased())
-      })
-    
-    handleReloadTableAfterSearch()
-  }
-  
-  func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-    searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-    guard #available(iOS 11.0, *) else {
-      searchBar.setShowsCancelButton(true, animated: true)
-      return true
     }
-    return true
-  }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        filteredConversations = searchText.isEmpty ? conversations :
+            conversations.filter({ (conversation) -> Bool in
+                if let chatName = conversation.chatName {
+                    return chatName.lowercased().contains(searchText.lowercased())
+                }
+                return ("").lowercased().contains(searchText.lowercased())
+            })
+        
+        handleReloadTableAfterSearch()
+    }
+    
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        guard #available(iOS 11.0, *) else {
+            searchBar.setShowsCancelButton(true, animated: true)
+            return true
+        }
+        return true
+    }
 }
 
 extension ChooseChatTableViewController { /* hiding keyboard */
-  
-  override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
     
-    if #available(iOS 11.0, *) {
-      searchChatsController?.searchBar.endEditing(true)
-    } else {
-      self.searchBar?.endEditing(true)
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        
+        if #available(iOS 11.0, *) {
+            searchChatsController?.searchBar.endEditing(true)
+        } else {
+            self.searchBar?.endEditing(true)
+        }
     }
-  }
-  
-  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    setNeedsStatusBarAppearanceUpdate()
-    if #available(iOS 11.0, *) {
-      searchChatsController?.searchBar.endEditing(true)
-    } else {
-      self.searchBar?.endEditing(true)
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        setNeedsStatusBarAppearanceUpdate()
+        if #available(iOS 11.0, *) {
+            searchChatsController?.searchBar.endEditing(true)
+        } else {
+            self.searchBar?.endEditing(true)
+        }
     }
-  }
 }

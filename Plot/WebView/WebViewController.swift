@@ -33,6 +33,9 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
         
         print(urlString ?? "")
         
@@ -60,7 +63,6 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         
         // Intercept custom URI
         let surl = navigationAction.request.url?.absoluteString
-        print("surl \(surl)")
         if (surl?.hasPrefix("atrium://"))! {
             // Take action here
             print("atrium://")

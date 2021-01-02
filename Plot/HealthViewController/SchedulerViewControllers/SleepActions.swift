@@ -28,7 +28,7 @@ class SleepActions: NSObject {
     
     }
     
-    public func deleteSleep() {
+    func deleteSleep() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -42,7 +42,7 @@ class SleepActions: NSObject {
                 
     }
     
-    public func createNewSleep() {
+    func createNewSleep() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }

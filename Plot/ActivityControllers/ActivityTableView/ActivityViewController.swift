@@ -42,44 +42,55 @@ protocol ActivityViewControllerDataStore: class {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->())
 }
 
-protocol HomeBaseActivities: class {
-    func manageAppearanceActivity(_ activityController: ActivityViewController, didFinishLoadingWith state: Bool )
-    func sendActivities(activities: [Activity], invitedActivities: [Activity], invitations: [String: Invitation])
-    func sendDate(selectedDate: Date)
-}
-
 class ActivityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance, UIGestureRecognizerDelegate {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     fileprivate var isAppLoaded = false
     fileprivate let plotAppGroup = "group.immaturecreations.plot"
     fileprivate var sharedContainer : UserDefaults?
     
     let activityView = ActivityView()
-    
-    weak var delegate: HomeBaseActivities?
-    weak var activityIndicatorDelegate: MasterContainerActivityIndicatorDelegate?
-    
+            
     var searchBar: UISearchBar?
     var searchController: UISearchController?
     
-    var activities = [Activity]()
+    var activities: [Activity] {
+        return networkController.activityService.activities
+    }
     var filteredActivities = [Activity]()
     var pinnedActivities = [Activity]()
     var filteredPinnedActivities = [Activity]()
-    var users = [User]()
-    var filteredUsers = [User]()
-    var conversations = [Conversation]()
-    let activitiesFetcher = ActivitiesFetcher()
-    let invitationsFetcher = InvitationsFetcher()
+    var users: [User] {
+        return networkController.userService.users
+    }
+    var filteredUsers: [User] {
+        return networkController.userService.users
+    }
+    var conversations: [Conversation] {
+        return networkController.conversationService.conversations
+    }
     
     let viewPlaceholder = ViewPlaceholder()
-    let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
     var canTransitionToLarge = false
     var canTransitionToSmall = true
     
     // [ActivityID: Invitation]
-    var invitations: [String: Invitation] = [:]
-    var invitedActivities: [Activity] = []
+    var invitations: [String: Invitation] {
+        return networkController.activityService.invitations
+    }
+    var invitedActivities: [Activity] {
+        return networkController.activityService.invitedActivities
+    }
     
     // [ActivityID: Participants]
     var activitiesParticipants: [String: [User]] = [:]
@@ -91,13 +102,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var hasLoadedCalendarEventActivities = false
     var categoryUpdateDispatchGroup: DispatchGroup?
-        
-    var eventKitManager: EventKitManager = {
-        let eventKitSetupAssistant = EventKitSetupAssistant()
-        let eventKitService = EventKitService()
-        let eventKitManager = EventKitManager(eventKitService: eventKitService)
-        return eventKitManager
-    }()
     
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -114,28 +118,35 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         return panGesture
         }()
     
+//    let closeButton: UIButton = {
+//        let button = UIButton(type: .system)
+//        button.setImage(UIImage(named: "close"), for: .normal)
+//        button.tintColor = .systemBlue
+//        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+//        return button
+//    }()
+    
+    @objc fileprivate func handleDismiss(button: UIButton) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    override var prefersStatusBarHidden: Bool { return true }
+        
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("activities view did load")
+        navigationItem.largeTitleDisplayMode = .never
+        title = "Calendar"
         
-        activitiesFetcher.delegate = self
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
         addObservers()
+        handleReloadTable()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-        if !isAppLoaded {
-            activitiesFetcher.fetchActivities()
-        }
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        navigationController?.isNavigationBarHidden = true
+//        navigationController?.navigationBar.isHidden = true
+//    }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -143,6 +154,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(activitiesUpdated), name: .activitiesUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -153,6 +165,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.backgroundColor = theme.generalBackgroundColor
         activityView.tableView.reloadData()
         applyCalendarTheme()
+    }
+    
+    @objc fileprivate func activitiesUpdated() {
+        handleReloadActivities()
     }
     
     fileprivate func applyCalendarTheme() {
@@ -170,10 +186,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.calendar.appearance.eventSelectionColor = ThemeManager.currentTheme().generalTitleColor
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
-    }
-    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         guard activityView.tableView.isEditing else { return }
@@ -181,20 +193,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.reloadData()
     }
     
-    override var editButtonItem: UIBarButtonItem {
-        let editButton = super.editButtonItem
-        editButton.action = #selector(editButtonAction)
-        return editButton
-    }
-    
     @objc func editButtonAction(sender: UIBarButtonItem) {
         if activityView.tableView.isEditing == true {
             activityView.tableView.setEditing(false, animated: true)
-            //activityView.tableView.isEditing = false
             sender.style = .plain
             sender.title = "Edit"
         } else {
-            //activityView.tableView.isEditing = true
             activityView.tableView.setEditing(true, animated: true)
             sender.style = .done
             sender.title = "Done"
@@ -202,23 +206,25 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func configureView() {
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
+        let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+        navigationItem.rightBarButtonItems = [newItemBarButton, searchBarButton]
         
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        
+        edgesForExtendedLayout = UIRectEdge.top
+
         view.addSubview(activityView)
+        
         activityView.translatesAutoresizingMaskIntoConstraints = false
-        activityView.topAnchor.constraint(equalTo:view.safeAreaLayoutGuide.topAnchor).isActive = true
-        activityView.leadingAnchor.constraint(equalTo:view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        activityView.trailingAnchor.constraint(equalTo:view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        activityView.bottomAnchor.constraint(equalTo:view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        activityView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        activityView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+        activityView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+        activityView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
         activityView.arrowButton.addTarget(self, action: #selector(arrowButtonTapped), for: .touchUpInside)
         
-        extendedLayoutIncludesOpaqueBars = true
-        edgesForExtendedLayout = UIRectEdge.top
         activityView.tableView.separatorStyle = .none
-        definesPresentationContext = true
         
         activityView.addGestureRecognizer(self.scopeGesture)
         
@@ -229,7 +235,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.calendar.scope = getCalendarScope()
         activityView.calendar.swipeToChooseGesture.isEnabled = true // Swipe-To-Choose
         activityView.calendar.calendarHeaderView.isHidden = true
-        activityView.calendar.headerHeight = 10.0
+        activityView.calendar.headerHeight = 0
         activityView.calendar.appearance.headerMinimumDissolvedAlpha = 0.0
         
         let scopeGesture = UIPanGestureRecognizer(target: activityView.calendar, action: #selector(activityView.calendar.handleScopeGesture(_:)));
@@ -247,6 +253,15 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         // apply theme
         applyCalendarTheme()
+    }
+    
+    @objc fileprivate func newItem() {
+        self.tabBarController?.selectedIndex = 0
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    @objc fileprivate func search() {
+        setupSearchController()
     }
     
     // MARK:- action: Selectors
@@ -283,7 +298,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @objc fileprivate func listView() {
         UIView.animate(withDuration: 0.35, animations: {
-            self.activityView.calendarHeightConstraint?.constant = 10
+            self.activityView.calendarHeightConstraint?.constant = 0
             self.activityView.layoutIfNeeded()
         }) { result in
             self.activityView.calendar.isHidden = true
@@ -326,16 +341,9 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         handleReloadActivities()
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
-        delegate?.sendActivities(activities: allActivities, invitedActivities: invitedActivities, invitations: invitations)
         
-        if !isAppLoaded {
-            activityView.tableView.reloadDataWithCompletion() {
-                self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, animated: false)
-            }
-//            configureTabBarBadge()
-        } else {
-            activityView.tableView.reloadData()
-//            configureTabBarBadge()
+        activityView.tableView.reloadDataWithCompletion() {
+            self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, animated: false)
         }
         
         if allActivities.count == 0 {
@@ -346,24 +354,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
 //        compileActivityDates(activities: allActivities)
         
-        guard !isAppLoaded else { return }
-        delegate?.manageAppearanceActivity(self, didFinishLoadingWith: true)
-        isAppLoaded = true
-        
     }
     
     func handleReloadActivities() {
-        activities.sort { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
-        }
-        
-        pinnedActivities.sort { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
-        }
-        
         filteredPinnedActivities = pinnedActivities
         filteredActivities = activities
-        
+        self.activityView.tableView.reloadData()
     }
     
     func handleReloadTableAftersearchBarCancelButtonClicked() {
@@ -372,6 +368,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func handleReloadTableAfterSearch() {
+        filteredPinnedActivities.sort { (activity1, activity2) -> Bool in
+            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
+        }
+        
         filteredActivities.sort { (activity1, activity2) -> Bool in
             return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
         }
@@ -380,7 +380,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func scrollToFirstActivityWithDate(date: Date, animated: Bool) {
-        let currentDate = date.stripTime()
+        let currentDate = date        
         var index = 0
         var activityFound = false
         for activity in self.filteredActivities {
@@ -395,11 +395,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 
             }
         }
-        
+                
         let numberOfSections = activityView.tableView.numberOfSections
         if activityFound && numberOfSections > 1 {
             let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
             if index < numberOfRows {
+                print("indexPath AV \(index)")
                 let indexPath = IndexPath(row: index, section: 1)
                 self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
                 if !animated {
@@ -408,6 +409,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             }
         } else if !activityFound {
             let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
+            print("numberOfRows AV \(numberOfRows)")
             if numberOfRows > 0 {
                 let indexPath = IndexPath(row: numberOfRows - 1, section: 1)
                 self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
@@ -467,12 +469,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
         self.scrollToFirstActivityWithDate(date: date, animated: true)
-        self.delegate?.sendDate(selectedDate: date)
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
         self.scrollToFirstActivityWithDate(date: calendar.currentPage, animated: true)
-        self.delegate?.sendDate(selectedDate: calendar.currentPage)
     }
     
     func saveCalendar(scope: FSCalendarScope) {
@@ -505,25 +505,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 0 {
-            if filteredPinnedActivities.count == 0 {
-                return ""
-            }
-            return " "//Pinned
-        } else {
-            return " "
-        }
+        return ""
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if section == 0 {
-            return 0
-        } else {
-            if filteredPinnedActivities.count == 0 {
-                return 0
-            }
-            return 0
-        }
+        return 0
     }
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
@@ -538,7 +524,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        
         let delete = setupDeleteAction(at: indexPath)
         //        let pin = setupPinAction(at: indexPath)
         let mute = setupMuteAction(at: indexPath)
@@ -564,6 +549,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
+        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         cell.delegate = self
         cell.updateInvitationDelegate = self
         cell.activityViewControllerDataStore = self
@@ -584,13 +570,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
         }
         
-        
         return cell
+    
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var activity: Activity!
-        
         if indexPath.section == 0 {
             let pinnedActivity = filteredPinnedActivities[indexPath.row]
             activity = pinnedActivity
@@ -602,7 +587,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func loadActivity(activity: Activity) {
-        
         let dispatchGroup = DispatchGroup()
         showActivityIndicator()
         
@@ -850,7 +834,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
     }
-    
 }
 
 extension ActivityViewController: DeleteAndExitDelegate {
@@ -875,171 +858,12 @@ extension ActivityViewController: DeleteAndExitDelegate {
     }
 }
 
-extension ActivityViewController: ActivityUpdatesDelegate {
-    
-    func activities(didStartFetching: Bool) {
-        guard !isAppLoaded else { return }
-        navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .updating,
-                                                              activityPriority: .mediumHigh, color: ThemeManager.currentTheme().generalTitleColor)
-    }
-    
-    func activities(didStartUpdatingData: Bool) {
-        navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .updating,
-                                                              activityPriority: .lowMedium, color: ThemeManager.currentTheme().generalTitleColor)
-    }
-    
-    func activities(didFinishFetching: Bool, activities: [Activity], newActivity: Activity?) {
-        checkForDataMigration(forActivities: activities)
-        
-        let (pinned, unpinned) = activities.stablePartition { (element) -> Bool in
-            let isPinned = element.pinned ?? false
-            return isPinned == true
-        }
-        
-        self.pinnedActivities = pinned
-        self.activities = unpinned
-        
-        var isActivityCalendarEvent = false
-        if let newActivity = newActivity, let type = CustomType(rawValue: newActivity.activityType ?? ""), type == .iOSCalendarEvent {
-            // don't update and reload for calendar events
-            isActivityCalendarEvent = true
-        }
-        
-        if !isActivityCalendarEvent {
-            fetchInvitations()
-        }
-    }
-    
-    func activities(update activity: Activity, reloadNeeded: Bool) {
-        let activityID = activity.activityID ?? ""
-        
-        if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
-            activities[index] = activity
-        }
-        if let index = pinnedActivities.firstIndex(where: {$0.activityID == activityID}) {
-            pinnedActivities[index] = activity
-        }
-        if let index = filteredActivities.firstIndex(where: {$0.activityID == activityID}) {
-            filteredActivities[index] = activity
-            let indexPath = IndexPath(row: index, section: 1)
-            if reloadNeeded { updateCell(at: indexPath) }
-        }
-        if let index = filteredPinnedActivities.firstIndex(where: {$0.activityID == activityID}) {
-            filteredPinnedActivities[index] = activity
-            let indexPath = IndexPath(row: index, section: 0)
-            if reloadNeeded { updateCell(at: indexPath) }
-        }
-    }
-    
-    func activities(remove activity: Activity) {
-        let activityID = activity.activityID ?? ""
-        
-        if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
-            activities.remove(at: index)
-        }
-        
-        if let index = pinnedActivities.firstIndex(where: {$0.activityID == activityID}) {
-            pinnedActivities.remove(at: index)
-        }
-        
-        if let index = filteredActivities.firstIndex(where: {$0.activityID == activityID}) {
-            filteredActivities.remove(at: index)
-            let indexPath = IndexPath(row: index, section: 1)
-            deleteCell(at: indexPath)
-        }
-        if let index = filteredPinnedActivities.firstIndex(where: {$0.activityID == activityID}) {
-            filteredPinnedActivities.remove(at: index)
-            let indexPath = IndexPath(row: index, section: 0)
-            deleteCell(at: indexPath)
-        }
-    }
-}
-
-// For invitations update
-extension ActivityViewController {
-    func fetchInvitations() {
-        print("fetchInvitations")
-        invitationsFetcher.fetchInvitations { [weak self] (invitations, activitiesForInvitations) in
-            guard let weakSelf = self else { return }
-            
-            weakSelf.invitations = invitations
-            weakSelf.invitedActivities = activitiesForInvitations
-            weakSelf.handleReloadTable()
-            weakSelf.navigationItemActivityIndicator.hideActivityIndicator(for: weakSelf.navigationItem, activityPriority: .mediumHigh)
-            weakSelf.observeInvitationForCurrentUser()
-            
-            if !weakSelf.hasLoadedCalendarEventActivities {
-                weakSelf.hasLoadedCalendarEventActivities = true
-                // Comment out the block below to stop the sync
-                DispatchQueue.main.async {
-                    weakSelf.activityIndicatorDelegate?.showActivityIndicator()
-                    if let _ = Auth.auth().currentUser {
-                        weakSelf.eventKitManager.syncEventKitActivities {
-                            DispatchQueue.main.async {
-                                weakSelf.handleReloadTable()
-                                weakSelf.activityIndicatorDelegate?.hideActivityIndicator()
-                            }
-                        }
-                    }
-                }
-                
-                // Uncomment this line to clean the calendar events. The app might freeze for a bit and/or require a restart
-//                DispatchQueue.global().async {
-//                    weakSelf.cleanCalendarEventActivities()
-//                }
-            }
-        }
-    }
-    
-    func cleanCalendarEventActivities() {
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
-            
-            return
-        }
-        
-        for activity in self.activities {
-            if activity.activityType == "calendarEvent" || activity.activityType == CustomType.iOSCalendarEvent.categoryText, let activityID = activity.activityID {
-                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID)
-                let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID)
-                activityReference.removeValue()
-                userActivityReference.removeValue()
-            }
-        }
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
-        reference.removeValue()
-    }
-    
-    func observeInvitationForCurrentUser() {
-        self.invitationsFetcher.observeInvitationForCurrentUser(invitationsAdded: { [weak self] invitationsAdded in
-            for invitation in invitationsAdded {
-                self?.invitations[invitation.activityID] = invitation
-                self?.updateCellForActivityID(activityID: invitation.activityID)
-            }
-        }) { [weak self] (invitationsRemoved) in
-            for invitation in invitationsRemoved {
-                self?.invitations.removeValue(forKey: invitation.activityID)
-                self?.updateCellForActivityID(activityID: invitation.activityID)
-            }
-        }
-    }
-    
-    func updateCellForActivityID(activityID: String) {
-        if let index = filteredActivities.firstIndex(where: {$0.activityID == activityID}) {
-            let indexPath = IndexPath(row: index, section: 1)
-            updateCell(at: indexPath)
-        }
-        if let index = filteredPinnedActivities.firstIndex(where: {$0.activityID == activityID}) {
-            let indexPath = IndexPath(row: index, section: 0)
-            updateCell(at: indexPath)
-        }
-    }
-}
-
 extension ActivityViewController: UpdateInvitationDelegate {
     func updateInvitation(invitation: Invitation) {
         InvitationsFetcher.update(invitation: invitation) { result in
             if result {
-                self.invitations[invitation.activityID] = invitation
+                self.networkController.activityService.invitations[invitation.activityID] = invitation
+                NotificationCenter.default.post(name: .activitiesUpdated, object: nil)
             }
         }
     }
@@ -1119,21 +943,7 @@ extension ActivityViewController: ActivityCellDelegate {
         destination.sections = [.activity]
         destination.locations = [.activity: locations]
         navigationController?.pushViewController(destination, animated: true)
-        
-//        if locationAddress.count > 1 {
-//            let destination = MapViewController()
-//            destination.hidesBottomBarWhenPushed = true
-//            var locations = [activity]
-//            locations.append(contentsOf: scheduleList)
-//            destination.sections = [.activity]
-//            destination.locations = [.activity: locations]
-//            navigationController?.pushViewController(destination, animated: true)
-//        } else {
-//            let destination = MapActivityViewController()
-//            destination.hidesBottomBarWhenPushed = true
-//            destination.locationAddress = locationAddress
-//            navigationController?.pushViewController(destination, animated: true)
-//        }
+    
     }
     
     func openChat(forConversation conversationID: String?, activityID: String?) {
@@ -1200,16 +1010,9 @@ extension ActivityViewController: MessagesDelegate {
         
         chatLogController?.messagesFetcher.collectionDelegate = chatLogController
         guard let destination = chatLogController else { return }
-        
         self.chatLogController?.startCollectionViewAtBottom()
         
-        
-        // If we're presenting a modal sheet
-        if let presentedViewController = presentedViewController as? UINavigationController {
-            presentedViewController.pushViewController(destination, animated: true)
-        } else {
-            navigationController?.pushViewController(destination, animated: true)
-        }
+        self.navigationController?.pushViewController(destination, animated: true)
         
         chatLogController = nil
         messagesFetcher?.delegate = nil
@@ -1280,22 +1083,5 @@ extension ActivityViewController: ChooseChatDelegate {
             self.connectedToChatAlert()
             self.dismiss(animated: true, completion: nil)
         }
-    }
-}
-
-class UITableViewWithReloadCompletion: UITableView {
-    
-    var reloadDataCompletionBlock: (() -> Void)?
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        self.reloadDataCompletionBlock?()
-        self.reloadDataCompletionBlock = nil
-    }
-    
-    func reloadDataWithCompletion(completion:@escaping () -> Void) {
-        reloadDataCompletionBlock = completion
-        self.reloadData()
     }
 }

@@ -32,6 +32,10 @@ class IngredientSearchViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
         // Do any additional setup after loading the view, typically from a nib.
         setupSearchController()
         setupMainView()

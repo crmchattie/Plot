@@ -16,7 +16,6 @@ class FinanceTransactionRuleViewController: FormViewController {
     var transaction: Transaction!
     var user: MXUser!
     
-    
     var active: Bool = true
     
     let numberFormatter = NumberFormatter()
@@ -28,6 +27,9 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
         
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
         setupVariables()
@@ -81,7 +83,7 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     fileprivate func initializeForm() {
         form +++
-            Section(header: nil, footer: "Set-up a rule to automatically categorize or ignore transactions that contain a certain description and/or equal a certain amount")
+            Section(header: nil, footer: "Set-up a rule to automatically rename, categorize and/or ignore certain transactions based on the name and/or equal a certain amount")
             
             <<< TextRow("Transaction name contains") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -247,8 +249,7 @@ class FinanceTransactionRuleViewController: FormViewController {
 
 extension FinanceTransactionRuleViewController: UpdateTransactionLevelDelegate {
     func update(value: String, level: String) {
-        if let row: LabelRow = form.rowBy(tag: level), let currentUser = Auth.auth().currentUser?.uid {
-            print("ButtonRow")
+        if let row: LabelRow = form.rowBy(tag: level), let _ = Auth.auth().currentUser?.uid {
             row.value = value
             row.updateCell()
             if level == "Subcategory" {

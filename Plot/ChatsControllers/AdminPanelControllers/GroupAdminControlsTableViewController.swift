@@ -34,6 +34,8 @@ class GroupAdminControlsTableViewController: UITableViewController {
     let informationMessageSender = InformationMessageSender()
     
     var members = [User]()
+    var users = [User]()
+    var filteredUsers = [User]()
     var activities = [Activity]()
     var checklists = [Checklist]()
     var grocerylists = [Grocerylist]()
@@ -781,7 +783,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
     }
     
     func addMembers() {
-        let filteredMembers = globalUsers.filter { user in
+        let filteredMembers = users.filter { user in
             return !members.contains { member in
                 user.id == member.id
             }

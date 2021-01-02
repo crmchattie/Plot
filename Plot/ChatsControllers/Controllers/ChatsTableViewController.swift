@@ -41,17 +41,11 @@ protocol ChatsViewControllerDataStore: class {
     func getParticipants(forConversation conversation: Conversation, completion: @escaping ([User])->())
 }
 
-protocol HomeBaseChats: class {
-    func sendChats(conversations: [Conversation])
-}
-
 class ChatsTableViewController: UITableViewController {
     
     fileprivate let userCellID = "userCellID"
     fileprivate var isAppLoaded = false
-    
-    weak var delegate: HomeBaseChats?
-    
+        
     var searchBar: UISearchBar?
     var searchController: UISearchController?
     
@@ -64,9 +58,7 @@ class ChatsTableViewController: UITableViewController {
     var filteredContacts = [CNContact]()
     var users = [User]()
     var filteredUsers = [User]()
-    
-    let conversationsFetcher = ConversationsFetcher()
-    
+        
     let viewPlaceholder = ViewPlaceholder()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     let phoneNumberKit = PhoneNumberKit()
@@ -84,9 +76,6 @@ class ChatsTableViewController: UITableViewController {
         print("chat view did load")
         configureTableView()
         addObservers()
-        if !isAppLoaded {
-            conversationsFetcher.fetchConversations()
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -143,12 +132,7 @@ class ChatsTableViewController: UITableViewController {
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
-        definesPresentationContext = true
-        conversationsFetcher.delegate = self
-        
-        
-        //    falconUsersFetcher.delegate = self
-        //    contactsFetcher.delegate = self
+        definesPresentationContext = true        
     }
     
     
@@ -204,9 +188,7 @@ class ChatsTableViewController: UITableViewController {
         filteredPinnedConversations = pinnedConversations
         filteredConversations = conversations
         let allConversations = conversations + pinnedConversations
-        
-        delegate?.sendChats(conversations: allConversations)
-        
+                
         if !isAppLoaded {
             tableView.reloadData()
 //            configureTabBarBadge()
@@ -407,55 +389,6 @@ extension ChatsTableViewController: MessagesDelegate {
         chatLogController = nil
         messagesFetcher?.delegate = nil
         messagesFetcher = nil
-    }
-}
-
-extension ChatsTableViewController: ConversationUpdatesDelegate {
-    
-    func conversations(didStartFetching: Bool) {
-        guard !isAppLoaded else { return }
-        navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .updating,
-                                                              activityPriority: .mediumHigh, color: ThemeManager.currentTheme().generalTitleColor)
-    }
-    
-    func conversations(didStartUpdatingData: Bool) {
-        navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .updating,
-                                                              activityPriority: .lowMedium, color: ThemeManager.currentTheme().generalTitleColor)
-    }
-    
-    func conversations(didFinishFetching: Bool, conversations: [Conversation]) {
-        let (pinned, unpinned) = conversations.stablePartition { (element) -> Bool in
-            let isPinned = element.pinned ?? false
-            return isPinned == true
-        }
-        
-        self.conversations = unpinned
-        self.pinnedConversations = pinned
-        
-        handleReloadTable()
-        navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .mediumHigh)
-        
-    }
-    
-    func conversations(update conversation: Conversation, reloadNeeded: Bool) {
-        let chatID = conversation.chatID ?? ""
-        
-        if let index = conversations.firstIndex(where: {$0.chatID == chatID}) {
-            conversations[index] = conversation
-        }
-        if let index = pinnedConversations.firstIndex(where: {$0.chatID == chatID}) {
-            pinnedConversations[index] = conversation
-        }
-        if let index = filteredConversations.firstIndex(where: {$0.chatID == chatID}) {
-            filteredConversations[index] = conversation
-            let indexPath = IndexPath(row: index, section: 1)
-            if reloadNeeded { updateCell(at: indexPath) }
-        }
-        if let index = filteredPinnedConversations.firstIndex(where: {$0.chatID == chatID}) {
-            filteredPinnedConversations[index] = conversation
-            let indexPath = IndexPath(row: index, section: 0)
-            if reloadNeeded { updateCell(at: indexPath) }
-        }
     }
 }
 
