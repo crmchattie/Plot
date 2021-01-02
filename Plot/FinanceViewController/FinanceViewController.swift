@@ -542,17 +542,17 @@ extension FinanceViewController: EndedWebViewDelegate {
 extension FinanceViewController: CustomSegmentedControlDelegate {
     func changeToIndex(index:Int) {
         if index == 0 {
-            startDate = Date().startOfDay
-            endDate = Date().endOfDay
+            startDate = Date().localTime.startOfDay
+            endDate = Date().localTime.endOfDay
         } else if index == 1 {
-            startDate = Date().startOfWeek
-            endDate = Date().endOfWeek
+            startDate = Date().localTime.startOfWeek
+            endDate = Date().localTime.endOfWeek
         } else if index == 2 {
-            startDate = Date().startOfMonth
-            endDate = Date().endOfMonth
+            startDate = Date().localTime.startOfMonth
+            endDate = Date().localTime.endOfMonth
         } else {
-            startDate = Date().startOfYear
-            endDate = Date().endOfYear
+            startDate = Date().localTime.startOfYear
+            endDate = Date().localTime.endOfYear
         }
         updateCollectionView()
         

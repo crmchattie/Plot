@@ -25,20 +25,20 @@ class FinanceDetailService: FinanceDetailServiceInterface {
         var endDate = anchorDate
 
         if segmentType == .day {
-            startDate = Date().startOfDay
-            endDate = Date().endOfDay
+            startDate = Date().localTime.startOfDay
+            endDate = Date().localTime.endOfDay
         }
         else if segmentType == .week {
-            startDate = Date().startOfWeek
-            endDate = Date().endOfWeek
+            startDate = Date().localTime.startOfWeek
+            endDate = Date().localTime.endOfWeek
         }
         else if segmentType == .month {
-            startDate = Date().startOfMonth
-            endDate = Date().endOfMonth
+            startDate = Date().localTime.startOfMonth
+            endDate = Date().localTime.endOfMonth
         }
         else if segmentType == .year {
-            startDate = Date().startOfYear
-            endDate = Date().endOfYear
+            startDate = Date().localTime.startOfYear
+            endDate = Date().localTime.endOfYear
         }
         
         print("startDate \(startDate)")
