@@ -1609,7 +1609,7 @@ extension Date {
     var startOfDay: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        return cal.startOfDay(for: localTime)
+        return cal.startOfDay(for: self)
     }
     
     var endOfDay: Date {
@@ -1621,7 +1621,7 @@ extension Date {
     var startOfWeek: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        return cal.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: localTime).date!
+        return cal.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date!
     }
 
     var endOfWeek: Date {
@@ -1633,7 +1633,7 @@ extension Date {
     var startOfMonth: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        let components = cal.dateComponents([.year, .month], from: localTime)
+        let components = cal.dateComponents([.year, .month], from: self)
         return cal.date(from: components)!
     }
 
@@ -1646,7 +1646,7 @@ extension Date {
     var startOfYear: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
-        let components = cal.dateComponents([.year], from: localTime)
+        let components = cal.dateComponents([.year], from: self)
         return  cal.date(from: components)!
     }
 
