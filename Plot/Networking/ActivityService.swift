@@ -40,7 +40,7 @@ class ActivityService {
         
     var eventKitManager: EventKitManager = {
         let eventKitSetupAssistant = EventKitSetupAssistant()
-        let eventKitService = EventKitService(setupAssistant: eventKitSetupAssistant)
+        let eventKitService = EventKitService()
         let eventKitManager = EventKitManager(eventKitService: eventKitService)
         return eventKitManager
     }()
