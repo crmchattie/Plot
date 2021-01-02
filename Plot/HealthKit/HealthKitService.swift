@@ -275,14 +275,15 @@ class HealthKitService {
                 }
         }
         
-        HKHealthStore().execute(query)
+        healthStore.execute(query)
     }
     
-    class func getAllSleepDataSamples(startDate: Date,
-                                endDate: Date,
-                                completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
+    class func getAllCategoryTypeSamples(forIdentifier identifier: HKCategoryTypeIdentifier,
+                                      startDate: Date,
+                                      endDate: Date,
+                                      completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
     
-        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+        guard let sleepType = HKObjectType.categoryType(forIdentifier: identifier) else {
             completion(nil, nil)
             return
         }
@@ -302,7 +303,7 @@ class HealthKitService {
         }
 
         // finally, we execute our query
-        HKHealthStore().execute(query)
+        healthStore.execute(query)
     }
     
     class func getSummaryActivityData(startDate: Date,
@@ -321,7 +322,16 @@ class HealthKitService {
             completion(summaries, error)
         }
         
-        HKHealthStore().execute(query)
-        
-    }    
+        healthStore.execute(query)
+    }
+    
+    // MARK:- Storing data
+    
+    class func storeSample(sample: HKSample, completion: @escaping (Bool, Error?) -> Void) {
+        healthStore.save(sample, withCompletion: completion)
+    }
+    
+    class func storeSamples(samples: [HKSample], completion: @escaping (Bool, Error?) -> Void) {
+        healthStore.save(samples, withCompletion: completion)
+    }
 }

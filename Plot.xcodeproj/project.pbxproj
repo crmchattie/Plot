@@ -244,8 +244,11 @@
 		2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */; };
 		2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2623AA9124FB67BF0020A316 /* HealthKitService.swift */; };
 		26317C30251DB250007CC315 /* WorkoutOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26317C2F251DB250007CC315 /* WorkoutOperation.swift */; };
+		26336E172593FA1A001A3071 /* HealthKitSampleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26336E162593FA1A001A3071 /* HealthKitSampleBuilder.swift */; };
+		263508AA258D76B000F57ACB /* MindfulnessOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263508A9258D76B000F57ACB /* MindfulnessOperation.swift */; };
 		26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */; };
 		265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */; };
+		265D4313259D203C00755EC2 /* ActivityBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265D4312259D203C00755EC2 /* ActivityBuilder.swift */; };
 		2666F4CE257DEA63001EF86B /* ActivityCategorySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2666F4CD257DEA63001EF86B /* ActivityCategorySelector.swift */; };
 		2670E33A252D2023007A6194 /* UserHealth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2670E339252D2023007A6194 /* UserHealth.swift */; };
 		2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2680A0332360C0BD00C4C287 /* Invitation.swift */; };
@@ -717,8 +720,11 @@
 		2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSetupAssistant.swift; sourceTree = "<group>"; };
 		2623AA9124FB67BF0020A316 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		26317C2F251DB250007CC315 /* WorkoutOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutOperation.swift; sourceTree = "<group>"; };
+		26336E162593FA1A001A3071 /* HealthKitSampleBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSampleBuilder.swift; sourceTree = "<group>"; };
+		263508A9258D76B000F57ACB /* MindfulnessOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindfulnessOperation.swift; sourceTree = "<group>"; };
 		26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityViewController+Migration.swift"; sourceTree = "<group>"; };
+		265D4312259D203C00755EC2 /* ActivityBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityBuilder.swift; sourceTree = "<group>"; };
 		2666F4CD257DEA63001EF86B /* ActivityCategorySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCategorySelector.swift; sourceTree = "<group>"; };
 		2670E339252D2023007A6194 /* UserHealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHealth.swift; sourceTree = "<group>"; };
 		2680A0332360C0BD00C4C287 /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
@@ -1384,6 +1390,7 @@
 				26C4431B250F0C9200A9533C /* Model */,
 				260C87C924FF5FE900715A64 /* HealthKitManager.swift */,
 				2623AA9124FB67BF0020A316 /* HealthKitService.swift */,
+				26336E162593FA1A001A3071 /* HealthKitSampleBuilder.swift */,
 				2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */,
 			);
 			path = HealthKit;
@@ -1410,6 +1417,7 @@
 				26317C2F251DB250007CC315 /* WorkoutOperation.swift */,
 				26958552255A7355008FEE9B /* NutritionOperation.swift */,
 				26BDCDCB2582097700E850CF /* SleepOperation.swift */,
+				263508A9258D76B000F57ACB /* MindfulnessOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);
 			path = Operations;
@@ -2060,6 +2068,7 @@
 				10737F8424912BDD00D146D6 /* Preview.swift */,
 				10B656CD24AFB0E7006686FA /* SectionType.swift */,
 				2666F4CD257DEA63001EF86B /* ActivityCategorySelector.swift */,
+				265D4312259D203C00755EC2 /* ActivityBuilder.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2656,6 +2665,7 @@
 				4BAEE4F321272D890045AB10 /* GroupProfileTableHeaderContainer.swift in Sources */,
 				1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */,
 				4BAEE46421272B380045AB10 /* AccountSettingsTableViewCell.swift in Sources */,
+				26336E172593FA1A001A3071 /* HealthKitSampleBuilder.swift in Sources */,
 				4BAEE49721272C5E0045AB10 /* FalconUsersFetcher.swift in Sources */,
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
 				4BA1E7832152582F00391BCB /* ChatLogController+DataSource.swift in Sources */,
@@ -2824,6 +2834,7 @@
 				26B975ED2365374A003BFBE3 /* InvitationsFetcher.swift in Sources */,
 				4BAEE47121272B380045AB10 /* AccountSettingsAvatarOpenerDelegate.swift in Sources */,
 				10B6B31625410D37008037AD /* FinanceTagsViewController.swift in Sources */,
+				265D4313259D203C00755EC2 /* ActivityBuilder.swift in Sources */,
 				10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */,
 				26E8E3A6238B2CA9000F30C8 /* NotificationsViewController.swift in Sources */,
 				10F3032C24EC6FD300C04B8F /* MXInstitution.swift in Sources */,
@@ -2956,6 +2967,7 @@
 				10DE97392475837B00D4A7E8 /* ListContainer.swift in Sources */,
 				4BAEE5F4212735E50045AB10 /* CenteredCollectionViewFlowLayout.swift in Sources */,
 				4B5E99E0212CC0D5001F067F /* ConversationsFetcher.swift in Sources */,
+				263508AA258D76B000F57ACB /* MindfulnessOperation.swift in Sources */,
 				4BAEE547212735200045AB10 /* SplashScreenContainer.swift in Sources */,
 				108087172583E72300FB9BB0 /* SummaryValueBarChartCell.swift in Sources */,
 				10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */,

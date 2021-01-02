@@ -59,6 +59,7 @@ class Activity: NSObject, NSCopying, Codable {
     var placeID: String?
     var attractionID: String?
     var showExtras: Bool?
+    var hkSampleID: String?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -723,4 +724,22 @@ func activityListStats(activities: [Activity], activityCategory: String, start: 
         }
     }
     completion(statistics, activityList)
+}
+
+extension Activity {
+    var startDate: Date? {
+        guard let startDateTime = startDateTime?.doubleValue else {
+            return nil
+        }
+        
+        return Date(timeIntervalSince1970: startDateTime)
+    }
+    
+    var endDate: Date? {
+        guard let endDateTime = endDateTime?.doubleValue else {
+            return nil
+        }
+        
+        return Date(timeIntervalSince1970: endDateTime)
+    }
 }

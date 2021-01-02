@@ -28,7 +28,7 @@ class WorkoutActions: NSObject {
     
     }
     
-    func deleteWorkout() {
+    public func deleteWorkout() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -46,7 +46,7 @@ class WorkoutActions: NSObject {
                 
     }
     
-    func createNewWorkout() {
+    public func createNewWorkout(shouldCreateActivity: Bool) {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -83,12 +83,38 @@ class WorkoutActions: NSObject {
             Analytics.logEvent("new_workout", parameters: [String: Any]())
             dispatchGroup.enter()
             connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
+            
+            createActivityAndUpdateHealthKit(shouldCreateActivity: shouldCreateActivity)
         } else {
             Analytics.logEvent("update_workout", parameters: [String: Any]())
         }
     }
     
-    func updateWorkoutParticipants() {
+    private func createActivityAndUpdateHealthKit(shouldCreateActivity: Bool) {
+        // Update healthKit
+        var hkSampleID: String?
+        if let hkWorkout = HealthKitSampleBuilder.createHKWorkout(from: workout) {
+            hkSampleID = hkWorkout.uuid.uuidString
+            HealthKitService.storeSample(sample: hkWorkout) { (_, _) in
+            }
+        }
+        
+        // create activity
+        if shouldCreateActivity {
+            if let activity = ActivityBuilder.createActivity(from: workout) {
+                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                activityActions.createNewActivity()
+                
+                // Update that the activity is created for workout/hkworkout
+                if let hkSampleID = hkSampleID, let currentUserId = Auth.auth().currentUser?.uid, let activityID = activity.activityID {
+                    let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+                    healthkitWorkoutsReference.setValue(activityID)
+                }
+            }
+        }
+    }
+    
+    public func updateWorkoutParticipants() {
         guard let _ = active, let workout = workout, let ID = ID else {
             return
         }

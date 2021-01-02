@@ -20,6 +20,7 @@ class ActivityActions: NSObject {
     var endDateTime: Date?
     
     let dispatchGroup = DispatchGroup()
+    let eventKitService = EventKitService()
         
     init(activity: Activity, active: Bool?, selectedFalconUsers: [User]) {
         super.init()
@@ -29,7 +30,6 @@ class ActivityActions: NSObject {
         self.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
         self.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
         self.selectedFalconUsers = selectedFalconUsers
-    
     }
     
     func deleteActivity() {
@@ -133,6 +133,16 @@ class ActivityActions: NSObject {
             InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
             }
         })
+        
+        // Save to calendar
+        guard let currentUserId = Auth.auth().currentUser?.uid, let event = eventKitService.storeEvent(for: activity) else {
+            return
+        }
+        
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(event.calendarItemIdentifier)
+        let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+        reference.updateChildValues(calendarEventActivityValue) { (_, _) in
+        }
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {

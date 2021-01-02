@@ -136,6 +136,10 @@ class HealthMetricCell: UICollectionViewCell {
             total = TimeInterval(healthMetric.total).stringTimeShort
             subtitleLabelText = "\(total) \(timeAgo)"
         }
+        else if case HealthMetricType.mindfulness = healthMetric.type {
+            total = TimeInterval(healthMetric.total).stringTimeShort
+            subtitleLabelText = "\(total) \(timeAgo)"
+        }
         
         subtitleLabel.text = subtitleLabelText
         
@@ -145,6 +149,10 @@ class HealthMetricCell: UICollectionViewCell {
                 averageText = "\(averageValue.clean) \(healthMetric.unitName) on average"
             }
             else if case HealthMetricType.sleep = healthMetric.type {
+                let shortTime = TimeInterval(averageValue).stringTimeShort
+                averageText = "\(shortTime) on average"
+            }
+            else if case HealthMetricType.mindfulness = healthMetric.type {
                 let shortTime = TimeInterval(averageValue).stringTimeShort
                 averageText = "\(shortTime) on average"
             }
@@ -185,6 +193,8 @@ class HealthMetricCell: UICollectionViewCell {
             imageName = "body-weight-scales"
         case .sleep:
             imageName = "sleep"
+        case .mindfulness:
+            imageName = "mindfulness"
         }
         
         activityTypeButton.setImage(UIImage(named: imageName), for: .normal)

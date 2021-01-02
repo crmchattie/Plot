@@ -85,24 +85,29 @@ class HealthKitManager {
             let sleepOp = SleepOperation(date: today)
             sleepOp.delegate = self
             
+            let mindfulnessOp = MindfulnessOperation(date: today)
+            mindfulnessOp.delegate = self
+            
             // Workouts
-            let functionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .functionalStrengthTraining, rank: 1)
+            // Consider workouts until a day in future
+            let futureDay = today.dayAfter
+            let functionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .functionalStrengthTraining, rank: 1)
             functionalStrengthTrainingOp.delegate = self
             functionalStrengthTrainingOp.lastSyncDate = lastSyncDate
-            
-            let traditionalStrengthTrainingOp = WorkoutOperation(date: today, workoutActivityType: .traditionalStrengthTraining, rank: 2)
+
+            let traditionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .traditionalStrengthTraining, rank: 2)
             traditionalStrengthTrainingOp.delegate = self
             traditionalStrengthTrainingOp.lastSyncDate = lastSyncDate
             
-            let runningOp = WorkoutOperation(date: today, workoutActivityType: .running, rank: 3)
+            let runningOp = WorkoutOperation(date: futureDay, workoutActivityType: .running, rank: 3)
             runningOp.delegate = self
             runningOp.lastSyncDate = lastSyncDate
             
-            let cyclingOp = WorkoutOperation(date: today, workoutActivityType: .cycling, rank: 4)
+            let cyclingOp = WorkoutOperation(date: futureDay, workoutActivityType: .cycling, rank: 4)
             cyclingOp.delegate = self
             cyclingOp.lastSyncDate = lastSyncDate
-            
-            let hiitOp = WorkoutOperation(date: today, workoutActivityType: .highIntensityIntervalTraining, rank: 5)
+
+            let hiitOp = WorkoutOperation(date: futureDay, workoutActivityType: .highIntensityIntervalTraining, rank: 5)
             hiitOp.delegate = self
             hiitOp.lastSyncDate = lastSyncDate
             
@@ -124,7 +129,7 @@ class HealthKitManager {
             dietarySugarOp.delegate = self
             
             // Setup queue
-            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
+            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in
@@ -161,10 +166,11 @@ class HealthKitManager {
             
         let reference = Database.database().reference().child(userHealthEntity).child(currentUser)
         reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            
             if snapshot.exists(),
-                let value = snapshot.value,
-                let userHealth = try? FirebaseDecoder().decode(UserHealth.self, from: value) {
-                completion(userHealth.lastSyncDate)
+               let value = snapshot.value as? [String: Any], let lastSyncDateTimeInterval = value[lastSyncDateKey] as? Double {
+                let lastSyncDate = Date(timeIntervalSince1970: lastSyncDateTimeInterval)
+                completion(lastSyncDate)
             } else {
                 completion(nil)
             }
@@ -201,24 +207,25 @@ class HealthKitManager {
                 userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                     self?.saveActivitiesDispatchGroup.leave()
                 })
+                
+                if let hkSampleID = activity.hkSampleID {
+                    let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+                    healthkitWorkoutsReference.setValue(activityID)
+                }
             }
         }
         
         let reference = Database.database().reference().child(userHealthEntity).child(currentUserId)
         saveActivitiesDispatchGroup.enter()
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
-            if snapshot.exists(), let value = snapshot.value, var userHealth = try? FirebaseDecoder().decode(UserHealth.self, from: value) {
-                userHealth.lastSyncDate = Date()
-                if let firebaseUserHealth = try? FirebaseEncoder().encode(userHealth) {
-                    reference.setValue(firebaseUserHealth)
-                }
+            if snapshot.exists() {
+                let values = [lastSyncDateKey: Date().timeIntervalSince1970]
+                reference.updateChildValues(values)
             }
             else if !snapshot.exists() {
                 let identifier = UUID().uuidString
-                let userHealth = UserHealth(identifier: identifier, lastSyncDate: Date())
-                if let firebaseUserHealth = try? FirebaseEncoder().encode(userHealth) {
-                    reference.setValue(firebaseUserHealth)
-                }
+                let values = [identifierKey: identifier, lastSyncDateKey: Date().timeIntervalSince1970] as [String : Any]
+                reference.setValue(values)
             }
             
             self?.saveActivitiesDispatchGroup.leave()

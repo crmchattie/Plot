@@ -11,14 +11,10 @@ import EventKit
 
 class EventKitSetupAssistant {
     
-    let eventStore: EKEventStore
+    static let eventStore = EKEventStore()
     
-    init() {
-        eventStore = EKEventStore()
-    }
-    
-    func authorizeEventKit(completion: @escaping (Bool, Error?) -> Swift.Void) {
-        eventStore.requestAccess(to: .event) { granted, error in
+    class func authorizeEventKit(completion: @escaping (Bool, Error?) -> Swift.Void) {
+        EventKitSetupAssistant.eventStore.requestAccess(to: .event) { granted, error in
             completion(granted, error)
         }
     }
