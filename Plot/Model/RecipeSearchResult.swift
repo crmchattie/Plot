@@ -24,7 +24,7 @@ struct RecipeSearchResult: Codable, Equatable, Hashable {
 }
 
 struct Recipe: Codable, Equatable, Hashable {
-    let uuid = UUID().uuidString
+    var uuid = UUID().uuidString
     let id: Int
     var title: String
     var readyInMinutes, servings: Int?

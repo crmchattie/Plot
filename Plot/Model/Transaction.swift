@@ -203,7 +203,7 @@ enum TransactionStatus: String, Codable {
 
 
 struct TransactionDetails: Codable, Equatable, Hashable {
-    let uuid = UUID().uuidString
+    var uuid = UUID().uuidString
     var name: String
     var amount: Double
     var level: TransactionCatLevel
