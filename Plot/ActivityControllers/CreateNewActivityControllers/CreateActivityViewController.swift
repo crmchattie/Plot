@@ -171,7 +171,7 @@ class CreateActivityViewController: FormViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
         
-        navigationItem.title = "Activity"
+        navigationItem.title = "Event"
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -755,7 +755,7 @@ class CreateActivityViewController: FormViewController {
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        $0.title = "Add Activity"
+                                        $0.title = "Add Event"
                                         }.cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                             cell.textLabel?.textAlignment = .left
@@ -1763,7 +1763,7 @@ class CreateActivityViewController: FormViewController {
             }
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "New Event", style: .default, handler: { (_) in
                 let destination = ActivityTypeViewController()
                 destination.users = self.acceptedParticipant
                 destination.filteredUsers = self.acceptedParticipant
@@ -1772,7 +1772,7 @@ class CreateActivityViewController: FormViewController {
                 destination.delegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
-            alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Existing Event", style: .default, handler: { (_) in
                 let destination = ChooseActivityTableViewController()
                 destination.needDelegate = true
                 destination.delegate = self
@@ -1932,12 +1932,12 @@ class CreateActivityViewController: FormViewController {
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 
-            alert.addAction(UIAlertAction(title: "Update Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Update Event", style: .default, handler: { (_) in
                 print("User click Edit button")
                 self.createActivity()
             }))
             
-            alert.addAction(UIAlertAction(title: "Duplicate Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Duplicate Event", style: .default, handler: { (_) in
                 print("User click Edit button")
                 self.duplicateActivity()
             }))
@@ -2051,7 +2051,7 @@ class CreateActivityViewController: FormViewController {
             }))
         }
         
-//        alert.addAction(UIAlertAction(title: "Share Activity", style: .default, handler: { (_) in
+//        alert.addAction(UIAlertAction(title: "Share Event", style: .default, handler: { (_) in
 //            print("User click Edit button")
 //            self.share()
 //        }))
@@ -2118,7 +2118,7 @@ class CreateActivityViewController: FormViewController {
                             "object": data] as [String: AnyObject]
                 let activityObject = ActivityObject(dictionary: aO)
             
-                let alert = UIAlertController(title: "Share Activity", message: nil, preferredStyle: .actionSheet)
+                let alert = UIAlertController(title: "Share Event", message: nil, preferredStyle: .actionSheet)
 
                 alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
                     print("User click Approve button")

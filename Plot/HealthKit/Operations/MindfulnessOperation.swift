@@ -51,7 +51,9 @@ class MindfulnessOperation: AsyncOperation {
             if let last = sortedDates.last?.key, let val = map[last] {
                 var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
                 metric.average = average
+
                 _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue)
+                
             }
 
             self?.finish()

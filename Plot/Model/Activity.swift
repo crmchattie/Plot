@@ -459,7 +459,7 @@ enum CustomType: String, Equatable, Hashable {
     
     var name: String {
         switch self {
-        case .basic: return "Activity"
+        case .basic: return "Event"
         case .complex: return "Complex"
         case .meal: return "Meal"
         case .workout: return "Workout"
@@ -479,8 +479,8 @@ enum CustomType: String, Equatable, Hashable {
     
     var categoryText: String {
         switch self {
-        case .basic: return "Build your own basic activity"
-        case .complex: return "Build your own complex activity"
+        case .basic: return "Build your own basic event"
+        case .complex: return "Build your own complex event"
         case .meal: return "Build your own meal"
         case .workout: return "Build your own workout"
         case .event: return "Build your own event"
@@ -499,8 +499,8 @@ enum CustomType: String, Equatable, Hashable {
     
     var subcategoryText: String {
         switch self {
-        case .basic: return "Includes basic calendar activity fields"
-        case .complex: return "Includes basic activity fields plus a schedule, a checklist and purchases fields"
+        case .basic: return "Includes basic calendar event fields"
+        case .complex: return "Includes basic event fields plus a schedule, a checklist and purchases fields"
         case .meal: return "Build a meal by looking up grocery products and/or restaurant menu items"
         case .workout: return "Build a workout by setting type, duration and intensity"
         case .event: return ""
