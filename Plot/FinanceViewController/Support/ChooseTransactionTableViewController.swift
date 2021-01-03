@@ -28,10 +28,17 @@ class ChooseTransactionTableViewController: UITableViewController {
     let dateFormatterPrint = DateFormatter()
     
     weak var delegate : ChooseTransactionDelegate?
+    
+    var movingBackwards = false
         
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Choose Transaction"
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
@@ -46,9 +53,17 @@ class ChooseTransactionTableViewController: UITableViewController {
         }
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        if movingBackwards {
+            let transaction = Transaction(description: "Transaction Name", amount: 0.0, created_at: "", guid: "", user_guid: "", status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
+            self.delegate?.chosenTransaction(transaction: transaction)
+        }
+    }
+    
     @objc fileprivate func closeTransaction() {
         let transaction = Transaction(description: "Transaction Name", amount: 0.0, created_at: "", guid: "", user_guid: "", status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
         self.delegate?.chosenTransaction(transaction: transaction)
+        movingBackwards = false
         dismiss(animated: true, completion: nil)
     }
     
@@ -119,6 +134,7 @@ class ChooseTransactionTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         let transaction = filteredTransactions[indexPath.row]
         delegate?.chosenTransaction(transaction: transaction)
+        movingBackwards = false
         self.dismiss(animated: true, completion: nil)
     }
 }

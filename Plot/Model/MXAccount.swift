@@ -792,8 +792,6 @@ func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, star
     var statistics = [Statistic]()
     var accountList = [MXAccount]()
     let isodateFormatter = ISO8601DateFormatter()
-    print("date \(date)")
-    print("nextDate \(nextDate)")
     for account in accounts {
         if account.should_link ?? true == false {
             continue

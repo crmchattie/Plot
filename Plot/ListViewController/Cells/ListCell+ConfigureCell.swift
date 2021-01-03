@@ -16,7 +16,7 @@ extension ListCell {
         
         backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        listImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        listImageView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
         if let grocerylist = grocerylist {
             self.grocerylist = grocerylist

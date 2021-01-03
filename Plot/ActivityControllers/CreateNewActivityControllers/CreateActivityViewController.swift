@@ -1775,6 +1775,7 @@ class CreateActivityViewController: FormViewController {
             alert.addAction(UIAlertAction(title: "Existing Event", style: .default, handler: { (_) in
                 let destination = ChooseActivityTableViewController()
                 destination.needDelegate = true
+                destination.movingBackwards = true
                 destination.delegate = self
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
@@ -1820,6 +1821,7 @@ class CreateActivityViewController: FormViewController {
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
                 let destination = ChooseTransactionTableViewController()
                 destination.delegate = self
+                destination.movingBackwards = true
                 destination.existingTransactions = self.purchaseList
                 let navController = UINavigationController(rootViewController: destination)
                 self.present(navController, animated: true, completion: nil)
@@ -1913,6 +1915,7 @@ class CreateActivityViewController: FormViewController {
                 let destination = ChooseListTableViewController()
                 destination.delegate = self
                 destination.needDelegate = true
+                destination.movingBackwards = true
                 destination.grocerylistExists = self.grocerylistIndex != -1
                 let navController = UINavigationController(rootViewController: destination)
                 self.present(navController, animated: true, completion: nil)

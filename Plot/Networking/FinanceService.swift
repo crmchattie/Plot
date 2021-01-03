@@ -55,8 +55,6 @@ class FinanceService {
     
     func grabFinances(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [unowned self] in
-            getMXUser() { _ in }
-            
             accountFetcher.fetchAccounts { (firebaseAccounts) in
                 self.accounts = firebaseAccounts
                 self.observeAccountsForCurrentUser()
@@ -68,6 +66,7 @@ class FinanceService {
                 self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
                     self.transactions = firebaseTransactions
                     self.observeTransactionsForCurrentUser()
+                    self.getMXData()
                     completion()
                 }
             }
@@ -501,10 +500,13 @@ class FinanceService {
             do {
                 var _account = account
                 if _account.balances != nil {
+                    print("_account.balances != nil \(_account.balances)")
                     if !_account.balances!.values.contains(_account.available_balance ?? _account.balance) {
                         _account.balances![_account.updated_at] = _account.available_balance ?? _account.balance
+                        print("_account.balances \(_account.balances)")
                     }
                 } else {
+                    print("_account.balances == nil")
                     _account.balances = [_account.updated_at: _account.available_balance ?? _account.balance]
                 }
                 // store account info

@@ -14,9 +14,9 @@ extension UserCell {
   
   func configureCell(for indexPath: IndexPath, conversations: [Conversation]) {
     
-    backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-    contentView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-    chatImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+    contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+    chatImageView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
 
     
     self.conversation = conversations[indexPath.row]

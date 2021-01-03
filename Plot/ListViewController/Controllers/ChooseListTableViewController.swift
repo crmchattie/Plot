@@ -81,6 +81,8 @@ class ChooseListTableViewController: UITableViewController {
     // [chatID: Participants]
     var listParticipants: [String: [User]] = [:]
     
+    var movingBackwards = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -92,12 +94,23 @@ class ChooseListTableViewController: UITableViewController {
         tableView.estimatedRowHeight = 105
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        if needDelegate && movingBackwards {
+            let newList = ListContainer()
+            delegate?.chosenList(list: newList)
+        }
+    }
+    
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
     }
     
     fileprivate func configureTableView() {
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         tableView.register(ListCell.self, forCellReuseIdentifier: listCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -124,6 +137,7 @@ class ChooseListTableViewController: UITableViewController {
             let newList = ListContainer()
             delegate?.chosenList(list: newList)
         }
+        movingBackwards = false
         dismiss(animated: true, completion: nil)
     }
     
@@ -324,6 +338,8 @@ class ChooseListTableViewController: UITableViewController {
         let list = filteredLists[indexPath.row]
         if needDelegate {
             delegate?.chosenList(list: list)
+            movingBackwards = false
+            dismiss(animated: true, completion: nil)
         } else if let grocerylist = list.grocerylist {
             if recipe.extendedIngredients != nil {
                 print("extendedIngredients does not equal nil")
@@ -357,7 +373,6 @@ class ChooseListTableViewController: UITableViewController {
     }
     
     fileprivate func updateGrocerylist(grocerylist: Grocerylist, recipe: Recipe, active: Bool) {
-        print("updating grocery list")
         if grocerylist.ingredients != nil, let recipeIngredients = recipe.extendedIngredients {
             var glIngredients = grocerylist.ingredients!
             if let grocerylistServings = grocerylist.servings!["\(recipe.id)"], grocerylistServings != recipe.servings {

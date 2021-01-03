@@ -73,16 +73,14 @@ class ChooseChatTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.isNavigationBarHidden = false
-        navigationController?.navigationBar.isHidden = false
-        navigationItem.largeTitleDisplayMode = .never
         
-        fetchConversations()
         configureTableView()
         setupSearchController()
         
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 105
+        
+        handleReloadTable()
     }
     
     
@@ -90,14 +88,14 @@ class ChooseChatTableViewController: UITableViewController {
         return ThemeManager.currentTheme().statusBarStyle
     }
     
-    fileprivate func fetchConversations() {
-        
-    }
-    
     fileprivate func configureTableView() {
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+
         tableView.register(UserCell.self, forCellReuseIdentifier: userCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeChat))

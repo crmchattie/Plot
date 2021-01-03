@@ -320,28 +320,28 @@ class MealViewController: FormViewController {
                         
                     }
         
-            <<< ButtonRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                if active {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = self.userNamesString
-                }
-            }.onCellSelection({ _,_ in
-                self.openParticipantsInviter()
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textLabel?.textAlignment = .left
-                if row.title == "Participants" {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                } else {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            }
+//            <<< ButtonRow("Participants") { row in
+//                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                row.cell.textLabel?.textAlignment = .left
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                row.cell.accessoryType = .disclosureIndicator
+//                row.title = row.tag
+//                if active {
+//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    row.title = self.userNamesString
+//                }
+//            }.onCellSelection({ _,_ in
+//                self.openParticipantsInviter()
+//            }).cellUpdate { cell, row in
+//                cell.accessoryType = .disclosureIndicator
+//                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                cell.textLabel?.textAlignment = .left
+//                if row.title == "Participants" {
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                } else {
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                }
+//            }
         
             <<< DecimalRow("Amount") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

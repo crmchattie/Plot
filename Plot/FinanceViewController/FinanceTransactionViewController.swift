@@ -216,6 +216,24 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }
             
+            <<< TextAreaRow("Description") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                $0.value = transaction.transactionDescription
+                }.cellUpdate({ (cell, row) in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }).onChange { row in
+                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transactionDescription")
+                    self.transaction.transactionDescription = row.value
+                    reference.setValue(row.value)
+                }
+            
             <<< TextRow("Date") {
                 $0.cell.isUserInteractionEnabled = false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -446,41 +464,24 @@ class FinanceTransactionViewController: FormViewController {
             
         form +++
             Section()
-            <<< ButtonRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                if active {
-                    row.title = self.userNamesString
-                }
-                }.onCellSelection({ _,_ in
-                    self.openParticipantsInviter()
-                }).cellUpdate { cell, row in
-                    cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.textLabel?.textAlignment = .left
-                }
+//            <<< ButtonRow("Participants") { row in
+//                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                row.cell.textLabel?.textAlignment = .left
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                row.cell.accessoryType = .disclosureIndicator
+//                row.title = row.tag
+//                if active {
+//                    row.title = self.userNamesString
+//                }
+//                }.onCellSelection({ _,_ in
+//                    self.openParticipantsInviter()
+//                }).cellUpdate { cell, row in
+//                    cell.accessoryType = .disclosureIndicator
+//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.textLabel?.textAlignment = .left
+//                }
         
-            <<< TextAreaRow("Description") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.placeholder = $0.tag
-                $0.value = transaction.transactionDescription
-                }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                }).onChange { row in
-                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transactionDescription")
-                    self.transaction.transactionDescription = row.value
-                    reference.setValue(row.value)
-                }
     }
     
     @objc func goToExtras() {

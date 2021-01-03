@@ -69,6 +69,8 @@ class ChooseActivityTableViewController: UITableViewController {
     // [chatID: Participants]
     var activityParticipants: [String: [User]] = [:]
     
+    var movingBackwards = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -96,12 +98,23 @@ class ChooseActivityTableViewController: UITableViewController {
         tableView.estimatedRowHeight = 105
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        if needDelegate && movingBackwards {
+            let activity = Activity(dictionary: ["activityID": "" as AnyObject])
+            delegate?.chosenActivity(mergeActivity: activity)
+        }
+    }
+    
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
     }
     
     fileprivate func configureTableView() {
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -121,6 +134,7 @@ class ChooseActivityTableViewController: UITableViewController {
             let activity = Activity(dictionary: ["activityID": "" as AnyObject])
             delegate?.chosenActivity(mergeActivity: activity)
         }
+        movingBackwards = false
         dismiss(animated: true, completion: nil)
     }
     
@@ -229,6 +243,7 @@ class ChooseActivityTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let activity = filteredActivities[indexPath.row]
         delegate?.chosenActivity(mergeActivity: activity)
+        movingBackwards = false
         self.dismiss(animated: true, completion: nil)
     }
 }

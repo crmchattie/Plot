@@ -21,6 +21,11 @@ enum Identifiers {
     static let checklistCategory = "CHECKLIST_CATEGORY"
     static let grocerylistCategory = "GROCERYLIST_CATEGORY"
     static let activitylistCategory = "ACTIVITYLIST_CATEGORY"
+    static let mealCategory = "MEAL_CATEGORY"
+    static let workoutCategory = "WORKOUT_CATEGORY"
+    static let mindfulnessCategory = "MINDFULNESS_CATEGORY"
+    static let transactionCategory = "TRANSACTION_CATEGORY"
+    static let accountCategory = "ACCOUNT_CATEGORY"
 }
 
 @UIApplicationMain
@@ -89,43 +94,49 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             guard granted else { return }
             
-            // 1
-            let viewActivityAction = UNNotificationAction(
-                identifier: Identifiers.viewActivitiesAction, title: "View Activities",
-                options: [.foreground])
-            
-            let viewChatAction = UNNotificationAction(
-                identifier: Identifiers.viewChatsAction, title: "View Chats",
-                options: [.foreground])
-            
-            let viewListAction = UNNotificationAction(
-                identifier: Identifiers.viewListsAction, title: "View Lists",
-                options: [.foreground])
-            
-            // 2
             let activityCategory = UNNotificationCategory(
-                identifier: Identifiers.activityCategory, actions: [viewActivityAction],
+                identifier: Identifiers.activityCategory, actions: [],
                 intentIdentifiers: [], options: [])
             
             let chatCategory = UNNotificationCategory(
-                identifier: Identifiers.chatCategory, actions: [viewChatAction],
+                identifier: Identifiers.chatCategory, actions: [],
                 intentIdentifiers: [], options: [])
             
             let checklistCategory = UNNotificationCategory(
-                identifier: Identifiers.checklistCategory, actions: [viewListAction],
+                identifier: Identifiers.checklistCategory, actions: [],
                 intentIdentifiers: [], options: [])
             
             let grocerylistCategory = UNNotificationCategory(
-                identifier: Identifiers.grocerylistCategory, actions: [viewListAction],
+                identifier: Identifiers.grocerylistCategory, actions: [],
                 intentIdentifiers: [], options: [])
             
             let activitylistCategory = UNNotificationCategory(
-                identifier: Identifiers.activitylistCategory, actions: [viewListAction],
+                identifier: Identifiers.activitylistCategory, actions: [],
+                intentIdentifiers: [], options: [])
+            
+            let mealCategory = UNNotificationCategory(
+                identifier: Identifiers.mealCategory, actions: [],
+                intentIdentifiers: [], options: [])
+            
+            let workoutCategory = UNNotificationCategory(
+                identifier: Identifiers.workoutCategory, actions: [],
+                intentIdentifiers: [], options: [])
+            
+            let mindfulnessCategory = UNNotificationCategory(
+                identifier: Identifiers.mindfulnessCategory, actions: [],
+                intentIdentifiers: [], options: [])
+            
+            let transactionCategory = UNNotificationCategory(
+                identifier: Identifiers.transactionCategory, actions: [],
+                intentIdentifiers: [], options: [])
+            
+            let accountCategory = UNNotificationCategory(
+                identifier: Identifiers.accountCategory, actions: [],
                 intentIdentifiers: [], options: [])
             
             
             // 3
-            UNUserNotificationCenter.current().setNotificationCategories([chatCategory, activityCategory, checklistCategory, grocerylistCategory, activitylistCategory])
+            UNUserNotificationCenter.current().setNotificationCategories([chatCategory, activityCategory, checklistCategory, grocerylistCategory, activitylistCategory, mealCategory, workoutCategory, mindfulnessCategory, transactionCategory, accountCategory])
             
             //get application instance ID
             InstanceID.instanceID().instanceID { (result, error) in
@@ -565,6 +576,50 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                             }
                         }
                     })
+                } else if let transactionID = userInfo["transactionID"] as? String {
+                    let ref = Database.database().reference()
+                    ref.child(financialTransactionsEntity).child(transactionID).observeSingleEvent(of: .value, with: { snapshot in
+                        if snapshot.exists(), let snapshotValue = snapshot.value {
+                            if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue) {
+                                let destination = FinanceTransactionViewController()
+                                destination.transaction = transaction
+                                self.getParticipants(transaction: transaction, account: nil) { (participants) in
+                                    destination.selectedFalconUsers = participants
+                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                        tabBarController.selectedIndex = 1
+                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                            homeNavigationController.pushViewController(destination, animated: true)
+                                            
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    })
+                } else if let accountID = userInfo["accountID"] as? String {
+                    let ref = Database.database().reference()
+                    ref.child(financialAccountsEntity).child(accountID).observeSingleEvent(of: .value, with: { snapshot in
+                        if snapshot.exists(), let snapshotValue = snapshot.value {
+                            if let account = try? FirebaseDecoder().decode(MXAccount.self, from: snapshotValue) {
+                                let destination = FinanceAccountViewController()
+                                destination.account = account
+                                self.getParticipants(transaction: nil, account: account) { (participants) in
+                                    destination.selectedFalconUsers = participants
+                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                        tabBarController.selectedIndex = 1
+                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
+                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
+                                            homeNavigationController.pushViewController(destination, animated: true)
+                                            
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    })
                 }
             }
         }
@@ -738,6 +793,78 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         group.notify(queue: .main) {
             self.participants[activityID] = participants
+            completion(participants)
+        }
+    }
+    
+    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
+        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = transaction.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if transaction.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = account.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            
+            for id in participantsIDs {
+                if account.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else {
+            let participants: [User] = []
             completion(participants)
         }
     }

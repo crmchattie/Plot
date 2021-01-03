@@ -180,7 +180,8 @@ class MasterActivityContainerController: UIViewController {
     
     func setNavBar() {
         let notificationsBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell"), style: .plain, target: self, action: #selector(goToNotifications))
-        navigationItem.leftBarButtonItem = notificationsBarButton
+        let chatBarButton = UIBarButtonItem(image: UIImage(named: "chat"), style: .plain, target: self, action: #selector(goToChat))
+        navigationItem.leftBarButtonItems = [notificationsBarButton, chatBarButton]
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         navigationItem.rightBarButtonItem = newItemBarButton
@@ -558,13 +559,24 @@ extension MasterActivityContainerController {
     @objc func goToNotifications() {
         let destination = NotificationsViewController()
         destination.notificationActivities = networkController.activityService.activities
-        destination.invitedActivities = self.networkController.activityService.invitedActivities
-        destination.invitations = self.networkController.activityService.invitations
+        destination.invitedActivities = networkController.activityService.invitedActivities
+        destination.invitations = networkController.activityService.invitations
         destination.users = networkController.userService.users
         destination.filteredUsers = networkController.userService.users
         destination.conversations = networkController.conversationService.conversations
         destination.listList = networkController.listService.listList
         destination.sortInvitedActivities()
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    @objc func goToChat() {
+        let destination = ChatsTableViewController()
+        destination.conversations = networkController.conversationService.conversations
+        destination.contacts = networkController.userService.contacts
+        destination.users = networkController.userService.users
+        destination.filteredUsers = networkController.userService.users
+        destination.conversations = networkController.conversationService.conversations
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -977,9 +989,6 @@ extension MasterActivityContainerController {
             destination.delegate = self
             destination.activity = activity
             destination.conversations = networkController.conversationService.conversations
-            destination.pinnedConversations = networkController.conversationService.conversations
-            destination.filteredConversations = networkController.conversationService.conversations
-            destination.filteredPinnedConversations = networkController.conversationService.conversations
             present(navController, animated: true, completion: nil)
         } else {
             let groupChatDataReference = Database.database().reference().child("groupChats").child(conversationID!).child(messageMetaDataFirebaseFolder)

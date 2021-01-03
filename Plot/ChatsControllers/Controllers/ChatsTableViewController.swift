@@ -10,7 +10,6 @@ import UIKit
 import Contacts
 import Firebase
 import SDWebImage
-import PhoneNumberKit
 
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     switch (lhs, rhs) {
@@ -61,14 +60,13 @@ class ChatsTableViewController: UITableViewController {
         
     let viewPlaceholder = ViewPlaceholder()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
-    let phoneNumberKit = PhoneNumberKit()
     
     // [chatID: Participants]
     var chatParticipants: [String: [User]] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        title = "Chats"
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
@@ -76,17 +74,7 @@ class ChatsTableViewController: UITableViewController {
         print("chat view did load")
         configureTableView()
         addObservers()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
+        handleReloadTable()
     }
     
     deinit {
@@ -126,9 +114,12 @@ class ChatsTableViewController: UITableViewController {
         tableView.backgroundColor = view.backgroundColor
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 105
+        
         navigationItem.leftBarButtonItem = editButtonItem
+        
+        let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
         let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
-        navigationItem.rightBarButtonItem = newChatBarButton
+        navigationItem.rightBarButtonItems = [newChatBarButton, searchBarButton]
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
@@ -148,6 +139,10 @@ class ChatsTableViewController: UITableViewController {
             destination.conversations = conversations
         }
         navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    @objc fileprivate func search() {
+        setupSearchController()
     }
     
     func setupSearchController() {
@@ -191,10 +186,8 @@ class ChatsTableViewController: UITableViewController {
                 
         if !isAppLoaded {
             tableView.reloadData()
-//            configureTabBarBadge()
         } else {
             tableView.reloadData()
-//            configureTabBarBadge()
         }
         
         if filteredConversations.count == 0 && filteredPinnedConversations.count == 0 {
