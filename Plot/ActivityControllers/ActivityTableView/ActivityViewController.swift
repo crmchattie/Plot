@@ -230,7 +230,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         activityView.calendar.dataSource = self
         activityView.calendar.delegate = self
-        activityView.calendar.select(Date())
+        activityView.calendar.select(Date().localTime)
         activityView.calendar.register(FSCalendarCell.self, forCellReuseIdentifier: "cell")
         activityView.calendar.scope = getCalendarScope()
         activityView.calendar.swipeToChooseGesture.isEnabled = true // Swipe-To-Choose
@@ -343,7 +343,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         saveDataToSharedContainer(activities: allActivities)
         
         activityView.tableView.reloadDataWithCompletion() {
-            self.scrollToFirstActivityWithDate(date: self.activityView.calendar.selectedDate!, animated: false)
+            self.scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
         }
         
         if allActivities.count == 0 {
@@ -380,14 +380,13 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func scrollToFirstActivityWithDate(date: Date, animated: Bool) {
-        let currentDate = date        
         var index = 0
         var activityFound = false
         for activity in self.filteredActivities {
             if let startInterval = activity.startDateTime?.doubleValue, let endInterval = activity.endDateTime?.doubleValue {
                 let startDate = Date(timeIntervalSince1970: startInterval)
                 let endDate = Date(timeIntervalSince1970: endInterval)
-                if currentDate < startDate || currentDate < endDate {
+                if date < startDate || date < endDate {
                     activityFound = true
                     break
                 }
@@ -400,7 +399,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         if activityFound && numberOfSections > 1 {
             let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
             if index < numberOfRows {
-                print("indexPath AV \(index)")
                 let indexPath = IndexPath(row: index, section: 1)
                 self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
                 if !animated {
@@ -409,7 +407,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             }
         } else if !activityFound {
             let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
-            print("numberOfRows AV \(numberOfRows)")
             if numberOfRows > 0 {
                 let indexPath = IndexPath(row: numberOfRows - 1, section: 1)
                 self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)

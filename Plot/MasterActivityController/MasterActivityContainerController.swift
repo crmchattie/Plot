@@ -255,7 +255,7 @@ class MasterActivityContainerController: UIViewController {
     func scrollToFirstActivityWithDate(_ completion: @escaping ([Activity]) -> Void) {
         let allActivities = networkController.activityService.activities
         var activities = [Activity]()
-        let currentDate = Date().localDate()
+        let currentDate = Date().localTime
         var index = 0
         var activityFound = false
         if allActivities.count < 2 {
