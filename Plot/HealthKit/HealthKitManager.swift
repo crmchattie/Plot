@@ -87,6 +87,7 @@ class HealthKitManager {
             
             let mindfulnessOp = MindfulnessOperation(date: today)
             mindfulnessOp.delegate = self
+            mindfulnessOp.lastSyncDate = lastSyncDate
             
             // Workouts
             // Consider workouts until a day in future

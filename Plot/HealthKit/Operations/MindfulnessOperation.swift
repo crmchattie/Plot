@@ -8,11 +8,13 @@
 
 import Foundation
 import HealthKit
+import Firebase
 
 class MindfulnessOperation: AsyncOperation {
     weak var delegate: MetricOperationDelegate?
-    
     private var date: Date
+    var lastSyncDate: Date?
+    
     init(date: Date) {
         self.date = date
     }
@@ -25,37 +27,69 @@ class MindfulnessOperation: AsyncOperation {
         let endDate = date
         let startDate = endDate.lastYear
         HealthKitService.getAllCategoryTypeSamples(forIdentifier:.mindfulSession, startDate: startDate, endDate: endDate) { [weak self] samples, error  in
-            guard let samples = samples, samples.count > 0, error == nil, let _self = self else {
+            guard let samples = samples, samples.count > 0, error == nil, let _self = self, let currentUserID = Auth.auth().currentUser?.uid else {
                 self?.finish()
                 return
             }
             
-            var startDay = startDate.dayBefore
-            var interval = NSDateInterval(start: startDay, duration: 86400)
-            var map: [Date: Double] = [:]
-            var sum: Double = 0
-            for sample in samples {
-                while !(interval.contains(sample.endDate)) && interval.endDate < endDate {
-                    startDay = startDay.advanced(by: 86400)
-                    interval = NSDateInterval(start: startDay, duration: 86400)
+            let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey)
+            healthkitWorkoutsReference.observeSingleEvent(of: .value) { dataSnapshot in
+                var existingWorkoutKeys: [String: Any] = [:]
+                if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
+                    existingWorkoutKeys = dataSnapshotValue
                 }
                 
-                let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
-                map[startDay, default: 0] += timeSum
-                sum += timeSum
-            }
-            
-            let sortedDates = Array(map.sorted(by: { $0.0 < $1.0 }))
-            let average = sum / Double(map.count)
-            
-            if let last = sortedDates.last?.key, let val = map[last] {
-                var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
-                metric.average = average
+                var activities: [Activity] = []
+                var startDay = startDate.dayBefore
+                var interval = NSDateInterval(start: startDay, duration: 86400)
+                var map: [Date: Double] = [:]
+                var sum: Double = 0
+                for sample in samples {
+                    while !(interval.contains(sample.endDate)) && interval.endDate < endDate {
+                        startDay = startDay.advanced(by: 86400)
+                        interval = NSDateInterval(start: startDay, duration: 86400)
+                    }
+                    
+                    let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
+                    map[startDay, default: 0] += timeSum
+                    sum += timeSum
+                    
+                    // Only create activities that past lastSync date time
+                    if (_self.lastSyncDate == nil || (sample.startDate >= _self.lastSyncDate!)) && existingWorkoutKeys[sample.uuid.uuidString] == nil {
+                        var activityID = UUID().uuidString
+                        if let newId = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
+                            activityID = newId
+                        }
+                        
+                        let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
+                        activity.activityType = "Mindfulness"
+                        activity.category = "Mindfulness"
+                        activity.name = "Mindfulness Session"
+                        
+                        let timezone = TimeZone.current
+                        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+                        let startDateTime = sample.startDate.addingTimeInterval(seconds)
+                        let endDateTime = sample.endDate.addingTimeInterval(seconds)
+                        activity.startDateTime = NSNumber(value: startDateTime.timeIntervalSince1970)
+                        activity.endDateTime = NSNumber(value: endDateTime.timeIntervalSince1970)
 
-                _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue)
+                        activity.allDay = false
+                        activity.hkSampleID = sample.uuid.uuidString
+                        activities.append(activity)
+                    }
+                }
                 
-            }
+                let sortedDates = Array(map.sorted(by: { $0.0 < $1.0 }))
+                let average = sum / Double(map.count)
+                
+                if let last = sortedDates.last?.key, let val = map[last] {
+                    var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
+                    metric.average = average
 
+                    _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue, activities)
+                    
+                }
+            }
             self?.finish()
         }
     }

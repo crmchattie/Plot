@@ -9,6 +9,7 @@
 import Foundation
 
 let userHealthEntity = "user-health"
+// Same key would be used for mindfulness sessions or any other samples
 let healthkitWorkoutsKey = "healthkit-workouts"
 let lastSyncDateKey = "lastSyncDate"
 let identifierKey = "identifier"
