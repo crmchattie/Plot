@@ -41,6 +41,7 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
         
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.isScrollEnabled = false
         
         collectionView.backgroundColor = backgroundColor
         
@@ -84,8 +85,8 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
         
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: self.collectionView.frame.size.width, height: 35)
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {        
+        return CGSize(width: self.collectionView.frame.size.width, height: 25)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

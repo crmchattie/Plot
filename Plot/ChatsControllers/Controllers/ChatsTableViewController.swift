@@ -137,6 +137,10 @@ class ChatsTableViewController: UITableViewController {
             destination.contacts = contacts
             destination.filteredContacts = filteredContacts
             destination.conversations = conversations
+        } else {
+            destination.users = users
+            destination.filteredUsers = filteredUsers
+            destination.conversations = conversations
         }
         navigationController?.pushViewController(destination, animated: true)
     }

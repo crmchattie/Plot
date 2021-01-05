@@ -51,7 +51,7 @@ class FalconUsersTableViewCell: UITableViewCell {
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
     
-    backgroundColor = .clear
+    backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     title.backgroundColor = backgroundColor
     icon.backgroundColor = backgroundColor
     

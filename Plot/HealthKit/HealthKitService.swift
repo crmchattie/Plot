@@ -18,6 +18,7 @@ class HealthKitService {
     class func syncEventsFromHealthKitData() {
         authorizeHealthKit { result in
             if result {
+                
             }
         }
     }

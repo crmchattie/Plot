@@ -346,7 +346,7 @@ struct DiagramImgs: Codable, Equatable, Hashable {
 
 extension Workout {
     var hkWorkoutActivityType: HKWorkoutActivityType {
-        guard let type = self.type, let workoutType = WorkoutTypes(rawValue: type)  else {
+        guard let type = self.type, let workoutType = WorkoutTypes(rawValue: type) else {
             return .traditionalStrengthTraining
         }
         

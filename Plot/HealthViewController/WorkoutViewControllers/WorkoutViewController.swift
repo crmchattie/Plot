@@ -214,7 +214,7 @@ class WorkoutViewController: FormViewController {
                 }
                 if row.value == nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-                } else {
+                } else if self.workout.type != nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, row in
@@ -274,6 +274,12 @@ class WorkoutViewController: FormViewController {
             }.onChange({ row in
                 self.workout.type = row.value
                 self.updateCalories()
+                
+                if row.value == nil {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+                } else if self.workout.name != "WorkoutName" {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                }
             })
             
             <<< DecimalRow("Calories Burned") {

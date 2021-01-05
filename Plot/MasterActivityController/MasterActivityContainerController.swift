@@ -55,7 +55,22 @@ class MasterActivityContainerController: UIViewController {
         return networkController.healthService.healthMetricSections
     }
     var healthMetrics: [String: [HealthMetric]] {
-        return networkController.healthService.healthMetrics
+        var metrics = networkController.healthService.healthMetrics
+        if metrics[HealthMetricCategory.general.rawValue] != nil {
+            var generalMetrics = metrics[HealthMetricCategory.general.rawValue]
+            generalMetrics!.removeAll(where: {$0.type.name == HealthMetricType.weight.name})
+            generalMetrics!.removeAll(where: {$0.type.name == HealthMetricType.heartRate.name})
+            generalMetrics!.removeAll(where: {$0.type.name == HealthMetricType.mindfulness.name})
+            metrics[HealthMetricCategory.general.rawValue] = generalMetrics
+        }
+        if metrics[HealthMetricCategory.nutrition.rawValue] != nil {
+            var nutritionMetrics = metrics[HealthMetricCategory.nutrition.rawValue]
+            nutritionMetrics!.removeAll(where: {$0.type.name == "Fat"})
+            nutritionMetrics!.removeAll(where: {$0.type.name == "Protein"})
+            nutritionMetrics!.removeAll(where: {$0.type.name == "Carbohydrates"})
+            metrics[HealthMetricCategory.nutrition.rawValue] = nutritionMetrics
+        }
+        return metrics
     }
     var financeSections = [SectionType]()
     var financeGroups = [SectionType: [AnyHashable]]()
@@ -574,6 +589,7 @@ extension MasterActivityContainerController {
         let destination = ChatsTableViewController()
         destination.conversations = networkController.conversationService.conversations
         destination.contacts = networkController.userService.contacts
+        destination.filteredContacts = networkController.userService.contacts
         destination.users = networkController.userService.users
         destination.filteredUsers = networkController.userService.users
         destination.conversations = networkController.conversationService.conversations

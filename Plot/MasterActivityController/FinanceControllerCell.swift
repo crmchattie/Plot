@@ -45,6 +45,7 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
         layer.cornerRadius = 16
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.isScrollEnabled = false
         
         collectionView.backgroundColor = backgroundColor
         
