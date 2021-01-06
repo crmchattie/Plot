@@ -86,7 +86,7 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {        
-        return CGSize(width: self.collectionView.frame.size.width, height: 25)
+        return CGSize(width: self.collectionView.frame.size.width, height: 30)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

@@ -14,8 +14,11 @@ protocol HealthDetailServiceInterface {
 }
 
 class HealthDetailService: HealthDetailServiceInterface {
+    var nutrition = [String: [HKQuantitySample]]()
+    var workouts = [String: [HKWorkout]]()
+    var mindfulnesses = [HKCategorySample]()
+    
     func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
-        
         getStatisticalSamples(for: healthMetric, segmentType: segmentType, completion: completion)
     }
     
@@ -69,6 +72,17 @@ class HealthDetailService: HealthDetailServiceInterface {
             unit = healthMetricUnit
             quantityType = type
         }
+        else if case .activeEnergy = healthMetricType {
+            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.activeEnergyBurned), let healthMetricUnit = healthMetric.unit else {
+                print("*** Unable to create a activeEnergy count type ***")
+                completion(nil, nil, nil)
+                return
+            }
+            
+            statisticsOptions = .cumulativeSum
+            unit = healthMetricUnit
+            quantityType = type
+        }
         
         var anchorDate = Date().localTime
         var startDate = anchorDate
@@ -106,57 +120,177 @@ class HealthDetailService: HealthDetailServiceInterface {
             endDate = Date()
             startDate = endDate.lastYear
         }
-                
-        if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
-            let workoutActivityType = hkWorkout.workoutActivityType
-            HealthKitService.getAllWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate, endDate: endDate) { [weak self] workouts, error  in
-                var stats: [Statistic]?
-                if segmentType == .day {
-                    stats = self?.perpareCustomStatsForHourlyWorkouts(from: workouts)
-                } else {
-                    stats = self?.perpareCustomStatsForDailyWorkouts(from: workouts, segmentType: segmentType)
+        
+        if HealthKitService.authorized {
+            if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+                let workoutActivityType = hkWorkout.workoutActivityType
+                HealthKitService.getAllWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate, endDate: endDate) { [weak self] workouts, error  in
+                    var stats: [Statistic]?
+                    if segmentType == .day {
+                        stats = self?.perpareCustomStatsForHourlyWorkouts(from: workouts)
+                    } else {
+                        stats = self?.perpareCustomStatsForDailyWorkouts(from: workouts, segmentType: segmentType)
+                    }
+                    
+                    let sortedWorkouts = workouts?.sorted(by: {$0.startDate > $1.startDate})
+                    completion(stats, sortedWorkouts, nil)
                 }
-                
-                let sortedWorkouts = workouts?.sorted(by: {$0.startDate > $1.startDate})
-                completion(stats, sortedWorkouts, nil)
-            }
-        }
-        else if case .sleep = healthMetricType {
-            HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
-                let stats = self?.perpareCustomStatsForCategorySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
-                completion(stats, samples, nil)
-            }
-        }
-        else if case .mindfulness = healthMetricType {
-            HealthKitService.getAllCategoryTypeSamples(forIdentifier:.mindfulSession, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
-                let stats = self?.perpareCustomStatsForCategorySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
-                completion(stats, samples, nil)
-            }
-        }
-        else {
-            guard let quantityTypeValue = quantityType else {
-                completion(nil, nil, nil)
-                return
             }
             
-            HealthKitService.getIntervalBasedSamples(for: quantityTypeValue, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval) { [weak self] (results, error) in
-                var stats: [Statistic]?
-                if case .steps = healthMetricType {
-                    if segmentType == .year {
-                        stats = self?.perpareCustomStatsForDailyAverageForAnnualSteps(from: results)
-                    } else {
-                        stats = self?.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
-                    }
+            else if case .sleep = healthMetricType {
+                HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
+                    let stats = self?.perpareCustomStatsForCategorySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
+                    completion(stats, samples, nil)
                 }
-                else {
-                    stats = self?.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
+            }
+            else if case .mindfulness = healthMetricType {
+                HealthKitService.getAllCategoryTypeSamples(forIdentifier:.mindfulSession, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
+                    let stats = self?.perpareCustomStatsForCategorySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
+                    completion(stats, samples, nil)
+                }
+            }
+            else {
+                guard let quantityTypeValue = quantityType else {
+                    completion(nil, nil, nil)
+                    return
                 }
                 
-                HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
+                HealthKitService.getIntervalBasedSamples(for: quantityTypeValue, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval) { [weak self] (results, error) in
+                    var stats: [Statistic]?
+                    if case .steps = healthMetricType {
+                        if segmentType == .year {
+                            stats = self?.perpareCustomStatsForDailyAverageForAnnualSteps(from: results)
+                        } else {
+                            stats = self?.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
+                        }
+                    }
+                    else {
+                        stats = self?.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
+                    }
+                    
+                    HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
+                        completion(stats, samples, nil)
+                    }
+                }
+            }
+        } else {
+            if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+                let workoutActivityType = hkWorkout.workoutActivityType
+                grabWorkouts(forWorkoutActivityType: workoutActivityType.name, startDate: startDate, endDate: endDate) { [weak self] (workouts) in
+                    var stats: [Statistic]?
+                    if segmentType == .day {
+                        stats = self?.perpareCustomStatsForHourlyWorkouts(from: workouts)
+                    } else {
+                        stats = self?.perpareCustomStatsForDailyWorkouts(from: workouts, segmentType: segmentType)
+                    }
+                    
+                    let sortedWorkouts = workouts?.sorted(by: {$0.startDate > $1.startDate})
+                    completion(stats, sortedWorkouts, nil)
+                }
+            } else if case .mindfulness = healthMetricType {
+                grabMindfulness(startDate: startDate, endDate: endDate) { [weak self] (samples) in
+                    let stats = self?.perpareCustomStatsForCategorySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
+                    completion(stats, samples, nil)
+                }
+            } else if case HealthMetricType.nutrition(let value) = healthMetric.type {
+                grabNutrition(forNutritionType: value, startDate: startDate, endDate: endDate) { [weak self] (samples) in
+                    let stats = self?.perpareCustomStatsForQuantitySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
                     completion(stats, samples, nil)
                 }
             }
         }
+    }
+    
+    private func grabNutrition(forNutritionType: String, startDate: Date, endDate: Date, completion: @escaping ([HKQuantitySample]?) -> Void) {
+        var list = [HKQuantitySample]()
+        if let samples = nutrition[forNutritionType] {
+            for sample in samples {
+                if sample.startDate < startDate || endDate < sample.startDate {
+                    continue
+                }
+                list.append(sample)
+            }
+        }
+        completion(list)
+    }
+    
+    private func grabWorkouts(forWorkoutActivityType: String, startDate: Date, endDate: Date, completion: @escaping ([HKWorkout]?) -> Void) {
+        var list = [HKWorkout]()
+        if let samples = workouts[forWorkoutActivityType] {
+            for sample in samples {
+                if sample.startDate < startDate || endDate < sample.startDate {
+                    continue
+                }
+                list.append(sample)
+            }
+        }
+        completion(list)
+    }
+    
+    private func grabMindfulness(startDate: Date, endDate: Date, completion: @escaping ([HKCategorySample]?) -> Void) {
+        var list = [HKCategorySample]()
+        for sample in mindfulnesses {
+            if sample.startDate < startDate || endDate < sample.startDate {
+                continue
+            }
+            list.append(sample)
+        }
+        completion(list)
+    }
+    
+    private func perpareCustomStatsForQuantitySamples(from samples: [HKQuantitySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType, type: HealthMetricType) -> [Statistic]? {
+        var customStats: [Statistic] = []
+        
+        guard let samples = samples else {
+            return customStats
+        }
+        
+        if segmentType == .day {
+            for sample in samples {
+                var double: Double = 0
+                if sample.quantityType.is(compatibleWith: .gram()) {
+                    double = sample.quantity.doubleValue(for: .gram())
+                } else if sample.quantityType.is(compatibleWith: .jouleUnit(with: .kilo)) {
+                    double = sample.quantity.doubleValue(for: .jouleUnit(with: .kilo))
+                }
+                let statistic = Statistic(date: sample.endDate, value: double)
+                customStats.append(statistic)
+            }
+        }
+        else {
+            let startAt: Double = 86400
+            
+            // 12 hours = 43200 seconds
+            var midDay = startDate.dayBefore.startOfDay.advanced(by: startAt)
+            var interval = NSDateInterval(start: midDay, duration: 86400)
+            var map: [Date: Double] = [:]
+            var sum: Double = 0
+            for sample in samples {
+                while !(interval.contains(sample.endDate)) && interval.endDate < endDate {
+                    midDay = midDay.advanced(by: 86400)
+                    interval = NSDateInterval(start: midDay, duration: 86400)
+                }
+                
+                var double: Double = 0
+                if sample.quantityType.is(compatibleWith: .gram()) {
+                    double = sample.quantity.doubleValue(for: .gram())
+                } else if sample.quantityType.is(compatibleWith: .jouleUnit(with: .kilo)) {
+                    double = sample.quantity.doubleValue(for: .jouleUnit(with: .kilo))
+                }
+
+                map[midDay, default: 0] += double
+                sum += double
+            }
+            
+            let sortedDates = Array(map.sorted(by: { $0.0 < $1.0 }))
+            
+            for item in sortedDates {
+                let stat = Statistic(date: item.key, value: item.value)
+                customStats.append(stat)
+            }
+        }
+        
+        return customStats
     }
     
     private func perpareCustomStatsForCategorySamples(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType, type: HealthMetricType) -> [Statistic]? {

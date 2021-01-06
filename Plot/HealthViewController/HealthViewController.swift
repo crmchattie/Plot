@@ -111,7 +111,11 @@ class HealthViewController: UIViewController {
     }
     
     func openMetric(metric: HealthMetric) {
-        let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
+        let healthDetailService = HealthDetailService()
+        healthDetailService.workouts = networkController.healthService.workouts
+        healthDetailService.mindfulnesses = networkController.healthService.mindfulnesses
+        healthDetailService.nutrition = networkController.healthService.nutrition
+        let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: healthDetailService)
         let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel)
         navigationController?.pushViewController(healthDetailViewController, animated: true)
     }

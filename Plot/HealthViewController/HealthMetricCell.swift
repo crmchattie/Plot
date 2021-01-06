@@ -198,6 +198,8 @@ class HealthMetricCell: UICollectionViewCell {
             imageName = "sleep"
         case .mindfulness:
             imageName = "mindfulness"
+        case .activeEnergy:
+            imageName = "trending"
         }
         
         activityTypeButton.setImage(UIImage(named: imageName), for: .normal)

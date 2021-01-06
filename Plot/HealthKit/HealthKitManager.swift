@@ -91,24 +91,27 @@ class HealthKitManager {
             
             // Workouts
             // Consider workouts until a day in future
+            let activeEnergyOp = ActiveEnergyOperation(date: today)
+            activeEnergyOp.delegate = self
+            
             let futureDay = today.dayAfter
-            let functionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .functionalStrengthTraining, rank: 1)
+            let functionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .functionalStrengthTraining, rank: 2)
             functionalStrengthTrainingOp.delegate = self
             functionalStrengthTrainingOp.lastSyncDate = lastSyncDate
 
-            let traditionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .traditionalStrengthTraining, rank: 2)
+            let traditionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .traditionalStrengthTraining, rank: 3)
             traditionalStrengthTrainingOp.delegate = self
             traditionalStrengthTrainingOp.lastSyncDate = lastSyncDate
             
-            let runningOp = WorkoutOperation(date: futureDay, workoutActivityType: .running, rank: 3)
+            let runningOp = WorkoutOperation(date: futureDay, workoutActivityType: .running, rank: 4)
             runningOp.delegate = self
             runningOp.lastSyncDate = lastSyncDate
             
-            let cyclingOp = WorkoutOperation(date: futureDay, workoutActivityType: .cycling, rank: 4)
+            let cyclingOp = WorkoutOperation(date: futureDay, workoutActivityType: .cycling, rank: 5)
             cyclingOp.delegate = self
             cyclingOp.lastSyncDate = lastSyncDate
 
-            let hiitOp = WorkoutOperation(date: futureDay, workoutActivityType: .highIntensityIntervalTraining, rank: 5)
+            let hiitOp = WorkoutOperation(date: futureDay, workoutActivityType: .highIntensityIntervalTraining, rank: 6)
             hiitOp.delegate = self
             hiitOp.lastSyncDate = lastSyncDate
             
@@ -130,7 +133,7 @@ class HealthKitManager {
             dietarySugarOp.delegate = self
             
             // Setup queue
-            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
+            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, activeEnergyOp, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in

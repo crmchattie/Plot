@@ -73,6 +73,13 @@ class HealthKitSampleBuilder {
             samples.append(sample)
         }
         
+        //sugar?
+        if let dietarySugar = HKQuantityType.quantityType(forIdentifier: .dietarySugar), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.title == "Sugar"}), let sugar = nutrient.amount {
+            let quantity = HKQuantity(unit: .gram(), doubleValue: sugar)
+            let sample = HKQuantitySample(type: dietarySugar, quantity: quantity, start: start, end: end)
+            samples.append(sample)
+        }
+        
         return samples
     }
 }

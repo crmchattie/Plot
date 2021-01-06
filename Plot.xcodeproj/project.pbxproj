@@ -157,6 +157,7 @@
 		10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */; };
 		10C766E325321732003C8E1F /* FinanceTransactionRuleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */; };
 		10C766E525321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */; };
+		10C7F92525A520ED004E9277 /* ActiveEnergyOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C7F92425A520ED004E9277 /* ActiveEnergyOperation.swift */; };
 		10C83340249AC2F00037F638 /* SygicPlacesSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C8333F249AC2F00037F638 /* SygicPlacesSearchResult.swift */; };
 		10C83342249ACC8F0037F638 /* SygicToursSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C83341249ACC8F0037F638 /* SygicToursSearchResult.swift */; };
 		10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C83343249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift */; };
@@ -633,6 +634,7 @@
 		10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityCell+ConfigureCell.swift"; sourceTree = "<group>"; };
 		10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionRuleViewController.swift; sourceTree = "<group>"; };
 		10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionNewLevelViewController.swift; sourceTree = "<group>"; };
+		10C7F92425A520ED004E9277 /* ActiveEnergyOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveEnergyOperation.swift; sourceTree = "<group>"; };
 		10C8333F249AC2F00037F638 /* SygicPlacesSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SygicPlacesSearchResult.swift; sourceTree = "<group>"; };
 		10C83341249ACC8F0037F638 /* SygicToursSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SygicToursSearchResult.swift; sourceTree = "<group>"; };
 		10C83343249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoursquareVenueRecSearchResult.swift; sourceTree = "<group>"; };
@@ -1418,6 +1420,7 @@
 				26958552255A7355008FEE9B /* NutritionOperation.swift */,
 				26BDCDCB2582097700E850CF /* SleepOperation.swift */,
 				263508A9258D76B000F57ACB /* MindfulnessOperation.swift */,
+				10C7F92425A520ED004E9277 /* ActiveEnergyOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);
 			path = Operations;
@@ -2719,6 +2722,7 @@
 				108087372585072300FB9BB0 /* MindfulnessActions.swift in Sources */,
 				4BAEE48121272C4F0045AB10 /* UserProfileController+keyboardHandlers.swift in Sources */,
 				1082C89724F0A91500CF6491 /* HealthViewController.swift in Sources */,
+				10C7F92525A520ED004E9277 /* ActiveEnergyOperation.swift in Sources */,
 				4BAEE4E921272D890045AB10 /* MediaPickerControllerNew.swift in Sources */,
 				4BAEE52121272D890045AB10 /* ChatLogController+CollectionDelegate.swift in Sources */,
 				4BAEE5E3212735E50045AB10 /* ThemeManager.swift in Sources */,

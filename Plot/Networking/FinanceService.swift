@@ -103,6 +103,7 @@ class FinanceService {
                                                     let date = self.isodateFormatter.date(from: _account.updated_at ) ?? Date()
                                                     self.getMXTransactions(user: user, account: _account, date: date.addingTimeInterval(-604800))
                                                     _account.balances = self.accounts[index].balances
+                                                    print("_account.balances aggregation \(_account.balances)")
                                                     _account.description = self.accounts[index].description
                                                     _account.admin = self.accounts[index].admin
                                                     _account.participantsIDs = self.accounts[index].participantsIDs
@@ -129,6 +130,7 @@ class FinanceService {
                                         self.getMXTransactions(user: user, account: _account, date: nil)
                                     } else if let index = self.accounts.firstIndex(of: account) {
                                         _account.balances = self.accounts[index].balances
+                                        print("_account.balances not-aggregation \(_account.balances)")
                                         _account.description = self.accounts[index].description
                                         _account.admin = self.accounts[index].admin
                                         _account.participantsIDs = self.accounts[index].participantsIDs
@@ -508,6 +510,7 @@ class FinanceService {
                 } else {
                     print("_account.balances == nil")
                     _account.balances = [_account.updated_at: _account.available_balance ?? _account.balance]
+                    print("_account.balances \(_account.balances)")
                 }
                 // store account info
                 let value = try FirebaseEncoder().encode(_account)

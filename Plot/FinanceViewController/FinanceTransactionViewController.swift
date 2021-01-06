@@ -216,23 +216,23 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }
             
-            <<< TextAreaRow("Description") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.placeholder = $0.tag
-                $0.value = transaction.transactionDescription
-                }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                }).onChange { row in
-                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transactionDescription")
-                    self.transaction.transactionDescription = row.value
-                    reference.setValue(row.value)
-                }
+//            <<< TextAreaRow("Description") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.placeholder = $0.tag
+//                $0.value = transaction.transactionDescription
+//                }.cellUpdate({ (cell, row) in
+//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                }).onChange { row in
+//                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transactionDescription")
+//                    self.transaction.transactionDescription = row.value
+//                    reference.setValue(row.value)
+//                }
             
             <<< TextRow("Date") {
                 $0.cell.isUserInteractionEnabled = false

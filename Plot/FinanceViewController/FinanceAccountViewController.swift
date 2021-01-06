@@ -161,23 +161,23 @@ class FinanceAccountViewController: FormViewController {
                 }
             }
             
-            <<< TextAreaRow("Description") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.placeholder = $0.tag
-                $0.value = account.description
-                }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                }).onChange { row in
-                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("description")
-                    reference.setValue(row.value)
-                    self.account.description = row.value
-                }
+//            <<< TextAreaRow("Description") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.placeholder = $0.tag
+//                $0.value = account.description
+//                }.cellUpdate({ (cell, row) in
+//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                }).onChange { row in
+//                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("description")
+//                    reference.setValue(row.value)
+//                    self.account.description = row.value
+//                }
             
             <<< PushRow<String>("Type") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

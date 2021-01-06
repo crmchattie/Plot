@@ -11,6 +11,7 @@ import Contacts
 import Firebase
 import CodableFirebase
 import LBTATools
+import HealthKit
 
 fileprivate let activitiesControllerCell = "ActivitiesControllerCell"
 fileprivate let healthControllerCell = "HealthControllerCell"
@@ -56,19 +57,14 @@ class MasterActivityContainerController: UIViewController {
     }
     var healthMetrics: [String: [HealthMetric]] {
         var metrics = networkController.healthService.healthMetrics
-        if metrics[HealthMetricCategory.general.rawValue] != nil {
-            var generalMetrics = metrics[HealthMetricCategory.general.rawValue]
-            generalMetrics!.removeAll(where: {$0.type.name == HealthMetricType.weight.name})
-            generalMetrics!.removeAll(where: {$0.type.name == HealthMetricType.heartRate.name})
-            generalMetrics!.removeAll(where: {$0.type.name == HealthMetricType.mindfulness.name})
-            metrics[HealthMetricCategory.general.rawValue] = generalMetrics
+        if let generalMetrics = metrics[HealthMetricCategory.general.rawValue] {
+            metrics[HealthMetricCategory.general.rawValue] = generalMetrics.filter({ $0.type.name == HealthMetricType.steps.name || $0.type.name == HealthMetricType.sleep.name })
         }
-        if metrics[HealthMetricCategory.nutrition.rawValue] != nil {
-            var nutritionMetrics = metrics[HealthMetricCategory.nutrition.rawValue]
-            nutritionMetrics!.removeAll(where: {$0.type.name == "Fat"})
-            nutritionMetrics!.removeAll(where: {$0.type.name == "Protein"})
-            nutritionMetrics!.removeAll(where: {$0.type.name == "Carbohydrates"})
-            metrics[HealthMetricCategory.nutrition.rawValue] = nutritionMetrics
+        if let workoutMetrics = metrics[HealthMetricCategory.workouts.rawValue] {
+            metrics[HealthMetricCategory.workouts.rawValue] = workoutMetrics.filter({ $0.type.name == HealthMetricType.activeEnergy.name})
+        }
+        if let nutritionMetrics = metrics[HealthMetricCategory.nutrition.rawValue] {
+            metrics[HealthMetricCategory.nutrition.rawValue] = nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name})
         }
         return metrics
     }
@@ -462,7 +458,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             }
         } else if section == .health {
             if !healthMetrics.isEmpty {
-                height += CGFloat(healthMetricSections.count * 50)
+                height += CGFloat(healthMetricSections.count * 45)
                 for key in healthMetricSections {
                     if let metrics = healthMetrics[key] {
                         height += CGFloat(metrics.count * 75)

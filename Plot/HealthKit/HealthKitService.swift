@@ -10,6 +10,7 @@ import HealthKit
 
 // Completion closures might not be on the main thread when executed.
 class HealthKitService {
+    static var authorized = false
     
     class var healthStore: HKHealthStore {
         return HealthKitSetupAssistant.healthStore
@@ -35,6 +36,7 @@ class HealthKitService {
                 completion(false)
                 return
             }
+            self.authorized = authorized
             completion(true)
         }
     }
