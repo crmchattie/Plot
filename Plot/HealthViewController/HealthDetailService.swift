@@ -84,7 +84,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             quantityType = type
         }
         
-        var anchorDate = Date().localTime
+        var anchorDate = Date()
         var startDate = anchorDate
         var endDate = anchorDate
         
