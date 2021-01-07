@@ -162,9 +162,9 @@ class FinanceBarChartViewController: UIViewController {
         
         chartView.chartDescription?.enabled = false
         
-        chartView.dragEnabled = true
-        chartView.setScaleEnabled(true)
-        chartView.pinchZoomEnabled = true
+        chartView.dragEnabled = false
+        chartView.setScaleEnabled(false)
+        chartView.pinchZoomEnabled = false
         
         chartView.drawBarShadowEnabled = false
         chartView.drawValueAboveBarEnabled = false

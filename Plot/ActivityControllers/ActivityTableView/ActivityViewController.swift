@@ -129,9 +129,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     @objc fileprivate func handleDismiss(button: UIButton) {
         dismiss(animated: true, completion: nil)
     }
-    
-    override var prefersStatusBarHidden: Bool { return true }
-        
+            
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -142,11 +140,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         addObservers()
         handleReloadTable()
     }
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        navigationController?.isNavigationBarHidden = true
-//        navigationController?.navigationBar.isHidden = true
-//    }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -253,6 +246,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         // apply theme
         applyCalendarTheme()
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return ThemeManager.currentTheme().statusBarStyle
     }
     
     @objc fileprivate func newItem() {

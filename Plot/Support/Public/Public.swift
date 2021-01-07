@@ -284,7 +284,7 @@ extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
         dateFormatter.dateStyle = .medium
-        dateFormatter.dateFormat = "MMM dd"
+        dateFormatter.dateFormat = "MMM d"
         return dateFormatter.string(from: self)
     }
     
@@ -379,10 +379,10 @@ extension Date {
         dateFormatter.dateFormat = "h a"
         dateFormatter.amSymbol = "AM"
         dateFormatter.pmSymbol = "PM"
+        let monthAndDay = self.getMonthAndDate()
         let cal = Calendar(identifier: .gregorian)
-        let startHour = cal.date(byAdding: .hour, value: -1, to: self)!
-        let monthAndDay = startHour.getMonthAndDate()
-        return "\(monthAndDay), \(dateFormatter.string(from: startHour))-\(dateFormatter.string(from: self))"
+        let endHour = cal.date(byAdding: .hour, value: 1, to: self)!
+        return "\(monthAndDay), \(dateFormatter.string(from: self))-\(dateFormatter.string(from: endHour))"
 
     }
     

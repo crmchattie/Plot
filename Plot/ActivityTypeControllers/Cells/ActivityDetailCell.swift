@@ -169,7 +169,7 @@ class ActivityDetailCell: UICollectionViewCell {
     }()
     
     var segmentedControl: UISegmentedControl = {
-        let segmentControl = UISegmentedControl(items: ["Activity", "Calendar"])
+        let segmentControl = UISegmentedControl(items: ["Place", "Calendar"])
         segmentControl.selectedSegmentIndex = 0
         segmentControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
         return segmentControl

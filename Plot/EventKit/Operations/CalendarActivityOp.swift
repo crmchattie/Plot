@@ -59,7 +59,7 @@ class CalendarActivityOp: AsyncOperation {
                     let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                         let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                
+
                         let values: [String : Any] = ["isGroupActivity": false, "badge": 0]
                         userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                             self?.finish()
@@ -83,7 +83,7 @@ class CalendarActivityOp: AsyncOperation {
     private func update(activity: Activity) {
         activity.activityType = CustomType.iOSCalendarEvent.categoryText
         activity.name = event.title
-        activity.notes = event.notes
+        activity.activityDescription = event.notes
         activity.locationName = event.location
         activity.allDay = event.isAllDay
         let timezone = event.timeZone
@@ -97,6 +97,7 @@ class CalendarActivityOp: AsyncOperation {
             activity.startDateTime = NSNumber(value: startDateTime.timeIntervalSince1970)
             activity.endDateTime = NSNumber(value: endDateTime.timeIntervalSince1970)
         }
+        
     }
     
     private func deleteActivity() {

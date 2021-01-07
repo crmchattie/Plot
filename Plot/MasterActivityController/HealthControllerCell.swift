@@ -35,6 +35,8 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
         }
     }
     
+    let viewPlaceholder = ViewPlaceholder()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         layer.cornerRadius = 16
@@ -61,6 +63,11 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
+        if healthMetricSections.count == 0 {
+            viewPlaceholder.add(for: collectionView, title: .emptyHealth, subtitle: .emptyHealth, priority: .medium, position: .fill)
+        } else {
+            viewPlaceholder.remove(from: collectionView, priority: .medium)
+        }
         return healthMetricSections.count
     }
     

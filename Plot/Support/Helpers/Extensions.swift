@@ -139,7 +139,7 @@ public extension HKQuantityTypeIdentifier {
     var name: String {
         switch self {
         case .dietaryFatTotal:             return "Dietary Fat Total"
-        case .dietaryEnergyConsumed:       return "Dietary Energy Consumed"
+        case .dietaryEnergyConsumed:       return "Dietary Energy"
         case .dietaryCarbohydrates:        return "Dietary Carbohydrates"
         case .dietaryProtein:              return "Dietary Protein"
         case .dietarySugar:                return "Dietary Sugar"

@@ -78,9 +78,7 @@ class FinanceViewController: UIViewController {
     @objc fileprivate func handleDismiss(button: UIButton) {
         dismiss(animated: true, completion: nil)
     }
-    
-    override var prefersStatusBarHidden: Bool { return true }
-        
+            
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never

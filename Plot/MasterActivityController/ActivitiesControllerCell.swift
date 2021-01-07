@@ -29,6 +29,8 @@ class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITabl
     
     let activityCellID = "activityCellID"
     
+    let viewPlaceholder = ViewPlaceholder()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         layer.cornerRadius = 16
@@ -52,6 +54,11 @@ class ActivitiesControllerCell: BaseContainerCell, UITableViewDataSource, UITabl
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if activities.count == 0 {
+            viewPlaceholder.add(for: tableView, title: .emptyActivities, subtitle: .emptyActivities, priority: .medium, position: .fill)
+        } else {
+            viewPlaceholder.remove(from: tableView, priority: .medium)
+        }
         return activities.count
     }
     

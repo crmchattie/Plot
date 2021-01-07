@@ -16,6 +16,8 @@ extension NSNotification.Name {
 class ActivityService {
     let activitiesFetcher = ActivitiesFetcher()
     let invitationsFetcher = InvitationsFetcher()
+    
+    var askedforAuthorization: Bool = false
 
     var activities = [Activity]() {
         didSet {
@@ -46,29 +48,22 @@ class ActivityService {
     }()
     
     func grabActivities(_ completion: @escaping () -> Void) {
-        DispatchQueue.main.async { [unowned self] in
-            activitiesFetcher.fetchActivities { (activities) in
-                self.activities = activities
-                self.fetchInvitations()
+        DispatchQueue.main.async { [weak self] in
+            self?.activitiesFetcher.fetchActivities { (activities) in
+                self?.activities = activities
+                self?.fetchInvitations()
                 if let _ = Auth.auth().currentUser {
-                    self.eventKitManager.syncEventKitActivities {
-                        self.observeActivitiesForCurrentUser()
-                        self.observeInvitationForCurrentUser()
-                    }
+                    self?.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
+                        self?.askedforAuthorization = askedforAuthorization
+                        self?.eventKitManager.syncEventKitActivities {
+                            self?.observeActivitiesForCurrentUser()
+                            self?.observeInvitationForCurrentUser()
+                        }
+                    })
                 }
                 completion()
             }
         }
-        
-//        if !self.hasLoadedCalendarEventActivities {
-//            self.hasLoadedCalendarEventActivities = true
-            // Comment out the block below to stop the sync
-//
-//                // Uncomment this line to clean the calendar events. The app might freeze for a bit and/or require a restart
-//                DispatchQueue.global().async {
-//                    weakSelf.cleanCalendarEventActivities()
-//                }
-//        }
     }
     
     func observeActivitiesForCurrentUser() {

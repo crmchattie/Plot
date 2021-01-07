@@ -30,9 +30,11 @@ class HealthViewController: UIViewController {
     let healhKitManager = HealthKitManager()
     
     var healthMetricSections: [String] {
+        print("healthMetricSections \(networkController.healthService.healthMetricSections)")
         return networkController.healthService.healthMetricSections
     }
     var healthMetrics: [String: [HealthMetric]] {
+        print("healthMetricSections \(networkController.healthService.healthMetrics)")
         return networkController.healthService.healthMetrics
     }
     
@@ -52,9 +54,7 @@ class HealthViewController: UIViewController {
     }
     
     var closeButtonConstraint: CGFloat = 0
-    
-    override var prefersStatusBarHidden: Bool { return true }
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -145,8 +145,10 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let key = healthMetricSections[indexPath.section]
+        print("healthMetricSections \(key)")
         if let metrics = healthMetrics[key] {
             let metric = metrics[indexPath.row]
+            print("metric \(metric)")
             openMetric(metric: metric)
         }
     }

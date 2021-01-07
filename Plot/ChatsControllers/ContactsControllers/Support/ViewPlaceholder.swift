@@ -17,6 +17,7 @@ enum ViewPlaceholderPriority: CGFloat {
 enum ViewPlaceholderPosition {
     case top
     case center
+    case fill
 }
 
 enum ViewPlaceholderTitle: String {
@@ -39,6 +40,7 @@ enum ViewPlaceholderTitle: String {
     case emptyAccounts = "You are not connected to any accounts yet"
     case emptyMealProducts = "Please search for ingredients, grocery items and restaurant menu items above"
     case emptyTransactionRules = "You have not created any transaction rules"
+    case emptyHealth = "You don't have any health metrics yet"
 }
 
 enum ViewPlaceholderSubtitle: String {
@@ -46,7 +48,7 @@ enum ViewPlaceholderSubtitle: String {
     case denied = "Please go to your iPhone Settings –– Privacy –– Contacts. Then select ON for Plot. If you have Privacy Restrictions ON, please go to Screen Time - Content & Privacy Restrictions - Contacts. Then select ALLOW for Plot"
     case emptyContacts = "You can invite your friends to Plot with the notepad button in the upper right corner"
     case emptyChat = "You can create your first message with the notepad button in the upper right corner"
-    case emptyActivities = "You can add an activity with the plus button in the upper right corner"
+    case emptyActivities = "You can allow Plot to access events from the Calendar App and/or add an event with the plus button in the upper right corner"
     case emptyPhotos = "You can add photos with the plus button in the upper right corner"
     case emptyFiles = "You can add docs with the plus button in the upper right corner"
     case emptyRecipesEvents = "You can update the search via the search bar and/or by adjusting filters in the upper right corner"
@@ -56,82 +58,90 @@ enum ViewPlaceholderSubtitle: String {
     case emptyLists = "You can add a list with the plus button in the upper right corner"
     case emptyAccounts = "You can add an account with the plus button in the upper right corner"
     case emptyTransactionRules = "You can add a transaction rule with the plus button in the upper right corner"
+    case emptyHealth = "You can allow Plot to access health metrics from the Health App and/or add a metric with the plus button in the upper right corner"
 }
 
 class ViewPlaceholder: UIView {
-  
-  var title = UILabel()
-  var subtitle = UILabel()
-  
-  var placeholderPriority: ViewPlaceholderPriority = .low
-  
-  override init(frame: CGRect) {
-    super.init(frame: frame)
     
-    backgroundColor = .clear
-    translatesAutoresizingMaskIntoConstraints = false
+    var title = UILabel()
+    var subtitle = UILabel()
     
-    title.font = .systemFont(ofSize: 18)
-    title.textColor = ThemeManager.currentTheme().generalSubtitleColor
-    title.textAlignment = .center
-    title.numberOfLines = 0
-    title.translatesAutoresizingMaskIntoConstraints = false
+    var placeholderPriority: ViewPlaceholderPriority = .low
     
-    subtitle.font = .systemFont(ofSize: 13)
-    subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
-    subtitle.textAlignment = .center
-    subtitle.numberOfLines = 0
-    subtitle.translatesAutoresizingMaskIntoConstraints = false
-    
-    addSubview(title)
-    
-    title.leftAnchor.constraint(equalTo: leftAnchor, constant: 15).isActive = true
-    title.rightAnchor.constraint(equalTo: rightAnchor, constant: -15).isActive = true
-    title.heightAnchor.constraint(equalToConstant: 45).isActive = true
-    
-    addSubview(subtitle)
-    subtitle.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 5).isActive = true
-    subtitle.leftAnchor.constraint(equalTo: leftAnchor, constant: 35).isActive = true
-    subtitle.rightAnchor.constraint(equalTo: rightAnchor, constant: -35).isActive = true
-    subtitle.heightAnchor.constraint(equalToConstant: 50).isActive = true
-  }
-  
-  required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-  
-  func add(for view: UIView, title: ViewPlaceholderTitle, subtitle: ViewPlaceholderSubtitle, priority: ViewPlaceholderPriority, position: ViewPlaceholderPosition) {
-    
-    guard priority.rawValue >= placeholderPriority.rawValue else { return }
-    placeholderPriority = priority
-    self.title.text = title.rawValue
-    self.subtitle.text = subtitle.rawValue
-    
-    if position == .center {
-      self.title.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
-    }
-    if position == .top {
-      self.title.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        backgroundColor = .clear
+        translatesAutoresizingMaskIntoConstraints = false
+        
+        title.font = .systemFont(ofSize: 18)
+        title.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        title.textAlignment = .center
+        title.numberOfLines = 0
+        title.translatesAutoresizingMaskIntoConstraints = false
+        
+        subtitle.font = .systemFont(ofSize: 13)
+        subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        subtitle.textAlignment = .center
+        subtitle.numberOfLines = 0
+        subtitle.translatesAutoresizingMaskIntoConstraints = false
+        
+        addSubview(title)
+        
+        title.leftAnchor.constraint(equalTo: leftAnchor, constant: 15).isActive = true
+        title.rightAnchor.constraint(equalTo: rightAnchor, constant: -15).isActive = true
+//        title.heightAnchor.constraint(equalToConstant: 45).isActive = true
+        
+        addSubview(subtitle)
+        subtitle.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 5).isActive = true
+        subtitle.leftAnchor.constraint(equalTo: leftAnchor, constant: 35).isActive = true
+        subtitle.rightAnchor.constraint(equalTo: rightAnchor, constant: -35).isActive = true
+//        subtitle.heightAnchor.constraint(equalToConstant: 50).isActive = true
     }
     
-    DispatchQueue.main.async {
-      view.addSubview(self)
-      if #available(iOS 11.0, *) {
-        self.topAnchor.constraint(equalTo: view.topAnchor, constant: 175).isActive = true
-      } else {
-        self.topAnchor.constraint(equalTo: view.topAnchor, constant: 135).isActive = true
-      }
-      self.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
-      self.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 20).isActive = true
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
-  }
-  
-  func remove(from view: UIView, priority: ViewPlaceholderPriority) {
-    guard priority.rawValue >= placeholderPriority.rawValue else { return }
-    for subview in view.subviews where subview is ViewPlaceholder {
-      DispatchQueue.main.async {
-        subview.removeFromSuperview()
-      }
+    
+    func add(for view: UIView, title: ViewPlaceholderTitle, subtitle: ViewPlaceholderSubtitle, priority: ViewPlaceholderPriority, position: ViewPlaceholderPosition) {
+        
+        guard priority.rawValue >= placeholderPriority.rawValue else { return }
+        placeholderPriority = priority
+        self.title.text = title.rawValue
+        self.subtitle.text = subtitle.rawValue
+        
+        if position == .center {
+            self.title.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
+        }
+        if position == .top {
+            self.title.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
+        }
+        
+        DispatchQueue.main.async {
+            view.addSubview(self)
+            if position == .fill {
+                self.title.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+                self.topAnchor.constraint(equalTo: view.topAnchor, constant: 90).isActive = true
+                self.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
+                self.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
+            } else {
+                if #available(iOS 11.0, *) {
+                    self.topAnchor.constraint(equalTo: view.topAnchor, constant: 175).isActive = true
+                } else {
+                    self.topAnchor.constraint(equalTo: view.topAnchor, constant: 135).isActive = true
+                }
+                self.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
+                self.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 20).isActive = true
+            }
+        }
     }
-  }
+    
+    func remove(from view: UIView, priority: ViewPlaceholderPriority) {
+        guard priority.rawValue >= placeholderPriority.rawValue else { return }
+        for subview in view.subviews where subview is ViewPlaceholder {
+            DispatchQueue.main.async {
+                subview.removeFromSuperview()
+            }
+        }
+    }
 }

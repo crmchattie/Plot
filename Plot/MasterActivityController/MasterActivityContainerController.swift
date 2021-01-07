@@ -53,18 +53,34 @@ class MasterActivityContainerController: UIViewController {
     
     var sortedActivities = [Activity]()
     var healthMetricSections: [String] {
-        return networkController.healthService.healthMetricSections
+        var healthMetricSections = Array(healthMetrics.keys)
+        healthMetricSections.sort(by: { (v1, v2) -> Bool in
+            if let cat1 = HealthMetricCategory(rawValue: v1), let cat2 = HealthMetricCategory(rawValue: v2) {
+                return cat1.rank < cat2.rank
+            }
+            return false
+        })
+        return healthMetricSections
     }
     var healthMetrics: [String: [HealthMetric]] {
         var metrics = networkController.healthService.healthMetrics
         if let generalMetrics = metrics[HealthMetricCategory.general.rawValue] {
             metrics[HealthMetricCategory.general.rawValue] = generalMetrics.filter({ $0.type.name == HealthMetricType.steps.name || $0.type.name == HealthMetricType.sleep.name })
+            if metrics[HealthMetricCategory.general.rawValue] == [] {
+                metrics[HealthMetricCategory.general.rawValue] = nil
+            }
         }
         if let workoutMetrics = metrics[HealthMetricCategory.workouts.rawValue] {
             metrics[HealthMetricCategory.workouts.rawValue] = workoutMetrics.filter({ $0.type.name == HealthMetricType.activeEnergy.name})
+            if metrics[HealthMetricCategory.workouts.rawValue] == [] {
+                metrics[HealthMetricCategory.workouts.rawValue] = nil
+            }
         }
         if let nutritionMetrics = metrics[HealthMetricCategory.nutrition.rawValue] {
             metrics[HealthMetricCategory.nutrition.rawValue] = nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name})
+            if metrics[HealthMetricCategory.nutrition.rawValue] == [] {
+                metrics[HealthMetricCategory.nutrition.rawValue] = nil
+            }
         }
         return metrics
     }
@@ -269,7 +285,7 @@ class MasterActivityContainerController: UIViewController {
         let currentDate = Date().localTime
         var index = 0
         var activityFound = false
-        if allActivities.count < 2 {
+        if allActivities.count < 3 {
             completion(allActivities)
             return
         }
@@ -285,21 +301,18 @@ class MasterActivityContainerController: UIViewController {
                 
             }
         }
-                                
-        if activityFound {
-            let numberOfActivities = networkController.activityService.activities.count
-            if index < numberOfActivities {
-                activities.append(allActivities[index])
-                for i in 0...1 {
-                    activities.append(allActivities[index + i + 1])
-                }
-                completion(activities)
+        
+        let numberOfActivities = networkController.activityService.activities.count
+        if activityFound && index < numberOfActivities - 2 {
+            activities.append(allActivities[index])
+            for i in 0...1 {
+                activities.append(allActivities[index + i + 1])
             }
+            completion(activities)
         } else {
-            let numberOfRows = networkController.activityService.activities.count
-            activities.append(allActivities[numberOfRows - 3])
-            activities.append(allActivities[numberOfRows - 2])
-            activities.append(allActivities[numberOfRows - 1])
+            activities.append(allActivities[numberOfActivities - 3])
+            activities.append(allActivities[numberOfActivities - 2])
+            activities.append(allActivities[numberOfActivities - 1])
             completion(activities)
         }
     }
@@ -365,15 +378,15 @@ class MasterActivityContainerController: UIViewController {
     }
     
     func goToVC(section: SectionType) {
-        if section == .calendar {
+        if section == .calendar, !sortedActivities.isEmpty {
             let destination = ActivityViewController(networkController: networkController)
             destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
-        } else if section == .health {
+        } else if section == .health, !healthMetrics.isEmpty {
             let destination = HealthViewController(networkController: networkController)
             destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
-        } else {
+        } else if !financeSections.isEmpty {
             let destination = FinanceViewController(networkController: networkController)
             destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
@@ -393,7 +406,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = sections[indexPath.section]
         if section == .calendar {
-            if !sortedActivities.isEmpty {
+            if networkController.activityService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.activities = sortedActivities
@@ -408,7 +421,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 return cell
             }
         } else if section == .health {
-            if !healthMetrics.isEmpty {
+            if networkController.healthService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.healthMetricSections = healthMetricSections
@@ -445,10 +458,10 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         var height: CGFloat = 0
         let section = sections[indexPath.section]
         if section == .calendar {
-            if !sortedActivities.isEmpty {
+            if !sortedActivities.isEmpty && networkController.activityService.askedforAuthorization {
                 for activity in sortedActivities {
                     if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
-                        height = CGFloat(sortedActivities.count * 172)
+                        height = CGFloat(sortedActivities.count * 170)
                     } else {
                         height = CGFloat(sortedActivities.count * 132)
                     }
@@ -457,7 +470,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 height = 300
             }
         } else if section == .health {
-            if !healthMetrics.isEmpty {
+            if !healthMetrics.isEmpty && networkController.healthService.askedforAuthorization {
                 height += CGFloat(healthMetricSections.count * 45)
                 for key in healthMetricSections {
                     if let metrics = healthMetrics[key] {
@@ -631,6 +644,7 @@ extension MasterActivityContainerController: HealthControllerCellDelegate {
     func cellTapped(metric: HealthMetric) {
         let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
         let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel)
+        healthDetailViewController.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(healthDetailViewController, animated: true)
     }
 }

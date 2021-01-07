@@ -166,9 +166,9 @@ class FinanceLineChartDetailViewController: UIViewController {
     func configureChart() {
         
         chartView.chartDescription?.enabled = false
-        chartView.dragEnabled = true
-        chartView.setScaleEnabled(true)
-        chartView.pinchZoomEnabled = true
+        chartView.dragEnabled = false
+        chartView.setScaleEnabled(false)
+        chartView.pinchZoomEnabled = false
         
         let xAxis = chartView.xAxis
         xAxis.labelPosition = .bottom

@@ -73,7 +73,6 @@ class HealthKitSetupAssistant {
                                                        dietaryProtein,
                                                        dietaryEnergyConsumed,
                                                        HKObjectType.workoutType()]
-        
         // Request Authorization
         healthStore.requestAuthorization(toShare: healthKitTypesToWrite,
                                              read: healthKitTypesToRead) { (success, error) in

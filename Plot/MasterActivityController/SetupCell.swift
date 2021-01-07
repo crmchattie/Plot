@@ -66,6 +66,7 @@ class SetupCell: BaseContainerCell {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.clipsToBounds = true
         button.layer.cornerRadius = 8
+        button.isUserInteractionEnabled = false
         return button
     }()
     

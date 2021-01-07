@@ -36,7 +36,6 @@ class HealthKitService {
                 completion(false)
                 return
             }
-            self.authorized = authorized
             completion(true)
         }
     }
