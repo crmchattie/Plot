@@ -10,15 +10,18 @@ import HealthKit
 
 class HealthKitSampleBuilder {
     class func createHKWorkout(from workout: Workout) -> HKWorkout? {
-        guard let start = workout.startDateTime, let end = workout.endDateTime else {
+        let timezone = TimeZone.current
+        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date())) * -1
+
+        guard let start = workout.startDateTime?.addingTimeInterval(seconds), let end = workout.endDateTime?.addingTimeInterval(seconds) else {
             return nil
         }
-
+        
         var totalEnergyBurned: HKQuantity?
         if let cals = workout.totalEnergyBurned {
             totalEnergyBurned = HKQuantity(unit: HKUnit.kilocalorie(), doubleValue: cals)
         }
-        
+                
         let workout = HKWorkout(
             activityType: workout.hkWorkoutActivityType,
             start: start,
@@ -34,7 +37,10 @@ class HealthKitSampleBuilder {
     }
     
     class func createHKMindfulness(from mindfulness: Mindfulness) -> HKCategorySample? {
-        guard let start = mindfulness.startDateTime, let end = mindfulness.endDateTime, let mindfulSessionType = HKObjectType.categoryType(forIdentifier: .mindfulSession) else {
+        let timezone = TimeZone.current
+        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date())) * -1
+
+        guard let start = mindfulness.startDateTime?.addingTimeInterval(seconds), let end = mindfulness.endDateTime?.addingTimeInterval(seconds), let mindfulSessionType = HKObjectType.categoryType(forIdentifier: .mindfulSession) else {
             return nil
         }
         
@@ -43,7 +49,10 @@ class HealthKitSampleBuilder {
     }
     
     class func createHKNutritions(from meal: Meal) -> [HKQuantitySample]? {
-        guard let start = meal.startDateTime, let end = meal.endDateTime else {
+        let timezone = TimeZone.current
+        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date())) * -1
+
+        guard let start = meal.startDateTime?.addingTimeInterval(seconds), let end = meal.endDateTime?.addingTimeInterval(seconds) else {
             return nil
         }
         

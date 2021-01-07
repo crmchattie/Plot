@@ -77,11 +77,11 @@ class CalendarActivityOp: AsyncOperation {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         update(activity: activity)
         activity.category = ActivityCategorySelector.selectCategory(for: activity)
+        activity.activityType = CustomType.iOSCalendarEvent.categoryText
         return activity
     }
     
     private func update(activity: Activity) {
-        activity.activityType = CustomType.iOSCalendarEvent.categoryText
         activity.name = event.title
         activity.activityDescription = event.notes
         activity.locationName = event.location

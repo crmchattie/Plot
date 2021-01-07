@@ -120,7 +120,7 @@ extension ActivityCell {
             invitationSegmentHeightConstraint.constant = 0
         }
         
-        switch activity.activityType {
+        switch activity.activityType?.lowercased() {
         case "recipe":
             activityTypeButton.setImage(UIImage(named: "recipe"), for: .normal)
         case "workout":
@@ -142,6 +142,8 @@ extension ActivityCell {
         case "shopping":
             activityTypeButton.setImage(UIImage(named: "shopping"), for: .normal)
         case "sightseeing":
+            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
+        case "mindfulness":
             activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
         default:
             activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)

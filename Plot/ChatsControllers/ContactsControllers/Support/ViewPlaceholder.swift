@@ -47,7 +47,7 @@ enum ViewPlaceholderSubtitle: String {
     case empty = ""
     case denied = "Please go to your iPhone Settings –– Privacy –– Contacts. Then select ON for Plot. If you have Privacy Restrictions ON, please go to Screen Time - Content & Privacy Restrictions - Contacts. Then select ALLOW for Plot"
     case emptyContacts = "You can invite your friends to Plot with the notepad button in the upper right corner"
-    case emptyChat = "You can create your first message with the notepad button in the upper right corner"
+    case emptyChat = "You can create your first conversation with the notepad button in the upper right corner"
     case emptyActivities = "You can allow Plot to access events from the Calendar App and/or add an event with the plus button in the upper right corner"
     case emptyPhotos = "You can add photos with the plus button in the upper right corner"
     case emptyFiles = "You can add docs with the plus button in the upper right corner"

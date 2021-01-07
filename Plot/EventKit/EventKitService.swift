@@ -48,7 +48,10 @@ class EventKitService {
     }
     
     func storeEvent(for activity: Activity) -> EKEvent? {
-        guard let startDate = activity.startDate, let endDate = activity.endDate, let name = activity.name else {
+        let timezone = TimeZone.current
+        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date())) * -1
+        
+        guard let startDate = activity.startDate?.addingTimeInterval(seconds), let endDate = activity.endDate?.addingTimeInterval(seconds), let name = activity.name else {
             return nil
         }
         
