@@ -62,7 +62,6 @@ class NetworkController {
     }
     
     func newUserItems() {
-        createNewUserActivities()
         sendWelcomeMessage()
     }
 }

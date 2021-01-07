@@ -715,9 +715,10 @@ extension MasterActivityContainerController: EndedWebViewDelegate {
     func updateMXMembers() {
         self.financeSections.removeAll(where: { $0 == .financialIssues })
         self.financeGroups[.financialIssues] = nil
-        self.networkController.financeService.getMXData()
-        DispatchQueue.main.async {
-            self.collectionView.reloadData()
+        self.networkController.financeService.grabFinances {
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
         }
     }
 }

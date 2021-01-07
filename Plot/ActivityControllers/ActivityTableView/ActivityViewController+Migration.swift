@@ -52,8 +52,6 @@ extension ActivityViewController {
             
             dispatchGroup.notify(queue: .main) {
                 if remainingActivities.count == 0 {
-//                    self.invitations = [:]
-//                    self.invitedActivities = []
                     self.activitiesParticipants = [:]
                 } else {
                     self.createParticiapantsInvitations(forActivities: remainingActivities)

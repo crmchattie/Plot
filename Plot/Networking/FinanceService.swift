@@ -103,7 +103,6 @@ class FinanceService {
                                                     let date = self.isodateFormatter.date(from: _account.updated_at ) ?? Date()
                                                     self.getMXTransactions(user: user, account: _account, date: date.addingTimeInterval(-604800))
                                                     _account.balances = self.accounts[index].balances
-                                                    print("_account.balances aggregation \(_account.balances)")
                                                     _account.description = self.accounts[index].description
                                                     _account.admin = self.accounts[index].admin
                                                     _account.participantsIDs = self.accounts[index].participantsIDs
@@ -130,7 +129,6 @@ class FinanceService {
                                         self.getMXTransactions(user: user, account: _account, date: nil)
                                     } else if let index = self.accounts.firstIndex(of: account) {
                                         _account.balances = self.accounts[index].balances
-                                        print("_account.balances not-aggregation \(_account.balances)")
                                         _account.description = self.accounts[index].description
                                         _account.admin = self.accounts[index].admin
                                         _account.participantsIDs = self.accounts[index].participantsIDs
@@ -141,6 +139,34 @@ class FinanceService {
                                 }
                                 dispatchGroup.leave()
                             }
+                        } else if member.connection_status == .connected && member.is_being_aggregated {
+                            dispatchGroup.enter()
+                            self.pollMemberStatus(guid: user.guid, member_guid: member.guid) { (member) in
+                                dispatchGroup.enter()
+                                self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
+                                    for account in accounts {
+                                        dispatchGroup.enter()
+                                        var _account = account
+                                        if !self.accounts.contains(_account) {
+                                            self.getMXTransactions(user: user, account: _account, date: nil)
+                                            self.accounts.append(_account)
+                                        } else if let index = self.accounts.firstIndex(of: account) {
+                                            let date = self.isodateFormatter.date(from: _account.updated_at ) ?? Date()
+                                            self.getMXTransactions(user: user, account: _account, date: date.addingTimeInterval(-604800))
+                                            _account.balances = self.accounts[index].balances
+                                            _account.description = self.accounts[index].description
+                                            _account.admin = self.accounts[index].admin
+                                            _account.participantsIDs = self.accounts[index].participantsIDs
+                                            self.accounts[index] = _account
+                                        }
+                                        updatedAccounts.append(_account)
+                                        dispatchGroup.leave()
+                                    }
+                                    dispatchGroup.leave()
+                                }
+                                dispatchGroup.leave()
+                            }
+                            dispatchGroup.leave()
                         } else if member.connection_status != .connected && !member.is_being_aggregated {
                             dispatchGroup.enter()
                             self.members.append(member)
@@ -502,15 +528,11 @@ class FinanceService {
             do {
                 var _account = account
                 if _account.balances != nil {
-                    print("_account.balances != nil \(_account.balances)")
                     if !_account.balances!.values.contains(_account.available_balance ?? _account.balance) {
                         _account.balances![_account.updated_at] = _account.available_balance ?? _account.balance
-                        print("_account.balances \(_account.balances)")
                     }
                 } else {
-                    print("_account.balances == nil")
                     _account.balances = [_account.updated_at: _account.available_balance ?? _account.balance]
-                    print("_account.balances \(_account.balances)")
                 }
                 // store account info
                 let value = try FirebaseEncoder().encode(_account)

@@ -351,6 +351,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
 //        compileActivityDates(activities: allActivities)
         
+        guard !isAppLoaded else { return }
+        isAppLoaded = true
+//        checkForDataMigration(forActivities: allActivities)
+        
     }
     
     func handleReloadActivities() {

@@ -73,8 +73,10 @@ extension ChatsTableViewController {
         let previousVersion = defaults.string(forKey: kAppVersionKey)
         let minVersion = "1.0.1"
         let maxVersion = "1.0.13"
+        
         //current app version is greater than min version and lesser than max version
         let firstCondition = (previousVersion == nil && currentAppVersion.compare(minVersion, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
+        
         //current app version is greater than previous version and lesser than max version
         let secondCondition = (previousVersion != nil && currentAppVersion.compare(previousVersion!, options: .numeric) == .orderedDescending && currentAppVersion.compare(maxVersion, options: .numeric) == .orderedAscending)
         if firstCondition || secondCondition {

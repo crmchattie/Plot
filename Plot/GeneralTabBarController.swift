@@ -60,18 +60,7 @@ class GeneralTabBarController: UITabBarController {
         
         homeController.delegate = self
         setOnlineStatus()
-        
-        isNewUser = Auth.auth().currentUser == nil
-        homeController.isNewUser = isNewUser
-                                
-        if !isNewUser {
-            networkController.setupKeyVariables {
-                self.homeController.networkController = self.networkController
-                self.discoverController.networkController = self.networkController
-                self.networkController.setupOtherVariables()
-            }
-        }
-        
+        loadVariables()
         configureTabBar()
     }
     
@@ -118,6 +107,32 @@ class GeneralTabBarController: UITabBarController {
             }
         } else {
             // Fallback on earlier versions
+        }
+    }
+    
+    fileprivate func loadVariables() {
+        isNewUser = Auth.auth().currentUser == nil
+        homeController.isNewUser = isNewUser
+        
+        let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
+                   
+        //if new user, do nothing; if existing user with old version of app, load other variables
+        //if existing user with current version, load everything
+        if !isNewUser {
+            if let previousVersion = previousVersion, let currentAppVersion = currentAppVersion, currentAppVersion.compare(previousVersion, options: .numeric) != .orderedDescending {
+                networkController.setupKeyVariables {
+                    self.homeController.networkController = self.networkController
+                    self.discoverController.networkController = self.networkController
+                    self.networkController.setupOtherVariables()
+                }
+            } else {
+                UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
+                self.networkController.setupOtherVariables()
+            }
+        } else {
+            UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
+            self.networkController.newUserItems()
         }
     }
     
