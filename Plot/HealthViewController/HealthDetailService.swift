@@ -84,7 +84,11 @@ class HealthDetailService: HealthDetailServiceInterface {
             quantityType = type
         }
         
-        var anchorDate = Date()
+        //https://developer.apple.com/documentation/healthkit/hkstatisticscollectionquery/1615241-anchordate?language=objc
+        // The date used to anchor the collection’s time intervals.
+        // Use the anchor date to set the start time for your time intervals. For example, if you are using a day interval, you might create a date object with a time of 2:00 a.m. This value sets the start of each day for all of your time intervals.
+        // Use start of the day in local time
+        var anchorDate = Date().startOfDay.localTime
         var startDate = anchorDate
         var endDate = anchorDate
         
@@ -92,15 +96,16 @@ class HealthDetailService: HealthDetailServiceInterface {
             interval.hour = 1
             anchorComponents.hour = 0
             anchorDate = calendar.date(from: anchorComponents)!
-            endDate = Date()
-            startDate = calendar.startOfDay(for: endDate)
+            startDate = Date().startOfDay
+            endDate = startDate.advanced(by: 86399)
         }
         else if segmentType == .week {
             interval.day = 1
             anchorComponents.day! -= 7
             anchorComponents.hour = 0
-            endDate = Date()
-            startDate = endDate.weekBefore
+            startDate = Date().startOfDay
+            endDate = startDate.advanced(by: 86399)
+            startDate = startDate.weekBefore.dayAfter
         }
         else if segmentType == .month {
             interval.day = 1
