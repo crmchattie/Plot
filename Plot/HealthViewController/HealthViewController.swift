@@ -30,11 +30,9 @@ class HealthViewController: UIViewController {
     let healhKitManager = HealthKitManager()
     
     var healthMetricSections: [String] {
-        print("healthMetricSections \(networkController.healthService.healthMetricSections)")
         return networkController.healthService.healthMetricSections
     }
     var healthMetrics: [String: [HealthMetric]] {
-        print("healthMetricSections \(networkController.healthService.healthMetrics)")
         return networkController.healthService.healthMetrics
     }
     
