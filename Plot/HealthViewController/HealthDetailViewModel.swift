@@ -53,7 +53,7 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
             }
             
             DispatchQueue.main.async {
-                self?.samples = samples ?? []
+                self?.samples = samples?.sorted(by: { $0.startDate > $1.startDate }) ?? []
                 completion(data, maxValue)
             }
         }

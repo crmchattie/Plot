@@ -186,6 +186,9 @@ class HealthMetricCell: UICollectionViewCell {
                 else if workoutActivityType == .cycling {
                     imageName = "cycling"
                 }
+                else if workoutActivityType == .highIntensityIntervalTraining {
+                    imageName = "jump"
+                }
                 else {
                     imageName = "dumbell"
                 }

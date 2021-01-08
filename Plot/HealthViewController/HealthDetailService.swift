@@ -88,16 +88,16 @@ class HealthDetailService: HealthDetailServiceInterface {
         // The date used to anchor the collection’s time intervals.
         // Use the anchor date to set the start time for your time intervals. For example, if you are using a day interval, you might create a date object with a time of 2:00 a.m. This value sets the start of each day for all of your time intervals.
         // Use start of the day in local time
-        var anchorDate = Date().startOfDay.localTime
+        var anchorDate = Date().localTime
         var startDate = anchorDate
         var endDate = anchorDate
-        
+                
         if segmentType == .day {
             interval.hour = 1
             anchorComponents.hour = 0
             anchorDate = calendar.date(from: anchorComponents)!
-            startDate = Date().startOfDay
-            endDate = startDate.advanced(by: 86399)
+            endDate = Date()
+            startDate = calendar.startOfDay(for: endDate)
         }
         else if segmentType == .week {
             interval.day = 1
@@ -117,7 +117,11 @@ class HealthDetailService: HealthDetailServiceInterface {
         else if segmentType == .year {
             if case .steps = healthMetricType {
                 interval.day = 1
-            } else {
+            }
+            else if case .activeEnergy = healthMetricType {
+                interval.day = 1
+            }
+            else {
                 interval.month = 1
             }
             anchorComponents.year! -= 1
@@ -136,9 +140,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                     } else {
                         stats = self?.perpareCustomStatsForDailyWorkouts(from: workouts, segmentType: segmentType)
                     }
-                    
-                    let sortedWorkouts = workouts?.sorted(by: {$0.startDate > $1.startDate})
-                    completion(stats, sortedWorkouts, nil)
+                    completion(stats, workouts, nil)
                 }
             }
             
@@ -164,7 +166,14 @@ class HealthDetailService: HealthDetailServiceInterface {
                     var stats: [Statistic]?
                     if case .steps = healthMetricType {
                         if segmentType == .year {
-                            stats = self?.perpareCustomStatsForDailyAverageForAnnualSteps(from: results)
+                            stats = self?.perpareCustomStatsForDailyAverageForAnnualMetrics(from: results, unit: unit)
+                        } else {
+                            stats = self?.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
+                        }
+                    }
+                    else if case .activeEnergy = healthMetricType {
+                        if segmentType == .year {
+                            stats = self?.perpareCustomStatsForDailyAverageForAnnualMetrics(from: results, unit: unit)
                         } else {
                             stats = self?.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
                         }
@@ -188,9 +197,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                     } else {
                         stats = self?.perpareCustomStatsForDailyWorkouts(from: workouts, segmentType: segmentType)
                     }
-                    
-                    let sortedWorkouts = workouts?.sorted(by: {$0.startDate > $1.startDate})
-                    completion(stats, sortedWorkouts, nil)
+                    completion(stats, workouts, nil)
                 }
             } else if case .mindfulness = healthMetricType {
                 grabMindfulness(startDate: startDate, endDate: endDate) { [weak self] (samples) in
@@ -435,7 +442,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         return customStats
     }
     
-    private func perpareCustomStatsForDailyAverageForAnnualSteps(from hkStatistics: [HKStatistics]?) -> [Statistic]? {
+    private func perpareCustomStatsForDailyAverageForAnnualMetrics(from hkStatistics: [HKStatistics]?, unit: HKUnit) -> [Statistic]? {
         guard let statsCollection = hkStatistics else {
             return nil
         }
@@ -454,7 +461,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             var firstDate: Date?
             for item in value {
                 if let sumQuantity = item.sumQuantity() {
-                    total += sumQuantity.doubleValue(for: HKUnit.count())
+                    total += sumQuantity.doubleValue(for: unit)
                     if firstDate == nil {
                         firstDate = item.startDate
                     }
