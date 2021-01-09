@@ -32,7 +32,9 @@ class Activity: NSObject, NSCopying, Codable {
     var activityFiles: [String]?
     var allDay: Bool?
     var startDateTime: NSNumber?
+    var startTimeZone: String?
     var endDateTime: NSNumber?
+    var endTimeZone: String?
     var reminder: String?
     var notes: String?
     var schedule: [Activity]?
@@ -174,7 +176,9 @@ class Activity: NSObject, NSCopying, Codable {
         activityFiles = dictionary?["activityFiles"] as? [String]
         allDay = dictionary?["allDay"] as? Bool
         startDateTime = dictionary?["startDateTime"] as? NSNumber
+        startTimeZone = dictionary?["startTimeZone"] as? String
         endDateTime = dictionary?["endDateTime"] as? NSNumber
+        endTimeZone = dictionary?["endTimeZone"] as? String
         reminder = dictionary?["reminder"] as? String
         notes = dictionary?["notes"] as? String
         isGroupActivity = dictionary?["isGroupActivity"] as? Bool
@@ -270,8 +274,16 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["startDateTime"] = value
         }
         
+        if let value = self.startTimeZone as AnyObject? {
+            dictionary["startTimeZone"] = value
+        }
+        
         if let value = self.endDateTime as AnyObject? {
             dictionary["endDateTime"] = value
+        }
+        
+        if let value = self.endTimeZone as AnyObject? {
+            dictionary["endTimeZone"] = value
         }
         
         if let value = self.notes as AnyObject? {
@@ -413,8 +425,16 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["startDateTime"] = value
         }
         
+        if let value = self.startTimeZone as AnyObject? {
+            dictionary["startTimeZone"] = value
+        }
+        
         if let value = self.endDateTime as AnyObject? {
             dictionary["endDateTime"] = value
+        }
+        
+        if let value = self.endTimeZone as AnyObject? {
+            dictionary["endTimeZone"] = value
         }
         
         if let value = self.reminder as AnyObject? {

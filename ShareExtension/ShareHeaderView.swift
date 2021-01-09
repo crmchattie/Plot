@@ -324,43 +324,54 @@ class ActivityCell: UITableViewCell {
         if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval, let allDay = activity.allDay {
             let startDate = Date(timeIntervalSince1970: startDate)
             let endDate = Date(timeIntervalSince1970: endDate)
-            let formatter = DateFormatter()
-            formatter.dateFormat = "d"
-            formatter.timeZone = TimeZone(identifier: "UTC")
+            let startDateFormatter = DateFormatter()
+            let endDateFormatter = DateFormatter()
+            startDateFormatter.dateFormat = "d"
+            endDateFormatter.dateFormat = "d"
+            if let startTimeZone = activity.startTimeZone {
+                startDateFormatter.timeZone = TimeZone(identifier: startTimeZone)
+            } else {
+                startDateFormatter.timeZone = TimeZone(identifier: "UTC")
+            }
+            if let endTimeZone = activity.endTimeZone {
+                endDateFormatter.timeZone = TimeZone(identifier: endTimeZone)
+            } else {
+                endDateFormatter.timeZone = TimeZone(identifier: "UTC")
+            }
         
             let numberFormatter = NumberFormatter()
             numberFormatter.numberStyle = .ordinal
             
             var startDay = ""
-            var day = formatter.string(from: startDate)
+            var day = startDateFormatter.string(from: startDate)
             if let integer = Int(day) {
                 let number = NSNumber(value: integer)
                 startDay = numberFormatter.string(from: number) ?? ""
             }
             
             var endDay = ""
-            day = formatter.string(from: endDate)
+            day = endDateFormatter.string(from: endDate)
             if let integer = Int(day) {
                 let number = NSNumber(value: integer)
                 endDay = numberFormatter.string(from: number) ?? ""
             }
             
-            formatter.dateFormat = "EEEE, MMM"
-            value += "\(formatter.string(from: startDate)) \(startDay)"
+            startDateFormatter.dateFormat = "EEEE, MMM"
+            value += "\(startDateFormatter.string(from: startDate)) \(startDay)"
             
             if allDay {
                 value += " All Day"
             } else {
-                formatter.dateFormat = "h:mm a"
-                value += " \(formatter.string(from: startDate))"
+                startDateFormatter.dateFormat = "h:mm a"
+                value += " \(startDateFormatter.string(from: startDate))"
             }
             
             if startDate.stripTime().compare(endDate.stripTime()) != .orderedSame {
                 value += "\n"
                 numberOfLines = 2
                 
-                formatter.dateFormat = "EEEE, MMM"
-                value += "\(formatter.string(from: endDate)) \(endDay) "
+                endDateFormatter.dateFormat = "EEEE, MMM"
+                value += "\(endDateFormatter.string(from: endDate)) \(endDay) "
                 
                 if allDay {
                     value += "All Day"
@@ -373,8 +384,8 @@ class ActivityCell: UITableViewCell {
                     numberOfLines = 2
                 }
                 
-                formatter.dateFormat = "h:mm a"
-                value += "\(formatter.string(from: endDate))"
+                endDateFormatter.dateFormat = "h:mm a"
+                value += "\(endDateFormatter.string(from: endDate))"
                 
             }
         }

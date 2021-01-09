@@ -13,6 +13,7 @@ class Activity: NSObject {
     var activityID: String?
     var name: String?
     var activityType: String?
+    var category: String?
     var activityDescription: String?
     var locationName: String?
     var locationAddress: [String : [Double]]?
@@ -24,12 +25,16 @@ class Activity: NSObject {
     var activityFiles: [String]?
     var allDay: Bool?
     var startDateTime: NSNumber?
+    var startTimeZone: String?
     var endDateTime: NSNumber?
+    var endTimeZone: String?
     var reminder: String?
     var notes: String?
-    var schedule: [AnyObject]?
-    var purchases: [AnyObject]?
-    var checklist: [String : [String : Bool]]?
+    var checklistIDs: [String]?
+    var activitylistIDs: [String]?
+    var packinglistIDs: [String]?
+    var transactionIDs: [String]?
+    var grocerylistID: String?
     var isGroupActivity: Bool?
     var admin: String?
     var badge: Int?
@@ -38,23 +43,66 @@ class Activity: NSObject {
     var conversationID: String?
     var calendarExport: Bool?
     var recipeID: String?
+    var servings: Int?
     var workoutID: String?
     var eventID: String?
+    var placeID: String?
     var attractionID: String?
-    var checklistIDs: [String]?
-    var packinglistIDs: [String]?
-    var grocerylistID: String?
+    var showExtras: Bool?
+    var hkSampleID: String?
     
-    init(dictionary: [String: AnyObject]?){
+    enum CodingKeys: String, CodingKey {
+        case name
+        case activityType
+        case category
+        case activityDescription
+        case isGroupActivity
+        case locationName
+        case locationAddress
+        case transportation
+        case activityOriginalPhotoURL
+        case activityThumbnailPhotoURL
+        case reminder
+        case notes
+        case schedule
+        case purchases
+        case checklist
+        case packinglist
+        case grocerylist
+        case checklistIDs
+        case activitylistIDs
+        case packinglistIDs
+        case grocerylistID
+        case transactionIDs
+        case calendarExport
+        case recipeID
+        case servings
+        case workoutID
+        case eventID
+        case attractionID
+        case placeID
+        case showExtras
+    }
+    
+    init(dictionary: [String: AnyObject]?) {
         super.init()
         
         activityID = dictionary?["activityID"] as? String
         name = dictionary?["name"] as? String
         activityType = dictionary?["activityType"] as? String
+        category = dictionary?["category"] as? String
         activityDescription = dictionary?["activityDescription"] as? String
         locationName = dictionary?["locationName"] as? String
         locationAddress = dictionary?["locationAddress"] as? [String : [Double]]
-        participantsIDs = dictionary?["participantsIDs"] as? [String]
+        
+        if let participantsIDsDict = dictionary?["participantsIDs"] as? [String: String] {
+            participantsIDs = Array(participantsIDsDict.keys)
+        } else if let participantsIDsArray = dictionary?["participantsIDs"] as? [String] {
+            participantsIDs = participantsIDsArray
+        } else {
+            participantsIDs = []
+        }
+        
         transportation = dictionary?["transportation"] as? String
         activityOriginalPhotoURL = dictionary?["activityOriginalPhotoURL"] as? String
         activityThumbnailPhotoURL = dictionary?["activityThumbnailPhotoURL"] as? String
@@ -62,131 +110,169 @@ class Activity: NSObject {
         activityFiles = dictionary?["activityFiles"] as? [String]
         allDay = dictionary?["allDay"] as? Bool
         startDateTime = dictionary?["startDateTime"] as? NSNumber
+        startTimeZone = dictionary?["startTimeZone"] as? String
         endDateTime = dictionary?["endDateTime"] as? NSNumber
+        endTimeZone = dictionary?["endTimeZone"] as? String
         reminder = dictionary?["reminder"] as? String
         notes = dictionary?["notes"] as? String
-        schedule = dictionary?["schedule"] as? [AnyObject]
-        purchases = dictionary?["purchases"] as? [AnyObject]
-        checklist = dictionary?["checklist"] as? [String: [String : Bool]]
         isGroupActivity = dictionary?["isGroupActivity"] as? Bool
         admin = dictionary?["admin"] as? String
         badge = dictionary?["badge"] as? Int
         pinned = dictionary?["pinned"] as? Bool
         muted = dictionary?["muted"] as? Bool
         conversationID = dictionary?["conversationID"] as? String
+        grocerylistID = dictionary?["grocerylistID"] as? String
+        checklistIDs = dictionary?["checklistIDs"] as? [String]
+        activitylistIDs = dictionary?["activitylistIDs"] as? [String]
+        packinglistIDs = dictionary?["packinglistIDs"] as? [String]
+        transactionIDs = dictionary?["transactionIDs"] as? [String]
         calendarExport = dictionary?["calendarExport"] as? Bool
         recipeID = dictionary?["recipeID"] as? String
+        servings = dictionary?["servings"] as? Int
         workoutID = dictionary?["workoutID"] as? String
         eventID = dictionary?["eventID"] as? String
         attractionID = dictionary?["attractionID"] as? String
-        grocerylistID = dictionary?["grocerylistID"] as? String
-        checklistIDs = dictionary?["checklistIDs"] as? [String]
-        packinglistIDs = dictionary?["packinglistIDs"] as? [String]
-        
+        placeID = dictionary?["placeID"] as? String
+        showExtras = dictionary?["showExtras"] as? Bool
+    }
+    
+    func copy(with zone: NSZone? = nil) -> Any {
+        let copy = Activity(dictionary: self.toAnyObject())
+        return copy
     }
     
     func toAnyObject() -> [String: AnyObject] {
-        var activityDict = [String: AnyObject]()
+        var dictionary = [String: AnyObject]()
         
-        activityDict["activityID"] = self.activityID as AnyObject
+        if let value = self.activityID as AnyObject? {
+            dictionary["activityID"] = value
+        }
         
-        activityDict["name"] = self.name as AnyObject
+        if let value = self.name as AnyObject? {
+            dictionary["name"] = value
+        }
+        
+        if let value = self.admin as AnyObject? {
+            dictionary["admin"] = value
+        }
         
         if let value = self.activityType as AnyObject? {
-            activityDict["activityType"] = value
-        } else {
-            activityDict["activityType"] = "nothing" as AnyObject
+            dictionary["activityType"] = value
+        }
+        
+        if let value = self.category as AnyObject? {
+            dictionary["category"] = value
         }
         
         if let value = self.activityDescription as AnyObject? {
-            activityDict["activityDescription"] = value
-        } else {
-            activityDict["activityDescription"] = "nothing" as AnyObject
+            dictionary["activityDescription"] = value
         }
         
         if let value = self.locationName as AnyObject? {
-            activityDict["locationName"] = value
+            dictionary["locationName"] = value
         }
         
         if let value = self.locationAddress as AnyObject? {
-            activityDict["locationAddress"] = value
+            dictionary["locationAddress"] = value
         }
         
-        activityDict["participantsIDs"] = self.participantsIDs as AnyObject
+        if let value = self.participantsIDs as AnyObject? {
+            dictionary["participantsIDs"] = value
+        }
         
         if let value = self.transportation as AnyObject? {
-            activityDict["transportation"] = value
-        } else {
-            activityDict["transportation"] = "nothing" as AnyObject
+            dictionary["transportation"] = value
         }
         
         if let value = self.activityOriginalPhotoURL as AnyObject? {
-            activityDict["activityOriginalPhotoURL"] = value
+            dictionary["activityOriginalPhotoURL"] = value
         }
         
         if let value = self.activityThumbnailPhotoURL as AnyObject? {
-            activityDict["activityThumbnailPhotoURL"] = value
+            dictionary["activityThumbnailPhotoURL"] = value
         }
         
         if let value = self.activityPhotos as AnyObject? {
-            activityDict["activityPhotos"] = value
+            dictionary["activityPhotos"] = value
         }
         
         if let value = self.activityFiles as AnyObject? {
-            activityDict["activityFiles"] = value
+            dictionary["activityFiles"] = value
         }
         
-        activityDict["allDay"] = self.allDay as AnyObject
-        activityDict["startDateTime"] = self.startDateTime as AnyObject
-        activityDict["endDateTime"] = self.endDateTime as AnyObject
+        if let value = self.allDay as AnyObject? {
+            dictionary["allDay"] = value
+        }
         
-        //        if let value = self.reminder as AnyObject? {
-        //            activityDict["reminder"] = value
-        //        }
+        if let value = self.startDateTime as AnyObject? {
+            dictionary["startDateTime"] = value
+        }
+        
+        if let value = self.startTimeZone as AnyObject? {
+            dictionary["startTimeZone"] = value
+        }
+        
+        if let value = self.endDateTime as AnyObject? {
+            dictionary["endDateTime"] = value
+        }
+        
+        if let value = self.endTimeZone as AnyObject? {
+            dictionary["endTimeZone"] = value
+        }
         
         if let value = self.notes as AnyObject? {
-            activityDict["notes"] = value
-        } else {
-            activityDict["notes"] = "nothing" as AnyObject
-        }
-        
-        if let value = self.schedule as AnyObject? {
-            activityDict["schedule"] = value
-        }
-        
-        if let value = self.purchases as AnyObject? {
-            activityDict["purchases"] = value
-        }
-        
-        if let value = self.checklist as AnyObject? {
-            activityDict["checklist"] = value
+            dictionary["notes"] = value
         }
         
         if let value = self.conversationID as AnyObject? {
-            activityDict["conversationID"] = value
+            dictionary["conversationID"] = value
         }
         
-        if let value = self.checklist as AnyObject? {
-            activityDict["checklist"] = value
+        if let value = self.grocerylistID as AnyObject? {
+            dictionary["grocerylistID"] = value
+        }
+        
+        if let value = self.checklistIDs as AnyObject? {
+            dictionary["checklistIDs"] = value
+        }
+        
+        if let value = self.activitylistIDs as AnyObject? {
+            dictionary["activitylistIDs"] = value
+        }
+        
+        if let value = self.packinglistIDs as AnyObject? {
+            dictionary["packinglistIDs"] = value
+        }
+        
+        if let value = self.transactionIDs as AnyObject? {
+            dictionary["transactionIDs"] = value
         }
         
         if let value = self.recipeID as AnyObject? {
-            activityDict["recipeID"] = value
+            dictionary["recipeID"] = value
+        }
+        
+        if let value = self.servings as AnyObject? {
+            dictionary["servings"] = value
         }
         
         if let value = self.workoutID as AnyObject? {
-            activityDict["workoutID"] = value
+            dictionary["workoutID"] = value
         }
         
         if let value = self.eventID as AnyObject? {
-            activityDict["eventID"] = value
+            dictionary["eventID"] = value
         }
         
         if let value = self.attractionID as AnyObject? {
-            activityDict["attractionID"] = value
+            dictionary["attractionID"] = value
         }
         
-        return activityDict
+        if let value = self.placeID as AnyObject? {
+            dictionary["placeID"] = value
+        }
+        
+        return dictionary
     }
 }
 

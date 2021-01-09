@@ -64,6 +64,7 @@ class EventKitService {
         event.title = name
         event.startDate = startDate
         event.endDate = endDate
+        event.timeZone = TimeZone(identifier: activity.startTimeZone ?? TimeZone.current.identifier)
         event.notes = text
         event.calendar = eventStore.defaultCalendarForNewEvents
         do {

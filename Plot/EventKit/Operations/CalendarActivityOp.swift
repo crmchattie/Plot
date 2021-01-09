@@ -86,16 +86,14 @@ class CalendarActivityOp: AsyncOperation {
         activity.activityDescription = event.notes
         activity.locationName = event.location
         activity.allDay = event.isAllDay
-        let timezone = event.timeZone
-        let seconds = TimeInterval(timezone?.secondsFromGMT(for: Date()) ?? 0)
-        let startDateTime = event.startDate.addingTimeInterval(seconds)
-        let endDateTime = event.endDate.addingTimeInterval(seconds)
-        if event.isAllDay, let endDateTime = Calendar.current.date(byAdding: .day, value: -1, to: endDateTime.startOfDay) {
-            activity.startDateTime = NSNumber(value: startDateTime.startOfDay.timeIntervalSince1970)
+        activity.startTimeZone = event.timeZone?.identifier ?? TimeZone.current.identifier
+        activity.endTimeZone = event.timeZone?.identifier ?? TimeZone.current.identifier
+        if event.isAllDay, let endDateTime = Calendar.current.date(byAdding: .day, value: -1, to: event.endDate.startOfDay) {
+            activity.startDateTime = NSNumber(value: event.startDate.startOfDay.timeIntervalSince1970)
             activity.endDateTime = NSNumber(value: endDateTime.timeIntervalSince1970)
         } else {
-            activity.startDateTime = NSNumber(value: startDateTime.timeIntervalSince1970)
-            activity.endDateTime = NSNumber(value: endDateTime.timeIntervalSince1970)
+            activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
+            activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
         }
         
     }

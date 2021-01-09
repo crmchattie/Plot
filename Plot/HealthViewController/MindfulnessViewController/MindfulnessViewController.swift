@@ -237,7 +237,6 @@ class MindfulnessViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
-                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
@@ -246,9 +245,7 @@ class MindfulnessViewController: FormViewController {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    $0.value = rounded.addingTimeInterval(seconds)
+                    $0.value = rounded
                     self.mindfulness.startDateTime = $0.value
                 }
             }.onChange { [weak self] row in
@@ -264,7 +261,6 @@ class MindfulnessViewController: FormViewController {
                     row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
-                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
                     }
@@ -286,7 +282,6 @@ class MindfulnessViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
-                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
@@ -295,9 +290,7 @@ class MindfulnessViewController: FormViewController {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    $0.value = rounded.addingTimeInterval(seconds + 1800)
+                    $0.value = rounded
                     self.mindfulness.endDateTime = $0.value
                 }
             }.onChange { [weak self] row in
@@ -313,7 +306,6 @@ class MindfulnessViewController: FormViewController {
                     row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
-                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
                     }

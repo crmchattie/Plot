@@ -105,7 +105,6 @@ class MoodViewController: FormViewController {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                 $0.title = $0.tag
                 $0.minuteInterval = 5
                 $0.dateFormatter?.dateStyle = .full
@@ -118,7 +117,6 @@ class MoodViewController: FormViewController {
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.datePicker.datePickerMode = .dateAndTime
-                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
                         }

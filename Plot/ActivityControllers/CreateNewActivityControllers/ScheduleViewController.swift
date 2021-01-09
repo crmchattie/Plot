@@ -233,164 +233,201 @@ class ScheduleViewController: FormViewController {
 //
 //            }
             
-            <<< SwitchRow("All-day") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.title = $0.tag
-                if self.active {
-                    $0.value = self.schedule.allDay
-                } else {
-                    $0.value = false
-                }
-                }.onChange { [weak self] row in
-                    let startDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
-                    let endDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
-                    
-                    if row.value ?? false {
-                        startDate.dateFormatter?.dateStyle = .medium
-                        startDate.dateFormatter?.timeStyle = .none
-                        endDate.dateFormatter?.dateStyle = .medium
-                        endDate.dateFormatter?.timeStyle = .none
-                    }
-                    else {
-                        startDate.dateFormatter?.dateStyle = .short
-                        startDate.dateFormatter?.timeStyle = .short
-                        endDate.dateFormatter?.dateStyle = .short
-                        endDate.dateFormatter?.timeStyle = .short
-                    }
-                    startDate.updateCell()
-                    endDate.updateCell()
-                    startDate.inlineRow?.updateCell()
-                    endDate.inlineRow?.updateCell()
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    
-            }
-            
             <<< DateTimeInlineRow("Starts") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.minuteInterval = 5
-                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.dateStyle = .long
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: schedule.startTimeZone ?? TimeZone.current.identifier)
                     $0.value = Date(timeIntervalSince1970: self.schedule!.startDateTime as! TimeInterval)
-                    
                     if self.schedule.allDay == true {
-                        $0.dateFormatter?.dateStyle = .full
+                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .full
+                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .short
                     }
-                    
                     $0.updateCell()
-                    
                 } else {
-                    $0.value = startDateTime
+                    $0.dateFormatter?.timeZone = .current
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    $0.value = rounded
+                    self.schedule.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.startDateTime = $0.value
-                }
-                .onChange { [weak self] row in
+                }.onChange { [weak self] row in
                     let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
                     if row.value?.compare(endRow.value!) == .orderedDescending {
                         endRow.value = Date(timeInterval: 0, since: row.value!)
-                        endRow.cell!.backgroundColor = .white
                         endRow.updateCell()
                     }
+                    self!.schedule.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.startDateTime = row.value
-                }
-                .onExpandInlineRow { [weak self] cell, row, inlineRow in
-                    inlineRow.cellUpdate() { cell, row in
+                    if self!.active {
+                        self!.scheduleReminder()
+                    }
+                }.onExpandInlineRow { [weak self] cell, row, inlineRow in
+                    inlineRow.cellUpdate { (cell, row) in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        if #available(iOS 13.4, *) {
+                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        }
                         let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                         if allRow.value ?? false {
                             cell.datePicker.datePickerMode = .date
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         }
                         else {
                             cell.datePicker.datePickerMode = .dateAndTime
+                        }
+                        if let startTimeZone = self?.schedule.startTimeZone {
+                            cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
+                        } else if self!.active {
                             cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        } else {
+                            cell.datePicker.timeZone = .current
                         }
                     }
-                    let color = cell.detailTextLabel?.textColor
-                    row.onCollapseInlineRow { cell, _, _ in
-                        cell.detailTextLabel?.textColor = color
-                    }
                     cell.detailTextLabel?.textColor = cell.tintColor
+                    if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "startTimeZone") {
+                        timeZoneRow.hidden = false
+                        timeZoneRow.evaluateHidden()
+                    }
+                }.onCollapseInlineRow { cell, _, _ in
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone") {
+                        timeZoneRow.hidden = true
+                        timeZoneRow.evaluateHidden()
+                    }
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    
-            }
+                }
             
-            <<< DateTimeInlineRow("Ends"){
+            <<< LabelRow("startTimeZone") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = "Time Zone"
+                row.hidden = true
+                if active {
+                    row.value = schedule.startTimeZone ?? TimeZone.current.identifier
+                } else {
+                    row.value = TimeZone.current.identifier
+                    schedule.endTimeZone = TimeZone.current.identifier
+                }
+                }.onCellSelection({ _,_ in
+                    self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
+                }).cellUpdate { cell, row in
+                    cell.accessoryType = .disclosureIndicator
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+            
+            <<< DateTimeInlineRow("Ends") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.minuteInterval = 5
-                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.dateStyle = .long
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: schedule.endTimeZone ?? TimeZone.current.identifier)
                     $0.value = Date(timeIntervalSince1970: self.schedule!.endDateTime as! TimeInterval)
-                    
                     if self.schedule.allDay == true {
-                        $0.dateFormatter?.dateStyle = .full
+                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .full
+                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .short
                     }
-                    
                     $0.updateCell()
-                    
                 } else {
-                    $0.value = endDateTime
+                    $0.dateFormatter?.timeZone = .current
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    $0.value = rounded
+                    self.schedule.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.endDateTime = $0.value
-                }
-                .onChange { [weak self] row in
+                }.onChange { [weak self] row in
                     let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
                     if row.value?.compare(startRow.value!) == .orderedAscending {
-                        row.cell!.backgroundColor = .red
+                        startRow.value = Date(timeInterval: 0, since: row.value!)
+                        startRow.updateCell()
                     }
-                    else{
-                        row.cell!.backgroundColor = .white
-                    }
-                    row.updateCell()
+                    self!.schedule.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.endDateTime = row.value
+                }.onExpandInlineRow { [weak self] cell, row, inlineRow in
+                inlineRow.cellUpdate { (cell, row) in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                    if let endTimeZone = self?.schedule.endTimeZone {
+                        cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
+                    } else if self!.active {
+                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    } else {
+                        cell.datePicker.timeZone = .current
+                    }
+                    if #available(iOS 13.4, *) {
+                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    }
+                    let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
+                    if allRow.value ?? false {
+                        cell.datePicker.datePickerMode = .date
+                    }
+                    else {
+                        cell.datePicker.datePickerMode = .dateAndTime
+                    }
                 }
-                .onExpandInlineRow { [weak self] cell, row, inlineRow in
-                    inlineRow.cellUpdate { cell, dateRow in
-                        let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
-                        if allRow.value ?? false {
-                            cell.datePicker.datePickerMode = .date
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                        }
-                        else {
-                            cell.datePicker.datePickerMode = .dateAndTime
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                        }
+                cell.detailTextLabel?.textColor = cell.tintColor
+                if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "endTimeZone") {
+                    timeZoneRow.hidden = false
+                    timeZoneRow.evaluateHidden()
+                }
+                }.onCollapseInlineRow { cell, _, _ in
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone") {
+                        timeZoneRow.hidden = true
+                        timeZoneRow.evaluateHidden()
                     }
-                    let color = cell.detailTextLabel?.textColor
-                    row.onCollapseInlineRow { cell, _, _ in
-                        cell.detailTextLabel?.textColor = color
-                    }
-                    cell.detailTextLabel?.textColor = cell.tintColor
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
-            }
+                }
+            
+            <<< LabelRow("endTimeZone") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = "Time Zone"
+                row.hidden = true
+                if active {
+                    row.value = schedule.endTimeZone ?? TimeZone.current.identifier
+                } else {
+                    row.value = TimeZone.current.identifier
+                    schedule.endTimeZone = TimeZone.current.identifier
+                }
+                }.onCellSelection({ _,_ in
+                    self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
+                }).cellUpdate { cell, row in
+                    cell.accessoryType = .disclosureIndicator
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
         
             <<< AlertRow<EventAlert>("Reminder") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -616,6 +653,17 @@ class ScheduleViewController: FormViewController {
         //        present(destination, animated: true, completion: nil)
     }
     
+    fileprivate func openTimeZoneFinder(startOrEndTimeZone: String) {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = TimeZoneViewController()
+        destination.delegate = self
+        destination.startOrEndTimeZone = startOrEndTimeZone
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
     //update so existing invitees are shown as selected
     @objc fileprivate func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
@@ -776,6 +824,32 @@ extension ScheduleViewController: UpdateLocationDelegate {
                 } else {
                     self.schedule.locationAddress![newLocationName] = value
                 }
+            }
+        }
+    }
+}
+
+extension ScheduleViewController: UpdateTimeZoneDelegate {
+    func updateTimeZone(startOrEndTimeZone: String, timeZone: TimeZone) {
+        if startOrEndTimeZone == "startTimeZone" {
+            if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone"), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts") {
+                startRow.dateFormatter?.timeZone = timeZone
+                startRow.updateCell()
+                startRow.inlineRow?.cell.datePicker.timeZone = timeZone
+                startRow.inlineRow?.updateCell()
+                timeZoneRow.value = timeZone.identifier
+                timeZoneRow.updateCell()
+                schedule.startTimeZone = timeZone.identifier
+            }
+        } else if startOrEndTimeZone == "endTimeZone" {
+            if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
+                endRow.dateFormatter?.timeZone = timeZone
+                endRow.updateCell()
+                endRow.inlineRow?.cell.datePicker.timeZone = timeZone
+                endRow.inlineRow?.updateCell()
+                timeZoneRow.value = timeZone.identifier
+                timeZoneRow.updateCell()
+                schedule.endTimeZone = timeZone.identifier
             }
         }
     }

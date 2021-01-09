@@ -1,28 +1,27 @@
 //
-//  SearchViewController.swift
-//  AutocompleteExample
+//  TimezoneFinderController.swift
+//  Plot
 //
-//  Created by George McDonnell on 26/04/2017.
-//  Copyright © 2017 George McDonnell. All rights reserved.
+//  Created by Cory McHattie on 1/8/21.
+//  Copyright © 2021 Immature Creations. All rights reserved.
 //
 
 import UIKit
 import MapKit
 
-protocol UpdateLocationDelegate: class {
-    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String)
+protocol UpdateTimeZoneDelegate: class {
+    func updateTimeZone(startOrEndTimeZone: String, timeZone: TimeZone)
 }
 
-class LocationFinderTableViewController: UIViewController {
-
+class TimeZoneViewController: UIViewController {
+    
     var searchCompleter = MKLocalSearchCompleter()
     var searchResults = [MKLocalSearchCompletion]()
     var searchBar: UISearchBar?
     let searchResultsTableView = UITableView()
-    weak var delegate : UpdateLocationDelegate?
+    weak var delegate : UpdateTimeZoneDelegate?
     
-    var locationName = "Location"
-    var locationAddress = ["locationAddress": [0.0]]
+    var startOrEndTimeZone: String?
     
     var viewPlaceholder = ViewPlaceholder()
     
@@ -64,7 +63,7 @@ class LocationFinderTableViewController: UIViewController {
     }
     
     fileprivate func setupTableView() {
-
+        
         
         view.addSubview(searchResultsTableView)
         searchResultsTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -85,14 +84,14 @@ class LocationFinderTableViewController: UIViewController {
         searchResultsTableView.sectionIndexBackgroundColor = view.backgroundColor
         searchResultsTableView.backgroundColor = view.backgroundColor
         searchResultsTableView.separatorStyle = .none
-
+        
     }
     
     @objc func cancel() {
         //            self.dismiss(animated: true, completion: nil)
         navigationController?.popViewController(animated: true)
     }
-
+    
     
     deinit {
         print("select location deinit")
@@ -109,7 +108,7 @@ class LocationFinderTableViewController: UIViewController {
 }
 
 
-extension LocationFinderTableViewController: UISearchBarDelegate {
+extension TimeZoneViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
@@ -117,7 +116,7 @@ extension LocationFinderTableViewController: UISearchBarDelegate {
     }
 }
 
-extension LocationFinderTableViewController: MKLocalSearchCompleterDelegate {
+extension TimeZoneViewController: MKLocalSearchCompleterDelegate {
     
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         searchResults = completer.results
@@ -129,7 +128,7 @@ extension LocationFinderTableViewController: MKLocalSearchCompleterDelegate {
     }
 }
 
-extension LocationFinderTableViewController: UITableViewDataSource {
+extension TimeZoneViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -155,41 +154,36 @@ extension LocationFinderTableViewController: UITableViewDataSource {
         return cell
     }
     
-
+    
 }
 
-extension LocationFinderTableViewController: UITableViewDelegate {
+extension TimeZoneViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let completion = searchResults[indexPath.row]
-        var latitude = Double()
-        var longitude = Double()
-        
-        locationName = String(completion.title)
-        
         let searchRequest = MKLocalSearch.Request(completion: completion)
         let search = MKLocalSearch(request: searchRequest)
         search.start { (response, error) in
-            let coordinates = response?.mapItems[0].placemark.coordinate
-            latitude = coordinates!.latitude
-            longitude = coordinates!.longitude
-            
-            let zipcode = response?.mapItems[0].placemark.postalCode ?? ""
-            let city = response?.mapItems[0].placemark.locality ?? ""
-            let state = response?.mapItems[0].placemark.administrativeArea ?? ""
-            let countryCode = response?.mapItems[0].placemark.countryCode ?? ""
-            
-            self.locationAddress = [self.locationName: [latitude, longitude]]
-            self.delegate?.updateLocation(locationName: self.locationName, locationAddress: self.locationAddress, zipcode: zipcode, city: city, state: state, country: countryCode)
-            self.navigationController?.popViewController(animated: true)
+            if let coordinates = response?.mapItems[0].placemark.coordinate {
+                let latitude = coordinates.latitude
+                let longitude = coordinates.longitude
+                
+                let location = CLLocation(latitude: latitude, longitude: longitude)
+                let geoCoder = CLGeocoder()
+                geoCoder.reverseGeocodeLocation(location) { (placemarks, err) in
+                    if let placemark = placemarks?[0], let timeZone = placemark.timeZone, let startOrEndTimeZone = self.startOrEndTimeZone {
+                        self.delegate?.updateTimeZone(startOrEndTimeZone: startOrEndTimeZone, timeZone: timeZone)
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                }
+            }
         }
-
     }
 }
 
-extension LocationFinderTableViewController {
+extension TimeZoneViewController {
     
     func updateSearchResults(for searchController: UISearchController) {}
     

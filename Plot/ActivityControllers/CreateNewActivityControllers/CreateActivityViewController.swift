@@ -247,7 +247,6 @@ class CreateActivityViewController: FormViewController {
                     self.openActivityPicture()
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.titleLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
             <<< TextRow("Activity Name") {
@@ -271,7 +270,6 @@ class CreateActivityViewController: FormViewController {
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
 //            <<< TextAreaRow("Activity Name") {
@@ -312,7 +310,6 @@ class CreateActivityViewController: FormViewController {
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 }.onChange() { [unowned self] row in
                     self.activity.activityType = row.value
                 }
@@ -330,7 +327,6 @@ class CreateActivityViewController: FormViewController {
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.activityDescription = row.value
                 }
@@ -426,28 +422,6 @@ class CreateActivityViewController: FormViewController {
                     }
                 }
             
-//            <<< ActionSheetRow<String>("Transportation") {
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                $0.title = $0.tag
-//                $0.selectorTitle = "How are you getting there?"
-//                $0.options = ["None", "Car", "Flight", "Train", "Bus", "Subway", "Bike/Scooter", "Walk"]
-//                if self.active && self.activity.transportation != "nothing" && self.activity.transportation != nil {
-//                    $0.value = self.activity.transportation
-//                }
-//                }
-//                .onPresent { from, to in
-//                    to.popoverPresentationController?.permittedArrowDirections = .up
-//                }.cellUpdate { cell, row in
-//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//
-//                }.onChange() { [unowned self] row in
-//                    self.activity.transportation = row.value
-//                }
-            
             <<< SwitchRow("All-day") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -493,10 +467,10 @@ class CreateActivityViewController: FormViewController {
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.minuteInterval = 5
-                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                 $0.dateFormatter?.dateStyle = .long
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: activity.startTimeZone ?? TimeZone.current.identifier)
                     $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
                     if self.activity.allDay == true {
                         $0.dateFormatter?.dateStyle = .long
@@ -506,15 +480,13 @@ class CreateActivityViewController: FormViewController {
                         $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .short
                     }
-                    
                     $0.updateCell()
                 } else {
+                    $0.dateFormatter?.timeZone = .current
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    $0.value = rounded.addingTimeInterval(seconds)
+                    $0.value = rounded
                     self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.startDateTime = $0.value
@@ -531,7 +503,7 @@ class CreateActivityViewController: FormViewController {
                     }
                     self!.weatherRow()
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
-                    inlineRow.cellUpdate() { cell, row in
+                    inlineRow.cellUpdate { (cell, row) in
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                         if #available(iOS 13.4, *) {
@@ -540,35 +512,65 @@ class CreateActivityViewController: FormViewController {
                         let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                         if allRow.value ?? false {
                             cell.datePicker.datePickerMode = .date
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         }
                         else {
                             cell.datePicker.datePickerMode = .dateAndTime
+                        }
+                        if let startTimeZone = self?.activity.startTimeZone {
+                            cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
+                        } else if self!.active {
                             cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                        } else {
+                            cell.datePicker.timeZone = .current
                         }
                     }
-                    let color = cell.detailTextLabel?.textColor
-                    row.onCollapseInlineRow { cell, _, _ in
-                        cell.detailTextLabel?.textColor = color
-                    }
                     cell.detailTextLabel?.textColor = cell.tintColor
+                    if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "startTimeZone") {
+                        timeZoneRow.hidden = false
+                        timeZoneRow.evaluateHidden()
+                    }
+                }.onCollapseInlineRow { cell, _, _ in
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone") {
+                        timeZoneRow.hidden = true
+                        timeZoneRow.evaluateHidden()
+                    }
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    
                 }
             
-            <<< DateTimeInlineRow("Ends"){
+            <<< LabelRow("startTimeZone") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = "Time Zone"
+                row.hidden = true
+                if active {
+                    row.value = activity.startTimeZone ?? TimeZone.current.identifier
+                } else {
+                    row.value = TimeZone.current.identifier
+                    activity.endTimeZone = TimeZone.current.identifier
+                }
+                }.onCellSelection({ _,_ in
+                    self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
+                }).cellUpdate { cell, row in
+                    cell.accessoryType = .disclosureIndicator
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+            
+            <<< DateTimeInlineRow("Ends") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.minuteInterval = 5
-                $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                 $0.dateFormatter?.dateStyle = .long
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: activity.endTimeZone ?? TimeZone.current.identifier)
                     $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
                     if self.activity.allDay == true {
                         $0.dateFormatter?.dateStyle = .long
@@ -580,12 +582,11 @@ class CreateActivityViewController: FormViewController {
                     }
                     $0.updateCell()
                 } else {
+                    $0.dateFormatter?.timeZone = .current
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    $0.value = rounded.addingTimeInterval(seconds)
+                    $0.value = rounded
                     self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.endDateTime = $0.value
@@ -599,33 +600,64 @@ class CreateActivityViewController: FormViewController {
                     self!.endDateTime = row.value
                     self!.weatherRow()
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
-                        inlineRow.cellUpdate() { cell, row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-                            if #available(iOS 13.4, *) {
-                                cell.datePicker.preferredDatePickerStyle = .wheels
-                            }
-                        let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
-                        if allRow.value ?? false {
-                            cell.datePicker.datePickerMode = .date
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                        }
-                        else {
-                            cell.datePicker.datePickerMode = .dateAndTime
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                        }
+                inlineRow.cellUpdate { (cell, row) in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                    if let endTimeZone = self?.activity.endTimeZone {
+                        cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
+                    } else if self!.active {
+                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                    } else {
+                        cell.datePicker.timeZone = .current
                     }
-                    let color = cell.detailTextLabel?.textColor
-                    row.onCollapseInlineRow { cell, _, _ in
-                        cell.detailTextLabel?.textColor = color
+                    if #available(iOS 13.4, *) {
+                        cell.datePicker.preferredDatePickerStyle = .wheels
                     }
-                    cell.detailTextLabel?.textColor = cell.tintColor
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                        
+                    let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
+                    if allRow.value ?? false {
+                        cell.datePicker.datePickerMode = .date
                     }
+                    else {
+                        cell.datePicker.datePickerMode = .dateAndTime
+                    }
+                }
+                cell.detailTextLabel?.textColor = cell.tintColor
+                if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "endTimeZone") {
+                    timeZoneRow.hidden = false
+                    timeZoneRow.evaluateHidden()
+                }
+                }.onCollapseInlineRow { cell, _, _ in
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone") {
+                        timeZoneRow.hidden = true
+                        timeZoneRow.evaluateHidden()
+                    }
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    
+                }
+            
+            <<< LabelRow("endTimeZone") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = "Time Zone"
+                row.hidden = true
+                if active {
+                    row.value = activity.endTimeZone ?? TimeZone.current.identifier
+                } else {
+                    row.value = TimeZone.current.identifier
+                    activity.endTimeZone = TimeZone.current.identifier
+                }
+                }.onCellSelection({ _,_ in
+                    self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
+                }).cellUpdate { cell, row in
+                    cell.accessoryType = .disclosureIndicator
+                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
             
             <<< AlertRow<EventAlert>("Reminder") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -671,41 +703,9 @@ class CreateActivityViewController: FormViewController {
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.notes = row.value
                 }
-            
-//            <<< ActionSheetRow<String>("Export") {
-//                $0.cell.textLabel?.textAlignment = .center
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                $0.cell.textLabel?.textColor = FalconPalette.defaultBlue
-//                $0.cell.detailTextLabel?.textColor = FalconPalette.defaultBlue
-//                $0.title = "Export Activity to Calendar"
-//                $0.selectorTitle = "Which Calendar?"
-//                $0.options = ["iCal"]
-////                $0.options = ["iCal", "Google Calendar", "Outlook"]
-//                if self.active && self.activity.calendarExport == true {
-//                    $0.value = "Exported"
-//                }
-//                }
-//                .onPresent { from, to in
-//                    to.popoverPresentationController?.permittedArrowDirections = .up
-//                }.cellUpdate { cell, row in
-//                    cell.textLabel?.textAlignment = .center
-//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                    cell.textLabel?.textColor = FalconPalette.defaultBlue
-//                    cell.detailTextLabel?.textColor = FalconPalette.defaultBlue
-//                }.onChange({ row in
-//                    if row.value == "iCal" {
-//                        self.addEventToiCal()
-//                        row.value = "Exported"
-//                    } else if row.value == "Google Calendar" {
-//                        row.value = "Exported"
-//                    } else {
-//                        row.value = "Exported"
-//                    }
-//                })
         
         <<< SwitchRow("showExtras") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -1506,12 +1506,20 @@ class CreateActivityViewController: FormViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        print("openLocation")
         let destination = LocationFinderTableViewController()
         destination.delegate = self
         self.navigationController?.pushViewController(destination, animated: true)
-//        let navigationViewController = UINavigationController(rootViewController: destination)
-//        self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    fileprivate func openTimeZoneFinder(startOrEndTimeZone: String) {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = TimeZoneViewController()
+        destination.delegate = self
+        destination.startOrEndTimeZone = startOrEndTimeZone
+        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     //update so existing invitees are shown as selected
@@ -2497,6 +2505,32 @@ extension CreateActivityViewController: UpdateLocationDelegate {
                     self.activity.locationAddress![newLocationName] = value
                 }
                 self.weatherRow()
+            }
+        }
+    }
+}
+
+extension CreateActivityViewController: UpdateTimeZoneDelegate {
+    func updateTimeZone(startOrEndTimeZone: String, timeZone: TimeZone) {
+        if startOrEndTimeZone == "startTimeZone" {
+            if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone"), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts") {
+                startRow.dateFormatter?.timeZone = timeZone
+                startRow.updateCell()
+                startRow.inlineRow?.cell.datePicker.timeZone = timeZone
+                startRow.inlineRow?.updateCell()
+                timeZoneRow.value = timeZone.identifier
+                timeZoneRow.updateCell()
+                activity.startTimeZone = timeZone.identifier
+            }
+        } else if startOrEndTimeZone == "endTimeZone" {
+            if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
+                endRow.dateFormatter?.timeZone = timeZone
+                endRow.updateCell()
+                endRow.inlineRow?.cell.datePicker.timeZone = timeZone
+                endRow.inlineRow?.updateCell()
+                timeZoneRow.value = timeZone.identifier
+                timeZoneRow.updateCell()
+                activity.endTimeZone = timeZone.identifier
             }
         }
     }

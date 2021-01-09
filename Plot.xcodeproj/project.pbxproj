@@ -16,6 +16,7 @@
 		100B9F5D2564536E00A80C87 /* FinanceDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100B9F5C2564536E00A80C87 /* FinanceDetailViewModel.swift */; };
 		100B9F632564539300A80C87 /* FinanceDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100B9F622564539300A80C87 /* FinanceDetailService.swift */; };
 		100E0DB024D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100E0DAF24D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift */; };
+		1011466925A8E6C5007B51AF /* TimeZoneFinderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1011466825A8E6C5007B51AF /* TimeZoneFinderViewController.swift */; };
 		10173606251924120073D283 /* FinancialAccountFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10173605251924120073D283 /* FinancialAccountFetcher.swift */; };
 		1017D32B24F2B746001D7CBE /* MXHolding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1017D32A24F2B746001D7CBE /* MXHolding.swift */; };
 		1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1017D32C24F2B879001D7CBE /* MXMerchant.swift */; };
@@ -489,6 +490,7 @@
 		100B9F5C2564536E00A80C87 /* FinanceDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceDetailViewModel.swift; sourceTree = "<group>"; };
 		100B9F622564539300A80C87 /* FinanceDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceDetailService.swift; sourceTree = "<group>"; };
 		100E0DAF24D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityExpandedDetailCell.swift; sourceTree = "<group>"; };
+		1011466825A8E6C5007B51AF /* TimeZoneFinderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneFinderViewController.swift; sourceTree = "<group>"; };
 		10173605251924120073D283 /* FinancialAccountFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialAccountFetcher.swift; sourceTree = "<group>"; };
 		1017D32A24F2B746001D7CBE /* MXHolding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXHolding.swift; sourceTree = "<group>"; };
 		1017D32C24F2B879001D7CBE /* MXMerchant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXMerchant.swift; sourceTree = "<group>"; };
@@ -1267,6 +1269,7 @@
 				10196EF624411B5600B6AFDF /* CreateActivityViewController+UpdateInvitees.swift */,
 				10196EF424411B5600B6AFDF /* ActivityAvatarOpenerDelegate.swift */,
 				10196EEF24411B5500B6AFDF /* LocationFinderTableViewController.swift */,
+				1011466825A8E6C5007B51AF /* TimeZoneFinderViewController.swift */,
 				10196EF724411B5600B6AFDF /* SelectActivityMembersViewController.swift */,
 				10196EF324411B5600B6AFDF /* ScheduleViewController.swift */,
 				10A18D392458E1A5006990F2 /* PurchasesViewController.swift */,
@@ -2935,6 +2938,7 @@
 				10F3032E24EC6FE500C04B8F /* MXMember.swift in Sources */,
 				269105EE253E8DD700A02C5F /* RadarMarkerView.swift in Sources */,
 				4BAEE51221272D890045AB10 /* UserInfoPhoneNumberTableViewCell.swift in Sources */,
+				1011466925A8E6C5007B51AF /* TimeZoneFinderViewController.swift in Sources */,
 				1092F2362414501D00E8CE16 /* RecipeDetailViewController.swift in Sources */,
 				265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */,
 				10F3033224EC700C00C04B8F /* Transaction.swift in Sources */,

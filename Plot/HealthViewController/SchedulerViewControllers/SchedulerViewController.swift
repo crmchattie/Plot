@@ -59,18 +59,14 @@ class SchedulerViewController: FormViewController {
                         let original = Date()
                         let rounded = Date(timeIntervalSinceReferenceDate:
                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        let timezone = TimeZone.current
-                        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                        let date = rounded.addingTimeInterval(seconds)
+                        let date = rounded
                         let ID = Database.database().reference().child(userSleepEntity).child(currentUser).childByAutoId().key ?? ""
                         var dateComp = DateComponents()
                         dateComp.hour = 23
                         dateComp.minute = 0
-                        dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         let startTime = Calendar.current.date(from: dateComp)
                         dateComp.hour = 7
                         dateComp.minute = 0
-                        dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         let endTime = Calendar.current.date(from: dateComp)
                         self.scheduler = Scheduler(id: ID, name: nil, dailyTimes: [DailyTimes(activeDays: nil, length: 8 * 60 * 60, startTime: startTime, endTime: endTime)], schedulerDate: date, lastModifiedDate: date, createdDate: date)
                         group.leave()
@@ -95,18 +91,14 @@ class SchedulerViewController: FormViewController {
                         let original = Date()
                         let rounded = Date(timeIntervalSinceReferenceDate:
                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        let timezone = TimeZone.current
-                        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                        let date = rounded.addingTimeInterval(seconds)
+                        let date = rounded
                         let ID = Database.database().reference().child(userWorkEntity).child(currentUser).childByAutoId().key ?? ""
                         var dateComp = DateComponents()
                         dateComp.hour = 9
                         dateComp.minute = 0
-                        dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         let startTime = Calendar.current.date(from: dateComp)
                         dateComp.hour = 17
                         dateComp.minute = 0
-                        dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         let endTime = Calendar.current.date(from: dateComp)
                         self.scheduler = Scheduler(id: ID, name: nil, dailyTimes: [DailyTimes(activeDays: nil, length: 8 * 60 * 60, startTime: startTime, endTime: endTime)], schedulerDate: date, lastModifiedDate: date, createdDate: date)
                         group.leave()
@@ -199,7 +191,6 @@ class SchedulerViewController: FormViewController {
                         $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                         $0.title = "\(type.categoryText)"
-                        $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         $0.minuteInterval = 5
                         $0.dateFormatter?.dateStyle = .none
                         $0.dateFormatter?.timeStyle = .short
@@ -212,7 +203,6 @@ class SchedulerViewController: FormViewController {
                             row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                             row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                             cell.datePicker.datePickerMode = .time
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                             if #available(iOS 13.4, *) {
                                 cell.datePicker.preferredDatePickerStyle = .wheels
                             }
@@ -232,7 +222,6 @@ class SchedulerViewController: FormViewController {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                        $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         $0.title = "\(type.subcategoryText)"
                         $0.minuteInterval = 5
                         $0.dateFormatter?.dateStyle = .none
@@ -246,7 +235,6 @@ class SchedulerViewController: FormViewController {
                             row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                             row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                             cell.datePicker.datePickerMode = .time
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                             if #available(iOS 13.4, *) {
                                 cell.datePicker.preferredDatePickerStyle = .wheels
                             }
@@ -283,11 +271,9 @@ class SchedulerViewController: FormViewController {
             var dateComp = DateComponents()
             dateComp.hour = 9
             dateComp.minute = 0
-            dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
             let startTime = Calendar.current.date(from: dateComp)
             dateComp.hour = 17
             dateComp.minute = 0
-            dateComp.timeZone = NSTimeZone(name: "UTC") as TimeZone?
             let endTime = Calendar.current.date(from: dateComp)
             
             let dailyTime = DailyTimes(activeDays: nil, length: 8 * 60 * 60, startTime: startTime, endTime: endTime)
@@ -300,7 +286,6 @@ class SchedulerViewController: FormViewController {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                     $0.title = "\(type.subcategoryText)"
                     $0.minuteInterval = 5
                     $0.dateFormatter?.dateStyle = .none
@@ -314,7 +299,6 @@ class SchedulerViewController: FormViewController {
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.datePicker.datePickerMode = .time
-                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
                         }
@@ -335,7 +319,6 @@ class SchedulerViewController: FormViewController {
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = "\(type.categoryText)"
-                    $0.dateFormatter?.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                     $0.minuteInterval = 5
                     $0.dateFormatter?.dateStyle = .none
                     $0.dateFormatter?.timeStyle = .short
@@ -348,7 +331,6 @@ class SchedulerViewController: FormViewController {
                         row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.datePicker.datePickerMode = .time
-                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
                         }

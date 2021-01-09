@@ -10,10 +10,7 @@ import HealthKit
 
 class HealthKitSampleBuilder {
     class func createHKWorkout(from workout: Workout) -> HKWorkout? {
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date())) * -1
-
-        guard let start = workout.startDateTime?.addingTimeInterval(seconds), let end = workout.endDateTime?.addingTimeInterval(seconds) else {
+        guard let start = workout.startDateTime, let end = workout.endDateTime else {
             return nil
         }
         
@@ -37,10 +34,7 @@ class HealthKitSampleBuilder {
     }
     
     class func createHKMindfulness(from mindfulness: Mindfulness) -> HKCategorySample? {
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date())) * -1
-
-        guard let start = mindfulness.startDateTime?.addingTimeInterval(seconds), let end = mindfulness.endDateTime?.addingTimeInterval(seconds), let mindfulSessionType = HKObjectType.categoryType(forIdentifier: .mindfulSession) else {
+        guard let start = mindfulness.startDateTime, let end = mindfulness.endDateTime, let mindfulSessionType = HKObjectType.categoryType(forIdentifier: .mindfulSession) else {
             return nil
         }
         
@@ -49,10 +43,7 @@ class HealthKitSampleBuilder {
     }
     
     class func createHKNutritions(from meal: Meal) -> [HKQuantitySample]? {
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date())) * -1
-
-        guard let start = meal.startDateTime?.addingTimeInterval(seconds), let end = meal.endDateTime?.addingTimeInterval(seconds) else {
+        guard let start = meal.startDateTime, let end = meal.endDateTime else {
             return nil
         }
         
