@@ -10,7 +10,8 @@ import UIKit
 import Firebase
 import ARSLineProgress
 
-class AccountSettingsController: UITableViewController {    
+class AccountSettingsController: UITableViewController {
+    var networkController = NetworkController()
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
@@ -319,7 +320,9 @@ extension AccountSettingsController {
         
         if indexPath.section == 0 {
             if indexPath.row == 0 {
-                let destination = AccountsTableViewController()
+                let destination = FinancialInfoViewController()
+                //let destination = AccountsTableViewController()
+                destination.networkController = networkController
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)
             }

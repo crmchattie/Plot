@@ -46,6 +46,7 @@ class FinanceService {
             }
         }
     }
+    var memberAccountsDict = [MXMember: [MXAccount]]()
     var transactionRules = [TransactionRule]()
     var institutionDict = [String: String]()
     var mxUser: MXUser!
@@ -84,6 +85,12 @@ class FinanceService {
                 self.getMXTransactions(user: user, account: nil, date: nil)
                 self.getMXMembers(guid: user.guid) { (members) in
                     for member in members {
+                        if let index = self.members.firstIndex(of: member) {
+                            self.members[index] = member
+                        } else {
+                            self.members.append(member)
+                            self.getInsitutionalDetails(institution_code: member.institution_code)
+                        }
                         dispatchGroup.enter()
                         if member.connection_status == .connected && !member.is_being_aggregated, let date = self.isodateFormatter.date(from: member.aggregated_at), date < Date().addingTimeInterval(-10800) {
                             dispatchGroup.enter()
@@ -93,6 +100,7 @@ class FinanceService {
                                     self.pollMemberStatus(guid: user.guid, member_guid: member.guid) { (member) in
                                         dispatchGroup.enter()
                                         self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
+                                            self.memberAccountsDict[member] = accounts
                                             for account in accounts {
                                                 dispatchGroup.enter()
                                                 var _account = account
@@ -121,6 +129,7 @@ class FinanceService {
                         } else if member.connection_status == .connected && !member.is_being_aggregated {
                             dispatchGroup.enter()
                             self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
+                                self.memberAccountsDict[member] = accounts
                                 for account in accounts {
                                     dispatchGroup.enter()
                                     var _account = account
@@ -144,6 +153,7 @@ class FinanceService {
                             self.pollMemberStatus(guid: user.guid, member_guid: member.guid) { (member) in
                                 dispatchGroup.enter()
                                 self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
+                                    self.memberAccountsDict[member] = accounts
                                     for account in accounts {
                                         dispatchGroup.enter()
                                         var _account = account
@@ -167,12 +177,6 @@ class FinanceService {
                                 dispatchGroup.leave()
                             }
                             dispatchGroup.leave()
-                        } else if member.connection_status != .connected && !member.is_being_aggregated {
-                            dispatchGroup.enter()
-                            self.members.append(member)
-                            self.getInsitutionalDetails(institution_code: member.institution_code) {
-                                dispatchGroup.leave()
-                            }
                         }
                         dispatchGroup.leave()
                     }
@@ -184,7 +188,9 @@ class FinanceService {
         }
         
         dispatchGroup.notify(queue: .main) {
+            print("dispatchGroup.notify(queue: .main)")
             self.updateFirebase(accounts: updatedAccounts, transactions: [])
+            self.deleteUserIfNecessary()
         }
     }
     
@@ -320,6 +326,16 @@ class FinanceService {
         }
     }
     
+    func deleteUserIfNecessary() {
+        print("deleteUserIfNecessary")
+        if self.members.isEmpty, let currentUser = Auth.auth().currentUser?.uid, let mxUser = mxUser {
+            print("self.members.isEmpty")
+            let mxIDReference = Database.database().reference().child(userFinancialEntity).child(currentUser)
+//            mxIDReference.removeValue()
+//            Service.shared.deleteMXUser(guid: mxUser.guid) { (string, err) in }
+        }
+    }
+    
     func getMXMembers(guid: String, completion: @escaping ([MXMember]) -> ()) {
         Service.shared.getMXMembers(guid: guid, page: "1", records_per_page: "100") { (search, err) in
             if let members = search?.members {
@@ -426,10 +442,7 @@ class FinanceService {
         Service.shared.getMXMember(guid: guid, member_guid: member_guid) { (search, err) in
             if let member = search?.member {
                 if member.connection_status == .challenged {
-                    self.members.append(member)
-                    self.getInsitutionalDetails(institution_code: member.institution_code) {
-                        completion(member)
-                    }
+                    completion(member)
                 } else if member.is_being_aggregated {
                     self.pollMemberStatus(guid: guid, member_guid: member_guid) { member in
                         completion(member)
@@ -441,11 +454,10 @@ class FinanceService {
         }
     }
     
-    func getInsitutionalDetails(institution_code: String, completion: @escaping () -> ()) {
+    func getInsitutionalDetails(institution_code: String) {
         Service.shared.getMXInstitution(institution_code: institution_code) { (search, err) in
             if let institution = search?.institution {
                 self.institutionDict[institution_code] = institution.medium_logo_url
-                completion()
             }
         }
     }
@@ -455,6 +467,14 @@ class FinanceService {
             for account in accountsAdded {
                 if !self!.accounts.contains(account) {
                     self!.accounts.append(account)
+                } else if let index = self!.accounts.firstIndex(of: account) {
+                    self!.accounts[index] = account
+                }
+            }
+        }, accountsChanged: { [weak self] accountsChanged in
+            for account in accountsChanged {
+                if let index = self!.accounts.firstIndex(of: account) {
+                    self!.accounts[index] = account
                 }
             }
         })
@@ -465,6 +485,14 @@ class FinanceService {
             for transaction in transactionsAdded {
                 if !self!.transactions.contains(transaction) {
                     self!.transactions.append(transaction)
+                } else if let index = self!.transactions.firstIndex(of: transaction) {
+                    self!.transactions[index] = transaction
+                }
+            }
+        }, transactionsChanged: { [weak self] transactionsChanged in
+            for transaction in transactionsChanged {
+                if let index = self!.transactions.firstIndex(of: transaction) {
+                    self!.transactions[index] = transaction
                 }
             }
         })
@@ -474,7 +502,11 @@ class FinanceService {
         self.transactionRuleFetcher.observeTransactionRuleForCurrentUser(transactionRulesAdded: { [weak self] transactionRulesAdded in
             var newTransactions = [Transaction]()
             for transactionRule in transactionRulesAdded {
-                self!.transactionRules.append(transactionRule)
+                if !self!.transactionRules.contains(transactionRule) {
+                    self!.transactionRules.append(transactionRule)
+                } else if let index = self!.transactionRules.firstIndex(of: transactionRule) {
+                    self!.transactionRules[index] = transactionRule
+                }
                 if !self!.transactions.isEmpty {
                     for index in 0...self!.transactions.count - 1 {
                         updateTransactionWRule(transaction: self!.transactions[index], transactionRules: self!.transactionRules) { (transaction, bool) in
@@ -491,14 +523,14 @@ class FinanceService {
             }
             }, transactionRulesRemoved: { [weak self] transactionRulesRemoved in
                 for transactionRule in transactionRulesRemoved {
-                    if let index = self!.transactionRules.firstIndex(where: {$0 == transactionRule}) {
+                    if let index = self!.transactionRules.firstIndex(of: transactionRule) {
                         self!.transactionRules.remove(at: index)
                     }
                 }
             }, transactionRulesChanged: { [weak self] transactionRulesChanged in
                 var newTransactions = [Transaction]()
                 for transactionRule in transactionRulesChanged {
-                    if let index = self!.transactionRules.firstIndex(where: {$0 == transactionRule}) {
+                    if let index = self!.transactionRules.firstIndex(of: transactionRule) {
                         self!.transactionRules[index] = transactionRule
                     }
                     if !self!.transactions.isEmpty {

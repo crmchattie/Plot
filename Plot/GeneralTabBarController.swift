@@ -124,6 +124,7 @@ class GeneralTabBarController: UITabBarController {
                 networkController.setupKeyVariables {
                     self.homeController.networkController = self.networkController
                     self.discoverController.networkController = self.networkController
+                    self.settingsController.networkController = self.networkController
                     self.networkController.setupOtherVariables()
                 }
             } else {

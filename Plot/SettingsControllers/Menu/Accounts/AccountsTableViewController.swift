@@ -17,6 +17,7 @@
 import UIKit
 
 class AccountsTableViewController: UITableViewController {
+    var networkController = NetworkController()
     
     deinit {
         print("STORAGE DID DEINIT")

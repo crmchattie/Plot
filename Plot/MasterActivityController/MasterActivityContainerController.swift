@@ -341,9 +341,17 @@ class MasterActivityContainerController: UIViewController {
             dispatchGroup.enter()
             if section.type == "Issues" {
                 dispatchGroup.enter()
-                if !members.isEmpty {
+                var challengedMembers = [MXMember]()
+                for member in members {
+                    dispatchGroup.enter()
+                    if member.connection_status == .challenged {
+                        challengedMembers.append(member)
+                    }
+                    dispatchGroup.leave()
+                }
+                if !challengedMembers.isEmpty {
                     sections.append(.financialIssues)
-                    groups[section] = members
+                    groups[section] = challengedMembers
                     dispatchGroup.leave()
                 } else {
                     dispatchGroup.leave()
@@ -487,7 +495,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 for section in financeSections {
                     if section == .financialIssues {
                         if let group = financeGroups[section] as? [MXMember] {
-                            height += CGFloat(group.count * 80)
+                            height += CGFloat(group.count * 70)
                         }
                     } else {
                         if let group = financeGroups[section] as? [AccountDetails] {
@@ -653,7 +661,7 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     func openTransactionDetails(transactionDetails: TransactionDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: networkController.financeService.transactions, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
-        financeDetailViewController.delegate = self
+//        financeDetailViewController.delegate = self
         financeDetailViewController.users = networkController.userService.users
         financeDetailViewController.filteredUsers = networkController.userService.users
         financeDetailViewController.hidesBottomBarWhenPushed = true
@@ -663,7 +671,7 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     func openAccountDetails(accountDetails: AccountDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: networkController.financeService.accounts, transactionDetails: nil, transactions: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
-        financeDetailViewController.delegate = self
+//        financeDetailViewController.delegate = self
         financeDetailViewController.users = networkController.userService.users
         financeDetailViewController.filteredUsers = networkController.userService.users
         financeDetailViewController.hidesBottomBarWhenPushed = true
@@ -691,35 +699,32 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     }
     
 }
-
-extension MasterActivityContainerController: UpdateFinancialsDelegate {
-    func updateTransactions(transactions: [Transaction]) {
-        for transaction in transactions {
-            if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
-                networkController.financeService.transactions[index] = transaction
-            }
-        }
-        financeUpdated()
-    }
-    func updateAccounts(accounts: [MXAccount]) {
-        for account in accounts {
-            if let index = networkController.financeService.accounts.firstIndex(of: account) {
-                networkController.financeService.accounts[index] = account
-            }
-        }
-        financeUpdated()
-    }
-}
+//
+//extension MasterActivityContainerController: UpdateFinancialsDelegate {
+//    func updateTransactions(transactions: [Transaction]) {
+//        for transaction in transactions {
+//            if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
+//                networkController.financeService.transactions[index] = transaction
+//            }
+//        }
+//    }
+//    func updateAccounts(accounts: [MXAccount]) {
+//        for account in accounts {
+//            if let index = networkController.financeService.accounts.firstIndex(of: account) {
+//                networkController.financeService.accounts[index] = account
+//            }
+//        }
+//    }
+//}
 
 extension MasterActivityContainerController: EndedWebViewDelegate {
     func updateMXMembers() {
         self.financeSections.removeAll(where: { $0 == .financialIssues })
         self.financeGroups[.financialIssues] = nil
-        self.networkController.financeService.grabFinances {
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
-            }
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
         }
+        self.networkController.financeService.getMXData()
     }
 }
 

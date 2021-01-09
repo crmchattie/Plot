@@ -114,12 +114,6 @@ class FinanceAccountViewController: FormViewController {
                 self.delegate?.updateAccount(account: account)
                 self.navigationController?.popViewController(animated: true)
             } else {
-//                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-//                if nav.topViewController is MasterActivityContainerController {
-//                    let homeTab = nav.topViewController as! MasterActivityContainerController
-//                    homeTab.customSegmented.setIndex(index: 3)
-//                    homeTab.changeToIndex(index: 3)
-//                }
                 self.tabBarController?.selectedIndex = 1
                 if #available(iOS 13.0, *) {
                     self.navigationController?.backToViewController(viewController: DiscoverViewController.self)

@@ -388,6 +388,7 @@ extension FinanceLineChartDetailViewController: UpdateAccountDelegate {
     func updateAccount(account: MXAccount) {
         if let index = viewModel.accounts!.firstIndex(of: account) {
             viewModel.accounts![index] = account
+            fetchData()
         }
     }
 }
@@ -396,6 +397,7 @@ extension FinanceLineChartDetailViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         if let index = viewModel.transactions!.firstIndex(of: transaction) {
             viewModel.transactions![index] = transaction
+            fetchData()
         }
     }
 }

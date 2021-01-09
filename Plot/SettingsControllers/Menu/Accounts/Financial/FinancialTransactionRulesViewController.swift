@@ -11,13 +11,14 @@ import Firebase
 import CodableFirebase
 
 class FinancialTransactionRulesViewController: UITableViewController {
-    
-    var user: MXUser!
+    var networkController = NetworkController()
     
     let financialAccountCellID = "financialAccountCellID"
     
-    var transactionRules = [TransactionRule]()
-    let transactionRuleFetcher = FinancialTransactionRuleFetcher()
+    var transactionRules: [TransactionRule] {
+        networkController.financeService.transactionRules
+    }
+    
     let viewPlaceholder = ViewPlaceholder()
     
     deinit {
@@ -26,7 +27,6 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        getFinancialData()
         title = "Transaction Rules"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
@@ -47,19 +47,9 @@ class FinancialTransactionRulesViewController: UITableViewController {
     }
     
     @objc func newTransactionRule() {
-        if let user = user {
-            let destination = FinanceTransactionRuleViewController()
-            destination.user = user
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }
-    }
-    
-    func getFinancialData() {
-        self.transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
-            self.transactionRules = firebaseTransactionRules
-            self.tableView.reloadData()
-        }
+        let destination = FinanceTransactionRuleViewController()
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -87,13 +77,10 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
-        if let user = user {
-            let rule = transactionRules[indexPath.item]
-            let destination = FinanceTransactionRuleViewController()
-            destination.user = user
-            destination.transactionRule = rule
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }
+        let rule = transactionRules[indexPath.item]
+        let destination = FinanceTransactionRuleViewController()
+        destination.transactionRule = rule
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
     }
 }

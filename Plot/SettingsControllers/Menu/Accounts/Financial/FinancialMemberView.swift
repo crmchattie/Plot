@@ -42,7 +42,7 @@ class FinancialMemberView: UIView {
         stackView.spacing = 10
         stackView.alignment = .center
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 10, left: 20, bottom: 10, right: 20))
+        stackView.fillSuperview(padding: .init(top: 10, left: 10, bottom: 10, right: 10))
 
     }
     

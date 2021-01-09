@@ -206,46 +206,20 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
             case .financialAccount:
-                let accountAlertController = UIAlertController(title: "New Account", message: nil, preferredStyle: .actionSheet)
-                let custom = UIAlertAction(title: "Manual Entry", style: .default) { (action:UIAlertAction) in
-                    let destination = FinanceAccountViewController()
-                    destination.hidesBottomBarWhenPushed = true
-                    destination.users = self.networkController.userService.users
-                    destination.filteredUsers = self.networkController.userService.users
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
-                let automatic = UIAlertAction(title: "Automatic Entry", style: .default) { (action:UIAlertAction) in
-                    if let mxUser = self.networkController.financeService.mxUser {
-                        self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-                    } else {
-                        self.networkController.financeService.getMXUser { (mxUser) in
-                            if let mxUser = self.networkController.financeService.mxUser {
-                                self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-                            }
+                if let mxUser = self.networkController.financeService.mxUser {
+                    self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+                } else {
+                    self.networkController.financeService.getMXUser { (mxUser) in
+                        if let mxUser = self.networkController.financeService.mxUser {
+                            self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
                         }
                     }
                 }
-                let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
-                    print("You've pressed cancel")
-                }
-                accountAlertController.addAction(custom)
-                accountAlertController.addAction(automatic)
-                accountAlertController.addAction(cancelAlert)
-                self.present(accountAlertController, animated: true, completion: nil)
             case .transactionRule:
                 let destination = FinanceTransactionRuleViewController()
                 destination.hidesBottomBarWhenPushed = true
-                if let mxUser = networkController.financeService.mxUser {
-                    destination.user = mxUser
-                    let navigationViewController = UINavigationController(rootViewController: destination)
-                    self.present(navigationViewController, animated: true, completion: nil)
-                } else {
-                    self.networkController.financeService.getMXUser { (mxUser) in
-                        destination.user = mxUser
-                        let navigationViewController = UINavigationController(rootViewController: destination)
-                        self.present(navigationViewController, animated: true, completion: nil)
-                    }
-                }
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
             default:
                 print("default")
             }

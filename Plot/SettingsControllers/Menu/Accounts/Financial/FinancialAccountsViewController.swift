@@ -11,41 +11,45 @@ import Firebase
 import CodableFirebase
 
 class FinancialAccountsViewController: UITableViewController {
+    var networkController = NetworkController()
     
     let financialAccountCellID = "financialAccountCellID"
     
-    var members = [MXMember]()
-    var memberAccountsDict = [MXMember: [MXAccount]]()
-    var user: MXUser!
-    var institutionDict = [String: String]()
-    var accounts = [MXAccount]()
-    var transactionRules = [TransactionRule]()
-    
-    let transactionRuleFetcher = FinancialTransactionRuleFetcher()
-    let accountFetcher = FinancialAccountFetcher()
+    var members: [MXMember] {
+        return networkController.financeService.members
+    }
+    var institutionDict: [String: String] {
+        return networkController.financeService.institutionDict
+    }
+    var memberAccountsDict: [MXMember: [MXAccount]] {
+        return networkController.financeService.memberAccountsDict
+    }
     
     let viewPlaceholder = ViewPlaceholder()
-    
-    deinit {
-        print("STORAGE DID DEINIT")
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Financial Accounts"
+        title = "Accounts"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
-        let newAccountBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
-        navigationItem.rightBarButtonItem = newAccountBarButton
-        
-        if let user = user {
-            self.getMXMembers(guid: user.guid)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func financeUpdated() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
         }
-        
     }
     
     func checkIfThereAreAnyResults(isEmpty: Bool) {
@@ -54,117 +58,6 @@ class FinancialAccountsViewController: UITableViewController {
             return
         }
         viewPlaceholder.add(for: tableView, title: .emptyAccounts, subtitle: .emptyAccounts, priority: .medium, position: .top)
-    }
-    
-    func getFinancialData() {
-        let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-        accountFetcher.fetchAccounts { (firebaseAccounts) in
-            self.accounts = firebaseAccounts
-            dispatchGroup.leave()
-        }
-        
-        dispatchGroup.enter()
-        self.transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
-            self.transactionRules = firebaseTransactionRules
-            dispatchGroup.leave()
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            self.tableView.reloadData()
-        }
-        
-    }
-    
-    func getMXMembers(guid: String) {
-        let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-        Service.shared.getMXMembers(guid: guid, page: "1", records_per_page: "100") { (search, err) in
-            if let members = search?.members {
-                self.members = members
-                for member in members {
-                    dispatchGroup.enter()
-                    self.getInsitutionalDetails(institution_code: member.institution_code) {
-                        dispatchGroup.leave()
-                    }
-                    dispatchGroup.enter()
-                    self.getMXAccounts(guid: guid, member_guid: member.guid) { (accounts) in
-                        self.memberAccountsDict[member] = accounts
-                        dispatchGroup.leave()
-                    }
-                }
-            } else if let member = search?.member {
-                self.members = [member]
-                dispatchGroup.enter()
-                self.getInsitutionalDetails(institution_code: member.institution_code) {
-                    dispatchGroup.leave()
-                }
-                dispatchGroup.enter()
-                self.getMXAccounts(guid: guid, member_guid: member.guid) { (accounts) in
-                    self.memberAccountsDict[member] = accounts
-                    dispatchGroup.leave()
-                }
-            }
-            dispatchGroup.leave()
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            self.tableView.reloadData()
-        }
-    }
-    
-    func getMXAccounts(guid: String, member_guid: String, completion: @escaping ([MXAccount]) -> ()) {
-        Service.shared.getMXMemberAccounts(guid: guid, member_guid: member_guid, page: "1", records_per_page: "100") { (search, err) in
-            if search?.accounts != nil {
-                var accounts = search?.accounts
-                for index in 0...accounts!.count - 1 {
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(accounts![index].guid).child("should_link")
-                        reference.observeSingleEvent(of: .value, with: { (snapshot) in
-                            if snapshot.exists(), let value = snapshot.value, let should_link = value as? Bool {
-                                accounts![index].should_link = should_link
-                            } else if !snapshot.exists() {
-                                reference.setValue(true)
-                                accounts![index].should_link = true
-                            }
-                            
-                            if index == accounts!.count - 1 {
-                                completion(accounts!)
-                            }
-                        })
-                    }
-                }
-            } else if search?.account != nil {
-                var account = search?.account
-                if let currentUser = Auth.auth().currentUser?.uid {
-                    let reference = Database.database().reference().child(financialAccountsEntity).child(currentUser).child(account!.guid).child("should_link")
-                    reference.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if snapshot.exists(), let value = snapshot.value, let should_link = value as? Bool {
-                            account!.should_link = should_link
-                        } else if !snapshot.exists() {
-                            reference.setValue(true)
-                            account!.should_link = true
-                        }
-                        completion([account!])
-                    })
-                }
-            }
-        }
-    }
-    
-    func getInsitutionalDetails(institution_code: String, completion: @escaping () -> ()) {
-        Service.shared.getMXInstitution(institution_code: institution_code) { (search, err) in
-            if let institution = search?.institution {
-                self.institutionDict[institution_code] = institution.medium_logo_url
-                completion()
-            }
-        }
-    }
-    
-    @objc func newAccount() {
-        if let user = user {
-            self.openMXConnect(guid: user.guid, current_member_guid: nil)
-        }
     }
     
     func openMXConnect(guid: String, current_member_guid: String?) {
@@ -254,7 +147,7 @@ class FinancialAccountsViewController: UITableViewController {
         if let accounts = memberAccountsDict[member] {
             let account = accounts[indexPath.row]
             let destination = FinanceAccountViewController()
-            destination.delegate = self
+//            destination.delegate = self
             destination.account = account
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
@@ -263,33 +156,36 @@ class FinancialAccountsViewController: UITableViewController {
     }
     
     @objc func viewTapped(_ sender: TapGesture) {
-        if let user = user {
-            let member = members[sender.item]
-            self.openMXConnect(guid: user.guid, current_member_guid: member.guid)
+        let member = members[sender.item]
+        if let mxUser = self.networkController.financeService.mxUser {
+            self.openMXConnect(guid: mxUser.guid, current_member_guid: member.guid)
+        } else {
+            self.networkController.financeService.getMXUser { (mxUser) in
+                if let mxUser = self.networkController.financeService.mxUser {
+                    self.openMXConnect(guid: mxUser.guid, current_member_guid: member.guid)
+                }
+            }
         }
     }
 }
 
 extension FinancialAccountsViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        if let user = user {
-            getMXMembers(guid: user.guid)
-        }
+        networkController.financeService.getMXData()
     }
 }
 
-extension FinancialAccountsViewController: UpdateAccountDelegate {
-    func updateAccount(account: MXAccount) {
-        print("updateAccount")
-        for (member, accounts) in memberAccountsDict {
-            for index in 0...accounts.count - 1 {
-                if accounts[index] == account {
-                    var accs = accounts
-                    accs[index] = account
-                    memberAccountsDict[member] = accs
-                    tableView.reloadData()
-                }
-            }
-        }
-    }
-}
+//extension FinancialAccountsViewController: UpdateAccountDelegate {
+//    func updateAccount(account: MXAccount) {
+//        for (member, accounts) in memberAccountsDict {
+//            for index in 0...accounts.count - 1 {
+//                if accounts[index] == account {
+//                    var accs = accounts
+//                    accs[index] = account
+//                    memberAccountsDict[member] = accs
+//                    tableView.reloadData()
+//                }
+//            }
+//        }
+//    }
+//}

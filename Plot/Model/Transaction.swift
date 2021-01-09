@@ -222,12 +222,16 @@ struct TransactionRule: Codable, Equatable, Hashable {
     var match_description: String
     var description: String?
     let updated_at: String
-    let user_guid: String
+    let user_guid: String?
     var category: String?
     var top_level_category: String?
     var group: String?
     var amount: Double?
     var should_link: Bool?
+}
+
+func ==(lhs: TransactionRule, rhs: TransactionRule) -> Bool {
+    return lhs.guid == rhs.guid
 }
 
 struct MXTransactionCategoryResult: Codable {

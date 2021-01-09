@@ -79,11 +79,12 @@ class FinancialAccountFetcher: NSObject {
         })
     }
     
-    func observeAccountForCurrentUser(accountsAdded: @escaping ([MXAccount])->()) {
+    func observeAccountForCurrentUser(accountsAdded: @escaping ([MXAccount])->(), accountsChanged: @escaping ([MXAccount])->()) {
         guard let _ = Auth.auth().currentUser?.uid else {
             return
         }
         self.accountsAdded = accountsAdded
+        self.accountsChanged = accountsChanged
         currentUserAccountsAddHandle = userAccountsDatabaseRef.observe(.childAdded, with: { snapshot in
             if let completion = self.accountsAdded {
                 let accountID = snapshot.key
@@ -94,7 +95,13 @@ class FinancialAccountFetcher: NSObject {
                     self.getAccountsFromSnapshot(snapshot: snapshot, completion: completion)
                 }
             }
-        })        
+        })
+        
+        currentUserAccountsChangeHandle = userAccountsDatabaseRef.observe(.childChanged, with: { snapshot in
+            if let completion = self.accountsChanged {
+                self.getAccountsFromSnapshot(snapshot: snapshot, completion: completion)
+            }
+        })
     }
     
     func getAccountsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([MXAccount])->()) {

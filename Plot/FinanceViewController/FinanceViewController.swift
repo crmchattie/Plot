@@ -104,6 +104,8 @@ class FinanceViewController: UIViewController {
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+
     }
     
     @objc fileprivate func changeTheme() {
@@ -113,6 +115,12 @@ class FinanceViewController: UIViewController {
         customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.reloadData()
         
+    }
+    
+    @objc fileprivate func financeUpdated() {
+        DispatchQueue.main.async {
+            self.updateCollectionView()
+        }
     }
     
     fileprivate func setupMainView() {
@@ -177,9 +185,17 @@ class FinanceViewController: UIViewController {
             dispatchGroup.enter()
             if section.type == "Issues" {
                 dispatchGroup.enter()
-                if !members.isEmpty {
-                    sections.append(.financialIssues)
-                    self.groups[section] = members
+                var challengedMembers = [MXMember]()
+                for member in members {
+                    dispatchGroup.enter()
+                    if member.connection_status == .challenged {
+                        challengedMembers.append(member)
+                    }
+                    dispatchGroup.leave()
+                }
+                if !challengedMembers.isEmpty {
+                    self.sections.append(.financialIssues)
+                    self.groups[section] = challengedMembers
                     dispatchGroup.leave()
                 } else {
                     dispatchGroup.leave()
@@ -328,7 +344,7 @@ class FinanceViewController: UIViewController {
     func openTransactionDetails(transactionDetails: TransactionDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: transactions, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
-        financeDetailViewController.delegate = self
+//        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
         financeDetailViewController.filteredUsers = filteredUsers
         financeDetailViewController.hidesBottomBarWhenPushed = true
@@ -338,7 +354,7 @@ class FinanceViewController: UIViewController {
     func openAccountDetails(accountDetails: AccountDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: accounts, transactionDetails: nil, transactions: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
-        financeDetailViewController.delegate = self
+//        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
         financeDetailViewController.filteredUsers = filteredUsers
         financeDetailViewController.hidesBottomBarWhenPushed = true
@@ -453,7 +469,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         } else if let object = object as? [Transaction] {
             if section.subType == "Transactions" {
                 let destination = FinanceTransactionViewController()
-                destination.delegate = self
+//                destination.delegate = self
                 destination.transaction = object[indexPath.item]
                 destination.users = users
                 destination.filteredUsers = filteredUsers
@@ -466,7 +482,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         } else if let object = object as? [MXAccount] {
             if section.subType == "Accounts" {
                 let destination = FinanceAccountViewController()
-                destination.delegate = self
+//                destination.delegate = self
                 destination.account = object[indexPath.item]
                 destination.users = users
                 destination.filteredUsers = filteredUsers
@@ -491,42 +507,42 @@ extension FinanceViewController: HeaderCellDelegate {
     }
 }
 
-extension FinanceViewController: UpdateFinancialsDelegate {
-    func updateTransactions(transactions: [Transaction]) {
-        for transaction in transactions {
-            if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
-                networkController.financeService.transactions[index] = transaction
-            }
-        }
-        updateCollectionView()
-    }
-    func updateAccounts(accounts: [MXAccount]) {
-        for account in accounts {
-            if let index = networkController.financeService.accounts.firstIndex(of: account) {
-                networkController.financeService.accounts[index] = account
-            }
-        }
-        updateCollectionView()
-    }
-}
-
-extension FinanceViewController: UpdateAccountDelegate {
-    func updateAccount(account: MXAccount) {
-        if let index = networkController.financeService.accounts.firstIndex(of: account) {
-            networkController.financeService.accounts[index] = account
-            updateCollectionView()
-        }
-    }
-}
-
-extension FinanceViewController: UpdateTransactionDelegate {
-    func updateTransaction(transaction: Transaction) {
-        if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
-            networkController.financeService.transactions[index] = transaction
-            updateCollectionView()
-        }
-    }
-}
+//extension FinanceViewController: UpdateFinancialsDelegate {
+//    func updateTransactions(transactions: [Transaction]) {
+//        for transaction in transactions {
+//            if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
+//                networkController.financeService.transactions[index] = transaction
+//            }
+//        }
+//        updateCollectionView()
+//    }
+//    func updateAccounts(accounts: [MXAccount]) {
+//        for account in accounts {
+//            if let index = networkController.financeService.accounts.firstIndex(of: account) {
+//                networkController.financeService.accounts[index] = account
+//            }
+//        }
+//        updateCollectionView()
+//    }
+//}
+//
+//extension FinanceViewController: UpdateAccountDelegate {
+//    func updateAccount(account: MXAccount) {
+//        if let index = networkController.financeService.accounts.firstIndex(of: account) {
+//            networkController.financeService.accounts[index] = account
+//            updateCollectionView()
+//        }
+//    }
+//}
+//
+//extension FinanceViewController: UpdateTransactionDelegate {
+//    func updateTransaction(transaction: Transaction) {
+//        if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
+//            networkController.financeService.transactions[index] = transaction
+//            updateCollectionView()
+//        }
+//    }
+//}
 
 extension FinanceViewController: EndedWebViewDelegate {
     func updateMXMembers() {

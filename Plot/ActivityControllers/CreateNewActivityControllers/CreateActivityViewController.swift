@@ -467,17 +467,15 @@ class CreateActivityViewController: FormViewController {
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.minuteInterval = 5
-                $0.dateFormatter?.dateStyle = .long
+                $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.dateFormatter?.timeZone = TimeZone(identifier: activity.startTimeZone ?? TimeZone.current.identifier)
                     $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
                     if self.activity.allDay == true {
-                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .short
                     }
                     $0.updateCell()
@@ -567,17 +565,15 @@ class CreateActivityViewController: FormViewController {
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.minuteInterval = 5
-                $0.dateFormatter?.dateStyle = .long
+                $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
                     $0.dateFormatter?.timeZone = TimeZone(identifier: activity.endTimeZone ?? TimeZone.current.identifier)
                     $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
                     if self.activity.allDay == true {
-                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        $0.dateFormatter?.dateStyle = .long
                         $0.dateFormatter?.timeStyle = .short
                     }
                     $0.updateCell()
