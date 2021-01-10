@@ -85,20 +85,17 @@ class FinanceService {
                 self.getMXTransactions(user: user, account: nil, date: nil)
                 self.getMXMembers(guid: user.guid) { (members) in
                     for member in members {
+                        dispatchGroup.enter()
                         if let index = self.members.firstIndex(of: member) {
                             self.members[index] = member
                         } else {
                             self.members.append(member)
                             self.getInsitutionalDetails(institution_code: member.institution_code)
                         }
-                        dispatchGroup.enter()
                         if member.connection_status == .connected && !member.is_being_aggregated, let date = self.isodateFormatter.date(from: member.aggregated_at), date < Date().addingTimeInterval(-10800) {
-                            dispatchGroup.enter()
                             Service.shared.aggregateMXMember(guid: user.guid, member_guid: member.guid) { (search, err)  in
                                 if let member = search?.member {
-                                    dispatchGroup.enter()
                                     self.pollMemberStatus(guid: user.guid, member_guid: member.guid) { (member) in
-                                        dispatchGroup.enter()
                                         self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
                                             self.memberAccountsDict[member] = accounts
                                             for account in accounts {
@@ -121,13 +118,10 @@ class FinanceService {
                                             }
                                             dispatchGroup.leave()
                                         }
-                                        dispatchGroup.leave()
                                     }
-                                    dispatchGroup.leave()
                                 }
                             }
                         } else if member.connection_status == .connected && !member.is_being_aggregated {
-                            dispatchGroup.enter()
                             self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
                                 self.memberAccountsDict[member] = accounts
                                 for account in accounts {
@@ -149,9 +143,7 @@ class FinanceService {
                                 dispatchGroup.leave()
                             }
                         } else if member.connection_status == .connected && member.is_being_aggregated {
-                            dispatchGroup.enter()
                             self.pollMemberStatus(guid: user.guid, member_guid: member.guid) { (member) in
-                                dispatchGroup.enter()
                                 self.getMXAccounts(guid: user.guid, member_guid: member.guid) { (accounts) in
                                     self.memberAccountsDict[member] = accounts
                                     for account in accounts {
@@ -174,11 +166,8 @@ class FinanceService {
                                     }
                                     dispatchGroup.leave()
                                 }
-                                dispatchGroup.leave()
                             }
-                            dispatchGroup.leave()
                         }
-                        dispatchGroup.leave()
                     }
                     dispatchGroup.leave()
                 }
@@ -188,9 +177,7 @@ class FinanceService {
         }
         
         dispatchGroup.notify(queue: .main) {
-            print("dispatchGroup.notify(queue: .main)")
             self.updateFirebase(accounts: updatedAccounts, transactions: [])
-            self.deleteUserIfNecessary()
         }
     }
     
@@ -327,12 +314,10 @@ class FinanceService {
     }
     
     func deleteUserIfNecessary() {
-        print("deleteUserIfNecessary")
         if self.members.isEmpty, let currentUser = Auth.auth().currentUser?.uid, let mxUser = mxUser {
-            print("self.members.isEmpty")
             let mxIDReference = Database.database().reference().child(userFinancialEntity).child(currentUser)
-//            mxIDReference.removeValue()
-//            Service.shared.deleteMXUser(guid: mxUser.guid) { (string, err) in }
+            mxIDReference.removeValue()
+            Service.shared.deleteMXUser(guid: mxUser.guid) { (string, err) in }
         }
     }
     

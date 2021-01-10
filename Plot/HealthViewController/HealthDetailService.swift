@@ -24,9 +24,7 @@ class HealthDetailService: HealthDetailServiceInterface {
     
     private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
         let healthMetricType = healthMetric.type
-        let calendar = NSCalendar.current
         var interval = DateComponents()
-        var anchorComponents = calendar.dateComponents([.day, .month, .year, .weekday], from: Date())
         var quantityType: HKQuantityType?
         var statisticsOptions: HKStatisticsOptions = .discreteAverage
         
@@ -88,31 +86,22 @@ class HealthDetailService: HealthDetailServiceInterface {
         // The date used to anchor the collection’s time intervals.
         // Use the anchor date to set the start time for your time intervals. For example, if you are using a day interval, you might create a date object with a time of 2:00 a.m. This value sets the start of each day for all of your time intervals.
         // Use start of the day in local time
-        var anchorDate = Date().localTime
+        let timezone = TimeZone.current
+        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+        let anchorDate = Date().localTime.startOfDay.addingTimeInterval(-seconds)
         var startDate = anchorDate
-        var endDate = anchorDate
+        let endDate = anchorDate.advanced(by: 86399)
                 
         if segmentType == .day {
             interval.hour = 1
-            anchorComponents.hour = 0
-            anchorDate = calendar.date(from: anchorComponents)!
-            endDate = Date()
-            startDate = calendar.startOfDay(for: endDate)
         }
         else if segmentType == .week {
             interval.day = 1
-            anchorComponents.day! -= 7
-            anchorComponents.hour = 0
-            startDate = Date().startOfDay
-            endDate = startDate.advanced(by: 86399)
-            startDate = startDate.weekBefore.dayAfter
+            startDate = anchorDate.weekBefore
         }
         else if segmentType == .month {
             interval.day = 1
-            anchorComponents.month! -= 1
-            anchorComponents.hour = 0
-            endDate = Date()
-            startDate = endDate.monthBefore
+            startDate = anchorDate.monthBefore
         }
         else if segmentType == .year {
             if case .steps = healthMetricType {
@@ -124,10 +113,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             else {
                 interval.month = 1
             }
-            anchorComponents.year! -= 1
-            anchorComponents.hour = 0
-            endDate = Date()
-            startDate = endDate.lastYear
+            startDate = anchorDate.lastYear
         }
         
         if HealthKitService.authorized {
