@@ -61,7 +61,7 @@ extension ActivityCell {
                 value += " \(startDateFormatter.string(from: startDate))"
             }
             
-            if startDate.stripTime().compare(endDate.stripTime()) != .orderedSame {
+            if endDate.timeIntervalSince(startDate) > 86399 {
                 value += "\n"
                 numberOfLines = 2
                 

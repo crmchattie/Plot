@@ -35,7 +35,8 @@ class EventKitService {
         // Create the predicate from the event store's instance method.
         var predicate: NSPredicate? = nil
         if let timeAgo = timeAgo, let timeFromNow = timeFromNow {
-            predicate = eventStore.predicateForEvents(withStart: timeAgo, end: timeFromNow, calendars: nil)
+            let calendars = eventStore.calendars(for: .event).filter { $0.title != "Siri Suggestions" }
+            predicate = eventStore.predicateForEvents(withStart: timeAgo, end: timeFromNow, calendars: calendars)
         }
 
         // Fetch all events that match the predicate.
@@ -47,17 +48,13 @@ class EventKitService {
         return events
     }
     
+    func fetchCalendars() {
+        
+    }
+    
     func storeEvent(for activity: Activity) -> EKEvent? {
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date())) * -1
-        
-        guard let startDate = activity.startDate?.addingTimeInterval(seconds), let endDate = activity.endDate?.addingTimeInterval(seconds), let name = activity.name else {
+        guard let startDate = activity.startDate, let endDate = activity.endDate, let name = activity.name else {
             return nil
-        }
-        
-        var text = activity.notes ?? ""
-        if text.isEmpty {
-            text = activity.activityDescription ?? ""
         }
         
         let event = EKEvent(eventStore: eventStore)
@@ -65,7 +62,7 @@ class EventKitService {
         event.startDate = startDate
         event.endDate = endDate
         event.timeZone = TimeZone(identifier: activity.startTimeZone ?? TimeZone.current.identifier)
-        event.notes = text
+        event.notes = activity.activityDescription
         event.calendar = eventStore.defaultCalendarForNewEvents
         do {
             try eventStore.save(event, span: .thisEvent)
@@ -76,4 +73,5 @@ class EventKitService {
         
         return event
     }
+    
 }

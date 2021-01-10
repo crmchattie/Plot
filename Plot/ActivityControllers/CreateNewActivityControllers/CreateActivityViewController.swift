@@ -439,15 +439,11 @@ class CreateActivityViewController: FormViewController {
                     let endDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
                     
                     if row.value ?? false {
-                        startDate.dateFormatter?.dateStyle = .long
                         startDate.dateFormatter?.timeStyle = .none
-                        endDate.dateFormatter?.dateStyle = .long
                         endDate.dateFormatter?.timeStyle = .none
                     }
                     else {
-                        startDate.dateFormatter?.dateStyle = .long
                         startDate.dateFormatter?.timeStyle = .short
-                        endDate.dateFormatter?.dateStyle = .long
                         endDate.dateFormatter?.timeStyle = .short
                     }
                     startDate.updateCell()
@@ -470,7 +466,7 @@ class CreateActivityViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: activity.startTimeZone ?? TimeZone.current.identifier)
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
                     $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
                     if self.activity.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
@@ -546,7 +542,7 @@ class CreateActivityViewController: FormViewController {
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {
-                    row.value = activity.startTimeZone ?? TimeZone.current.identifier
+                    row.value = activity.startTimeZone ?? "UTC"
                 } else {
                     row.value = TimeZone.current.identifier
                     activity.endTimeZone = TimeZone.current.identifier
@@ -568,7 +564,7 @@ class CreateActivityViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: activity.endTimeZone ?? TimeZone.current.identifier)
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: activity.endTimeZone ?? "UTC")
                     $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
                     if self.activity.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
@@ -642,7 +638,7 @@ class CreateActivityViewController: FormViewController {
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {
-                    row.value = activity.endTimeZone ?? TimeZone.current.identifier
+                    row.value = activity.endTimeZone ?? "UTC"
                 } else {
                     row.value = TimeZone.current.identifier
                     activity.endTimeZone = TimeZone.current.identifier
@@ -1395,45 +1391,6 @@ class CreateActivityViewController: FormViewController {
         }
     }
     
-    func addEventToiCal(completion: ((_ success: Bool, _ error: NSError?) -> Void)? = nil) {
-        let eventStore = EKEventStore()
-        
-        eventStore.requestAccess(to: .event, completion: { (granted, error) in
-            if (granted) && (error == nil) {
-                if let nameRow: TextRow = self.form.rowBy(tag: "Activity Name"), let nameValue = nameRow.value {
-                    let descriptiowRow: TextAreaRow = self.form.rowBy(tag: "Description")!
-                    let timezone = TimeZone.current
-                    let seconds = -TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    
-                    let event = EKEvent(eventStore: eventStore)
-                    event.title = nameValue
-                    event.startDate = self.startDateTime?.addingTimeInterval(seconds)
-                    event.endDate = self.endDateTime?.addingTimeInterval(seconds)
-                    if let description = descriptiowRow.value {
-                        event.notes = description
-                    }
-                    if self.locationName != "locationName" {
-                        event.location = self.locationName
-                    }
-                    event.calendar = eventStore.defaultCalendarForNewEvents
-                    do {
-                        try eventStore.save(event, span: .thisEvent)
-                    } catch let e as NSError {
-                        completion?(false, e)
-                        return
-                    }
-                    completion?(true, nil)
-                    guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-                    let userReference = Database.database().reference().child("user-activities").child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder)
-                    let values:[String : Any] = ["calendarExport": true]
-                    userReference.updateChildValues(values)
-                }
-            } else {
-                completion?(false, error as NSError?)
-            }
-        })
-    }
-    
     func scheduleReminder() {
         let center = UNUserNotificationCenter.current()
         guard activity.reminder! != "None" else {
@@ -1444,14 +1401,14 @@ class CreateActivityViewController: FormViewController {
         content.title = "\(String(describing: activity.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        if let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay {
-            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay)
+        if let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone {
+            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
             content.subtitle = formattedDate.0
         }
         let reminder = EventAlert(rawValue: activity.reminder!)
         var reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+        let timezone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
+        let seconds = TimeInterval(timezone!.secondsFromGMT(for: Date()))
         reminderDate = reminderDate.addingTimeInterval(-seconds)
         let triggerDate = Calendar.current.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,

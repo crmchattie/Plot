@@ -95,9 +95,11 @@ final class ScheduleCell: Cell<Activity>, CellType {
         guard let schedule = row.value else { return }
         
         if let startDate = schedule.startDateTime as? TimeInterval, let endDate = schedule.endDateTime as? TimeInterval, let allDay = schedule.allDay {
+            let startTimeZone = schedule.startTimeZone ?? "UTC"
+            let endTimeZone = schedule.endTimeZone ?? "UTC"
             let startDate = Date(timeIntervalSince1970: startDate)
             let endDate = Date(timeIntervalSince1970: endDate)
-            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay)
+            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
         }
         // set the texts to the labels
         nameLabel.text = schedule.name
@@ -106,14 +108,20 @@ final class ScheduleCell: Cell<Activity>, CellType {
             locationNameLabel.text = schedule.locationName
         }
         
-        switch schedule.activityType {
+        switch schedule.activityType?.lowercased() {
         case "recipe":
             activityTypeButton.setImage(UIImage(named: "recipe"), for: .normal)
         case "workout":
             activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
         case "event":
             activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+        case "sleep":
+            activityTypeButton.setImage(UIImage(named: "sleep"), for: .normal)
+        case "work":
+            activityTypeButton.setImage(UIImage(named: "work"), for: .normal)
         case "food":
+            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
+        case "meal":
             activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
         case "nightlife":
             activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
@@ -122,6 +130,8 @@ final class ScheduleCell: Cell<Activity>, CellType {
         case "shopping":
             activityTypeButton.setImage(UIImage(named: "shopping"), for: .normal)
         case "sightseeing":
+            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
+        case "mindfulness":
             activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
         default:
             activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)

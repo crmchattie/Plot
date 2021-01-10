@@ -67,7 +67,7 @@ class ChatActivitiesTableViewCell: UITableViewCell {
         dateTimeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         dateTimeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         dateTimeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
-                        
+        
         locationNameLabel.topAnchor.constraint(equalTo: dateTimeLabel.bottomAnchor, constant: 2).isActive = true
         locationNameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         locationNameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
@@ -75,29 +75,31 @@ class ChatActivitiesTableViewCell: UITableViewCell {
     }
     
     required init?(coder aDecoder: NSCoder) {
-      fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func prepareForReuse() {
-      super.prepareForReuse()
-    
-      nameLabel.text = ""
-      locationNameLabel.text = ""
-      dateTimeLabel.text = ""
-      nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-      locationNameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-      dateTimeLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        super.prepareForReuse()
+        
+        nameLabel.text = ""
+        locationNameLabel.text = ""
+        dateTimeLabel.text = ""
+        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        locationNameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        dateTimeLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
     }
     
     func configureCell(for activity: Activity) {
         if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval, let allDay = activity.allDay {
-          let startDate = Date(timeIntervalSince1970: startDate)
-          let endDate = Date(timeIntervalSince1970: endDate)
-          formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay)
+            let startTimeZone = activity.startTimeZone ?? "UTC"
+            let endTimeZone = activity.endTimeZone ?? "UTC"
+            let startDate = Date(timeIntervalSince1970: startDate)
+            let endDate = Date(timeIntervalSince1970: endDate)
+            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
         }
-
-          
-          // set the texts to the labels
+        
+        
+        // set the texts to the labels
         nameLabel.text = activity.name
         dateTimeLabel.text = formattedDate.0 + formattedDate.1
         if activity.locationName != "locationName" && activity.locationName != "Location" {

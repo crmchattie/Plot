@@ -195,9 +195,9 @@ extension ActivityViewController {
         filteredPinnedActivities.remove(at: indexPath.row)
         pinnedActivities.remove(at: index)
         
-//        if let invitation = invitations.removeValue(forKey: activityID) {
-//            InvitationsFetcher.remove(invitation: invitation)
-//        }
+        if let invitation = networkController.activityService.invitations.removeValue(forKey: activityID) {
+            InvitationsFetcher.remove(invitation: invitation)
+        }
         
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()
@@ -227,17 +227,17 @@ extension ActivityViewController {
         let activity = filteredActivities[indexPath.row]
         guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activity.activityID  else { return }
         
-        guard let index = activities.firstIndex(where: { (activity) -> Bool in
+        guard let index = networkController.activityService.activities.firstIndex(where: { (activity) -> Bool in
             return activity.activityID == self.filteredActivities[indexPath.row].activityID
         }) else { return }
         
         activityView.tableView.beginUpdates()
         filteredActivities.remove(at: indexPath.row)
-//        activities.remove(at: index)
+        networkController.activityService.activities.remove(at: index)
         
-//        if let invitation = invitations.removeValue(forKey: activityID) {
-//            InvitationsFetcher.remove(invitation: invitation)
-//        }
+        if let invitation = networkController.activityService.invitations.removeValue(forKey: activityID) {
+            InvitationsFetcher.remove(invitation: invitation)
+        }
         
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()
@@ -255,7 +255,6 @@ extension ActivityViewController {
 
         })
         
-//        configureTabBarBadge()
         if activities.count <= 0 && pinnedActivities.count <= 0 {
             DispatchQueue.main.async {
                 self.checkIfThereAnyActivities(isEmpty: true)

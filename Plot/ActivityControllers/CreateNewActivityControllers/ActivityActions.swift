@@ -268,8 +268,8 @@ class ActivityActions: NSObject {
         content.title = "\(String(describing: activity.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        if let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay {
-            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay)
+        if let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone {
+            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
             content.subtitle = formattedDate.0
         }
         let reminder = EventAlert(rawValue: activity.reminder!)

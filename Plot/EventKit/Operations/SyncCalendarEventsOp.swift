@@ -14,6 +14,7 @@ class SyncCalendarEventsOp: AsyncOperation {
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     var events: [EKEvent] = []
+    var existingEvents: [EKEvent] = []
     
     override init() {
         self.queue = OperationQueue()
@@ -25,8 +26,11 @@ class SyncCalendarEventsOp: AsyncOperation {
     
     private func startRequest() {
         for event in events {
-            let op = CalendarActivityOp(event: event)
-            queue.addOperation(op)
+            if !existingEvents.contains(where: {$0.title == event.title && $0.startDate == event.startDate && $0.endDate == event.endDate}) {
+                existingEvents.append(event)
+                let op = CalendarActivityOp(event: event)
+                queue.addOperation(op)
+            }
         }
         
         queue.addBarrierBlock { [weak self] in
