@@ -85,10 +85,6 @@ struct MXAccount: Codable, Equatable, Hashable {
     }
 }
 
-func ==(lhs: MXAccount, rhs: MXAccount) -> Bool {
-    return lhs.guid == rhs.guid && lhs.user_guid == rhs.user_guid
-}
-
 struct UserAccount: Codable, Equatable, Hashable {
     var name: String?
     var tags: [String]?

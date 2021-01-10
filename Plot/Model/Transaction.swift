@@ -138,10 +138,6 @@ struct Transaction: Codable, Equatable, Hashable {
     }
 }
 
-func ==(lhs: Transaction, rhs: Transaction) -> Bool {
-    return lhs.guid == rhs.guid && lhs.member_guid == rhs.member_guid && lhs.user_guid == rhs.user_guid
-}
-
 struct UserTransaction: Codable, Equatable, Hashable {
     var description: String?
     var category: String?
@@ -228,10 +224,6 @@ struct TransactionRule: Codable, Equatable, Hashable {
     var group: String?
     var amount: Double?
     var should_link: Bool?
-}
-
-func ==(lhs: TransactionRule, rhs: TransactionRule) -> Bool {
-    return lhs.guid == rhs.guid
 }
 
 struct MXTransactionCategoryResult: Codable {

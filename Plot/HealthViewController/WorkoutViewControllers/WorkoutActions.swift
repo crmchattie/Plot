@@ -46,7 +46,7 @@ class WorkoutActions: NSObject {
                 
     }
     
-    public func createNewWorkout(shouldCreateActivity: Bool) {
+    public func createNewWorkout() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -83,14 +83,13 @@ class WorkoutActions: NSObject {
             Analytics.logEvent("new_workout", parameters: [String: Any]())
             dispatchGroup.enter()
             connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
-            
-            createActivityAndUpdateHealthKit(shouldCreateActivity: shouldCreateActivity)
+            createActivityAndUpdateHealthKit()
         } else {
             Analytics.logEvent("update_workout", parameters: [String: Any]())
         }
     }
     
-    private func createActivityAndUpdateHealthKit(shouldCreateActivity: Bool) {
+    private func createActivityAndUpdateHealthKit() {
         // Update healthKit
         var hkSampleID: String?
         if let hkWorkout = HealthKitSampleBuilder.createHKWorkout(from: workout) {
@@ -99,17 +98,14 @@ class WorkoutActions: NSObject {
             }
         }
         
-        // create activity
-        if shouldCreateActivity {
-            if let activity = ActivityBuilder.createActivity(from: workout) {
-                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-                activityActions.createNewActivity()
-                
-                // Update that the activity is created for workout/hkworkout
-                if let hkSampleID = hkSampleID, let currentUserId = Auth.auth().currentUser?.uid, let activityID = activity.activityID {
-                    let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
-                    healthkitWorkoutsReference.setValue(activityID)
-                }
+        if let activity = ActivityBuilder.createActivity(from: workout) {
+            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+            activityActions.createNewActivity()
+            
+            // Update that the activity is created for workout/hkworkout
+            if let hkSampleID = hkSampleID, let currentUserId = Auth.auth().currentUser?.uid, let activityID = activity.activityID {
+                let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+                healthkitWorkoutsReference.setValue(activityID)
             }
         }
     }

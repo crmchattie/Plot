@@ -21,7 +21,9 @@ class FinanceService {
 
     var transactions = [Transaction]() {
         didSet {
+            print("didSet transactions")
             if oldValue != transactions {
+                print("oldValue != transactions")
                 NotificationCenter.default.post(name: .financeUpdated, object: nil)
             }
         }
@@ -86,7 +88,7 @@ class FinanceService {
                 self.getMXMembers(guid: user.guid) { (members) in
                     for member in members {
                         dispatchGroup.enter()
-                        if let index = self.members.firstIndex(of: member) {
+                        if let index = self.members.firstIndex(where: {$0.guid == member.guid}) {
                             self.members[index] = member
                         } else {
                             self.members.append(member)
@@ -101,10 +103,7 @@ class FinanceService {
                                             for account in accounts {
                                                 dispatchGroup.enter()
                                                 var _account = account
-                                                if !self.accounts.contains(_account) {
-                                                    self.getMXTransactions(user: user, account: _account, date: nil)
-                                                    self.accounts.append(_account)
-                                                } else if let index = self.accounts.firstIndex(of: account) {
+                                                if let index = self.accounts.firstIndex(where: {$0.guid == account.guid}) {
                                                     let date = self.isodateFormatter.date(from: _account.updated_at ) ?? Date()
                                                     self.getMXTransactions(user: user, account: _account, date: date.addingTimeInterval(-604800))
                                                     _account.balances = self.accounts[index].balances
@@ -112,6 +111,9 @@ class FinanceService {
                                                     _account.admin = self.accounts[index].admin
                                                     _account.participantsIDs = self.accounts[index].participantsIDs
                                                     self.accounts[index] = _account
+                                                } else {
+                                                    self.getMXTransactions(user: user, account: _account, date: nil)
+                                                    self.accounts.append(_account)
                                                 }
                                                 updatedAccounts.append(_account)
                                                 dispatchGroup.leave()
@@ -127,15 +129,17 @@ class FinanceService {
                                 for account in accounts {
                                     dispatchGroup.enter()
                                     var _account = account
-                                    if !self.accounts.contains(_account) {
-                                        self.accounts.append(_account)
-                                        self.getMXTransactions(user: user, account: _account, date: nil)
-                                    } else if let index = self.accounts.firstIndex(of: account) {
+                                    if let index = self.accounts.firstIndex(where: {$0.guid == account.guid}) {
+                                        let date = self.isodateFormatter.date(from: _account.updated_at ) ?? Date()
+                                        self.getMXTransactions(user: user, account: _account, date: date.addingTimeInterval(-604800))
                                         _account.balances = self.accounts[index].balances
                                         _account.description = self.accounts[index].description
                                         _account.admin = self.accounts[index].admin
                                         _account.participantsIDs = self.accounts[index].participantsIDs
                                         self.accounts[index] = _account
+                                    } else {
+                                        self.getMXTransactions(user: user, account: _account, date: nil)
+                                        self.accounts.append(_account)
                                     }
                                     updatedAccounts.append(_account)
                                     dispatchGroup.leave()
@@ -149,10 +153,7 @@ class FinanceService {
                                     for account in accounts {
                                         dispatchGroup.enter()
                                         var _account = account
-                                        if !self.accounts.contains(_account) {
-                                            self.getMXTransactions(user: user, account: _account, date: nil)
-                                            self.accounts.append(_account)
-                                        } else if let index = self.accounts.firstIndex(of: account) {
+                                        if let index = self.accounts.firstIndex(where: {$0.guid == account.guid}) {
                                             let date = self.isodateFormatter.date(from: _account.updated_at ) ?? Date()
                                             self.getMXTransactions(user: user, account: _account, date: date.addingTimeInterval(-604800))
                                             _account.balances = self.accounts[index].balances
@@ -160,6 +161,9 @@ class FinanceService {
                                             _account.admin = self.accounts[index].admin
                                             _account.participantsIDs = self.accounts[index].participantsIDs
                                             self.accounts[index] = _account
+                                        } else {
+                                            self.getMXTransactions(user: user, account: _account, date: nil)
+                                            self.accounts.append(_account)
                                         }
                                         updatedAccounts.append(_account)
                                         dispatchGroup.leave()
@@ -193,7 +197,7 @@ class FinanceService {
                     for transaction in transactions {
                         dispatchGroup.enter()
                         let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
-                        if !self.transactions.contains(transaction) {
+                        if self.transactions.first(where: { $0.guid == transaction.guid}) == nil {
                             updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction, bool) in
                                 if finalAccount?.should_link ?? true {
                                     self.transactions.append(transaction)
@@ -222,7 +226,7 @@ class FinanceService {
                     for transaction in transactions {
                         dispatchGroup.enter()
                         let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
-                        if !self.transactions.contains(transaction) {
+                        if self.transactions.first(where: { $0.guid == transaction.guid}) == nil {
                             updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction, bool) in
                                 if finalAccount?.should_link ?? true {
                                     self.transactions.append(transaction)
@@ -254,7 +258,7 @@ class FinanceService {
                 for transaction in transactions {
                     dispatchGroup.enter()
                     let finalAccount = self.accounts.first(where: { $0.guid == transaction.account_guid})
-                    if !self.transactions.contains(transaction) {
+                    if self.transactions.first(where: { $0.guid == transaction.guid}) == nil {
                         updateTransactionWRule(transaction: transaction, transactionRules: self.transactionRules) { (transaction, bool) in
                             if finalAccount?.should_link ?? true {
                                 self.transactions.append(transaction)
@@ -450,15 +454,15 @@ class FinanceService {
     func observeAccountsForCurrentUser() {
         self.accountFetcher.observeAccountForCurrentUser(accountsAdded: { [weak self] accountsAdded in
             for account in accountsAdded {
-                if !self!.accounts.contains(account) {
-                    self!.accounts.append(account)
-                } else if let index = self!.accounts.firstIndex(of: account) {
+                if let index = self!.accounts.firstIndex(where: {$0.guid == account.guid}) {
                     self!.accounts[index] = account
+                } else {
+                    self!.accounts.append(account)
                 }
             }
         }, accountsChanged: { [weak self] accountsChanged in
             for account in accountsChanged {
-                if let index = self!.accounts.firstIndex(of: account) {
+                if let index = self!.accounts.firstIndex(where: {$0.guid == account.guid}) {
                     self!.accounts[index] = account
                 }
             }
@@ -468,15 +472,15 @@ class FinanceService {
     func observeTransactionsForCurrentUser() {
         self.transactionFetcher.observeTransactionForCurrentUser(transactionsAdded: { [weak self] transactionsAdded in
             for transaction in transactionsAdded {
-                if !self!.transactions.contains(transaction) {
-                    self!.transactions.append(transaction)
-                } else if let index = self!.transactions.firstIndex(of: transaction) {
+                if let index = self!.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
                     self!.transactions[index] = transaction
+                } else {
+                    self!.transactions.append(transaction)
                 }
             }
         }, transactionsChanged: { [weak self] transactionsChanged in
             for transaction in transactionsChanged {
-                if let index = self!.transactions.firstIndex(of: transaction) {
+                if let index = self!.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
                     self!.transactions[index] = transaction
                 }
             }
@@ -487,10 +491,10 @@ class FinanceService {
         self.transactionRuleFetcher.observeTransactionRuleForCurrentUser(transactionRulesAdded: { [weak self] transactionRulesAdded in
             var newTransactions = [Transaction]()
             for transactionRule in transactionRulesAdded {
-                if !self!.transactionRules.contains(transactionRule) {
-                    self!.transactionRules.append(transactionRule)
-                } else if let index = self!.transactionRules.firstIndex(of: transactionRule) {
+                if let index = self!.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
                     self!.transactionRules[index] = transactionRule
+                } else {
+                    self!.transactionRules.append(transactionRule)
                 }
                 if !self!.transactions.isEmpty {
                     for index in 0...self!.transactions.count - 1 {
@@ -508,14 +512,14 @@ class FinanceService {
             }
             }, transactionRulesRemoved: { [weak self] transactionRulesRemoved in
                 for transactionRule in transactionRulesRemoved {
-                    if let index = self!.transactionRules.firstIndex(of: transactionRule) {
-                        self!.transactionRules.remove(at: index)
+                    if let index = self!.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
+                        self!.transactionRules[index] = transactionRule
                     }
                 }
             }, transactionRulesChanged: { [weak self] transactionRulesChanged in
                 var newTransactions = [Transaction]()
                 for transactionRule in transactionRulesChanged {
-                    if let index = self!.transactionRules.firstIndex(of: transactionRule) {
+                    if let index = self!.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
                         self!.transactionRules[index] = transactionRule
                     }
                     if !self!.transactions.isEmpty {

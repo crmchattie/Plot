@@ -699,7 +699,7 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     }
     
 }
-//
+
 //extension MasterActivityContainerController: UpdateFinancialsDelegate {
 //    func updateTransactions(transactions: [Transaction]) {
 //        for transaction in transactions {
@@ -710,7 +710,7 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
 //    }
 //    func updateAccounts(accounts: [MXAccount]) {
 //        for account in accounts {
-//            if let index = networkController.financeService.accounts.firstIndex(of: account) {
+//            if let index = networkController.financeService.accounts.firstIndex(where: {$0.guid == account.guid}) {
 //                networkController.financeService.accounts[index] = account
 //            }
 //        }

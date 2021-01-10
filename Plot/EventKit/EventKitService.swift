@@ -62,7 +62,7 @@ class EventKitService {
         event.startDate = startDate
         event.endDate = endDate
         event.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
-        event.notes = activity.activityDescription
+        event.notes = activity.activityDescription ?? ""
         event.calendar = eventStore.defaultCalendarForNewEvents
         do {
             try eventStore.save(event, span: .thisEvent)

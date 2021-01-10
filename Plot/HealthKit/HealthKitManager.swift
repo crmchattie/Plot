@@ -198,19 +198,8 @@ class HealthKitManager {
         for activity in activities {
             if let activityID = activity.activityID {
                 
-                saveActivitiesDispatchGroup.enter()
-                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                    self?.saveActivitiesDispatchGroup.leave()
-                })
-                
-                saveActivitiesDispatchGroup.enter()
-                let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-        
-                let values: [String : Any] = ["isGroupActivity": false, "badge": 0]
-                userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
-                    self?.saveActivitiesDispatchGroup.leave()
-                })
+                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                activityActions.createNewActivity()
                 
                 if let hkSampleID = activity.hkSampleID {
                     let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")

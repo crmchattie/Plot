@@ -166,6 +166,7 @@ class FinanceViewController: UIViewController {
     }
     
     private func updateCollectionView() {
+        print("updateCollectionView")
         guard currentReachabilityStatus != .notReachable else {
             return
         }

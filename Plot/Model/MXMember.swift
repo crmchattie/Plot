@@ -30,10 +30,6 @@ struct MXMember: Codable, Equatable, Hashable {
     var participantsIDs: [String]?
 }
 
-func ==(lhs: MXMember, rhs: MXMember) -> Bool {
-    return lhs.guid == rhs.guid
-}
-
 enum ConnectionStatus: String, CaseIterable, Codable {
     case created = "CREATED"
     case prevented = "PREVENTED"

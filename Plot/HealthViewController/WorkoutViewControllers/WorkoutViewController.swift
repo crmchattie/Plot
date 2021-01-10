@@ -103,7 +103,7 @@ class WorkoutViewController: FormViewController {
                 // update
                 self.showActivityIndicator()
                 let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createWorkout.createNewWorkout(shouldCreateActivity: false)
+                createWorkout.createNewWorkout()
                 self.hideActivityIndicator()
                 self.navigationController?.popViewController(animated: true)
                 
@@ -120,7 +120,7 @@ class WorkoutViewController: FormViewController {
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     self.showActivityIndicator()
                     let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    createWorkout.createNewWorkout(shouldCreateActivity: false)
+                    createWorkout.createNewWorkout()
                     
                     //duplicate workout
                     let newWorkoutID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -130,7 +130,7 @@ class WorkoutViewController: FormViewController {
                     newWorkout.participantsIDs = nil
                     
                     let createNewWorkout = WorkoutActions(workout: newWorkout, active: false, selectedFalconUsers: [])
-                    createNewWorkout.createNewWorkout(shouldCreateActivity: false)
+                    createNewWorkout.createNewWorkout()
                     self.hideActivityIndicator()
                     
                     self.navigationController?.popViewController(animated: true)
@@ -150,16 +150,10 @@ class WorkoutViewController: FormViewController {
         } else {
             self.showActivityIndicator()
             workoutActions = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            workoutActions?.createNewWorkout(shouldCreateActivity: true)
+            workoutActions?.createNewWorkout()
             
             self.hideActivityIndicator()
             
-//            let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-//            if nav.topViewController is MasterActivityContainerController {
-//                let homeTab = nav.topViewController as! MasterActivityContainerController
-//                homeTab.customSegmented.setIndex(index: 2)
-//                homeTab.changeToIndex(index: 2)
-//            }
             self.tabBarController?.selectedIndex = 1
             if #available(iOS 13.0, *) {
                 self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
