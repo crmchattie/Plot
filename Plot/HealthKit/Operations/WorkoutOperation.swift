@@ -67,12 +67,10 @@ class WorkoutOperation: AsyncOperation {
                                 activity.name = workout.workoutActivityType.name
                                 activity.activityDescription = "\(totalEnergyBurned.clean) calories"
                                 
-                                let timezone = TimeZone.current
-                                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                                let startDateTime = workout.startDate.addingTimeInterval(seconds)
-                                let endDateTime = workout.endDate.addingTimeInterval(seconds)
-                                activity.startDateTime = NSNumber(value: startDateTime.timeIntervalSince1970)
-                                activity.endDateTime = NSNumber(value: endDateTime.timeIntervalSince1970)
+                                activity.startDateTime = NSNumber(value: workout.startDate.timeIntervalSince1970)
+                                activity.endDateTime = NSNumber(value: workout.endDate.timeIntervalSince1970)
+                                activity.startTimeZone = TimeZone.current.identifier
+                                activity.endTimeZone = TimeZone.current.identifier
 
                                 activity.allDay = false
                                 activity.hkSampleID = workout.uuid.uuidString

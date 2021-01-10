@@ -66,12 +66,10 @@ class MindfulnessOperation: AsyncOperation {
                         activity.category = "Mindfulness"
                         activity.name = "Mindfulness Session"
                         
-                        let timezone = TimeZone.current
-                        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                        let startDateTime = sample.startDate.addingTimeInterval(seconds)
-                        let endDateTime = sample.endDate.addingTimeInterval(seconds)
-                        activity.startDateTime = NSNumber(value: startDateTime.timeIntervalSince1970)
-                        activity.endDateTime = NSNumber(value: endDateTime.timeIntervalSince1970)
+                        activity.startDateTime = NSNumber(value: sample.startDate.timeIntervalSince1970)
+                        activity.endDateTime = NSNumber(value: sample.endDate.timeIntervalSince1970)
+                        activity.startTimeZone = TimeZone.current.identifier
+                        activity.endTimeZone = TimeZone.current.identifier
 
                         activity.allDay = false
                         activity.hkSampleID = sample.uuid.uuidString

@@ -28,6 +28,8 @@ class ActivityBuilder {
             activity.activityDescription = "\(String(describing: workout.type)) - \(totalEnergyBurned.clean) calories"
         }
         
+        activity.startTimeZone = TimeZone.current.identifier
+        activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
@@ -49,6 +51,8 @@ class ActivityBuilder {
         activity.activityType = "Mindfulness"
         activity.category = "Mindfulness"
         activity.name = mindfulness.name
+        activity.startTimeZone = TimeZone.current.identifier
+        activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
@@ -70,6 +74,8 @@ class ActivityBuilder {
         activity.activityType = "Meal"
         activity.category = "Meal"
         activity.name = meal.name
+        activity.startTimeZone = TimeZone.current.identifier
+        activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
