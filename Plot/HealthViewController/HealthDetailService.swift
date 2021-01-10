@@ -444,10 +444,12 @@ class HealthDetailService: HealthDetailServiceInterface {
         var customStats: [Statistic] = []
         for (_, value) in map {
             var total: Double = 0
+            var count: Int = 0
             var firstDate: Date?
             for item in value {
                 if let sumQuantity = item.sumQuantity() {
                     total += sumQuantity.doubleValue(for: unit)
+                    count += 1
                     if firstDate == nil {
                         firstDate = item.startDate
                     }
@@ -455,7 +457,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             }
             
             if let date = firstDate, value.count > 0 {
-                let statistic = Statistic(date: date, value: total/Double(value.count))
+                let statistic = Statistic(date: date, value: total/Double(count))
                 customStats.append(statistic)
             }
         }
