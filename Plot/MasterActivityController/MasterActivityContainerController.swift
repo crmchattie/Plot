@@ -724,7 +724,7 @@ extension MasterActivityContainerController: EndedWebViewDelegate {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
-        self.networkController.financeService.getMXData()
+        self.networkController.financeService.grabFinances {}
     }
 }
 

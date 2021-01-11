@@ -52,6 +52,10 @@
 	<string>To find your friends who also use Plot</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>To get access to your personal data</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>We help you keep track of your exercise, nutritional, sleep, mindful minutes and body measurement data from all sources.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>We use exercise, nutritional and mindful minutes data to help you keep track of your health activities.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Show your location on the map</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -95,9 +99,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSHealthShareUsageDescription</key>
-	<string>We help you keep track of your exercise, nutritional, sleep, mindful minutes and body measurement data from all sources.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>We use exercise, nutritional and mindful minutes data to help you keep track of your health activities.</string>
 </dict>
 </plist>

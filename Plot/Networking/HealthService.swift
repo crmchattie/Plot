@@ -20,7 +20,19 @@ class HealthService {
     let mindfulnessFetcher = MindfulnessFetcher()
     let moodFetcher = MoodFetcher()
 
-    var healthMetricSections: [String] = []
+    var healthMetricSections: [String] = [] {
+        didSet {
+            if oldValue != healthMetricSections {
+                healthMetricSections.sort(by: { (v1, v2) -> Bool in
+                    if let cat1 = HealthMetricCategory(rawValue: v1), let cat2 = HealthMetricCategory(rawValue: v2) {
+                        return cat1.rank < cat2.rank
+                    }
+                    return false
+                })
+            }
+        }
+    }
+    
     var healthMetrics: [String: [HealthMetric]] = [:]
     
     var nutrition = [String: [HKQuantitySample]]()
@@ -36,18 +48,12 @@ class HealthService {
                 if !metrics.isEmpty {
                     HealthKitService.authorized = true
                     DispatchQueue.main.async {
-                        self?.healthMetrics = metrics
                         self?.healthMetricSections = Array(metrics.keys)
-                        
-                        self?.healthMetricSections.sort(by: { (v1, v2) -> Bool in
-                            if let cat1 = HealthMetricCategory(rawValue: v1), let cat2 = HealthMetricCategory(rawValue: v2) {
-                                return cat1.rank < cat2.rank
-                            }
-                            return false
-                        })
+                        self?.healthMetrics = metrics
                         completion()
                     }
                 } else {
+                    var metrics: [String: [HealthMetric]] = [:]
                     HealthKitService.authorized = false
                     let dispatchGroup = DispatchGroup()
                     dispatchGroup.enter()
@@ -91,31 +97,31 @@ class HealthService {
                                     metric.unit = .kilocalorie()
                                     metric.quantityTypeIdentifier = type
                                     metric.average = average
-                                    self?.healthMetrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
+                                    metrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
                                 } else if type == .dietaryFatTotal {
                                     var metric = HealthMetric(type: HealthMetricType.nutrition(type.name), total: dailyTotal, date: recentStatDate!, unitName: "grams", rank: 2)
                                     metric.unit = .gram()
                                     metric.quantityTypeIdentifier = type
                                     metric.average = average
-                                    self?.healthMetrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
+                                    metrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
                                 } else if type == .dietaryProtein {
                                     var metric = HealthMetric(type: HealthMetricType.nutrition(type.name), total: dailyTotal, date: recentStatDate!, unitName: "grams", rank: 3)
                                     metric.unit = .gram()
                                     metric.quantityTypeIdentifier = type
                                     metric.average = average
-                                    self?.healthMetrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
+                                    metrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
                                 } else if type == .dietaryCarbohydrates {
                                     var metric = HealthMetric(type: HealthMetricType.nutrition(type.name), total: dailyTotal, date: recentStatDate!, unitName: "grams", rank: 4)
                                     metric.unit = .gram()
                                     metric.quantityTypeIdentifier = type
                                     metric.average = average
-                                    self?.healthMetrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
+                                    metrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
                                 } else if type == .dietarySugar {
                                     var metric = HealthMetric(type: HealthMetricType.nutrition(type.name), total: dailyTotal, date: recentStatDate!, unitName: "grams", rank: 5)
                                     metric.unit = .gram()
                                     metric.quantityTypeIdentifier = type
                                     metric.average = average
-                                    self?.healthMetrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
+                                    metrics[HealthMetricCategory.nutrition.rawValue, default: []].append(metric)
                                 }
                             }
                         }
@@ -173,7 +179,7 @@ class HealthService {
                                     averageEnergyBurned /= Double(workouts.count)
                                     metric.average = averageEnergyBurned
                                 }
-                                self?.healthMetrics[HealthMetricCategory.workouts.rawValue, default: []].append(metric)
+                                metrics[HealthMetricCategory.workouts.rawValue, default: []].append(metric)
                             }
                         }
                         
@@ -216,21 +222,16 @@ class HealthService {
                             var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
                             metric.average = average
                             
-                            self?.healthMetrics[HealthMetricCategory.general.rawValue, default: []].append(metric)
+                            metrics[HealthMetricCategory.general.rawValue, default: []].append(metric)
                         }
                         
                         dispatchGroup.leave()
                     }
                     
                     dispatchGroup.notify(queue: .main) {
-                        if let healthMetrics = self?.healthMetrics, !healthMetrics.isEmpty {
-                            self?.healthMetricSections = Array(healthMetrics.keys)
-                            self?.healthMetricSections.sort(by: { (v1, v2) -> Bool in
-                                if let cat1 = HealthMetricCategory(rawValue: v1), let cat2 = HealthMetricCategory(rawValue: v2) {
-                                    return cat1.rank < cat2.rank
-                                }
-                                return false
-                            })
+                        if !metrics.isEmpty {
+                            self?.healthMetrics = metrics
+                            self?.healthMetricSections = Array(metrics.keys)
                         }
                         completion()
                     }

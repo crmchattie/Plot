@@ -171,7 +171,7 @@ class FinancialAccountsViewController: UITableViewController {
 
 extension FinancialAccountsViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        networkController.financeService.getMXData()
+        networkController.financeService.grabFinances {}
     }
 }
 

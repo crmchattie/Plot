@@ -321,6 +321,6 @@ extension DiscoverViewController: CompositionalHeaderDelegate {
 
 extension DiscoverViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        networkController.financeService.getMXData()
+        networkController.financeService.grabFinances {}
     }
 }
