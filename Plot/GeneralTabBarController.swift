@@ -131,7 +131,6 @@ class GeneralTabBarController: UITabBarController {
             }
         } else {
             UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
-            self.networkController.newUserItems()
         }
     }
     

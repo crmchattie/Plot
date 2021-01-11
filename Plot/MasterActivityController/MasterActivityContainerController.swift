@@ -161,6 +161,7 @@ class MasterActivityContainerController: UIViewController {
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(activitiesUpdated), name: .activitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
     }
     
@@ -191,6 +192,12 @@ class MasterActivityContainerController: UIViewController {
                 }
             }
         })
+    }
+    
+    @objc fileprivate func healthUpdated() {
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
     }
     
     @objc fileprivate func financeUpdated() {
@@ -745,7 +752,6 @@ extension MasterActivityContainerController {
         guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-        
         
         let group = DispatchGroup()
         let olderParticipants = self.activitiesParticipants[activityID]

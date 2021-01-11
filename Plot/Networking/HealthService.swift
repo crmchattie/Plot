@@ -29,11 +29,18 @@ class HealthService {
                     }
                     return false
                 })
+                NotificationCenter.default.post(name: .healthUpdated, object: nil)
             }
         }
     }
     
-    var healthMetrics: [String: [HealthMetric]] = [:]
+    var healthMetrics: [String: [HealthMetric]] = [:] {
+        didSet {
+            if oldValue != healthMetrics {
+                NotificationCenter.default.post(name: .healthUpdated, object: nil)
+            }
+        }
+    }
     
     var nutrition = [String: [HKQuantitySample]]()
     var workouts = [String: [HKWorkout]]()
