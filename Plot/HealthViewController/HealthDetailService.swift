@@ -91,7 +91,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         let anchorDate = Date().localTime.startOfDay.addingTimeInterval(-seconds)
         var startDate = anchorDate
         let endDate = anchorDate.advanced(by: 86399)
-                
+                        
         if segmentType == .day {
             interval.hour = 1
         }

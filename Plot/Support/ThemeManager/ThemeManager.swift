@@ -7,7 +7,6 @@
 //
 
 
-
 import UIKit
 
 let SelectedThemeKey = "SelectedTheme"
@@ -49,7 +48,7 @@ struct ThemeManager {
 }
 enum Theme: Int {
     case Default, Dark
-
+    
     @available(iOS 12.0, *)
     var userInterfaceStyle: UIUserInterfaceStyle {
         switch self {
@@ -296,6 +295,15 @@ enum Theme: Int {
         case .Dark:
             return UIColor(red: 34.0/255.0, green: 128.0/255.0, blue: 66.0/255.0, alpha: 1.0)
             
+        }
+    }
+    
+    var controlButtonColor: UIColor {
+        switch self {
+        case .Default:
+            return UIColor(red: 0.94, green: 0.94, blue: 0.96, alpha: 1.0)
+        case .Dark:
+            return UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.0)
         }
     }
 }

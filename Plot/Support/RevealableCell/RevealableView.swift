@@ -21,9 +21,9 @@ public enum RevealSwipeDirection {
 open class RevealableView: UIControl {
     
     @IBInspectable open var width: CGFloat = 0 {
-      didSet {
-        prepareWidthConstraint()
-      }
+        didSet {
+            prepareWidthConstraint()
+        }
     }
     
     internal weak var tableView: UICollectionView?
@@ -36,28 +36,28 @@ open class RevealableView: UIControl {
      Ensure to call super.didMoveToSuperview in your subclasses!
      */
     open override func didMoveToSuperview() {
-      if self.superview != nil {
-        prepareWidthConstraint()
-      }
-      self.translatesAutoresizingMaskIntoConstraints = false
+        if self.superview != nil {
+            prepareWidthConstraint()
+        }
+        self.translatesAutoresizingMaskIntoConstraints = false
     }
     
     internal func prepareForReuse() {
-      tableView?.prepareRevealableViewForReuse(self)
+        tableView?.prepareRevealableViewForReuse(self)
     }
     
     fileprivate func prepareWidthConstraint() {
-      if width > 0 {
-        let constraint = NSLayoutConstraint(item: self, attribute: .width, relatedBy: .equal,
-                                            toItem: nil, attribute: .notAnAttribute,
-                                            multiplier: 1, constant: width)
-        NSLayoutConstraint.activate([constraint])
-        widthConstraint = constraint
-      } else {
-        if let constraint = widthConstraint {
-          NSLayoutConstraint.deactivate([constraint])
+        if width > 0 {
+            let constraint = NSLayoutConstraint(item: self, attribute: .width, relatedBy: .equal,
+                                                toItem: nil, attribute: .notAnAttribute,
+                                                multiplier: 1, constant: width)
+            NSLayoutConstraint.activate([constraint])
+            widthConstraint = constraint
+        } else {
+            if let constraint = widthConstraint {
+                NSLayoutConstraint.deactivate([constraint])
+            }
         }
-      }
-      setNeedsUpdateConstraints()
+        setNeedsUpdateConstraints()
     }
 }

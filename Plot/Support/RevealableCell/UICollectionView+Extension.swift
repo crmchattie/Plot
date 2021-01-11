@@ -54,38 +54,35 @@ extension UICollectionView: UIGestureRecognizerDelegate {
             }
         }
     }
-  
+    
     @objc func handleRevealPan(_ gesture: UIPanGestureRecognizer) {
         switch gesture.state {
         case .began:
-         
             addObserver(self, forKeyPath: "contentOffset", options: .new, context: &AssociationKey.panGesture)
             break
         case .changed:
-        
-          UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
-            UICollectionView.translationX = gesture.translation(in: gesture.view).x
-            UICollectionView.currentOffset += UICollectionView.translationX
             
-            gesture.setTranslation(CGPoint.zero, in: gesture.view)
+            UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
+                UICollectionView.translationX = gesture.translation(in: gesture.view).x
+                UICollectionView.currentOffset += UICollectionView.translationX
+                
+                gesture.setTranslation(CGPoint.zero, in: gesture.view)
+                self.updateTableViewCellFrames()
+            }, completion: { (true) in
+                
+            })
             
-            self.updateTableViewCellFrames()
-         
-          }, completion: { (true) in
-            
-          })
-          
             break
         default:
-          
-          UIView.animate(withDuration: 0.4, delay: 0, options: [.curveEaseOut], animations: {
-            UICollectionView.currentOffset = 0
-            self.updateTableViewCellFrames()
-          }, completion: { (finished: Bool) in
-             UICollectionView.translationX = 0
-          })
-
-          
+            
+            UIView.animate(withDuration: 0.4, delay: 0, options: [.curveEaseOut], animations: {
+                UICollectionView.currentOffset = 0
+                self.updateTableViewCellFrames()
+            }, completion: { (finished: Bool) in
+                UICollectionView.translationX = 0
+            })
+            
+            
             removeObserver(self, forKeyPath: "contentOffset")
         }
     }
@@ -97,7 +94,7 @@ extension UICollectionView: UIGestureRecognizerDelegate {
     open override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if let gesture = gestureRecognizer as? UIPanGestureRecognizer, gesture == revealPanGesture {
             let translation = gesture.translation(in: gesture.view);
-					return (abs(translation.x) > abs(translation.y)) && (gesture == revealPanGesture)
+            return (abs(translation.x) > abs(translation.y)) && (gesture == revealPanGesture)
         }
         
         return true
@@ -109,7 +106,7 @@ extension UICollectionView: UIGestureRecognizerDelegate {
             associatedProperty.delegate = self
             objc_setAssociatedObject(self, &AssociationKey.panGesture, associatedProperty, .OBJC_ASSOCIATION_RETAIN)
             return associatedProperty
-            }()
+        }()
     }
     
     fileprivate var registrations: NSMutableDictionary {
@@ -117,7 +114,7 @@ extension UICollectionView: UIGestureRecognizerDelegate {
             let associatedProperty = NSMutableDictionary()
             objc_setAssociatedObject(self, &AssociationKey.registrations, associatedProperty, .OBJC_ASSOCIATION_RETAIN)
             return associatedProperty
-            }()
+        }()
     }
     
     fileprivate var reuseQueues: RevealableViewsReuseQueues {
@@ -125,7 +122,7 @@ extension UICollectionView: UIGestureRecognizerDelegate {
             let associatedProperty = RevealableViewsReuseQueues()
             objc_setAssociatedObject(self, &AssociationKey.queues, associatedProperty, .OBJC_ASSOCIATION_RETAIN)
             return associatedProperty
-            }()
+        }()
     }
     
     public func registerNib(_ nib: UINib, forRevealableViewReuseIdentifier identifier: String) {
@@ -157,11 +154,11 @@ extension UICollectionView: UIGestureRecognizerDelegate {
     
     public func dequeueReusableRevealableView(withIdentifier identifier: String) -> RevealableView? {
         let queue = reuseQueues.queueForIdentifier(identifier)
-      
+        
         if let view = queue.dequeueView() {
             return view
         }
-      
+        
         let regs = registrations
         
         if let nib = regs[identifier] as? UINib {
@@ -195,7 +192,7 @@ extension UICollectionView: UIGestureRecognizerDelegate {
     
     internal func prepareRevealableViewForReuse(_ view: RevealableView) {
         view.removeFromSuperview()
-       
+        
         let queue = reuseQueues.queueForIdentifier(view.reuseIdentifier)
         queue.enqueue(view)
     }

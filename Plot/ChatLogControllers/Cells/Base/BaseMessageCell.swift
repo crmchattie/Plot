@@ -99,8 +99,8 @@ class BaseMessageCell: RevealableCollectionViewCell {
     DispatchQueue.main.async {
       let view = self.chatLogController?.collectionView?.dequeueReusableRevealableView(withIdentifier: "timestamp") as? TimestampView ?? TimestampView()
       view.titleLabel.text = message.convertedTimestamp
-      let style: RevealStyle = isOutgoing ? .slide : .over
-      self.setRevealableView(view, style: style, direction: .left)
+//      let style: RevealStyle = isOutgoing ? .slide : .over
+//      self.setRevealableView(view, style: style, direction: .left)
     }
   }
 

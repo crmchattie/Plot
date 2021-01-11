@@ -80,8 +80,6 @@ class GeneralTabBarController: UITabBarController {
         
         if onceToken == 0 {
             splashContainer.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            splashContainer.navigationBar.barTintColor = ThemeManager.currentTheme().generalBackgroundColor
-            splashContainer.viewForSatausbarSafeArea.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             view.addSubview(splashContainer)
             splashContainer.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
             splashContainer.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true

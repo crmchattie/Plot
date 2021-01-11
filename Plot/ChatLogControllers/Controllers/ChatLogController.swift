@@ -527,36 +527,6 @@ class ChatLogController: UICollectionViewController {
         }
     }
     
-    //    func setupActivities() {
-    //        if conversation?.activities != nil {
-    //            for activityID in conversation!.activities! {
-    //                let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-    //                activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-    //                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-    //
-    //                    dictionary.updateValue(activityID as AnyObject, forKey: "id")
-    //
-    //                    if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
-    //                        dictionary.updateValue(Array(membersIDs.values) as AnyObject, forKey: "participantsIDs")
-    //                    }
-    //
-    //                    let activity = Activity(dictionary: dictionary)
-    //
-    //                    self.activities.append(activity)
-    //
-    //                })
-    //            }
-    //        }
-    //    }
-    
-    //  func configureTitleViewWithOnlineStatus() {
-    //    if let isGroupChat = conversation?.isGroupChat, isGroupChat, let title = conversation?.chatName,
-    //      let membersCount = conversation?.chatParticipantsIDs?.count {
-    //      let subtitle = "\(membersCount) members"
-    //      self.navigationItem.setTitle(title: title, subtitle: subtitle)
-    //      return
-    //    }
-    
     func configureTitleViewWithOnlineStatus() {
         if let title = conversation?.chatName, let membersCount = conversation?.chatParticipantsIDs?.count, membersCount > 2 {
             let subtitle = "\(membersCount) members"
@@ -654,9 +624,7 @@ class ChatLogController: UICollectionViewController {
     }
     
     @objc func goToActivity(message: Message) {
-        let dispatchGroup = DispatchGroup()
-        print("going to activity")
-        
+        let dispatchGroup = DispatchGroup()        
         if message.activityType == "recipe", let recipeString = message.activityTypeID, let recipeID = Int(recipeString) {
             dispatchGroup.enter()
             Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in

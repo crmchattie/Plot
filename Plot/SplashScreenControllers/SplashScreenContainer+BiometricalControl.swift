@@ -8,7 +8,6 @@
 
 import LocalAuthentication
 
-
 extension SplashScreenContainer {
     
     func showSecuredData() {
@@ -77,3 +76,4 @@ extension SplashScreenContainer {
         })
     }
 }
+

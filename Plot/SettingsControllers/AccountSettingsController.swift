@@ -18,7 +18,8 @@ class AccountSettingsController: UITableViewController {
     
     let accountSettingsCellId = "userProfileCell"
     
-    var firstSection = [( icon: UIImage(named: "Accounts") , title: "Financial Info" ), ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
+    var firstSection = [( icon: UIImage(named: "Accounts") , title: "Financial Info" ),
+//                        ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
                         ( icon: UIImage(named: "Privacy") , title: "Privacy and Security" ),
                         ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
                         ( icon: UIImage(named: "DataStorage") , title: "Data and Storage")]
@@ -326,19 +327,19 @@ extension AccountSettingsController {
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)
             }
-            if indexPath.row == 1 {
-                let destination = NotificationsTableViewController()
-                destination.hidesBottomBarWhenPushed = true
-                navigationController?.pushViewController(destination, animated: true)
-            }
+//            if indexPath.row == 1 {
+//                let destination = NotificationsTableViewController()
+//                destination.hidesBottomBarWhenPushed = true
+//                navigationController?.pushViewController(destination, animated: true)
+//            }
             
-            if indexPath.row == 2 {
+            if indexPath.row == 1 {
                 let destination = PrivacyTableViewController()
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)
             }
             
-            if indexPath.row == 3 {
+            if indexPath.row == 2 {
                 AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
                 let controller = ChangePhoneNumberController()
                 let destination = UINavigationController(rootViewController: controller)
@@ -349,7 +350,7 @@ extension AccountSettingsController {
                 present(destination, animated: true, completion: nil)
             }
             
-            if indexPath.row == 4 {
+            if indexPath.row == 3 {
                 let destination = StorageTableViewController()
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)
