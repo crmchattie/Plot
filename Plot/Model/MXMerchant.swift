@@ -22,7 +22,3 @@ struct MXMerchant: Codable, Equatable {
     let updated_at: String?
     let website_url: String?
 }
-
-func ==(lhs: MXMerchant, rhs: MXMerchant) -> Bool {
-    return lhs.guid == rhs.guid
-}

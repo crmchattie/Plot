@@ -15,15 +15,14 @@ extension NSNotification.Name {
 }
 
 class FinanceService {
+    let accountFetcher = FinancialAccountFetcher()
     let transactionFetcher = FinancialTransactionFetcher()
     let transactionRuleFetcher = FinancialTransactionRuleFetcher()
-    let accountFetcher = FinancialAccountFetcher()
+    let memberFetcher = FinancialMemberFetcher()
 
     var transactions = [Transaction]() {
         didSet {
-            print("didSet transactions")
             if oldValue != transactions {
-                print("oldValue != transactions")
                 NotificationCenter.default.post(name: .financeUpdated, object: nil)
             }
         }
@@ -58,6 +57,11 @@ class FinanceService {
     
     func grabFinances(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [unowned self] in
+            memberFetcher.fetchMembers { (firebaseMembers) in
+                self.members = firebaseMembers
+                self.observeMembersForCurrentUser()
+            }
+            
             accountFetcher.fetchAccounts { (firebaseAccounts) in
                 self.accounts = firebaseAccounts
                 self.observeAccountsForCurrentUser()
@@ -78,6 +82,7 @@ class FinanceService {
     
     func getMXData() {
         let dispatchGroup = DispatchGroup()
+        var updatedMembers = [MXMember]()
         var updatedAccounts = [MXAccount]()
         dispatchGroup.enter()
         self.getMXUser { user in
@@ -88,6 +93,7 @@ class FinanceService {
                 self.getMXMembers(guid: user.guid) { (members) in
                     for member in members {
                         dispatchGroup.enter()
+                        updatedMembers.append(member)
                         if let index = self.members.firstIndex(where: {$0.guid == member.guid}) {
                             self.members[index] = member
                         } else {
@@ -181,7 +187,7 @@ class FinanceService {
         }
         
         dispatchGroup.notify(queue: .main) {
-            self.updateFirebase(accounts: updatedAccounts, transactions: [])
+            self.updateFirebase(members: updatedMembers, accounts: updatedAccounts, transactions: [])
         }
     }
     
@@ -286,7 +292,7 @@ class FinanceService {
         dispatchGroup.leave()
         
         dispatchGroup.notify(queue: .main) {
-            self.updateFirebase(accounts: [], transactions: newTransactions)
+            self.updateFirebase(members: [], accounts: [], transactions: newTransactions)
         }
     }
     
@@ -451,6 +457,18 @@ class FinanceService {
         }
     }
     
+    func observeMembersForCurrentUser() {
+        self.memberFetcher.observeMemberForCurrentUser(membersAdded: { [weak self] membersAdded in
+            for member in membersAdded {
+                if let index = self!.members.firstIndex(where: {$0.guid == member.guid}) {
+                    self!.members[index] = member
+                } else {
+                    self!.members.append(member)
+                }
+            }
+        })
+    }
+    
     func observeAccountsForCurrentUser() {
         self.accountFetcher.observeAccountForCurrentUser(accountsAdded: { [weak self] accountsAdded in
             for account in accountsAdded {
@@ -540,11 +558,22 @@ class FinanceService {
         )
     }
     
-    private func updateFirebase(accounts: [MXAccount], transactions: [Transaction]) {
+    private func updateFirebase(members: [MXMember], accounts: [MXAccount], transactions: [Transaction]) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         let ref = Database.database().reference()
+        for member in members {
+            do {
+                // store account info
+                let value = try FirebaseEncoder().encode(member)
+                ref.child(financialMembersEntity).child(member.guid).setValue(value)
+                // store account balance at given date
+                ref.child(userFinancialMembersEntity).child(currentUserID).child(member.guid).child("name").setValue(member.name)
+            } catch let error {
+                print(error)
+            }
+        }
         for account in accounts {
             do {
                 var _account = account

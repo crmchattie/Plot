@@ -175,6 +175,7 @@
 		10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */; };
 		10D420AD24787AD500CBAFA7 /* ChecklistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */; };
 		10DA3A222465C74500E6B491 /* IngredientDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */; };
+		10DC5C4025AF35C600D52722 /* FinancialMemberFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DC5C3F25AF35C600D52722 /* FinancialMemberFetcher.swift */; };
 		10DE97352475737500D4A7E8 /* ListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97342475737500D4A7E8 /* ListCell.swift */; };
 		10DE97372475801400D4A7E8 /* ListCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */; };
 		10DE97392475837B00D4A7E8 /* ListContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97382475837B00D4A7E8 /* ListContainer.swift */; };
@@ -653,6 +654,7 @@
 		10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistFetcher.swift; sourceTree = "<group>"; };
 		10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistActions.swift; sourceTree = "<group>"; };
 		10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientDetailViewController.swift; sourceTree = "<group>"; };
+		10DC5C3F25AF35C600D52722 /* FinancialMemberFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialMemberFetcher.swift; sourceTree = "<group>"; };
 		10DE97342475737500D4A7E8 /* ListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCell.swift; sourceTree = "<group>"; };
 		10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListCell+ConfigureCell.swift"; sourceTree = "<group>"; };
 		10DE97382475837B00D4A7E8 /* ListContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListContainer.swift; sourceTree = "<group>"; };
@@ -1302,6 +1304,7 @@
 				10173605251924120073D283 /* FinancialAccountFetcher.swift */,
 				10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */,
 				1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */,
+				10DC5C3F25AF35C600D52722 /* FinancialMemberFetcher.swift */,
 				10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */,
 			);
 			path = Support;
@@ -2949,6 +2952,7 @@
 				10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */,
 				10737F8524912BDD00D146D6 /* Preview.swift in Sources */,
 				1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */,
+				10DC5C4025AF35C600D52722 /* FinancialMemberFetcher.swift in Sources */,
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,
 				4BAEE51421272D890045AB10 /* VoiceRecordingViewController.swift in Sources */,
 				1017D32F24F2B8E5001D7CBE /* MXMerchantLocation.swift in Sources */,

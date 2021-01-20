@@ -109,6 +109,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         return formatter
     }()
     
+    let selectedDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter
+    }()
+    
     fileprivate lazy var scopeGesture: UIPanGestureRecognizer = {
         [unowned self] in
         let panGesture = UIPanGestureRecognizer(target: activityView.calendar, action: #selector(activityView.calendar.handleScopeGesture(_:)))
@@ -129,11 +135,14 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     @objc fileprivate func handleDismiss(button: UIButton) {
         dismiss(animated: true, completion: nil)
     }
-            
+                
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        title = "Calendar"
+        
+        let dateString = dateFormatter.string(from: Date().localTime)
+        title = dateString
+
         
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
@@ -466,10 +475,14 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        let dateString = selectedDateFormatter.string(from: date)
+        title = dateString
         self.scrollToFirstActivityWithDate(date: date, animated: true)
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
+        let dateString = selectedDateFormatter.string(from: calendar.currentPage)
+        title = dateString
         self.scrollToFirstActivityWithDate(date: calendar.currentPage, animated: true)
     }
     

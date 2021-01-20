@@ -27,7 +27,3 @@ struct MXMerchantLocation: Codable, Equatable {
     let store_number: String?
     let street_address: String?
 }
-
-func ==(lhs: MXMerchantLocation, rhs: MXMerchantLocation) -> Bool {
-    return lhs.guid == rhs.guid
-}

@@ -36,7 +36,3 @@ struct MXHolding: Codable, Equatable, Hashable {
     let user_guid: String
     var participantsIDs: [String]?
 }
-
-func ==(lhs: MXHolding, rhs: MXHolding) -> Bool {
-    return lhs.guid == rhs.guid && lhs.member_guid == rhs.member_guid && lhs.user_guid == rhs.user_guid
-}

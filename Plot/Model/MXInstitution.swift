@@ -24,8 +24,3 @@ struct MXInstitution: Codable, Equatable {
     let url: String
     
 }
-
-func ==(lhs: MXInstitution, rhs: MXInstitution) -> Bool {
-    return lhs.code == rhs.code && lhs.name == rhs.name
-    
-}
