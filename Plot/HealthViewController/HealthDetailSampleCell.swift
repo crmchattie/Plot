@@ -175,5 +175,17 @@ class HealthDetailSampleCell: UITableViewCell {
                 subtitleLabel.text = string
             }
         }
+        else if case .sleep = healthMetric.type, let categorySample = sample as? HKCategorySample, let sleepValue = HKCategoryValueSleepAnalysis(rawValue: categorySample.value) {
+            switch sleepValue {
+            case .asleep:
+                subtitleLabel.text = "Asleep"
+            case .inBed:
+                subtitleLabel.text = "In Bed"
+            case .awake:
+                subtitleLabel.text = "Awake"
+            @unknown default:
+                print("unknown default")
+            }
+        }
     }
 }

@@ -129,10 +129,9 @@ class HealthDetailService: HealthDetailServiceInterface {
                     completion(stats, workouts, nil)
                 }
             }
-            
             else if case .sleep = healthMetricType {
                 HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
-                    let stats = self?.perpareCustomStatsForCategorySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
+                    let stats = self?.perpareCustomStatsForSleepSamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
                     completion(stats, samples, nil)
                 }
             }
@@ -307,24 +306,94 @@ class HealthDetailService: HealthDetailServiceInterface {
             }
         }
         else {
-            var startAt: Double = 86400
-            if case .sleep = type {
-                startAt = 43200
-            }
-            
-            // 12 hours = 43200 seconds
+            let startAt: Double = 86400
             var midDay = startDate.dayBefore.startOfDay.advanced(by: startAt)
             var interval = NSDateInterval(start: midDay, duration: 86400)
             var map: [Date: Double] = [:]
             var sum: Double = 0
             for sample in samples {
-                while !(interval.contains(sample.endDate)) && interval.endDate < endDate {
+                while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
                     midDay = midDay.advanced(by: 86400)
                     interval = NSDateInterval(start: midDay, duration: 86400)
                 }
                 
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
                 map[midDay, default: 0] += timeSum
+                sum += timeSum
+            }
+            
+            let sortedDates = Array(map.sorted(by: { $0.0 < $1.0 }))
+            
+            for item in sortedDates {
+                let hours = TimeInterval(item.value).totalHours
+                let stat = Statistic(date: item.key, value: hours)
+                customStats.append(stat)
+            }
+        }
+        
+        return customStats
+    }
+    
+    private func perpareCustomStatsForSleepSamples(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType, type: HealthMetricType) -> [Statistic]? {
+        var customStats: [Statistic] = []
+        
+        guard let samples = samples else {
+            return customStats
+        }
+        
+        var typeOfSleep: HKCategoryValueSleepAnalysis = .inBed
+        
+        if segmentType == .day {
+            let sleepValues = samples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
+            if sleepValues.contains(.asleep) {
+                typeOfSleep = .asleep
+            } else {
+                typeOfSleep = .inBed
+            }
+            for sample in samples {
+                if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value), sleepValue != typeOfSleep {
+                    continue
+                }
+                let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
+                let hours = TimeInterval(timeSum).totalHours
+                let stat = Statistic(date: sample.startDate, value: hours)
+                customStats.append(stat)
+            }
+        }
+        else {
+            let startAt: Double = 43200
+            var midDay = startDate.dayBefore.startOfDay.advanced(by: startAt)
+            var interval = NSDateInterval(start: midDay, duration: 86400)
+            var map: [Date: Double] = [:]
+            var sum: Double = 0
+            
+            let relevantSamples = samples.filter({interval.contains($0.endDate.localTime)})
+            let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
+            if sleepValues.contains(.asleep) {
+                typeOfSleep = .asleep
+            } else {
+                typeOfSleep = .inBed
+            }
+            
+            for sample in samples {
+                while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
+                    midDay = midDay.advanced(by: 86400)
+                    interval = NSDateInterval(start: midDay, duration: 86400)
+                    
+                    let relevantSamples = samples.filter({interval.contains($0.endDate.localTime)})
+                    let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
+                    if sleepValues.contains(.asleep) {
+                        typeOfSleep = .asleep
+                    } else {
+                        typeOfSleep = .inBed
+                    }
+                }
+                if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value), sleepValue != typeOfSleep {
+                    continue
+                }
+                
+                let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
+                map[midDay.advanced(by: 86400), default: 0] += timeSum
                 sum += timeSum
             }
             

@@ -285,7 +285,7 @@ class HealthKitService {
                                       endDate: Date,
                                       completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
     
-        guard let sleepType = HKObjectType.categoryType(forIdentifier: identifier) else {
+        guard let type = HKObjectType.categoryType(forIdentifier: identifier) else {
             completion(nil, nil)
             return
         }
@@ -294,7 +294,7 @@ class HealthKitService {
 
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
 
-        let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: 0, sortDescriptors: [sortDescriptor]) { (query, result, error) in
+        let query = HKSampleQuery(sampleType: type, predicate: predicate, limit: 0, sortDescriptors: [sortDescriptor]) { (query, result, error) in
             guard let result = result, error == nil else {
                 completion(nil, error)
                 return
