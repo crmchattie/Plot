@@ -333,7 +333,7 @@ class MasterActivityContainerController: UIViewController {
         accountLevel = .bs_type
         transactionLevel = .group
         
-        let setSections: [SectionType] = [.financialIssues, .balanceSheet, .incomeStatement]
+        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet]
         
         let members = networkController.financeService.members
         let accounts = networkController.financeService.accounts

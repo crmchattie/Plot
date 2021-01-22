@@ -96,6 +96,7 @@ class FinanceService {
                         updatedMembers.append(member)
                         if let index = self.members.firstIndex(where: {$0.guid == member.guid}) {
                             self.members[index] = member
+                            self.getInsitutionalDetails(institution_code: member.institution_code)
                         } else {
                             self.members.append(member)
                             self.getInsitutionalDetails(institution_code: member.institution_code)

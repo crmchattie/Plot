@@ -101,7 +101,6 @@ class FalconUsersFetcher: NSObject {
                             }
                             
                             self.users = self.sortUsers(users: self.users)
-//                            self.users = self.rearrangeUsers(users: self.users)
                             
                             //remove current user from users array
                             if let index = self.users.firstIndex(where: { (user) -> Bool in
@@ -112,22 +111,17 @@ class FalconUsersFetcher: NSObject {
                             
                             if asynchronously {
                                 self.delegate?.falconUsers(shouldBeUpdatedTo: self.users)
-                                //                                print("Updated delegate")
                             }
                             
                             if !asynchronously {
                                 self.group.leave()
-                                print("leaving group")
                             }
                         } else {
-                            print("Nothing found")
                         }
                     }) { (error) in
                         print(error.localizedDescription)
                     }
                 }
-            } else {
-                print("nothing found")
             }
         }, withCancel: { (error) in
             print(error.localizedDescription)
@@ -152,12 +146,10 @@ class FalconUsersFetcher: NSObject {
                 let nationalNumber = try phoneNumberKit.parse(number).nationalNumber
                 preparedNumbers.append("+" + String(countryCode) + String(nationalNumber))
                 group.enter()
-                print("entering group")
             } catch {}
         }
         
         group.notify(queue: DispatchQueue.main, execute: {
-            print("Contacts load finished Plot")
             self.delegate?.falconUsers(shouldBeUpdatedTo: self.users)
         })
         
@@ -252,15 +244,4 @@ class FalconUsersFetcher: NSObject {
     func sortUsers(users: [User]) -> [User] { /* Sort users by name  */
         return users.sorted { ($0.name! < $1.name!) }
     }
-    
-    
-    //  func sortUsers(users: [User]) -> [User] { /* Sort users by last online date  */
-    //    return users.sorted(by: { (user1, user2) -> Bool in
-    //      if let firstUserOnlineStatus = user1.onlineStatus as? TimeInterval , let secondUserOnlineStatus = user2.onlineStatus as? TimeInterval {
-    //        return (firstUserOnlineStatus, user1.phoneNumber ?? "") > ( secondUserOnlineStatus, user2.phoneNumber ?? "")
-    //      } else {
-    //        return ( user1.phoneNumber ?? "") > (user2.phoneNumber ?? "") // sort
-    //      }
-    //    })
-    //  }
 }

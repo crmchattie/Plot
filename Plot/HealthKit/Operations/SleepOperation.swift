@@ -30,6 +30,15 @@ class SleepOperation: AsyncOperation {
                 return
             }
             
+            var typeOfSleep: HKCategoryValueSleepAnalysis = .inBed
+            
+            let sleepValues = sleepSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
+            if sleepValues.contains(.asleep) {
+                typeOfSleep = .asleep
+            } else {
+                typeOfSleep = .inBed
+            }
+            
             // 12 hours = 43200 seconds
             var midDay = startDate.dayBefore.startOfDay.advanced(by: 43200)
             var interval = NSDateInterval(start: midDay, duration: 86400)
@@ -39,6 +48,16 @@ class SleepOperation: AsyncOperation {
                 while !(interval.contains(sample.endDate)) && interval.endDate < endDate {
                     midDay = midDay.advanced(by: 86400)
                     interval = NSDateInterval(start: midDay, duration: 86400)
+                    let relevantSamples = sleepSamples.filter({interval.contains($0.endDate.localTime)})
+                    let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
+                    if sleepValues.contains(.asleep) {
+                        typeOfSleep = .asleep
+                    } else {
+                        typeOfSleep = .inBed
+                    }
+                }
+                if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value), sleepValue != typeOfSleep {
+                    continue
                 }
                 
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)

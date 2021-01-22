@@ -175,7 +175,7 @@ class FinanceViewController: UIViewController {
         accountLevel = .none
         transactionLevel = .none
         
-        setSections = [.financialIssues, .balanceSheet, .financialAccounts, .incomeStatement, .transactions]
+        setSections = [.financialIssues, .incomeStatement, .balanceSheet, .financialAccounts, .transactions]
                 
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()

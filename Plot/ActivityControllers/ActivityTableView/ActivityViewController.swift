@@ -140,7 +140,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
         
-        let dateString = dateFormatter.string(from: Date().localTime)
+        let dateString = selectedDateFormatter.string(from: Date().localTime)
         title = dateString
 
         

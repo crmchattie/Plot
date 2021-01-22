@@ -192,8 +192,10 @@ class FinanceTransactionViewController: FormViewController {
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
                 if active {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
                     $0.value = transaction.description
                 } else {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
                     $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
@@ -207,6 +209,11 @@ class FinanceTransactionViewController: FormViewController {
                         let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("description")
                         reference.setValue(value)
                     }
+                }
+                if row.value == nil {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+                } else {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }
             

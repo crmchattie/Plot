@@ -93,6 +93,9 @@ class HealthDetailService: HealthDetailServiceInterface {
         let endDate = anchorDate.advanced(by: 86399)
                         
         if segmentType == .day {
+            if case .sleep = healthMetricType {
+                startDate = startDate.dayBefore.startOfDay.advanced(by: 83200)
+            }
             interval.hour = 1
         }
         else if segmentType == .week {

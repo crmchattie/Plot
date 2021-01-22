@@ -36,8 +36,6 @@ class ContactsController: UITableViewController {
     
     var activityObject: ActivityObject?
     
-    
-    //called only once when the controller loads the view - use for things you only need to load once, results in short freeze when first called in app (use progress bar?)
     override func viewDidLoad() {
         super.viewDidLoad()
         configureViewController()
@@ -68,9 +66,6 @@ class ContactsController: UITableViewController {
     }
     
     fileprivate func configureViewController() {
-        //      falconUsersFetcher.delegate = self
-        //      contactsFetcher.delegate = self
-        
         navigationItem.title = "New Chat"
         
         if #available(iOS 11.0, *) {
@@ -163,7 +158,6 @@ class ContactsController: UITableViewController {
         if section == 0 {
             return ""
         } else if section == 1 {
-            
             if filteredUsers.count == 0 {
                 return ""
             } else {

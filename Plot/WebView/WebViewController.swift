@@ -26,8 +26,11 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     override func loadView() {
         let webConfiguration = WKWebViewConfiguration()
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.uiDelegate = self
         webView.navigationDelegate = self
+        webView.isOpaque = false
+        webView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         view = webView
     }
     
@@ -36,14 +39,12 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        
-        print(urlString ?? "")
-        
+                
         title = controllerTitle
         
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.rightBarButtonItem = doneBarButton
-        
+                
         if let url = urlString, let myURL = URL(string: url) {
             let myRequest = URLRequest(url: myURL)
             webView.load(myRequest)

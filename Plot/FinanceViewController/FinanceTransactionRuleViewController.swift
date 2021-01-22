@@ -82,7 +82,7 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     fileprivate func initializeForm() {
         form +++
-            Section(header: nil, footer: "Set-up a rule to automatically rename, categorize and/or ignore certain transactions based on the name and/or equal a certain amount")
+            Section(header: nil, footer: "Set-up a rule to automatically rename, categorize and/or ignore certain transactions based on the name and/or amount")
             
             <<< TextRow("Transaction name contains") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
