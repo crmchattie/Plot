@@ -42,9 +42,12 @@ class ScheduleViewController: FormViewController {
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupMainView()
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
         
         if schedule != nil {
+            title = "Activity"
             active = true
             if schedule.activityID != nil {
                 scheduleID = schedule.activityID!
@@ -66,10 +69,12 @@ class ScheduleViewController: FormViewController {
                 checklist = schedule.checklist!
             }
         } else {
+            title = "New Activity"
             scheduleID = UUID().uuidString
             schedule = Activity(dictionary: ["activityID": scheduleID as AnyObject])
         }
-            
+        
+        setupMainView()
         initializeForm()
         
     }
@@ -78,30 +83,34 @@ class ScheduleViewController: FormViewController {
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
         }
-        navigationItem.title = "New Mini Activity"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         
-        let dotsImage = UIImage(named: "dots")
-        if #available(iOS 11.0, *) {
+        if !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
-            
-            let dotsBarButton = UIButton(type: .system)
-            dotsBarButton.setImage(dotsImage, for: .normal)
-            dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-                            
-            navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
+            navigationItem.rightBarButtonItem = plusBarButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
         } else {
-            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
-            let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-            navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
+            if let localName = schedule.locationName, localName != "locationName" {
+                let dotsImage = UIImage(named: "dots")
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
+                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
+            } else {
+                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
+                navigationItem.rightBarButtonItem = plusBarButton
+            }
+            navigationItem.rightBarButtonItem?.isEnabled = true
         }
-        navigationItem.rightBarButtonItem?.isEnabled = true
         
-        
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     fileprivate func initializeForm() {
@@ -109,7 +118,7 @@ class ScheduleViewController: FormViewController {
         form +++
             Section()
         
-            <<< TextRow("Mini Activity Name") {
+            <<< TextRow("Activity Name") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -120,6 +129,7 @@ class ScheduleViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     $0.cell.textField.becomeFirstResponder()
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
                 }
                 }.onChange() { [unowned self] row in
                     if row.value == nil {
@@ -135,7 +145,7 @@ class ScheduleViewController: FormViewController {
                     row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-            <<< TextRow("Mini Activity Type") {
+            <<< TextRow("Activity Type") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -324,7 +334,7 @@ class ScheduleViewController: FormViewController {
                     row.value = schedule.startTimeZone ?? "UTC"
                 } else {
                     row.value = TimeZone.current.identifier
-                    schedule.endTimeZone = TimeZone.current.identifier
+                    schedule.startTimeZone = TimeZone.current.identifier
                 }
                 }.onCellSelection({ _,_ in
                     self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
@@ -605,7 +615,12 @@ class ScheduleViewController: FormViewController {
         schedule.participantsIDs = membersIDs.0
 
         delegate?.updateSchedule(schedule: schedule)
-        self.navigationController?.backToViewController(viewController: CreateActivityViewController.self)
+        
+        if active {
+            self.navigationController?.popViewController(animated: true)
+        } else {
+            self.dismiss(animated: true, completion: nil)
+        }
         
     }
     

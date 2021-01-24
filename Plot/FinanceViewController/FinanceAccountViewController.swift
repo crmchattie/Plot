@@ -48,6 +48,7 @@ class FinanceAccountViewController: FormViewController {
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
         
         if let _ = account {
+            title = "Account"
             active = true
             numberFormatter.currencyCode = account.currency_code
             
@@ -69,6 +70,7 @@ class FinanceAccountViewController: FormViewController {
             }
             
         } else if let currentUser = Auth.auth().currentUser?.uid {
+            title = "New Account"
             let ID = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
             account = MXAccount(name: "Account Name", balance: 0.0, created_at: date, guid: ID, user_guid: currentUser, type: .any, subtype: .any, user_created: true, admin: currentUser)
@@ -96,11 +98,20 @@ class FinanceAccountViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Account"
         
-        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-        navigationItem.rightBarButtonItem = addBarButton
-        
+        if active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
+        } else {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
+        }
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func create(_ sender: AnyObject) {
@@ -110,20 +121,12 @@ class FinanceAccountViewController: FormViewController {
             createAccount.createNewAccount()
             self.hideActivityIndicator()
             
-            if active {
-                self.delegate?.updateAccount(account: account)
-                self.navigationController?.popViewController(animated: true)
-            } else {
-                self.tabBarController?.selectedIndex = 1
-                if #available(iOS 13.0, *) {
-                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-                } else {
-                    // Fallback on earlier versions
-                }
-            }
-        } else {
+        }
+        if active {
             self.delegate?.updateAccount(account: account)
             self.navigationController?.popViewController(animated: true)
+        } else {
+            self.dismiss(animated: true, completion: nil)
         }
     }
     
@@ -199,6 +202,9 @@ class FinanceAccountViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                if !(self.account?.user_created ?? false) {
+                    row.cell.accessoryType = .none
+                }
             }.onChange { row in
                 if let value = row.value, let type = MXAccountType(rawValue: value) {
                     self.account.type = type
@@ -235,6 +241,9 @@ class FinanceAccountViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                if !(self.account?.user_created ?? false) {
+                    row.cell.accessoryType = .none
+                }
             }.onChange { row in
                 if let value = row.value, let subtype = MXAccountSubType(rawValue: value) {
                     self.account.subtype = subtype

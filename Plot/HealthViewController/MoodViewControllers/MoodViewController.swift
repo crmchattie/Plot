@@ -27,7 +27,6 @@ class MoodViewController: FormViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
         
-        title = "Mood"
         setupVariables()
         configureTableView()
         initializeForm()
@@ -36,6 +35,7 @@ class MoodViewController: FormViewController {
     
     fileprivate func setupVariables() {
         if mood == nil, let currentUser = Auth.auth().currentUser?.uid {
+            title = "New Mood"
             active = false
             let ID = Database.database().reference().child(userMoodsEntity).child(currentUser).childByAutoId().key ?? ""
             let original = Date()
@@ -45,6 +45,8 @@ class MoodViewController: FormViewController {
             let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
             let date = rounded.addingTimeInterval(seconds)
             mood = Mood(id: ID, mood: nil, applicableTo: .specificTime, moodDate: date, lastModifiedDate: date, createdDate: date)
+        } else {
+            title = "Mood"
         }
     }
     
@@ -58,9 +60,20 @@ class MoodViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-        navigationItem.rightBarButtonItem = addBarButton
+        if active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
+        } else {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
+        }
         navigationItem.rightBarButtonItem?.isEnabled = active
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func create(_ sender: AnyObject) {
@@ -69,18 +82,10 @@ class MoodViewController: FormViewController {
             let createMood = MoodActions(mood: mood, active: active, currentUser: currentUser)
             createMood.createNewMood()
             self.hideActivityIndicator()
-            
             if active {
                 self.navigationController?.popViewController(animated: true)
             } else {
-//                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-//                if nav.topViewController is MasterActivityContainerController {
-//                    let homeTab = nav.topViewController as! MasterActivityContainerController
-//                    homeTab.customSegmented.setIndex(index: 2)
-//                    homeTab.changeToIndex(index: 2)
-//                }
-                self.tabBarController?.selectedIndex = 1
-                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }

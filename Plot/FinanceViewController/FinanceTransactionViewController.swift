@@ -66,7 +66,7 @@ class FinanceTransactionViewController: FormViewController {
             }
         } else if !(transaction?.user_created ?? false) {
             for row in form.rows {
-                if row.tag == "Financial Account" {
+                if row.tag == "Account" || row.tag == "Date" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -81,6 +81,7 @@ class FinanceTransactionViewController: FormViewController {
     
     fileprivate func setupVariables() {
         if let _ = transaction {
+            title = "Transaction"
             active = true
             numberFormatter.currencyCode = transaction.currency_code
             
@@ -107,6 +108,7 @@ class FinanceTransactionViewController: FormViewController {
                 transaction.admin = currentUser
             }
         } else if let currentUser = Auth.auth().currentUser?.uid {
+            title = "New Transaction"
             let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
             transaction = Transaction(description: "Transaction Name", amount: 0.0, created_at: date, guid: ID, user_guid: currentUser, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: currentUser)
@@ -120,7 +122,7 @@ class FinanceTransactionViewController: FormViewController {
             self.accounts.sort { (account1, account2) -> Bool in
                 return account1.name < account2.name
             }
-            if let row: PushRow<String> = self.form.rowBy(tag: "Financial Account") {
+            if let row: PushRow<String> = self.form.rowBy(tag: "Account") {
                 self.accounts.forEach {
                     row.options?.append($0.name.capitalized)
                 }
@@ -144,17 +146,22 @@ class FinanceTransactionViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Transaction"
         
         if !active {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
         } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             let dotsBarButton = UIBarButtonItem(image: UIImage(named: "dots"), style: .plain, target: self, action: #selector(goToExtras))
             navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
         }
         
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func create(_ sender: AnyObject) {
@@ -164,21 +171,12 @@ class FinanceTransactionViewController: FormViewController {
             let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createTransaction.createNewTransaction()
             self.hideActivityIndicator()
-            
-            if active {
-                self.delegate?.updateTransaction(transaction: transaction)
-                self.navigationController?.popViewController(animated: true)
-            } else {
-                self.tabBarController?.selectedIndex = 1
-                if #available(iOS 13.0, *) {
-                    self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-                } else {
-                    // Fallback on earlier versions
-                }
-            }
-        } else {
+        }
+        if active {
             self.delegate?.updateTransaction(transaction: transaction)
             self.navigationController?.popViewController(animated: true)
+        } else {
+            self.dismiss(animated: true, completion: nil)
         }
     }
     
@@ -235,17 +233,21 @@ class FinanceTransactionViewController: FormViewController {
 //                    reference.setValue(row.value)
 //                }
             
-            <<< TextRow("Date") {
-                $0.cell.isUserInteractionEnabled = false
+            <<< DateInlineRow("Date") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 if let date = isodateFormatter.date(from: transaction.transacted_at) {
-                    $0.value = dateFormatterPrint.string(from: date)
+                    $0.value = date
                 }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }.onChange { row in
+                if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
+                    let date = self.isodateFormatter.string(from: value)
+                    self.transaction.transacted_at = date
+                    let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("transacted_at")
+                    reference.setValue(date)
+                }
             }
             
             <<< DateInlineRow("Financial Profile Date") {
@@ -364,13 +366,12 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }
             
-            <<< PushRow<String>("Financial Account") { row in
+            <<< PushRow<String>("Account") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.title = row.tag
                 if let value = transaction.account_name {
-                    print("not nil as well")
                     row.value = value
                 }
                 row.options = []
@@ -379,7 +380,7 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }.onPresent { from, to in
                 to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Financial Accounts"
+                    to.title = "Accounts"
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -390,6 +391,9 @@ class FinanceTransactionViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                if !(self.transaction?.user_created ?? false) {
+                    row.cell.accessoryType = .none
+                }
             }.onChange({ row in
                 if let currentUser = Auth.auth().currentUser?.uid {
                     self.transaction.account_name = row.value
@@ -502,8 +506,7 @@ class FinanceTransactionViewController: FormViewController {
     func createRule() {
         let destination = FinanceTransactionRuleViewController()
         destination.transaction = transaction
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     @objc fileprivate func openLevel(level: String, value: String) {

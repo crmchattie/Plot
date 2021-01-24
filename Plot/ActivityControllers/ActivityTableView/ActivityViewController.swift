@@ -219,10 +219,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         view.addSubview(activityView)
         
         activityView.translatesAutoresizingMaskIntoConstraints = false
-        activityView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        activityView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        activityView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        activityView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        activityView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        activityView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        activityView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        activityView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
         activityView.arrowButton.addTarget(self, action: #selector(arrowButtonTapped), for: .touchUpInside)
         
@@ -262,8 +262,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func newItem() {
-        self.tabBarController?.selectedIndex = 0
-        self.navigationController?.popViewController(animated: true)
+        let destination = CreateActivityViewController()
+        destination.users = self.networkController.userService.users
+        destination.filteredUsers = self.networkController.userService.users
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     @objc fileprivate func search() {

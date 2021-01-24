@@ -135,8 +135,8 @@ class FinanceViewController: UIViewController {
         view.addSubview(customSegmented)
         view.addSubview(collectionView)
 
-        customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
+        customSegmented.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         navigationItem.rightBarButtonItem = newItemBarButton
@@ -145,8 +145,43 @@ class FinanceViewController: UIViewController {
     }
     
     @objc fileprivate func newItem() {
-        self.tabBarController?.selectedIndex = 0
-        self.navigationController?.popViewController(animated: true)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+        alert.addAction(UIAlertAction(title: "Transaction", style: .default, handler: { (_) in
+            let destination = FinanceTransactionViewController()
+            destination.users = self.networkController.userService.users
+            destination.filteredUsers = self.networkController.userService.users
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Account", style: .default, handler: { (_) in
+            print("User click Edit button")
+            if let mxUser = self.networkController.financeService.mxUser {
+                self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+            } else {
+                self.networkController.financeService.getMXUser { (mxUser) in
+                    if let mxUser = self.networkController.financeService.mxUser {
+                        self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+                    }
+                }
+            }
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Transaction Rule", style: .default, handler: { (_) in
+            print("User click Edit button")
+            let destination = FinanceTransactionRuleViewController()
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     func openMXConnect(guid: String, current_member_guid: String?) {
@@ -166,7 +201,6 @@ class FinanceViewController: UIViewController {
     }
     
     private func updateCollectionView() {
-        print("updateCollectionView")
         guard currentReachabilityStatus != .notReachable else {
             return
         }

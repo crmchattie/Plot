@@ -30,6 +30,10 @@ class FinanceTransactionRuleViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
+        
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
         setupVariables()
         configureTableView()
@@ -38,10 +42,13 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     fileprivate func setupVariables() {
         if transactionRule == nil, let currentUser = Auth.auth().currentUser?.uid {
+            title = "New Transaction Rule"
             active = false
             let ID = Database.database().reference().child(userFinancialTransactionRulesEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
-            transactionRule = TransactionRule(created_at: date, guid: ID, match_description: "", description: nil, updated_at: date, user_guid: nil, category: nil, top_level_category: nil, group: nil, amount: nil, should_link: true)
+            transactionRule = TransactionRule(created_at: date, guid: ID, match_description: "", description: nil, updated_at: date, user_guid: nil, category: "Uncategorized", top_level_category: "Uncategorized", group: "Uncategorized", amount: nil, should_link: true)
+        } else {
+            title = "Transaction Rule"
         }
     }
     
@@ -54,10 +61,12 @@ class FinanceTransactionRuleViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Transaction Rule"
         
-        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-        navigationItem.leftBarButtonItem = cancelBarButton
+        if !active {
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
+        }
+        
         let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
         navigationItem.rightBarButtonItem = addBarButton
         
@@ -76,8 +85,12 @@ class FinanceTransactionRuleViewController: FormViewController {
             } catch let error {
                 print(error)
             }
+            if active {
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                self.dismiss(animated: true, completion: nil)
+            }
         }
-        self.dismiss(animated: true, completion: nil)
     }
     
     fileprivate func initializeForm() {
@@ -86,7 +99,7 @@ class FinanceTransactionRuleViewController: FormViewController {
             
             <<< TextRow("Transaction name contains") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 if transactionRule.match_description != "" {
                     $0.value = transactionRule.match_description
@@ -101,7 +114,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange() { [unowned self] row in
                 if row.value == nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -113,21 +126,21 @@ class FinanceTransactionRuleViewController: FormViewController {
             
             <<< TextRow("Update transaction name to") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 if let description = transactionRule.description {
                     $0.value = description
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange() { [unowned self] row in
                 self.transactionRule.description = row.value
             }
             
             <<< DecimalRow("Transaction amount equals") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 if let amount = transactionRule.amount {
                     $0.value = amount
@@ -137,7 +150,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange() { [unowned self] row in
                 self.transactionRule.amount = row.value
             }
@@ -146,7 +159,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.tintColor = FalconPalette.defaultBlue
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.cell.accessoryType = .checkmark
                 if let should_link = transactionRule.should_link {
                     $0.title = "Included in Financial Profile"
@@ -164,7 +177,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.tintColor = FalconPalette.defaultBlue
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
                 row.updateCell()
@@ -174,7 +187,7 @@ class FinanceTransactionRuleViewController: FormViewController {
             <<< LabelRow("Group") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
                 if let string = transactionRule.group {
@@ -189,13 +202,13 @@ class FinanceTransactionRuleViewController: FormViewController {
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
         
             <<< LabelRow("Category") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
                 if let string = transactionRule.top_level_category {
@@ -210,13 +223,13 @@ class FinanceTransactionRuleViewController: FormViewController {
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
         
             <<< LabelRow("Subcategory") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
                 if let string = transactionRule.top_level_category {
@@ -231,7 +244,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
     }
     

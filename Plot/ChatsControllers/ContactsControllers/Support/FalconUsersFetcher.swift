@@ -137,7 +137,6 @@ class FalconUsersFetcher: NSObject {
     }
     
     fileprivate func fetchSynchronously() {
-        
         var preparedNumbers = [String]()
         for number in localPhones {
             do {
@@ -169,7 +168,6 @@ class FalconUsersFetcher: NSObject {
                 let nationalNumber = try phoneNumberKit.parse(number).nationalNumber
                 //update number format
                 preparedNumber = "+" + String(countryCode) + String(nationalNumber)
-                //        print("Prepared Number: \(preparedNumber)")
             } catch {}
             
             fetchAndObserveFalconUser(for: preparedNumber, asynchronously: true)
@@ -178,12 +176,11 @@ class FalconUsersFetcher: NSObject {
     
     //need to redo fetchAndObserveFalconUser: fetch once and create user friendship node
     fileprivate func fetchAndObserveFalconUser(for preparedNumber: String, asynchronously: Bool) {
-        
+//        print("Prepared Number: \(preparedNumber)")
         //create reference to database + reference + child("users"); just a url
         reference = Database.database().reference()
         //create query that grabs a user's phone number
         reference.child("users").queryOrdered(byChild: "phoneNumber").queryEqual(toValue: preparedNumber).observeSingleEvent(of: .childAdded, with: { (snapshot) in
-            
             //if phone number(s) exists in collection of user phone numbers
             //need to create friendship collection
             if snapshot.exists() {
@@ -192,12 +189,11 @@ class FalconUsersFetcher: NSObject {
                 
                 self.reference.child("relationships").child(self.userID!).child(snapshot.key).setValue("true")
                 
-                
                 dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
                 if let thumbnailURLString = User(dictionary: dictionary).thumbnailPhotoURL, let thumbnailURL = URL(string: thumbnailURLString) {
                     SDWebImagePrefetcher.shared.prefetchURLs([thumbnailURL])
                 }
-                
+                                
                 //add user to self.users unless user already was added, then update user's dictionary - will continuously add current user since current user is removed below
                 if let index = self.users.firstIndex(where: { (user) -> Bool in
                     return user.id == User(dictionary: dictionary).id
@@ -242,6 +238,6 @@ class FalconUsersFetcher: NSObject {
     }
     
     func sortUsers(users: [User]) -> [User] { /* Sort users by name  */
-        return users.sorted { ($0.name! < $1.name!) }
+        return users.sorted { ($0.name ?? "" < $1.name ?? "") }
     }
 }

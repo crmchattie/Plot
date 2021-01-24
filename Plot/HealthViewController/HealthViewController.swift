@@ -104,8 +104,39 @@ class HealthViewController: UIViewController {
     }
     
     @objc fileprivate func newItem() {
-        self.tabBarController?.selectedIndex = 0
-        self.navigationController?.popViewController(animated: true)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+        alert.addAction(UIAlertAction(title: "Meal", style: .default, handler: { (_) in
+            let destination = MealViewController()
+            destination.users = self.networkController.userService.users
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Workout", style: .default, handler: { (_) in
+            let destination = WorkoutViewController()
+            destination.users = self.networkController.userService.users
+            destination.filteredUsers = self.networkController.userService.users
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Mindfulness", style: .default, handler: { (_) in
+            let destination = MindfulnessViewController()
+            destination.hidesBottomBarWhenPushed = true
+            destination.users = self.networkController.userService.users
+            destination.filteredUsers = self.networkController.userService.users
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     func openMetric(metric: HealthMetric) {

@@ -17,6 +17,7 @@ class NotificationsViewController: UIViewController {
 
     var segmentedControl: UISegmentedControl!
     var invitedActivities: [Activity] = []
+    var filteredInvitedActivities: [Activity] = []
     var notificationActivities: [Activity] = []
     var listList = [ListContainer]()
     var chatLogController: ChatLogController? = nil
@@ -100,15 +101,16 @@ class NotificationsViewController: UIViewController {
         view.addSubview(tableView)
         tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
         tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(userNotification(notification:)), name: .userNotification, object: nil)
-        
+                
         addObservers()
+        
+//        sortInvitedActivities()
                 
     }
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(userNotification(notification:)), name: .userNotification, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -126,11 +128,12 @@ class NotificationsViewController: UIViewController {
     
     func sortInvitedActivities() {
         var invitationValues = Array(invitations.values)
+        invitationValues = invitationValues.filter { ($0.status == .pending)}
         invitationValues.sort { (invitation1, invitation2) -> Bool in
             return invitation1.dateInvited > invitation2.dateInvited
         }
         let invitationActivityIDs = invitationValues.map({ $0.activityID})
-        invitedActivities = invitedActivities.sorted { invitationActivityIDs.firstIndex(of: $0.activityID ?? "") ?? 0 < invitationActivityIDs.firstIndex(of: $1.activityID ?? "") ?? 0 }
+        filteredInvitedActivities = invitedActivities.filter({ invitationActivityIDs.contains($0.activityID ?? "") })
         tableView.reloadData()
     }
     
@@ -173,7 +176,11 @@ class NotificationsViewController: UIViewController {
             viewPlaceholder.remove(from: tableView, priority: .medium)
             return
         }
-        viewPlaceholder.add(for: tableView, title: .emptyInvitedActivities, subtitle: .emptyInvitedActivities, priority: .medium, position: .top)
+        if invitedActivities.isEmpty {
+            viewPlaceholder.add(for: tableView, title: .emptyInvitedActivities, subtitle: .emptyInvitedActivities, priority: .medium, position: .top)
+        } else {
+            viewPlaceholder.add(for: tableView, title: .emptyFilteredInvitedActivities, subtitle: .emptyFilteredInvitedActivities, priority: .medium, position: .top)
+        }
     }
     
     func checkIfThereAnyNotifications(isEmpty: Bool) {
@@ -195,12 +202,12 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if segmentedControl.selectedSegmentIndex == 0 {
-            if invitedActivities.isEmpty {
+            if filteredInvitedActivities.isEmpty {
                 checkIfThereAnyActivities(isEmpty: true)
             } else {
                 checkIfThereAnyActivities(isEmpty: false)
             }
-            return invitedActivities.count
+            return filteredInvitedActivities.count
         } else {
             if notifications.isEmpty {
                 checkIfThereAnyNotifications(isEmpty: true)
@@ -220,7 +227,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
                 activityCell.updateInvitationDelegate = self
                 activityCell.activityViewControllerDataStore = self
                 
-                let activity = invitedActivities[indexPath.row]
+                let activity = filteredInvitedActivities[indexPath.row]
                 var invitation: Invitation?
                 if let activityID = activity.activityID, let value = invitations[activityID] {
                     invitation = value
@@ -267,7 +274,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if segmentedControl.selectedSegmentIndex == 0 {
-            let activity = invitedActivities[indexPath.row]
+            let activity = filteredInvitedActivities[indexPath.row]
             openActivityDetailView(forActivity: activity)
         } else {
             let notification = notifications[indexPath.row]

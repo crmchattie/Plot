@@ -41,12 +41,14 @@ class MindfulnessViewController: FormViewController {
         numberFormatter.numberStyle = .decimal
         
         if mindfulness == nil {
+            title = "New Mindfulness"
             active = false
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).childByAutoId().key ?? ""
                 mindfulness = Mindfulness(id: ID, name: nil, startDateTime: nil, endDateTime: nil, lastModifiedDate: Date(), createdDate: Date())
             }
         } else {
+            title = "Mindfulness"
             var participantCount = self.selectedFalconUsers.count
             
             // If user is creating this activity (admin)
@@ -84,12 +86,22 @@ class MindfulnessViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Mindfulness"
     }
     
     func setupRightBarButton() {
-        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-        navigationItem.rightBarButtonItem = plusBarButton
+        if active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = addBarButton
+        } else {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = addBarButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
+        }
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc fileprivate func close() {
@@ -152,13 +164,8 @@ class MindfulnessViewController: FormViewController {
             let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createMindfulness.createNewMindfulness()
             self.hideActivityIndicator()
-            
-            self.tabBarController?.selectedIndex = 1
-            if #available(iOS 13.0, *) {
-                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-            } else {
-                // Fallback on earlier versions
-            }
+            self.dismiss(animated: true, completion: nil)
+
         }
     }
     

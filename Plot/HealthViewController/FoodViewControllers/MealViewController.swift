@@ -46,6 +46,7 @@ class MealViewController: FormViewController {
         configureTableView()
         
         if meal != nil {
+            title = "Meal"
             active = true
             
             var participantCount = self.selectedFalconUsers.count
@@ -66,6 +67,7 @@ class MealViewController: FormViewController {
                 inviteesRow.updateCell()
             }
         } else {
+            title = "New Meal"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userMealsEntity).child(currentUserID).childByAutoId().key ?? ""
                 meal = Meal(id: ID, name: "MealName", admin: currentUserID)
@@ -86,12 +88,22 @@ class MealViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Meal"
     }
     
     func setupRightBarButton() {
-        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-        navigationItem.rightBarButtonItem = plusBarButton
+        if active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = addBarButton
+        } else {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = addBarButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
+        }
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc fileprivate func close() {
@@ -106,7 +118,6 @@ class MealViewController: FormViewController {
                 let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createMeal.createNewMeal()
                 self.hideActivityIndicator()
-
                 self.navigationController?.popViewController(animated: true)
                 
             }))
@@ -156,19 +167,7 @@ class MealViewController: FormViewController {
             let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createMeal.createNewMeal()
             self.hideActivityIndicator()
-            
-//            let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-//            if nav.topViewController is MasterActivityContainerController {
-//                let homeTab = nav.topViewController as! MasterActivityContainerController
-//                homeTab.customSegmented.setIndex(index: 2)
-//                homeTab.changeToIndex(index: 2)
-//            }
-            self.tabBarController?.selectedIndex = 1
-            if #available(iOS 13.0, *) {
-                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-            } else {
-                // Fallback on earlier versions
-            }
+            self.dismiss(animated: true, completion: nil)
         }
     }
     

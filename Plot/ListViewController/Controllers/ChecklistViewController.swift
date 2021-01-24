@@ -501,8 +501,10 @@ class ChecklistViewController: FormViewController {
             $0.placeholder = $0.tag
             if active, let checklist = checklist {
                 $0.value = checklist.name
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 $0.cell.textField.becomeFirstResponder()
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
             }.onChange() { [unowned self] row in
                 if let rowValue = row.value {

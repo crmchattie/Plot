@@ -44,6 +44,8 @@ class WorkoutViewController: FormViewController {
         numberFormatter.numberStyle = .decimal
         
         if workout != nil {
+            title = "Workout"
+
             active = true
             
             var participantCount = self.selectedFalconUsers.count
@@ -64,6 +66,7 @@ class WorkoutViewController: FormViewController {
                 inviteesRow.updateCell()
             }
         } else {
+            title = "New Workout"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
                 workout = Workout(id: ID, name: "WorkoutName", admin: currentUserID)
@@ -85,12 +88,22 @@ class WorkoutViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Workout"
     }
     
     func setupRightBarButton() {
-        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-        navigationItem.rightBarButtonItem = plusBarButton
+        if active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = addBarButton
+        } else {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = addBarButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
+        }
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc fileprivate func close() {
@@ -151,15 +164,9 @@ class WorkoutViewController: FormViewController {
             self.showActivityIndicator()
             workoutActions = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             workoutActions?.createNewWorkout()
-            
             self.hideActivityIndicator()
-            
-            self.tabBarController?.selectedIndex = 1
-            if #available(iOS 13.0, *) {
-                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
-            } else {
-                // Fallback on earlier versions
-            }
+            self.dismiss(animated: true, completion: nil)
+
         }
         
     }

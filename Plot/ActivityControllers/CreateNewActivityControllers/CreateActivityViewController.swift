@@ -79,6 +79,7 @@ class CreateActivityViewController: FormViewController {
         setupMainView()
         
         if activity != nil {
+            title = "Event"
             active = true
             if activity.activityID != nil {
                 activityID = activity.activityID!
@@ -104,6 +105,7 @@ class CreateActivityViewController: FormViewController {
             setupRightBarButton(with: "Update")
             resetBadgeForSelf()
         } else {
+            title = "New Event"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
                 activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
@@ -171,7 +173,6 @@ class CreateActivityViewController: FormViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
         
-        navigationItem.title = "Event"
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -187,21 +188,13 @@ class CreateActivityViewController: FormViewController {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
             navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = false
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
         } else {
             let dotsImage = UIImage(named: "dots")
-            if #available(iOS 11.0, *) {
-                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
-                
-                let dotsBarButton = UIButton(type: .system)
-                dotsBarButton.setImage(dotsImage, for: .normal)
-                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-                                
-                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
-            } else {
-                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
-                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-            }
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
+            let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+            navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
     }
@@ -545,7 +538,7 @@ class CreateActivityViewController: FormViewController {
                     row.value = activity.startTimeZone ?? "UTC"
                 } else {
                     row.value = TimeZone.current.identifier
-                    activity.endTimeZone = TimeZone.current.identifier
+                    activity.startTimeZone = TimeZone.current.identifier
                 }
                 }.onCellSelection({ _,_ in
                     self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
@@ -747,7 +740,7 @@ class CreateActivityViewController: FormViewController {
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                        $0.title = "Add Event"
+                                        $0.title = "Add Activity"
                                         }.cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                             cell.textLabel?.textAlignment = .left
@@ -777,14 +770,14 @@ class CreateActivityViewController: FormViewController {
 
     form +++
         MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                           header: "Lists",
-                           footer: "Add a checklist, activity list and/or recipe list") {
+                           header: "Checklists",
+                           footer: "Add a checklist") {
                             $0.tag = "listsfields"
                             $0.hidden = "$sections != 'Lists'"
                             $0.addButtonProvider = { section in
                                 return ButtonRow(){
                                     $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                                    $0.title = "Add List"
+                                    $0.title = "Add Checklist"
                                     }.cellUpdate { cell, row in
                                         cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                                         cell.textLabel?.textAlignment = .left
@@ -1724,16 +1717,23 @@ class CreateActivityViewController: FormViewController {
             }
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Event", style: .default, handler: { (_) in
-                let destination = ActivityTypeViewController()
+            alert.addAction(UIAlertAction(title: "New Activity", style: .default, handler: { (_) in
+                if let _: LabelRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+                let destination = ScheduleViewController()
                 destination.users = self.acceptedParticipant
                 destination.filteredUsers = self.acceptedParticipant
-                destination.umbrellaActivity = self.activity
-                destination.schedule = true
                 destination.delegate = self
-                self.navigationController?.pushViewController(destination, animated: true)
+                destination.startDateTime = self.startDateTime
+                destination.endDateTime = self.endDateTime
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
             }))
-            alert.addAction(UIAlertAction(title: "Existing Event", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
+                if let _: LabelRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
                 let destination = ChooseActivityTableViewController()
                 destination.needDelegate = true
                 destination.movingBackwards = true
@@ -1741,8 +1741,8 @@ class CreateActivityViewController: FormViewController {
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
                 destination.activity = self.activity
-                let navController = UINavigationController(rootViewController: destination)
-                self.present(navController, animated: true, completion: nil)
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let _: LabelRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
@@ -1777,15 +1777,16 @@ class CreateActivityViewController: FormViewController {
                 destination.movingBackwards = true
                 destination.users = self.purchaseUsers
                 destination.filteredUsers = self.purchaseUsers
-                self.navigationController?.pushViewController(destination, animated: true)
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
                 let destination = ChooseTransactionTableViewController()
                 destination.delegate = self
                 destination.movingBackwards = true
                 destination.existingTransactions = self.purchaseList
-                let navController = UINavigationController(rootViewController: destination)
-                self.present(navController, animated: true, completion: nil)
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
@@ -1825,69 +1826,14 @@ class CreateActivityViewController: FormViewController {
             }
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New List", style: .default, handler: { (_) in
-                let alertController = UIAlertController(title: "Type of List", message: nil, preferredStyle: .alert)
-                let groceryList = UIAlertAction(title: "Grocery List", style: .default) { (action:UIAlertAction) in
-                    self.grocerylistIndex = self.listIndex
-                    let destination = GrocerylistViewController()
-                    destination.delegate = self
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
-//                let packingList = UIAlertAction(title: "Packing List", style: .default) { (action:UIAlertAction) in
-//                    let destination = PackinglistViewController()
-//                    destination.delegate = self
-//                    
-//                }
-                let checkList = UIAlertAction(title: "Checklist", style: .default) { (action:UIAlertAction) in
-                    let destination = ChecklistViewController()
-                    destination.delegate = self
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
-                let activityList = UIAlertAction(title: "Activity List", style: .default) { (action:UIAlertAction) in
-                    let destination = ActivitylistViewController()
-                    destination.delegate = self
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
-                let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
-                    print("You've pressed cancel")
-                    if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
-                        print("listsfields")
-                        mvs.remove(at: self.listIndex)
-                    }
-                }
-                
-                if self.activity.grocerylistID == nil {
-                    alertController.addAction(groceryList)
-                    alertController.addAction(activityList)
-    //                alertController.addAction(packingList)
-                    alertController.addAction(checkList)
-                    alertController.addAction(cancelAlert)
-                    self.present(alertController, animated: true, completion: nil)
-                } else {
-                    alertController.addAction(activityList)
-    //                alertController.addAction(packingList)
-                    alertController.addAction(checkList)
-                    alertController.addAction(cancelAlert)
-                    self.present(alertController, animated: true, completion: nil)
-                }
-            }))
-            alert.addAction(UIAlertAction(title: "Existing List", style: .default, handler: { (_) in
-                let destination = ChooseListTableViewController()
-                destination.delegate = self
-                destination.needDelegate = true
-                destination.movingBackwards = true
-                destination.grocerylistExists = self.grocerylistIndex != -1
-                let navController = UINavigationController(rootViewController: destination)
-                self.present(navController, animated: true, completion: nil)
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
-                    mvs.remove(at: self.purchaseIndex)
-                }
-            }))
-            self.present(alert, animated: true)
+            let destination = ChecklistViewController()
+            destination.delegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
         }
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc func createNewActivity() {
@@ -1932,14 +1878,7 @@ class CreateActivityViewController: FormViewController {
             if active {
                 self.navigationController?.popViewController(animated: true)
             } else {
-//                let nav = self.tabBarController!.viewControllers![1] as! UINavigationController
-//                if nav.topViewController is MasterActivityContainerController {
-//                    let homeTab = nav.topViewController as! MasterActivityContainerController
-//                    homeTab.customSegmented.setIndex(index: 1)
-//                    homeTab.changeToIndex(index: 1)
-//                }
-                self.tabBarController?.selectedIndex = 1
-                self.navigationController?.backToViewController(viewController: DiscoverViewController.self)
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }
@@ -2166,12 +2105,8 @@ class CreateActivityViewController: FormViewController {
             let createActivity = ActivityActions(activity: newActivity, active: !self.active, selectedFalconUsers: [])
             createActivity.createNewActivity()
             self.hideActivityIndicator()
-
-            if self.conversation == nil {
-                self.navigationController?.backToViewController(viewController: ActivityViewController.self)
-            } else {
-               self.navigationController?.backToViewController(viewController: ChatLogController.self)
-            }
+            self.navigationController?.popViewController(animated: true)
+            
         }
     }
     
@@ -2198,7 +2133,6 @@ class CreateActivityViewController: FormViewController {
     }
     
     fileprivate func updateGrocerylist(recipe: Recipe, add: Bool) {
-        print("updating grocery list")
         if self.activity.grocerylistID != nil, let grocerylist = listList[grocerylistIndex].grocerylist, grocerylist.ingredients != nil, let recipeIngredients = recipe.extendedIngredients {
             var glIngredients = grocerylist.ingredients!
             if let grocerylistServings = grocerylist.servings!["\(recipe.id)"], grocerylistServings != recipe.servings {
@@ -2491,9 +2425,6 @@ extension CreateActivityViewController: UpdateTimeZoneDelegate {
 
 extension CreateActivityViewController: UpdateScheduleDelegate {
     func updateSchedule(schedule: Activity) {
-        if let _: LabelRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
-            mvs.remove(at: mvs.count - 2)
-        }
         if let _ = schedule.name {
             if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
                 let scheduleRow = mvs.allRows[scheduleIndex]
@@ -2523,7 +2454,6 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
                     locationAddress[key] = value
                 }
             }
-            setupRightBarButton(with: "Update")
             updateLists(type: "schedule")
         }
     }
@@ -2602,7 +2532,6 @@ extension CreateActivityViewController: ChooseActivityDelegate {
                     locationAddress[key] = value
                 }
             }
-            setupRightBarButton(with: "Update")
             updateLists(type: "schedule")
         }
     }
