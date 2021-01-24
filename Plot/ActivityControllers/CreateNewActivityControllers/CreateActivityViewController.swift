@@ -806,7 +806,7 @@ class CreateActivityViewController: FormViewController {
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Transactions",
-                               footer: "Add a transaction that can be split among participants") {
+                               footer: "Add a transaction") {
                                 $0.tag = "purchasefields"
                                 $0.hidden = "$sections != 'Transactions'"
                                 $0.addButtonProvider = { section in
@@ -833,12 +833,12 @@ class CreateActivityViewController: FormViewController {
                                 }
             }
 
-                                form +++
-                                    Section(header: "Balances",
-                                            footer: "Positive Balance = Owe; Negative Balance = Owed") {
-                                                $0.tag = "Balances"
-                                                $0.hidden = "$sections != 'Transactions'"
-                                }
+//                                form +++
+//                                    Section(header: "Balances",
+//                                            footer: "Positive Balance = Owe; Negative Balance = Owed") {
+//                                                $0.tag = "Balances"
+//                                                $0.hidden = "$sections != 'Transactions'"
+//                                }
     }
     
     func decimalRowFunc() {
@@ -1027,7 +1027,7 @@ class CreateActivityViewController: FormViewController {
             } else if rowType is PurchaseRow {
                 if self!.purchaseList.indices.contains(self!.purchaseIndex) {
                     self!.purchaseList.remove(at: rowNumber)
-                    self!.purchaseBreakdown()
+//                    self!.purchaseBreakdown()
                 }
                 self!.updateLists(type: "purchases")
             } else if rowType is ButtonRow {
@@ -1123,8 +1123,8 @@ class CreateActivityViewController: FormViewController {
         
         dispatchGroup.notify(queue: .main) {
             self.listRow()
-            self.decimalRowFunc()
-            self.purchaseBreakdown()
+//            self.decimalRowFunc()
+//            self.purchaseBreakdown()
         }
     }
     
@@ -2425,6 +2425,7 @@ extension CreateActivityViewController: UpdateTimeZoneDelegate {
 
 extension CreateActivityViewController: UpdateScheduleDelegate {
     func updateSchedule(schedule: Activity) {
+        print("schedule \(schedule.name)")
         if let _ = schedule.name {
             if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
                 let scheduleRow = mvs.allRows[scheduleIndex]
@@ -2554,7 +2555,7 @@ extension CreateActivityViewController: UpdateTransactionDelegate {
             else {
                 mvs.remove(at: purchaseIndex)
             }
-            purchaseBreakdown()
+//            purchaseBreakdown()
         }
     }
 }
@@ -2577,7 +2578,7 @@ extension CreateActivityViewController: ChooseTransactionDelegate {
             else {
                 mvs.remove(at: purchaseIndex)
             }
-            purchaseBreakdown()
+//            purchaseBreakdown()
         }
     }
 }

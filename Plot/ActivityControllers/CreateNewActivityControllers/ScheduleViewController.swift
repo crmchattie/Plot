@@ -133,10 +133,9 @@ class ScheduleViewController: FormViewController {
                 }
                 }.onChange() { [unowned self] row in
                     if row.value == nil {
-                        self.navigationItem.title = "New Mini Activity"
+                        self.navigationItem.title = "New Activity"
                         self.navigationItem.rightBarButtonItem?.isEnabled = false
                     } else {
-                        self.navigationItem.title = row.value
                         self.navigationItem.rightBarButtonItem?.isEnabled = true
                     }
                 }.cellUpdate { cell, row in
@@ -585,9 +584,9 @@ class ScheduleViewController: FormViewController {
         
         schedule.activityID = scheduleID
 
-        schedule.name = valuesDictionary["Mini Activity Name"] as? String
+        schedule.name = valuesDictionary["Activity Name"] as? String
 
-        if let value = valuesDictionary["Mini Activity Type"] as? String {
+        if let value = valuesDictionary["Activity Type"] as? String {
             schedule.activityType = value
         }
         
