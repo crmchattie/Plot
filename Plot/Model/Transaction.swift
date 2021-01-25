@@ -886,7 +886,7 @@ func updateTransactionWRule(transaction: Transaction, transactionRules: [Transac
                 _transaction.group = rule.group ?? "Uncategorized"
                 _transaction.top_level_category = rule.top_level_category ?? "Uncategorized"
                 _transaction.category = rule.category ?? "Uncategorized"
-            } else {
+            } else if rule.amount == nil {
                 if rule.description != nil {
                     _transaction.description = rule.description!
                 }

@@ -125,7 +125,6 @@ class ScheduleViewController: FormViewController {
                 $0.placeholder = $0.tag
                 if self.active {
                     $0.value = self.schedule.name
-                    self.navigationItem.title = $0.value
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     $0.cell.textField.becomeFirstResponder()
@@ -133,7 +132,6 @@ class ScheduleViewController: FormViewController {
                 }
                 }.onChange() { [unowned self] row in
                     if row.value == nil {
-                        self.navigationItem.title = "New Activity"
                         self.navigationItem.rightBarButtonItem?.isEnabled = false
                     } else {
                         self.navigationItem.rightBarButtonItem?.isEnabled = true
