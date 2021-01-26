@@ -188,7 +188,6 @@ class ActivityActions: NSObject {
     }
 
     func createGroupActivityNode(reference: DatabaseReference, childValues: [String: Any]) {
-        print("child values \(childValues)")
         let nodeCreationGroup = DispatchGroup()
         nodeCreationGroup.enter()
         nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {

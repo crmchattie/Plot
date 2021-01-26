@@ -70,7 +70,10 @@ class EventKitManager {
         
         isRunning = true
         
-        let activitiesOp = PlotActivityOp(eventKitService: eventKitService, activities: activities)
+        //filter old activities out
+        let filterActivities = activities.filter { $0.startDate ?? Date() > Date() }
+        
+        let activitiesOp = PlotActivityOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue
         queue.addOperations([activitiesOp], waitUntilFinished: false)
         

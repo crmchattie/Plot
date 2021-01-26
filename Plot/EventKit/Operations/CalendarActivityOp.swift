@@ -38,7 +38,7 @@ class CalendarActivityOp: AsyncOperation {
                         self?.finish()
                         return
                     }
-                    
+                                        
                     self?.update(activity: activity)
                     let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in

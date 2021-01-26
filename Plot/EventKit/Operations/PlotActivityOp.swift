@@ -28,7 +28,6 @@ class PlotActivityOp: AsyncOperation {
             self.finish()
             return
         }
-        
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? [String: [String:String]] {
@@ -39,10 +38,10 @@ class PlotActivityOp: AsyncOperation {
                     dispatchGroup.enter()
                     if let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
                         if let event = self?.eventKitService.storeEvent(for: activity) {
-//                            let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-//                            reference.child(event.calendarItemIdentifier).updateChildValues(calendarEventActivityValue) { (_, _) in
+                            let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                            reference.child(event.calendarItemIdentifier).updateChildValues(calendarEventActivityValue) { (_, _) in
                                 dispatchGroup.leave()
-//                            }
+                            }
                         } else {
                             dispatchGroup.leave()
                         }
