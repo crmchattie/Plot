@@ -100,6 +100,7 @@ class MasterActivityContainerController: UIViewController {
         setNavBar()
         addObservers()
         delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
+        setApplicationBadge()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -252,15 +253,7 @@ class MasterActivityContainerController: UIViewController {
     }
     
     func setApplicationBadge() {
-        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
         var badge = 0
-        
-        for tab in 0...tabItems.count - 1 {
-            guard let tabItem = tabItems[tab] as? UITabBarItem else { return }
-            if let tabBadge = tabItem.badgeValue?.toInt() {
-                badge += tabBadge
-            }
-        }
         UIApplication.shared.applicationIconBadgeNumber = badge
         if let uid = Auth.auth().currentUser?.uid {
             let ref = Database.database().reference().child("users").child(uid)
@@ -476,9 +469,9 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             if !sortedActivities.isEmpty && networkController.activityService.askedforAuthorization {
                 for activity in sortedActivities {
                     if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
-                        height = CGFloat(sortedActivities.count * 170)
+                        height += 170
                     } else {
-                        height = CGFloat(sortedActivities.count * 132)
+                        height += 132
                     }
                 }
             } else {
