@@ -77,12 +77,12 @@ class EventKitManager {
 
         // Create the end date components.
         var timeFromNowComponents = DateComponents()
-        timeFromNowComponents.month = 6
+        timeFromNowComponents.month = 3
         let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
 
         //filter old activities out
         let filterActivities = activities.filter { $0.startDate ?? Date() > timeAgo && $0.startDate ?? Date() < timeFromNow }
-        
+                
         let activitiesOp = PlotActivityOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue
         queue.addOperations([activitiesOp], waitUntilFinished: false)
