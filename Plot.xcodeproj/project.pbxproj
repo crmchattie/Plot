@@ -54,6 +54,7 @@
 		1031410F230D712E00DB471B /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1031410D230D712E00DB471B /* MainInterface.storyboard */; };
 		10314113230D712E00DB471B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 10314109230D712E00DB471B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
+		1034A01325BF8015006D3DB8 /* PlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */; };
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
 		1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103946892549FD4B005CED3A /* FoodProductContainer.swift */; };
 		103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */; };
@@ -532,6 +533,7 @@
 		1031410E230D712E00DB471B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		10314110230D712E00DB471B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		10323D5D2479A58500749706 /* GrocerylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistActions.swift; sourceTree = "<group>"; };
+		1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotActivityOp.swift; sourceTree = "<group>"; };
 		10367D42230B126800D25885 /* ActivityImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityImageCell.swift; sourceTree = "<group>"; };
 		103946892549FD4B005CED3A /* FoodProductContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodProductContainer.swift; sourceTree = "<group>"; };
 		103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionLevelViewController.swift; sourceTree = "<group>"; };
@@ -1387,6 +1389,7 @@
 				26036773256DBBAD00FE9142 /* FetchCalendarEventsOp.swift */,
 				26036777256DC76800FE9142 /* SyncCalendarEventsOp.swift */,
 				2603677D256DC86300FE9142 /* CalendarActivityOp.swift */,
+				1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -2944,6 +2947,7 @@
 				1011466925A8E6C5007B51AF /* TimeZoneFinderViewController.swift in Sources */,
 				1092F2362414501D00E8CE16 /* RecipeDetailViewController.swift in Sources */,
 				265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */,
+				1034A01325BF8015006D3DB8 /* PlotActivityOp.swift in Sources */,
 				10F3033224EC700C00C04B8F /* Transaction.swift in Sources */,
 				10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */,
 				106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */,

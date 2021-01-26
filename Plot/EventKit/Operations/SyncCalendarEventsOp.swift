@@ -7,7 +7,6 @@
 //
 
 import EventKit
-import EventKit
 
 class SyncCalendarEventsOp: AsyncOperation {
     

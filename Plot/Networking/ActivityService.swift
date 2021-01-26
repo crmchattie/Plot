@@ -56,8 +56,10 @@ class ActivityService {
                     self?.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
                         self?.askedforAuthorization = askedforAuthorization
                         self?.eventKitManager.syncEventKitActivities {
-                            self?.observeActivitiesForCurrentUser()
-                            self?.observeInvitationForCurrentUser()
+                            self?.eventKitManager.syncActivitiesToEventKit(activities: activities, completion: {
+                                self?.observeActivitiesForCurrentUser()
+                                self?.observeInvitationForCurrentUser()
+                            })
                         }
                     })
                 }

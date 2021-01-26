@@ -129,7 +129,7 @@ class HealthDetailSampleCell: UITableViewCell {
         }
         else if case .heartRate = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
             let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-            let count = quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit)
+            let count = String(format: "%.1f", quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit))
             let string = "\(count) bpm"
             if let text = titleLabel.text, text.isEmpty {
                 titleLabel.text = string

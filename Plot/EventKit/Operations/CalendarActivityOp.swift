@@ -21,7 +21,6 @@ class CalendarActivityOp: AsyncOperation {
     
     override func main() {
         startRequest()
-        //deleteActivity()
     }
     
     private func startRequest() {

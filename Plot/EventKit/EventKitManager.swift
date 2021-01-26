@@ -61,4 +61,28 @@ class EventKitManager {
             completion()
         }
     }
+    
+    func syncActivitiesToEventKit(activities: [Activity], completion: @escaping () -> Void)  {
+        guard !isRunning, isAuthorized else {
+            completion()
+            return
+        }
+        
+        isRunning = true
+        
+        let activitiesOp = PlotActivityOp(eventKitService: eventKitService, activities: activities)
+        // Setup queue
+        queue.addOperations([activitiesOp], waitUntilFinished: false)
+        
+        // Once everything is fetched call the completion block
+        queue.addBarrierBlock { [weak self] in
+            guard let weakSelf = self else {
+                completion()
+                return
+            }
+            
+            weakSelf.isRunning = false
+            completion()
+        }
+    }
 }
