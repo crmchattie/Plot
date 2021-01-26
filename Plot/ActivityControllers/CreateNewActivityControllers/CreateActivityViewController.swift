@@ -216,7 +216,6 @@ class CreateActivityViewController: FormViewController {
                     cell.height = { return CGFloat(44) }
                     
                     row.title = "Cover Photo"
-                    cell.titleLabel?.textAlignment = .left
                     cell.titleLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
 //                    //  Construct the view for the cell
@@ -242,7 +241,7 @@ class CreateActivityViewController: FormViewController {
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             }
             
-            <<< TextRow("Activity Name") {
+            <<< TextRow("Event Name") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor

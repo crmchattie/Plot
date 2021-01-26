@@ -106,6 +106,7 @@ class MasterActivityContainerController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         managePresense()
+        collectionView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -223,37 +224,8 @@ class MasterActivityContainerController: UIViewController {
         
     }
     
-    func configureTabBarBadge() {
-//        guard let tabItems = tabBarController?.tabBar.items as NSArray? else { return }
-//        guard let tabItem = tabItems[Tabs.home.rawValue] as? UITabBarItem else { return }
-//        guard !listList.isEmpty, !activities.isEmpty, !conversations.isEmpty, let uid = Auth.auth().currentUser?.uid else { return }
-//        var badge = 0
-//        
-//        for activity in activities {
-//            guard let activityBadge = activity.badge else { continue }
-//            badge += activityBadge
-//        }
-//        
-//        for conversation in conversations {
-//            guard let lastMessage = conversation.lastMessage, let conversationBadge = conversation.badge, lastMessage.fromId != uid  else { continue }
-//            badge += conversationBadge
-//        }
-//        
-//        for list in listList {
-//            badge += list.badge
-//        }
-//        
-//        guard badge > 0 else {
-//            tabItem.badgeValue = nil
-//            setApplicationBadge()
-//            return
-//        }
-//        tabItem.badgeValue = badge.toString()
-//        setApplicationBadge()
-    }
-    
     func setApplicationBadge() {
-        var badge = 0
+        let badge = 0
         UIApplication.shared.applicationIconBadgeNumber = badge
         if let uid = Auth.auth().currentUser?.uid {
             let ref = Database.database().reference().child("users").child(uid)
