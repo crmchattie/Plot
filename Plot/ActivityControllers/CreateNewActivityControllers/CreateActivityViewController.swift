@@ -203,43 +203,43 @@ class CreateActivityViewController: FormViewController {
         form +++
             Section()
             
-            <<< ViewRow<UIImageView>("Activity Image")
-                .cellSetup { (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-
-                    //  Make the image view occupy the entire row:
-                    cell.viewRightMargin = 0.0
-                    cell.viewLeftMargin = 0.0
-                    cell.viewTopMargin = 0.0
-                    cell.viewBottomMargin = 0.0
-                    
-                    cell.height = { return CGFloat(44) }
-                    
-                    row.title = "Cover Photo"
-                    cell.titleLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    
-//                    //  Construct the view for the cell
-                    cell.view = UIImageView()
-                    cell.view!.contentMode = .scaleAspectFill //.scaleAspectFit
-                    cell.view!.clipsToBounds = true
-                    cell.contentView.addSubview(cell.view!)
-                    
-                    if self.active && self.activity.activityOriginalPhotoURL != "" && self.activity.activityOriginalPhotoURL != nil {
-                        cell.height = { return CGFloat(300) }
-                        row.title = nil
-                        cell.view!.sd_setImage(with: URL(string:self.activity.activityOriginalPhotoURL!), placeholderImage: nil, options: [.continueInBackground, .scaleDownLargeImages], completed: { (image, error, cacheType, url) in
-                        })
-                        self.activityAvatarURL = self.activity.activityOriginalPhotoURL!
-                        self.thumbnailImage = self.activity.activityThumbnailPhotoURL!
-
-                    } else {
-                        self.activityAvatarURL = ""
-                    }
-                }.onCellSelection { ViewCell, ViewRow in
-                    self.openActivityPicture()
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            }
+//            <<< ViewRow<UIImageView>("Activity Image")
+//                .cellSetup { (cell, row) in
+//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//
+//                    //  Make the image view occupy the entire row:
+//                    cell.viewRightMargin = 0.0
+//                    cell.viewLeftMargin = 0.0
+//                    cell.viewTopMargin = 0.0
+//                    cell.viewBottomMargin = 0.0
+//                    
+//                    cell.height = { return CGFloat(44) }
+//                    
+//                    row.title = "Cover Photo"
+//                    cell.titleLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    
+////                    //  Construct the view for the cell
+//                    cell.view = UIImageView()
+//                    cell.view!.contentMode = .scaleAspectFill //.scaleAspectFit
+//                    cell.view!.clipsToBounds = true
+//                    cell.contentView.addSubview(cell.view!)
+//                    
+//                    if self.active && self.activity.activityOriginalPhotoURL != "" && self.activity.activityOriginalPhotoURL != nil {
+//                        cell.height = { return CGFloat(300) }
+//                        row.title = nil
+//                        cell.view!.sd_setImage(with: URL(string:self.activity.activityOriginalPhotoURL!), placeholderImage: nil, options: [.continueInBackground, .scaleDownLargeImages], completed: { (image, error, cacheType, url) in
+//                        })
+//                        self.activityAvatarURL = self.activity.activityOriginalPhotoURL!
+//                        self.thumbnailImage = self.activity.activityThumbnailPhotoURL!
+//
+//                    } else {
+//                        self.activityAvatarURL = ""
+//                    }
+//                }.onCellSelection { ViewCell, ViewRow in
+//                    self.openActivityPicture()
+//                }.cellUpdate { cell, row in
+//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//            }
             
             <<< TextRow("Event Name") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
