@@ -351,9 +351,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
         
-        activityView.tableView.reloadDataWithCompletion() {
-            self.scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
-        }
+//        activityView.tableView.reloadDataWithCompletion() {
+//            self.scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
+//        }
+        
+        self.scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
         
         if allActivities.count == 0 {
             checkIfThereAnyActivities(isEmpty: true)
@@ -583,9 +585,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
         }
-        
         return cell
-    
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

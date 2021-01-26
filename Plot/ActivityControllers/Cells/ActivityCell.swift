@@ -276,12 +276,8 @@ class ActivityCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        activityImageView.image = nil
-        activityImageView.sd_cancelCurrentImageLoad()
         nameLabel.text = nil
         startLabel.text = nil
-//        activityTypeLabel.text = nil
-//        activityAddressLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         newActivityIndicator.isHidden = true

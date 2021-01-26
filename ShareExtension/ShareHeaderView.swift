@@ -306,7 +306,6 @@ class ActivityCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        activityImageView.image = nil
         nameLabel.text = ""
         startLabel.text = ""
 //        activityTypeLabel.text = ""

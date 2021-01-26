@@ -94,7 +94,7 @@ extension ActivityCell {
         
         let isActivityMuted = activity.muted != nil && activity.muted!
         let activityName = activity.name
-        
+                
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
                 
@@ -171,7 +171,7 @@ extension ActivityCell {
             newActivityIndicator.isHidden = true
             badgeLabel.isHidden = true
         }
-                
+        
         loadParticipantsThumbnail(activity: activity)
         
         if activity.locationAddress == nil {
