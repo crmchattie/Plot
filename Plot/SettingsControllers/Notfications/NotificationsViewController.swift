@@ -66,8 +66,8 @@ class NotificationsViewController: UIViewController {
         view.backgroundColor = theme.generalBackgroundColor
         
         let segmentTextContent = [
-            invitationsText,
             notificationsText,
+            invitationsText
         ]
         
         // Segmented control as the custom title view.
@@ -138,7 +138,7 @@ class NotificationsViewController: UIViewController {
     }
     
     @objc func userNotification(notification: NSNotification) {
-         if segmentedControl.selectedSegmentIndex == 1 {
+         if segmentedControl.selectedSegmentIndex == 0 {
              self.tableView.reloadData()
          }
     }
@@ -159,9 +159,9 @@ class NotificationsViewController: UIViewController {
     /// IBAction for the segmented control.
     @IBAction func action(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
-            self.title = invitationsText
-        } else {
             self.title = notificationsText
+        } else {
+            self.title = invitationsText
         }
         
         self.tableView.reloadData()
@@ -202,41 +202,24 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if segmentedControl.selectedSegmentIndex == 0 {
-            if filteredInvitedActivities.isEmpty {
-                checkIfThereAnyActivities(isEmpty: true)
-            } else {
-                checkIfThereAnyActivities(isEmpty: false)
-            }
-            return filteredInvitedActivities.count
-        } else {
             if notifications.isEmpty {
                 checkIfThereAnyNotifications(isEmpty: true)
             } else {
                 checkIfThereAnyNotifications(isEmpty: false)
             }
             return notifications.count
+        } else {
+            if filteredInvitedActivities.isEmpty {
+                checkIfThereAnyActivities(isEmpty: true)
+            } else {
+                checkIfThereAnyActivities(isEmpty: false)
+            }
+            return filteredInvitedActivities.count
         }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if segmentedControl.selectedSegmentIndex == 0 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath)
-            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            if let activityCell = cell as? ActivityCell {
-                activityCell.delegate = self
-                activityCell.updateInvitationDelegate = self
-                activityCell.activityViewControllerDataStore = self
-                
-                let activity = filteredInvitedActivities[indexPath.row]
-                var invitation: Invitation?
-                if let activityID = activity.activityID, let value = invitations[activityID] {
-                    invitation = value
-                }
-                activityCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
-            }
-            
-            return cell
-        } else {
             let theme = ThemeManager.currentTheme()
             let cell = tableView.dequeueReusableCell(withIdentifier: notificationCellID, for: indexPath)
             let notification = notifications[indexPath.row]
@@ -268,15 +251,28 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
                 cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 36, height: 30)
             }
             return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath)
+            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            if let activityCell = cell as? ActivityCell {
+                activityCell.delegate = self
+                activityCell.updateInvitationDelegate = self
+                activityCell.activityViewControllerDataStore = self
+                
+                let activity = filteredInvitedActivities[indexPath.row]
+                var invitation: Invitation?
+                if let activityID = activity.activityID, let value = invitations[activityID] {
+                    invitation = value
+                }
+                activityCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+            }
+            return cell
         }
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if segmentedControl.selectedSegmentIndex == 0 {
-            let activity = filteredInvitedActivities[indexPath.row]
-            openActivityDetailView(forActivity: activity)
-        } else {
             let notification = notifications[indexPath.row]
             if notification.aps.category == Identifiers.chatCategory {
                 if let chatID = notification.chatID, let chat = conversations.first(where: { (chat) -> Bool in
@@ -337,6 +333,10 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
                     }
                 }
             }
+        } else {
+            let activity = filteredInvitedActivities[indexPath.row]
+            openActivityDetailView(forActivity: activity)
+            
         }
     }
     
@@ -353,7 +353,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     @objc func notificationButtonTapped(_ sender: UIButton) {
-        if segmentedControl.selectedSegmentIndex == 1 {
+        if segmentedControl.selectedSegmentIndex == 0 {
             if sender.tag >= 0 && sender.tag < notifications.count {
                 let notification = notifications[sender.tag]
                 if notification.aps.category == Identifiers.chatCategory {

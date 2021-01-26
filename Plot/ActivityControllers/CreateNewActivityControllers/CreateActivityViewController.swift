@@ -216,7 +216,7 @@ class CreateActivityViewController: FormViewController {
                     cell.height = { return CGFloat(44) }
                     
                     row.title = "Cover Photo"
-                    cell.titleLeftMargin = 15.0
+                    cell.titleLabel?.textAlignment = .left
                     cell.titleLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
 //                    //  Construct the view for the cell
@@ -264,33 +264,6 @@ class CreateActivityViewController: FormViewController {
                     cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
-            
-//            <<< TextAreaRow("Activity Name") {
-//            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//            $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//            $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//            $0.placeholder = $0.tag
-//            $0.textAreaHeight = .dynamic(initialTextViewHeight: 200)
-//            if self.active {
-//                $0.value = self.activity.name
-//                self.navigationItem.rightBarButtonItem?.isEnabled = true
-//            } else {
-//                $0.cell.textView.becomeFirstResponder()
-//            }
-//            }.cellUpdate({ (cell, row) in
-//                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//                cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//            }).onChange() { [unowned self] row in
-//                self.activity.name = row.value
-//                if row.value == nil {
-//                    self.navigationItem.rightBarButtonItem?.isEnabled = false
-//                } else {
-//                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-//                }
-//            }
             
             <<< TextRow("Type") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -2425,7 +2398,6 @@ extension CreateActivityViewController: UpdateTimeZoneDelegate {
 
 extension CreateActivityViewController: UpdateScheduleDelegate {
     func updateSchedule(schedule: Activity) {
-        print("schedule \(schedule.name)")
         if let _ = schedule.name {
             if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
                 let scheduleRow = mvs.allRows[scheduleIndex]
