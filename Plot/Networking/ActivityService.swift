@@ -55,12 +55,12 @@ class ActivityService {
                 if let _ = Auth.auth().currentUser {
                     self?.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
                         self?.askedforAuthorization = askedforAuthorization
-                        self?.eventKitManager.syncEventKitActivities {
+                        self?.eventKitManager.syncEventKitActivities(existingActivities: activities, completion: {
                             self?.eventKitManager.syncActivitiesToEventKit(activities: activities, completion: {
                                 self?.observeActivitiesForCurrentUser()
                                 self?.observeInvitationForCurrentUser()
                             })
-                        }
+                        })
                     })
                 }
                 completion()

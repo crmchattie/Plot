@@ -30,7 +30,7 @@ class EventKitManager {
         }
     }
     
-    func syncEventKitActivities(_ completion: @escaping () -> Void) {
+    func syncEventKitActivities(existingActivities: [Activity], completion: @escaping () -> Void) {
         guard !isRunning, isAuthorized else {
             completion()
             return
@@ -40,7 +40,7 @@ class EventKitManager {
         isRunning = true
         
         let eventsOp = FetchCalendarEventsOp(eventKitService: eventKitService)
-        let syncEventsOp = SyncCalendarEventsOp()
+        let syncEventsOp = SyncCalendarEventsOp(existingActivities: existingActivities)
         let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
             syncEventsOp.events = eventsOp.events
         }
