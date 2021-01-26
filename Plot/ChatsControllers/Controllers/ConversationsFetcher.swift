@@ -181,17 +181,19 @@ class ConversationsFetcher: NSObject {
                 var otherUserID: String!
                 if let membersIDs = metaInfo.chatParticipantsIDs, let index = membersIDs.firstIndex(of: currentUserID) {
                     otherUserID = membersIDs[membersIDs.count - index - 1]
+                    if otherUserID != nil {
+                        let userDataReference = Database.database().reference().child("users").child(otherUserID)
+                        userDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                            guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
+                            dictionary.updateValue(chatID as AnyObject, forKey: "id")
+                            
+                            let user = User(dictionary: dictionary)
+                            conversation.chatName = user.name
+                            conversation.chatPhotoURL = user.photoURL
+                            conversation.chatThumbnailPhotoURL = user.thumbnailPhotoURL
+                        })
+                    }
                 }
-                let userDataReference = Database.database().reference().child("users").child(otherUserID)
-                userDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    dictionary.updateValue(chatID as AnyObject, forKey: "id")
-                    
-                    let user = User(dictionary: dictionary)
-                    conversation.chatName = user.name
-                    conversation.chatPhotoURL = user.photoURL
-                    conversation.chatThumbnailPhotoURL = user.thumbnailPhotoURL
-                })
             }
             conversation.chatParticipantsIDs =  metaInfo.chatParticipantsIDs
             conversation.isGroupChat = metaInfo.isGroupChat
