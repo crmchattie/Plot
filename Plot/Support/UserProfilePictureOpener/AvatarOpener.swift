@@ -186,13 +186,15 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
   }
   
   private func presentGallery() {
-    picker = UIImagePickerController()
-    picker.delegate = self
-    picker.allowsEditing = false
-    picker.sourceType = .photoLibrary
-    picker.modalPresentationStyle = .overFullScreen
-    picker.modalPresentationCapturesStatusBarAppearance = true
-    parentController?.present(picker, animated: true, completion: nil)
+    DispatchQueue.main.async {
+        self.picker = UIImagePickerController()
+        self.picker.delegate = self
+        self.picker.allowsEditing = false
+        self.picker.sourceType = .photoLibrary
+        self.picker.modalPresentationStyle = .overFullScreen
+        self.picker.modalPresentationCapturesStatusBarAppearance = true
+        self.parentController?.present(self.picker, animated: true, completion: nil)
+    }
   }
   
   private func presentCamera() {
@@ -201,13 +203,15 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
       basicErrorAlertWith(title: basicErrorTitleForAlert, message: cameraNotExistsMessage, controller: controller)
       return
     }
-    picker = UIImagePickerController()
-    picker.delegate = self
-    picker.sourceType = .camera
-    picker.allowsEditing = false
-    picker.modalPresentationStyle = .overFullScreen
-    picker.modalPresentationCapturesStatusBarAppearance = true
-    parentController?.present(picker, animated: true, completion: nil)
+    DispatchQueue.main.async {
+        self.picker = UIImagePickerController()
+        self.picker.delegate = self
+        self.picker.sourceType = .camera
+        self.picker.allowsEditing = false
+        self.picker.modalPresentationStyle = .overFullScreen
+        self.picker.modalPresentationCapturesStatusBarAppearance = true
+        self.parentController?.present(self.picker, animated: true, completion: nil)
+    }
   }
 
 	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
