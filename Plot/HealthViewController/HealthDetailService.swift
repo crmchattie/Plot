@@ -93,9 +93,6 @@ class HealthDetailService: HealthDetailServiceInterface {
         let endDate = anchorDate.advanced(by: 86399)
                         
         if segmentType == .day {
-            if case .sleep = healthMetricType {
-                startDate = startDate.dayBefore.startOfDay.advanced(by: 83200)
-            }
             interval.hour = 1
         }
         else if segmentType == .week {
@@ -117,6 +114,10 @@ class HealthDetailService: HealthDetailServiceInterface {
                 interval.month = 1
             }
             startDate = anchorDate.lastYear
+        }
+        
+        if case .sleep = healthMetricType {
+            startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
         }
         
         if HealthKitService.authorized {
@@ -258,17 +259,14 @@ class HealthDetailService: HealthDetailServiceInterface {
             }
         }
         else {
-            let startAt: Double = 86400
-            
-            // 12 hours = 43200 seconds
-            var midDay = startDate.dayBefore.startOfDay.advanced(by: startAt)
-            var interval = NSDateInterval(start: midDay, duration: 86400)
+            var startDay = startDate.startOfDay
+            var interval = NSDateInterval(start: startDay, duration: 86400)
             var map: [Date: Double] = [:]
             var sum: Double = 0
             for sample in samples {
                 while !(interval.contains(sample.endDate)) && interval.endDate < endDate {
-                    midDay = midDay.advanced(by: 86400)
-                    interval = NSDateInterval(start: midDay, duration: 86400)
+                    startDay = startDay.advanced(by: 86400)
+                    interval = NSDateInterval(start: startDay, duration: 86400)
                 }
                 
                 var double: Double = 0
@@ -278,7 +276,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                     double = sample.quantity.doubleValue(for: .jouleUnit(with: .kilo))
                 }
 
-                map[midDay, default: 0] += double
+                map[startDay, default: 0] += double
                 sum += double
             }
             
@@ -309,19 +307,18 @@ class HealthDetailService: HealthDetailServiceInterface {
             }
         }
         else {
-            let startAt: Double = 86400
-            var midDay = startDate.dayBefore.startOfDay.advanced(by: startAt)
-            var interval = NSDateInterval(start: midDay, duration: 86400)
+            var startDay = startDate.startOfDay
+            var interval = NSDateInterval(start: startDay, duration: 86400)
             var map: [Date: Double] = [:]
             var sum: Double = 0
             for sample in samples {
                 while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
-                    midDay = midDay.advanced(by: 86400)
-                    interval = NSDateInterval(start: midDay, duration: 86400)
+                    startDay = startDay.advanced(by: 86400)
+                    interval = NSDateInterval(start: startDay, duration: 86400)
                 }
                 
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
-                map[midDay, default: 0] += timeSum
+                map[startDay, default: 0] += timeSum
                 sum += timeSum
             }
             
@@ -364,12 +361,13 @@ class HealthDetailService: HealthDetailServiceInterface {
             }
         }
         else {
-            let startAt: Double = 43200
-            var midDay = startDate.dayBefore.startOfDay.advanced(by: startAt)
+            var midDay = startDate.dayBefore.startOfDay.advanced(by: 43200)
             var interval = NSDateInterval(start: midDay, duration: 86400)
             var map: [Date: Double] = [:]
             var sum: Double = 0
             
+            print("midDay \(midDay)")
+            print("interval \(interval)")
             let relevantSamples = samples.filter({interval.contains($0.endDate.localTime)})
             let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
             if sleepValues.contains(.asleep) {
@@ -377,12 +375,14 @@ class HealthDetailService: HealthDetailServiceInterface {
             } else {
                 typeOfSleep = .inBed
             }
+            print("typeOfSleep \(typeOfSleep.rawValue)")
             
             for sample in samples {
                 while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
                     midDay = midDay.advanced(by: 86400)
                     interval = NSDateInterval(start: midDay, duration: 86400)
-                    
+                    print("midDay \(midDay)")
+                    print("interval \(interval)")
                     let relevantSamples = samples.filter({interval.contains($0.endDate.localTime)})
                     let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
                     if sleepValues.contains(.asleep) {
@@ -390,13 +390,19 @@ class HealthDetailService: HealthDetailServiceInterface {
                     } else {
                         typeOfSleep = .inBed
                     }
+                    print("typeOfSleep \(typeOfSleep.rawValue)")
                 }
                 if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value), sleepValue != typeOfSleep {
+                    print("continuing \(midDay)")
+                    print("sample.endDate.localTime \(sample.endDate.localTime)")
                     continue
                 }
                 
+                print("not continuing \(midDay)")
+                print("sample.endDate.localTime \(sample.endDate.localTime)")
+                
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
-                map[midDay.advanced(by: 86400), default: 0] += timeSum
+                map[interval.endDate, default: 0] += timeSum
                 sum += timeSum
             }
             

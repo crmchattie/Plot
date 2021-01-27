@@ -553,7 +553,7 @@ func timeAgoSinceDate(_ date:Date, numericDates:Bool = false) -> String {
     let earliest = now < date ? now : date
     let latest = (earliest == now) ? date : now
     let components = calendar.dateComponents(unitFlags, from: earliest,  to: latest)
-    
+
     if (components.year! >= 2) {
         return "\(components.year!) years ago"
     } else if (components.year! >= 1){
@@ -603,7 +603,7 @@ func timeAgoSinceDate(_ date:Date, numericDates:Bool = false) -> String {
             return "a minute ago"
         }
     } else if (components.second! >= 3) {
-        return "just now"//"\(components.second!) seconds ago"
+        return "\(components.second!) seconds ago"
     } else {
         return "just now"
     }
