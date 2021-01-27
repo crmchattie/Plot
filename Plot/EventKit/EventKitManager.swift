@@ -73,7 +73,9 @@ class EventKitManager {
         let calendar = Calendar.current
 
         // Create the start date components
-        let timeAgo = Date()
+        var timeAgoComponents = DateComponents()
+        timeAgoComponents.day = -7
+        let timeAgo = calendar.date(byAdding: timeAgoComponents, to: Date()) ?? Date()
 
         // Create the end date components.
         var timeFromNowComponents = DateComponents()
