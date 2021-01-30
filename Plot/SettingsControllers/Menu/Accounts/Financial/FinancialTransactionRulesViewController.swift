@@ -48,7 +48,9 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     @objc func newTransactionRule() {
         let destination = FinanceTransactionRuleViewController()
-        self.navigationController?.pushViewController(destination, animated: true)
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
+
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

@@ -147,15 +147,16 @@ class FinanceTransactionViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        if !active {
+        if active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+            let dotsBarButton = UIBarButtonItem(image: UIImage(named: "dots"), style: .plain, target: self, action: #selector(goToExtras))
+            navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
+        } else {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
             navigationItem.leftBarButtonItem = cancelBarButton
-        } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-            let dotsBarButton = UIBarButtonItem(image: UIImage(named: "dots"), style: .plain, target: self, action: #selector(goToExtras))
-            navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
+        
         }
         
     }

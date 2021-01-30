@@ -20,7 +20,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
             if status == .connected {
                 statusImageView.image =  UIImage(named: "success")
                 infoLabel.text = "Information is up-to-date"
-            } else if status == .created || status == .updated || status == .delayed || status == .resumed {
+            } else if status == .created || status == .updated || status == .delayed || status == .resumed || status == .pending {
                 statusImageView.image =  UIImage(named: "updating")
                 infoLabel.text = "Information is updating"
             } else {

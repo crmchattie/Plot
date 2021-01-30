@@ -52,4 +52,5 @@ enum ConnectionStatus: String, CaseIterable, Codable {
     case resumed = "RESUMED"
     case expired = "EXPIRED"
     case impaired = "IMPAIRED"
+    case pending = "PENDING"
 }

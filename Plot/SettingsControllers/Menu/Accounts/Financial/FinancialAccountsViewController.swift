@@ -103,7 +103,7 @@ class FinancialAccountsViewController: UITableViewController {
         if status == .connected {
             headerView.statusImageView.image =  UIImage(named: "success")
             headerView.infoLabel.text = "Information is up-to-date"
-        } else if status == .created || status == .updated || status == .delayed || status == .resumed {
+        } else if status == .created || status == .updated || status == .delayed || status == .resumed || status == .pending {
             headerView.statusImageView.image =  UIImage(named: "updating")
             headerView.infoLabel.text = "Information is updating"
         } else {
@@ -147,10 +147,8 @@ class FinancialAccountsViewController: UITableViewController {
         if let accounts = memberAccountsDict[member] {
             let account = accounts[indexPath.row]
             let destination = FinanceAccountViewController()
-//            destination.delegate = self
             destination.account = account
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(destination, animated: true)
         }
         
     }

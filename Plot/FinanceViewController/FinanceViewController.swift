@@ -223,7 +223,7 @@ class FinanceViewController: UIViewController {
                 var challengedMembers = [MXMember]()
                 for member in members {
                     dispatchGroup.enter()
-                    if member.connection_status == .challenged {
+                    if member.connection_status != .connected && member.connection_status != .created && member.connection_status != .updated && member.connection_status != .delayed && member.connection_status != .resumed && member.connection_status == .pending {
                         challengedMembers.append(member)
                     }
                     dispatchGroup.leave()
