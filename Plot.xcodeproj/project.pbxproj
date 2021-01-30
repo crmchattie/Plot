@@ -55,6 +55,7 @@
 		10314113230D712E00DB471B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 10314109230D712E00DB471B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
 		1034A01325BF8015006D3DB8 /* PlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */; };
+		1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */; };
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
 		1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103946892549FD4B005CED3A /* FoodProductContainer.swift */; };
 		103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */; };
@@ -534,6 +535,7 @@
 		10314110230D712E00DB471B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		10323D5D2479A58500749706 /* GrocerylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistActions.swift; sourceTree = "<group>"; };
 		1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotActivityOp.swift; sourceTree = "<group>"; };
+		1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarInfoViewController.swift; sourceTree = "<group>"; };
 		10367D42230B126800D25885 /* ActivityImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityImageCell.swift; sourceTree = "<group>"; };
 		103946892549FD4B005CED3A /* FoodProductContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodProductContainer.swift; sourceTree = "<group>"; };
 		103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionLevelViewController.swift; sourceTree = "<group>"; };
@@ -1022,6 +1024,14 @@
 			path = ShareExtension;
 			sourceTree = "<group>";
 		};
+		1034A04325C5ECB9006D3DB8 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
 		1037E4322550CD7400F4EE42 /* FoodViewControllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -1347,6 +1357,7 @@
 			isa = PBXGroup;
 			children = (
 				10F3032424EB746E00C04B8F /* AccountsTableViewController.swift */,
+				1034A04325C5ECB9006D3DB8 /* Calendar */,
 				10F3032824EC69C200C04B8F /* Financial */,
 			);
 			path = Accounts;
@@ -2778,6 +2789,7 @@
 				1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */,
 				102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */,
 				4B4F452F1F32230C00A6FF96 /* AppDelegate.swift in Sources */,
+				1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */,
 				4BAEE48221272C4F0045AB10 /* UserProfileController.swift in Sources */,
 				4BAEE50A21272D890045AB10 /* GroupAdminControlsTableViewController+NameEditing.swift in Sources */,
 				4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */,

@@ -52,19 +52,25 @@ class ActivityService {
             self?.activitiesFetcher.fetchActivities { (activities) in
                 self?.activities = activities
                 self?.fetchInvitations()
-                if let _ = Auth.auth().currentUser {
-                    self?.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
-                        self?.askedforAuthorization = askedforAuthorization
-                        self?.eventKitManager.syncEventKitActivities(existingActivities: activities, completion: {
-                            self?.eventKitManager.syncActivitiesToEventKit(activities: activities, completion: {
-                                self?.observeActivitiesForCurrentUser()
-                                self?.observeInvitationForCurrentUser()
-                            })
-                        })
-                    })
+                self?.grabEventKit {
+                    self?.observeActivitiesForCurrentUser()
+                    self?.observeInvitationForCurrentUser()
                 }
                 completion()
             }
+        }
+    }
+    
+    func grabEventKit(_ completion: @escaping () -> Void) {
+        if let _ = Auth.auth().currentUser {
+            self.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
+                self.askedforAuthorization = askedforAuthorization
+                self.eventKitManager.syncEventKitActivities(existingActivities: self.activities, completion: {
+                    self.eventKitManager.syncActivitiesToEventKit(activities: self.activities, completion: {
+                        completion()
+                    })
+                })
+            })
         }
     }
     

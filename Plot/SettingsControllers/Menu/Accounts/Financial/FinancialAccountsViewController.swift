@@ -29,13 +29,27 @@ class FinancialAccountsViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         title = "Accounts"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
+        let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
+        navigationItem.rightBarButtonItem = barButton
+        
+    }
+    
+    @objc fileprivate func newAccount() {
+        if let mxUser = self.networkController.financeService.mxUser {
+            self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+        } else {
+            self.networkController.financeService.getMXUser { (mxUser) in
+                if let mxUser = self.networkController.financeService.mxUser {
+                    self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
+                }
+            }
+        }
     }
     
     deinit {

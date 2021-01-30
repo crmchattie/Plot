@@ -13,10 +13,6 @@ import CodableFirebase
 class FinancialInfoViewController: UITableViewController {
     var networkController = NetworkController()
     
-    deinit {
-        print("STORAGE DID DEINIT")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()        
         title = "Financial Information"
@@ -46,7 +42,7 @@ class FinancialInfoViewController: UITableViewController {
             cell.isUserInteractionEnabled = true
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
-        if indexPath.row == 1 {
+        else if indexPath.row == 1 {
             cell.textLabel?.text = "Transaction Rules"
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }

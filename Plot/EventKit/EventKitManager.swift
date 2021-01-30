@@ -11,9 +11,10 @@ import Foundation
 class EventKitManager {
     private let eventKitService: EventKitService
     private var isRunning: Bool
-    private var isAuthorized: Bool
     private var activities: [Activity]
     private var queue: OperationQueue
+    
+    var isAuthorized: Bool
     
     init(eventKitService: EventKitService) {
         self.eventKitService = eventKitService
