@@ -24,6 +24,7 @@ target 'Plot' do
   pod 'CodableFirebase'
   pod 'FloatingPanel'
   pod 'Charts'
+  pod 'GoogleSignIn'
   
 	pod 'ARSLineProgress'
 
