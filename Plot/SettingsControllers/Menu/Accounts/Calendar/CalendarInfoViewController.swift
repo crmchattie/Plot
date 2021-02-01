@@ -14,17 +14,13 @@ import GoogleSignIn
 class CalendarInfoViewController: UITableViewController {
     var networkController = NetworkController()
     
-    var calendars = ["Plot"]
+    var accounts = ["Plot"]
+    var calendars = [String: [String]]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Calendar Information"
-        
-        grabAccounts()
-        GIDSignIn.sharedInstance()?.presentingViewController = self
-        // Automatically sign in the user.
-        GIDSignIn.sharedInstance()?.restorePreviousSignIn()
-        
+        grabData()
         
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
@@ -34,19 +30,19 @@ class CalendarInfoViewController: UITableViewController {
         let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newCalendar))
         navigationItem.rightBarButtonItem = barButton
         
-        
+        GIDSignIn.sharedInstance()?.presentingViewController = self
         
     }
     
-    func grabAccounts() {
+    func grabData() {
         if networkController.activityService.eventKitManager.isAuthorized {
-            if !calendars.contains("Apple") {
-                calendars.append("Apple")
+            if !accounts.contains("Apple") {
+                accounts.append("Apple")
             }
         }
         if let user = GIDSignIn.sharedInstance()?.currentUser, let profile = user.profile {
-            if !calendars.contains(profile.email) {
-                calendars.append(profile.email)
+            if !accounts.contains(profile.email) {
+                accounts.append(profile.email)
             }
         }
         tableView.reloadData()
@@ -55,7 +51,7 @@ class CalendarInfoViewController: UITableViewController {
     @objc func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !calendars.contains("Apple") {
+        if !accounts.contains("Apple") {
             alert.addAction(UIAlertAction(title: "Apple", style: .default, handler: { (_) in
                 self.networkController.activityService.grabEventKit {}
             }))
@@ -73,12 +69,15 @@ class CalendarInfoViewController: UITableViewController {
         })
     }
     
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return accounts.count
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return calendars.count
+        return calendars[accounts[section]]?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let identifier = "cell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
         cell.accessoryType = .none
@@ -86,9 +85,8 @@ class CalendarInfoViewController: UITableViewController {
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         cell.backgroundColor = view.backgroundColor
         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        cell.textLabel?.text = calendars[indexPath.row]
+        cell.textLabel?.text = accounts[indexPath.row]
         cell.isUserInteractionEnabled = false
-        
         return cell
     }
     
@@ -97,21 +95,9 @@ class CalendarInfoViewController: UITableViewController {
     }
 }
 
-extension CalendarInfoViewController: GIDSignInDelegate {
+extension CalendarInfoViewController {
     @objc private func userDidSignInGoogle(_ notification: Notification) {
         // Update screen after user successfully signed in
-        grabAccounts()
-    }
-    
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!,
-              withError error: Error!) {
-        if let error = error {
-            if (error as NSError).code == GIDSignInErrorCode.hasNoAuthInKeychain.rawValue {
-                print("The user has not signed in before or they have since signed out.")
-            } else {
-                print("\(error.localizedDescription)")
-            }
-            return
-        }
+        grabData()
     }
 }

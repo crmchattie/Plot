@@ -30,7 +30,7 @@ enum Identifiers {
 }
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     var chatLogController: ChatLogController? = nil
@@ -61,10 +61,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
         if Auth.auth().currentUser != nil {
             registerForPushNotifications(application: application)
         }
-        
+         
         GIDSignIn.sharedInstance().clientID = "433321796976-14dht5ecttj96dnltoj7cf0arfr7e6bo.apps.googleusercontent.com"
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance()?.restorePreviousSignIn()
 
         RunLoop.current.run(until: NSDate(timeIntervalSinceNow:2) as Date)
         
@@ -75,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
         _ application: UIApplication,
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler:
-        @escaping (UIBackgroundFetchResult) -> Void
+            @escaping (UIBackgroundFetchResult) -> Void
     ) {
         guard let aps = userInfo["aps"] as? [String: AnyObject] else {
             completionHandler(.failed)
@@ -83,7 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
         }
         // 1
         if aps["content-available"] as? Int == 1 {
-
+            
         } else  {
             completionHandler(.newData)
         }
@@ -214,10 +212,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     }
     
     func application(_ app: UIApplication,
-       open url: URL,
-       options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+                     open url: URL,
+                     options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         return GIDSignIn.sharedInstance().handle(url)
-        return true
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
@@ -261,32 +258,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
             }
         }
     }
-    
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!,
-              withError error: Error!) {
-      if let error = error {
-        if (error as NSError).code == GIDSignInErrorCode.hasNoAuthInKeychain.rawValue {
-          print("The user has not signed in before or they have since signed out.")
-        } else {
-          print("\(error.localizedDescription)")
-        }
-        return
-      }
-      // Perform any operations on signed in user here.
-//      let userId = user.userID                  // For client-side use only!
-//      let idToken = user.authentication.idToken // Safe to send to the server
-//      let fullName = user.profile.name
-//      let givenName = user.profile.givenName
-//      let familyName = user.profile.familyName
-//      let email = user.profile.email
-      // ...
-    }
-    
-    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!,
-              withError error: Error!) {
-      // Perform any operations when the user disconnects from app here.
-      // ...
-    }
 }
 
 // MARK: - UNUserNotificationCenterDelegate
@@ -321,13 +292,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         if let aps = userInfo["aps"] as? [String: AnyObject] {
             switch response.actionIdentifier {
             case Identifiers.viewChatsAction:
-//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 1)
+                //                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 1)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             case Identifiers.viewActivitiesAction:
-//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
+                //                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             case Identifiers.viewListsAction:
-//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 3)
+                //                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 3)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
                 if let chatID = userInfo["chatID"] as? String {
@@ -364,7 +335,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         let activity = Activity(dictionary: dictionary)
                         
                         let dispatchGroup = DispatchGroup()
-                                
+                        
                         if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {
                             dispatchGroup.enter()
                             Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
@@ -453,7 +424,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                         }
                                     }
                                 }
-                              })
+                            })
                             { (error) in
                                 print(error.localizedDescription)
                             }
@@ -968,5 +939,5 @@ extension AppDelegate: MessagesDelegate {
 }
 
 extension Notification.Name {
-     static let userNotification = Notification.Name("userNotification")
+    static let userNotification = Notification.Name("userNotification")
 }

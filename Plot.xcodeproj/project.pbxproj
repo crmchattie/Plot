@@ -56,6 +56,9 @@
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
 		1034A01325BF8015006D3DB8 /* PlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */; };
 		1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */; };
+		1034A07825C84FCC006D3DB8 /* GoogleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A07725C84FCC006D3DB8 /* GoogleManager.swift */; };
+		1034A07E25C84FF0006D3DB8 /* GoogleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A07D25C84FF0006D3DB8 /* GoogleService.swift */; };
+		1034A08225C8507A006D3DB8 /* GoogleSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A08125C8507A006D3DB8 /* GoogleSetupAssistant.swift */; };
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
 		1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103946892549FD4B005CED3A /* FoodProductContainer.swift */; };
 		103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */; };
@@ -286,7 +289,6 @@
 		26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */; };
 		26E8E3A6238B2CA9000F30C8 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E8E3A5238B2CA9000F30C8 /* NotificationsViewController.swift */; };
 		26E8EFE7237F393900B9067E /* MapActivitiesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E8EFE6237F393900B9067E /* MapActivitiesViewController.swift */; };
-		39A4CDCEF0891B83DB3EB92C /* libPods-ShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D773FFBAA1393BD2878E54F /* libPods-ShareExtension.a */; };
 		4B4F452F1F32230C00A6FF96 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */; };
 		4B4F45381F32230C00A6FF96 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B4F45371F32230C00A6FF96 /* Assets.xcassets */; };
 		4B4F45431F32246000A6FF96 /* GeneralTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F45421F32246000A6FF96 /* GeneralTabBarController.swift */; };
@@ -455,7 +457,8 @@
 		4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB46C6B2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift */; };
 		4BCB128C224ADD450046DFF3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */; };
 		4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */; };
-		7E6985A6EF59641559135D26 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB136BC84E7E2C2D4FDB49B /* libPods-Plot.a */; };
+		4C8AECD0EE1399B70E212D37 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86B2B7D6847589D237CBC74C /* libPods-Plot.a */; };
+		A3746FF3E82BEB8384479764 /* libPods-ShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 49C98C0DD2C763C6C03C15B1 /* libPods-ShareExtension.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -483,7 +486,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0D773FFBAA1393BD2878E54F /* libPods-ShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ShareExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		10021A1524F1A480006A1B25 /* FinancialMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialMemberView.swift; sourceTree = "<group>"; };
 		100458942517D50D00065872 /* FinancialTransactionFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionFetcher.swift; sourceTree = "<group>"; };
 		100A53EB23E0DD9C004AA952 /* ActivityHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHeaderCell.swift; sourceTree = "<group>"; };
@@ -536,6 +538,10 @@
 		10323D5D2479A58500749706 /* GrocerylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistActions.swift; sourceTree = "<group>"; };
 		1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotActivityOp.swift; sourceTree = "<group>"; };
 		1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarInfoViewController.swift; sourceTree = "<group>"; };
+		1034A07725C84FCC006D3DB8 /* GoogleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleManager.swift; sourceTree = "<group>"; };
+		1034A07D25C84FF0006D3DB8 /* GoogleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleService.swift; sourceTree = "<group>"; };
+		1034A08125C8507A006D3DB8 /* GoogleSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSetupAssistant.swift; sourceTree = "<group>"; };
+		1034A0D925C8727E006D3DB8 /* libGoogleAPIClientForREST.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libGoogleAPIClientForREST.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		10367D42230B126800D25885 /* ActivityImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityImageCell.swift; sourceTree = "<group>"; };
 		103946892549FD4B005CED3A /* FoodProductContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodProductContainer.swift; sourceTree = "<group>"; };
 		103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionLevelViewController.swift; sourceTree = "<group>"; };
@@ -768,6 +774,7 @@
 		26E8E3A5238B2CA9000F30C8 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		26E8EFE6237F393900B9067E /* MapActivitiesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapActivitiesViewController.swift; sourceTree = "<group>"; };
 		2928EFFC1124EED65963BE1D /* Pods-ShareExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.release.xcconfig"; path = "Pods/Target Support Files/Pods-ShareExtension/Pods-ShareExtension.release.xcconfig"; sourceTree = "<group>"; };
+		49C98C0DD2C763C6C03C15B1 /* libPods-ShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ShareExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4F452B1F32230C00A6FF96 /* Plot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Plot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4B4F45371F32230C00A6FF96 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -940,11 +947,9 @@
 		4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsFetcher.swift; sourceTree = "<group>"; };
 		4BE9F1DE219B457C00C6768F /* Pigeon-project.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Pigeon-project.entitlements"; sourceTree = "<group>"; };
-		8B9AFAE7ED3D864CA90779BE /* Pods-Pigeon-project.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pigeon-project.release.xcconfig"; path = "Pods/Target Support Files/Pods-Pigeon-project/Pods-Pigeon-project.release.xcconfig"; sourceTree = "<group>"; };
+		86B2B7D6847589D237CBC74C /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ShareExtension/Pods-ShareExtension.debug.xcconfig"; sourceTree = "<group>"; };
-		9B9CAF682523EA718F4C503C /* Pods-Pigeon-project.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pigeon-project.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Pigeon-project/Pods-Pigeon-project.debug.xcconfig"; sourceTree = "<group>"; };
 		BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.debug.xcconfig"; sourceTree = "<group>"; };
-		CDB136BC84E7E2C2D4FDB49B /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -952,7 +957,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				39A4CDCEF0891B83DB3EB92C /* libPods-ShareExtension.a in Frameworks */,
+				A3746FF3E82BEB8384479764 /* libPods-ShareExtension.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -961,8 +966,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */,
-				7E6985A6EF59641559135D26 /* libPods-Plot.a in Frameworks */,
 				10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */,
+				4C8AECD0EE1399B70E212D37 /* libPods-Plot.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1030,6 +1035,16 @@
 				1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */,
 			);
 			path = Calendar;
+			sourceTree = "<group>";
+		};
+		1034A07625C84FAA006D3DB8 /* Google */ = {
+			isa = PBXGroup;
+			children = (
+				1034A07725C84FCC006D3DB8 /* GoogleManager.swift */,
+				1034A07D25C84FF0006D3DB8 /* GoogleService.swift */,
+				1034A08125C8507A006D3DB8 /* GoogleSetupAssistant.swift */,
+			);
+			path = Google;
 			sourceTree = "<group>";
 		};
 		1037E4322550CD7400F4EE42 /* FoodViewControllers */ = {
@@ -1522,9 +1537,10 @@
 		2AF4427B37282913090A248D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1034A0D925C8727E006D3DB8 /* libGoogleAPIClientForREST.a */,
 				2623AA8C24FA2A250020A316 /* HealthKit.framework */,
-				CDB136BC84E7E2C2D4FDB49B /* libPods-Plot.a */,
-				0D773FFBAA1393BD2878E54F /* libPods-ShareExtension.a */,
+				86B2B7D6847589D237CBC74C /* libPods-Plot.a */,
+				49C98C0DD2C763C6C03C15B1 /* libPods-ShareExtension.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1574,6 +1590,7 @@
 				4BAEE557212735E50045AB10 /* Support */,
 				2623AA8E24FA2D710020A316 /* HealthKit */,
 				26036760256CC4A600FE9142 /* EventKit */,
+				1034A07625C84FAA006D3DB8 /* Google */,
 				26A5DDD92394CB8E00771DC1 /* Networking */,
 				4B4F45421F32246000A6FF96 /* GeneralTabBarController.swift */,
 				4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */,
@@ -2379,8 +2396,6 @@
 		E788FC79B73E9599A409079F /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				9B9CAF682523EA718F4C503C /* Pods-Pigeon-project.debug.xcconfig */,
-				8B9AFAE7ED3D864CA90779BE /* Pods-Pigeon-project.release.xcconfig */,
 				BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */,
 				1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */,
 				91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */,
@@ -2667,6 +2682,7 @@
 				1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */,
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
 				260C87CE24FF60B200715A64 /* StepsOperation.swift in Sources */,
+				1034A07825C84FCC006D3DB8 /* GoogleManager.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				101B90902457999600EDDB90 /* Weather.swift in Sources */,
 				10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */,
@@ -2820,6 +2836,7 @@
 				10C83342249ACC8F0037F638 /* SygicToursSearchResult.swift in Sources */,
 				4BAEE46521272B380045AB10 /* AccountSettingsController.swift in Sources */,
 				10CA911725367D8D003CEAF7 /* FinancialTransactionActions.swift in Sources */,
+				1034A07E25C84FF0006D3DB8 /* GoogleService.swift in Sources */,
 				2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */,
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
 				104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */,
@@ -2848,6 +2865,7 @@
 				4BAEE51C21272D890045AB10 /* BaseMessageCell+CellDeletionHandlers.swift in Sources */,
 				10808733258506EC00FB9BB0 /* WorkFetcher.swift in Sources */,
 				10B541E625479D4300CC9023 /* GroceryProductDetailViewController.swift in Sources */,
+				1034A08225C8507A006D3DB8 /* GoogleSetupAssistant.swift in Sources */,
 				4BA1E778215250BF00391BCB /* MessageSender.swift in Sources */,
 				269105F5253E8E2E00A02C5F /* IntAxisValueFormatter.swift in Sources */,
 				26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */,
@@ -3238,6 +3256,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
@@ -3262,6 +3281,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = G226F98322;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/FirebaseAnalytics/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleAppMeasurement/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleSignIn/Frameworks\"",
+				);
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -3296,6 +3321,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = G226F98322;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/FirebaseAnalytics/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleAppMeasurement/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleSignIn/Frameworks\"",
+				);
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -3304,7 +3335,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1.3;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";

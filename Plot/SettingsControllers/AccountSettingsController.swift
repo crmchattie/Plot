@@ -8,7 +8,6 @@
 
 import UIKit
 import Firebase
-import ARSLineProgress
 
 class AccountSettingsController: UITableViewController {
     var networkController = NetworkController()

@@ -9,6 +9,8 @@
 import Foundation
 import Firebase
 
+let appleString = "Apple"
+
 extension NSNotification.Name {
     static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
 }
@@ -18,6 +20,8 @@ class ActivityService {
     let invitationsFetcher = InvitationsFetcher()
     
     var askedforAuthorization: Bool = false
+    
+    var calendars = [String: [String]]()
 
     var activities = [Activity]() {
         didSet {
@@ -41,10 +45,15 @@ class ActivityService {
     var hasLoadedCalendarEventActivities = false
         
     var eventKitManager: EventKitManager = {
-        let eventKitSetupAssistant = EventKitSetupAssistant()
         let eventKitService = EventKitService()
         let eventKitManager = EventKitManager(eventKitService: eventKitService)
         return eventKitManager
+    }()
+    
+    var googleManager: GoogleManager = {
+        let googleService = GoogleService()
+        let googleManager = GoogleManager(googleService: googleService)
+        return googleManager
     }()
     
     func grabActivities(_ completion: @escaping () -> Void) {
@@ -53,8 +62,10 @@ class ActivityService {
                 self?.activities = activities
                 self?.fetchInvitations()
                 self?.grabEventKit {
-                    self?.observeActivitiesForCurrentUser()
-                    self?.observeInvitationForCurrentUser()
+                    self?.grabGoogle {
+                        self?.observeActivitiesForCurrentUser()
+                        self?.observeInvitationForCurrentUser()
+                    }
                 }
                 completion()
             }
@@ -67,10 +78,25 @@ class ActivityService {
                 self.askedforAuthorization = askedforAuthorization
                 self.eventKitManager.syncEventKitActivities(existingActivities: self.activities, completion: {
                     self.eventKitManager.syncActivitiesToEventKit(activities: self.activities, completion: {
+                        if let appleCalendars = self.eventKitManager.grabCalendars() {
+                            self.calendars[appleString] = appleCalendars
+                        }
                         completion()
                     })
                 })
             })
+        } else {
+            completion()
+        }
+    }
+    
+    func grabGoogle(_ completion: @escaping () -> Void) {
+        if let _ = Auth.auth().currentUser {
+            self.googleManager.setupGoogle {
+                completion()
+            }
+        } else {
+            completion()
         }
     }
     

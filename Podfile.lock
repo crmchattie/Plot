@@ -4,7 +4,6 @@ PODS:
     - AppAuth/ExternalUserAgent (= 1.4.0)
   - AppAuth/Core (1.4.0)
   - AppAuth/ExternalUserAgent (1.4.0)
-  - ARSLineProgress (3.1.0)
   - Charts (3.6.0):
     - Charts/Core (= 3.6.0)
   - Charts/Core (3.6.0)
@@ -81,6 +80,11 @@ PODS:
   - FloatingPanel (1.7.5)
   - FSCalendar (2.8.1)
   - FTPopOverMenu_Swift (0.2.1)
+  - GoogleAPIClientForREST/Calendar (1.5.1):
+    - GoogleAPIClientForREST/Core
+    - GTMSessionFetcher (>= 1.1.7)
+  - GoogleAPIClientForREST/Core (1.5.1):
+    - GTMSessionFetcher (>= 1.1.7)
   - GoogleAppMeasurement (6.6.1):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
@@ -145,7 +149,6 @@ PODS:
     - Eureka (>= 5.0.0)
 
 DEPENDENCIES:
-  - ARSLineProgress
   - Charts
   - CodableFirebase
   - CropViewController
@@ -160,6 +163,7 @@ DEPENDENCIES:
   - FloatingPanel
   - FSCalendar
   - FTPopOverMenu_Swift (~> 0.2.0)
+  - GoogleAPIClientForREST/Calendar
   - GoogleSignIn
   - PhoneNumberKit
   - SDWebImage
@@ -169,7 +173,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - AppAuth
-    - ARSLineProgress
     - Charts
     - CodableFirebase
     - CropViewController
@@ -188,6 +191,7 @@ SPEC REPOS:
     - FloatingPanel
     - FSCalendar
     - FTPopOverMenu_Swift
+    - GoogleAPIClientForREST
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleDataTransportCCTSupport
@@ -206,7 +210,6 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
-  ARSLineProgress: 60778657c69491796c3faf5b834c72924c405833
   Charts: b1e3a1f5a1c9ba5394438ca3b91bd8c9076310af
   CodableFirebase: 0bf201991eeec35eb9fcd987d271ea463cf34a80
   CropViewController: a5c143548a0fabcd6cc25f2d26e40460cfb8c78c
@@ -225,6 +228,7 @@ SPEC CHECKSUMS:
   FloatingPanel: bb17fd6fc7ae519f877f7bd30f4f6115a78acf07
   FSCalendar: 5245140456fcbcac5824c203b98bd8068bdfee1a
   FTPopOverMenu_Swift: c91ce7301c358264743de028bc28177ee9d8e1a4
+  GoogleAPIClientForREST: 4bb409633efcc2e1b3f945afe7e35039b5a61db2
   GoogleAppMeasurement: 2fd5c5a56c069db635c8e7b92d4809a9591d0a69
   GoogleDataTransport: 9a8a16f79feffc7f42096743de2a7c4815e84020
   GoogleDataTransportCCTSupport: 489c1265d2c85b68187a83a911913d190012158d
@@ -241,6 +245,6 @@ SPEC CHECKSUMS:
   SplitRow: 921e76fbbd7ef50d005131d6665a6e10f26df04b
   ViewRow: 8da541e9c019f3be63f4e28f311a62cac2045ecf
 
-PODFILE CHECKSUM: 893eb4e9753ed0c85f9340b7b20dad1e8631edd4
+PODFILE CHECKSUM: 24476aa4e65e32158f8efb3f0444c609de729db2
 
 COCOAPODS: 1.9.3

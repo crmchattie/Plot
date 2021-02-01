@@ -101,4 +101,12 @@ class EventKitManager {
             completion()
         }
     }
+    
+    func grabCalendars() -> [String]? {
+        guard isAuthorized else {
+            return nil
+        }
+        
+        return eventKitService.eventStore.calendars(for: .event).map({ $0.title })
+    }
 }
