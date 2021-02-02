@@ -386,7 +386,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = sections[indexPath.section]
         if section == .calendar {
-            if networkController.activityService.askedforAuthorization {
+            if networkController.activityService.askedforEventKitAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.activities = sortedActivities
@@ -438,7 +438,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         var height: CGFloat = 0
         let section = sections[indexPath.section]
         if section == .calendar {
-            if !sortedActivities.isEmpty && networkController.activityService.askedforAuthorization {
+            if !sortedActivities.isEmpty && networkController.activityService.askedforEventKitAuthorization {
                 for activity in sortedActivities {
                     if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
                         height += 162

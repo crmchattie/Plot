@@ -14,13 +14,13 @@ import GoogleSignIn
 class CalendarInfoViewController: UITableViewController {
     var networkController = NetworkController()
     
-    var accounts = ["Plot"]
-    var calendars = [String: [String]]()
+    var calendars: [String: [String]] {
+        return networkController.activityService.calendars
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Calendar Information"
-        grabData()
         
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
@@ -34,24 +34,10 @@ class CalendarInfoViewController: UITableViewController {
         
     }
     
-    func grabData() {
-        if networkController.activityService.eventKitManager.isAuthorized {
-            if !accounts.contains("Apple") {
-                accounts.append("Apple")
-            }
-        }
-        if let user = GIDSignIn.sharedInstance()?.currentUser, let profile = user.profile {
-            if !accounts.contains(profile.email) {
-                accounts.append(profile.email)
-            }
-        }
-        tableView.reloadData()
-    }
-    
     @objc func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !accounts.contains("Apple") {
+        if !calendars.keys.contains("Apple") {
             alert.addAction(UIAlertAction(title: "Apple", style: .default, handler: { (_) in
                 self.networkController.activityService.grabEventKit {}
             }))
@@ -70,11 +56,31 @@ class CalendarInfoViewController: UITableViewController {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return accounts.count
+        return calendars.keys.count
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return calendars[accounts[section]]?.count ?? 0
+        let sections = Array(calendars.keys)
+        let section = sections[section]
+        return calendars[section]?.count ?? 0
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let identifier = "cell"
+        let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
+        cell.accessoryType = .none
+        cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .headline)
+        cell.textLabel?.adjustsFontForContentSizeCategory = true
+        cell.backgroundColor = view.backgroundColor
+        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        let sections = Array(calendars.keys)
+        cell.textLabel?.text = sections[section]
+        cell.isUserInteractionEnabled = false
+        return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 20
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -85,7 +91,9 @@ class CalendarInfoViewController: UITableViewController {
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         cell.backgroundColor = view.backgroundColor
         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        cell.textLabel?.text = accounts[indexPath.row]
+        let sections = Array(calendars.keys)
+        let section = sections[indexPath.section]
+        cell.textLabel?.text = calendars[section]?[indexPath.row]
         cell.isUserInteractionEnabled = false
         return cell
     }
@@ -98,6 +106,6 @@ class CalendarInfoViewController: UITableViewController {
 extension CalendarInfoViewController {
     @objc private func userDidSignInGoogle(_ notification: Notification) {
         // Update screen after user successfully signed in
-        grabData()
+        
     }
 }

@@ -48,10 +48,6 @@ class EventKitService {
         return events
     }
     
-    func fetchCalendars() {
-        
-    }
-    
     func storeEvent(for activity: Activity) -> EKEvent? {
         guard let startDate = activity.startDate, let endDate = activity.endDate, let name = activity.name else {
             return nil

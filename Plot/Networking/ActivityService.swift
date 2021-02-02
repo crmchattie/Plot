@@ -8,6 +8,7 @@
 
 import Foundation
 import Firebase
+import GoogleSignIn
 
 let appleString = "Apple"
 
@@ -19,7 +20,7 @@ class ActivityService {
     let activitiesFetcher = ActivitiesFetcher()
     let invitationsFetcher = InvitationsFetcher()
     
-    var askedforAuthorization: Bool = false
+    var askedforEventKitAuthorization: Bool = false
     
     var calendars = [String: [String]]()
 
@@ -75,7 +76,7 @@ class ActivityService {
     func grabEventKit(_ completion: @escaping () -> Void) {
         if let _ = Auth.auth().currentUser {
             self.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
-                self.askedforAuthorization = askedforAuthorization
+                self.askedforEventKitAuthorization = askedforAuthorization
                 self.eventKitManager.syncEventKitActivities(existingActivities: self.activities, completion: {
                     self.eventKitManager.syncActivitiesToEventKit(activities: self.activities, completion: {
                         if let appleCalendars = self.eventKitManager.grabCalendars() {
@@ -93,7 +94,12 @@ class ActivityService {
     func grabGoogle(_ completion: @escaping () -> Void) {
         if let _ = Auth.auth().currentUser {
             self.googleManager.setupGoogle {
-                completion()
+                self.googleManager.grabCalendars() { calendars in
+                    if let calendars = calendars {
+                        self.calendars.merge(dict: calendars)
+                    }
+                    completion()
+                }
             }
         } else {
             completion()
