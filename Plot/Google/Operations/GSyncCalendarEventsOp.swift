@@ -1,19 +1,19 @@
 //
-//  SyncCalendarEventsOp.swift
+//  GSyncCalendarEventsOp.swift
 //  Plot
 //
-//  Created by Hafiz Usama on 2020-11-24.
-//  Copyright © 2020 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 2/3/21.
+//  Copyright © 2021 Immature Creations. All rights reserved.
 //
 
-import EventKit
+import Foundation
 
-class SyncCalendarEventsOp: AsyncOperation {
+class GSyncCalendarEventsOp: AsyncOperation {
     
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
-    var events: [EKEvent] = []
-    var existingEvents: [EKEvent] = []
+    var events: [GTLRCalendar_Event] = []
+    var existingEvents: [GTLRCalendar_Event] = []
     var existingActivities: [Activity] = []
     
     init(existingActivities: [Activity]) {
@@ -27,9 +27,10 @@ class SyncCalendarEventsOp: AsyncOperation {
     
     private func startRequest() {
         for event in events {
-            if !existingEvents.contains(where: {$0.title == event.title && $0.startDate == event.startDate && $0.endDate == event.endDate}) && !existingActivities.contains(where: {$0.name == event.title && $0.startDate == event.startDate && $0.endDate == event.endDate}) {
+            // @FIX-ME - add in additional check for existing activities
+            if !existingEvents.contains(where: {$0.summary == event.summary && $0.start == event.start && $0.end == event.end}) {
                 existingEvents.append(event)
-                let op = CalendarActivityOp(event: event)
+                let op = GCalendarActivityOp(event: event)
                 queue.addOperation(op)
             }
         }

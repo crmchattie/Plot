@@ -9,21 +9,21 @@
 import Foundation
 
 class GoogleManager {
-    private let googleService: GoogleService
+    private let googleCalService: GoogleCalService
     private var isRunning: Bool
     private var queue: OperationQueue
     
     var isAuthorized: Bool
         
-    init(googleService: GoogleService) {
-        self.googleService = googleService
+    init(googleCalService: GoogleCalService) {
+        self.googleCalService = googleCalService
         self.isRunning = false
         self.isAuthorized = false
         self.queue = OperationQueue()
     }
     
     func setupGoogle(_ completion: @escaping () -> Void) {
-        googleService.setupGoogle { [weak self] bool in
+        googleCalService.setupGoogle { [weak self] bool in
             self?.isAuthorized = bool
             completion()
         }
@@ -44,7 +44,7 @@ class GoogleManager {
             completion(nil)
             return
         }
-        googleService.grabCalendars { (calendars) in
+        googleCalService.grabCalendars { (calendars) in
             completion(calendars)
         }
     }

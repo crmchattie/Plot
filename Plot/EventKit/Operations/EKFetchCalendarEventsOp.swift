@@ -8,7 +8,7 @@
 
 import EventKit
 
-class FetchCalendarEventsOp: AsyncOperation {
+class EKFetchCalendarEventsOp: AsyncOperation {
     private let eventKitService: EventKitService
     var events: [EKEvent] = []
     

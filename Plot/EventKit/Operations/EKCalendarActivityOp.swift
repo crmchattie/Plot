@@ -10,9 +10,7 @@ import EventKit
 import Firebase
 import CodableFirebase
 
-let ekEventIDKey = "ekEventID"
-
-class CalendarActivityOp: AsyncOperation {
+class EKCalendarActivityOp: AsyncOperation {
     private var event: EKEvent
     
     init(event: EKEvent) {

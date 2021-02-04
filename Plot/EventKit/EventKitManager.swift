@@ -40,8 +40,8 @@ class EventKitManager {
         activities = []
         isRunning = true
         
-        let eventsOp = FetchCalendarEventsOp(eventKitService: eventKitService)
-        let syncEventsOp = SyncCalendarEventsOp(existingActivities: existingActivities)
+        let eventsOp = EKFetchCalendarEventsOp(eventKitService: eventKitService)
+        let syncEventsOp = EKSyncCalendarEventsOp(existingActivities: existingActivities)
         let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
             syncEventsOp.events = eventsOp.events
         }
@@ -86,7 +86,7 @@ class EventKitManager {
         //filter old activities out
         let filterActivities = activities.filter { $0.startDate ?? Date() > timeAgo && $0.startDate ?? Date() < timeFromNow }
                 
-        let activitiesOp = PlotActivityOp(eventKitService: eventKitService, activities: filterActivities)
+        let activitiesOp = EKPlotActivityOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue
         queue.addOperations([activitiesOp], waitUntilFinished: false)
         
@@ -106,6 +106,13 @@ class EventKitManager {
         guard isAuthorized else {
             return nil
         }
-        return eventKitService.eventStore.calendars(for: .event).map({ $0.title })
+        let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.type == .calDAV }
+        for calendar in eventKitService.eventStore.calendars(for: .event) {
+            print("calendarName \(calendar.title)")
+            print("calendarType \(calendar.type.rawValue)")
+            print("calendarSource \(calendar.source)")
+            print("calendarID \(calendar.calendarIdentifier)")
+        }
+        return calendars.map({ $0.title })
     }
 }

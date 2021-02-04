@@ -37,8 +37,8 @@ class CalendarInfoViewController: UITableViewController {
     @objc func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !calendars.keys.contains("Apple") {
-            alert.addAction(UIAlertAction(title: "Apple", style: .default, handler: { (_) in
+        if !calendars.keys.contains(icloudString) {
+            alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
                 self.networkController.activityService.grabEventKit {}
             }))
         }

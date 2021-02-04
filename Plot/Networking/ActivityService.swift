@@ -10,7 +10,8 @@ import Foundation
 import Firebase
 import GoogleSignIn
 
-let appleString = "Apple"
+let icloudString = "iCloud"
+let gmailString = "Gmail"
 
 extension NSNotification.Name {
     static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
@@ -52,8 +53,8 @@ class ActivityService {
     }()
     
     var googleManager: GoogleManager = {
-        let googleService = GoogleService()
-        let googleManager = GoogleManager(googleService: googleService)
+        let googleCalService = GoogleCalService()
+        let googleManager = GoogleManager(googleCalService: googleCalService)
         return googleManager
     }()
     
@@ -80,7 +81,7 @@ class ActivityService {
                 self.eventKitManager.syncEventKitActivities(existingActivities: self.activities, completion: {
                     self.eventKitManager.syncActivitiesToEventKit(activities: self.activities, completion: {
                         if let appleCalendars = self.eventKitManager.grabCalendars() {
-                            self.calendars[appleString] = appleCalendars
+                            self.calendars[icloudString] = appleCalendars
                         }
                         completion()
                     })

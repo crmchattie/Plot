@@ -10,7 +10,7 @@ import EventKit
 import Firebase
 import CodableFirebase
 
-class PlotActivityOp: AsyncOperation {
+class EKPlotActivityOp: AsyncOperation {
     private let eventKitService: EventKitService
     private var activities: [Activity]
     
@@ -28,6 +28,7 @@ class PlotActivityOp: AsyncOperation {
             self.finish()
             return
         }
+        // @FIX-ME - need a better way to check if event ID exists
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? [String: [String:String]] {

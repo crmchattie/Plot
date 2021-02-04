@@ -35,7 +35,7 @@ class EventKitService {
         // Create the predicate from the event store's instance method.
         var predicate: NSPredicate? = nil
         if let timeAgo = timeAgo, let timeFromNow = timeFromNow {
-            let calendars = eventStore.calendars(for: .event).filter { $0.title != "Siri Suggestions" }
+            let calendars = eventStore.calendars(for: .event).filter { $0.type == .local || $0.type == .calDAV || $0.type == .exchange || $0.type == .subscription || $0.type == .birthday }
             predicate = eventStore.predicateForEvents(withStart: timeAgo, end: timeFromNow, calendars: calendars)
         }
 
