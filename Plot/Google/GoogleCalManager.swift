@@ -8,7 +8,7 @@
 
 import Foundation
 
-class GoogleManager {
+class GoogleCalManager {
     private let googleCalService: GoogleCalService
     private var isRunning: Bool
     private var queue: OperationQueue

@@ -52,9 +52,9 @@ class ActivityService {
         return eventKitManager
     }()
     
-    var googleManager: GoogleManager = {
+    var googleManager: GoogleCalManager = {
         let googleCalService = GoogleCalService()
-        let googleManager = GoogleManager(googleCalService: googleCalService)
+        let googleManager = GoogleCalManager(googleCalService: googleCalService)
         return googleManager
     }()
     

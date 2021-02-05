@@ -11,7 +11,7 @@ import GoogleSignIn
 
 class GoogleCalService {
     var calendarService: GTLRCalendarService? {
-        return GoogleSetupAssistant.calendarService
+        return GoogleCalSetupAssistant.calendarService
     }
     
     var user : GIDGoogleUser?

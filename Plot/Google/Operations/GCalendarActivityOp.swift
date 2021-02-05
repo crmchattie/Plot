@@ -77,16 +77,23 @@ class GCalendarActivityOp: AsyncOperation {
         return activity
     }
     
-    // @FIX-ME - update function incomplete
     private func update(activity: Activity) {
         activity.name = event.summary
         activity.activityDescription = event.description
         activity.locationName = event.location
-//        activity.allDay = event.isAllDay
-//        activity.startTimeZone = event.timeZone?.identifier ?? TimeZone.current.identifier
-//        activity.endTimeZone = event.timeZone?.identifier ?? TimeZone.current.identifier
-//        activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
-//        activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
+        if let start = event.start?.date, let end = event.end?.date {
+            activity.allDay = true
+            activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)
+            activity.startTimeZone = event.start?.timeZone
+            activity.endDateTime = NSNumber(value: end.date.timeIntervalSince1970)
+            activity.endTimeZone = event.end?.timeZone
+        } else if let start = event.start?.dateTime, let end = event.end?.dateTime {
+            activity.allDay = false
+            activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)
+            activity.startTimeZone = event.start?.timeZone
+            activity.endDateTime = NSNumber(value: end.date.timeIntervalSince1970)
+            activity.endTimeZone = event.end?.timeZone
+        }
     }
     
     private func deleteActivity() {

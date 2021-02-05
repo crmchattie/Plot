@@ -56,9 +56,9 @@
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
 		1034A01325BF8015006D3DB8 /* EKPlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A01225BF8015006D3DB8 /* EKPlotActivityOp.swift */; };
 		1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */; };
-		1034A07825C84FCC006D3DB8 /* GoogleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A07725C84FCC006D3DB8 /* GoogleManager.swift */; };
+		1034A07825C84FCC006D3DB8 /* GoogleCalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A07725C84FCC006D3DB8 /* GoogleCalManager.swift */; };
 		1034A07E25C84FF0006D3DB8 /* GoogleCalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */; };
-		1034A08225C8507A006D3DB8 /* GoogleSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A08125C8507A006D3DB8 /* GoogleSetupAssistant.swift */; };
+		1034A08225C8507A006D3DB8 /* GoogleCalSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A08125C8507A006D3DB8 /* GoogleCalSetupAssistant.swift */; };
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
 		1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103946892549FD4B005CED3A /* FoodProductContainer.swift */; };
 		103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */; };
@@ -542,9 +542,9 @@
 		10323D5D2479A58500749706 /* GrocerylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistActions.swift; sourceTree = "<group>"; };
 		1034A01225BF8015006D3DB8 /* EKPlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKPlotActivityOp.swift; sourceTree = "<group>"; };
 		1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarInfoViewController.swift; sourceTree = "<group>"; };
-		1034A07725C84FCC006D3DB8 /* GoogleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleManager.swift; sourceTree = "<group>"; };
+		1034A07725C84FCC006D3DB8 /* GoogleCalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalManager.swift; sourceTree = "<group>"; };
 		1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalService.swift; sourceTree = "<group>"; };
-		1034A08125C8507A006D3DB8 /* GoogleSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSetupAssistant.swift; sourceTree = "<group>"; };
+		1034A08125C8507A006D3DB8 /* GoogleCalSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalSetupAssistant.swift; sourceTree = "<group>"; };
 		10367D42230B126800D25885 /* ActivityImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityImageCell.swift; sourceTree = "<group>"; };
 		103946892549FD4B005CED3A /* FoodProductContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodProductContainer.swift; sourceTree = "<group>"; };
 		103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionLevelViewController.swift; sourceTree = "<group>"; };
@@ -1048,9 +1048,9 @@
 			isa = PBXGroup;
 			children = (
 				10F5CFF025CB7D100078C821 /* Operations */,
-				1034A07725C84FCC006D3DB8 /* GoogleManager.swift */,
+				1034A07725C84FCC006D3DB8 /* GoogleCalManager.swift */,
 				1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */,
-				1034A08125C8507A006D3DB8 /* GoogleSetupAssistant.swift */,
+				1034A08125C8507A006D3DB8 /* GoogleCalSetupAssistant.swift */,
 			);
 			path = Google;
 			sourceTree = "<group>";
@@ -2705,7 +2705,7 @@
 				1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */,
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
 				260C87CE24FF60B200715A64 /* StepsOperation.swift in Sources */,
-				1034A07825C84FCC006D3DB8 /* GoogleManager.swift in Sources */,
+				1034A07825C84FCC006D3DB8 /* GoogleCalManager.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				101B90902457999600EDDB90 /* Weather.swift in Sources */,
 				10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */,
@@ -2891,7 +2891,7 @@
 				4BAEE51C21272D890045AB10 /* BaseMessageCell+CellDeletionHandlers.swift in Sources */,
 				10808733258506EC00FB9BB0 /* WorkFetcher.swift in Sources */,
 				10B541E625479D4300CC9023 /* GroceryProductDetailViewController.swift in Sources */,
-				1034A08225C8507A006D3DB8 /* GoogleSetupAssistant.swift in Sources */,
+				1034A08225C8507A006D3DB8 /* GoogleCalSetupAssistant.swift in Sources */,
 				4BA1E778215250BF00391BCB /* MessageSender.swift in Sources */,
 				269105F5253E8E2E00A02C5F /* IntAxisValueFormatter.swift in Sources */,
 				26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */,

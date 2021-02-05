@@ -9,7 +9,7 @@
 import Foundation
 import GoogleSignIn
 
-class GoogleSetupAssistant {
+class GoogleCalSetupAssistant {
     
     /// Creates calendar service with current authentication
     static let calendarService: GTLRCalendarService? = {
