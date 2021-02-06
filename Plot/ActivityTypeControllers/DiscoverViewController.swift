@@ -269,8 +269,9 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     }
     
     func openMXConnect(guid: String, current_member_guid: String?) {
-        Service.shared.getMXConnectURL(guid: guid, current_member_guid: current_member_guid ?? nil) { (search, err) in
-            if let url = search?.user?.connect_widget_url {
+        Service.shared.fetchMXConnectURL() { (search, err) in
+            print("search \(search)")
+            if let url = search {
                 DispatchQueue.main.async {
                     let destination = WebViewController()
                     destination.urlString = url

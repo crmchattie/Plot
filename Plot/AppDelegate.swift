@@ -289,13 +289,10 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         if let aps = userInfo["aps"] as? [String: AnyObject] {
             switch response.actionIdentifier {
             case Identifiers.viewChatsAction:
-//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 1)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             case Identifiers.viewActivitiesAction:
-//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 2)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             case Identifiers.viewListsAction:
-//                ((window?.rootViewController as? UITabBarController)?.viewControllers![1] as? MasterActivityContainerController)?.changeToIndex(index: 3)
                 (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
                 if let chatID = userInfo["chatID"] as? String {
@@ -873,8 +870,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 extension AppDelegate : MessagingDelegate {
     // [START refresh_token]
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-        print("Firebase registration token: \(fcmToken)")
-        
         let dataDict:[String: String] = ["token": fcmToken]
         NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
         self.setFCMToken()
@@ -917,7 +912,7 @@ extension AppDelegate: MessagesDelegate {
         
         if let tabBarController = window?.rootViewController as? GeneralTabBarController {
             
-            tabBarController.selectedIndex = 0
+            tabBarController.selectedIndex = 1
             
             tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
             

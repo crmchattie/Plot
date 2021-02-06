@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Firebase
 
 class Service {
     
@@ -20,7 +21,7 @@ class Service {
         
         let defaultParameters = ["diet": "", "excludeIngredients": "snails", "offset": "0", "number": "20", "limitLicense": "true", "instructionsRequired": "true", "apiKey": "\(SpoonacularAPI.apiKey)"]
         let parameters = ["query": "\(query)", "cuisine": "\(cuisine)"].merging(defaultParameters, uniquingKeysWith: +)
-    
+        
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
@@ -36,7 +37,7 @@ class Service {
         
         let defaultParameters = ["diet": "", "excludeIngredients": "", "offset": "0", "number": "20", "limitLicense": "true", "instructionsRequired": "true", "addRecipeInformation": "true", "apiKey": "\(SpoonacularAPI.apiKey)"]
         let parameters = ["query": "\(query)", "cuisine": "\(cuisine)", "excludeCuisine": "\(excludeCuisine)", "diet": "\(diet)", "intolerances": "\(intolerances)", "type": "\(type)"].merging(defaultParameters, uniquingKeysWith: +)
-    
+        
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
@@ -83,7 +84,7 @@ class Service {
         
         let defaultParameters = [ "offset": "0", "number": "100", "apiKey": "\(SpoonacularAPI.apiKey)"]
         let parameters = ["query": "\(query)"].merging(defaultParameters, uniquingKeysWith: +)
-    
+        
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
@@ -163,15 +164,15 @@ class Service {
         if venueId == "" {
             parameters["venueId"] = nil
         }
-//        if city.isEmpty {
-//            parameters["city"] = nil
-//        }
-//        if classificationName.isEmpty {
-//            parameters["classificationName"] = nil
-//        }
-//        if classificationId.isEmpty {
-//            parameters["classificationId"] = nil
-//        }
+        //        if city.isEmpty {
+        //            parameters["city"] = nil
+        //        }
+        //        if classificationName.isEmpty {
+        //            parameters["classificationName"] = nil
+        //        }
+        //        if classificationId.isEmpty {
+        //            parameters["classificationId"] = nil
+        //        }
         parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
@@ -196,15 +197,15 @@ class Service {
         if venueId == "" {
             parameters["venueId"] = nil
         }
-//        if city.isEmpty {
-//            parameters["city"] = nil
-//        }
-//        if classificationName.isEmpty {
-//            parameters["classificationName"] = nil
-//        }
-//        if classificationId.isEmpty {
-//            parameters["classificationId"] = nil
-//        }
+        //        if city.isEmpty {
+        //            parameters["city"] = nil
+        //        }
+        //        if classificationName.isEmpty {
+        //            parameters["classificationName"] = nil
+        //        }
+        //        if classificationId.isEmpty {
+        //            parameters["classificationId"] = nil
+        //        }
         parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
@@ -252,12 +253,12 @@ class Service {
         
         let defaultParameters = ["apikey": "\(TicketMasterAPI.apiKey)", "locale":"*"]
         var parameters = ["size":"\(size)", "id": "\(id)", "keyword": "\(keyword)", "classificationName": "\(classificationName)", "classificationId": "\(classificationId)"]
-//        if classificationName.isEmpty {
-//            parameters["classificationName"] = nil
-//        }
-//        if classificationId.isEmpty {
-//            parameters["classificationId"] = nil
-//        }
+        //        if classificationName.isEmpty {
+        //            parameters["classificationName"] = nil
+        //        }
+        //        if classificationId.isEmpty {
+        //            parameters["classificationId"] = nil
+        //        }
         parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
         
         let urlRequest = URLRequest(url: baseURL)
@@ -289,23 +290,23 @@ class Service {
     }
     
     func fetchWeatherDaily(startDateTime: String, endDateTime: String, lat: Double, long: Double, unit: String, completion: @escaping (([DailyWeatherElement]?), Error?) -> ()) {
-                
+        
         let baseURL: URL = {
             return URL(string: ClimaCellAPI.dailyUrlString)!
         }()
         
         let defaultParameters = ["apikey": "\(ClimaCellAPI.apiKey)", "fields":"temp,weather_code,precipitation_probability"]
         let parameters = ["unit_system":"\(unit)", "start_time":"\(startDateTime)", "end_time":"\(endDateTime)", "lat": "\(lat)", "lon": "\(long)"].merging(defaultParameters, uniquingKeysWith: +)
-               
+        
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
-                                
+        
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
         
     }
     
     func fetchFSSearchLatLong(limit: String, query: String, radius: String, intent: String, city: String, stateCode: String, countryCode: String, categoryId: String, lat: Double, long: Double, completion: @escaping ((FoursquareVenueSearchResult?), Error?) -> ()) {
-            
+        
         let baseURL: URL = {
             return URL(string: FoursquareAPI.searchUrlString)!
         }()
@@ -326,7 +327,7 @@ class Service {
     }
     
     func fetchFSSearch(limit: String, query: String, radius: String, intent: String, city: String, stateCode: String, countryCode: String, categoryId: String, completion: @escaping ((FoursquareVenueSearchResult?), Error?) -> ()) {
-            
+        
         let baseURL: URL = {
             return URL(string: FoursquareAPI.searchUrlString)!
         }()
@@ -348,7 +349,7 @@ class Service {
     }
     
     func fetchFSExploreLatLong(limit: String, offset: String, time: String, day: String, openNow: Int, sortByDistance: Int, sortByPopularity: Int, price: [Int], query: String, radius: String, city: String, stateCode: String, countryCode: String, categoryId: String, section: String, lat: Double, long: Double, completion: @escaping ((FoursquareRecVenueSearchResult?), Error?) -> ()) {
-            
+        
         let baseURL: URL = {
             return URL(string: FoursquareAPI.exploreUrlString)!
         }()
@@ -375,13 +376,13 @@ class Service {
         
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
-
+        
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
         
     }
     
     func fetchFSExplore(limit: String, offset: String, time: String, day: String, openNow: Int, sortByDistance: Int, sortByPopularity: Int, price: [Int], query: String, radius: String, city: String, stateCode: String, countryCode: String, categoryId: String, section: String, completion: @escaping ((FoursquareRecVenueSearchResult?), Error?) -> ()) {
-            
+        
         let baseURL: URL = {
             return URL(string: FoursquareAPI.exploreUrlString)!
         }()
@@ -418,7 +419,7 @@ class Service {
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: defaultParameters)
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-                        
+        
     }
     
     func fetchSygicCollections(limit: String, query: String, parent_place_id: String, place_ids: String, tags: String, tags_not: String, prefer_unique: String, city: String, stateCode: String, countryCode: String, completion: @escaping ((SygicCollectionsSearchResult?), Error?) -> ()) {
@@ -426,12 +427,12 @@ class Service {
         let baseURL: URL = {
             return URL(string: SygicAPI.collectionsUrlString)!
         }()
-                
+        
         var parameters = ["limit":"\(limit)", "query": "\(query)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)"]
         if query == "" {
             parameters["query"] = nil
         }
-                
+        
         let urlRequest = URLRequest(url: baseURL)
         var encodedURLRequest = urlRequest.encode(with: parameters)
         encodedURLRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
@@ -448,7 +449,7 @@ class Service {
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-                        
+        
     }
     
     func fetchSygicPlacesLatLong(limit: String, offset: String, query: String, categories: [String], categories_not: [String], parent_place_id: String, place_ids: String, tags: String, tags_not: String, prefer_unique: String, city: String, stateCode: String, countryCode: String, lat: Double, long: Double, radius: String, completion: @escaping ((SygicPlacesSearchResult?), Error?) -> ()) {
@@ -482,7 +483,7 @@ class Service {
         } else if categories_not.count == 1 {
             notCategoryString = categories_not[0]
         }
-                
+        
         var parameters = ["limit":"\(limit)", "offset":"\(offset)", "query": "\(query)", "categories": "\(categoryString)", "categories_not": "\(notCategoryString)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)", "area": "\(lat),\(long),\(radius)", "location": "\(lat),\(long)"]
         if query == "" {
             parameters["query"] = nil
@@ -530,7 +531,7 @@ class Service {
         } else if categories_not.count == 1 {
             notCategoryString = categories_not[0]
         }
-                
+        
         var parameters = ["limit":"\(limit)", "offset":"\(offset)", "query": "\(query)", "categories": "\(categoryString)", "categories_not": "\(notCategoryString)", "parent_place_id": "\(parent_place_id)", "place_ids": "\(place_ids)", "tags": "\(tags)", "tags_not": "\(tags_not)", "prefer_unique": "\(prefer_unique)"]
         if query == "" {
             parameters["query"] = nil
@@ -538,7 +539,7 @@ class Service {
         if offset == "" {
             parameters["offset"] = nil
         }
-                
+        
         let urlRequest = URLRequest(url: baseURL)
         var encodedURLRequest = urlRequest.encode(with: parameters)
         encodedURLRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
@@ -555,7 +556,7 @@ class Service {
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-                        
+        
     }
     
     func fetchSygicTours(parent_place_id: String, completion: @escaping ((SygicToursSearchResult?), Error?) -> ()) {
@@ -563,9 +564,9 @@ class Service {
         let baseURL: URL = {
             return URL(string: SygicAPI.tripTemplatesUrlString)!
         }()
-                
+        
         let parameters = ["parent_place_id": "\(parent_place_id)"]
-                
+        
         let urlRequest = URLRequest(url: baseURL)
         var encodedURLRequest = urlRequest.encode(with: parameters)
         encodedURLRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
@@ -582,7 +583,7 @@ class Service {
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.setValue("\(SygicAPI.apiKey)", forHTTPHeaderField: "x-api-key")
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-                        
+        
     }
     
     func fetchFlight(flight_date: String, flight_status: String, dep_iata: String, arr_iata: String, dep_icao: String, arr_icao: String, airline_name: String, airline_iata: String, airline_icao: String, flight_number: String, flight_iata: String, flight_icao: String, completion: @escaping ((FlightSearchResult?), Error?) -> ()) {
@@ -592,7 +593,7 @@ class Service {
         }()
         
         let defaultParameters = ["access_key": "\(AviationAPI.apiKey)"]
-                
+        
         var parameters = ["flight_date":"\(flight_date)", "flight_status":"\(flight_status)", "dep_iata": "\(dep_iata)", "arr_iata": "\(arr_iata)", "dep_icao": "\(dep_icao)", "arr_icao": "\(arr_icao)", "airline_name": "\(airline_name)", "airline_iata": "\(airline_iata)", "airline_icao": "\(airline_icao)", "flight_number": "\(flight_number)", "flight_iata": "\(flight_iata)", "flight_icao": "\(flight_icao)"]
         
         parameters = parameters.merging(defaultParameters, uniquingKeysWith: +)
@@ -600,7 +601,7 @@ class Service {
         let urlRequest = URLRequest(url: baseURL)
         let encodedURLRequest = urlRequest.encode(with: parameters)
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-                        
+        
     }
     
     func createMXUser(id: String, completion: @escaping ((MXUserResult?), Error?) -> ()) {
@@ -611,15 +612,15 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": "\(MXAPI.apiKey)",
-                                        "MX-Client-ID": "\(MXAPI.clientID)",
-                                        "Accept": "\(MXAPI.version)",
-                                        "Content-Type": "\(MXAPI.contentType)"]
+                                          "MX-Client-ID": "\(MXAPI.clientID)",
+                                          "Accept": "\(MXAPI.version)",
+                                          "Content-Type": "\(MXAPI.contentType)"]
         urlRequest.httpMethod = "POST"
         let parameters = ["user": ["identifier": "\(id)"]]
         let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
         urlRequest.httpBody = jsonData
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-                        
+        
     }
     
     func updateMXUser(method: String, guid: String, is_disabled: Bool?, completion: @escaping ((MXUserResult?), Error?) -> ()) {
@@ -630,9 +631,9 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         
         var parameters = [String: String]()
         
@@ -648,7 +649,7 @@ class Service {
         
         let encodedURLRequest = urlRequest.encode(with: parameters)
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-                        
+        
     }
     
     func deleteMXUser(guid: String, completion: @escaping ((String?), Error?) -> ()) {
@@ -659,13 +660,13 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "DELETE"
         
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-                        
+        
     }
     
     func getMXConnectURL(guid: String, current_member_guid: String?, completion: @escaping ((MXUserResult?), Error?) -> ()) {
@@ -675,7 +676,7 @@ class Service {
         }()
         
         var parameters = ["is_mobile_webview":"\(true)",
-                        "ui_message_version": "\(4)"]
+                          "ui_message_version": "\(4)"]
         if UITraitCollection.current.userInterfaceStyle == .light {
             parameters["color_scheme"] = "light"
         } else {
@@ -688,14 +689,14 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "POST"
         
         let encodedURLRequest = urlRequest.encode(with: parameters)
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-                        
+        
     }
     
     func getMXMembers(guid: String, page: String, records_per_page: String, completion: @escaping ((MXMemberResult?), Error?) -> ()) {
@@ -706,13 +707,13 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
         let parameters = ["page":"\(page)",
-        "records_per_page": "\(records_per_page)"]
+                          "records_per_page": "\(records_per_page)"]
         let encodedURLRequest = urlRequest.encode(with: parameters)
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
     }
@@ -725,9 +726,9 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
@@ -740,13 +741,13 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
         let parameters = ["page":"\(page)",
-        "records_per_page": "\(records_per_page)"]
+                          "records_per_page": "\(records_per_page)"]
         let encodedURLRequest = urlRequest.encode(with: parameters)
         
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
@@ -760,9 +761,9 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "POST"
         
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
@@ -776,9 +777,9 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "DELETE"
         
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
@@ -792,13 +793,13 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
         let parameters = ["page":"\(page)",
-        "records_per_page": "\(records_per_page)"]
+                          "records_per_page": "\(records_per_page)"]
         let encodedURLRequest = urlRequest.encode(with: parameters)
         
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
@@ -812,9 +813,9 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
@@ -828,9 +829,9 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
@@ -844,13 +845,13 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
         var parameters = ["page":"\(page)",
-        "records_per_page": "\(records_per_page)"]
+                          "records_per_page": "\(records_per_page)"]
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
         if let from_date = from_date {
             parameters["from_date"] = "\(from_date)"
@@ -872,13 +873,13 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
         var parameters = ["page":"\(page)",
-        "records_per_page": "\(records_per_page)"]
+                          "records_per_page": "\(records_per_page)"]
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
         if let from_date = from_date {
             parameters["from_date"] = "\(from_date)"
@@ -900,13 +901,13 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         urlRequest.httpMethod = "GET"
         
         var parameters = ["page": "\(page)",
-        "records_per_page": "\(records_per_page)"]
+                          "records_per_page": "\(records_per_page)"]
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
         if let from_date = from_date {
             parameters["from_date"] = "\(from_date)"
@@ -916,7 +917,7 @@ class Service {
         }
         
         let encodedURLRequest = urlRequest.encode(with: parameters)
-                
+        
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
     }
     
@@ -928,12 +929,12 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         
         var parameters = ["category_guid": "\(category_guid)",
-        "match_description": "\(match_description)"]
+                          "match_description": "\(match_description)"]
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
         if let description = description {
             parameters["description"] = "\(description)"
@@ -943,7 +944,7 @@ class Service {
         
         let encodedURLRequest = urlRequest.encode(with: parameters)
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-                        
+        
     }
     
     func deleteMXTransactionRule(guid: String, transaction_rule_guid: String, completion: @escaping ((MXTransactionRuleResult?), Error?) -> ()) {
@@ -954,14 +955,14 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         
         urlRequest.httpMethod = "DELETE"
         
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-                        
+        
     }
     
     func updateMXTransactionRule(guid: String, transaction_rule_guid: String, category_guid: String?, match_description: String?, description: String?, completion: @escaping ((MXTransactionRuleResult?), Error?) -> ()) {
@@ -972,9 +973,9 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         
         var parameters = [String: String]()
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
@@ -992,7 +993,7 @@ class Service {
         
         let encodedURLRequest = urlRequest.encode(with: parameters)
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-                        
+        
     }
     
     func createMXCategory(guid: String, parent_guid: String, name: String, completion: @escaping ((MXTransactionCategoryResult?), Error?) -> ()) {
@@ -1003,19 +1004,19 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         
         let parameters = ["parent_guid": "\(parent_guid)",
-        "name": "\(name)"]
+                          "name": "\(name)"]
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
         
         urlRequest.httpMethod = "POST"
         
         let encodedURLRequest = urlRequest.encode(with: parameters)
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-                        
+        
     }
     
     func deleteMXCategory(guid: String, category_guid: String, completion: @escaping ((MXTransactionCategoryResult?), Error?) -> ()) {
@@ -1026,16 +1027,16 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
         
         urlRequest.httpMethod = "DELETE"
         
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-                        
+        
     }
     
     func updateMXCategory(guid: String, category_guid: String, parent_guid: String?, name: String?, completion: @escaping ((MXTransactionCategoryResult?), Error?) -> ()) {
@@ -1046,9 +1047,9 @@ class Service {
         
         var urlRequest = URLRequest(url: baseURL)
         urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                        "MX-Client-ID": MXAPI.clientID,
-                                        "Accept": MXAPI.version,
-                                        "Content-Type": MXAPI.contentType]
+                                          "MX-Client-ID": MXAPI.clientID,
+                                          "Accept": MXAPI.version,
+                                          "Content-Type": MXAPI.contentType]
         
         var parameters = [String: String]()
         //If no values are given, from_date will default to 90 days prior to the request, and to_date will default to 5 days from the time of the request.
@@ -1063,14 +1064,41 @@ class Service {
         
         let encodedURLRequest = urlRequest.encode(with: parameters)
         fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
-                        
+        
+    }
+    
+    func fetchMXConnectURL(completion: @escaping ((String?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/openMXConnect")!
+        }()
+        
+        let currentUser = Auth.auth().currentUser
+        currentUser?.getIDTokenForcingRefresh(true) { [weak self] token, error in
+            if let error = error {
+                print("error getting token \(error)")
+                // Handle error
+                return
+            }
+            if let token = token {
+                print("Bearer \(token)")
+                var urlRequest = URLRequest(url: baseURL)
+                urlRequest.allHTTPHeaderFields = ["Content-Type": "text/plain; charset=utf-8",
+                                                  "Authorization" : "Bearer \(token)"]
+                
+                urlRequest.httpMethod = "GET"
+                
+                self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+            }
+        }
+        
     }
     
     // declare my generic json function here
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
-//        print("encodedURLRequest \(encodedURLRequest)")
+        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
-//            print("resObject \(resp)")
+            print("resObject \(resp)")
             if let err = err {
                 print("err \(err)")
                 completion(nil, err)
@@ -1079,13 +1107,13 @@ class Service {
             do {
                 let objects = try JSONDecoder().decode(T.self, from: data!)
                 // success
-//                print("objects \(objects)")
+                print("objects \(objects)")
                 completion(objects, nil)
             } catch {
                 print("error \(error)")
                 completion(nil, error)
             }
-            }.resume()
+        }.resume()
     }
     
 }
@@ -1142,11 +1170,11 @@ struct SygicAPI {
 
 struct MXAPI {
     //production environment
-//    static let baseURL = "https://atrium.mx.com/"
+    //    static let baseURL = "https://atrium.mx.com/"
     
     //production environment keys
-//    static fileprivate let apiKey = "d14242458ddd419ac3e40238537070a6ccf29c2f"
-//    static fileprivate let clientID = "cc3f22cd-7431-4bd9-955c-2624dcbb0e26"
+    //    static fileprivate let apiKey = "d14242458ddd419ac3e40238537070a6ccf29c2f"
+    //    static fileprivate let clientID = "cc3f22cd-7431-4bd9-955c-2624dcbb0e26"
     
     //development environment URL
     static let baseURL = "https://vestibule.mx.com/"
@@ -1171,8 +1199,8 @@ extension URLRequest {
         var encodedURLRequest = self
         
         if let url = self.url,
-            let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false),
-            !parameters.isEmpty {
+           let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false),
+           !parameters.isEmpty {
             var newUrlComponents = urlComponents
             let queryItems = parameters.map { key, value in
                 URLQueryItem(name: key, value: value)
