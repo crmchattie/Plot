@@ -17,7 +17,7 @@ class GoogleCalService {
     var user : GIDGoogleUser?
     
     func setupGoogle(completion: @escaping (Bool) -> Swift.Void) {
-        GoogleSetupAssistant.setupGoogle { bool in
+        GoogleCalSetupAssistant.setupGoogle { bool in
             if let user = GIDSignIn.sharedInstance()?.currentUser {
                 self.user = user
             }
@@ -83,12 +83,25 @@ class GoogleCalService {
         event.start = start
         event.end = end
         
-        let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: "primary")
-        service.executeQuery(query, completionHandler: { (ticket, result, error) in
-            if error != nil {
-                print("Failed to save google calendar event with error : \(String(describing: error))")
+        if let value = UserDefaults.standard.string(forKey: "PlotCalendar") {
+            let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: value)
+            service.executeQuery(query, completionHandler: { (ticket, result, error) in
+                if error != nil {
+                    print("Failed to save google calendar event with error : \(String(describing: error))")
+                }
+            })
+        } else {
+            createPlotCalendar { (identifier) in
+                if let value = identifier {
+                    let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: value)
+                    service.executeQuery(query, completionHandler: { (ticket, result, error) in
+                        if error != nil {
+                            print("Failed to save google calendar event with error : \(String(describing: error))")
+                        }
+                    })
+                }
             }
-        })
+        }
         
         return event
     }
@@ -109,5 +122,25 @@ class GoogleCalService {
             calendars[user.profile.email] = items.map { $0.summary ?? "" }
             completion(calendars)
         }
+    }
+    
+    func createPlotCalendar(completion: @escaping (String?) -> Swift.Void) {
+        guard let service = self.calendarService else {
+            completion(nil)
+            return
+        }
+        let calendar = GTLRCalendar_Calendar()
+        calendar.summary = "Plot"
+        
+        let query = GTLRCalendarQuery_CalendarsInsert.query(withObject: calendar)
+        service.executeQuery(query, completionHandler: { (ticket, result, error) in
+            guard error == nil, let createdCalendar = result as? GTLRCalendar_Calendar else {
+                print("Failed to save google calendar with error : \(String(describing: error))")
+                completion(nil)
+                return
+            }
+            UserDefaults.standard.set(calendar.identifier, forKey: "PlotCalendar")
+            completion(createdCalendar.identifier)
+        })
     }
 }

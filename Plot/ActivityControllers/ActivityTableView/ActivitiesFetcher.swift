@@ -37,7 +37,7 @@ class ActivitiesFetcher: NSObject {
                 let group = DispatchGroup()
                 for (activityID, userActivityInfo) in activityIDs {
                     if let dictionary = userActivityInfo as? [String: AnyObject] {
-                        let userActivity = Activity(dictionary: dictionary)
+                        let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
                         group.enter()
                         ref.child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
                             if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
@@ -116,8 +116,8 @@ class ActivitiesFetcher: NSObject {
             let group = DispatchGroup()
             group.enter()
             ref.child(userActivitiesEntity).child(currentUserID).child(activityID).observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let userActivityInfo = snapshot.value as? [String: AnyObject] {
-                    let userActivity = Activity(dictionary: userActivityInfo)
+                if snapshot.exists(), let dictionary = snapshot.value as? [String: AnyObject] {
+                    let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
                     ref.child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
                         if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
                             let activity = Activity(dictionary: activitySnapshotValue)

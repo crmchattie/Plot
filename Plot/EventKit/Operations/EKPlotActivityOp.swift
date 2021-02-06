@@ -28,7 +28,7 @@ class EKPlotActivityOp: AsyncOperation {
             self.finish()
             return
         }
-        // @FIX-ME - need a better way to check if event ID exists
+        // @FIX-ME remove in four months from 2/6/21 since we can check for calendar export property on activities
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? [String: [String:String]] {
@@ -36,18 +36,23 @@ class EKPlotActivityOp: AsyncOperation {
                 let values = value.values
                 let activitiesIDs = values.compactMap { $0["activityID"] }
                 for activity in self!.activities {
-                    dispatchGroup.enter()
-                    if let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
-                        if let event = self?.eventKitService.storeEvent(for: activity) {
-                            let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                            reference.child(event.calendarItemIdentifier).updateChildValues(calendarEventActivityValue) { (_, _) in
+                    if !(activity.calendarExport ?? false) {
+                        dispatchGroup.enter()
+                        if let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
+                            if let event = self?.eventKitService.storeEvent(for: activity) {
+                                let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                                reference.child(event.calendarItemIdentifier).updateChildValues(calendarEventActivityValue) { (_, _) in
+                                    let userReference = Database.database().reference().child("user-activities").child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                                    let values:[String : Any] = ["calendarExport": true]
+                                    userReference.updateChildValues(values)
+                                    dispatchGroup.leave()
+                                }
+                            } else {
                                 dispatchGroup.leave()
                             }
                         } else {
                             dispatchGroup.leave()
                         }
-                    } else {
-                        dispatchGroup.leave()
                     }
                 }
                 dispatchGroup.notify(queue: .global()) {

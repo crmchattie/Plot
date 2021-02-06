@@ -26,6 +26,7 @@ class EKSyncCalendarEventsOp: AsyncOperation {
     }
     
     private func startRequest() {
+        // @FIX-ME remove in four months from 2/6/21 since only grabbing events not on Plot Calendar
         for event in events {
             if !existingEvents.contains(where: {$0.title == event.title && $0.startDate == event.startDate && $0.endDate == event.endDate}) && !existingActivities.contains(where: {$0.name == event.title && $0.startDate == event.startDate && $0.endDate == event.endDate}) {
                 existingEvents.append(event)

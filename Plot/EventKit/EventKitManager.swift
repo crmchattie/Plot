@@ -106,7 +106,7 @@ class EventKitManager {
         guard isAuthorized else {
             return nil
         }
-        let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.type == .calDAV }
+        let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.title != "Plot" }
         for calendar in eventKitService.eventStore.calendars(for: .event) {
             print("calendarName \(calendar.title)")
             print("calendarType \(calendar.type.rawValue)")
