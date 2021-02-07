@@ -1,6 +1,3 @@
-# Uncomment the next line to define a global platform for your project
-# platform :ios, '10.0'
-
 target 'Plot' do
   platform :ios, '13.0'
   inhibit_all_warnings!
@@ -24,8 +21,9 @@ target 'Plot' do
   pod 'CodableFirebase'
   pod 'FloatingPanel'
   pod 'Charts'
-  
-	pod 'ARSLineProgress'
+
+  pod 'GoogleSignIn'
+  pod 'GoogleAPIClientForREST/Calendar'
 
 end
 

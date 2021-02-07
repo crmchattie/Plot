@@ -11,9 +11,10 @@ import Foundation
 class EventKitManager {
     private let eventKitService: EventKitService
     private var isRunning: Bool
-    private var isAuthorized: Bool
     private var activities: [Activity]
     private var queue: OperationQueue
+    
+    var isAuthorized: Bool
     
     init(eventKitService: EventKitService) {
         self.eventKitService = eventKitService
@@ -39,8 +40,8 @@ class EventKitManager {
         activities = []
         isRunning = true
         
-        let eventsOp = FetchCalendarEventsOp(eventKitService: eventKitService)
-        let syncEventsOp = SyncCalendarEventsOp(existingActivities: existingActivities)
+        let eventsOp = EKFetchCalendarEventsOp(eventKitService: eventKitService)
+        let syncEventsOp = EKSyncCalendarEventsOp(existingActivities: existingActivities)
         let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
             syncEventsOp.events = eventsOp.events
         }
@@ -85,7 +86,7 @@ class EventKitManager {
         //filter old activities out
         let filterActivities = activities.filter { $0.startDate ?? Date() > timeAgo && $0.startDate ?? Date() < timeFromNow }
                 
-        let activitiesOp = PlotActivityOp(eventKitService: eventKitService, activities: filterActivities)
+        let activitiesOp = EKPlotActivityOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue
         queue.addOperations([activitiesOp], waitUntilFinished: false)
         
@@ -99,5 +100,19 @@ class EventKitManager {
             weakSelf.isRunning = false
             completion()
         }
+    }
+    
+    func grabCalendars() -> [String]? {
+        guard isAuthorized else {
+            return nil
+        }
+        let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.title != "Plot" }
+        for calendar in eventKitService.eventStore.calendars(for: .event) {
+            print("calendarName \(calendar.title)")
+            print("calendarType \(calendar.type.rawValue)")
+            print("calendarSource \(calendar.source)")
+            print("calendarID \(calendar.calendarIdentifier)")
+        }
+        return calendars.map({ $0.title })
     }
 }

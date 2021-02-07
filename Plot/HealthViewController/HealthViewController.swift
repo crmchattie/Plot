@@ -174,10 +174,8 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let key = healthMetricSections[indexPath.section]
-        print("healthMetricSections \(key)")
         if let metrics = healthMetrics[key] {
             let metric = metrics[indexPath.row]
-            print("metric \(metric)")
             openMetric(metric: metric)
         }
     }

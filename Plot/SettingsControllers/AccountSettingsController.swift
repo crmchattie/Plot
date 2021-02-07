@@ -8,7 +8,6 @@
 
 import UIKit
 import Firebase
-import ARSLineProgress
 
 class AccountSettingsController: UITableViewController {
     var networkController = NetworkController()
@@ -18,7 +17,7 @@ class AccountSettingsController: UITableViewController {
     
     let accountSettingsCellId = "userProfileCell"
     
-    var firstSection = [( icon: UIImage(named: "Accounts") , title: "Financial Info" ),
+    var firstSection = [( icon: UIImage(named: "Accounts") , title: "Calendar & Financial Info" ),
 //                        ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
                         ( icon: UIImage(named: "Privacy") , title: "Privacy and Security" ),
                         ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
@@ -321,8 +320,8 @@ extension AccountSettingsController {
         
         if indexPath.section == 0 {
             if indexPath.row == 0 {
-                let destination = FinancialInfoViewController()
-                //let destination = AccountsTableViewController()
+//                let destination = FinancialInfoViewController()
+                let destination = AccountsTableViewController()
                 destination.networkController = networkController
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)

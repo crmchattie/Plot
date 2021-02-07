@@ -115,8 +115,8 @@ class ChatsTableViewController: UITableViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 105
         
-        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-        navigationItem.leftBarButtonItem = cancelBarButton
+        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+        navigationItem.leftBarButtonItem = doneBarButton
         
         let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
         let newChatBarButton =  UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
@@ -127,7 +127,7 @@ class ChatsTableViewController: UITableViewController {
         definesPresentationContext = true        
     }
     
-    @IBAction func cancel(_ sender: AnyObject) {
+    @IBAction func done(_ sender: AnyObject) {
         self.dismiss(animated: true, completion: nil)
     }
     

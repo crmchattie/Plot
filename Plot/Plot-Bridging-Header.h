@@ -11,4 +11,8 @@
 
 #import "FSCalendar.h"
 
+#import "GTMAppAuth/GTMAppAuth.h"
+#import "GTMSessionFetcher/GTMSessionFetcherLogging.h"
+#import "GTLRCalendar.h"
+
 #endif /* Plot_Bridging_Header_h */

@@ -8,7 +8,6 @@
 
 import UIKit
 import Firebase
-import ARSLineProgress
 
 //protocol UpdateInvitees {
 //    func updateInvitees(selectedFalconUsers : [User])

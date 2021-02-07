@@ -8,7 +8,6 @@
 
 import UIKit
 import SDWebImage
-import ARSLineProgress
 
 extension Double {
     func round(to places: Int) -> Double {

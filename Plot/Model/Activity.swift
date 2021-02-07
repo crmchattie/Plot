@@ -763,3 +763,46 @@ extension Activity {
         return Date(timeIntervalSince1970: endDateTime)
     }
 }
+
+func dateToGLTRDate(date: Date, allDay: Bool, timeZone: TimeZone?) -> GTLRCalendar_EventDateTime? {
+    guard let timeZone = timeZone else {
+        return nil
+    }
+    let gDate = GTLRCalendar_EventDateTime()
+    if allDay {
+        gDate.date = GTLRDateTime(date: date)
+        gDate.timeZone = timeZone.identifier
+    } else {
+        gDate.dateTime = GTLRDateTime(date: date)
+        gDate.timeZone = timeZone.identifier
+    }
+    return gDate
+}
+
+extension GTLRCalendar_Event {
+    var startDate: Date? {
+        guard let start = self.start else {
+            return nil
+        }
+        var date = Date()
+        if let startDate = start.dateTime {
+            date = startDate.date
+        } else if let startDate = start.date {
+            date = startDate.date
+        }
+        return date
+    }
+    
+    var endDate: Date? {
+        guard let end = self.end else {
+            return nil
+        }
+        var date = Date()
+        if let endDate = end.dateTime {
+            date = endDate.date
+        } else if let endDate = end.date {
+            date = endDate.date
+        }
+        return date
+    }
+}

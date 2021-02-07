@@ -8,7 +8,6 @@
 
 import UIKit
 import ContactsUI
-import ARSLineProgress
 
 extension UIViewController: CNContactViewControllerDelegate {
   fileprivate func checkContactsAuthorizationStatus() -> Bool {

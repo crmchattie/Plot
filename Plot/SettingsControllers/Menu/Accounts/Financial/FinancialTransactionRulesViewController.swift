@@ -21,10 +21,6 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     let viewPlaceholder = ViewPlaceholder()
     
-    deinit {
-        print("STORAGE DID DEINIT")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Transaction Rules"
@@ -33,8 +29,8 @@ class FinancialTransactionRulesViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
-        let newAccountBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newTransactionRule))
-        navigationItem.rightBarButtonItem = newAccountBarButton
+        let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newTransactionRule))
+        navigationItem.rightBarButtonItem = barButton
         
     }
     

@@ -54,7 +54,11 @@
 		1031410F230D712E00DB471B /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1031410D230D712E00DB471B /* MainInterface.storyboard */; };
 		10314113230D712E00DB471B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 10314109230D712E00DB471B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
-		1034A01325BF8015006D3DB8 /* PlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */; };
+		1034A01325BF8015006D3DB8 /* EKPlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A01225BF8015006D3DB8 /* EKPlotActivityOp.swift */; };
+		1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */; };
+		1034A07825C84FCC006D3DB8 /* GoogleCalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A07725C84FCC006D3DB8 /* GoogleCalManager.swift */; };
+		1034A07E25C84FF0006D3DB8 /* GoogleCalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */; };
+		1034A08225C8507A006D3DB8 /* GoogleCalSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A08125C8507A006D3DB8 /* GoogleCalSetupAssistant.swift */; };
 		10367D43230B126800D25885 /* ActivityImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10367D42230B126800D25885 /* ActivityImageCell.swift */; };
 		1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103946892549FD4B005CED3A /* FoodProductContainer.swift */; };
 		103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */; };
@@ -223,6 +227,10 @@
 		10F3032E24EC6FE500C04B8F /* MXMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F3032D24EC6FE500C04B8F /* MXMember.swift */; };
 		10F3033024EC6FF800C04B8F /* MXAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F3032F24EC6FF800C04B8F /* MXAccount.swift */; };
 		10F3033224EC700C00C04B8F /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F3033124EC700C00C04B8F /* Transaction.swift */; };
+		10F5CFF625CB7E3B0078C821 /* GFetchCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFF525CB7E3B0078C821 /* GFetchCalendarEventsOp.swift */; };
+		10F5CFFA25CB7E490078C821 /* GSyncCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */; };
+		10F5CFFE25CB7E5A0078C821 /* GCalendarActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFFD25CB7E5A0078C821 /* GCalendarActivityOp.swift */; };
+		10F5D00225CB7E670078C821 /* GPlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D00125CB7E670078C821 /* GPlotActivityOp.swift */; };
 		10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */; };
 		10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */; };
 		10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */; };
@@ -234,9 +242,9 @@
 		26036762256CC4DA00FE9142 /* EventKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036761256CC4DA00FE9142 /* EventKitSetupAssistant.swift */; };
 		26036766256CC88900FE9142 /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036765256CC88900FE9142 /* EventKitService.swift */; };
 		2603676C256CD9A000FE9142 /* EventKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603676B256CD9A000FE9142 /* EventKitManager.swift */; };
-		26036774256DBBAD00FE9142 /* FetchCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036773256DBBAD00FE9142 /* FetchCalendarEventsOp.swift */; };
-		26036778256DC76900FE9142 /* SyncCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036777256DC76800FE9142 /* SyncCalendarEventsOp.swift */; };
-		2603677E256DC86300FE9142 /* CalendarActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603677D256DC86300FE9142 /* CalendarActivityOp.swift */; };
+		26036774256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036773256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift */; };
+		26036778256DC76900FE9142 /* EKSyncCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036777256DC76800FE9142 /* EKSyncCalendarEventsOp.swift */; };
+		2603677E256DC86300FE9142 /* EKCalendarActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603677D256DC86300FE9142 /* EKCalendarActivityOp.swift */; };
 		260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87C924FF5FE900715A64 /* HealthKitManager.swift */; };
 		260C87CC24FF600900715A64 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CB24FF600900715A64 /* AsyncOperation.swift */; };
 		260C87CE24FF60B200715A64 /* StepsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CD24FF60B100715A64 /* StepsOperation.swift */; };
@@ -285,7 +293,6 @@
 		26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */; };
 		26E8E3A6238B2CA9000F30C8 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E8E3A5238B2CA9000F30C8 /* NotificationsViewController.swift */; };
 		26E8EFE7237F393900B9067E /* MapActivitiesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E8EFE6237F393900B9067E /* MapActivitiesViewController.swift */; };
-		39A4CDCEF0891B83DB3EB92C /* libPods-ShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D773FFBAA1393BD2878E54F /* libPods-ShareExtension.a */; };
 		4B4F452F1F32230C00A6FF96 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */; };
 		4B4F45381F32230C00A6FF96 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B4F45371F32230C00A6FF96 /* Assets.xcassets */; };
 		4B4F45431F32246000A6FF96 /* GeneralTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F45421F32246000A6FF96 /* GeneralTabBarController.swift */; };
@@ -454,7 +461,8 @@
 		4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB46C6B2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift */; };
 		4BCB128C224ADD450046DFF3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */; };
 		4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */; };
-		7E6985A6EF59641559135D26 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB136BC84E7E2C2D4FDB49B /* libPods-Plot.a */; };
+		4ED658A2BE8AC368D77831D1 /* libPods-ShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */; };
+		A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53D0336E7A51EFB22060D82 /* libPods-Plot.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -482,7 +490,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0D773FFBAA1393BD2878E54F /* libPods-ShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ShareExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		10021A1524F1A480006A1B25 /* FinancialMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialMemberView.swift; sourceTree = "<group>"; };
 		100458942517D50D00065872 /* FinancialTransactionFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionFetcher.swift; sourceTree = "<group>"; };
 		100A53EB23E0DD9C004AA952 /* ActivityHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHeaderCell.swift; sourceTree = "<group>"; };
@@ -533,7 +540,11 @@
 		1031410E230D712E00DB471B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		10314110230D712E00DB471B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		10323D5D2479A58500749706 /* GrocerylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistActions.swift; sourceTree = "<group>"; };
-		1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotActivityOp.swift; sourceTree = "<group>"; };
+		1034A01225BF8015006D3DB8 /* EKPlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKPlotActivityOp.swift; sourceTree = "<group>"; };
+		1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarInfoViewController.swift; sourceTree = "<group>"; };
+		1034A07725C84FCC006D3DB8 /* GoogleCalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalManager.swift; sourceTree = "<group>"; };
+		1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalService.swift; sourceTree = "<group>"; };
+		1034A08125C8507A006D3DB8 /* GoogleCalSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalSetupAssistant.swift; sourceTree = "<group>"; };
 		10367D42230B126800D25885 /* ActivityImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityImageCell.swift; sourceTree = "<group>"; };
 		103946892549FD4B005CED3A /* FoodProductContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodProductContainer.swift; sourceTree = "<group>"; };
 		103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionLevelViewController.swift; sourceTree = "<group>"; };
@@ -703,6 +714,10 @@
 		10F3032D24EC6FE500C04B8F /* MXMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXMember.swift; sourceTree = "<group>"; };
 		10F3032F24EC6FF800C04B8F /* MXAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXAccount.swift; sourceTree = "<group>"; };
 		10F3033124EC700C00C04B8F /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
+		10F5CFF525CB7E3B0078C821 /* GFetchCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GFetchCalendarEventsOp.swift; sourceTree = "<group>"; };
+		10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSyncCalendarEventsOp.swift; sourceTree = "<group>"; };
+		10F5CFFD25CB7E5A0078C821 /* GCalendarActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCalendarActivityOp.swift; sourceTree = "<group>"; };
+		10F5D00125CB7E670078C821 /* GPlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPlotActivityOp.swift; sourceTree = "<group>"; };
 		10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientSearchViewController.swift; sourceTree = "<group>"; };
 		10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDetailCell.swift; sourceTree = "<group>"; };
 		10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailViewController.swift; sourceTree = "<group>"; };
@@ -714,9 +729,9 @@
 		26036761256CC4DA00FE9142 /* EventKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitSetupAssistant.swift; sourceTree = "<group>"; };
 		26036765256CC88900FE9142 /* EventKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitService.swift; sourceTree = "<group>"; };
 		2603676B256CD9A000FE9142 /* EventKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitManager.swift; sourceTree = "<group>"; };
-		26036773256DBBAD00FE9142 /* FetchCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchCalendarEventsOp.swift; sourceTree = "<group>"; };
-		26036777256DC76800FE9142 /* SyncCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCalendarEventsOp.swift; sourceTree = "<group>"; };
-		2603677D256DC86300FE9142 /* CalendarActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarActivityOp.swift; sourceTree = "<group>"; };
+		26036773256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKFetchCalendarEventsOp.swift; sourceTree = "<group>"; };
+		26036777256DC76800FE9142 /* EKSyncCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKSyncCalendarEventsOp.swift; sourceTree = "<group>"; };
+		2603677D256DC86300FE9142 /* EKCalendarActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKCalendarActivityOp.swift; sourceTree = "<group>"; };
 		260C87C924FF5FE900715A64 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		260C87CB24FF600900715A64 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		260C87CD24FF60B100715A64 /* StepsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsOperation.swift; sourceTree = "<group>"; };
@@ -765,6 +780,7 @@
 		26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeCell.swift; sourceTree = "<group>"; };
 		26E8E3A5238B2CA9000F30C8 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		26E8EFE6237F393900B9067E /* MapActivitiesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapActivitiesViewController.swift; sourceTree = "<group>"; };
+		286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ShareExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2928EFFC1124EED65963BE1D /* Pods-ShareExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.release.xcconfig"; path = "Pods/Target Support Files/Pods-ShareExtension/Pods-ShareExtension.release.xcconfig"; sourceTree = "<group>"; };
 		4B4F452B1F32230C00A6FF96 /* Plot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Plot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -938,11 +954,9 @@
 		4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsFetcher.swift; sourceTree = "<group>"; };
 		4BE9F1DE219B457C00C6768F /* Pigeon-project.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Pigeon-project.entitlements"; sourceTree = "<group>"; };
-		8B9AFAE7ED3D864CA90779BE /* Pods-Pigeon-project.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pigeon-project.release.xcconfig"; path = "Pods/Target Support Files/Pods-Pigeon-project/Pods-Pigeon-project.release.xcconfig"; sourceTree = "<group>"; };
 		91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ShareExtension/Pods-ShareExtension.debug.xcconfig"; sourceTree = "<group>"; };
-		9B9CAF682523EA718F4C503C /* Pods-Pigeon-project.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pigeon-project.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Pigeon-project/Pods-Pigeon-project.debug.xcconfig"; sourceTree = "<group>"; };
 		BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.debug.xcconfig"; sourceTree = "<group>"; };
-		CDB136BC84E7E2C2D4FDB49B /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E53D0336E7A51EFB22060D82 /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -950,7 +964,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				39A4CDCEF0891B83DB3EB92C /* libPods-ShareExtension.a in Frameworks */,
+				4ED658A2BE8AC368D77831D1 /* libPods-ShareExtension.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -959,8 +973,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */,
-				7E6985A6EF59641559135D26 /* libPods-Plot.a in Frameworks */,
 				10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */,
+				A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1020,6 +1034,25 @@
 				101B90922458809000EDDB90 /* Assets.xcassets */,
 			);
 			path = ShareExtension;
+			sourceTree = "<group>";
+		};
+		1034A04325C5ECB9006D3DB8 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		1034A07625C84FAA006D3DB8 /* Google */ = {
+			isa = PBXGroup;
+			children = (
+				10F5CFF025CB7D100078C821 /* Operations */,
+				1034A07725C84FCC006D3DB8 /* GoogleCalManager.swift */,
+				1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */,
+				1034A08125C8507A006D3DB8 /* GoogleCalSetupAssistant.swift */,
+			);
+			path = Google;
 			sourceTree = "<group>";
 		};
 		1037E4322550CD7400F4EE42 /* FoodViewControllers */ = {
@@ -1347,6 +1380,7 @@
 			isa = PBXGroup;
 			children = (
 				10F3032424EB746E00C04B8F /* AccountsTableViewController.swift */,
+				1034A04325C5ECB9006D3DB8 /* Calendar */,
 				10F3032824EC69C200C04B8F /* Financial */,
 			);
 			path = Accounts;
@@ -1372,6 +1406,17 @@
 			path = WebView;
 			sourceTree = "<group>";
 		};
+		10F5CFF025CB7D100078C821 /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				10F5CFF525CB7E3B0078C821 /* GFetchCalendarEventsOp.swift */,
+				10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */,
+				10F5CFFD25CB7E5A0078C821 /* GCalendarActivityOp.swift */,
+				10F5D00125CB7E670078C821 /* GPlotActivityOp.swift */,
+			);
+			path = Operations;
+			sourceTree = "<group>";
+		};
 		26036760256CC4A600FE9142 /* EventKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -1386,10 +1431,10 @@
 		26036771256DB68600FE9142 /* Operations */ = {
 			isa = PBXGroup;
 			children = (
-				26036773256DBBAD00FE9142 /* FetchCalendarEventsOp.swift */,
-				26036777256DC76800FE9142 /* SyncCalendarEventsOp.swift */,
-				2603677D256DC86300FE9142 /* CalendarActivityOp.swift */,
-				1034A01225BF8015006D3DB8 /* PlotActivityOp.swift */,
+				26036773256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift */,
+				26036777256DC76800FE9142 /* EKSyncCalendarEventsOp.swift */,
+				2603677D256DC86300FE9142 /* EKCalendarActivityOp.swift */,
+				1034A01225BF8015006D3DB8 /* EKPlotActivityOp.swift */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -1512,8 +1557,8 @@
 			isa = PBXGroup;
 			children = (
 				2623AA8C24FA2A250020A316 /* HealthKit.framework */,
-				CDB136BC84E7E2C2D4FDB49B /* libPods-Plot.a */,
-				0D773FFBAA1393BD2878E54F /* libPods-ShareExtension.a */,
+				E53D0336E7A51EFB22060D82 /* libPods-Plot.a */,
+				286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1563,6 +1608,7 @@
 				4BAEE557212735E50045AB10 /* Support */,
 				2623AA8E24FA2D710020A316 /* HealthKit */,
 				26036760256CC4A600FE9142 /* EventKit */,
+				1034A07625C84FAA006D3DB8 /* Google */,
 				26A5DDD92394CB8E00771DC1 /* Networking */,
 				4B4F45421F32246000A6FF96 /* GeneralTabBarController.swift */,
 				4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */,
@@ -2368,8 +2414,6 @@
 		E788FC79B73E9599A409079F /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				9B9CAF682523EA718F4C503C /* Pods-Pigeon-project.debug.xcconfig */,
-				8B9AFAE7ED3D864CA90779BE /* Pods-Pigeon-project.release.xcconfig */,
 				BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */,
 				1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */,
 				91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */,
@@ -2569,12 +2613,17 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Plot/Pods-Plot-resources-${CONFIGURATION}-input-files.xcfilelist",
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Plot/Pods-Plot-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/CropViewController/TOCropViewControllerBundle.bundle",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+				"${PODS_ROOT}/PhoneNumberKit/PhoneNumberKit/Resources/PhoneNumberMetadata.json",
 			);
 			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Plot/Pods-Plot-resources-${CONFIGURATION}-output-files.xcfilelist",
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PhoneNumberMetadata.json",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -2598,7 +2647,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26036774256DBBAD00FE9142 /* FetchCalendarEventsOp.swift in Sources */,
+				26036774256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift in Sources */,
 				10A18D3A2458E1A5006990F2 /* PurchasesViewController.swift in Sources */,
 				4BAEE5C1212735E50045AB10 /* FalconTextView.swift in Sources */,
 				4BAEE49521272C5E0045AB10 /* ContactsTableViewCell.swift in Sources */,
@@ -2656,6 +2705,7 @@
 				1092F2382414503000E8CE16 /* EventDetailViewController.swift in Sources */,
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
 				260C87CE24FF60B200715A64 /* StepsOperation.swift in Sources */,
+				1034A07825C84FCC006D3DB8 /* GoogleCalManager.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				101B90902457999600EDDB90 /* Weather.swift in Sources */,
 				10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */,
@@ -2667,6 +2717,7 @@
 				4BA1E77C2152511B00391BCB /* UploadProgress.swift in Sources */,
 				10E8E4FF25923B4F0076BE42 /* FinanceControllerCell.swift in Sources */,
 				4BAEE5D7212735E50045AB10 /* AnnouncementFactory.swift in Sources */,
+				10F5CFFA25CB7E490078C821 /* GSyncCalendarEventsOp.swift in Sources */,
 				26836B51251338E800AFC2D7 /* HeartRateOperation.swift in Sources */,
 				4BAEE5EF212735E50045AB10 /* RevealableCollectionViewCell.swift in Sources */,
 				10021A1624F1A480006A1B25 /* FinancialMemberView.swift in Sources */,
@@ -2677,6 +2728,7 @@
 				4BAEE4F321272D890045AB10 /* GroupProfileTableHeaderContainer.swift in Sources */,
 				1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */,
 				4BAEE46421272B380045AB10 /* AccountSettingsTableViewCell.swift in Sources */,
+				10F5CFFE25CB7E5A0078C821 /* GCalendarActivityOp.swift in Sources */,
 				26336E172593FA1A001A3071 /* HealthKitSampleBuilder.swift in Sources */,
 				4BAEE49721272C5E0045AB10 /* FalconUsersFetcher.swift in Sources */,
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
@@ -2752,7 +2804,7 @@
 				10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */,
 				109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */,
 				4BAEE5BB212735E50045AB10 /* INSPhotosOverlayView.swift in Sources */,
-				26036778256DC76900FE9142 /* SyncCalendarEventsOp.swift in Sources */,
+				26036778256DC76900FE9142 /* EKSyncCalendarEventsOp.swift in Sources */,
 				10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */,
 				4BAEE50C21272D890045AB10 /* UserInfoTableViewController+handlers.swift in Sources */,
 				4BAEE50921272D890045AB10 /* SelectedMediaCollectionCell+timerHandlers.swift in Sources */,
@@ -2773,11 +2825,13 @@
 				260C87D02500BFDF00715A64 /* AnnualAverageStepsOperation.swift in Sources */,
 				10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
+				10F5D00225CB7E670078C821 /* GPlotActivityOp.swift in Sources */,
 				10DFC3F5255CC63000565DAD /* WorkoutFetcher.swift in Sources */,
 				10B541DE25479D0700CC9023 /* MealProductSearchViewController.swift in Sources */,
 				1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */,
 				102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */,
 				4B4F452F1F32230C00A6FF96 /* AppDelegate.swift in Sources */,
+				1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */,
 				4BAEE48221272C4F0045AB10 /* UserProfileController.swift in Sources */,
 				4BAEE50A21272D890045AB10 /* GroupAdminControlsTableViewController+NameEditing.swift in Sources */,
 				4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */,
@@ -2808,6 +2862,7 @@
 				10C83342249ACC8F0037F638 /* SygicToursSearchResult.swift in Sources */,
 				4BAEE46521272B380045AB10 /* AccountSettingsController.swift in Sources */,
 				10CA911725367D8D003CEAF7 /* FinancialTransactionActions.swift in Sources */,
+				1034A07E25C84FF0006D3DB8 /* GoogleCalService.swift in Sources */,
 				2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */,
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
 				104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */,
@@ -2836,6 +2891,7 @@
 				4BAEE51C21272D890045AB10 /* BaseMessageCell+CellDeletionHandlers.swift in Sources */,
 				10808733258506EC00FB9BB0 /* WorkFetcher.swift in Sources */,
 				10B541E625479D4300CC9023 /* GroceryProductDetailViewController.swift in Sources */,
+				1034A08225C8507A006D3DB8 /* GoogleCalSetupAssistant.swift in Sources */,
 				4BA1E778215250BF00391BCB /* MessageSender.swift in Sources */,
 				269105F5253E8E2E00A02C5F /* IntAxisValueFormatter.swift in Sources */,
 				26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */,
@@ -2902,6 +2958,7 @@
 				4BAEE46F21272B380045AB10 /* NotificationsTableViewController.swift in Sources */,
 				4BAEE50421272D890045AB10 /* AutoSizingCollectionViewFlowLayout.swift in Sources */,
 				10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */,
+				10F5CFF625CB7E3B0078C821 /* GFetchCalendarEventsOp.swift in Sources */,
 				10E93D4F24BE41B500F6EE18 /* LocationsCarouselController.swift in Sources */,
 				10196F0524411B5600B6AFDF /* CreateActivityViewController.swift in Sources */,
 				4BAEE5B8212735E50045AB10 /* INSPhotosInteractionAnimator.swift in Sources */,
@@ -2947,12 +3004,12 @@
 				1011466925A8E6C5007B51AF /* TimeZoneFinderViewController.swift in Sources */,
 				1092F2362414501D00E8CE16 /* RecipeDetailViewController.swift in Sources */,
 				265AA95E23A362CE00DBB10A /* ActivityViewController+Migration.swift in Sources */,
-				1034A01325BF8015006D3DB8 /* PlotActivityOp.swift in Sources */,
+				1034A01325BF8015006D3DB8 /* EKPlotActivityOp.swift in Sources */,
 				10F3033224EC700C00C04B8F /* Transaction.swift in Sources */,
 				10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */,
 				106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */,
 				4BAEE4ED21272D890045AB10 /* LeaveGroupAndChangeAdminController.swift in Sources */,
-				2603677E256DC86300FE9142 /* CalendarActivityOp.swift in Sources */,
+				2603677E256DC86300FE9142 /* EKCalendarActivityOp.swift in Sources */,
 				10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */,
 				10737F8524912BDD00D146D6 /* Preview.swift in Sources */,
 				1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */,
@@ -3226,6 +3283,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
@@ -3250,6 +3308,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = G226F98322;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/FirebaseAnalytics/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleAppMeasurement/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleSignIn/Frameworks\"",
+					"$(PROJECT_DIR)",
+				);
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -3284,6 +3349,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = G226F98322;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/FirebaseAnalytics/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleAppMeasurement/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleSignIn/Frameworks\"",
+					"$(PROJECT_DIR)",
+				);
 				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "$(SRCROOT)/Plot/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -3292,7 +3364,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1.3;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";

@@ -19,10 +19,6 @@ import UIKit
 class AccountsTableViewController: UITableViewController {
     var networkController = NetworkController()
     
-    deinit {
-        print("STORAGE DID DEINIT")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -35,12 +31,8 @@ class AccountsTableViewController: UITableViewController {
         extendedLayoutIncludesOpaqueBars = true
     }
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return 2
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -55,17 +47,15 @@ class AccountsTableViewController: UITableViewController {
         cell.backgroundColor = view.backgroundColor
         
         if indexPath.row == 0 {
+            cell.textLabel?.text = "Calendar Information"
+            cell.isUserInteractionEnabled = true
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+        else if indexPath.row == 1 {
             cell.textLabel?.text = "Financial Information"
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
-        
-//        if indexPath.row == 0 {
-//            cell.textLabel?.text = "Calendar Information"
-//            cell.isUserInteractionEnabled = true
-//            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//        }
-//
-//        if indexPath.row == 2 {
+//        else if indexPath.row == 2 {
 //            cell.textLabel?.text = "Health Information"
 //            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
 //        }
@@ -74,7 +64,13 @@ class AccountsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 {
+            let destination = CalendarInfoViewController()
+            destination.networkController = networkController
+            navigationController?.pushViewController(destination, animated: true)
+        }
+        else if indexPath.row == 1 {
             let destination = FinancialInfoViewController()
+            destination.networkController = networkController
             navigationController?.pushViewController(destination, animated: true)
         }
         tableView.deselectRow(at: indexPath, animated: true)

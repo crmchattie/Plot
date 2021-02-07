@@ -21,6 +21,7 @@ class ActivityActions: NSObject {
     
     let dispatchGroup = DispatchGroup()
     let eventKitService = EventKitService()
+    let googleCalService = GoogleCalService()
         
     init(activity: Activity, active: Bool?, selectedFalconUsers: [User]) {
         super.init()
@@ -141,8 +142,10 @@ class ActivityActions: NSObject {
         
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(event.calendarItemIdentifier)
         let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-        reference.updateChildValues(calendarEventActivityValue) { (_, _) in
-        }
+        reference.updateChildValues(calendarEventActivityValue)
+        let userReference = Database.database().reference().child("user-activities").child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+        let values:[String : Any] = ["calendarExport": true]
+        userReference.updateChildValues(values)
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {

@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 import UserNotifications
 import CodableFirebase
+import GoogleSignIn
 
 enum Identifiers {
     static let viewChatsAction = "VIEW_CHAT_IDENTIFIER"
@@ -29,8 +30,7 @@ enum Identifiers {
 }
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     var window: UIWindow?
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -43,6 +43,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         Database.database().isPersistenceEnabled = true
         userDefaults.configureInitialLaunch()
+        GIDSignIn.sharedInstance().clientID = "433321796976-14dht5ecttj96dnltoj7cf0arfr7e6bo.apps.googleusercontent.com"
+        GIDSignIn.sharedInstance().scopes = ["https://www.googleapis.com/auth/calendar"]
+        GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance()?.restorePreviousSignIn()
         //manually create window or default controller, thus ridding of Storyboard
         let tabBarController = GeneralTabBarController()
         // set-up window
@@ -60,7 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if Auth.auth().currentUser != nil {
             registerForPushNotifications(application: application)
         }
-        
+
         RunLoop.current.run(until: NSDate(timeIntervalSinceNow:2) as Date)
         
         return true
@@ -70,7 +74,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler:
-        @escaping (UIBackgroundFetchResult) -> Void
+            @escaping (UIBackgroundFetchResult) -> Void
     ) {
         guard let aps = userInfo["aps"] as? [String: AnyObject] else {
             completionHandler(.failed)
@@ -78,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         // 1
         if aps["content-available"] as? Int == 1 {
-
+            
         } else  {
             completionHandler(.newData)
         }
@@ -209,9 +213,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication,
-       open url: URL,
-       options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        return true
+                     open url: URL,
+                     options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        return GIDSignIn.sharedInstance().handle(url)
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
@@ -254,6 +258,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 notifications.append(contentsOf: items)
             }
         }
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
     }
 }
 
@@ -329,7 +336,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         let activity = Activity(dictionary: dictionary)
                         
                         let dispatchGroup = DispatchGroup()
-                                
+                        
                         if let recipeString = activity.recipeID, let recipeID = Int(recipeString) {
                             dispatchGroup.enter()
                             Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
@@ -418,7 +425,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                         }
                                     }
                                 }
-                              })
+                            })
                             { (error) in
                                 print(error.localizedDescription)
                             }
@@ -931,5 +938,5 @@ extension AppDelegate: MessagesDelegate {
 }
 
 extension Notification.Name {
-     static let userNotification = Notification.Name("userNotification")
+    static let userNotification = Notification.Name("userNotification")
 }

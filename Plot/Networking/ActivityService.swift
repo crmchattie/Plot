@@ -8,6 +8,10 @@
 
 import Foundation
 import Firebase
+import GoogleSignIn
+
+let icloudString = "iCloud"
+let gmailString = "Gmail"
 
 extension NSNotification.Name {
     static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
@@ -18,6 +22,8 @@ class ActivityService {
     let invitationsFetcher = InvitationsFetcher()
     
     var askedforAuthorization: Bool = false
+    
+    var calendars = [String: [String]]()
 
     var activities = [Activity]() {
         didSet {
@@ -41,10 +47,15 @@ class ActivityService {
     var hasLoadedCalendarEventActivities = false
         
     var eventKitManager: EventKitManager = {
-        let eventKitSetupAssistant = EventKitSetupAssistant()
         let eventKitService = EventKitService()
         let eventKitManager = EventKitManager(eventKitService: eventKitService)
         return eventKitManager
+    }()
+    
+    var googleCalManager: GoogleCalManager = {
+        let googleCalService = GoogleCalService()
+        let googleCalManager = GoogleCalManager(googleCalService: googleCalService)
+        return googleCalManager
     }()
     
     func grabActivities(_ completion: @escaping () -> Void) {
@@ -52,19 +63,53 @@ class ActivityService {
             self?.activitiesFetcher.fetchActivities { (activities) in
                 self?.activities = activities
                 self?.fetchInvitations()
-                if let _ = Auth.auth().currentUser {
-                    self?.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
-                        self?.askedforAuthorization = askedforAuthorization
-                        self?.eventKitManager.syncEventKitActivities(existingActivities: activities, completion: {
-                            self?.eventKitManager.syncActivitiesToEventKit(activities: activities, completion: {
-                                self?.observeActivitiesForCurrentUser()
-                                self?.observeInvitationForCurrentUser()
-                            })
-                        })
-                    })
+                self?.grabEventKit {
+                    self?.observeActivitiesForCurrentUser()
+                    self?.observeInvitationForCurrentUser()
+//                    self?.grabGoogle {
+//
+//                    }
                 }
                 completion()
             }
+        }
+    }
+    
+    func grabEventKit(_ completion: @escaping () -> Void) {
+        if let _ = Auth.auth().currentUser {
+            self.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
+                self.askedforAuthorization = askedforAuthorization
+                self.eventKitManager.syncEventKitActivities(existingActivities: self.activities, completion: {
+                    self.eventKitManager.syncActivitiesToEventKit(activities: self.activities, completion: {
+                        if let appleCalendars = self.eventKitManager.grabCalendars() {
+                            self.calendars[icloudString] = appleCalendars
+                        }
+                        completion()
+                    })
+                })
+            })
+        } else {
+            completion()
+        }
+    }
+    
+    func grabGoogle(_ completion: @escaping () -> Void) {
+        if let _ = Auth.auth().currentUser {
+            self.googleCalManager.setupGoogle { askedforAuthorization in
+                self.askedforAuthorization = askedforAuthorization
+                self.googleCalManager.syncGoogleCalActivities(existingActivities: self.activities, completion: {
+                    self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activities, completion: {
+                        self.googleCalManager.grabCalendars() { calendars in
+                            if let calendars = calendars {
+                                self.calendars.merge(dict: calendars)
+                            }
+                        }
+                        completion()
+                    })
+                })
+            }
+        } else {
+            completion()
         }
     }
     
