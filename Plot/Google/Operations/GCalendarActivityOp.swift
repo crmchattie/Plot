@@ -35,7 +35,6 @@ class GCalendarActivityOp: AsyncOperation {
                         self?.finish()
                         return
                     }
-                                        
                     self?.update(activity: activity)
                     let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
@@ -55,7 +54,6 @@ class GCalendarActivityOp: AsyncOperation {
                     let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                         let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-
                         let values: [String : Any] = ["isGroupActivity": false, "badge": 0]
                         userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                             self?.finish()
@@ -85,7 +83,7 @@ class GCalendarActivityOp: AsyncOperation {
             activity.allDay = true
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)
             activity.startTimeZone = event.start?.timeZone
-            activity.endDateTime = NSNumber(value: end.date.timeIntervalSince1970)
+            activity.endDateTime = NSNumber(value: end.date.addingTimeInterval(-86400).timeIntervalSince1970)
             activity.endTimeZone = event.end?.timeZone
         } else if let start = event.start?.dateTime, let end = event.end?.dateTime {
             activity.allDay = false

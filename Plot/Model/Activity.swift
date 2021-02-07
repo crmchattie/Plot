@@ -764,13 +764,18 @@ extension Activity {
     }
 }
 
-func dateToGLTRDate(date: Date, timeZone: TimeZone?) -> GTLRCalendar_EventDateTime? {
+func dateToGLTRDate(date: Date, allDay: Bool, timeZone: TimeZone?) -> GTLRCalendar_EventDateTime? {
     guard let timeZone = timeZone else {
         return nil
     }
     let gDate = GTLRCalendar_EventDateTime()
-    gDate.dateTime = GTLRDateTime(date: date)
-    gDate.timeZone = timeZone.identifier
+    if allDay {
+        gDate.date = GTLRDateTime(date: date)
+        gDate.timeZone = timeZone.identifier
+    } else {
+        gDate.dateTime = GTLRDateTime(date: date)
+        gDate.timeZone = timeZone.identifier
+    }
     return gDate
 }
 

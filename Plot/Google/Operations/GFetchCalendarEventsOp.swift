@@ -21,7 +21,9 @@ class GFetchCalendarEventsOp: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        events = googleCalService.fetchEventsForCertainTime()
-        self.finish()
+        googleCalService.fetchEventsForCertainTime() { events in
+            self.events = events
+            self.finish()
+        }
     }
 }

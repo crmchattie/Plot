@@ -21,6 +21,7 @@ class ActivityActions: NSObject {
     
     let dispatchGroup = DispatchGroup()
     let eventKitService = EventKitService()
+    let googleCalService = GoogleCalService()
         
     init(activity: Activity, active: Bool?, selectedFalconUsers: [User]) {
         super.init()

@@ -21,7 +21,7 @@ class ActivityService {
     let activitiesFetcher = ActivitiesFetcher()
     let invitationsFetcher = InvitationsFetcher()
     
-    var askedforEventKitAuthorization: Bool = false
+    var askedforAuthorization: Bool = false
     
     var calendars = [String: [String]]()
 
@@ -52,10 +52,10 @@ class ActivityService {
         return eventKitManager
     }()
     
-    var googleManager: GoogleCalManager = {
+    var googleCalManager: GoogleCalManager = {
         let googleCalService = GoogleCalService()
-        let googleManager = GoogleCalManager(googleCalService: googleCalService)
-        return googleManager
+        let googleCalManager = GoogleCalManager(googleCalService: googleCalService)
+        return googleCalManager
     }()
     
     func grabActivities(_ completion: @escaping () -> Void) {
@@ -64,10 +64,11 @@ class ActivityService {
                 self?.activities = activities
                 self?.fetchInvitations()
                 self?.grabEventKit {
-                    self?.grabGoogle {
-                        self?.observeActivitiesForCurrentUser()
-                        self?.observeInvitationForCurrentUser()
-                    }
+                    self?.observeActivitiesForCurrentUser()
+                    self?.observeInvitationForCurrentUser()
+//                    self?.grabGoogle {
+//
+//                    }
                 }
                 completion()
             }
@@ -77,7 +78,7 @@ class ActivityService {
     func grabEventKit(_ completion: @escaping () -> Void) {
         if let _ = Auth.auth().currentUser {
             self.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
-                self.askedforEventKitAuthorization = askedforAuthorization
+                self.askedforAuthorization = askedforAuthorization
                 self.eventKitManager.syncEventKitActivities(existingActivities: self.activities, completion: {
                     self.eventKitManager.syncActivitiesToEventKit(activities: self.activities, completion: {
                         if let appleCalendars = self.eventKitManager.grabCalendars() {
@@ -94,13 +95,18 @@ class ActivityService {
     
     func grabGoogle(_ completion: @escaping () -> Void) {
         if let _ = Auth.auth().currentUser {
-            self.googleManager.setupGoogle {
-                self.googleManager.grabCalendars() { calendars in
-                    if let calendars = calendars {
-                        self.calendars.merge(dict: calendars)
-                    }
-                    completion()
-                }
+            self.googleCalManager.setupGoogle { askedforAuthorization in
+                self.askedforAuthorization = askedforAuthorization
+                self.googleCalManager.syncGoogleCalActivities(existingActivities: self.activities, completion: {
+                    self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activities, completion: {
+                        self.googleCalManager.grabCalendars() { calendars in
+                            if let calendars = calendars {
+                                self.calendars.merge(dict: calendars)
+                            }
+                        }
+                        completion()
+                    })
+                })
             }
         } else {
             completion()

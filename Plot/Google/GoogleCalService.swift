@@ -25,11 +25,13 @@ class GoogleCalService {
         }
     }
     
-    func fetchEventsForCertainTime() -> [GTLRCalendar_Event] {
+    func fetchEventsForCertainTime(completion: @escaping ([GTLRCalendar_Event]) -> Swift.Void) {
         var events: [GTLRCalendar_Event] = []
         guard let service = self.calendarService else {
-            return events
+            completion(events)
+            return
         }
+        let dispatchGroup = DispatchGroup()
         // Get the appropriate calendar.
         let calendar = Calendar.current
 
@@ -42,39 +44,43 @@ class GoogleCalService {
         var timeFromNowComponents = DateComponents()
         timeFromNowComponents.month = 6
         let timeFromNow = GTLRDateTime(date: calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date())
-
+        
+        dispatchGroup.enter()
         let query = GTLRCalendarQuery_CalendarListList.query()
         service.executeQuery(query) { (ticket, result, error) in
-            if error == nil, let items = (result as? GTLRCalendar_CalendarList)?.items {
-                for item in items {
-                    if let id = item.identifier {
+            if error == nil, let calendars = (result as? GTLRCalendar_CalendarList)?.items {
+                for calendar in calendars {
+                    if let id = calendar.identifier {
+                        dispatchGroup.enter()
                         let eventsListQuery = GTLRCalendarQuery_EventsList.query(withCalendarId: id)
                         eventsListQuery.timeMin = timeAgo
                         eventsListQuery.timeMax = timeFromNow
-
+                        
                         service.executeQuery(eventsListQuery, completionHandler: { (ticket, result, error) in
                             guard error == nil, let items = (result as? GTLRCalendar_Events)?.items else {
+                                print("failed to grab events \(String(describing: error))")
+                                dispatchGroup.leave()
                                 return
                             }
-
-                            if items.count > 0 {
-                                print(items)
-                                events.append(contentsOf: items)
-                                // Do stuff with your events
-                            } else {
-                                // No events
-                            }
+                            events.append(contentsOf: items)
+                            dispatchGroup.leave()
                         })
                     }
                 }
+                dispatchGroup.leave()
+            } else {
+                print("failed to grab calendars \(String(describing: error))")
+                dispatchGroup.leave()
             }
         }
         
-        return events
+        dispatchGroup.notify(queue: .main) {
+            completion(events)
+        }
     }
     
     func storeEvent(for activity: Activity) -> GTLRCalendar_Event? {
-        guard let service = self.calendarService, let startDate = activity.startDate, let endDate = activity.endDate, let start = dateToGLTRDate(date: startDate, timeZone: TimeZone(identifier: activity.startTimeZone ?? "UTC")), let end = dateToGLTRDate(date: endDate, timeZone: TimeZone(identifier: activity.endTimeZone ?? "UTC")), let name = activity.name else {
+        guard let service = self.calendarService, let startDate = activity.startDate, let endDate = activity.endDate, let start = dateToGLTRDate(date: startDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.startTimeZone ?? "UTC")), let end = dateToGLTRDate(date: endDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.endTimeZone ?? "UTC")), let name = activity.name else {
             return nil
         }
         
