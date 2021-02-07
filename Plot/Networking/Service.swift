@@ -1097,8 +1097,9 @@ class Service {
                                                   "Authorization" : "Bearer \(token)"]
                 
                 urlRequest.httpMethod = "GET"
-                let encodedURLRequest = urlRequest.encode(with: parameters)
-                self?.fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
+                let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
+                urlRequest.httpBody = jsonData
+                self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
             }
         }
         
