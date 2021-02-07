@@ -269,7 +269,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     }
     
     func openMXConnect(guid: String, current_member_guid: String?) {
-        Service.shared.fetchMXConnectURL() { (search, err) in
+        Service.shared.fetchMXConnectURL(current_member_guid: nil) { (search, err) in
             print("search \(search)")
             if let url = search {
                 DispatchQueue.main.async {

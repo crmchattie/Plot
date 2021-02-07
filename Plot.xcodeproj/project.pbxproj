@@ -1044,7 +1044,7 @@
 			path = Calendar;
 			sourceTree = "<group>";
 		};
-		1034A07625C84FAA006D3DB8 /* Google */ = {
+		1034A07625C84FAA006D3DB8 /* Google Calendar */ = {
 			isa = PBXGroup;
 			children = (
 				10F5CFF025CB7D100078C821 /* Operations */,
@@ -1052,7 +1052,7 @@
 				1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */,
 				1034A08125C8507A006D3DB8 /* GoogleCalSetupAssistant.swift */,
 			);
-			path = Google;
+			path = "Google Calendar";
 			sourceTree = "<group>";
 		};
 		1037E4322550CD7400F4EE42 /* FoodViewControllers */ = {
@@ -1608,7 +1608,7 @@
 				4BAEE557212735E50045AB10 /* Support */,
 				2623AA8E24FA2D710020A316 /* HealthKit */,
 				26036760256CC4A600FE9142 /* EventKit */,
-				1034A07625C84FAA006D3DB8 /* Google */,
+				1034A07625C84FAA006D3DB8 /* Google Calendar */,
 				26A5DDD92394CB8E00771DC1 /* Networking */,
 				4B4F45421F32246000A6FF96 /* GeneralTabBarController.swift */,
 				4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */,
