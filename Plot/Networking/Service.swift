@@ -1067,11 +1067,22 @@ class Service {
         
     }
     
-    func fetchMXConnectURL(completion: @escaping ((String?), Error?) -> ()) {
-        
+    func fetchMXConnectURL(current_member_guid: String?, completion: @escaping ((String?), Error?) -> ()) {
         let baseURL: URL = {
             return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/openMXConnect")!
         }()
+        
+        var parameters = ["isMobileWebview":"\(true)",
+                          "uiMessageVersion": "\(4)"]
+        if UITraitCollection.current.userInterfaceStyle == .light {
+            parameters["colorScheme"] = "light"
+        } else {
+            parameters["colorScheme"] = "dark"
+        }
+        if let guid = current_member_guid {
+            parameters["currentMemberGuid"] = "\(guid)"
+            parameters["disableInstitutionSearch"] = "true"
+        }
         
         let currentUser = Auth.auth().currentUser
         currentUser?.getIDTokenForcingRefresh(true) { [weak self] token, error in
@@ -1086,8 +1097,8 @@ class Service {
                                                   "Authorization" : "Bearer \(token)"]
                 
                 urlRequest.httpMethod = "GET"
-                
-                self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+                let encodedURLRequest = urlRequest.encode(with: parameters)
+                self?.fetchGenericJSONData(encodedURLRequest: encodedURLRequest, completion: completion)
             }
         }
         
