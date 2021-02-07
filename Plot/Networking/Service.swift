@@ -1081,7 +1081,6 @@ class Service {
                 return
             }
             if let token = token {
-                print("Bearer \(token)")
                 var urlRequest = URLRequest(url: baseURL)
                 urlRequest.allHTTPHeaderFields = ["Content-Type": "text/plain; charset=utf-8",
                                                   "Authorization" : "Bearer \(token)"]
