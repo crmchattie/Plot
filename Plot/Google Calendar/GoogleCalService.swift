@@ -49,7 +49,8 @@ class GoogleCalService {
         let query = GTLRCalendarQuery_CalendarListList.query()
         service.executeQuery(query) { (ticket, result, error) in
             if error == nil, let calendars = (result as? GTLRCalendar_CalendarList)?.items {
-                for calendar in calendars {
+                let filteredCalendars = calendars.filter{ $0.summary != "Plot" }
+                for calendar in filteredCalendars {
                     if let id = calendar.identifier {
                         dispatchGroup.enter()
                         let eventsListQuery = GTLRCalendarQuery_EventsList.query(withCalendarId: id)
@@ -133,7 +134,7 @@ class GoogleCalService {
     }
     
     func grabCalendars(completion: @escaping ([String]?) -> Swift.Void) {
-        guard let service = self.calendarService, let user = user else {
+        guard let service = self.calendarService else {
             completion(nil)
             return
         }
@@ -145,7 +146,7 @@ class GoogleCalService {
                 completion(nil)
                 return
             }
-            calendars = items.map { $0.summary ?? "" }
+            calendars = items.filter { $0.summary != "Plot" }.map { $0.summary ?? "" }
             completion(calendars)
         }
     }

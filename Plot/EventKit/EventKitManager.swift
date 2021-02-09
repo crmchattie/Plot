@@ -107,12 +107,6 @@ class EventKitManager {
             return nil
         }
         let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.title != "Plot" }
-        for calendar in eventKitService.eventStore.calendars(for: .event) {
-            print("calendarName \(calendar.title)")
-            print("calendarType \(calendar.type.rawValue)")
-            print("calendarSource \(calendar.source)")
-            print("calendarID \(calendar.calendarIdentifier)")
-        }
         return calendars.map({ $0.title })
     }
 }

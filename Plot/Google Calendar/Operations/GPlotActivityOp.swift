@@ -35,24 +35,24 @@ class GPlotActivityOp: AsyncOperation {
                 let dispatchGroup = DispatchGroup()
                 let values = value.values
                 let activitiesIDs = values.compactMap { $0["activityID"] }
-//                for activity in self!.activities {
-//                    dispatchGroup.enter()
-//                    if let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
-//                        if let event = self?.googleCalService.storeEvent(for: activity), let id = event.identifier {
-//                            let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-//                            reference.child(id).updateChildValues(calendarEventActivityValue) { (_, _) in
-//                                let userReference = Database.database().reference().child("user-activities").child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-//                                let values:[String : Any] = ["calendarExport": true]
-//                                userReference.updateChildValues(values)
-//                                dispatchGroup.leave()
-//                            }
-//                        } else {
-//                            dispatchGroup.leave()
-//                        }
-//                    } else {
-//                        dispatchGroup.leave()
-//                    }
-//                }
+                for activity in self!.activities {
+                    dispatchGroup.enter()
+                    if let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
+                        if let event = self?.googleCalService.storeEvent(for: activity), let id = event.identifier {
+                            let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                            reference.child(id).updateChildValues(calendarEventActivityValue) { (_, _) in
+                                let userReference = Database.database().reference().child("user-activities").child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                                let values:[String : Any] = ["calendarExport": true]
+                                userReference.updateChildValues(values)
+                                dispatchGroup.leave()
+                            }
+                        } else {
+                            dispatchGroup.leave()
+                        }
+                    } else {
+                        dispatchGroup.leave()
+                    }
+                }
                 dispatchGroup.notify(queue: .global()) {
                     self?.finish()
                 }

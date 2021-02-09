@@ -1,0 +1,53 @@
+//
+//  CalendarAccountView.swift
+//  Plot
+//
+//  Created by Cory McHattie on 2/9/21.
+//  Copyright © 2021 Immature Creations. All rights reserved.
+//
+
+import UIKit
+
+class CalendarAccountView: UIView {
+    let nameLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.numberOfLines = 1
+        return label
+    }()
+    
+    let infoLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
+        label.numberOfLines = 1
+        return label
+    }()
+    
+    let accountImageView = UIImageView(cornerRadius: 8)
+    let statusImageView = UIImageView(cornerRadius: 8)
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        accountImageView.constrainWidth(40)
+        accountImageView.constrainHeight(40)
+        
+        statusImageView.constrainWidth(25)
+        statusImageView.constrainHeight(25)
+        
+        let labelStack = VerticalStackView(arrangedSubviews: [nameLabel, infoLabel], spacing: 2)
+        
+        let stackView = UIStackView(arrangedSubviews: [accountImageView, labelStack, UIView(), statusImageView])
+        stackView.spacing = 10
+        stackView.alignment = .center
+        addSubview(stackView)
+        stackView.fillSuperview(padding: .init(top: 10, left: 10, bottom: 10, right: 10))
+
+    }
+    
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)!
+    }
+ 
+}

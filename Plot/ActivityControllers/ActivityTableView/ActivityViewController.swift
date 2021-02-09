@@ -292,7 +292,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         if !networkController.activityService.calendars.keys.contains(icloudString) {
             alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: gmailString)
+                self.networkController.activityService.updatePrimaryCalendar(value: googleString)
             }))
         }
         alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
@@ -1142,6 +1142,6 @@ extension ActivityViewController: ChooseChatDelegate {
 extension ActivityViewController {
     @objc private func userDidSignInGoogle(_ notification: Notification) {
         // Update screen after user successfully signed in
-        networkController.activityService.updatePrimaryCalendar(value: gmailString)
+        networkController.activityService.updatePrimaryCalendar(value: googleString)
     }
 }

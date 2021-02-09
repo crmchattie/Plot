@@ -11,7 +11,7 @@ import Firebase
 import GoogleSignIn
 
 let icloudString = "iCloud"
-let gmailString = "Gmail"
+let googleString = "Google"
 
 extension NSNotification.Name {
     static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
@@ -62,7 +62,6 @@ class ActivityService {
     
     func grabActivities(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [weak self] in
-            self?.checkAndUpdatePrimaryCalendar()
             self?.activitiesFetcher.fetchActivities { (activities) in
                 self?.activities = activities
                 self?.fetchInvitations()
@@ -72,7 +71,7 @@ class ActivityService {
                             self?.observeActivitiesForCurrentUser()
                             self?.observeInvitationForCurrentUser()
                         }
-                    } else if calendar == gmailString {
+                    } else if calendar == googleString {
                         self?.grabGoogle {
                             self?.observeActivitiesForCurrentUser()
                             self?.observeInvitationForCurrentUser()
@@ -81,6 +80,7 @@ class ActivityService {
                         self?.observeActivitiesForCurrentUser()
                         self?.observeInvitationForCurrentUser()
                     }
+                    self?.grabCalendars()
                 })
                 completion()
             }
@@ -89,13 +89,10 @@ class ActivityService {
     
     func grabEventKit(_ completion: @escaping () -> Void) {
         if let _ = Auth.auth().currentUser {
-            self.eventKitManager.authorizeEventKit({ (askedforAuthorization) in
+            self.eventKitManager.authorizeEventKit({ askedforAuthorization in
                 self.askedforAuthorization = askedforAuthorization
                 self.eventKitManager.syncEventKitActivities(existingActivities: self.activities, completion: {
                     self.eventKitManager.syncActivitiesToEventKit(activities: self.activities, completion: {
-                        if let calendars = self.eventKitManager.grabCalendars() {
-                            self.calendars[icloudString] = calendars
-                        }
                         completion()
                     })
                 })
@@ -111,17 +108,29 @@ class ActivityService {
                 self.askedforAuthorization = askedforAuthorization
                 self.googleCalManager.syncGoogleCalActivities(existingActivities: self.activities, completion: {
                     self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activities, completion: {
-                        self.googleCalManager.grabCalendars() { calendars in
-                            if let calendars = calendars {
-                                self.calendars[gmailString] = calendars
-                            }
-                        }
                         completion()
                     })
                 })
             }
         } else {
             completion()
+        }
+    }
+    
+    func grabCalendars() {
+        if let _ = Auth.auth().currentUser {
+            self.eventKitManager.authorizeEventKit({ _ in
+                if let calendars = self.eventKitManager.grabCalendars() {
+                    self.calendars[icloudString] = calendars
+                }
+            })
+            self.googleCalManager.setupGoogle { _ in
+                self.googleCalManager.grabCalendars() { calendars in
+                    if let calendars = calendars {
+                        self.calendars[googleString] = calendars
+                    }
+                }
+            }r
         }
     }
     
@@ -154,7 +163,7 @@ class ActivityService {
     func runCalendarFunctions(value: String) {
         if value == primaryCalendar && value == icloudString {
             grabEventKit {}
-        } else if value == primaryCalendar && value == gmailString {
+        } else if value == primaryCalendar && value == googleString {
             grabGoogle {}
         }
     }
@@ -164,21 +173,6 @@ class ActivityService {
             self.primaryCalendar = value
             let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
             reference.setValue(value)
-        }
-    }
-    
-    func checkAndUpdatePrimaryCalendar() {
-        if let currentUserId = Auth.auth().currentUser?.uid {
-            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId)
-            reference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists() {
-                    reference.child(primaryCalendarKey).observeSingleEvent(of: .value, with: { (snapshot) in
-                        if !snapshot.exists() {
-                            self.updatePrimaryCalendarFB(value: icloudString)
-                        }
-                    })
-                }
-            })
         }
     }
 }

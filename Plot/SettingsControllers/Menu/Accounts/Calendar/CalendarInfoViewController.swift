@@ -16,6 +16,10 @@ let primaryCalendarKey = "primary-calendar"
 class CalendarInfoViewController: UITableViewController {
     var networkController = NetworkController()
     
+    var primaryCalendar: String {
+        return networkController.activityService.primaryCalendar
+    }
+    
     var calendars: [String: [String]] {
         return networkController.activityService.calendars
     }
@@ -84,25 +88,25 @@ class CalendarInfoViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let identifier = "cell"
-        let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-        cell.accessoryType = .none
-        cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .headline)
-        cell.textLabel?.adjustsFontForContentSizeCategory = true
-        cell.backgroundColor = view.backgroundColor
-        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        let headerView = CalendarAccountView()
         let sections = Array(calendars.keys)
-        cell.textLabel?.text = sections[section]
-        cell.isUserInteractionEnabled = true
-        let tap = UITapGestureRecognizer(target: self, action: #selector(updatePrimaryCalendar(_:)))
-        tap.view?.tag = section
-        tap.accessibilityLabel = sections[section]
-        cell.addGestureRecognizer(tap)
-        return cell
+        headerView.nameLabel.text = sections[section]
+        headerView.accountImageView.image = sections[section] == icloudString ? UIImage(named: "iCloud") : UIImage(named: "googleCalendar")
+        if sections[section] == primaryCalendar {
+            headerView.statusImageView.image =  UIImage(systemName: "checkmark")
+            headerView.infoLabel.text = "Primary Calendar Account"
+        } else {
+            headerView.statusImageView.image =  .none
+            headerView.infoLabel.text = "Not Primary Calendar Account"
+        }
+        let tap = TapGesture(target: self, action: #selector(updatePrimaryCalendar(_:)))
+        tap.item = section
+        headerView.addGestureRecognizer(tap)
+        return headerView
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 20
+        return 60
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -115,7 +119,7 @@ class CalendarInfoViewController: UITableViewController {
         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         let sections = Array(calendars.keys)
         let section = sections[indexPath.section]
-        cell.textLabel?.text = calendars[section]?[indexPath.row]
+        cell.textLabel?.text = calendars[section]?.sorted()[indexPath.row]
         cell.isUserInteractionEnabled = false
         return cell
     }
@@ -124,19 +128,17 @@ class CalendarInfoViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    @objc func updatePrimaryCalendar(_ sender: UITapGestureRecognizer) {
-        if let section = sender.view?.tag {
-            let sections = Array(calendars.keys)
-            networkController.activityService.updatePrimaryCalendarFB(value: sections[section])
-            networkController.activityService.runCalendarFunctions(value: sections[section])
-        }
+    @objc func updatePrimaryCalendar(_ sender: TapGesture) {
+        let sections = Array(calendars.keys)
+        let section = sender.item
+        networkController.activityService.updatePrimaryCalendarFB(value: sections[section])
+        networkController.activityService.runCalendarFunctions(value: sections[section])
     }
-    
 }
 
 extension CalendarInfoViewController {
     @objc private func userDidSignInGoogle(_ notification: Notification) {
         // Update screen after user successfully signed in
-        networkController.activityService.updatePrimaryCalendar(value: gmailString)
+        networkController.activityService.updatePrimaryCalendar(value: googleString)
     }
 }

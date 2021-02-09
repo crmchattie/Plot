@@ -186,6 +186,7 @@
 		10DE97392475837B00D4A7E8 /* ListContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97382475837B00D4A7E8 /* ListContainer.swift */; };
 		10DE973B2475E4E600D4A7E8 /* ChecklistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */; };
 		10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */; };
+		10DF1F1025D2EDF4009FABA7 /* CalendarAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DF1F0F25D2EDF4009FABA7 /* CalendarAccountView.swift */; };
 		10DFC3B2255A148F00565DAD /* WorkoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFC3B1255A148E00565DAD /* WorkoutViewController.swift */; };
 		10DFC3DB255C48A500565DAD /* FinancialInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFC3DA255C48A400565DAD /* FinancialInfoViewController.swift */; };
 		10DFC3E3255C495800565DAD /* FinancialTransactionRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFC3E2255C495800565DAD /* FinancialTransactionRulesViewController.swift */; };
@@ -673,6 +674,7 @@
 		10DE97382475837B00D4A7E8 /* ListContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListContainer.swift; sourceTree = "<group>"; };
 		10DE973A2475E4E600D4A7E8 /* ChecklistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistFetcher.swift; sourceTree = "<group>"; };
 		10DE9CDC2463631100C8332C /* InstructionsDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsDetailCell.swift; sourceTree = "<group>"; };
+		10DF1F0F25D2EDF4009FABA7 /* CalendarAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarAccountView.swift; sourceTree = "<group>"; };
 		10DFC3B1255A148E00565DAD /* WorkoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutViewController.swift; sourceTree = "<group>"; };
 		10DFC3DA255C48A400565DAD /* FinancialInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialInfoViewController.swift; sourceTree = "<group>"; };
 		10DFC3E2255C495800565DAD /* FinancialTransactionRulesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionRulesViewController.swift; sourceTree = "<group>"; };
@@ -1040,6 +1042,7 @@
 			isa = PBXGroup;
 			children = (
 				1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */,
+				10DF1F0F25D2EDF4009FABA7 /* CalendarAccountView.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -3024,6 +3027,7 @@
 				4BAEE51121272D890045AB10 /* BaseMediaMessageCell.swift in Sources */,
 				10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */,
 				108BDE7124B5108D00BE2CBA /* ShoppingTypeViewController.swift in Sources */,
+				10DF1F1025D2EDF4009FABA7 /* CalendarAccountView.swift in Sources */,
 				10FBC8BB24BFEF7E00D0E6B5 /* ActivitylistActions.swift in Sources */,
 				1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */,
 				10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */,
