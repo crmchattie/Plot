@@ -24,6 +24,8 @@ class ActivityService {
     var askedforAuthorization: Bool = false
     
     var calendars = [String: [String]]()
+    
+    var primaryCalendar = String()
 
     var activities = [Activity]() {
         didSet {
@@ -60,16 +62,26 @@ class ActivityService {
     
     func grabActivities(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [weak self] in
+            self?.checkAndUpdatePrimaryCalendar()
             self?.activitiesFetcher.fetchActivities { (activities) in
                 self?.activities = activities
                 self?.fetchInvitations()
-                self?.grabEventKit {
-                    self?.observeActivitiesForCurrentUser()
-                    self?.observeInvitationForCurrentUser()
-//                    self?.grabGoogle {
-//
-//                    }
-                }
+                self?.grabPrimaryCalendar({ (calendar) in
+                    if calendar == icloudString {
+                        self?.grabEventKit {
+                            self?.observeActivitiesForCurrentUser()
+                            self?.observeInvitationForCurrentUser()
+                        }
+                    } else if calendar == gmailString {
+                        self?.grabGoogle {
+                            self?.observeActivitiesForCurrentUser()
+                            self?.observeInvitationForCurrentUser()
+                        }
+                    } else {
+                        self?.observeActivitiesForCurrentUser()
+                        self?.observeInvitationForCurrentUser()
+                    }
+                })
                 completion()
             }
         }
@@ -81,8 +93,8 @@ class ActivityService {
                 self.askedforAuthorization = askedforAuthorization
                 self.eventKitManager.syncEventKitActivities(existingActivities: self.activities, completion: {
                     self.eventKitManager.syncActivitiesToEventKit(activities: self.activities, completion: {
-                        if let appleCalendars = self.eventKitManager.grabCalendars() {
-                            self.calendars[icloudString] = appleCalendars
+                        if let calendars = self.eventKitManager.grabCalendars() {
+                            self.calendars[icloudString] = calendars
                         }
                         completion()
                     })
@@ -101,7 +113,7 @@ class ActivityService {
                     self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activities, completion: {
                         self.googleCalManager.grabCalendars() { calendars in
                             if let calendars = calendars {
-                                self.calendars.merge(dict: calendars)
+                                self.calendars[gmailString] = calendars
                             }
                         }
                         completion()
@@ -113,29 +125,61 @@ class ActivityService {
         }
     }
     
-    func observeActivitiesForCurrentUser() {
-        activitiesFetcher.observeActivityForCurrentUser(activitiesAdded: { [weak self] activitiesAdded in
-                for activity in activitiesAdded {
-                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self!.activities[index] = activity
-                    } else {
-                        self!.activities.append(activity)
-                    }
+    func grabPrimaryCalendar(_ completion: @escaping (String) -> Void) {
+        if let currentUserId = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let value = snapshot.value as? String {
+                    self.primaryCalendar = value
+                    completion(value)
+                } else {
+                    completion("none")
                 }
-            }, activitiesRemoved: { [weak self] activitiesRemoved in
-                for activity in activitiesRemoved {
-                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self!.activities.remove(at: index)
-                    }
+            })
+        }
+    }
+    
+    func updatePrimaryCalendar(value: String) {
+        if let currentUserId = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if !snapshot.exists() {
+                    self.updatePrimaryCalendarFB(value: value)
                 }
-            }, activitiesChanged: { [weak self] activitiesChanged in
-                for activity in activitiesChanged {
-                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self!.activities[index] = activity
-                    }
+                self.runCalendarFunctions(value: value)
+            })
+        }
+    }
+    
+    func runCalendarFunctions(value: String) {
+        if value == primaryCalendar && value == icloudString {
+            grabEventKit {}
+        } else if value == primaryCalendar && value == gmailString {
+            grabGoogle {}
+        }
+    }
+    
+    func updatePrimaryCalendarFB(value: String) {
+        if let currentUserId = Auth.auth().currentUser?.uid {
+            self.primaryCalendar = value
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            reference.setValue(value)
+        }
+    }
+    
+    func checkAndUpdatePrimaryCalendar() {
+        if let currentUserId = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId)
+            reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    reference.child(primaryCalendarKey).observeSingleEvent(of: .value, with: { (snapshot) in
+                        if !snapshot.exists() {
+                            self.updatePrimaryCalendarFB(value: icloudString)
+                        }
+                    })
                 }
-            }
-        )
+            })
+        }
     }
 }
 
@@ -165,6 +209,31 @@ extension ActivityService {
         }
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
         reference.removeValue()
+    }
+    
+    func observeActivitiesForCurrentUser() {
+        activitiesFetcher.observeActivityForCurrentUser(activitiesAdded: { [weak self] activitiesAdded in
+                for activity in activitiesAdded {
+                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                        self!.activities[index] = activity
+                    } else {
+                        self!.activities.append(activity)
+                    }
+                }
+            }, activitiesRemoved: { [weak self] activitiesRemoved in
+                for activity in activitiesRemoved {
+                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                        self!.activities.remove(at: index)
+                    }
+                }
+            }, activitiesChanged: { [weak self] activitiesChanged in
+                for activity in activitiesChanged {
+                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                        self!.activities[index] = activity
+                    }
+                }
+            }
+        )
     }
     
     func observeInvitationForCurrentUser() {

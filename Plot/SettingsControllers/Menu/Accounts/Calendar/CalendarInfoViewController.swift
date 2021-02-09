@@ -11,6 +11,8 @@ import Firebase
 import CodableFirebase
 import GoogleSignIn
 
+let primaryCalendarKey = "primary-calendar"
+
 class CalendarInfoViewController: UITableViewController {
     var networkController = NetworkController()
     
@@ -32,6 +34,22 @@ class CalendarInfoViewController: UITableViewController {
         
         GIDSignIn.sharedInstance()?.presentingViewController = self
         
+        addObservers()
+        
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(activitiesUpdated), name: .activitiesUpdated, object: nil)
+    }
+    
+    @objc fileprivate func activitiesUpdated() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     @objc func newCalendar() {
@@ -39,7 +57,7 @@ class CalendarInfoViewController: UITableViewController {
         
         if !calendars.keys.contains(icloudString) {
             alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
-                self.networkController.activityService.grabEventKit {}
+                self.networkController.activityService.updatePrimaryCalendar(value: icloudString)
             }))
         }
         alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
@@ -75,7 +93,11 @@ class CalendarInfoViewController: UITableViewController {
         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         let sections = Array(calendars.keys)
         cell.textLabel?.text = sections[section]
-        cell.isUserInteractionEnabled = false
+        cell.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(updatePrimaryCalendar(_:)))
+        tap.view?.tag = section
+        tap.accessibilityLabel = sections[section]
+        cell.addGestureRecognizer(tap)
         return cell
     }
     
@@ -101,11 +123,20 @@ class CalendarInfoViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    @objc func updatePrimaryCalendar(_ sender: UITapGestureRecognizer) {
+        if let section = sender.view?.tag {
+            let sections = Array(calendars.keys)
+            networkController.activityService.updatePrimaryCalendarFB(value: sections[section])
+            networkController.activityService.runCalendarFunctions(value: sections[section])
+        }
+    }
+    
 }
 
 extension CalendarInfoViewController {
     @objc private func userDidSignInGoogle(_ notification: Notification) {
         // Update screen after user successfully signed in
-        
+        networkController.activityService.updatePrimaryCalendar(value: gmailString)
     }
 }

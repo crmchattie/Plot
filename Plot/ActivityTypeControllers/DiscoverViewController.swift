@@ -11,6 +11,7 @@ import MapKit
 import Firebase
 import CodableFirebase
 import SwiftUI
+import GoogleSignIn
 
 class DiscoverViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
         
@@ -19,8 +20,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
-    var customTypes: [CustomType] = [.basic, .meal, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
-    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mindfulness, .customTransaction, .customFinancialAccount, .customTransactionRule]
+    var customTypes: [CustomType] = [.basic, .calendar, .meal, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
+    var sections: [SectionType] = [.activity, .calendar, .customMeal, .customWorkout, .mindfulness, .customTransaction, .customFinancialAccount, .customTransactionRule]
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0
@@ -86,6 +87,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 
         fetchData()
         
+        GIDSignIn.sharedInstance()?.presentingViewController = self
         
     }
     
@@ -165,6 +167,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 destination.activities = self.networkController.activityService.activities
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
+            case .calendar:
+                self.newCalendar()
             case .flight:
                 let destination = FlightSearchViewController()
                 destination.hidesBottomBarWhenPushed = true
@@ -270,7 +274,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     func openMXConnect(guid: String, current_member_guid: String?) {
         Service.shared.fetchMXConnectURL(current_member_guid: nil) { (search, err) in
-            print("search \(search)")
             if let url = search {
                 DispatchQueue.main.async {
                     let destination = WebViewController()
@@ -283,6 +286,27 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 }
             }
         }
+    }
+    
+    @objc func newCalendar() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if !networkController.activityService.calendars.keys.contains(icloudString) {
+            alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryCalendar(value: icloudString)
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
+            GIDSignIn.sharedInstance()?.signIn()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     func getSelectedFalconUsers(forActivity activity: Activity, completion: @escaping ([User])->()) {
@@ -336,3 +360,11 @@ extension DiscoverViewController: EndedWebViewDelegate {
         networkController.financeService.grabFinances {}
     }
 }
+
+extension DiscoverViewController {
+    @objc private func userDidSignInGoogle(_ notification: Notification) {
+        // Update screen after user successfully signed in
+        networkController.activityService.updatePrimaryCalendar(value: gmailString)
+    }
+}
+

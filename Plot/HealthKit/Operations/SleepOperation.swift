@@ -22,7 +22,7 @@ class SleepOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        let endDate = date.localTime
+        let endDate = date.localTime.advanced(by: 43200)
         let startDate = endDate.lastYear
         HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self] sleepSamples, error  in
             guard let sleepSamples = sleepSamples, sleepSamples.count > 0, error == nil, let _self = self else {

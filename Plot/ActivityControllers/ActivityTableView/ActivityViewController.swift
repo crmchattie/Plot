@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 import SDWebImage
 import CodableFirebase
+import GoogleSignIn
 
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     switch (lhs, rhs) {
@@ -142,12 +143,13 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         let dateString = selectedDateFormatter.string(from: Date().localTime)
         title = dateString
-
         
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
         addObservers()
         handleReloadTable()
+        
+        GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
     deinit {
@@ -262,11 +264,48 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func newItem() {
-        let destination = CreateActivityViewController()
-        destination.users = self.networkController.userService.users
-        destination.filteredUsers = self.networkController.userService.users
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
+            let destination = CreateActivityViewController()
+            destination.users = self.networkController.userService.users
+            destination.filteredUsers = self.networkController.userService.users
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Calendar", style: .default, handler: { (_) in
+            self.newCalendar()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+    }
+    
+    @objc func newCalendar() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if !networkController.activityService.calendars.keys.contains(icloudString) {
+            alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryCalendar(value: gmailString)
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
+            GIDSignIn.sharedInstance()?.signIn()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     @objc fileprivate func search() {
@@ -1097,5 +1136,12 @@ extension ActivityViewController: ChooseChatDelegate {
             self.connectedToChatAlert()
             self.dismiss(animated: true, completion: nil)
         }
+    }
+}
+
+extension ActivityViewController {
+    @objc private func userDidSignInGoogle(_ notification: Notification) {
+        // Update screen after user successfully signed in
+        networkController.activityService.updatePrimaryCalendar(value: gmailString)
     }
 }

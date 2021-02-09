@@ -122,6 +122,7 @@ enum SectionType: Hashable, CaseIterable {
     case mood
     case mindfulness
     
+    
     var name: String {
         switch self {
         case .custom: return "Build Your Own"
@@ -280,7 +281,7 @@ enum SectionType: Hashable, CaseIterable {
         case .financialAccounts: return "Accounts"
         case .financialIssues: return "Issues"
         case .ingredients, .groceryItems, .restaurantItems: return "Food Products"
-        case .calendar: return "Set up Calendar by connecting the Apple Calendar App"
+        case .calendar: return "Set up Calendar by connecting your Apple Calendar or Gmail Account"
         case .health: return "Set up Health by connecting the Apple Health App"
         case .finances: return "Set up Finances by connecting your existing financial accounts"
         case .activitySummary: return "Activity Summary"

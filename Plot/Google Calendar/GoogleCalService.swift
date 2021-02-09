@@ -112,24 +112,6 @@ class GoogleCalService {
         return event
     }
     
-    func grabCalendars(completion: @escaping ([String: [String]]?) -> Swift.Void) {
-        guard let service = self.calendarService, let user = user else {
-            completion(nil)
-            return
-        }
-        
-        var calendars = [String: [String]]()
-        let query = GTLRCalendarQuery_CalendarListList.query()
-        service.executeQuery(query) { (ticket, result, error) in
-            guard error == nil, let items = (result as? GTLRCalendar_CalendarList)?.items else {
-                completion(nil)
-                return
-            }
-            calendars[user.profile.email] = items.map { $0.summary ?? "" }
-            completion(calendars)
-        }
-    }
-    
     func createPlotCalendar(completion: @escaping (String?) -> Swift.Void) {
         guard let service = self.calendarService else {
             completion(nil)
@@ -148,5 +130,23 @@ class GoogleCalService {
             UserDefaults.standard.set(calendar.identifier, forKey: "PlotCalendar")
             completion(createdCalendar.identifier)
         })
+    }
+    
+    func grabCalendars(completion: @escaping ([String]?) -> Swift.Void) {
+        guard let service = self.calendarService, let user = user else {
+            completion(nil)
+            return
+        }
+        
+        var calendars = [String]()
+        let query = GTLRCalendarQuery_CalendarListList.query()
+        service.executeQuery(query) { (ticket, result, error) in
+            guard error == nil, let items = (result as? GTLRCalendar_CalendarList)?.items else {
+                completion(nil)
+                return
+            }
+            calendars = items.map { $0.summary ?? "" }
+            completion(calendars)
+        }
     }
 }
