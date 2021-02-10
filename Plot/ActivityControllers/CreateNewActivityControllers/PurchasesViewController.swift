@@ -94,7 +94,7 @@ class PurchasesViewController: FormViewController {
             Section()
             
             <<< TextRow("Purchase Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -105,7 +105,7 @@ class PurchasesViewController: FormViewController {
                     $0.cell.textField.becomeFirstResponder()
                 }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 }
@@ -120,7 +120,7 @@ class PurchasesViewController: FormViewController {
             }
             
             <<< TextRow("Type of Purchase") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -128,14 +128,14 @@ class PurchasesViewController: FormViewController {
                     $0.value = self.purchase.purchaseType
                 }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
             <<< TextAreaRow("Description") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -143,15 +143,15 @@ class PurchasesViewController: FormViewController {
                     $0.value = self.purchase.purchaseDescription
                 }
                 }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 })
             
             <<< DecimalRow("Cost"){
                 $0.useFormatterDuringInput = true
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
@@ -164,7 +164,7 @@ class PurchasesViewController: FormViewController {
                 formatter.numberStyle = .currency
                 $0.formatter = formatter
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }.onChange() { [unowned self] row in
@@ -181,7 +181,7 @@ class PurchasesViewController: FormViewController {
             if let userName = user.name {
                 form.last!
                 <<< CheckRow("purchaser\(userName)") {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.tintColor = FalconPalette.defaultBlue
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -192,7 +192,7 @@ class PurchasesViewController: FormViewController {
                         $0.value = false
                     }
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.tintColor = FalconPalette.defaultBlue
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -214,7 +214,7 @@ class PurchasesViewController: FormViewController {
         if users.count > 1 {
             form.last!
             <<< CheckRow("Everyone") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.tintColor = FalconPalette.defaultBlue
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -225,7 +225,7 @@ class PurchasesViewController: FormViewController {
                     $0.value = false
                 }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.tintColor = FalconPalette.defaultBlue
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -251,7 +251,7 @@ class PurchasesViewController: FormViewController {
             if let userName = user.name {
                 form.last!
                 <<< CheckRow("purchasee\(userName)") {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.tintColor = FalconPalette.defaultBlue
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -270,7 +270,7 @@ class PurchasesViewController: FormViewController {
                         }
                     }
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.tintColor = FalconPalette.defaultBlue
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -304,7 +304,7 @@ class PurchasesViewController: FormViewController {
         
         form.last!
         <<< IntRow("purchaseRowCount") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.title = "Split purchase by custom number"

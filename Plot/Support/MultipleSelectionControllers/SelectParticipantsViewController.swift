@@ -42,15 +42,10 @@ class SelectParticipantsViewController: UIViewController {
     var priorSelectedUsers = [User]()
     var conversations = [Conversation]()
     var searchBar: UISearchBar?
-    let tableView = UITableView()
+    let tableView = UITableView(frame: .zero, style: .insetGrouped)
     let viewPlaceholder = ViewPlaceholder()
     
     var activityObject: ActivityObject?
-    
-    var selectedParticipantsCollectionView: UICollectionView = {
-        var selectedParticipantsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-        return selectedParticipantsCollectionView
-    }()
     
     let alignedFlowLayout = CollectionViewLeftAlignFlowLayout()
     var collectionViewHeightAnchor: NSLayoutConstraint!
@@ -59,7 +54,6 @@ class SelectParticipantsViewController: UIViewController {
         super.viewDidLoad()
         setupSearchController()
         setupMainView()
-        setupCollectionView()
         setupTableView()
     }
     
@@ -74,7 +68,6 @@ class SelectParticipantsViewController: UIViewController {
         
         DispatchQueue.main.async {
             self.tableView.reloadData()
-            self.reloadCollectionView()
         }
     }
     
@@ -255,7 +248,7 @@ class SelectParticipantsViewController: UIViewController {
         
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.topAnchor.constraint(equalTo: selectedParticipantsCollectionView.bottomAnchor).isActive = true
+        tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         
         if #available(iOS 11.0, *) {
             tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true
@@ -285,42 +278,6 @@ class SelectParticipantsViewController: UIViewController {
         }
     }
     
-    fileprivate func setupCollectionView() {
-        
-        selectedParticipantsCollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: alignedFlowLayout)
-        
-        view.addSubview(selectedParticipantsCollectionView)
-        selectedParticipantsCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        selectedParticipantsCollectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
-        
-        collectionViewHeightAnchor = selectedParticipantsCollectionView.heightAnchor.constraint(equalToConstant: 0)
-        collectionViewHeightAnchor.priority = UILayoutPriority(rawValue: 999)
-        collectionViewHeightAnchor.isActive = true
-        
-        if #available(iOS 11.0, *) {
-            selectedParticipantsCollectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true
-            selectedParticipantsCollectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
-        } else {
-            selectedParticipantsCollectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
-            selectedParticipantsCollectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
-        }
-        
-        selectedParticipantsCollectionView.delegate = self
-        selectedParticipantsCollectionView.dataSource = self
-        selectedParticipantsCollectionView.showsVerticalScrollIndicator = true
-        selectedParticipantsCollectionView.showsHorizontalScrollIndicator = false
-        selectedParticipantsCollectionView.alwaysBounceVertical = true
-        selectedParticipantsCollectionView.backgroundColor = .clear
-        selectedParticipantsCollectionView.register(SelectedParticipantsCollectionViewCell.self, forCellWithReuseIdentifier: selectedParticipantsCollectionViewCellID)
-        selectedParticipantsCollectionView.decelerationRate = UIScrollView.DecelerationRate.fast
-        selectedParticipantsCollectionView.isScrollEnabled = true
-        selectedParticipantsCollectionView.contentInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-        
-        alignedFlowLayout.minimumInteritemSpacing = 5
-        alignedFlowLayout.minimumLineSpacing = 5
-        alignedFlowLayout.estimatedItemSize = CGSize(width: 100, height: 32)
-    }
-    
     fileprivate func setupSearchController() {
         searchBar = UISearchBar()
         searchBar?.delegate = self
@@ -329,46 +286,6 @@ class SelectParticipantsViewController: UIViewController {
         searchBar?.placeholder = "Search"
         searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
         tableView.tableHeaderView = searchBar
-    }
-    
-    func reloadCollectionView() {
-        if #available(iOS 11.0, *) {
-            DispatchQueue.main.async {
-                self.selectedParticipantsCollectionView.reloadData()
-            }
-        } else {
-            DispatchQueue.main.async {
-                UIView.performWithoutAnimation {
-                    self.selectedParticipantsCollectionView.reloadSections([0])
-                }
-            }
-        }
-        
-        if selectedFalconUsers.count == 0 {
-            collectionViewHeightAnchor.constant = 0
-            UIView.animate(withDuration: 0.3) {
-                self.view.layoutIfNeeded()
-            }
-        }
-        
-        if selectedFalconUsers.count == 1 {
-            collectionViewHeightAnchor.constant = 75
-//            collectionViewHeightAnchor.constant = 0
-
-            UIView.animate(withDuration: 0.3) {
-                self.view.layoutIfNeeded()
-            }
-        }
-    
-        
-        let set1 = Set(selectedFalconUsers)
-        let set2 = Set(priorSelectedUsers)
-
-        if (set1.count == set2.count && set1 == set2) {
-            navigationItem.rightBarButtonItem?.isEnabled = false
-        } else {
-            navigationItem.rightBarButtonItem?.isEnabled = true
-        }
     }
     
     func didSelectUser(at indexPath: IndexPath) {
@@ -386,9 +303,6 @@ class SelectParticipantsViewController: UIViewController {
         
         selectedFalconUsers.append(sections[indexPath.section][indexPath.row])
         
-        DispatchQueue.main.async {
-            self.reloadCollectionView()
-        }
     }
     
     func didDeselectUser(at indexPath: IndexPath) {
@@ -405,10 +319,6 @@ class SelectParticipantsViewController: UIViewController {
         if let selectedFalconUserIndexInCollectionView = selectedFalconUsers.firstIndex(of: user) {
             selectedFalconUsers[selectedFalconUserIndexInCollectionView].isSelected = false
             selectedFalconUsers.remove(at: selectedFalconUserIndexInCollectionView)
-            
-            DispatchQueue.main.async {
-                self.reloadCollectionView()
-            }
         }
         
         sections[indexPath.section][indexPath.row].isSelected = false
@@ -429,9 +339,7 @@ class SelectParticipantsViewController: UIViewController {
                 priorSelectedUsers[selectedFalconUserIndexInCollectionView].isSelected = true
                 selectedFalconUsers.append(user)
             }
-            
-            self.reloadCollectionView()
-            
+                        
         }
         
     }

@@ -189,7 +189,7 @@ class SelectChatTableViewController: UITableViewController {
     if indexPath.section == headerSection {
       let cell = tableView.dequeueReusableCell(withIdentifier: newGroupCellID) ?? UITableViewCell(style: .default, reuseIdentifier: newGroupCellID)
       
-      cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+      cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
       cell.imageView?.image = UIImage(named: "groupChat")
       cell.imageView?.contentMode = .scaleAspectFit
       cell.textLabel?.font = UIFont.systemFont(ofSize: 17)

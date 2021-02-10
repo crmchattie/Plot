@@ -49,7 +49,7 @@ class NewActivityCategoryViewController: FormViewController {
         form +++
             Section()
             <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
                 if let name = name {
@@ -60,7 +60,7 @@ class NewActivityCategoryViewController: FormViewController {
                     $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }.onChange() { [unowned self] row in
                 if row.value == nil {

@@ -146,7 +146,7 @@ extension TimeZoneViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let searchResult = searchResults[indexPath.row]
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
-        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
         cell.textLabel?.text = searchResult.title

@@ -82,7 +82,7 @@ class CreateContactTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
       let cell = tableView.dequeueReusableCell(withIdentifier: createContactTableViewCellIdentifier,
                                                      for: indexPath) as? ContactDataTableViewCell ?? ContactDataTableViewCell()
-      cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+      cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
       cell.textField.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
       cell.textField.textColor = ThemeManager.currentTheme().generalTitleColor
     

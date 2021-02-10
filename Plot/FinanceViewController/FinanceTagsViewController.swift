@@ -22,6 +22,14 @@ class FinanceTagsViewController: FormViewController {
     
     weak var delegate : UpdateTagsDelegate?
     
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = false
@@ -32,7 +40,6 @@ class FinanceTagsViewController: FormViewController {
         initializeForm()
     }
 
-    
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -62,22 +69,22 @@ class FinanceTagsViewController: FormViewController {
                                 $0.tag = "tagsfields"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                         $0.title = "Add New Tag"
                                     }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                         cell.textLabel?.textAlignment = .left
                                         
                                     }
                                 }
                                 $0.multivaluedRowToInsertAt = { index in
                                     return TextRow() {
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                         $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                                         $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                                         $0.placeholder = "Tag"
                                     }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                         cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                                         row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                                     }
@@ -88,12 +95,12 @@ class FinanceTagsViewController: FormViewController {
             for item in items {
                 var mvs = (form.sectionBy(tag: "tagsfields") as! MultivaluedSection)
                 mvs.insert(TextRow(){
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.value = item
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 } , at: mvs.count - 1)

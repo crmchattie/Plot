@@ -45,7 +45,7 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         textLabel?.textColor = .clear
         selectionStyle = .none
         
-        backgroundColor = .clear
+        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         contentView.addSubview(nameLabel)
         contentView.addSubview(participantsLabal)
         contentView.addSubview(costLabel)
@@ -72,13 +72,13 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         // set the texts to the labels
         nameLabel.text = transaction.description
         costLabel.text = String(format: "$%.02f", transaction.amount)
-        if let purchaseRowCount = transaction.splitNumber {
-            participantsLabal.text = "Purchase split among \(purchaseRowCount) participants"
-        } else if let participants = transaction.participantsIDs, participants.count > 1 {
-            participantsLabal.text = "Purchase split among \(participants.count) participants"
-        } else {
-            participantsLabal.text = "Purchase not split"
-        }
+//        if let purchaseRowCount = transaction.splitNumber {
+//            participantsLabal.text = "Purchase split among \(purchaseRowCount) participants"
+//        } else if let participants = transaction.participantsIDs, participants.count > 1 {
+//            participantsLabal.text = "Purchase split among \(participants.count) participants"
+//        } else {
+//            participantsLabal.text = "Purchase not split"
+//        }
         
     }
 }

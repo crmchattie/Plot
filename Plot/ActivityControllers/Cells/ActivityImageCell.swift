@@ -13,6 +13,8 @@ class ActivityImageCell: UICollectionViewCell {
     let photoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 10
+        imageView.layer.masksToBounds = true
         imageView.clipsToBounds = true
         imageView.backgroundColor = .clear
         return imageView

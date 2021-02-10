@@ -31,6 +31,14 @@ class WorkoutViewController: FormViewController {
     var timer: Timer?
     var workoutActions: WorkoutActions?
     
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = false
@@ -198,7 +206,7 @@ class WorkoutViewController: FormViewController {
             Section(header: nil, footer: "Calories burned is based on estimates and subject to error as a result")
             
             <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -219,13 +227,13 @@ class WorkoutViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
             <<< IntRow("Body Weight") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.title = row.tag
@@ -240,7 +248,7 @@ class WorkoutViewController: FormViewController {
                     })
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange({ row in
@@ -251,7 +259,7 @@ class WorkoutViewController: FormViewController {
             })
             
             <<< PushRow<String>("Type") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.title = row.tag
@@ -265,12 +273,12 @@ class WorkoutViewController: FormViewController {
                     to.title = "Type"
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }.onChange({ row in
                 self.workout.type = row.value
@@ -284,29 +292,29 @@ class WorkoutViewController: FormViewController {
             })
             
             <<< DecimalRow("Calories Burned") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
             <<< TextRow("Length") {
                 $0.cell.isUserInteractionEnabled = false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange({ _ in
                 self.updateCalories()
             })
             
             <<< DateTimeInlineRow("Starts") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
@@ -331,8 +339,8 @@ class WorkoutViewController: FormViewController {
                 self!.workout.startDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
@@ -344,14 +352,14 @@ class WorkoutViewController: FormViewController {
                 }
                 cell.detailTextLabel?.textColor = cell.tintColor
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 
             }
             
             <<< DateTimeInlineRow("Ends"){
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
@@ -376,8 +384,8 @@ class WorkoutViewController: FormViewController {
                 self!.workout.endDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
@@ -389,14 +397,14 @@ class WorkoutViewController: FormViewController {
                 }
                 cell.detailTextLabel?.textColor = cell.tintColor
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 
             }
             
 //            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                row.cell.textLabel?.textAlignment = .left
 //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                row.cell.accessoryType = .disclosureIndicator
@@ -409,7 +417,7 @@ class WorkoutViewController: FormViewController {
 //                self.openParticipantsInviter()
 //            }).cellUpdate { cell, row in
 //                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                cell.textLabel?.textAlignment = .left
 //                if row.title == "Participants" {
 //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor

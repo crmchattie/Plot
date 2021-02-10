@@ -89,7 +89,7 @@ class FilterViewController: FormViewController {
         
         form +++ Section()
             <<< ButtonRow("Restore Default Filters") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textAlignment = .center
                 row.cell.textLabel?.textColor = FalconPalette.defaultBlue
                 row.cell.accessoryType = .none
@@ -101,7 +101,7 @@ class FilterViewController: FormViewController {
                 })
         form +++ Section("Only include \(filters[0].activity) you have favorited")
             <<< CheckRow("Favorited \(filters[0].activity)") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
                 $0.value = Bool(self.filterDictionary["favorites"]?[0] ?? "false")
@@ -123,11 +123,11 @@ class FilterViewController: FormViewController {
                     $0.value = false
                     $0.cell.accessoryView = UIImageView(image: UIImage(named: "chevronDownBlack")!.withRenderingMode(.alwaysTemplate))
                     $0.cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     }.cellUpdate({ (cell, row) in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     }).onCellSelection({ (cell, row) in
@@ -149,7 +149,7 @@ class FilterViewController: FormViewController {
                                 row.value = choice
                             }
                             cell.accessoryType = .checkmark
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                             cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                         }.onChange({ row in
@@ -173,11 +173,11 @@ class FilterViewController: FormViewController {
                         $0.value = false
                         $0.cell.accessoryView = UIImageView(image: UIImage(named: "chevronDownBlack")!.withRenderingMode(.alwaysTemplate))
                         $0.cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                         }.cellUpdate({ (cell, row) in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                             cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                         }).onCellSelection({ (cell, row) in
@@ -200,7 +200,7 @@ class FilterViewController: FormViewController {
                                     row.value = choice
                                 }
                                 cell.accessoryType = .checkmark
-                                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                         }.onChange({ row in
@@ -234,7 +234,7 @@ class FilterViewController: FormViewController {
             } else if filter.typeOfSection == "input" {
                 form +++ Section(filter.descriptionText)
                 <<< ButtonRow("\(filter.rawValue)") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
@@ -250,7 +250,7 @@ class FilterViewController: FormViewController {
                     }
                 }).cellUpdate { cell, row in
                     if row.tag == "location" {
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textAlignment = .left
                         if row.title == "Location" {
                             cell.accessoryType = .disclosureIndicator
@@ -268,7 +268,7 @@ class FilterViewController: FormViewController {
             } else if filter.typeOfSection == "date" {
                 form +++ Section(filter.descriptionText)
                 <<< DateInlineRow("\(filter.rawValue)") {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = filter.titleText

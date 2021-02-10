@@ -33,6 +33,14 @@ class MealViewController: FormViewController {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = false
@@ -198,7 +206,7 @@ class MealViewController: FormViewController {
             Section()
             
             <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -219,13 +227,13 @@ class MealViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
             <<< DateTimeInlineRow("Starts") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
@@ -249,8 +257,8 @@ class MealViewController: FormViewController {
                     self!.meal.startDateTime = row.value
                 }.onExpandInlineRow { cell, row, inlineRow in
                     inlineRow.cellUpdate() { cell, row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.datePicker.datePickerMode = .dateAndTime
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
@@ -262,13 +270,13 @@ class MealViewController: FormViewController {
                     }
                     cell.detailTextLabel?.textColor = cell.tintColor
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 }
             
             <<< DateTimeInlineRow("Ends"){
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
@@ -292,8 +300,8 @@ class MealViewController: FormViewController {
                     self!.meal.endDateTime = row.value
                 }.onExpandInlineRow { cell, row, inlineRow in
                         inlineRow.cellUpdate() { cell, row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                             cell.datePicker.datePickerMode = .dateAndTime
                             if #available(iOS 13.4, *) {
                                 cell.datePicker.preferredDatePickerStyle = .wheels
@@ -305,14 +313,14 @@ class MealViewController: FormViewController {
                     }
                     cell.detailTextLabel?.textColor = cell.tintColor
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                         
                     }
         
 //            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                row.cell.textLabel?.textAlignment = .left
 //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                row.cell.accessoryType = .disclosureIndicator
@@ -325,7 +333,7 @@ class MealViewController: FormViewController {
 //                self.openParticipantsInviter()
 //            }).cellUpdate { cell, row in
 //                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                cell.textLabel?.textAlignment = .left
 //                if row.title == "Participants" {
 //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -335,13 +343,13 @@ class MealViewController: FormViewController {
 //            }
         
             <<< DecimalRow("Amount") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
                 $0.value = meal.amount
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 self.meal.amount = row.value
@@ -359,10 +367,10 @@ class MealViewController: FormViewController {
                 $0.tag = "itemfields"
                 $0.addButtonProvider = { section in
                     return ButtonRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.title = "Add New Ingredient"
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textAlignment = .left
                     }
                 }
@@ -370,14 +378,14 @@ class MealViewController: FormViewController {
                     self.productIndex = index
                     self.openProduct()
                     return ButtonRow(){ row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         row.cell.textLabel?.textAlignment = .left
                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     }.onCellSelection({ cell, row in
                         self.productIndex = index
                         self.openProduct()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.textLabel?.textAlignment = .left
                     }
@@ -390,7 +398,7 @@ class MealViewController: FormViewController {
             for product in products {
                 if product.groceryProduct != nil {
                     mvs.insert(ButtonRow() { row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         row.cell.textLabel?.textAlignment = .left
                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         row.title = "\(product.groceryProduct!.amount ?? 0) \(product.groceryProduct!.title.capitalized)"
@@ -398,13 +406,13 @@ class MealViewController: FormViewController {
                         self.productIndex = row.indexPath!.row
                         self.openProduct()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.textLabel?.textAlignment = .left
                     }, at: mvs.count - 1)
                 } else if product.menuProduct != nil {
                     mvs.insert(ButtonRow() { row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         row.cell.textLabel?.textAlignment = .left
                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         row.title = "\(product.menuProduct!.amount ?? 0) \(product.menuProduct!.title.capitalized)"
@@ -412,13 +420,13 @@ class MealViewController: FormViewController {
                         self.productIndex = row.indexPath!.row
                         self.openProduct()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.textLabel?.textAlignment = .left
                     }, at: mvs.count - 1)
                 } else if product.complexIngredient != nil {
                     mvs.insert(ButtonRow() { row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         row.cell.textLabel?.textAlignment = .left
                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         row.title = "\(product.complexIngredient!.amount ?? 0.0) \(product.complexIngredient!.unit?.capitalized ?? "") of \(product.complexIngredient!.name?.capitalized ?? "")"
@@ -426,7 +434,7 @@ class MealViewController: FormViewController {
                         self.productIndex = row.indexPath!.row
                         self.openProduct()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.textLabel?.textAlignment = .left
                     }, at: mvs.count - 1)
@@ -541,13 +549,13 @@ class MealViewController: FormViewController {
             for nutrient in nutrients {
                 if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
                     section!.insert(LabelRow() {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = "\(title.capitalized)"
                     $0.value = "\(String(format: "%.0f", amount)) \(unit.capitalized)"
                     }.cellUpdate { cell, _ in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     }, at: section!.count)
                 }

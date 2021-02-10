@@ -62,6 +62,14 @@ class CreateActivityViewController: FormViewController {
     
     typealias CompletionHandler = (_ success: Bool) -> Void
     
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -205,7 +213,7 @@ class CreateActivityViewController: FormViewController {
             
 //            <<< ViewRow<UIImageView>("Activity Image")
 //                .cellSetup { (cell, row) in
-//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //
 //                    //  Make the image view occupy the entire row:
 //                    cell.viewRightMargin = 0.0
@@ -238,11 +246,11 @@ class CreateActivityViewController: FormViewController {
 //                }.onCellSelection { ViewCell, ViewRow in
 //                    self.openActivityPicture()
 //                }.cellUpdate { cell, row in
-//                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //            }
             
             <<< TextRow("Event Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -260,12 +268,12 @@ class CreateActivityViewController: FormViewController {
                         self.navigationItem.rightBarButtonItem?.isEnabled = true
                     }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
             
             <<< TextRow("Type") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -273,15 +281,15 @@ class CreateActivityViewController: FormViewController {
                     $0.value = self.activity.activityType!
                 }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }.onChange() { [unowned self] row in
                     self.activity.activityType = row.value
                 }
             
             <<< TextAreaRow("Description") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -289,15 +297,15 @@ class CreateActivityViewController: FormViewController {
                     $0.value = self.activity.activityDescription
                 }
                 }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.activityDescription = row.value
                 }
             
             <<< LabelRow("Category") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
@@ -310,13 +318,13 @@ class CreateActivityViewController: FormViewController {
                 self.openCategory(value: row.title ?? "Category")
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textAlignment = .left
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
             
             <<< ButtonRow("Media") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
@@ -324,7 +332,7 @@ class CreateActivityViewController: FormViewController {
                 }.onCellSelection({ _,_ in
                     self.openMedia()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.accessoryType = .disclosureIndicator
                     cell.textLabel?.textAlignment = .left
                     if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
@@ -335,7 +343,7 @@ class CreateActivityViewController: FormViewController {
                 }
             
             <<< ButtonRow("Location") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
@@ -348,7 +356,7 @@ class CreateActivityViewController: FormViewController {
                 }.onCellSelection({ _,_ in
                     self.openLocationFinder()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textAlignment = .left
                     if row.title == "Location" {
                         cell.accessoryType = .disclosureIndicator
@@ -365,7 +373,7 @@ class CreateActivityViewController: FormViewController {
             
         
             <<< ButtonRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
@@ -378,7 +386,7 @@ class CreateActivityViewController: FormViewController {
                     self.openParticipantsInviter()
                 }).cellUpdate { cell, row in
                     cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textAlignment = .left
                     if row.title == "Participants" {
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -388,7 +396,7 @@ class CreateActivityViewController: FormViewController {
                 }
             
             <<< SwitchRow("All-day") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
                 if self.active {
@@ -416,14 +424,14 @@ class CreateActivityViewController: FormViewController {
                     startDate.inlineRow?.updateCell()
                     endDate.inlineRow?.updateCell()
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
             
             
             //add Soon option to replace time; will require update to end time as well
             <<< DateTimeInlineRow("Starts") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
@@ -463,8 +471,8 @@ class CreateActivityViewController: FormViewController {
                     self!.weatherRow()
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                     inlineRow.cellUpdate { (cell, row) in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
                         }
@@ -495,12 +503,12 @@ class CreateActivityViewController: FormViewController {
                         timeZoneRow.evaluateHidden()
                     }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
             
             <<< LabelRow("startTimeZone") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
@@ -516,12 +524,12 @@ class CreateActivityViewController: FormViewController {
                     self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
                 }).cellUpdate { cell, row in
                     cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
             
             <<< DateTimeInlineRow("Ends") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
@@ -558,8 +566,8 @@ class CreateActivityViewController: FormViewController {
                     self!.weatherRow()
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                 inlineRow.cellUpdate { (cell, row) in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                     if let endTimeZone = self?.activity.endTimeZone {
                         cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
                     } else if self!.active {
@@ -590,13 +598,13 @@ class CreateActivityViewController: FormViewController {
                         timeZoneRow.evaluateHidden()
                     }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     
                 }
             
             <<< LabelRow("endTimeZone") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
@@ -612,12 +620,12 @@ class CreateActivityViewController: FormViewController {
                     self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
                 }).cellUpdate { cell, row in
                     cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
             
             <<< AlertRow<EventAlert>("Reminder") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
@@ -634,7 +642,7 @@ class CreateActivityViewController: FormViewController {
                 }
                 $0.options = EventAlert.allValues
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
@@ -648,8 +656,8 @@ class CreateActivityViewController: FormViewController {
                 }
 
             <<< TextAreaRow("Notes") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -657,17 +665,17 @@ class CreateActivityViewController: FormViewController {
                     $0.value = self.activity.notes
                 }
                 }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.notes = row.value
                 }
         
         <<< SwitchRow("showExtras") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.title = "Show Schedule, Lists & Transactions"
+                row.title = "Show Extras"
                 if let showExtras = activity.showExtras {
                     row.value = showExtras
                 } else {
@@ -689,7 +697,7 @@ class CreateActivityViewController: FormViewController {
             }
             
         <<< SegmentedRow<String>("sections"){
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.hidden = "$showExtras == false"
                 if #available(iOS 13.0, *) {
                     $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
@@ -699,7 +707,7 @@ class CreateActivityViewController: FormViewController {
                 $0.options = ["Schedule", "Lists", "Transactions"]
                 $0.value = "Schedule"
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
 
@@ -711,10 +719,10 @@ class CreateActivityViewController: FormViewController {
                                 $0.hidden = "!$sections == 'Schedule'"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                         $0.title = "Add Activity"
                                         }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                             cell.textLabel?.textAlignment = .left
                                             cell.height = { 60 }
                                         }
@@ -748,10 +756,10 @@ class CreateActivityViewController: FormViewController {
                             $0.hidden = "$sections != 'Lists'"
                             $0.addButtonProvider = { section in
                                 return ButtonRow(){
-                                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                     $0.title = "Add Checklist"
                                     }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                         cell.textLabel?.textAlignment = .left
                                     }
                             }
@@ -759,7 +767,7 @@ class CreateActivityViewController: FormViewController {
                                 self.listIndex = index
                                 self.openList()
                                 return ButtonRow() { row in
-                                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                 row.cell.textLabel?.textAlignment = .left
                                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                 row.title = "List"
@@ -767,7 +775,7 @@ class CreateActivityViewController: FormViewController {
                                     self.listIndex = index
                                     self.openList()
                                 }).cellUpdate { cell, row in
-                                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                     cell.textLabel?.textAlignment = .left
                                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                                 }
@@ -783,10 +791,10 @@ class CreateActivityViewController: FormViewController {
                                 $0.hidden = "$sections != 'Transactions'"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                         $0.title = "Add Transaction"
                                         }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                             cell.textLabel?.textAlignment = .left
                                             cell.height = { 60 }
                                     }
@@ -799,7 +807,6 @@ class CreateActivityViewController: FormViewController {
                                             self.purchaseIndex = index
                                             self.openPurchases()
                                             cell.cellResignFirstResponder()
-    //                                                self.tableView.endEditing(true)
                                     }
                                     
                                 }
@@ -825,7 +832,7 @@ class CreateActivityViewController: FormViewController {
                         $0.hidden = "$sections != 'Transactions'"
                         $0.tag = user.name
                         $0.useFormatterDuringInput = true
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                         $0.title = user.name
@@ -836,7 +843,7 @@ class CreateActivityViewController: FormViewController {
                         formatter.numberStyle = .currency
                         $0.formatter = formatter
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                             cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
 
@@ -901,7 +908,6 @@ class CreateActivityViewController: FormViewController {
     }
     
     func updateDecimalRow() {
-        print("purchaseDict \(purchaseDict)")
         for (user, value) in purchaseDict {
             if let userName = user.name, let decimalRow : DecimalRow = form.rowBy(tag: "\(userName)") {
                 decimalRow.value = value
@@ -1105,7 +1111,7 @@ class CreateActivityViewController: FormViewController {
             if let groceryList = list.grocerylist {
                 var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     row.cell.textLabel?.textAlignment = .left
                     row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.title = groceryList.name
@@ -1116,14 +1122,14 @@ class CreateActivityViewController: FormViewController {
                         print("listIndex \(self.listIndex)")
                         self.openList()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.textLabel?.textAlignment = .left
                     }, at: mvs.count - 1)
             } else if let checklist = list.checklist {
                 var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     row.cell.textLabel?.textAlignment = .left
                     row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.title = checklist.name
@@ -1131,14 +1137,14 @@ class CreateActivityViewController: FormViewController {
                         self.listIndex = row.indexPath!.row
                         self.openList()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.textLabel?.textAlignment = .left
                     }, at: mvs.count - 1)
             } else if let activitylist = list.activitylist {
                 var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     row.cell.textLabel?.textAlignment = .left
                     row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.title = activitylist.name
@@ -1146,14 +1152,14 @@ class CreateActivityViewController: FormViewController {
                         self.listIndex = row.indexPath!.row
                         self.openList()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.textLabel?.textAlignment = .left
                     }, at: mvs.count - 1)
             } else if let packinglist = list.packinglist {
                 var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     row.cell.textLabel?.textAlignment = .left
                     row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.title = packinglist.name
@@ -1161,7 +1167,7 @@ class CreateActivityViewController: FormViewController {
                         self.listIndex = row.indexPath!.row
                         self.openList()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.textLabel?.textAlignment = .left
                     }, at: mvs.count - 1)
@@ -2182,7 +2188,7 @@ class CreateActivityViewController: FormViewController {
             
             var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
             mvs.insert(ButtonRow() { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.title = grocerylist.name
@@ -2191,7 +2197,7 @@ class CreateActivityViewController: FormViewController {
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.textLabel?.textAlignment = .left
                 }, at: mvs.count - 1)
@@ -2525,7 +2531,6 @@ extension CreateActivityViewController: UpdateTransactionDelegate {
             else {
                 mvs.remove(at: purchaseIndex)
             }
-//            purchaseBreakdown()
         }
     }
 }

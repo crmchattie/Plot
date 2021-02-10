@@ -62,7 +62,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
         textLabel?.textColor = .clear
         selectionStyle = .none
         
-        backgroundColor = .clear
+        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         contentView.addSubview(nameLabel)
         contentView.addSubview(dateTimeLabel)
         contentView.addSubview(locationNameLabel)

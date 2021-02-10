@@ -209,7 +209,7 @@ class ActivityCell: BaseContainerTableViewCell {
 //        activityAddressLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
 //        activityAddressLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
-        activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 5).isActive = true
+        activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true

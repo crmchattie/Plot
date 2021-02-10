@@ -28,6 +28,14 @@ class MindfulnessViewController: FormViewController {
     var userNames : [String] = []
     var userNamesString: String = ""
     
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = false
@@ -174,7 +182,7 @@ class MindfulnessViewController: FormViewController {
             Section()
             
             <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -195,13 +203,13 @@ class MindfulnessViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
 //            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                row.cell.textLabel?.textAlignment = .left
 //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                row.cell.accessoryType = .disclosureIndicator
@@ -214,7 +222,7 @@ class MindfulnessViewController: FormViewController {
 //                self.openParticipantsInviter()
 //            }).cellUpdate { cell, row in
 //                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                cell.textLabel?.textAlignment = .left
 //                if row.title == "Participants" {
 //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -225,16 +233,16 @@ class MindfulnessViewController: FormViewController {
             
             <<< TextRow("Length") {
                 $0.cell.isUserInteractionEnabled = false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
             <<< DateTimeInlineRow("Starts") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
@@ -259,8 +267,8 @@ class MindfulnessViewController: FormViewController {
                 self!.mindfulness.startDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
@@ -272,14 +280,14 @@ class MindfulnessViewController: FormViewController {
                 }
                 cell.detailTextLabel?.textColor = cell.tintColor
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 
             }
             
             <<< DateTimeInlineRow("Ends"){
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
@@ -304,8 +312,8 @@ class MindfulnessViewController: FormViewController {
                 self!.mindfulness.endDateTime = row.value
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.datePicker.datePickerMode = .dateAndTime
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
@@ -317,7 +325,7 @@ class MindfulnessViewController: FormViewController {
                 }
                 cell.detailTextLabel?.textColor = cell.tintColor
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 

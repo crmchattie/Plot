@@ -40,6 +40,14 @@ class ChecklistViewController: FormViewController {
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
+    
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
                 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -493,7 +501,7 @@ class ChecklistViewController: FormViewController {
         Section()
             
         <<< TextRow("Name") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.placeholder = $0.tag
@@ -514,7 +522,7 @@ class ChecklistViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
         }
@@ -522,7 +530,7 @@ class ChecklistViewController: FormViewController {
         if !connectedToAct {
             form.last!
             <<< ButtonRow("Participants") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textAlignment = .left
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             row.cell.accessoryType = .disclosureIndicator
@@ -535,7 +543,7 @@ class ChecklistViewController: FormViewController {
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textAlignment = .left
                 if row.title == "Participants" {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -552,10 +560,10 @@ class ChecklistViewController: FormViewController {
             $0.tag = "checklistfields"
             $0.addButtonProvider = { section in
                 return ButtonRow(){
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.title = "Add New Item"
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textAlignment = .left
                         
                 }
@@ -564,24 +572,24 @@ class ChecklistViewController: FormViewController {
                 return SplitRow<TextRow, CheckRow>(){
                     $0.rowLeftPercentage = 0.75
                     $0.rowLeft = TextRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                         $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                         $0.placeholder = "Item"
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                             cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                             row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                     }
                     
                     $0.rowRight = CheckRow() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.cell.tintColor = FalconPalette.defaultBlue
                         $0.value = false
                         $0.cell.accessoryType = .checkmark
                         $0.cell.tintAdjustmentMode = .dimmed
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                             cell.tintColor = FalconPalette.defaultBlue
                             if row.value == false {
                                 cell.accessoryType = .checkmark
@@ -591,7 +599,7 @@ class ChecklistViewController: FormViewController {
                             }
                     }
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     }.onChange() { _ in
                         self.updateLists()
                 }
@@ -606,23 +614,23 @@ class ChecklistViewController: FormViewController {
                 mvs.insert(SplitRow<TextRow, CheckRow>() {
                     $0.rowLeftPercentage = 0.75
                     $0.rowLeft = TextRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                         $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                         $0.value = item.key
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                             cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                             row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                     }
                     $0.rowRight = CheckRow() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.cell.tintColor = FalconPalette.defaultBlue
                         $0.value = item.value
                         $0.cell.accessoryType = .checkmark
                         $0.cell.tintAdjustmentMode = .dimmed
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                             cell.tintColor = FalconPalette.defaultBlue
                             if row.value == false {
                                 cell.accessoryType = .checkmark
@@ -632,7 +640,7 @@ class ChecklistViewController: FormViewController {
                             }
                     }
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     }.onChange() { _ in
                         self.updateLists()
                 } , at: mvs.count - 1)

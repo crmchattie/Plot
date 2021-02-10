@@ -19,7 +19,7 @@ final class WeatherCell: Cell<[DailyWeatherElement]>, CellType, UICollectionView
         let collectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: self.contentView.frame.width, height: self.contentView.frame.height), collectionViewLayout: self.collectionViewLayout)
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .clear
+        collectionView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(WeatherCollectionViewCell.self, forCellWithReuseIdentifier: kWeatherCollectionViewCell)
@@ -46,7 +46,7 @@ final class WeatherCell: Cell<[DailyWeatherElement]>, CellType, UICollectionView
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
         selectionStyle = .none
-        backgroundColor = .clear
+        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
         contentView.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()

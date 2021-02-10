@@ -388,7 +388,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         if section == .calendar {
             if networkController.activityService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.activities = sortedActivities
                 cell.invitations = networkController.activityService.invitations
                 cell.delegate = self
@@ -403,7 +403,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else if section == .health {
             if networkController.healthService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.healthMetricSections = healthMetricSections
                 cell.healthMetrics = healthMetrics
                 cell.delegate = self
@@ -418,7 +418,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else {
             if !financeSections.isEmpty {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.institutionDict = networkController.financeService.institutionDict
                 cell.sections = financeSections
                 cell.groups = financeGroups

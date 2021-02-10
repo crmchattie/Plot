@@ -13,7 +13,7 @@ class IngredientSearchViewController: UIViewController {
     weak var delegate : UpdateFoodProductContainerDelegate?
     
     var searchBar: UISearchBar?
-    let searchResultsTableView = UITableView()
+    let searchResultsTableView = UITableView(frame: .zero, style: .insetGrouped)
     
     fileprivate var movingBackwards: Bool = true
     
@@ -234,7 +234,7 @@ extension IngredientSearchViewController: UITableViewDataSource, UITableViewDele
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
-        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
         let section = sections[indexPath.section]

@@ -51,7 +51,7 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 20
+        return 30
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -62,6 +62,7 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
         let cell = tableView.dequeueReusableCell(withIdentifier: falconUsersCellID, for: indexPath) as? ParticipantTableViewCell ?? ParticipantTableViewCell()
         cell.selectParticipantsViewController = self
         
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         let backgroundView = UIView()
         backgroundView.backgroundColor = cell.backgroundColor
         cell.selectedBackgroundView = backgroundView

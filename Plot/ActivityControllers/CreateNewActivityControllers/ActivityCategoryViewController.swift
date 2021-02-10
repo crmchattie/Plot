@@ -91,7 +91,7 @@ class ActivityCategoryViewController: FormViewController {
         for title in categories {
             form.last!
                 <<< ListCheckRow<String>() {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.tintColor = FalconPalette.defaultBlue
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -102,7 +102,7 @@ class ActivityCategoryViewController: FormViewController {
                     }
                 }.cellSetup { cell, row in
                     cell.accessoryType = .checkmark
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.tintColor = FalconPalette.defaultBlue
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

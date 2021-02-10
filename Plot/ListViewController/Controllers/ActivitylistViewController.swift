@@ -44,6 +44,14 @@ class ActivitylistViewController: FormViewController {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = false
@@ -494,7 +502,7 @@ class ActivitylistViewController: FormViewController {
             Section()
             
             <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
@@ -515,7 +523,7 @@ class ActivitylistViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
         }
@@ -523,7 +531,7 @@ class ActivitylistViewController: FormViewController {
         if !connectedToAct {
             form.last!
                 <<< ButtonRow("Participants") { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     row.cell.textLabel?.textAlignment = .left
                     row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     row.cell.accessoryType = .disclosureIndicator
@@ -536,7 +544,7 @@ class ActivitylistViewController: FormViewController {
                     self.openParticipantsInviter()
                 }).cellUpdate { cell, row in
                     cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textAlignment = .left
                     if row.title == "Participants" {
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -553,10 +561,10 @@ class ActivitylistViewController: FormViewController {
                                 $0.tag = "activitylistfields"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                         $0.title = "Add New Activity"
                                     }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                         cell.textLabel?.textAlignment = .left
                                         
                                     }
@@ -578,7 +586,7 @@ class ActivitylistViewController: FormViewController {
                 mvs.insert(SplitRow<ButtonRow, CheckRow>() { splitRow in
                     splitRow.rowLeftPercentage = 0.75
                     splitRow.rowLeft = ButtonRow(){ row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         row.cell.textLabel?.textAlignment = .left
                         row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         row.cell.textLabel?.numberOfLines = 0
@@ -587,19 +595,19 @@ class ActivitylistViewController: FormViewController {
                             self.activityName = key
                             self.openActivity()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.textLabel?.textAlignment = .left
                         cell.textLabel?.numberOfLines = 0
                     }
                     splitRow.rowRight = CheckRow() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.cell.tintColor = FalconPalette.defaultBlue
                         $0.value = value
                         $0.cell.accessoryType = .checkmark
                         $0.cell.tintAdjustmentMode = .dimmed
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.tintColor = FalconPalette.defaultBlue
                         if row.value == false {
                             cell.accessoryType = .checkmark
@@ -611,7 +619,7 @@ class ActivitylistViewController: FormViewController {
                         self.activitylist.items![key] = row.value
                     })
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 } , at: mvs.count - 1)
             }
         }
@@ -891,7 +899,7 @@ extension ActivitylistViewController: UpdateListDelegate {
         mvs.insert(SplitRow<ButtonRow, CheckRow>() { splitRow in
             splitRow.rowLeftPercentage = 0.75
             splitRow.rowLeft = ButtonRow(){ row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.textLabel?.numberOfLines = 0
@@ -900,19 +908,19 @@ extension ActivitylistViewController: UpdateListDelegate {
                     self.activityName = key
                     self.openActivity()
             }).cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.textLabel?.textAlignment = .left
                 cell.textLabel?.numberOfLines = 0
             }
             splitRow.rowRight = CheckRow() {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.tintColor = FalconPalette.defaultBlue
                 $0.value = false
                 $0.cell.accessoryType = .checkmark
                 $0.cell.tintAdjustmentMode = .dimmed
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.tintColor = FalconPalette.defaultBlue
                 if row.value == false {
                     cell.accessoryType = .checkmark
@@ -924,7 +932,7 @@ extension ActivitylistViewController: UpdateListDelegate {
                 self.activitylist.items![key] = row.value
             })
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         } , at: mvs.count - 1)
         
         let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)

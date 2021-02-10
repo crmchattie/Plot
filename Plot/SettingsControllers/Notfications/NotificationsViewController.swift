@@ -33,7 +33,7 @@ class NotificationsViewController: UIViewController {
     var activitiesParticipants: [String: [User]] = [:]
     
     let tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return tableView
@@ -136,7 +136,7 @@ class NotificationsViewController: UIViewController {
         super.viewDidLayoutSubviews()
         segmentedControl.frame = CGRect(x: view.frame.width * 0.125, y: 10, width: view.frame.width * 0.75, height: 30)
         var frame = view.frame
-        frame.origin.y = segmentedControl.frame.maxY + 10
+        frame.origin.y = segmentedControl.frame.maxY + 5
         frame.size.height -= frame.origin.y
         tableView.frame = frame
     }
@@ -188,6 +188,14 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         return appDelegate.notifications
     }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
         
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if segmentedControl.selectedSegmentIndex == 0 {
@@ -211,13 +219,13 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         if segmentedControl.selectedSegmentIndex == 0 {
             let theme = ThemeManager.currentTheme()
             let cell = tableView.dequeueReusableCell(withIdentifier: notificationCellID, for: indexPath)
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             let notification = notifications[indexPath.row]
             cell.textLabel?.text = notification.description
             cell.textLabel?.sizeToFit()
             cell.textLabel?.numberOfLines = 0
             cell.textLabel?.lineBreakMode = .byWordWrapping
             cell.textLabel?.textColor = theme.generalTitleColor
-            cell.backgroundColor = .clear
             let button = UIButton(type: .system)
             button.isUserInteractionEnabled = true
             button.addTarget(self, action: #selector(NotificationsViewController.notificationButtonTapped(_:)), for: .touchUpInside)
@@ -242,7 +250,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath)
-            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             if let activityCell = cell as? ActivityCell {
                 activityCell.delegate = self
                 activityCell.updateInvitationDelegate = self

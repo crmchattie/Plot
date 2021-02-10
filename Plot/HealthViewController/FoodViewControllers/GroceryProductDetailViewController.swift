@@ -22,6 +22,14 @@ class GroceryProductDetailViewController: FormViewController {
     var searchController = ""
     
     let numberFormatter = NumberFormatter()
+    
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
               
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,7 +99,7 @@ class GroceryProductDetailViewController: FormViewController {
         Section()
             
         <<< LabelRow("Name") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
@@ -105,27 +113,27 @@ class GroceryProductDetailViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, _ in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
         
         if let product = product, let number_of_servings = product.number_of_servings, let serving_size = product.serving_size {
             form.last!
             <<< LabelRow("Servings") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.value = "\(number_of_servings) servings per \(serving_size)"
                 }.cellUpdate { cell, _ in
-                    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
         }
         
         form.last!
         <<< DecimalRow("Amount") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
             $0.formatter = numberFormatter
@@ -133,7 +141,7 @@ class GroceryProductDetailViewController: FormViewController {
                 $0.value = product.amount
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
         }.onChange { row in
             self.product.amount = row.value
@@ -172,13 +180,13 @@ class GroceryProductDetailViewController: FormViewController {
             for nutrient in nutrients {
                 if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
                     section!.insert(LabelRow() {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = "\(title.capitalized)"
                         $0.value = "\(String(format: "%.0f", amount)) \(unit.capitalized)"
                     }.cellUpdate { cell, _ in
-                        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     }, at: section!.count)
                 }

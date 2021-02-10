@@ -43,6 +43,14 @@ class PackinglistViewController: FormViewController {
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
+    
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
               
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -287,7 +295,7 @@ class PackinglistViewController: FormViewController {
         Section()
             
         <<< TextRow("Name") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.placeholder = $0.tag
@@ -308,14 +316,14 @@ class PackinglistViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
         if !connectedToAct {
             form.last!
             <<< ButtonRow("Participants") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textAlignment = .left
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             row.cell.accessoryType = .disclosureIndicator
@@ -328,7 +336,7 @@ class PackinglistViewController: FormViewController {
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textAlignment = .left
                 if row.title == "Participants" {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
