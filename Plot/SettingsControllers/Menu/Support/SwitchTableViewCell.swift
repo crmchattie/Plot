@@ -37,7 +37,7 @@ class SwitchTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         
-        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         selectionStyle = .none
         
         addSubview(switchAccessory)

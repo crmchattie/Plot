@@ -166,6 +166,7 @@ class ActivityService {
         } else if value == primaryCalendar && value == googleString {
             grabGoogle {}
         }
+        grabCalendars()
     }
     
     func updatePrimaryCalendarFB(value: String) {

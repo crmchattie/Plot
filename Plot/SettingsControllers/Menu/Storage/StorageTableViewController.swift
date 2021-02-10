@@ -25,12 +25,20 @@ class StorageTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
+        tableView = UITableView(frame: view.frame, style: .insetGrouped)
         title = "Data and Storage"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -44,14 +52,11 @@ class StorageTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let identifier = "cell"
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-        
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.accessoryType = .disclosureIndicator
-        //      cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
-        cell.backgroundColor = view.backgroundColor
         
         if indexPath.row == 0 {
             let cachedSize = SDImageCache.shared.totalDiskSize()
@@ -122,12 +127,4 @@ class StorageTableViewController: UITableViewController {
             tableView.deselectRow(at: indexPath, animated: true)
         }
     }
-    
-    //  override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    //    return 55
-    //  }
-    
-    //  override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    //    return 65
-    //  }
 }

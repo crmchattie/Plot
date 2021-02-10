@@ -61,6 +61,17 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
     }
     
     func setupViews() {
+        backgroundColor = .clear
+        backgroundView = UIView()
+        addSubview(backgroundView!)
+        backgroundView?.fillSuperview()
+        backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+
+        backgroundView?.roundCorners(corners: [.allCorners], radius: 10)
+        backgroundView?.layer.shadowOpacity = 0.1
+        backgroundView?.layer.shadowRadius = 10
+        backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
+        
         companyImageView.constrainWidth(60)
         companyImageView.constrainHeight(60)
         
@@ -73,7 +84,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
         stackView.spacing = 10
         stackView.alignment = .center
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 10, left: 0, bottom: 0, right: 0))
+        stackView.fillSuperview(padding: .init(top: 10, left: 5, bottom: 10, right: 5))
 
     }
     

@@ -34,8 +34,6 @@ class UserProfileContainerView: UIView {
     profileImageView.translatesAutoresizingMaskIntoConstraints = false
     profileImageView.contentMode = .scaleAspectFill
     profileImageView.layer.masksToBounds = true
-    profileImageView.layer.borderWidth = 1
-    profileImageView.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
     profileImageView.layer.cornerRadius = 48
     profileImageView.isUserInteractionEnabled = true
     
@@ -110,18 +108,15 @@ class UserProfileContainerView: UIView {
   let userData: UIView = {
     let userData = UIView()
     userData.translatesAutoresizingMaskIntoConstraints = false
-    userData.layer.cornerRadius = 30
-    userData.layer.borderWidth = 1
-    userData.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
-    
+    userData.layer.cornerRadius = 10
+    userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     return userData
   }()
 
   let bio: BioTextView = {
     let bio = BioTextView()
     bio.translatesAutoresizingMaskIntoConstraints = false
-    bio.layer.cornerRadius = 28
-    bio.layer.borderWidth = 1
+    bio.layer.cornerRadius = 10
     bio.textAlignment = .center
 //    bio.font = UIFont.systemFont(ofSize: 16)
     bio.font = UIFont.preferredFont(forTextStyle: .body)
@@ -129,10 +124,9 @@ class UserProfileContainerView: UIView {
     bio.isScrollEnabled = false
     bio.textContainerInset = UIEdgeInsets(top: 15, left: 35, bottom: 15, right: 35)
     bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-    bio.backgroundColor = .clear
+    bio.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     bio.textColor = ThemeManager.currentTheme().generalTitleColor
     bio.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-    bio.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
     bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
     bio.textContainer.lineBreakMode = .byTruncatingTail
     bio.returnKeyType = .done
@@ -209,17 +203,17 @@ class UserProfileContainerView: UIView {
     
     if #available(iOS 11.0, *) {
       NSLayoutConstraint.activate([
-        profileImageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-        bio.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-        bio.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-        userData.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+        profileImageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
+        bio.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
+        bio.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
+        userData.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
       ])
     } else {
       NSLayoutConstraint.activate([
-        profileImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-        bio.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-        bio.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-        userData.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+        profileImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
+        bio.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
+        bio.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
+        userData.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
       ])
     }
   }

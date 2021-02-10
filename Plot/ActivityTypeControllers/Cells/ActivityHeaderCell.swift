@@ -48,7 +48,30 @@ class ActivityHeaderCell: UICollectionViewCell {
         return imageView
     }()
     
+    var firstPosition: Bool = false
+    var lastPosition: Bool = false
+    
     func setupViews() {
+        backgroundColor = .clear
+        backgroundView = UIView()
+        addSubview(backgroundView!)
+        backgroundView?.fillSuperview()
+        backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+
+        if firstPosition && lastPosition {
+            backgroundView?.roundCorners(corners: [.allCorners], radius: 10)
+            backgroundView?.layer.shadowOpacity = 0.1
+            backgroundView?.layer.shadowRadius = 10
+            backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
+        } else if firstPosition {
+            backgroundView?.roundCorners(corners: [.topLeft, .topRight], radius: 10)
+        } else if lastPosition {
+            backgroundView?.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
+            backgroundView?.layer.shadowOpacity = 0.1
+            backgroundView?.layer.shadowRadius = 10
+            backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
+        }
+        
         logoImageView.constrainWidth(40)
         logoImageView.constrainHeight(40)
         
@@ -60,7 +83,7 @@ class ActivityHeaderCell: UICollectionViewCell {
         nameLabelStackView.isLayoutMarginsRelativeArrangement = true
         let stackView = UIStackView(arrangedSubviews: [logoImageView, nameLabelStackView, arrowView])
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        stackView.fillSuperview(padding: .init(top: 10, left: 5, bottom: 10, right: 5))
     }
     
     override init(frame: CGRect) {
@@ -70,6 +93,13 @@ class ActivityHeaderCell: UICollectionViewCell {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        firstPosition = false
+        lastPosition = false
+        
     }
     
 }

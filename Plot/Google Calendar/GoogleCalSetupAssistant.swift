@@ -31,7 +31,6 @@ class GoogleCalSetupAssistant {
     
     class func setupGoogle(_ completion: @escaping (Bool) -> Void) {
         if let _ = calendarService {
-            print("calendarService does not equal nil")
             completion(true)
             return
         }

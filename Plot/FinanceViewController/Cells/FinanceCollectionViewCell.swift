@@ -271,11 +271,17 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         backgroundView?.fillSuperview()
         backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 
-        if firstPosition {
+        if firstPosition && lastPosition {
+            topHeightConstraint = 10
+            bottomHeightConstraint = 10
+            backgroundView?.roundCorners(corners: [.allCorners], radius: 10)
+            backgroundView?.layer.shadowOpacity = 0.1
+            backgroundView?.layer.shadowRadius = 10
+            backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
+        } else if firstPosition {
             topHeightConstraint = 10
             backgroundView?.roundCorners(corners: [.topLeft, .topRight], radius: 10)
-        }
-        if lastPosition {
+        } else if lastPosition {
             bottomHeightConstraint = 10
             backgroundView?.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
             backgroundView?.layer.shadowOpacity = 0.1

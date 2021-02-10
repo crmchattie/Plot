@@ -18,9 +18,9 @@ class NotificationsTableViewController: SwitchTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
-        createDataSource()
         navigationItem.title = "Notifications"
+        
+        createDataSource()
     }
     
     fileprivate func createDataSource() {

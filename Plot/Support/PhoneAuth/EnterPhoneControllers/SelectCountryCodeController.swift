@@ -45,20 +45,20 @@ class SelectCountryCodeController: UITableViewController {
   
   fileprivate func configureView() {
     title = "Select your country"
-    view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+    view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
   }
   
   fileprivate func configureSearchBar() {
     searchBar.delegate = self
     searchBar.searchBarStyle = .minimal
     searchBar.placeholder = "Search"
-    searchBar.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+    searchBar.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
     searchBar.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
   }
   
   fileprivate func configureTableView() {
-    tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+    tableView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
     tableView.separatorStyle = .none
     tableView.tableHeaderView = searchBar
@@ -85,7 +85,7 @@ extension SelectCountryCodeController {
     let identifier = "cell"
     
     let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-    cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //    cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
     cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
     cell.textLabel?.adjustsFontForContentSizeCategory = true

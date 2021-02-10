@@ -17,7 +17,8 @@ class AccountSettingsController: UITableViewController {
     
     let accountSettingsCellId = "userProfileCell"
     
-    var firstSection = [( icon: UIImage(named: "Accounts") , title: "Calendar & Financial Info" ),
+    var firstSection = [( icon: UIImage(named: "CalendarAccounts") , title: "Calendar Info" ),
+                        ( icon: UIImage(named: "FinancialAccounts") , title: "Financial Info" ),
 //                        ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
                         ( icon: UIImage(named: "Privacy") , title: "Privacy and Security" ),
                         ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
@@ -38,10 +39,10 @@ class AccountSettingsController: UITableViewController {
         title = "Settings"
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
-        tableView = UITableView(frame: tableView.frame, style: .grouped)
+        tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         
-        navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
@@ -320,25 +321,26 @@ extension AccountSettingsController {
         
         if indexPath.section == 0 {
             if indexPath.row == 0 {
-//                let destination = FinancialInfoViewController()
-                let destination = AccountsTableViewController()
+                let destination = CalendarInfoViewController()
                 destination.networkController = networkController
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)
             }
-//            if indexPath.row == 1 {
-//                let destination = NotificationsTableViewController()
-//                destination.hidesBottomBarWhenPushed = true
-//                navigationController?.pushViewController(destination, animated: true)
-//            }
             
             if indexPath.row == 1 {
-                let destination = PrivacyTableViewController()
+                let destination = FinancialInfoViewController()
+                destination.networkController = networkController
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)
             }
             
             if indexPath.row == 2 {
+                let destination = PrivacyTableViewController()
+                destination.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(destination, animated: true)
+            }
+            
+            if indexPath.row == 3 {
                 AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
                 let controller = ChangePhoneNumberController()
                 let destination = UINavigationController(rootViewController: controller)
@@ -349,7 +351,7 @@ extension AccountSettingsController {
                 present(destination, animated: true, completion: nil)
             }
             
-            if indexPath.row == 3 {
+            if indexPath.row == 4 {
                 let destination = StorageTableViewController()
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)

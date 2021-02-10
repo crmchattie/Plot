@@ -23,8 +23,11 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.largeTitleDisplayMode = .never
+        
         title = "Transaction Rules"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
@@ -49,6 +52,14 @@ class FinancialTransactionRulesViewController: UITableViewController {
 
     }
     
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -64,6 +75,7 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "Cell")
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.selectionStyle = .none
         let rule = transactionRules[indexPath.item]
         cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor

@@ -18,9 +18,9 @@ class PrivacyTableViewController: SwitchTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
-        createDataSource()
         navigationItem.title = "Privacy"
+
+        createDataSource()
     }
     
     fileprivate func createDataSource() {

@@ -17,7 +17,7 @@ class EnterVerificationCodeController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         view.addSubview(enterVerificationContainerView)
         enterVerificationContainerView.frame = view.bounds
         //    navigationItem.leftBarButtonItem = enterVerificationContainerView.leftBarButton

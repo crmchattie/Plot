@@ -29,8 +29,11 @@ class FinancialAccountsViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.largeTitleDisplayMode = .never
+        
         title = "Accounts"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView = UITableView(frame: view.frame, style: .insetGrouped)
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
@@ -136,6 +139,7 @@ class FinancialAccountsViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "Cell")
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.selectionStyle = .none
         let member = members[indexPath.section]
         if let accounts = memberAccountsDict[member] {

@@ -14,12 +14,23 @@ class FinancialInfoViewController: UITableViewController {
     var networkController = NetworkController()
     
     override func viewDidLoad() {
-        super.viewDidLoad()        
+        super.viewDidLoad()
+        navigationItem.largeTitleDisplayMode = .never
+        
         title = "Financial Information"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -31,12 +42,10 @@ class FinancialInfoViewController: UITableViewController {
         let identifier = "cell"
         
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-        
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.accessoryType = .disclosureIndicator
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        cell.textLabel?.adjustsFontForContentSizeCategory = true
-        cell.backgroundColor = view.backgroundColor
-        
+        cell.textLabel?.adjustsFontForContentSizeCategory = true        
         if indexPath.row == 0 {
             cell.textLabel?.text = "Accounts"
             cell.isUserInteractionEnabled = true

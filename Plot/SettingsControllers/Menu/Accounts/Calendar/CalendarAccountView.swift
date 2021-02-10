@@ -30,6 +30,14 @@ class CalendarAccountView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = .clear
+        let backgroundView = UIView()
+        addSubview(backgroundView)
+        backgroundView.fillSuperview()
+        backgroundView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+
+        backgroundView.roundCorners(corners: [.topLeft, .topRight], radius: 10)
+        
         accountImageView.constrainWidth(40)
         accountImageView.constrainHeight(40)
         

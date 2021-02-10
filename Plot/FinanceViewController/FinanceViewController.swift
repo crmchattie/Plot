@@ -57,7 +57,7 @@ class FinanceViewController: UIViewController {
         return networkController.userService.users
     }
             
-    var setSections: [SectionType] = [.financialIssues, .balanceSheet, .financialAccounts, .incomeStatement, .transactions]
+    var setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .financialAccounts, .transactions]
     var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
     
@@ -413,28 +413,23 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         let totalItems = collectionView.numberOfItems(inSection: indexPath.section) - 1
         if section != .financialIssues {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             if indexPath.item == 0 {
                 cell.firstPosition = true
-                cell.roundCorners(corners: [.topLeft, .topRight], radius: 10)
-            } else {
-                cell.firstPosition = false
-                cell.roundCorners(corners: [.topLeft, .topRight], radius: 0)
             }
             if indexPath.item == totalItems {
                 cell.lastPosition = true
-                cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
-            } else {
-                cell.lastPosition = false
-                cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 0)
             }
             if let object = object as? [TransactionDetails] {
                 cell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
                 cell.accountDetails = object[indexPath.item]
             } else if let object = object as? [Transaction] {
+                cell.firstPosition = true
+                cell.lastPosition = true
                 cell.transaction = object[indexPath.item]
             } else if let object = object as? [MXAccount] {
+                cell.firstPosition = true
+                cell.lastPosition = true
                 cell.account = object[indexPath.item]
             }
             return cell
@@ -460,21 +455,21 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 30, height: 1000))
             if indexPath.item == 0 {
                 dummyCell.firstPosition = true
-            } else {
-                dummyCell.firstPosition = false
             }
             if indexPath.item == totalItems {
                 dummyCell.lastPosition = true
-            } else {
-                dummyCell.lastPosition = false
             }
             if let object = object as? [TransactionDetails] {
                 dummyCell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
                 dummyCell.accountDetails = object[indexPath.item]
             } else if let object = object as? [Transaction] {
+                dummyCell.firstPosition = true
+                dummyCell.lastPosition = true
                 dummyCell.transaction = object[indexPath.item]
             } else if let object = object as? [MXAccount] {
+                dummyCell.firstPosition = true
+                dummyCell.lastPosition = true
                 dummyCell.account = object[indexPath.item]
             }
             dummyCell.layoutIfNeeded()
@@ -512,6 +507,10 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        let section = sections[section]
+        if section == .transactions || section == .financialAccounts {
+            return 10
+        }
         return 0
     }
 

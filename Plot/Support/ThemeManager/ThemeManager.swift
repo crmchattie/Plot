@@ -62,9 +62,18 @@ enum Theme: Int {
     var generalBackgroundColor: UIColor {
         switch self {
         case .Default:
-            return #colorLiteral(red: 0.9753336296, green: 0.9740961139, blue: 0.9957124312, alpha: 1)
+            return #colorLiteral(red: 0.9489266276, green: 0.9490858912, blue: 0.9747040868, alpha: 1)
         case .Dark:
             return .black
+        }
+    }
+    
+    var cellBackgroundColor: UIColor {
+        switch self {
+        case .Default:
+            return .white
+        case .Dark:
+            return #colorLiteral(red: 0.161149174, green: 0.1603732407, blue: 0.1725786328, alpha: 1)
         }
     }
     
@@ -80,18 +89,9 @@ enum Theme: Int {
     var barBackgroundColor: UIColor {
         switch self {
         case .Default:
-            return #colorLiteral(red: 0.9753336296, green: 0.9740961139, blue: 0.9957124312, alpha: 1)
+            return #colorLiteral(red: 0.9489266276, green: 0.9490858912, blue: 0.9747040868, alpha: 1)
         case .Dark:
             return .black
-        }
-    }
-    
-    var cellBackgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return .white
-        case .Dark:
-            return #colorLiteral(red: 0.1097619608, green: 0.1096628532, blue: 0.1179399118, alpha: 1)
         }
     }
     

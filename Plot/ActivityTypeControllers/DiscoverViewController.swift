@@ -35,15 +35,14 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         let layout = UICollectionViewCompositionalLayout { (_, _) -> NSCollectionLayoutSection? in
             
             let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
-            item.contentInsets.bottom = 16
+            item.contentInsets.bottom = 0
             
             let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(60)), subitems: [item])
-            group.contentInsets.trailing = 32
+            group.contentInsets.trailing = 30
             
             let section = NSCollectionLayoutSection(group: group)
             section.orthogonalScrollingBehavior = .groupPaging
-            section.contentInsets.leading = 16
-            
+            section.contentInsets.leading = 15
             return section
         }
         
@@ -58,8 +57,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = true
         
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
@@ -86,14 +85,13 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         }
                 
         fetchData()
-        
-        GIDSignIn.sharedInstance()?.presentingViewController = self
-        
+                
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         managePresense()
+        GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
     fileprivate func managePresense() {
@@ -147,8 +145,15 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
         if let object = object as? CustomType {
+            let totalSections = self.groups.count - 1
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityHeaderCell, for: indexPath) as! ActivityHeaderCell
             cell.intColor = (indexPath.section % 5)
+            if indexPath.section == 0 {
+                cell.firstPosition = true
+            }
+            if indexPath.section == totalSections {
+                cell.lastPosition = true
+            }
             cell.activityType = object
             return cell
         }

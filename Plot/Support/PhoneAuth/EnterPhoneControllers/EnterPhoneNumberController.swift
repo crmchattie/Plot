@@ -15,11 +15,10 @@ class EnterPhoneNumberController: UIViewController {
     let phoneNumberContainerView = EnterPhoneNumberContainerView()
     let countries = Country().countries
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         configurePhoneNumberContainerView()
         //    configureNavigationBar()
         setCountry()

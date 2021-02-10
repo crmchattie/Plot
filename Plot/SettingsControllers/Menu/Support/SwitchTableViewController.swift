@@ -18,8 +18,8 @@ class SwitchTableViewController: UITableViewController {
     
     fileprivate func configureController() {
         navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
         
+        tableView = UITableView(frame: view.frame, style: .insetGrouped)
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -27,15 +27,11 @@ class SwitchTableViewController: UITableViewController {
         tableView.register(SwitchTableViewCell.self, forCellReuseIdentifier: switchCellID)
     }
     
-    //  override func numberOfSections(in tableView: UITableView) -> Int {
-    //    return 1
-    //  }
-    //
-    //  override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    //    return 55
-    //  }
-    //
-    //  override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    //    return 100
-    //  }
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
 }

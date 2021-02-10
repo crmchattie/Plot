@@ -76,19 +76,12 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
         let totalItems = collectionView.numberOfItems(inSection: indexPath.section) - 1
         if section != .financialIssues {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.mode = .small
             if indexPath.item == 0 {
                 cell.firstPosition = true
             }
-            else {
-                cell.firstPosition = false
-            }
             if indexPath.item == totalItems {
                 cell.lastPosition = true
-            }
-            else {
-                cell.lastPosition = false
             }
             if let object = object as? [TransactionDetails] {
                 cell.transactionDetails = object[indexPath.item]
@@ -146,13 +139,9 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
             dummyCell.mode = .small
             if indexPath.item == 0 {
                 dummyCell.firstPosition = true
-            } else {
-                dummyCell.firstPosition = false
             }
             if indexPath.item == totalItems {
                 dummyCell.lastPosition = true
-            } else {
-                dummyCell.lastPosition = false
             }
             if let object = object as? [TransactionDetails] {
                 dummyCell.transactionDetails = object[indexPath.item]

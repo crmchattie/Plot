@@ -320,10 +320,18 @@ class ChatLogController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+
         setupCollectionView()
         setRightBarButtonItem()
         setupTitleName()
+        configureProgressBar()
+        
+        guard inputContainerView.inputTextView.isFirstResponder else { return }
+        UIView.performWithoutAnimation {
+            self.inputContainerView.inputTextView.resignFirstResponder()
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -372,19 +380,7 @@ class ChatLogController: UICollectionViewController {
     deinit {
         print("\n CHATLOG CONTROLLER DE INIT \n")
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         
-        navigationController?.isNavigationBarHidden = false
-        navigationController?.navigationBar.isHidden = false
-        configureProgressBar()
-        guard inputContainerView.inputTextView.isFirstResponder else { return }
-        UIView.performWithoutAnimation {
-            self.inputContainerView.inputTextView.resignFirstResponder()
-        }
-    }
-    
     func startCollectionViewAtBottom () { // start chat log at bottom for iOS 10
         let collectionViewInsets: CGFloat = (collectionView!.contentInset.bottom + collectionView!.contentInset.top)
         guard let contentHeight = collectionView?.collectionViewLayout.collectionViewContentSize.height,
