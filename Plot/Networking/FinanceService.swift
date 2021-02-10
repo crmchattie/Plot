@@ -178,6 +178,8 @@ class FinanceService {
                                     dispatchGroup.leave()
                                 }
                             }
+                        } else {
+                            dispatchGroup.leave()
                         }
                     }
                     dispatchGroup.leave()

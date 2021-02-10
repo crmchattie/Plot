@@ -1415,8 +1415,6 @@ class CreateActivityViewController: FormViewController {
         }
 
         self.navigationController?.pushViewController(destination, animated: true)
-//        let navigationViewController = UINavigationController(rootViewController: destination)
-//        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     fileprivate func openLocationFinder() {
@@ -1800,7 +1798,8 @@ class CreateActivityViewController: FormViewController {
         } else {
             let destination = ChecklistViewController()
             destination.delegate = self
-            self.navigationController?.pushViewController(destination, animated: true)
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
         }
     }
     

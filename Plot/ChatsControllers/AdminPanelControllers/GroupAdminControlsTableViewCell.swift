@@ -28,19 +28,19 @@ class GroupAdminControlsTableViewCell: UITableViewCell {
     
     backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     selectionColor = ThemeManager.currentTheme().cellSelectionColor
-    contentView.layer.cornerRadius = 25
-    contentView.backgroundColor = ThemeManager.currentTheme().controlButtonsColor
+    contentView.layer.cornerRadius = 10
+    contentView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     contentView.translatesAutoresizingMaskIntoConstraints = false
 
     contentView.topAnchor.constraint(equalTo: topAnchor, constant: 5).isActive = true
     contentView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
     
     if #available(iOS 11.0, *) {
-      contentView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: 10).isActive = true
-      contentView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -10).isActive = true
+      contentView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true
+      contentView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
     } else {
-      contentView.leftAnchor.constraint(equalTo: leftAnchor, constant: 10).isActive = true
-      contentView.rightAnchor.constraint(equalTo: rightAnchor, constant: -10).isActive = true
+      contentView.leftAnchor.constraint(equalTo: leftAnchor, constant: 0).isActive = true
+      contentView.rightAnchor.constraint(equalTo: rightAnchor, constant: 0).isActive = true
     }
    
     contentView.addSubview(title)

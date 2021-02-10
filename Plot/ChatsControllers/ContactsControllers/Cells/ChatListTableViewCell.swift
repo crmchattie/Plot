@@ -15,8 +15,6 @@ class ChatListTableViewCell: UITableViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        
         return label
     }()
     
@@ -29,7 +27,7 @@ class ChatListTableViewCell: UITableViewCell {
         contentView.addSubview(nameLabel)
         
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
-        nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
+        nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
         
     }
@@ -40,7 +38,6 @@ class ChatListTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
       super.prepareForReuse()
-    
       nameLabel.text = ""
       nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
     }

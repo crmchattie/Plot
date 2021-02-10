@@ -117,6 +117,7 @@ class FinancialAccountsViewController: UITableViewController {
             headerView.companyImageView.sd_setImage(with: URL(string: imageURL))
         }
         let status = members[section].connection_status
+        print("connection_status \(status)")
         if status == .connected {
             headerView.statusImageView.image =  UIImage(named: "success")
             headerView.infoLabel.text = "Information is up-to-date"

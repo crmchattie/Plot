@@ -168,14 +168,13 @@ class GroupAdminControlsTableViewController: UITableViewController {
     
     fileprivate func setupTableView() {
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = view.backgroundColor
-        tableView.backgroundColor = view.backgroundColor
+        tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         tableView.register(FalconUsersTableViewCell.self, forCellReuseIdentifier: membersCellID)
         tableView.register(GroupAdminControlsTableViewCell.self, forCellReuseIdentifier: adminControlsCellID)
         tableView.register(ChatActivitiesTableViewCell.self, forCellReuseIdentifier: activityCellID)
         tableView.register(ChatListTableViewCell.self, forCellReuseIdentifier: listCellID)
-        tableView.separatorStyle = .none
         tableView.allowsSelection = true
+        tableView.separatorStyle = .none
     }
     
     fileprivate func setupContainerView() {
@@ -189,8 +188,6 @@ class GroupAdminControlsTableViewController: UITableViewController {
     }
     
     fileprivate func setupColorsAccordingToTheme() {
-        groupProfileTableHeaderContainer.profileImageView.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
-        groupProfileTableHeaderContainer.userData.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         groupProfileTableHeaderContainer.name.textColor = ThemeManager.currentTheme().generalTitleColor
         groupProfileTableHeaderContainer.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
     }
@@ -344,16 +341,14 @@ class GroupAdminControlsTableViewController: UITableViewController {
                 let user = User(dictionary: dictionary)
                 
                 if let userIndex = self.members.firstIndex(where: { (member) -> Bool in
-                    return member.id == snapshot.key }) {
+                                                            return member.id == snapshot.key }) {
                     self.tableView.beginUpdates()
                     self.members[userIndex] = user
                     self.tableView.reloadRows(at: [IndexPath(row:userIndex,section: 1)], with: .none)
                 } else {
                     self.tableView.beginUpdates()
                     self.members.append(user)
-                    
-                    self.tableView.headerView(forSection: 1)?.textLabel?.text = "\(self.members.count) members"
-                    self.tableView.headerView(forSection: 1)?.textLabel?.sizeToFit()
+                    self.tableView.headerView(forSection: 1)?.textLabel?.text = "\(self.members.count) MEMBERS"
                     var index = 0
                     if self.members.count-1 >= 0 { index = self.members.count - 1 }
                     self.tableView.insertRows(at: [IndexPath(row: index, section: 1)], with: .fade)
@@ -373,8 +368,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
             self.tableView.beginUpdates()
             self.members.remove(at: memberIndex)
             self.tableView.deleteRows(at: [IndexPath(row:memberIndex, section: 1)], with: .left)
-            self.tableView.headerView(forSection: 1)?.textLabel?.text = "\(self.members.count) members"
-            self.tableView.headerView(forSection: 1)?.textLabel?.sizeToFit()
+            self.tableView.headerView(forSection: 1)?.textLabel?.text = "\(self.members.count) MEMBERS"
             self.tableView.endUpdates()
             if !self.isCurrentUserMemberOfCurrentGroup() {
                 self.navigationController?.popViewController(animated: true)
@@ -419,9 +413,9 @@ class GroupAdminControlsTableViewController: UITableViewController {
             }
             return ""
         } else if section == 1 {
-            return "\(members.count) members"
+            return "\(members.count) MEMBERS"
         } else {
-            return sections[section - 2]
+            return sections[section - 2].capitalized
         }
     }
     
@@ -741,19 +735,6 @@ class GroupAdminControlsTableViewController: UITableViewController {
                     groupLeaveAlert()
                 }
             }
-        } else {
-            //        var activity: Activity!
-            //
-            //        activity = activities[indexPath.row]
-            //
-            //        let destination = CreateActivityViewController()
-            //        destination.hidesBottomBarWhenPushed = true
-            //        destination.activity = activity
-            //        destination.conversation = conversation
-            //        destination.users = members
-            //        destination.filteredUsers = members
-            //
-            //        navigationController?.pushViewController(destination, animated: true)
         }
         
         tableView.deselectRow(at: indexPath, animated: true)
@@ -844,7 +825,6 @@ class GroupAdminControlsTableViewController: UITableViewController {
             var membersIDs = self.members.map({$0.id ?? ""})
             membersIDs.append(uid)
             self.informationMessageSender.sendInformatoinMessage(chatID: self.chatID, membersIDs: membersIDs, text: text)
-            //      ARSLineProgress.hide()
             self.removeSpinner()
             self.navigationController?.popViewController(animated: true)
         }
@@ -866,17 +846,13 @@ class GroupAdminControlsTableViewController: UITableViewController {
             
         } else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: membersCellID, for: indexPath) as? FalconUsersTableViewCell ?? FalconUsersTableViewCell()
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.selectionStyle = .none
             if members[indexPath.row].id == conversationAdminID {
                 let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
                 label.text = "admin"
                 label.font = UIFont.systemFont(ofSize: 13)
                 label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                cell.accessoryType = UITableViewCell.AccessoryType.none
-                cell.accessoryView = label
-                cell.accessoryView?.backgroundColor = UIColor.clear
-            } else {
-                cell.accessoryView = nil
             }
             
             if let name = members[indexPath.row].name {
@@ -924,32 +900,38 @@ class GroupAdminControlsTableViewController: UITableViewController {
             return cell
         } else if sections[indexPath.section - 2] == "Activities" {
             let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ChatActivitiesTableViewCell ?? ChatActivitiesTableViewCell()
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.selectionStyle = .none
             cell.configureCell(for: activities[indexPath.row])
             return cell
         } else if sections[indexPath.section - 2] == "Checklists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.selectionStyle = .none
             cell.configureCell(checklist: checklists[indexPath.row], grocerylist: nil, packinglist: nil, activitylist: nil)
             return cell
         } else if sections[indexPath.section - 2] == "Grocery Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.selectionStyle = .none
             cell.configureCell(checklist: nil, grocerylist: grocerylists[indexPath.row], packinglist: nil, activitylist: nil)
             return cell
         } else if sections[indexPath.section - 2] == "Activity Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.selectionStyle = .none
             cell.configureCell(checklist: nil, grocerylist: nil, packinglist: nil, activitylist: activitylists[indexPath.row])
             return cell
         } else if sections[indexPath.section - 2] == "Packing Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.selectionStyle = .none
             cell.configureCell(checklist: nil, grocerylist: nil, packinglist: packinglists[indexPath.row], activitylist: nil)
             return cell
         } else {
             let cell = UITableViewCell(style: UITableViewCell.CellStyle.default,
                                        reuseIdentifier: "default")
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             return cell
         }
     }

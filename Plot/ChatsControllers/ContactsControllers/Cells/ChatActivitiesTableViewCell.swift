@@ -18,35 +18,26 @@ class ChatActivitiesTableViewCell: UITableViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        
         return label
     }()
     
     //activity type label (e.g. drinks, trip)
     lazy var locationNameLabel: UILabel = {
         let label = UILabel()
-        //        label.font = UIFont.systemFont(ofSize: 13)
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        
         return label
     }()
     
     
     lazy var dateTimeLabel: UILabel = {
         let label = UILabel()
-        //        label.font = UIFont.systemFont(ofSize: 13)
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.isUserInteractionEnabled = true
-        label.sizeToFit()
-        
         return label
     }()
     

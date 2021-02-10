@@ -16,18 +16,13 @@ class ContactsTableViewCell: UITableViewCell {
     icon.contentMode = .scaleAspectFill
     icon.layer.cornerRadius = 20
     icon.layer.masksToBounds = true
-    
     return icon
   }()
   
   var title: UILabel = {
     var title = UILabel()
     title.translatesAutoresizingMaskIntoConstraints = false
-//    title.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
     title.font = UIFont.preferredFont(forTextStyle: .headline)
-    title.adjustsFontForContentSizeCategory = true
-    title.minimumScaleFactor = 0.1
-    title.adjustsFontSizeToFitWidth = true
     title.textColor = ThemeManager.currentTheme().generalTitleColor
 
     return title
@@ -35,11 +30,6 @@ class ContactsTableViewCell: UITableViewCell {
     
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-    
-    backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-    title.backgroundColor = backgroundColor
-    icon.backgroundColor = backgroundColor
-        
     
     contentView.addSubview(icon)
     icon.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0).isActive = true

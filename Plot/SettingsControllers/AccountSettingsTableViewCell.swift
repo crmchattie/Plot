@@ -14,7 +14,6 @@ class AccountSettingsTableViewCell: UITableViewCell {
         var icon = UIImageView()
         icon.translatesAutoresizingMaskIntoConstraints = false
         icon.contentMode = .scaleAspectFit
-        
         return icon
     }()
     

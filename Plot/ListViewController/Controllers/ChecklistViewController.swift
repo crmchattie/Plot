@@ -90,7 +90,6 @@ class ChecklistViewController: FormViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         if self.movingBackwards && !comingFromLists {
             updateLists()
             delegate?.updateChecklist(checklist: checklist)
@@ -121,25 +120,20 @@ class ChecklistViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if !comingFromLists || !active || self.selectedFalconUsers.count == 0 {
+        if !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
             navigationItem.rightBarButtonItem = plusBarButton
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+            navigationItem.leftBarButtonItem = cancelBarButton
         } else {
-            let dotsImage = UIImage(named: "dots")
-            if #available(iOS 11.0, *) {
-                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-                
-                let dotsBarButton = UIButton(type: .system)
-                dotsBarButton.setImage(dotsImage, for: .normal)
-                dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-                                
-                navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
-            } else {
-                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-            }
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(close))
+            navigationItem.rightBarButtonItem = plusBarButton
         }
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        checklist.name = "CheckListName"
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc fileprivate func close() {
@@ -154,8 +148,12 @@ class ChecklistViewController: FormViewController {
             createChecklist.createNewChecklist()
             self.hideActivityIndicator()
             delegate?.updateChecklist(checklist: checklist)
-            self.navigationController?.popViewController(animated: true)
-            
+            if !active {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+            return
         }
                 
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)

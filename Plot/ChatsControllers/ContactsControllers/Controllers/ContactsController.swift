@@ -38,6 +38,10 @@ class ContactsController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        filteredContacts = filteredContacts.filter {$0.givenName != "nil" && $0.familyName != "nil"}
+        filteredContacts.sort(by: {$0.givenName < $1.givenName})
+        
         configureViewController()
         setupSearchController()
         addObservers()
@@ -76,6 +80,7 @@ class ContactsController: UITableViewController {
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
@@ -156,7 +161,7 @@ class ContactsController: UITableViewController {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
         if section == 0 {
-            return ""
+            return "New Group"
         } else if section == 1 {
             if filteredUsers.count == 0 {
                 return ""
@@ -185,7 +190,7 @@ class ContactsController: UITableViewController {
         if indexPath.section == headerSection {
             let cell = tableView.dequeueReusableCell(withIdentifier: newGroupCellID) ?? UITableViewCell(style: .default, reuseIdentifier: newGroupCellID)
             
-            cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.imageView?.image = UIImage(named: "groupChat")
             cell.imageView?.contentMode = .scaleAspectFit
             cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
@@ -195,6 +200,7 @@ class ContactsController: UITableViewController {
         } else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: falconUsersCellID,
                                                      for: indexPath) as? FalconUsersTableViewCell ?? FalconUsersTableViewCell()
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             let user = filteredUsers[indexPath.row]
             cell.configureCell(for: user)
             return cell
@@ -202,8 +208,12 @@ class ContactsController: UITableViewController {
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: contactsCellID,
                                                      for: indexPath) as? ContactsTableViewCell ?? ContactsTableViewCell()
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.icon.image = UIImage(named: "UserpicIcon")
             cell.title.text = filteredContacts[indexPath.row].givenName + " " + filteredContacts[indexPath.row].familyName
+            print("filteredContacts[indexPath.row] \(filteredContacts[indexPath.row])")
+            print("filteredContacts[indexPath.row].givenName \(filteredContacts[indexPath.row].givenName)")
+            print("filteredContacts[indexPath.row].givenName \(filteredContacts[indexPath.row].familyName)")
             return cell
         }
     }

@@ -83,7 +83,7 @@ class ActivityHeaderCell: UICollectionViewCell {
         nameLabelStackView.isLayoutMarginsRelativeArrangement = true
         let stackView = UIStackView(arrangedSubviews: [logoImageView, nameLabelStackView, arrowView])
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 10, left: 5, bottom: 10, right: 5))
+        stackView.fillSuperview(padding: .init(top: 10, left: 10, bottom: 10, right: 10))
     }
     
     override init(frame: CGRect) {

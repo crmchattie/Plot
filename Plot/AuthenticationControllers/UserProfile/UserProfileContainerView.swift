@@ -36,7 +36,7 @@ class UserProfileContainerView: UIView {
     profileImageView.layer.masksToBounds = true
     profileImageView.layer.cornerRadius = 48
     profileImageView.isUserInteractionEnabled = true
-    
+    profileImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     return profileImageView
   }()
   

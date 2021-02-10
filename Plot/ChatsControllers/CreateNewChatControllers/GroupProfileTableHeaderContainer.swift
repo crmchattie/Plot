@@ -16,11 +16,9 @@ class GroupProfileTableHeaderContainer: UIView {
     profileImageView.translatesAutoresizingMaskIntoConstraints = false
     profileImageView.contentMode = .scaleAspectFill
     profileImageView.layer.masksToBounds = true
-    profileImageView.layer.borderWidth = 1
-    profileImageView.layer.borderColor = ThemeManager.currentTheme().generalSubtitleColor.cgColor//ThemeManager.currentTheme().inputTextViewColor.cgColor
     profileImageView.layer.cornerRadius = 48
     profileImageView.isUserInteractionEnabled = true
-  
+    profileImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     return profileImageView
   }()
 
@@ -31,24 +29,18 @@ class GroupProfileTableHeaderContainer: UIView {
   let addPhotoLabel: UILabel = {
     let addPhotoLabel = UILabel()
     addPhotoLabel.translatesAutoresizingMaskIntoConstraints = false
-  
     addPhotoLabel.numberOfLines = 2
     addPhotoLabel.textColor = FalconPalette.defaultBlue
     addPhotoLabel.textAlignment = .center
-    
     return addPhotoLabel
   }()
 
   var name: PasteRestrictedTextField = {
     let name = PasteRestrictedTextField()
     name.enablesReturnKeyAutomatically = true
-//    name.font = UIFont.systemFont(ofSize: 20)
-    name.font = UIFont.preferredFont(forTextStyle: .title3)
-    name.adjustsFontForContentSizeCategory = true
-    name.adjustsFontSizeToFitWidth = true
     name.translatesAutoresizingMaskIntoConstraints = false
     name.textAlignment = .center
-    name.attributedPlaceholder = NSAttributedString(string:"Group name", attributes:[NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor])
+    name.attributedPlaceholder = NSAttributedString(string:"Group name", attributes:[NSAttributedString.Key.foregroundColor: FalconPalette.defaultBlue])
     name.borderStyle = .none
     name.autocorrectionType = .no
     name.returnKeyType = .done
@@ -60,10 +52,8 @@ class GroupProfileTableHeaderContainer: UIView {
   let userData: UIView = {
     let userData = UIView()
     userData.translatesAutoresizingMaskIntoConstraints = false
-    userData.layer.cornerRadius = 30
-    userData.layer.borderWidth = 1
-    userData.layer.borderColor = ThemeManager.currentTheme().generalSubtitleColor.cgColor
-    
+    userData.layer.cornerRadius = 10
+    userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     return userData
   }()
 
@@ -71,8 +61,8 @@ class GroupProfileTableHeaderContainer: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    addSubview(addPhotoLabel)
     addSubview(profileImageView)
+    addSubview(addPhotoLabel)
     addSubview(userData)
    
     userData.addSubview(name)
@@ -102,13 +92,13 @@ class GroupProfileTableHeaderContainer: UIView {
 
     if #available(iOS 11.0, *) {
       NSLayoutConstraint.activate([
-        profileImageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-        userData.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+        profileImageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
+        userData.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
       ])
     } else {
       NSLayoutConstraint.activate([
-        profileImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-        userData.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+        profileImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
+        userData.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
       ])
     }
   }

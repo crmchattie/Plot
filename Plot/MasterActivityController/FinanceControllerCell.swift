@@ -102,33 +102,6 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
         }
     }
     
-//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        print("willDisplay")
-//        let section = sections[indexPath.section]
-//        let object = groups[section]
-//        if section != .financialIssues {
-//            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-//            if indexPath.item == 0 {
-//                cell.roundCorners(corners: [.topLeft, .topRight], radius: 10)
-//            } else {
-//                cell.roundCorners(corners: [.topLeft, .topRight], radius: 0)
-//            }
-//            if let object = object as? [TransactionDetails] {
-//                if indexPath.item == object.count - 1 {
-//                    cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
-//                } else {
-//                    cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 0)
-//                }
-//            } else if let object = object as? [AccountDetails] {
-//                if indexPath.item == object.count - 1 {
-//                    cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
-//                } else {
-//                    cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 0)
-//                }
-//            }
-//        }
-//    }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var height: CGFloat = 328
         let section = sections[indexPath.section]
