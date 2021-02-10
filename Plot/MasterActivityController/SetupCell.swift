@@ -17,8 +17,8 @@ class SetupCell: BaseContainerCollectionViewCell {
             imageView.image = UIImage(named: sectionType.image)!.withRenderingMode(.alwaysTemplate)
             imageView.tintColor = colors[intColor]
             imageView.contentMode = .scaleAspectFit
-            imageView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            containerImageView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            imageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            containerImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             typeLabel.text = sectionType.type
             descriptionLabel.text = sectionType.subType
             setupViews()

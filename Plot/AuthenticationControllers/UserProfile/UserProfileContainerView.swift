@@ -153,8 +153,8 @@ class UserProfileContainerView: UIView {
     
     backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     
-    addSubview(addPhotoLabel)
     addSubview(profileImageView)
+    addSubview(addPhotoLabel)
     addSubview(userData)
     addSubview(bio)
     addSubview(countLabel)
