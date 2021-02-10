@@ -8,5 +8,3 @@
 
 import UIKit
 import SDWebImage
-
-

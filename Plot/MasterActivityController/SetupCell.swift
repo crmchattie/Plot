@@ -74,21 +74,6 @@ class SetupCell: BaseContainerCollectionViewCell {
         super.init(frame: frame)
         layer.cornerRadius = 16
         
-        containerImageView.constrainWidth(100)
-        containerImageView.constrainHeight(100)
-        
-        containerImageView.layer.masksToBounds = true
-        containerImageView.layer.cornerRadius = 100 / 2
-        
-        imageView.constrainWidth(50)
-        imageView.constrainHeight(50)
-        
-        button.constrainWidth(contentView.frame.width - 32)
-        button.constrainHeight(45)
-        
-        button.clipsToBounds = true
-        button.layer.cornerRadius = 8
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -97,7 +82,7 @@ class SetupCell: BaseContainerCollectionViewCell {
     
     override func setupViews() {
         super.setupViews()
-                
+        
         containerImageView.constrainWidth(100)
         containerImageView.constrainHeight(100)
         

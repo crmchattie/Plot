@@ -303,6 +303,14 @@ class SelectParticipantsViewController: UIViewController {
         
         selectedFalconUsers.append(sections[indexPath.section][indexPath.row])
         
+        let set1 = Set(selectedFalconUsers)
+        let set2 = Set(priorSelectedUsers)
+
+        if (set1.count == set2.count && set1 == set2) {
+            navigationItem.rightBarButtonItem?.isEnabled = false
+        } else {
+            navigationItem.rightBarButtonItem?.isEnabled = true
+        }
     }
     
     func didDeselectUser(at indexPath: IndexPath) {
@@ -322,6 +330,15 @@ class SelectParticipantsViewController: UIViewController {
         }
         
         sections[indexPath.section][indexPath.row].isSelected = false
+        
+        let set1 = Set(selectedFalconUsers)
+        let set2 = Set(priorSelectedUsers)
+
+        if (set1.count == set2.count && set1 == set2) {
+            navigationItem.rightBarButtonItem?.isEnabled = false
+        } else {
+            navigationItem.rightBarButtonItem?.isEnabled = true
+        }
     }
     
     func selectPriorUsers(priorSelectedUsers: [User]) {
@@ -340,8 +357,7 @@ class SelectParticipantsViewController: UIViewController {
                 selectedFalconUsers.append(user)
             }
                         
-        }
-        
+        }        
     }
     
     func fetchMembersIDs() -> ([String]) {

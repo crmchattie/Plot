@@ -446,8 +446,9 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         height += 140
                     }
                 }
+                return CGSize(width: self.collectionView.frame.size.width, height: height)
             } else {
-                height = 300
+                return CGSize(width: self.collectionView.frame.size.width - 30, height: 300)
             }
         } else if section == .health {
             if !healthMetrics.isEmpty && networkController.healthService.askedforAuthorization {
@@ -458,8 +459,9 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                     }
                 }
                 height += 25
+                return CGSize(width: self.collectionView.frame.size.width, height: height)
             } else {
-                height = 300
+                return CGSize(width: self.collectionView.frame.size.width - 30, height: 300)
             }
         } else {
             if !financeSections.isEmpty {
@@ -478,11 +480,11 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                     }
                 }
                 height += 35
+                return CGSize(width: self.collectionView.frame.size.width, height: height)
             } else {
-                height = 300
+                return CGSize(width: self.collectionView.frame.size.width - 30, height: 300)
             }
         }
-        return CGSize(width: self.collectionView.frame.size.width, height: height)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
