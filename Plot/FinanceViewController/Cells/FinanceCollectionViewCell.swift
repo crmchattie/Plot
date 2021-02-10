@@ -32,7 +32,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
 
                 switch transactionDetails.level {
                 case .category:
-                    heightConstraint = 5
+                    topHeightConstraint = 5
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
                     nameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
@@ -49,18 +49,18 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     
                     if transactionDetails.group == "Income", let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = "\(amount)"
-                        heightConstraint = 20
+                        topHeightConstraint = 20
 
                     } else if let amount = numberFormatter.string(from: transactionDetails.amount * -1 as NSNumber) {
                         categoryLabel.text = "\(amount)"
-                        heightConstraint = 5
+                        topHeightConstraint = 5
 
                     }
                 case .group:
                     if mode == .fullscreen {
-                        heightConstraint = 20
+                        topHeightConstraint = 20
                     } else {
-                        heightConstraint = 5
+                        topHeightConstraint = 5
                     }
                     
                     if (transactionDetails.group == "Income" || transactionDetails.group == "Expense" || transactionDetails.group == "Difference") {
@@ -99,10 +99,10 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 imageView.isHidden = true
                 
                 nameLabel.text = accountDetails.name
-
+                
                 switch accountDetails.level {
                 case .account:
-                    heightConstraint = 5
+                    topHeightConstraint = 5
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
                     nameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
@@ -112,7 +112,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                         categoryLabel.text = "\(amount)"
                     }
                 case .subtype:
-                    heightConstraint = 5
+                    topHeightConstraint = 5
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .callout)
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .callout)
                     
@@ -120,7 +120,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                         categoryLabel.text = "\(amount)"
                     }
                 case .type:
-                    heightConstraint = 20
+                    topHeightConstraint = 20
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
                     
@@ -129,10 +129,11 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     }
                 case .bs_type:
                     if mode == .fullscreen {
-                        heightConstraint = 20
+                        topHeightConstraint = 20
                     } else {
-                        heightConstraint = 5
+                        topHeightConstraint = 5
                     }
+                    
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                     
@@ -162,8 +163,8 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
                 
                 categoryLabel.isHidden = true
-                heightConstraint = 20
-                
+                topHeightConstraint = 10
+                                
                 nameLabel.text = transaction.description
                 if let amount = numberFormatter.string(from: transaction.amount as NSNumber) {
                     middleLabel.text = "Amount: \(amount)"
@@ -196,8 +197,8 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 dateFormatterPrint.dateFormat = "MMM dd, yyyy"
                 
                 categoryLabel.isHidden = true
-                heightConstraint = 20
-                
+                topHeightConstraint = 10
+                                
                 nameLabel.text = account.name
                 let currentBalance = account.available_balance ?? account.balance
                 if let balance = numberFormatter.string(from: currentBalance as NSNumber) {
@@ -258,9 +259,30 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     
     let imageView = UIImageView(cornerRadius: 8)
     
-    var heightConstraint = CGFloat()
-
+    var topHeightConstraint = CGFloat()
+    var bottomHeightConstraint: CGFloat = 0
+    var firstPosition: Bool = false
+    var lastPosition: Bool = false
+        
     func setupViews() {
+        backgroundColor = .clear
+        backgroundView = UIView()
+        addSubview(backgroundView!)
+        backgroundView?.fillSuperview()
+        backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+
+        if firstPosition {
+            topHeightConstraint = 10
+            backgroundView?.roundCorners(corners: [.topLeft, .topRight], radius: 10)
+        }
+        if lastPosition {
+            bottomHeightConstraint = 10
+            backgroundView?.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
+            backgroundView?.layer.shadowOpacity = 0.1
+            backgroundView?.layer.shadowRadius = 10
+            backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
+        }
+        
         let verticalStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
 
         let stackView = UIStackView(arrangedSubviews: [verticalStackView, UIView(), imageView, categoryLabel])
@@ -269,12 +291,15 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         stackView.distribution = .fill
 
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: heightConstraint, left: 0, bottom: 0, right: 0))
+        stackView.fillSuperview(padding: .init(top: topHeightConstraint, left: 10, bottom: bottomHeightConstraint, right: 10))
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        heightConstraint = CGFloat()
+        topHeightConstraint = CGFloat()
+        bottomHeightConstraint = 0
+        firstPosition = false
+        lastPosition = false
                 
         nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         categoryLabel.textColor = ThemeManager.currentTheme().generalTitleColor

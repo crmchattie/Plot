@@ -162,7 +162,6 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
-        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         let key = healthMetricSections[indexPath.section]
         if let metrics = healthMetrics[key] {
             let metric = metrics[indexPath.row]
@@ -181,7 +180,7 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.collectionView.frame.size.width, height: 75)
+        return CGSize(width: self.collectionView.frame.size.width - 30, height: 90)
         
     }
     

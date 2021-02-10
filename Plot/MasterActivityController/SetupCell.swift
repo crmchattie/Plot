@@ -8,7 +8,7 @@
 
 import Foundation
 
-class SetupCell: BaseContainerCell {    
+class SetupCell: BaseContainerCollectionViewCell {    
     var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
     var intColor: Int = 0
     

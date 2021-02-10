@@ -604,7 +604,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
-        cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         cell.delegate = self
         cell.updateInvitationDelegate = self
         cell.activityViewControllerDataStore = self

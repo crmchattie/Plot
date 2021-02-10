@@ -130,7 +130,7 @@ class ActivityService {
                         self.calendars[googleString] = calendars
                     }
                 }
-            }r
+            }
         }
     }
     

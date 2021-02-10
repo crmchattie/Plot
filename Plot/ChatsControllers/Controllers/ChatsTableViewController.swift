@@ -113,7 +113,7 @@ class ChatsTableViewController: UITableViewController {
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 105
+        tableView.estimatedRowHeight = 115
         
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.leftBarButtonItem = doneBarButton

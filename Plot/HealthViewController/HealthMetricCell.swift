@@ -9,7 +9,7 @@
 import UIKit
 import HealthKit
 
-class HealthMetricCell: UICollectionViewCell {
+class HealthMetricCell: BaseContainerCollectionViewCell {
 
     let titleLabel: UILabel = {
         let label = UILabel()
@@ -60,7 +60,7 @@ class HealthMetricCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        contentView.backgroundColor = .clear
         contentView.addSubview(titleLabel)
         contentView.addSubview(subtitleLabel)
         contentView.addSubview(detailLabel)
@@ -88,9 +88,9 @@ class HealthMetricCell: UICollectionViewCell {
         detailLabel.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 4).isActive = true
         detailLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
         detailLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
-        detailLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0).isActive = true
+        detailLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
 
-        activityTypeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
+        activityTypeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 29).isActive = true

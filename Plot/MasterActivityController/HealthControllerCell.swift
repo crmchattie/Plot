@@ -10,7 +10,7 @@ protocol HealthControllerCellDelegate: class {
     func cellTapped(metric: HealthMetric)
 }
 
-class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {
+class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {
     weak var delegate: HealthControllerCellDelegate?
     
     let healthMetricCellID = "HealthMetricCellID"
@@ -44,9 +44,7 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.isScrollEnabled = false
-        
-        collectionView.backgroundColor = backgroundColor
-        
+                
         collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
         
@@ -56,10 +54,10 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
         fatalError()
     }
     
-    override func setupViews() {
-        super.setupViews()        
+    func setupViews() {
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         addSubview(collectionView)
-        collectionView.fillSuperview(padding: .init(top: 15, left: 5, bottom: 5, right: 5))
+        collectionView.fillSuperview()
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -78,7 +76,6 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         let key = healthMetricSections[indexPath.section]
         if let metrics = healthMetrics[key] {
             let metric = metrics[indexPath.row]
@@ -88,19 +85,19 @@ class HealthControllerCell: BaseContainerCell, UICollectionViewDelegateFlowLayou
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.collectionView.frame.size.width, height: 75)
+        return CGSize(width: self.collectionView.frame.size.width - 30, height: 90)
         
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {        
-        return CGSize(width: self.collectionView.frame.size.width, height: 30)
+        return CGSize(width: self.collectionView.frame.size.width, height: 35)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             let key = healthMetricSections[indexPath.section]
             let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
-            sectionHeader.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            sectionHeader.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             sectionHeader.titleLabel.text = key.capitalized
             return sectionHeader
         } else { //No footer in this case but can add option for that

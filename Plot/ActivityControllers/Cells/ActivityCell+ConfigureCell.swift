@@ -91,7 +91,7 @@ extension ActivityCell {
     func configureCell(for indexPath: IndexPath, activity: Activity, withInvitation invitation: Invitation?) {        
         self.invitation = invitation
         self.activity = activity
-        
+                
         let isActivityMuted = activity.muted != nil && activity.muted!
         let activityName = activity.name
                 
@@ -198,7 +198,7 @@ extension ActivityCell {
                         continue
                     }
                     
-                    if i > 8 {
+                    if i > 7 {
                         return
                     }
                     

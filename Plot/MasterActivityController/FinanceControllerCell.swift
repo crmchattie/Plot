@@ -12,7 +12,7 @@ protocol FinanceControllerCellDelegate: class {
     func openMember(member: MXMember)
 }
 
-class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     weak var delegate: FinanceControllerCellDelegate?
     
     let kHeaderCell = "HeaderCell"
@@ -22,14 +22,13 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 20, right: 10)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.contentInset.bottom = 0
         return collectionView
     }()
-        
+    
     var institutionDict = [String: String]()
     
     var sections = [SectionType]()
@@ -42,12 +41,9 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        layer.cornerRadius = 16
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.isScrollEnabled = false
-        
-        collectionView.backgroundColor = backgroundColor
         
         collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kHeaderCell)
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
@@ -59,10 +55,10 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
         fatalError()
     }
     
-    override func setupViews() {
-        super.setupViews()
+    func setupViews() {
+        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         addSubview(collectionView)
-        collectionView.fillSuperview(padding: .init(top: 15, left: 5, bottom: 0, right: 5))
+        collectionView.fillSuperview()
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -77,18 +73,27 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = sections[indexPath.section]
         let object = groups[section]
+        let totalItems = collectionView.numberOfItems(inSection: indexPath.section) - 1
         if section != .financialIssues {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.mode = .small
+            if indexPath.item == 0 {
+                cell.firstPosition = true
+            }
+            else {
+                cell.firstPosition = false
+            }
+            if indexPath.item == totalItems {
+                cell.lastPosition = true
+            }
+            else {
+                cell.lastPosition = false
+            }
             if let object = object as? [TransactionDetails] {
                 cell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
                 cell.accountDetails = object[indexPath.item]
-            } else if let object = object as? [Transaction] {
-                cell.transaction = object[indexPath.item]
-            } else if let object = object as? [MXAccount] {
-                cell.account = object[indexPath.item]
             }
             return cell
         } else {
@@ -104,13 +109,51 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
         }
     }
     
+//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        print("willDisplay")
+//        let section = sections[indexPath.section]
+//        let object = groups[section]
+//        if section != .financialIssues {
+//            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+//            if indexPath.item == 0 {
+//                cell.roundCorners(corners: [.topLeft, .topRight], radius: 10)
+//            } else {
+//                cell.roundCorners(corners: [.topLeft, .topRight], radius: 0)
+//            }
+//            if let object = object as? [TransactionDetails] {
+//                if indexPath.item == object.count - 1 {
+//                    cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
+//                } else {
+//                    cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 0)
+//                }
+//            } else if let object = object as? [AccountDetails] {
+//                if indexPath.item == object.count - 1 {
+//                    cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
+//                } else {
+//                    cell.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 0)
+//                }
+//            }
+//        }
+//    }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var height: CGFloat = 328
         let section = sections[indexPath.section]
         let object = groups[section]
+        let totalItems = collectionView.numberOfItems(inSection: indexPath.section) - 1
         if section != .financialIssues {
-            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 20, height: 1000))
+            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             dummyCell.mode = .small
+            if indexPath.item == 0 {
+                dummyCell.firstPosition = true
+            } else {
+                dummyCell.firstPosition = false
+            }
+            if indexPath.item == totalItems {
+                dummyCell.lastPosition = true
+            } else {
+                dummyCell.lastPosition = false
+            }
             if let object = object as? [TransactionDetails] {
                 dummyCell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
@@ -121,10 +164,10 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
                 dummyCell.account = object[indexPath.item]
             }
             dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: frame.width - 20, height: 1000))
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
             height = estimatedSize.height
         } else {
-            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 20, height: 1000))
+            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             if let object = object as? [MXMember] {
                 if let imageURL = institutionDict[object[indexPath.item].institution_code] {
                     dummyCell.imageURL = imageURL
@@ -132,10 +175,10 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
                 }
             }
             dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: frame.width - 20, height: 1000))
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
             height = estimatedSize.height
         }
-        return CGSize(width: self.collectionView.frame.size.width - 20, height: height)
+        return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
         
     }
     
@@ -144,9 +187,10 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
     }
     
     func collectionView(_ collectionView: UICollectionView,
-        viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+                        viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let section = sections[indexPath.section]
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
+        header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         header.titleLabel.text = section.name
         header.subTitleLabel.isHidden = true
         return header
@@ -155,7 +199,7 @@ class FinanceControllerCell: BaseContainerCell, UICollectionViewDelegate, UIColl
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }

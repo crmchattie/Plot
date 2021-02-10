@@ -388,7 +388,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         if section == .calendar {
             if networkController.activityService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.activities = sortedActivities
                 cell.invitations = networkController.activityService.invitations
                 cell.delegate = self
@@ -403,7 +403,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else if section == .health {
             if networkController.healthService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.healthMetricSections = healthMetricSections
                 cell.healthMetrics = healthMetrics
                 cell.delegate = self
@@ -418,7 +418,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else {
             if !financeSections.isEmpty {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 cell.institutionDict = networkController.financeService.institutionDict
                 cell.sections = financeSections
                 cell.groups = financeGroups
@@ -443,7 +443,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                     if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
                         height += 168
                     } else {
-                        height += 132
+                        height += 140
                     }
                 }
             } else {
@@ -451,10 +451,10 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             }
         } else if section == .health {
             if !healthMetrics.isEmpty && networkController.healthService.askedforAuthorization {
-                height += CGFloat(healthMetricSections.count * 45)
+                height += CGFloat(healthMetricSections.count * 30)
                 for key in healthMetricSections {
                     if let metrics = healthMetrics[key] {
-                        height += CGFloat(metrics.count * 75)
+                        height += CGFloat(metrics.count * 95)
                     }
                 }
                 height += 25
@@ -463,7 +463,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             }
         } else {
             if !financeSections.isEmpty {
-                height += CGFloat(financeSections.count * 60)
+                height += CGFloat(financeSections.count * 50)
                 for section in financeSections {
                     if section == .financialIssues {
                         if let group = financeGroups[section] as? [MXMember] {
@@ -477,13 +477,12 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         }
                     }
                 }
-                height += 20
+                height += 35
             } else {
                 height = 300
             }
         }
-        return CGSize(width: self.collectionView.frame.size.width - 40, height: height)
-        
+        return CGSize(width: self.collectionView.frame.size.width, height: height)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -491,7 +490,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: view.frame.width, height: 30)
+        return CGSize(width: view.frame.width, height: 25)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

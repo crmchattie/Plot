@@ -52,8 +52,8 @@ class ActivityView: UIView {
             arrowButton.centerXAnchor.constraint(equalTo: calendar.centerXAnchor),
             
             tableView.topAnchor.constraint(equalTo: calendar.bottomAnchor, constant: 0),
-            tableView.leftAnchor.constraint(equalTo: leftAnchor, constant: 5),
-            tableView.rightAnchor.constraint(equalTo: rightAnchor, constant: -5),
+            tableView.leftAnchor.constraint(equalTo: leftAnchor, constant: 0),
+            tableView.rightAnchor.constraint(equalTo: rightAnchor, constant: 0),
             tableView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 

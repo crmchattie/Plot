@@ -15,7 +15,7 @@ protocol ChatCellDelegate: class {
     func openActivity(forConversation conversation: Conversation)
 }
 
-class UserCell: UITableViewCell {
+class UserCell: BaseContainerTableViewCell {
     
     let thumbnailsCount = 9
     var thumbnails: [UIImageView] = []
@@ -95,7 +95,7 @@ class UserCell: UITableViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.numberOfLines = 2
+        label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.sizeToFit()
         
@@ -144,8 +144,9 @@ class UserCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
+        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        chatImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
-        backgroundColor = .clear
         contentView.addSubview(chatImageView)
         chatImageView.addSubview(nameLabel)
         chatImageView.addSubview(messageLabel)
@@ -157,12 +158,12 @@ class UserCell: UITableViewCell {
         chatImageView.addSubview(activityButton)
         chatImageView.addSubview(infoButton)
         
-        chatImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4).isActive = true
-        chatImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4).isActive = true
-        chatImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
-        chatImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
+        chatImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
+        chatImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
+        chatImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
+        chatImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
         
-        nameLabel.topAnchor.constraint(equalTo: chatImageView.topAnchor, constant: 2).isActive = true
+        nameLabel.topAnchor.constraint(equalTo: chatImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -20).isActive = true
         
@@ -189,20 +190,20 @@ class UserCell: UITableViewCell {
         badgeLabel.centerYAnchor.constraint(equalTo: activityButton.centerYAnchor).isActive = true
         badgeLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
-        chatButton.topAnchor.constraint(equalTo: chatImageView.topAnchor, constant: 4).isActive = true
-        chatButton.rightAnchor.constraint(equalTo: chatImageView.rightAnchor, constant: -5).isActive = true
+        chatButton.topAnchor.constraint(equalTo: chatImageView.topAnchor, constant: 10).isActive = true
+        chatButton.rightAnchor.constraint(equalTo: chatImageView.rightAnchor, constant: -10).isActive = true
         chatButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         chatButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
-        activityButton.topAnchor.constraint(equalTo: chatButton.bottomAnchor, constant: 10).isActive = true
-        activityButton.rightAnchor.constraint(equalTo: chatImageView.rightAnchor, constant: -5).isActive = true
+        activityButton.topAnchor.constraint(equalTo: chatButton.bottomAnchor, constant: 8).isActive = true
+        activityButton.rightAnchor.constraint(equalTo: chatImageView.rightAnchor, constant: -10).isActive = true
         activityButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         activityButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         activityButton.addTarget(self, action: #selector(UserCell.activityButtonTapped), for: .touchUpInside)
         
-        infoButton.topAnchor.constraint(equalTo: activityButton.bottomAnchor, constant: 10).isActive = true
-        infoButton.bottomAnchor.constraint(equalTo: chatImageView.bottomAnchor, constant: -12).isActive = true
-        infoButton.rightAnchor.constraint(equalTo: chatImageView.rightAnchor, constant: -5).isActive = true
+        infoButton.topAnchor.constraint(equalTo: activityButton.bottomAnchor, constant: 8).isActive = true
+        infoButton.bottomAnchor.constraint(equalTo: chatImageView.bottomAnchor, constant: -10).isActive = true
+        infoButton.rightAnchor.constraint(equalTo: chatImageView.rightAnchor, constant: -10).isActive = true
         infoButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         infoButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         infoButton.addTarget(self, action: #selector(UserCell.getInfoAction), for: .touchUpInside)
@@ -232,9 +233,8 @@ class UserCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
-        //profileImageView.image = nil
-        //profileImageView.sd_cancelCurrentImageLoad()
+        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        chatImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         nameLabel.text = ""
         messageLabel.text = nil
         timeLabel.text = nil

@@ -8,26 +8,10 @@
 
 import UIKit
 
-class BaseContainerCell: UICollectionViewCell {
-        
-    override var isHighlighted: Bool {
-        didSet {
-            var transform: CGAffineTransform = .identity
-            if isHighlighted {
-                transform = .init(scaleX: 0.9, y: 0.9)
-            }
-            
-            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
-                
-                self.transform = transform
-                
-            })
-        }
-    }
-    
+class BaseContainerCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        setupViews()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -39,11 +23,46 @@ class BaseContainerCell: UICollectionViewCell {
         addSubview(self.backgroundView!)
         self.backgroundView?.fillSuperview()
         self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        self.backgroundView?.layer.cornerRadius = 16
+        self.backgroundView?.layer.cornerRadius = 10
+        self.backgroundView?.layer.masksToBounds = true
         self.backgroundView?.layer.shadowOpacity = 0.1
         self.backgroundView?.layer.shadowRadius = 10
         self.backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
         self.backgroundView?.layer.shouldRasterize = true
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    }
+    
+}
+
+class BaseContainerTableViewCell: UITableViewCell {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: .default, reuseIdentifier: reuseIdentifier)
+        setupViews()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupViews() {
+        self.backgroundView = UIView()
+        addSubview(self.backgroundView!)
+        self.backgroundView?.fillSuperview()
+        self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        self.backgroundView?.layer.cornerRadius = 10
+        self.backgroundView?.layer.masksToBounds = true
+        self.backgroundView?.layer.shadowOpacity = 0.1
+        self.backgroundView?.layer.shadowRadius = 10
+        self.backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
+        self.backgroundView?.layer.shouldRasterize = true
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    }
 }

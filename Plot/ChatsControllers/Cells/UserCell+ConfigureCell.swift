@@ -13,12 +13,6 @@ import SDWebImage
 extension UserCell {
   
   func configureCell(for indexPath: IndexPath, conversations: [Conversation]) {
-    
-    backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-    contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-    chatImageView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-
-    
     self.conversation = conversations[indexPath.row]
     
     let isPersonalStorage = conversations[indexPath.row].chatID == Auth.auth().currentUser?.uid

@@ -24,7 +24,7 @@ class SectionHeader: UICollectionReusableView {
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-        titleLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 10).isActive = true
+        titleLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 15).isActive = true
         titleLabel.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
     }
     
