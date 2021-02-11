@@ -107,7 +107,7 @@ class StorageTableViewController: UITableViewController {
             oversizeAlert.addAction(okAction)
             oversizeAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             self.present(oversizeAlert, animated: true, completion: nil)
-            tableView.deselectRow(at: indexPath, animated: true)
+            
             
         }
         
@@ -124,7 +124,7 @@ class StorageTableViewController: UITableViewController {
             alert.addAction(okAction)
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
-            tableView.deselectRow(at: indexPath, animated: true)
+            
         }
     }
 }

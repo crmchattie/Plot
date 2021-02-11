@@ -136,9 +136,7 @@ class UserInfoTableViewController: UITableViewController {
             if let timestamp = user?.onlineStatus {
                 headerCell.subtitle.text = stringTimestamp(onlineStatusObject: timestamp)
             }
-            
-            headerCell.selectionStyle = .none
-            
+                        
             guard let photoURL = user?.photoURL else { headerCell.icon.image = UIImage(named: "UserpicIcon"); return headerCell }
             headerCell.icon.showActivityIndicator()
             headerCell.icon.sd_setImage(with: URL(string: photoURL), placeholderImage: UIImage(named: "UserpicIcon"), options: [.continueInBackground, .scaleDownLargeImages], completed: { (image, error, cacheType, url) in

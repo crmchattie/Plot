@@ -740,7 +740,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
             }
         }
         
-        tableView.deselectRow(at: indexPath, animated: true)
+        
     }
     
     fileprivate func groupLeaveAlert() {
@@ -837,7 +837,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: adminControlsCellID,
                                                      for: indexPath) as? GroupAdminControlsTableViewCell ?? GroupAdminControlsTableViewCell()
-            cell.selectionStyle = .none
+            
             cell.title.text = adminControls[indexPath.row]
             
             if cell.title.text == adminControls.last {
@@ -850,7 +850,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
         } else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: membersCellID, for: indexPath) as? FalconUsersTableViewCell ?? FalconUsersTableViewCell()
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.selectionStyle = .none
+            
             if members[indexPath.row].id == conversationAdminID {
                 let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
                 label.text = "admin"
@@ -904,31 +904,31 @@ class GroupAdminControlsTableViewController: UITableViewController {
         } else if sections[indexPath.section - 2] == "Activities" {
             let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ChatActivitiesTableViewCell ?? ChatActivitiesTableViewCell()
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.selectionStyle = .none
+            
             cell.configureCell(for: activities[indexPath.row])
             return cell
         } else if sections[indexPath.section - 2] == "Checklists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.selectionStyle = .none
+            
             cell.configureCell(checklist: checklists[indexPath.row], grocerylist: nil, packinglist: nil, activitylist: nil)
             return cell
         } else if sections[indexPath.section - 2] == "Grocery Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.selectionStyle = .none
+            
             cell.configureCell(checklist: nil, grocerylist: grocerylists[indexPath.row], packinglist: nil, activitylist: nil)
             return cell
         } else if sections[indexPath.section - 2] == "Activity Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.selectionStyle = .none
+            
             cell.configureCell(checklist: nil, grocerylist: nil, packinglist: nil, activitylist: activitylists[indexPath.row])
             return cell
         } else if sections[indexPath.section - 2] == "Packing Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.selectionStyle = .none
+            
             cell.configureCell(checklist: nil, grocerylist: nil, packinglist: packinglists[indexPath.row], activitylist: nil)
             return cell
         } else {

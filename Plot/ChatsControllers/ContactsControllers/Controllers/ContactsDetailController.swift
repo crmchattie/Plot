@@ -63,7 +63,7 @@ class ContactsDetailController: UITableViewController {
     let identifier = "cell"
     let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
      cell.backgroundColor =  view.backgroundColor
-     cell.selectionStyle = .none
+     
      cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
     
     if indexPath.section == 0 {
@@ -83,7 +83,7 @@ class ContactsDetailController: UITableViewController {
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    tableView.deselectRow(at: indexPath, animated: true)
+    
     if indexPath.section == 2 {
       if MFMessageComposeViewController.canSendText() {
         guard contactPhoneNumbers.indices.contains(0) else {

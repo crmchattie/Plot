@@ -369,7 +369,7 @@ class ChooseChatTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: userCellID, for: indexPath) as? UserCell ?? UserCell()
         
         cell.delegate = self
-        cell.selectionStyle = .none
+        
         cell.chatsViewControllerDataStore = self
         cell.configureCell(for: indexPath, conversations: filteredConversations)
         return cell

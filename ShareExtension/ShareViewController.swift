@@ -307,7 +307,7 @@ extension ShareViewController: UITableViewDataSource {
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.ActivityCell, for: indexPath) as? ActivityCell ?? ActivityCell()
-        cell.selectionStyle = .none
+        
         let activity = activitiesArray[indexPath.row]
         cell.configureCell(for: indexPath, activity: activity)
         return cell

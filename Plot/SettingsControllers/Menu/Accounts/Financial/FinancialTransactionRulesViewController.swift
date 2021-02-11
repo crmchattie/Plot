@@ -76,7 +76,7 @@ class FinancialTransactionRulesViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "Cell")
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        cell.selectionStyle = .none
+        
         let rule = transactionRules[indexPath.item]
         cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor
         cell.textLabel!.font = UIFont.preferredFont(forTextStyle: .body)

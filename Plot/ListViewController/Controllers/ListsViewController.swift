@@ -217,7 +217,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ListCell ?? ListCell()
         cell.delegate = self
         cell.listViewControllerDataStore = self
-        cell.selectionStyle = .none
+        
         let list = filteredlistList[indexPath.row]
         if let grocerylist = list.grocerylist {
             cell.configureCell(for: indexPath, grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil)
@@ -232,7 +232,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        
         let list = filteredlistList[indexPath.row]
         if let grocerylist = list.grocerylist {
             let destination = GrocerylistViewController()

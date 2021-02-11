@@ -604,7 +604,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         cell.delegate = self
         cell.updateInvitationDelegate = self
         cell.activityViewControllerDataStore = self
-        cell.selectionStyle = .none
+        
         if indexPath.section == 0 {
             let activity = filteredPinnedActivities[indexPath.row]
             var invitation: Invitation? = nil

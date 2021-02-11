@@ -320,7 +320,7 @@ class ChooseListTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ListCell ?? ListCell()
         cell.delegate = self
         cell.listViewControllerDataStore = self
-        cell.selectionStyle = .none
+        
         let list = filteredLists[indexPath.row]
         if let grocerylist = list.grocerylist {
             cell.configureCell(for: indexPath, grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil)

@@ -269,7 +269,7 @@ class ChatsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: userCellID, for: indexPath) as? UserCell ?? UserCell()
         
         cell.delegate = self
-        cell.selectionStyle = .none
+        
         cell.chatsViewControllerDataStore = self
         
         if indexPath.section == 0 {

@@ -141,7 +141,7 @@ class FinancialAccountsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "Cell")
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        cell.selectionStyle = .none
+        
         let member = members[indexPath.section]
         if let accounts = memberAccountsDict[member] {
             cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor

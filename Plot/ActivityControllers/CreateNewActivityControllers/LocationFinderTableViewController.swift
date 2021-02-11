@@ -161,7 +161,7 @@ extension LocationFinderTableViewController: UITableViewDataSource {
 extension LocationFinderTableViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        
         
         let completion = searchResults[indexPath.row]
         var latitude = Double()

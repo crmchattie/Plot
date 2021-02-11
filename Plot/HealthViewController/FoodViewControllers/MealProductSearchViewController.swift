@@ -284,7 +284,7 @@ extension MealProductSearchViewController: UITableViewDataSource, UITableViewDel
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        
         let section = sections[indexPath.section]
         if let object = groups[section] as? [GroceryProduct] {
             fetchProductInfo(groceryID: object[indexPath.item].id, menuID: nil, recipeID: nil, ingredientID: nil)

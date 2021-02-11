@@ -231,7 +231,7 @@ class ChooseActivityTableViewController: UITableViewController {
         
         cell.delegate = self
         cell.activityViewControllerDataStore = self
-        cell.selectionStyle = .none
+        
         
         let activity = filteredActivities[indexPath.row]
         

@@ -363,7 +363,6 @@ extension FinanceLineChartDetailViewController: UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: kFinanceTableViewCell, for: indexPath) as? FinanceTableViewCell ?? FinanceTableViewCell()
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        cell.selectionStyle = .none
         if let transactions = viewModel.transactions, !transactions.isEmpty {
             cell.transaction = transactions[indexPath.row]
         } else if let accounts = viewModel.accounts, !accounts.isEmpty {

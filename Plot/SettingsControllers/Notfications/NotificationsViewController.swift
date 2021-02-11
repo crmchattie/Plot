@@ -266,7 +266,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        
         if segmentedControl.selectedSegmentIndex == 0 {
             let notification = notifications[indexPath.row]
             if notification.aps.category == Identifiers.chatCategory {

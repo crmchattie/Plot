@@ -361,7 +361,7 @@ extension AccountSettingsController {
         if indexPath.section == 1 {
             logoutButtonTapped()
         }
-        tableView.deselectRow(at: indexPath, animated: true)
+        
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

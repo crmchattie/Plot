@@ -123,7 +123,7 @@ class ChooseTransactionTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
                         
         let cell = tableView.dequeueReusableCell(withIdentifier: kFinanceTableViewCell, for: indexPath) as? FinanceTableViewCell ?? FinanceTableViewCell()
-        cell.selectionStyle = .none
+        
         if let filteredTransactions = filteredTransactions {
             cell.transaction = filteredTransactions[indexPath.row]
         }
@@ -131,7 +131,7 @@ class ChooseTransactionTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        
         let transaction = filteredTransactions[indexPath.row]
         delegate?.chosenTransaction(transaction: transaction)
         movingBackwards = false

@@ -81,7 +81,6 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
         cell.activityViewControllerDataStore = self
-        cell.selectionStyle = .none
         let activity = activities[indexPath.row]
         var invitation: Invitation? = nil
         if let activityID = activity.activityID, let value = invitations[activityID] {
@@ -94,7 +93,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        
         let activity = activities[indexPath.row]
         delegate?.cellTapped(activity: activity)
     }

@@ -147,7 +147,7 @@ class GroupProfileTableViewController: UITableViewController {
     if indexPath.section == 0 {
         let cell = tableView.dequeueReusableCell(withIdentifier: adminControlsCellID,
                                                  for: indexPath) as? GroupAdminControlsTableViewCell ?? GroupAdminControlsTableViewCell()
-        cell.selectionStyle = .none
+        
         
         if conversationAdminNeeded == false {
             cell.title.text = "Add Admin"
