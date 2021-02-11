@@ -116,7 +116,6 @@ class FinanceTableViewCell: UITableViewCell {
     let IV = UIImageView(cornerRadius: 8)
     
     func setupViews() {
-        backgroundColor = .clear
         let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
         labelStackView.spacing = 2
         
@@ -126,7 +125,7 @@ class FinanceTableViewCell: UITableViewCell {
         stackView.distribution = .fill
         
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 0, left: 10, bottom: 20, right: 10))
+        stackView.fillSuperview(padding: .init(top: 10, left: 10, bottom: 10, right: 10))
     }
     
     override func prepareForReuse() {

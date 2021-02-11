@@ -29,8 +29,14 @@ class FinanceBarChartViewController: UIViewController {
     
     private var viewModel: FinanceDetailViewModelInterface
     var dayAxisValueFormatter: DayAxisValueFormatter?
-    var chartViewHeightAnchor: NSLayoutConstraint?
-    var chartViewTopAnchor: NSLayoutConstraint?
+    var backgroundChartViewHeightAnchor: NSLayoutConstraint?
+    var backgroundChartViewTopAnchor: NSLayoutConstraint?
+    
+    lazy var backgroundChartView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     
     lazy var chartView: BarChartView = {
         let chartView = BarChartView()
@@ -46,7 +52,7 @@ class FinanceBarChartViewController: UIViewController {
     }()
     
     lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return tableView
@@ -92,16 +98,18 @@ class FinanceBarChartViewController: UIViewController {
         addObservers()
         changeTheme()
         
-        view.addSubview(chartView)
+        view.addSubview(segmentedControl)
+        segmentedControl.selectedSegmentIndex = 2
+
+        backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        view.addSubview(backgroundChartView)
+        backgroundChartView.addSubview(chartView)
         chartView.delegate = self
         
         view.addSubview(tableView)
         tableView.dataSource = self
         tableView.delegate = self
-        
-        view.addSubview(segmentedControl)
-        segmentedControl.selectedSegmentIndex = 2
-        
+            
         configureView()
         configureChart()
         
@@ -125,21 +133,28 @@ class FinanceBarChartViewController: UIViewController {
     @objc fileprivate func changeTheme() {
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
+        backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        chartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     }
     
     private func configureView() {
         
-        chartViewHeightAnchor = chartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
-        chartViewTopAnchor = chartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
+        backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
+        backgroundChartViewTopAnchor = backgroundChartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
         NSLayoutConstraint.activate([
-            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            segmentedControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
             segmentedControl.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             segmentedControl.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
             
-            chartViewTopAnchor!,
-            chartView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
-            chartView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-            chartViewHeightAnchor!,
+            backgroundChartViewTopAnchor!,
+            backgroundChartView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+            backgroundChartView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+            backgroundChartViewHeightAnchor!,
+            
+            chartView.topAnchor.constraint(equalTo: backgroundChartView.topAnchor),
+            chartView.leftAnchor.constraint(equalTo: backgroundChartView.leftAnchor, constant: 16),
+            chartView.rightAnchor.constraint(equalTo: backgroundChartView.rightAnchor, constant: -16),
+            chartView.bottomAnchor.constraint(equalTo: backgroundChartView.bottomAnchor),
             
             tableView.topAnchor.constraint(equalTo: chartView.bottomAnchor, constant: 10),
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
@@ -148,8 +163,6 @@ class FinanceBarChartViewController: UIViewController {
         ])
         
         tableView.separatorStyle = .none
-        tableView.backgroundColor = view.backgroundColor
-        extendedLayoutIncludesOpaqueBars = true
         tableView.register(FinanceTableViewCell.self, forCellReuseIdentifier: kFinanceTableViewCell)
         tableView.allowsMultipleSelectionDuringEditing = false
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
@@ -160,6 +173,7 @@ class FinanceBarChartViewController: UIViewController {
     
     func configureChart() {
         
+        chartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         chartView.chartDescription?.enabled = false
         
         chartView.dragEnabled = false
@@ -228,8 +242,8 @@ class FinanceBarChartViewController: UIViewController {
     
     private func updateChartViewAppearance(hidden: Bool) {
         chartView.isHidden = hidden
-        chartViewHeightAnchor?.constant = hidden ? 0 : chartViewHeight
-        chartViewTopAnchor?.constant = hidden ? 0 : chartViewTopMargin
+        backgroundChartViewHeightAnchor?.constant = hidden ? 0 : chartViewHeight
+        backgroundChartViewTopAnchor?.constant = hidden ? 0 : chartViewTopMargin
         
         barButton.title = chartView.isHidden ? "Show Chart" : "Hide Chart"
     }
@@ -342,6 +356,14 @@ extension FinanceBarChartViewController: ChartViewDelegate {
 }
 
 extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let transactions = viewModel.transactions, !transactions.isEmpty {
             return transactions.count
@@ -353,6 +375,7 @@ extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSou
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: kFinanceTableViewCell, for: indexPath) as? FinanceTableViewCell ?? FinanceTableViewCell()
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.selectionStyle = .none
         if let transactions = viewModel.transactions, !transactions.isEmpty {
             cell.transaction = transactions[indexPath.row]

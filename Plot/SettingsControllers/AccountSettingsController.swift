@@ -142,6 +142,8 @@ class AccountSettingsController: UITableViewController {
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         
         userProfileContainerView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        userProfileContainerView.bio.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        userProfileContainerView.userData.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         userProfileContainerView.profileImageView.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.userData.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor
