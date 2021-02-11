@@ -35,6 +35,8 @@ class FinanceBarChartViewController: UIViewController {
     lazy var backgroundChartView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 10
+        view.layer.masksToBounds = true
         return view
     }()
     
@@ -147,8 +149,8 @@ class FinanceBarChartViewController: UIViewController {
             segmentedControl.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
             
             backgroundChartViewTopAnchor!,
-            backgroundChartView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
-            backgroundChartView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+            backgroundChartView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
+            backgroundChartView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
             backgroundChartViewHeightAnchor!,
             
             chartView.topAnchor.constraint(equalTo: backgroundChartView.topAnchor),
