@@ -92,9 +92,7 @@ class NotificationsViewController: UIViewController {
         tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
                 
         addObservers()
-        
-//        sortInvitedActivities()
-                
+                        
     }
     
     fileprivate func addObservers() {
@@ -136,7 +134,7 @@ class NotificationsViewController: UIViewController {
         super.viewDidLayoutSubviews()
         segmentedControl.frame = CGRect(x: view.frame.width * 0.125, y: 10, width: view.frame.width * 0.75, height: 30)
         var frame = view.frame
-        frame.origin.y = segmentedControl.frame.maxY + 5
+        frame.origin.y = segmentedControl.frame.maxY
         frame.size.height -= frame.origin.y
         tableView.frame = frame
     }

@@ -46,7 +46,7 @@ class ActivityCell: BaseContainerTableViewCell {
         imageView.layer.cornerRadius = 10
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
-        imageView.isUserInteractionEnabled = false
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     
@@ -190,8 +190,8 @@ class ActivityCell: BaseContainerTableViewCell {
         
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-        activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
-        activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
+        activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 0).isActive = true
+        activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 0).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
@@ -242,7 +242,6 @@ class ActivityCell: BaseContainerTableViewCell {
             x += 38
         }
         
-        
         invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: mapButton.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
         invitationSegmentedControlTopAnchor.isActive = true
         invitationSegmentedControl.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
@@ -261,8 +260,8 @@ class ActivityCell: BaseContainerTableViewCell {
         newActivityIndicator.widthAnchor.constraint(equalToConstant: 10).isActive = true
         newActivityIndicator.heightAnchor.constraint(equalToConstant: 10).isActive = true
         
-        badgeLabel.topAnchor.constraint(equalTo: chatButton.topAnchor, constant: 25).isActive = true
-        badgeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -50).isActive = true
+        badgeLabel.centerYAnchor.constraint(equalTo: chatButton.centerYAnchor).isActive = true
+        badgeLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -10).isActive = true
         badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
         invitationSegmentedControl.addTarget(self, action: #selector(ActivityCell.indexChangedSegmentedControl(_:)), for: .valueChanged)

@@ -160,8 +160,8 @@ class UserCell: BaseContainerTableViewCell {
         
         chatImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         chatImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-        chatImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
-        chatImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
+        chatImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 0).isActive = true
+        chatImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 0).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: chatImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 10).isActive = true
@@ -173,7 +173,7 @@ class UserCell: BaseContainerTableViewCell {
         
         timeLabel.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 2).isActive = true
         timeLabel.leftAnchor.constraint(equalTo: chatImageView.leftAnchor, constant: 10).isActive = true
-        timeLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -5).isActive = true
+        timeLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -15).isActive = true
     
         muteIndicator.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 3).isActive = true
         muteIndicator.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor, constant: 1).isActive = true
@@ -185,10 +185,9 @@ class UserCell: BaseContainerTableViewCell {
         newMessageIndicator.widthAnchor.constraint(equalToConstant: 10).isActive = true
         newMessageIndicator.heightAnchor.constraint(equalToConstant: 10).isActive = true
         
-        badgeLabel.rightAnchor.constraint(equalTo: chatImageView.rightAnchor, constant: -50).isActive = true
-        badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         badgeLabel.centerYAnchor.constraint(equalTo: activityButton.centerYAnchor).isActive = true
-        badgeLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        badgeLabel.rightAnchor.constraint(equalTo: activityButton.leftAnchor, constant: -10).isActive = true
+        badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
         chatButton.topAnchor.constraint(equalTo: chatImageView.topAnchor, constant: 10).isActive = true
         chatButton.rightAnchor.constraint(equalTo: chatImageView.rightAnchor, constant: -10).isActive = true

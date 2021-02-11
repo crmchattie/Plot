@@ -19,7 +19,7 @@ protocol ActivitiesControllerCellDelegate: class {
 class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UITableViewDelegate, ActivityCellDelegate, UpdateInvitationDelegate {
     weak var delegate: ActivitiesControllerCellDelegate?
     
-    var tableView = UITableViewWithReloadCompletion()
+    var tableView = UITableView(frame: .zero, style: .insetGrouped)
     var activities = [Activity]() {
         didSet {
             setupViews()
@@ -50,6 +50,14 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     func setupViews() {
         addSubview(tableView)
         tableView.fillSuperview()
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

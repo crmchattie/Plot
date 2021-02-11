@@ -107,13 +107,13 @@ class ChatsTableViewController: UITableViewController {
     }
     
     fileprivate func configureTableView() {
+        tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(UserCell.self, forCellReuseIdentifier: userCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 115
         
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.leftBarButtonItem = doneBarButton
@@ -225,45 +225,12 @@ class ChatsTableViewController: UITableViewController {
         return true
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 0 {
-            if filteredPinnedConversations.count == 0 {
-                return ""
-            }
-            return " " //Pinned
-        } else {
-            return " "
-        }
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if section == 0 {
-            return 8
-        } else {
-            if self.filteredPinnedConversations.count == 0 {
-                return 0
-            }
-            return 8
-        }
-    }
-    
-    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        view.tintColor = ThemeManager.currentTheme().inputTextViewColor
-        
-        //    if section == 0 {
-        //      view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-        //    } else {
-        //      view.tintColor = ThemeManager.currentTheme().inputTextViewColor
-        //    }
-        
-        if let headerTitle = view as? UITableViewHeaderFooterView {
-            headerTitle.textLabel?.textColor = FalconPalette.defaultBlue
-            //      headerTitle.textLabel?.font = UIFont.systemFont(ofSize: 10)
-            headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
-            headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
-            headerTitle.textLabel?.minimumScaleFactor = 0.1
-            headerTitle.textLabel?.adjustsFontSizeToFitWidth = true
-        }
+        return 0
     }
     
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
@@ -319,15 +286,17 @@ class ChatsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var conversation: Conversation!
-        
         if indexPath.section == 0 {
             let pinnedConversation = filteredPinnedConversations[indexPath.row]
             conversation = pinnedConversation
+            filteredPinnedConversations[indexPath.row].badge = 0
+            tableView.reloadRows(at: [indexPath], with: .none)
         } else {
             let unpinnedConversation = filteredConversations[indexPath.row]
             conversation = unpinnedConversation
+            filteredConversations[indexPath.row].badge = 0
+            tableView.reloadRows(at: [indexPath], with: .none)
         }
-        
         chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
         messagesFetcher = MessagesFetcher()
         messagesFetcher?.delegate = self
@@ -442,6 +411,8 @@ extension ChatsTableViewController: ChatCellDelegate {
             destination.hidesBottomBarWhenPushed = true
             destination.chatID = conversation.chatID ?? ""
             destination.conversation = conversation
+            destination.users = users
+            destination.filteredUsers = filteredUsers
             if conversation.admin != Auth.auth().currentUser?.uid {
                 destination.adminControls = destination.defaultAdminControlls
             }

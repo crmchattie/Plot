@@ -252,7 +252,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         activityView.tableView.backgroundColor = view.backgroundColor
         activityView.tableView.rowHeight = UITableView.automaticDimension
-        activityView.tableView.estimatedRowHeight = 105
         
         
         // apply theme
@@ -390,17 +389,13 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
         
-//        activityView.tableView.reloadDataWithCompletion() {
-//            self.scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
-//        }
-        
-        self.scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
-        
         if allActivities.count == 0 {
             checkIfThereAnyActivities(isEmpty: true)
         } else {
             checkIfThereAnyActivities(isEmpty: false)
         }
+        
+        self.scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
         
 //        compileActivityDates(activities: allActivities)
         
@@ -445,7 +440,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                     break
                 }
                 index += 1
-                
             }
         }
                 
@@ -464,6 +458,9 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             if numberOfRows > 0 {
                 let indexPath = IndexPath(row: numberOfRows - 1, section: 1)
                 self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
+                if !animated {
+                    self.activityView.tableView.reloadRows(at: [indexPath], with: .none)
+                }
             }
         }
     }

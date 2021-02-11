@@ -48,7 +48,6 @@ class ContactsController: UITableViewController {
         
     }
     
-    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return ThemeManager.currentTheme().statusBarStyle
     }
@@ -80,10 +79,10 @@ class ContactsController: UITableViewController {
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
+        tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = view.backgroundColor
-        tableView.backgroundColor = view.backgroundColor
+        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.register(ContactsTableViewCell.self, forCellReuseIdentifier: contactsCellID)
         tableView.register(FalconUsersTableViewCell.self, forCellReuseIdentifier: falconUsersCellID)
         tableView.register(CurrentUserTableViewCell.self, forCellReuseIdentifier: currentUserCellID)
@@ -196,7 +195,6 @@ class ContactsController: UITableViewController {
         let headerSection = 0
         if indexPath.section == headerSection {
             let cell = tableView.dequeueReusableCell(withIdentifier: newGroupCellID) ?? UITableViewCell(style: .default, reuseIdentifier: newGroupCellID)
-            
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.imageView?.image = UIImage(named: "groupChat")
             cell.imageView?.contentMode = .scaleAspectFit

@@ -46,10 +46,7 @@ class SelectParticipantsViewController: UIViewController {
     let viewPlaceholder = ViewPlaceholder()
     
     var activityObject: ActivityObject?
-    
-    let alignedFlowLayout = CollectionViewLeftAlignFlowLayout()
-    var collectionViewHeightAnchor: NSLayoutConstraint!
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         setupSearchController()
@@ -263,8 +260,8 @@ class SelectParticipantsViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = view.backgroundColor
-        tableView.backgroundColor = view.backgroundColor
+        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.allowsMultipleSelection = true
         tableView.allowsSelection = true
         tableView.allowsSelectionDuringEditing = true

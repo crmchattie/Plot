@@ -108,6 +108,7 @@ class SelectActivityTableViewController: UITableViewController {
     }
     
     fileprivate func configureTableView() {
+        tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)

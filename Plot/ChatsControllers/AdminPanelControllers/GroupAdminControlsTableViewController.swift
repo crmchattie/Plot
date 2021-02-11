@@ -167,8 +167,10 @@ class GroupAdminControlsTableViewController: UITableViewController {
     }
     
     fileprivate func setupTableView() {
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
+        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.register(FalconUsersTableViewCell.self, forCellReuseIdentifier: membersCellID)
         tableView.register(GroupAdminControlsTableViewCell.self, forCellReuseIdentifier: adminControlsCellID)
         tableView.register(ChatActivitiesTableViewCell.self, forCellReuseIdentifier: activityCellID)

@@ -327,6 +327,7 @@ class ChatLogController: UICollectionViewController {
         setRightBarButtonItem()
         setupTitleName()
         configureProgressBar()
+        resetBadgeForSelf()
         
         guard inputContainerView.inputTextView.isFirstResponder else { return }
         UIView.performWithoutAnimation {
