@@ -108,13 +108,14 @@ extension UserProfileController {
         
         let photoReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("photoURL")
         photoReference.observe(.value, with: { (snapshot) in
-            
             if snapshot.exists() {
                 guard let urlString = snapshot.value as? String else { return }
                 self.userProfileContainerView.profileImageView.sd_setImage(with: URL(string: urlString), placeholderImage: nil, options: [.scaleDownLargeImages , .continueInBackground], completed: { (_, _, _, _) in
+                    self.userProfileContainerView.addPhotoLabel.isHidden = true
                     completionHandler(true)
                 })
             } else {
+                self.userProfileContainerView.addPhotoLabel.isHidden = false
                 completionHandler(true)
             }
         })
