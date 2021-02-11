@@ -48,6 +48,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
     
     func setupViews() {
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         addSubview(tableView)
         tableView.fillSuperview()
     }

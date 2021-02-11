@@ -102,6 +102,8 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.bio.delegate = self
         userProfileContainerView.name.delegate = self
         userProfileContainerView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        userProfileContainerView.bio.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        userProfileContainerView.userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor
         userProfileContainerView.bio.textColor = ThemeManager.currentTheme().generalTitleColor
         userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
@@ -139,8 +141,8 @@ class AccountSettingsController: UITableViewController {
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         
         userProfileContainerView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        userProfileContainerView.bio.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        userProfileContainerView.userData.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        userProfileContainerView.bio.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        userProfileContainerView.userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         userProfileContainerView.profileImageView.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.userData.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor

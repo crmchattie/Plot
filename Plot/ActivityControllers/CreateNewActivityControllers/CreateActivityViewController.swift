@@ -694,6 +694,9 @@ class CreateActivityViewController: FormViewController {
                 let userReference = Database.database().reference().child("user-activities").child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
                 let values:[String : Any] = ["showExtras": row.value ?? false]
                 userReference.updateChildValues(values)
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
             
         <<< SegmentedRow<String>("sections"){
