@@ -15,6 +15,7 @@ let googleString = "Google"
 
 extension NSNotification.Name {
     static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
+    static let invitationsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".invitationsUpdated")
 }
 
 class ActivityService {
@@ -40,7 +41,7 @@ class ActivityService {
     var invitations: [String: Invitation] = [:] {
         didSet {
             if oldValue != invitations {
-                NotificationCenter.default.post(name: .activitiesUpdated, object: nil)
+                NotificationCenter.default.post(name: .invitationsUpdated, object: nil)
             }
         }
     }

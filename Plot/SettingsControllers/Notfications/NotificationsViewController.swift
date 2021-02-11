@@ -333,6 +333,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             openActivityDetailView(forActivity: activity)
             
         }
+        tableView.deselectRow(at: indexPath, animated: false)
     }
     
     func openChatDetailView(forChat chat: Conversation) {

@@ -15,8 +15,8 @@ class ActivityView: UIView {
     let calendar = FSCalendar()
     var calendarHeightConstraint: NSLayoutConstraint?
 
-    let tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .insetGrouped)
+    let tableView: UITableViewWithReloadCompletion = {
+        let tableView = UITableViewWithReloadCompletion(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return tableView

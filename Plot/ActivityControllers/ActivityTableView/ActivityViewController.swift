@@ -140,6 +140,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
+        GIDSignIn.sharedInstance()?.presentingViewController = self
         
         let dateString = selectedDateFormatter.string(from: Date().localTime)
         title = dateString
@@ -147,9 +148,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
         addObservers()
-        handleReloadTable()
         
-        GIDSignIn.sharedInstance()?.presentingViewController = self
+        handleReloadTable()
     }
     
     deinit {
@@ -388,32 +388,30 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         handleReloadActivities()
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
-        
+                
         if allActivities.count == 0 {
             checkIfThereAnyActivities(isEmpty: true)
         } else {
             checkIfThereAnyActivities(isEmpty: false)
         }
-        
-        self.scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
-        
-//        compileActivityDates(activities: allActivities)
-        
+                
         guard !isAppLoaded else { return }
         isAppLoaded = true
-//        checkForDataMigration(forActivities: allActivities)
+        
+        activityView.tableView.layoutIfNeeded()
+        scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
         
     }
     
     func handleReloadActivities() {
         filteredPinnedActivities = pinnedActivities
         filteredActivities = activities
-        self.activityView.tableView.reloadData()
+        activityView.tableView.reloadData()
     }
     
     func handleReloadTableAftersearchBarCancelButtonClicked() {
         handleReloadActivities()
-        self.activityView.tableView.reloadData()
+        activityView.tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
@@ -487,20 +485,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     func scrollViewDidScroll(_ scrollView: UIScrollView)
     {
         if canTransitionToLarge && scrollView.contentOffset.y <= 0 {
-            //            UIView.animate(withDuration: 0.5) {
-            //                if #available(iOS 11.0, *) {
-            //                    self.navigationItem.largeTitleDisplayMode = .never
-            //                }
-            //            }
             canTransitionToLarge = false
             canTransitionToSmall = true
         }
         else if canTransitionToSmall && scrollView.contentOffset.y > 0 {
-            //            UIView.animate(withDuration: 0.5) {
-            //                if #available(iOS 11.0, *) {
-            //                    self.navigationItem.largeTitleDisplayMode = .never
-            //                }
-            //            }
             canTransitionToLarge = true
             canTransitionToSmall = false
         }
@@ -535,7 +523,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         if let value = UserDefaults.standard.value(forKey: kCalendarScope) as? UInt, let scope = FSCalendarScope(rawValue: value) {
             return scope
         } else {
-            // default
             return .week
         }
     }
@@ -552,27 +539,20 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     //    }
     
     // MARK: - Table view data source
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return ""
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 0
     }
     
-    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        view.tintColor = ThemeManager.currentTheme().inputTextViewColor
-        if let headerTitle = view as? UITableViewHeaderFooterView {
-            headerTitle.textLabel?.textColor = FalconPalette.defaultBlue
-            headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
-            headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
-            headerTitle.textLabel?.minimumScaleFactor = 0.1
-            headerTitle.textLabel?.adjustsFontSizeToFitWidth = true
-        }
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
@@ -581,10 +561,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         let mute = setupMuteAction(at: indexPath)
         
         return [delete, mute]
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -604,7 +580,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         cell.delegate = self
         cell.updateInvitationDelegate = self
         cell.activityViewControllerDataStore = self
-        
         if indexPath.section == 0 {
             let activity = filteredPinnedActivities[indexPath.row]
             var invitation: Invitation? = nil

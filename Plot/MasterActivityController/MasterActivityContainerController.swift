@@ -52,6 +52,7 @@ class MasterActivityContainerController: UIViewController {
     var sections: [SectionType] = [.calendar, .health, .finances]
     
     var sortedActivities = [Activity]()
+    
     var healthMetricSections: [String] {
         var healthMetricSections = Array(healthMetrics.keys)
         healthMetricSections.sort(by: { (v1, v2) -> Bool in
@@ -163,6 +164,7 @@ class MasterActivityContainerController: UIViewController {
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(activitiesUpdated), name: .activitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
     }
@@ -194,6 +196,12 @@ class MasterActivityContainerController: UIViewController {
                 }
             }
         })
+    }
+    
+    @objc fileprivate func invitationsUpdated() {
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
     }
     
     @objc fileprivate func healthUpdated() {
@@ -441,9 +449,9 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             if !sortedActivities.isEmpty && networkController.activityService.askedforAuthorization {
                 for activity in sortedActivities {
                     if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
-                        height += 168
+                        height += 173
                     } else {
-                        height += 140
+                        height += 144
                     }
                 }
                 return CGSize(width: self.collectionView.frame.size.width, height: height)
@@ -615,7 +623,7 @@ extension MasterActivityContainerController: ActivitiesControllerCellDelegate {
         InvitationsFetcher.update(invitation: invitation) { result in
             if result {
                 self.networkController.activityService.invitations[invitation.activityID] = invitation
-                self.activitiesUpdated()
+                self.invitationsUpdated()
             }
         }
     }
