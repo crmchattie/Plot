@@ -10,10 +10,13 @@ import UIKit
 
 extension GroupProfileTableViewController: AvatarOpenerDelegate {
   func avatarOpener(avatarPickerDidPick image: UIImage) {
-    groupProfileTableHeaderContainer.profileImageView.image = image
+    self.groupProfileTableHeaderContainer.addPhotoLabel.isHidden = true
+    self.groupProfileTableHeaderContainer.profileImageView.image = image
   }
   
   func avatarOpener(didPerformDeletionAction: Bool) {
-    groupProfileTableHeaderContainer.profileImageView.image = nil
+    self.groupProfileTableHeaderContainer.addPhotoLabel.isHidden = false
+    self.groupProfileTableHeaderContainer.profileImageView.image = nil
+    
   }
 }

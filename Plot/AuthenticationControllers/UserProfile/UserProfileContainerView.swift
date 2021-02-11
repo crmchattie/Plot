@@ -199,6 +199,12 @@ class UserProfileContainerView: UIView {
     
 //    bioPlaceholderLabel.font = UIFont.systemFont(ofSize: 20)//(bio.font!.pointSize - 1)
     bioPlaceholderLabel.isHidden = !bio.text.isEmpty
+    
+    if profileImageView.image != nil {
+        addPhotoLabel.isHidden = true
+    } else {
+        addPhotoLabel.isHidden = false
+    }
    
     
     if #available(iOS 11.0, *) {
