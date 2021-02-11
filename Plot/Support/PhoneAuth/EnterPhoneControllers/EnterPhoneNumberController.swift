@@ -9,9 +9,11 @@
 import UIKit
 import Firebase
 import SafariServices
+import PhoneNumberKit
 
 class EnterPhoneNumberController: UIViewController {
     
+    let phoneNumberKit = PhoneNumberKit()
     let phoneNumberContainerView = EnterPhoneNumberContainerView()
     let countries = Country().countries
     
@@ -38,7 +40,7 @@ class EnterPhoneNumberController: UIViewController {
     
     fileprivate func setCountry() {
         for country in countries {
-            if  country["code"] == countryCode {
+            if country["code"] == countryCode {
                 phoneNumberContainerView.countryCode.text = country["dial_code"]
                 phoneNumberContainerView.selectCountry.setTitle(country["name"], for: .normal)
             }
@@ -64,7 +66,16 @@ class EnterPhoneNumberController: UIViewController {
     }
     
     func setRightBarButtonStatus() {
-        if phoneNumberContainerView.phoneNumber.text!.count < 4 || phoneNumberContainerView.phoneNumber.text!.count > 13 || phoneNumberContainerView.countryCode.text == " - " {
+        var phoneNumberForVerification = String()
+        
+        do {
+            let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.phoneNumber.text!)
+            phoneNumberForVerification = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+        } catch {
+            phoneNumberForVerification = phoneNumberContainerView.phoneNumber.text!
+        }
+        
+        if phoneNumberForVerification.count < 4 || phoneNumberForVerification.count > 13 || phoneNumberContainerView.countryCode.text == " - " {
             self.navigationItem.rightBarButtonItem?.isEnabled = false
             phoneNumberContainerView.nextView.isEnabled = false
         } else {
@@ -76,7 +87,6 @@ class EnterPhoneNumberController: UIViewController {
     var isVerificationSent = false
     
     @objc func rightBarButtonDidTap () {
-        
         if currentReachabilityStatus == .notReachable {
             basicErrorAlertWith(title: "No internet connection", message: noInternetError, controller: self)
             return
@@ -90,10 +100,16 @@ class EnterPhoneNumberController: UIViewController {
     }
     
     func sendSMSConfirmation () {
-        
         print("tapped sms confirmation")
         
-        let phoneNumberForVerification = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
+        var phoneNumberForVerification = String()
+        
+        do {
+            let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!)
+            phoneNumberForVerification = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+        } catch {
+            phoneNumberForVerification = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
+        }
         
         PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumberForVerification, uiDelegate: nil) { (verificationID, error) in
             if let error = error {

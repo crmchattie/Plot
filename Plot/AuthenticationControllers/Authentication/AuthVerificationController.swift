@@ -10,15 +10,14 @@ import UIKit
 
 //see Support/PhoneAuth/EnterVerificationControllers for more detail
 class AuthVerificationController: EnterVerificationCodeController {
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-//    setRightBarButton(with: "Next")
-  }
-  
-  override func rightBarButtonDidTap() {
-    super.rightBarButtonDidTap()
-    authenticate()
-  }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+    
+    override func rightBarButtonDidTap() {
+        super.rightBarButtonDidTap()
+        authenticate()
+    }
     
 }

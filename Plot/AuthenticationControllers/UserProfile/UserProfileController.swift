@@ -52,6 +52,7 @@ class UserProfileController: UIViewController {
         userProfileContainerView.bio.textColor = ThemeManager.currentTheme().generalTitleColor
         userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        userProfileContainerView.addPhotoLabel.isHidden = (userProfileContainerView.profileImageView.image != nil)
     }
     
     override func viewWillLayoutSubviews() {

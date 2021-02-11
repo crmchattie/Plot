@@ -13,7 +13,6 @@ import PhoneNumberKit
 class EnterVerificationCodeController: UIViewController {
     
     let enterVerificationContainerView = EnterVerificationContainerView()
-    // var phoneNumberControllerType: PhoneNumberControllerType = .authentication
     
     let phoneNumberKit = PhoneNumberKit()
     
@@ -23,14 +22,9 @@ class EnterVerificationCodeController: UIViewController {
         view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         view.addSubview(enterVerificationContainerView)
         enterVerificationContainerView.frame = view.bounds
-        //    navigationItem.leftBarButtonItem = enterVerificationContainerView.leftBarButton
-        //    enterVerificationContainerView.leftBarButton.action = #selector(sendSMSConfirmation)
-        //    let leftBarButton = UIBarButtonItem(title: "Back", style: .done, target: self, action: #selector(leftBarButtonDidTap))
-        //    navigationItem.leftBarButtonItem = leftBarButton
         enterVerificationContainerView.resend.addTarget(self, action: #selector(sendSMSConfirmation), for: .touchUpInside)
         enterVerificationContainerView.nextView.addTarget(self, action: #selector(rightBarButtonDidTap), for: .touchUpInside)
         enterVerificationContainerView.enterVerificationCodeController = self
-        //    configureNavigationBar()
     }
     
     fileprivate func configureNavigationBar () {
@@ -50,11 +44,17 @@ class EnterVerificationCodeController: UIViewController {
             return
         }
         
-        //    enterVerificationContainerView.leftBarButton.isEnabled = false
         enterVerificationContainerView.resend.isEnabled = false
         print("tapped sms confirmation")
+                
+        var phoneNumberForVerification = String()
         
-        let phoneNumberForVerification = enterVerificationContainerView.titleNumber.text!
+        do {
+            let phoneNumber = try self.phoneNumberKit.parse(enterVerificationContainerView.titleNumber.text!)
+            phoneNumberForVerification = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+        } catch {
+            phoneNumberForVerification = enterVerificationContainerView.titleNumber.text!
+        }
         
         PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumberForVerification, uiDelegate: nil) { (verificationID, error) in
             if let error = error {
@@ -64,7 +64,6 @@ class EnterVerificationCodeController: UIViewController {
             }
             
             print("verification sent")
-            //      self.enterVerificationContainerView.leftBarButton.isEnabled = false
             self.enterVerificationContainerView.resend.isEnabled = false
             
             userDefaults.updateObject(for: userDefaults.authVerificationID, with: verificationID)
@@ -105,22 +104,28 @@ class EnterVerificationCodeController: UIViewController {
         
         Auth.auth().currentUser?.updatePhoneNumber(credential, completion: { (error) in
             if error != nil {
-                //        ARSLineProgress.hide()
                 self.removeSpinner()
                 basicErrorAlertWith(title: "Error", message: error?.localizedDescription ?? "Number changing process failed. Please try again later.", controller: self)
                 return
             }
             
+            var phoneNumberForFB = String()
+            
+            do {
+                let phoneNumber = try self.phoneNumberKit.parse(self.enterVerificationContainerView.titleNumber.text!)
+                phoneNumberForFB = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+            } catch {
+                phoneNumberForFB = self.enterVerificationContainerView.titleNumber.text!
+            }
+            
             let userReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
-            userReference.updateChildValues(["phoneNumber" : self.enterVerificationContainerView.titleNumber.text! ]) { (error, reference) in
+            userReference.updateChildValues(["phoneNumber" : phoneNumberForFB]) { (error, reference) in
                 if error != nil {
-                    //          ARSLineProgress.hide()
                     self.removeSpinner()
                     basicErrorAlertWith(title: "Error", message: error?.localizedDescription ?? "Number changing process failed. Please try again later.", controller: self)
                     return
                 }
                 
-                //        ARSLineProgress.showSuccess()
                 self.removeSpinner()
                 self.dismiss(animated: true) {
                     AppUtility.lockOrientation(.allButUpsideDown)
