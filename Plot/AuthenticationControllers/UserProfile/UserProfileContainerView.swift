@@ -75,7 +75,6 @@ class UserProfileContainerView: UIView {
     
     let phone: PasteRestrictedTextField = {
         let phone = PasteRestrictedTextField()
-        //    phone.font = UIFont.systemFont(ofSize: 20)
         phone.font = UIFont.preferredFont(forTextStyle: .title3)
         phone.adjustsFontForContentSizeCategory = true
         phone.adjustsFontSizeToFitWidth = true
@@ -87,7 +86,6 @@ class UserProfileContainerView: UIView {
         phone.isEnabled = false
         phone.textColor = ThemeManager.currentTheme().generalSubtitleColor
         phone.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        
         return phone
     }()
     

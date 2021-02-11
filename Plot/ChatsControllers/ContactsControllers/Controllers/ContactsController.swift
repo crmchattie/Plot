@@ -38,10 +38,7 @@ class ContactsController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        filteredContacts = filteredContacts.filter {$0.givenName != "nil" && $0.familyName != "nil"}
-        filteredContacts.sort(by: {$0.givenName < $1.givenName})
-        
+                
         configureViewController()
         setupSearchController()
         addObservers()
@@ -216,9 +213,6 @@ class ContactsController: UITableViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.icon.image = UIImage(named: "UserpicIcon")
             cell.title.text = filteredContacts[indexPath.row].givenName + " " + filteredContacts[indexPath.row].familyName
-            print("filteredContacts[indexPath.row] \(filteredContacts[indexPath.row])")
-            print("filteredContacts[indexPath.row].givenName \(filteredContacts[indexPath.row].givenName)")
-            print("filteredContacts[indexPath.row].givenName \(filteredContacts[indexPath.row].familyName)")
             return cell
         }
     }

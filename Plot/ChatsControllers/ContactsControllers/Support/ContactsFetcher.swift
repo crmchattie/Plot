@@ -52,20 +52,14 @@ class ContactsFetcher: NSObject {
   }
     
     func sortContacts(contacts: [CNContact]) -> [CNContact] { /* Sort users by name  */
-        return contacts.sorted { ($0.givenName < $1.givenName) }
-//        let sortedContacts = contacts.sort {
-//            if $0.lastName != $1.lastName { // first, compare by last names
-//                return $0.lastName < $1.lastName
-//            }
-//                /*  last names are the same, break ties by foo
-//                 else if $0.foo != $1.foo {
-//                 return $0.foo < $1.foo
-//                 }
-//                 ... repeat for all other fields in the sorting
-//                 */
-//            else { // All other fields are tied, break ties by last name
-//                return $0.firstName < $1.firstName
-//            }
-//        }
+        let filteredContacts = contacts.filter({ $0.givenName != "" && $0.familyName != "" })
+        return filteredContacts.sorted {
+            if $0.familyName != "" && $1.familyName != "" {
+                return $0.familyName < $1.familyName
+            }
+            else {
+                return $0.givenName < $1.givenName
+            }
+        }
     }
 }

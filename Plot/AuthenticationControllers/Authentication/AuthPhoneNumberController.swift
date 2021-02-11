@@ -7,10 +7,11 @@
 //
 
 import UIKit
+import PhoneNumberKit
 
 //see Support/PhoneAuth/EnterPhoneControllers for more detail
 class AuthPhoneNumberController: EnterPhoneNumberController {
-  
+  let phoneNumberKit = PhoneNumberKit()
   override func configurePhoneNumberContainerView() {
     super.configurePhoneNumberContainerView()
     phoneNumberContainerView.instructions.text = "Please confirm your country code\nand enter your phone number."
@@ -21,7 +22,12 @@ class AuthPhoneNumberController: EnterPhoneNumberController {
   override func rightBarButtonDidTap() {
     super.rightBarButtonDidTap()
     let destination = AuthVerificationController()
-    destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
+    do {
+        let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!)
+        destination.enterVerificationContainerView.titleNumber.text = self.phoneNumberKit.format(phoneNumber, toType: .international)
+    } catch {
+        destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
+    }
     navigationController?.pushViewController(destination, animated: true)
   }
 }

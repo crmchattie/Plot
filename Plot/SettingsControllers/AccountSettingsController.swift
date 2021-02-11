@@ -8,9 +8,11 @@
 
 import UIKit
 import Firebase
+import PhoneNumberKit
 
 class AccountSettingsController: UITableViewController {
     var networkController = NetworkController()
+    let phoneNumberKit = PhoneNumberKit()
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
@@ -231,7 +233,12 @@ class AccountSettingsController: UITableViewController {
             let phoneNumberReference = Database.database().reference().child("users").child(currentUser).child("phoneNumber")
             phoneNumberReference.observe(.value, with: { (snapshot) in
                 if let phoneNumber = snapshot.value as? String {
-                    self.userProfileContainerView.phone.text = phoneNumber
+                    do {
+                        let phoneNumber = try self.phoneNumberKit.parse(phoneNumber)
+                        self.userProfileContainerView.phone.text = self.phoneNumberKit.format(phoneNumber, toType: .international)
+                    } catch {
+                        self.userProfileContainerView.phone.text = phoneNumber
+                    }
                 }
             })
         }

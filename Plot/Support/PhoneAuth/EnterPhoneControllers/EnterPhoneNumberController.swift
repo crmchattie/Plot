@@ -17,10 +17,8 @@ class EnterPhoneNumberController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         configurePhoneNumberContainerView()
-        //    configureNavigationBar()
         setCountry()
     }
     
@@ -97,7 +95,6 @@ class EnterPhoneNumberController: UIViewController {
         
         let phoneNumberForVerification = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
         
-        
         PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumberForVerification, uiDelegate: nil) { (verificationID, error) in
             if let error = error {
                 basicErrorAlertWith(title: "Error", message: error.localizedDescription + "\nPlease try again later.", controller: self)
@@ -111,7 +108,6 @@ class EnterPhoneNumberController: UIViewController {
 }
 
 extension EnterPhoneNumberController: CountryPickerDelegate {
-    
     func countryPicker(_ picker: SelectCountryCodeController, didSelectCountryWithName name: String, code: String, dialCode: String) {
         phoneNumberContainerView.selectCountry.setTitle(name, for: .normal)
         phoneNumberContainerView.countryCode.text = dialCode

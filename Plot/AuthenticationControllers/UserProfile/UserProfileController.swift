@@ -91,7 +91,6 @@ extension UserProfileController {
     }
     
     func checkIfUserDataExists(completionHandler: @escaping CompletionHandler) {
-        
         let nameReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("name")
         nameReference.observe(.value, with: { (snapshot) in
             if snapshot.exists() {

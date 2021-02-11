@@ -8,11 +8,14 @@
 
 import UIKit
 import Firebase
+import PhoneNumberKit
 
 class EnterVerificationCodeController: UIViewController {
     
     let enterVerificationContainerView = EnterVerificationContainerView()
     // var phoneNumberControllerType: PhoneNumberControllerType = .authentication
+    
+    let phoneNumberKit = PhoneNumberKit()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -165,7 +168,12 @@ class EnterVerificationCodeController: UIViewController {
             
             let destination = UserProfileController()
             AppUtility.lockOrientation(.portrait)
-            destination.userProfileContainerView.phone.text = self.enterVerificationContainerView.titleNumber.text
+            do {
+                let phoneNumber = try self.phoneNumberKit.parse(self.enterVerificationContainerView.titleNumber.text ?? "")
+                destination.userProfileContainerView.phone.text = self.phoneNumberKit.format(phoneNumber, toType: .international)
+            } catch {
+                destination.userProfileContainerView.phone.text = self.enterVerificationContainerView.titleNumber.text
+            }
             destination.checkIfUserDataExists(completionHandler: { (isCompleted) in
                 guard isCompleted else {self.removeSpinner(); return }
                 self.removeSpinner()

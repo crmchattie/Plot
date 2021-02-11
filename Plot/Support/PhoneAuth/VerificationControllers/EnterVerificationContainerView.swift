@@ -18,14 +18,12 @@ class EnterVerificationContainerView: UIView {
     titleNumber.textAlignment = .center
     titleNumber.textColor = ThemeManager.currentTheme().generalTitleColor
     titleNumber.font = UIFont.systemFont(ofSize: 32)
-    
     return titleNumber
   }()
   
   let subtitleText: UILabel = {
     let subtitleText = UILabel()
     subtitleText.translatesAutoresizingMaskIntoConstraints = false
-//    subtitleText.font = UIFont.systemFont(ofSize: 15)
     subtitleText.font = UIFont.preferredFont(forTextStyle: .body)
     subtitleText.adjustsFontForContentSizeCategory = true
     subtitleText.textAlignment = .center
@@ -37,7 +35,6 @@ class EnterVerificationContainerView: UIView {
   
   let verificationCode: UITextField = {
     let verificationCode = UITextField()
-//    verificationCode.font = UIFont.systemFont(ofSize: 20)
     verificationCode.font = UIFont.preferredFont(forTextStyle: .title3)
     verificationCode.adjustsFontForContentSizeCategory = true
     verificationCode.translatesAutoresizingMaskIntoConstraints = false
@@ -91,7 +88,6 @@ class EnterVerificationContainerView: UIView {
   var timerLabel: UILabel = {
     var timerLabel = UILabel()
     timerLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//    timerLabel.font = UIFont.systemFont(ofSize: 13)
     timerLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
     timerLabel.adjustsFontForContentSizeCategory = true
     timerLabel.translatesAutoresizingMaskIntoConstraints = false
