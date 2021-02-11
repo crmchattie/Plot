@@ -93,6 +93,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
         didSet {
             groupProfileTableHeaderContainer.profileImageView.showActivityIndicator()
             groupProfileTableHeaderContainer.profileImageView.sd_setImage(with: URL(string:groupAvatarURL), placeholderImage: nil, options: [.continueInBackground, .scaleDownLargeImages], completed: { (image, error, cacheType, url) in
+                self.groupProfileTableHeaderContainer.addPhotoLabel.isHidden = true
                 self.groupProfileTableHeaderContainer.profileImageView.hideActivityIndicator()
             })
         }

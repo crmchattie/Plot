@@ -244,7 +244,6 @@ class FinanceBarChartViewController: UIViewController {
         chartView.isHidden = hidden
         backgroundChartViewHeightAnchor?.constant = hidden ? 0 : chartViewHeight
         backgroundChartViewTopAnchor?.constant = hidden ? 0 : chartViewTopMargin
-        
         barButton.title = chartView.isHidden ? "Show Chart" : "Hide Chart"
     }
     

@@ -102,10 +102,7 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.bio.delegate = self
         userProfileContainerView.name.delegate = self
         userProfileContainerView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        userProfileContainerView.profileImageView.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
-        userProfileContainerView.userData.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.bio.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.bio.textColor = ThemeManager.currentTheme().generalTitleColor
         userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
@@ -208,6 +205,7 @@ class AccountSettingsController: UITableViewController {
             photoURLReference.observe(.value, with: { (snapshot) in
                 if let url = snapshot.value as? String {
                     self.userProfileContainerView.profileImageView.sd_setImage(with: URL(string: url) , placeholderImage: nil, options: [.scaleDownLargeImages, .continueInBackground], completed: nil)
+                    self.userProfileContainerView.addPhotoLabel.isHidden = true
                 }
             })
             
