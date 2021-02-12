@@ -26,7 +26,6 @@ class GoogleCalManager {
     
     func setupGoogle(_ completion: @escaping (Bool) -> Void) {
         googleCalService.setupGoogle { [weak self] bool in
-            print("bool \(bool)")
             self?.isAuthorized = bool
             completion(true)
         }

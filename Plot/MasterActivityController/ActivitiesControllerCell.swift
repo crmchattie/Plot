@@ -64,9 +64,9 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let activity = activities[indexPath.row]
         if let activityID = activity.activityID, let _ = invitations[activityID] {
-            return 168
+            return 174
         } else {
-            return 140
+            return 145
         }
     }
     

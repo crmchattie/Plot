@@ -449,9 +449,9 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             if !sortedActivities.isEmpty && networkController.activityService.askedforAuthorization {
                 for activity in sortedActivities {
                     if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
-                        height += 173
+                        height += 174
                     } else {
-                        height += 144
+                        height += 145
                     }
                 }
                 return CGSize(width: self.collectionView.frame.size.width, height: height)

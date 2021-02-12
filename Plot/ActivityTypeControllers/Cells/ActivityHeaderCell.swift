@@ -78,10 +78,13 @@ class ActivityHeaderCell: UICollectionViewCell {
         arrowView.constrainWidth(20)
         arrowView.constrainHeight(20)
         
+        let arrowStackView = UIStackView(arrangedSubviews: [arrowView])
+        arrowStackView.layoutMargins = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        arrowStackView.isLayoutMarginsRelativeArrangement = true
         let nameLabelStackView = UIStackView(arrangedSubviews: [nameLabel])
         nameLabelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
         nameLabelStackView.isLayoutMarginsRelativeArrangement = true
-        let stackView = UIStackView(arrangedSubviews: [logoImageView, nameLabelStackView, arrowView])
+        let stackView = UIStackView(arrangedSubviews: [logoImageView, nameLabelStackView, arrowStackView])
         addSubview(stackView)
         stackView.fillSuperview(padding: .init(top: 10, left: 10, bottom: 10, right: 10))
     }

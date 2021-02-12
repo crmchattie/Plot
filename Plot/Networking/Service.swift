@@ -1107,21 +1107,21 @@ class Service {
     
     // declare my generic json function here
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
-        print("encodedURLRequest \(encodedURLRequest)")
+//        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
-            print("resObject \(resp)")
+//            print("resObject \(resp)")
             if let err = err {
-                print("err \(err)")
+//                print("err \(err)")
                 completion(nil, err)
                 return
             }
             do {
                 let objects = try JSONDecoder().decode(T.self, from: data!)
                 // success
-                print("objects \(objects)")
+//                print("objects \(objects)")
                 completion(objects, nil)
             } catch {
-                print("error \(error)")
+//                print("error \(error)")
                 completion(nil, error)
             }
         }.resume()

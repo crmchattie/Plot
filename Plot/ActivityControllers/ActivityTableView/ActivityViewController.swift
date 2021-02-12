@@ -140,16 +140,18 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        GIDSignIn.sharedInstance()?.presentingViewController = self
         
         let dateString = selectedDateFormatter.string(from: Date().localTime)
         title = dateString
         
-        sharedContainer = UserDefaults(suiteName: plotAppGroup)
         configureView()
+        
+        sharedContainer = UserDefaults(suiteName: plotAppGroup)
         addObservers()
         
         handleReloadTable()
+        
+        GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
     deinit {
@@ -251,8 +253,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.allowsMultipleSelectionDuringEditing = false
         activityView.tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         activityView.tableView.backgroundColor = view.backgroundColor
-        activityView.tableView.rowHeight = UITableView.automaticDimension
-        
         
         // apply theme
         applyCalendarTheme()
@@ -388,7 +388,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         handleReloadActivities()
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
-                
+        
         if allActivities.count == 0 {
             checkIfThereAnyActivities(isEmpty: true)
         } else {
@@ -552,7 +552,21 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
+        if indexPath.section == 0 {
+            let activity = filteredPinnedActivities[indexPath.row]
+            if let activityID = activity.activityID, let _ = invitations[activityID] {
+                return 174
+            } else {
+                return 145
+            }
+        } else {
+            let activity = filteredActivities[indexPath.row]
+            if let activityID = activity.activityID, let _ = invitations[activityID] {
+                return 174
+            } else {
+                return 145
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
