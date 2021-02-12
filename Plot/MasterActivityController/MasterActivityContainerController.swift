@@ -66,7 +66,7 @@ class MasterActivityContainerController: UIViewController {
     var healthMetrics: [String: [HealthMetric]] {
         var metrics = networkController.healthService.healthMetrics
         if let generalMetrics = metrics[HealthMetricCategory.general.rawValue] {
-            metrics[HealthMetricCategory.general.rawValue] = generalMetrics.filter({ $0.type.name == HealthMetricType.steps.name || $0.type.name == HealthMetricType.sleep.name })
+            metrics[HealthMetricCategory.general.rawValue] = generalMetrics.filter({ $0.type.name == HealthMetricType.steps.name || $0.type.name == HealthMetricType.sleep.name || $0.type.name == HealthMetricType.heartRate.name })
             if metrics[HealthMetricCategory.general.rawValue] == [] {
                 metrics[HealthMetricCategory.general.rawValue] = nil
             }
@@ -119,10 +119,7 @@ class MasterActivityContainerController: UIViewController {
         }
     }
 
-    func setupViews() {
-        navigationItem.largeTitleDisplayMode = .always
-        navigationController?.navigationBar.prefersLargeTitles = true
-                
+    func setupViews() {                
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
@@ -552,15 +549,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                     collectionView.reloadData()
                 }
             } else {
-                if let mxUser = self.networkController.financeService.mxUser {
-                    openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-                } else {
-                    self.networkController.financeService.getMXUser { (mxUser) in
-                        if let mxUser = self.networkController.financeService.mxUser {
-                            self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-                        }
-                    }
-                }
+                self.openMXConnect(current_member_guid: nil)
             }
         } else {
             goToVC(section: section)
@@ -660,12 +649,12 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     }
     
     func openMember(member: MXMember) {
-        openMXConnect(guid: networkController.financeService.mxUser.guid, current_member_guid: member.guid)
+        openMXConnect(current_member_guid: member.guid)
     }
     
-    func openMXConnect(guid: String, current_member_guid: String?) {
-        Service.shared.getMXConnectURL(guid: guid, current_member_guid: current_member_guid ?? nil) { (search, err) in
-            if let url = search?.user?.connect_widget_url {
+    func openMXConnect(current_member_guid: String?) {
+        Service.shared.fetchMXConnectURL(current_member_guid: current_member_guid) { (search, err) in
+            if let search = search, let url = search["url"] {
                 DispatchQueue.main.async {
                     let destination = WebViewController()
                     destination.urlString = url

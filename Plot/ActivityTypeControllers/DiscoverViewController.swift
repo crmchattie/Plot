@@ -55,11 +55,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        navigationItem.largeTitleDisplayMode = .always
-        navigationController?.navigationBar.prefersLargeTitles = true
-        
+        super.viewDidLoad()        
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
@@ -226,15 +222,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             case .financialAccount:
-                if let mxUser = self.networkController.financeService.mxUser {
-                    self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-                } else {
-                    self.networkController.financeService.getMXUser { (mxUser) in
-                        if let mxUser = self.networkController.financeService.mxUser {
-                            self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-                        }
-                    }
-                }
+                self.openMXConnect(current_member_guid: nil)
             case .transactionRule:
                 let destination = FinanceTransactionRuleViewController()
                 destination.hidesBottomBarWhenPushed = true
@@ -277,9 +265,9 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         }
     }
     
-    func openMXConnect(guid: String, current_member_guid: String?) {
-        Service.shared.fetchMXConnectURL(current_member_guid: nil) { (search, err) in
-            if let url = search {
+    func openMXConnect(current_member_guid: String?) {
+        Service.shared.fetchMXConnectURL(current_member_guid: current_member_guid) { (search, err) in
+            if let search = search, let url = search["url"] {
                 DispatchQueue.main.async {
                     let destination = WebViewController()
                     destination.urlString = url

@@ -59,11 +59,14 @@ class FinanceService {
         DispatchQueue.main.async { [unowned self] in
             memberFetcher.fetchMembers { (firebaseMembers) in
                 self.members = firebaseMembers
+                self.setupMembersDict()
                 self.observeMembersForCurrentUser()
+                
             }
             
             accountFetcher.fetchAccounts { (firebaseAccounts) in
                 self.accounts = firebaseAccounts
+                self.setupMembersAccountsDict()
                 self.observeAccountsForCurrentUser()
             }
             
@@ -73,8 +76,24 @@ class FinanceService {
                 self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
                     self.transactions = firebaseTransactions
                     self.observeTransactionsForCurrentUser()
-                    self.getMXData()
+//                    self.getMXData()
                     completion()
+                }
+            }
+        }
+    }
+    
+    func setupMembersDict() {
+        for member in self.members {
+            self.getInsitutionalDetails(institution_code: member.institution_code)
+        }
+    }
+    
+    func setupMembersAccountsDict() {
+        for member in self.members {
+            for account in accounts {
+                if account.member_guid == member.guid {
+                    memberAccountsDict[member, default: []].append(account)
                 }
             }
         }

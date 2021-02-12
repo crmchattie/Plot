@@ -147,12 +147,13 @@ class GeneralTabBarController: UITabBarController {
         let discoverNavigationController = UINavigationController(rootViewController: discoverController)
         let settingsNavigationController = UINavigationController(rootViewController: settingsController)
         
-        if #available(iOS 11.0, *) {
-            homeNavigationController.navigationBar.prefersLargeTitles = true
-            settingsNavigationController.navigationBar.prefersLargeTitles = true
-            discoverNavigationController.navigationBar.prefersLargeTitles = true
-        }
-        
+        homeNavigationController.navigationBar.prefersLargeTitles = true
+        homeNavigationController.navigationItem.largeTitleDisplayMode = .always
+        settingsNavigationController.navigationBar.prefersLargeTitles = true
+        settingsNavigationController.navigationItem.largeTitleDisplayMode = .always
+        discoverNavigationController.navigationBar.prefersLargeTitles = true
+        discoverNavigationController.navigationItem.largeTitleDisplayMode = .always
+                
         let homeImage = UIImage(named: "home")
         let discoverImage = UIImage(named: "discover")
         let settingsImage = UIImage(named: "settings")

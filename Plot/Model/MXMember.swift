@@ -27,6 +27,7 @@ struct MXMember: Codable, Equatable, Hashable {
     let status: String?
     let successfully_aggregated_at: String
     let user_guid: String
+    let oauth_window_uri: String?
     var participantsIDs: [String]?
 }
 

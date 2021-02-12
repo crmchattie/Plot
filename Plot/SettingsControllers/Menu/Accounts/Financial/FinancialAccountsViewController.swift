@@ -44,15 +44,7 @@ class FinancialAccountsViewController: UITableViewController {
     }
     
     @objc fileprivate func newAccount() {
-        if let mxUser = self.networkController.financeService.mxUser {
-            self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-        } else {
-            self.networkController.financeService.getMXUser { (mxUser) in
-                if let mxUser = self.networkController.financeService.mxUser {
-                    self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-                }
-            }
-        }
+        self.openMXConnect(current_member_guid: nil)
     }
     
     deinit {
@@ -77,9 +69,9 @@ class FinancialAccountsViewController: UITableViewController {
         viewPlaceholder.add(for: tableView, title: .emptyAccounts, subtitle: .emptyAccounts, priority: .medium, position: .top)
     }
     
-    func openMXConnect(guid: String, current_member_guid: String?) {
-        Service.shared.getMXConnectURL(guid: guid, current_member_guid: current_member_guid ?? nil) { (search, err) in
-            if let url = search?.user?.connect_widget_url {
+    func openMXConnect(current_member_guid: String?) {
+        Service.shared.fetchMXConnectURL(current_member_guid: current_member_guid) { (search, err) in
+            if let search = search, let url = search["url"] {
                 DispatchQueue.main.async {
                     let destination = WebViewController()
                     destination.urlString = url
@@ -174,15 +166,7 @@ class FinancialAccountsViewController: UITableViewController {
     
     @objc func viewTapped(_ sender: TapGesture) {
         let member = members[sender.item]
-        if let mxUser = self.networkController.financeService.mxUser {
-            self.openMXConnect(guid: mxUser.guid, current_member_guid: member.guid)
-        } else {
-            self.networkController.financeService.getMXUser { (mxUser) in
-                if let mxUser = self.networkController.financeService.mxUser {
-                    self.openMXConnect(guid: mxUser.guid, current_member_guid: member.guid)
-                }
-            }
-        }
+        self.openMXConnect(current_member_guid: member.guid)
     }
 }
 

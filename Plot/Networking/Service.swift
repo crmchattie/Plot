@@ -1067,7 +1067,7 @@ class Service {
         
     }
     
-    func fetchMXConnectURL(current_member_guid: String?, completion: @escaping ((String?), Error?) -> ()) {
+    func fetchMXConnectURL(current_member_guid: String?, completion: @escaping (([String: String]?), Error?) -> ()) {
         let baseURL: URL = {
             return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/openMXConnect")!
         }()
@@ -1096,7 +1096,8 @@ class Service {
                 urlRequest.allHTTPHeaderFields = ["Content-Type": "text/plain; charset=utf-8",
                                                   "Authorization" : "Bearer \(token)"]
                 
-                urlRequest.httpMethod = "GET"
+                urlRequest.httpMethod = "POST"
+                
                 let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
                 urlRequest.httpBody = jsonData
                 self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
@@ -1109,7 +1110,7 @@ class Service {
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
 //        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
-//            print("resObject \(resp)")
+            print("resObject \(resp)")
             if let err = err {
 //                print("err \(err)")
                 completion(nil, err)
@@ -1118,7 +1119,7 @@ class Service {
             do {
                 let objects = try JSONDecoder().decode(T.self, from: data!)
                 // success
-//                print("objects \(objects)")
+                print("objects \(objects)")
                 completion(objects, nil)
             } catch {
 //                print("error \(error)")

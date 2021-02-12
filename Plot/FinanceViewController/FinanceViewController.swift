@@ -157,15 +157,7 @@ class FinanceViewController: UIViewController {
         
         alert.addAction(UIAlertAction(title: "Account", style: .default, handler: { (_) in
             print("User click Edit button")
-            if let mxUser = self.networkController.financeService.mxUser {
-                self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-            } else {
-                self.networkController.financeService.getMXUser { (mxUser) in
-                    if let mxUser = self.networkController.financeService.mxUser {
-                        self.openMXConnect(guid: mxUser.guid, current_member_guid: nil)
-                    }
-                }
-            }
+            self.openMXConnect(current_member_guid: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Transaction Rule", style: .default, handler: { (_) in
@@ -184,9 +176,9 @@ class FinanceViewController: UIViewController {
         })
     }
     
-    func openMXConnect(guid: String, current_member_guid: String?) {
-        Service.shared.getMXConnectURL(guid: guid, current_member_guid: current_member_guid ?? nil) { (search, err) in
-            if let url = search?.user?.connect_widget_url {
+    func openMXConnect(current_member_guid: String?) {
+        Service.shared.fetchMXConnectURL(current_member_guid: current_member_guid) { (search, err) in
+            if let search = search, let url = search["url"] {
                 DispatchQueue.main.async {
                     let destination = WebViewController()
                     destination.urlString = url
@@ -534,6 +526,8 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 let destination = FinanceTransactionViewController()
 //                destination.delegate = self
                 destination.transaction = object[indexPath.item]
+                print("object[indexPath.item] \(object[indexPath.item].description)")
+                print("object[indexPath.item] \(object[indexPath.item].guid)")
                 destination.users = users
                 destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
@@ -557,7 +551,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             }
         } else if let object = object as? [MXMember] {
             if section.type == "Issues" {
-                self.openMXConnect(guid: user.guid, current_member_guid: object[indexPath.item].guid)
+                self.openMXConnect(current_member_guid: object[indexPath.item].guid)
             }
         }
         collectionView.deselectItem(at: indexPath, animated: true)
