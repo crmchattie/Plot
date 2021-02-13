@@ -93,10 +93,7 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             if let object = object as? [MXMember] {
-                if let imageURL = institutionDict[object[indexPath.item].institution_code] {
-                    cell.imageURL = imageURL
-                    cell.member = object[indexPath.item]
-                }
+                cell.member = object[indexPath.item]
             }
             return cell
         }
@@ -129,16 +126,7 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
             height = estimatedSize.height
         } else {
-            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-            if let object = object as? [MXMember] {
-                if let imageURL = institutionDict[object[indexPath.item].institution_code] {
-                    dummyCell.imageURL = imageURL
-                    dummyCell.member = object[indexPath.item]
-                }
-            }
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
-            height = estimatedSize.height
+            height = 70
         }
         return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
         
@@ -159,6 +147,10 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        let section = sections[section]
+        if section == .transactions || section == .financialAccounts || section == .financialIssues {
+            return 10
+        }
         return 0
     }
     

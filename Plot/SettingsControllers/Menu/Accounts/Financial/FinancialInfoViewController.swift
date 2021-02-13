@@ -69,6 +69,6 @@ class FinancialInfoViewController: UITableViewController {
             destination.networkController = networkController
             navigationController?.pushViewController(destination, animated: true)
         }
-        
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		10021A1624F1A480006A1B25 /* FinancialMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10021A1524F1A480006A1B25 /* FinancialMemberView.swift */; };
+		10021A1624F1A480006A1B25 /* FinancialMemberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10021A1524F1A480006A1B25 /* FinancialMemberCell.swift */; };
 		100458952517D50D00065872 /* FinancialTransactionFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100458942517D50D00065872 /* FinancialTransactionFetcher.swift */; };
 		100A53EC23E0DD9C004AA952 /* ActivityHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100A53EB23E0DD9C004AA952 /* ActivityHeaderCell.swift */; };
 		100A53EE23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100A53ED23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift */; };
@@ -491,7 +491,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		10021A1524F1A480006A1B25 /* FinancialMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialMemberView.swift; sourceTree = "<group>"; };
+		10021A1524F1A480006A1B25 /* FinancialMemberCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialMemberCell.swift; sourceTree = "<group>"; };
 		100458942517D50D00065872 /* FinancialTransactionFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionFetcher.swift; sourceTree = "<group>"; };
 		100A53EB23E0DD9C004AA952 /* ActivityHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHeaderCell.swift; sourceTree = "<group>"; };
 		100A53ED23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHeaderHorizontalController.swift; sourceTree = "<group>"; };
@@ -1395,7 +1395,7 @@
 				10DFC3DA255C48A400565DAD /* FinancialInfoViewController.swift */,
 				10F3032624EC622000C04B8F /* FinancialAccountsViewController.swift */,
 				10DFC3E2255C495800565DAD /* FinancialTransactionRulesViewController.swift */,
-				10021A1524F1A480006A1B25 /* FinancialMemberView.swift */,
+				10021A1524F1A480006A1B25 /* FinancialMemberCell.swift */,
 				10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */,
 			);
 			path = Financial;
@@ -2723,7 +2723,7 @@
 				10F5CFFA25CB7E490078C821 /* GSyncCalendarEventsOp.swift in Sources */,
 				26836B51251338E800AFC2D7 /* HeartRateOperation.swift in Sources */,
 				4BAEE5EF212735E50045AB10 /* RevealableCollectionViewCell.swift in Sources */,
-				10021A1624F1A480006A1B25 /* FinancialMemberView.swift in Sources */,
+				10021A1624F1A480006A1B25 /* FinancialMemberCell.swift in Sources */,
 				10E93D5724BE43B700F6EE18 /* Extensions.swift in Sources */,
 				4BAEE4F621272D890045AB10 /* GroupPictureAvatarOpenerDelegate.swift in Sources */,
 				4BAEE4FB21272D890045AB10 /* InputBlockerContainerView.swift in Sources */,

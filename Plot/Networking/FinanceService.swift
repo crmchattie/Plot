@@ -59,9 +59,8 @@ class FinanceService {
         DispatchQueue.main.async { [unowned self] in
             memberFetcher.fetchMembers { (firebaseMembers) in
                 self.members = firebaseMembers
-                self.setupMembersDict()
+//                self.setupMembersDict()
                 self.observeMembersForCurrentUser()
-                
             }
             
             accountFetcher.fetchAccounts { (firebaseAccounts) in
@@ -75,8 +74,8 @@ class FinanceService {
                 self.observeTransactionRulesForCurrentUser()
                 self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
                     self.transactions = firebaseTransactions
+                    self.removePendingTransactions()
                     self.observeTransactionsForCurrentUser()
-//                    self.getMXData()
                     completion()
                 }
             }
@@ -90,12 +89,88 @@ class FinanceService {
     }
     
     func setupMembersAccountsDict() {
+        memberAccountsDict = [MXMember: [MXAccount]]()
         for member in self.members {
             for account in accounts {
                 if account.member_guid == member.guid {
                     memberAccountsDict[member, default: []].append(account)
                 }
             }
+        }
+    }
+    
+    func triggerUpdateMXUser() {
+        Service.shared.triggerUpdateMXUser() { (search, err) in
+            print("tiggeredUpdateMXUser")
+        }
+    }
+    
+    func removePendingTransactions() {
+        let pendingTransactions = self.transactions.filter{($0.status == .pending)}
+        let postedTransactions = self.transactions.filter{($0.status == .posted)}
+        let lastFortNight = Calendar.current.date(byAdding: .day, value: -14, to: Date())
+        for transaction in pendingTransactions {
+            let transactionDate = isodateFormatter.date(from: transaction.transacted_at) ?? Date()
+            //older than 14 days
+            if transactionDate < lastFortNight! {
+                print("transaction older than 14 days \(transaction.guid)")
+//                deleteTransaction(transaction_guid: transaction.guid)
+                continue
+            }
+            //matches posted transaction's GUID
+            if let _ = postedTransactions.firstIndex(where: {$0.guid == transaction.guid}) {
+                print("transaction matches posted transaction's GUID \(transaction.guid)")
+//                deleteTransaction(transaction_guid: transaction.guid)
+                continue
+            }
+            //posted transaction matches name and merchant (time (amount - tips)
+            if let _ = postedTransactions.firstIndex(where: {$0.description == transaction.description && $0.transacted_at == transaction.transacted_at && $0.account_guid == transaction.account_guid}) {
+                print("transaction matches posted transaction's description, time, account \(transaction.guid)")
+//                deleteTransaction(transaction_guid: transaction.guid)
+                continue
+            }
+        }
+    }
+    
+    func deleteTransaction(transaction_guid: String) {
+        if let currentUserId = Auth.auth().currentUser?.uid, let index = self.transactions.firstIndex(where: {$0.guid == transaction_guid}) {
+            self.transactions.remove(at: index)
+            let reference = Database.database().reference()
+            reference.child(userFinancialTransactionsEntity).child(currentUserId).child(transaction_guid).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    reference.child(userFinancialTransactionsEntity).child(currentUserId).child(transaction_guid).removeValue()
+                }
+            })
+            reference.child(financialTransactionsEntity).child(transaction_guid).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    reference.child(financialTransactionsEntity).child(transaction_guid).removeValue()
+                }
+            })
+        }
+    }
+    
+    func deleteMXMember(member: MXMember) {
+        Service.shared.deleteMXMember(current_member_guid: member.guid) { (search, err) in
+            self.deleteMXMemberFB(member: member)
+        }
+    }
+    
+    func deleteMXMemberFB(member: MXMember) {
+        let current_member_guid = member.guid
+        if let currentUserId = Auth.auth().currentUser?.uid, let index = self.members.firstIndex(where: {$0.guid == current_member_guid}) {
+            self.members.remove(at: index)
+            self.memberAccountsDict[member] = nil
+            let reference = Database.database().reference()
+            reference.child(userFinancialMembersEntity).child(currentUserId).child(current_member_guid).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    reference.child(userFinancialTransactionsEntity).child(currentUserId).child(current_member_guid).removeValue()
+                }
+            })
+            reference.child(financialMembersEntity).child(current_member_guid).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    reference.child(financialTransactionsEntity).child(current_member_guid).removeValue()
+                }
+            })
         }
     }
     

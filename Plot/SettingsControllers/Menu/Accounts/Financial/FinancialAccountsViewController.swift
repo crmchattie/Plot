@@ -12,14 +12,9 @@ import CodableFirebase
 
 class FinancialAccountsViewController: UITableViewController {
     var networkController = NetworkController()
-    
-    let financialAccountCellID = "financialAccountCellID"
-    
+            
     var members: [MXMember] {
         return networkController.financeService.members
-    }
-    var institutionDict: [String: String] {
-        return networkController.financeService.institutionDict
     }
     var memberAccountsDict: [MXMember: [MXAccount]] {
         return networkController.financeService.memberAccountsDict
@@ -40,7 +35,7 @@ class FinancialAccountsViewController: UITableViewController {
         
         let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
         navigationItem.rightBarButtonItem = barButton
-        
+                
     }
     
     @objc fileprivate func newAccount() {
@@ -97,82 +92,99 @@ class FinancialAccountsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let member = members[section]
         if let accounts = memberAccountsDict[member] {
-            return accounts.count
+            return accounts.count + 1
         }
-        return 0
-    }
-    
-    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = FinancialMemberView()
-        headerView.nameLabel.text = members[section].name
-        if let imageURL = institutionDict[members[section].institution_code] {
-            headerView.companyImageView.sd_setImage(with: URL(string: imageURL))
-        }
-        let status = members[section].connection_status
-        print("connection_status \(status)")
-        if status == .connected {
-            headerView.statusImageView.image =  UIImage(named: "success")
-            headerView.infoLabel.text = "Information is up-to-date"
-        } else if status == .created || status == .updated || status == .delayed || status == .resumed || status == .pending {
-            headerView.statusImageView.image =  UIImage(named: "updating")
-            headerView.infoLabel.text = "Information is updating"
-        } else {
-            headerView.statusImageView.image =  UIImage(named: "failure")
-            headerView.infoLabel.text = "Please click to fix connection"
-        }
-        let viewTap = TapGesture(target: self, action: #selector(self.viewTapped(_:)))
-        viewTap.item = section
-        headerView.addGestureRecognizer(viewTap)
-        return headerView
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 80
+        return 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "Cell")
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        
         let member = members[indexPath.section]
-        if let accounts = memberAccountsDict[member] {
+        if indexPath.row == 0 {
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor
             cell.textLabel!.font = UIFont.preferredFont(forTextStyle: .body)
-            cell.textLabel!.text = accounts[indexPath.row].name
+            cell.textLabel!.text = members[indexPath.section].name
             cell.detailTextLabel!.textColor = ThemeManager.currentTheme().generalSubtitleColor
             cell.detailTextLabel!.font = UIFont.preferredFont(forTextStyle: .callout)
-            if accounts[indexPath.row].should_link ?? true {
-                cell.detailTextLabel!.text = "Account Linked to Financial Profile"
-                cell.accessoryType = .checkmark
+            let status = members[indexPath.section].connection_status
+            if status == .connected {
+                let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+                imgView.image = UIImage(named: "success")
+                cell.accessoryView = imgView
+                cell.detailTextLabel!.text = "Information is up-to-date"
+            } else if status == .created || status == .updated || status == .delayed || status == .resumed || status == .pending {
+                let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+                imgView.image = UIImage(named: "updating")
+                cell.accessoryView = imgView
+                cell.detailTextLabel!.text = "Information is updating"
             } else {
-                cell.detailTextLabel!.text = "Account Not Linked to Financial Profile"
-                cell.accessoryType = .none
+                let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+                imgView.image = UIImage(named: "failure")
+                cell.accessoryView = imgView
+                cell.detailTextLabel!.text = "Please click to fix connection"
+            }
+            let viewTap = TapGesture(target: self, action: #selector(self.viewTapped(_:)))
+            viewTap.item = indexPath.section
+            cell.addGestureRecognizer(viewTap)
+        } else {
+            if let accounts = memberAccountsDict[member] {
+                cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel!.font = UIFont.preferredFont(forTextStyle: .body)
+                cell.textLabel!.text = accounts[indexPath.row - 1].name
+                cell.detailTextLabel!.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.detailTextLabel!.font = UIFont.preferredFont(forTextStyle: .callout)
+                if accounts[indexPath.row - 1].should_link ?? true {
+                    cell.detailTextLabel!.text = "Account Linked to Financial Profile"
+                    cell.accessoryType = .checkmark
+                } else {
+                    cell.detailTextLabel!.text = "Account Not Linked to Financial Profile"
+                    cell.accessoryType = .none
+                }
             }
         }
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
         let member = members[indexPath.section]
         if let accounts = memberAccountsDict[member] {
-            let account = accounts[indexPath.row]
+            let account = accounts[indexPath.row - 1]
             let destination = FinanceAccountViewController()
             destination.account = account
             self.navigationController?.pushViewController(destination, animated: true)
         }
-        
+        tableView.deselectRow(at: indexPath, animated: false)
     }
     
     @objc func viewTapped(_ sender: TapGesture) {
-        let member = members[sender.item]
-        self.openMXConnect(current_member_guid: member.guid)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Update", style: .default, handler: { (_) in
+            let member = self.members[sender.item]
+            self.openMXConnect(current_member_guid: member.guid)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { (_) in
+            let member = self.members[sender.item]
+            self.networkController.financeService.deleteMXMember(member: member)
+
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
 }
 
 extension FinancialAccountsViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        networkController.financeService.grabFinances {}
+        networkController.financeService.triggerUpdateMXUser()
     }
 }
 

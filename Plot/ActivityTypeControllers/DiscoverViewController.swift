@@ -350,7 +350,7 @@ extension DiscoverViewController: CompositionalHeaderDelegate {
 
 extension DiscoverViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        networkController.financeService.grabFinances {}
+        networkController.financeService.triggerUpdateMXUser()
     }
 }
 

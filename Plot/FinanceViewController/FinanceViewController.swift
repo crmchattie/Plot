@@ -429,10 +429,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             if let object = object as? [MXMember] {
-                if let imageURL = institutionDict[object[indexPath.item].institution_code] {
-                    cell.imageURL = imageURL
-                    cell.member = object[indexPath.item]
-                }
+                cell.member = object[indexPath.item]
             }
             return cell
         }
@@ -468,16 +465,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
             height = estimatedSize.height
         } else {
-            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 30, height: 1000))
-            if let object = object as? [MXMember] {
-                if let imageURL = institutionDict[object[indexPath.item].institution_code] {
-                    dummyCell.imageURL = imageURL
-                    dummyCell.member = object[indexPath.item]
-                }
-            }
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
-            height = estimatedSize.height
+            height = 70
         }
         return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
         
@@ -500,7 +488,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         let section = sections[section]
-        if section == .transactions || section == .financialAccounts {
+        if section == .transactions || section == .financialAccounts || section == .financialIssues {
             return 10
         }
         return 0
@@ -526,8 +514,6 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 let destination = FinanceTransactionViewController()
 //                destination.delegate = self
                 destination.transaction = object[indexPath.item]
-                print("object[indexPath.item] \(object[indexPath.item].description)")
-                print("object[indexPath.item] \(object[indexPath.item].guid)")
                 destination.users = users
                 destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
@@ -606,7 +592,7 @@ extension FinanceViewController: EndedWebViewDelegate {
         sections.removeAll(where: { $0 == .financialIssues })
         groups[.financialIssues] = nil
         collectionView.reloadData()
-        networkController.financeService.grabFinances {}
+        networkController.financeService.triggerUpdateMXUser()
     }
 }
 

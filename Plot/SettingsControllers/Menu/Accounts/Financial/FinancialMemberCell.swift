@@ -8,7 +8,7 @@
 
 import UIKit
 
-class FinancialMemberView: UIView {
+class FinancialMemberCell: UITableViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -28,21 +28,18 @@ class FinancialMemberView: UIView {
     let companyImageView = UIImageView(cornerRadius: 8)
     let statusImageView = UIImageView(cornerRadius: 8)
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        companyImageView.constrainWidth(60)
-        companyImageView.constrainHeight(60)
-        
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: .default, reuseIdentifier: reuseIdentifier)
         statusImageView.constrainWidth(30)
         statusImageView.constrainHeight(30)
         
         let labelStack = VerticalStackView(arrangedSubviews: [nameLabel, infoLabel], spacing: 2)
         
-        let stackView = UIStackView(arrangedSubviews: [companyImageView, labelStack, UIView(), statusImageView])
+        let stackView = UIStackView(arrangedSubviews: [labelStack, UIView(), statusImageView])
         stackView.spacing = 10
         stackView.alignment = .center
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 10, left: 10, bottom: 10, right: 10))
+        stackView.fillSuperview(padding: .init(top: 10, left: 15, bottom: 10, right: 15))
 
     }
     

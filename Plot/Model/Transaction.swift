@@ -43,6 +43,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var is_international: Bool?
     var is_overdraft_fee: Bool?
     var is_payroll_advance: Bool?
+    var is_subscription: Bool?
     var latitude: Double?
     var longitude: Double?
     var member_guid: String?

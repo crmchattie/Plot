@@ -222,14 +222,14 @@ class FinanceAccountViewController: FormViewController {
                 }
             }
         
-        if account.subtype != .none {
+        if let subtype = account.subtype, subtype != .none {
             form.last!
             <<< PushRow<String>("Subtype") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.title = row.tag
-                row.value = account.subtype.name
+                row.value = subtype.name
                 row.options = []
                 MXAccountSubType.allCases.forEach {
                     row.options?.append($0.name)

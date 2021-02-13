@@ -47,7 +47,7 @@ struct MXAccount: Codable, Equatable, Hashable {
     var payment_due_at: String?
     var payoff_balance: Double?
     var started_on: String?
-    var subtype: MXAccountSubType
+    var subtype: MXAccountSubType?
     var total_account_value: Double?
     var type: MXAccountType
     var updated_at: String
@@ -526,11 +526,11 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
         }
         switch level {
         case .account:
-            let accountDetail = AccountDetails(name: account.name, balance: account.available_balance ?? account.balance, level: .account, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+            let accountDetail = AccountDetails(name: account.name, balance: account.available_balance ?? account.balance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type)
             accountsDict[accountDetail] = [account]
             
         case .subtype:
-            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype.name && $0.level == .subtype && $0.subtype == account.subtype && $0.type == account.type && $0.bs_type == account.bs_type}) {
+            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype?.name ?? MXAccountSubType.none.name && $0.level == .subtype && $0.subtype == account.subtype ?? MXAccountSubType.none && $0.type == account.type && $0.bs_type == account.bs_type}) {
                 var accountDetail = accountsDict.keys[index]
                 var accounts = accountsDict[accountDetail]
                 
@@ -541,7 +541,7 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 
                 accountsDict[accountDetail] = accounts
             } else {
-                let accountDetail = AccountDetails(name: account.subtype.name, balance: account.available_balance ?? account.balance, level: .subtype, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+                let accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: account.available_balance ?? account.balance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type)
                 accountsDict[accountDetail] = [account]
             }
         case .type:
@@ -551,7 +551,7 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 
                 accountsDict[accountDetail] = nil
                 
-                accountDetail.balance = account.available_balance ?? account.balance
+                accountDetail.balance += account.available_balance ?? account.balance
                 accounts!.append(account)
                 
                 accountsDict[accountDetail] = accounts
@@ -575,10 +575,10 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 accountsDict[accountDetail] = [account]
             }
         case .none:
-            let accountDetail = AccountDetails(name: account.name, balance: account.available_balance ?? account.balance, level: .account, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+            let accountDetail = AccountDetails(name: account.name, balance: account.available_balance ?? account.balance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type)
             accountsDict[accountDetail] = [account]
             
-            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype.name && $0.level == .subtype && $0.subtype == account.subtype && $0.type == account.type && $0.bs_type == account.bs_type}) {
+            if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype?.name ?? MXAccountSubType.none.name && $0.level == .subtype && $0.subtype == account.subtype ?? MXAccountSubType.none && $0.type == account.type && $0.bs_type == account.bs_type}) {
                 var accountDetail = accountsDict.keys[index]
                 var accounts = accountsDict[accountDetail]
                 
@@ -589,7 +589,7 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 
                 accountsDict[accountDetail] = accounts
             } else {
-                let accountDetail = AccountDetails(name: account.subtype.name, balance: account.available_balance ?? account.balance, level: .subtype, subtype: account.subtype, type: account.type, bs_type: account.bs_type)
+                let accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: account.available_balance ?? account.balance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type)
                 accountsDict[accountDetail] = [account]
             }
             
@@ -599,7 +599,7 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 
                 accountsDict[accountDetail] = nil
                 
-                accountDetail.balance = account.available_balance ?? account.balance
+                accountDetail.balance += account.available_balance ?? account.balance
                 accounts!.append(account)
                 
                 accountsDict[accountDetail] = accounts
@@ -650,10 +650,9 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                                 }
                             }
                             let accounts = accountsList.filter({$0.level == .account && $0.bs_type == bs_type && $0.type == type && $0.subtype == subtype})
-                            for account in accounts {
-                                if account.balance != 0 {
-                                    sortedAccountsList.append(account)
-                                }
+                            let sortedAccounts = accounts.sorted(by: {$0.name < $1.name})
+                            for account in sortedAccounts {
+                                sortedAccountsList.append(account)
                             }
                         }
                     }
@@ -852,7 +851,7 @@ func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, star
                         }
                         continue
                     }
-                } else if accountDetail.name == account.subtype.name && accountDetail.level == .subtype {
+                } else if accountDetail.name == account.subtype?.name ?? MXAccountSubType.none.name && accountDetail.level == .subtype {
                     if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
                         statistics[index].value += currentBalance
                         if !accountList.contains(account) {

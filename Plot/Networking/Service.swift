@@ -769,21 +769,21 @@ class Service {
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
     
-    func deleteMXMember(guid: String, member_guid: String, completion: @escaping ((String?), Error?) -> ()) {
-        
-        let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid)!
-        }()
-        
-        var urlRequest = URLRequest(url: baseURL)
-        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                          "MX-Client-ID": MXAPI.clientID,
-                                          "Accept": MXAPI.version,
-                                          "Content-Type": MXAPI.contentType]
-        urlRequest.httpMethod = "DELETE"
-        
-        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-    }
+//    func deleteMXMember(guid: String, member_guid: String, completion: @escaping ((String?), Error?) -> ()) {
+//
+//        let baseURL: URL = {
+//            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid)!
+//        }()
+//
+//        var urlRequest = URLRequest(url: baseURL)
+//        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
+//                                          "MX-Client-ID": MXAPI.clientID,
+//                                          "Accept": MXAPI.version,
+//                                          "Content-Type": MXAPI.contentType]
+//        urlRequest.httpMethod = "DELETE"
+//
+//        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+//    }
     
     func getMXAccounts(guid: String, page: String, records_per_page: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
         
@@ -1093,13 +1093,68 @@ class Service {
             }
             if let token = token {
                 var urlRequest = URLRequest(url: baseURL)
-                urlRequest.allHTTPHeaderFields = ["Content-Type": "text/plain; charset=utf-8",
+                urlRequest.allHTTPHeaderFields = ["Content-Type": "application/json",
+                                                  "Authorization" : "Bearer \(token)"]
+                
+                urlRequest.httpMethod = "POST"
+                let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
+                urlRequest.httpBody = jsonData
+                
+                self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+            }
+        }
+        
+    }
+    
+    func deleteMXMember(current_member_guid: String, completion: @escaping ((String?), Error?) -> ()) {
+        let baseURL: URL = {
+            return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/deleteMXMember")!
+        }()
+        
+        let parameters = ["memberGuid":"\(current_member_guid)"]
+
+        let currentUser = Auth.auth().currentUser
+        currentUser?.getIDTokenForcingRefresh(true) { [weak self] token, error in
+            if let error = error {
+                print("error getting token \(error)")
+                // Handle error
+                return
+            }
+            if let token = token {
+                var urlRequest = URLRequest(url: baseURL)
+                urlRequest.allHTTPHeaderFields = ["Content-Type": "application/json",
                                                   "Authorization" : "Bearer \(token)"]
                 
                 urlRequest.httpMethod = "POST"
                 
                 let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
                 urlRequest.httpBody = jsonData
+                
+                self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+            }
+        }
+        
+    }
+    
+    func triggerUpdateMXUser(completion: @escaping ((String?), Error?) -> ()) {
+        let baseURL: URL = {
+            return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/triggerUpdateMXUser")!
+        }()
+        
+        let currentUser = Auth.auth().currentUser
+        currentUser?.getIDTokenForcingRefresh(true) { [weak self] token, error in
+            if let error = error {
+                print("error getting token \(error)")
+                // Handle error
+                return
+            }
+            if let token = token {
+                var urlRequest = URLRequest(url: baseURL)
+                urlRequest.allHTTPHeaderFields = ["Content-Type": "application/json",
+                                                  "Authorization" : "Bearer \(token)"]
+                
+                urlRequest.httpMethod = "POST"
+                
                 self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
             }
         }
@@ -1110,19 +1165,19 @@ class Service {
     func fetchGenericJSONData<T: Decodable>(encodedURLRequest: URLRequest, completion: @escaping (T?, Error?) -> ()) {
 //        print("encodedURLRequest \(encodedURLRequest)")
         URLSession.shared.dataTask(with: encodedURLRequest) { (data, resp, err) in
-            print("resObject \(resp)")
+//            print("resObject \(resp)")
             if let err = err {
-//                print("err \(err)")
+                print("err \(err)")
                 completion(nil, err)
                 return
             }
             do {
                 let objects = try JSONDecoder().decode(T.self, from: data!)
                 // success
-                print("objects \(objects)")
+//                print("objects \(objects)")
                 completion(objects, nil)
             } catch {
-//                print("error \(error)")
+                print("error \(error)")
                 completion(nil, error)
             }
         }.resume()
@@ -1182,11 +1237,11 @@ struct SygicAPI {
 
 struct MXAPI {
     //production environment
-    //    static let baseURL = "https://atrium.mx.com/"
+//    static let baseURL = "https://atrium.mx.com/"
     
     //production environment keys
-    //    static fileprivate let apiKey = "d14242458ddd419ac3e40238537070a6ccf29c2f"
-    //    static fileprivate let clientID = "cc3f22cd-7431-4bd9-955c-2624dcbb0e26"
+//    static fileprivate let apiKey = "d14242458ddd419ac3e40238537070a6ccf29c2f"
+//    static fileprivate let clientID = "cc3f22cd-7431-4bd9-955c-2624dcbb0e26"
     
     //development environment URL
     static let baseURL = "https://vestibule.mx.com/"

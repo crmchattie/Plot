@@ -12,9 +12,7 @@ import CodableFirebase
 
 class FinancialTransactionRulesViewController: UITableViewController {
     var networkController = NetworkController()
-    
-    let financialAccountCellID = "financialAccountCellID"
-    
+        
     var transactionRules: [TransactionRule] {
         networkController.financeService.transactionRules
     }

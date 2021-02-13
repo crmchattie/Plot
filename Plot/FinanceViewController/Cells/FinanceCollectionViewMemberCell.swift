@@ -13,9 +13,6 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
     var member: MXMember! {
         didSet {
             nameLabel.text = member.name
-            if let imageURL = imageURL {
-                companyImageView.sd_setImage(with: URL(string: imageURL))
-            }
             let status = member.connection_status
             if status == .connected {
                 statusImageView.image =  UIImage(named: "success")
@@ -72,15 +69,12 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
         backgroundView?.layer.shadowRadius = 10
         backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
         
-        companyImageView.constrainWidth(60)
-        companyImageView.constrainHeight(60)
-        
         statusImageView.constrainWidth(30)
         statusImageView.constrainHeight(30)
         
         let labelStack = VerticalStackView(arrangedSubviews: [nameLabel, infoLabel], spacing: 2)
         
-        let stackView = UIStackView(arrangedSubviews: [companyImageView, labelStack, UIView(), statusImageView])
+        let stackView = UIStackView(arrangedSubviews: [labelStack, UIView(), statusImageView])
         stackView.spacing = 10
         stackView.alignment = .center
         addSubview(stackView)
@@ -90,7 +84,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
+        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
     }
  
 }
