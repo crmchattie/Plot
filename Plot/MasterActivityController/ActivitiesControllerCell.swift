@@ -41,6 +41,8 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
         tableView.separatorStyle = .none
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.rowHeight = UITableView.automaticDimension
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -62,13 +64,21 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let activity = activities[indexPath.row]
-        if let activityID = activity.activityID, let _ = invitations[activityID] {
-            return 174
-        } else {
-            return 145
-        }
+        return UITableView.automaticDimension
     }
+    
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        let dummyCell = ActivityCell(frame: .init(x: 0, y: 0, width: self.tableView.frame.size.width, height: 1000))
+//        let activity = activities[indexPath.row]
+//        var invitation: Invitation? = nil
+//        if let activityID = activity.activityID, let value = invitations[activityID] {
+//            invitation = value
+//        }
+//        dummyCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+//        dummyCell.layoutIfNeeded()
+//        let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.tableView.frame.size.width, height: 1000))
+//        return estimatedSize.height
+//    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if activities.count == 0 {

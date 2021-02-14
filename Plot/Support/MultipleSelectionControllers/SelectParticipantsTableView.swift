@@ -97,14 +97,14 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
         cell.allowSelection = true
         
         if self.ownerID == user.id {
-            cell.rightSubtitle.text = "~admin"
+//            cell.rightSubtitle.text = "~admin"
             cell.allowSelection = false
         }
-        else if let userID = user.id, let status = self.userInvitationStatus[userID] {
-            cell.rightSubtitle.text = status.description
-        } else {
-            cell.rightSubtitle.text = ""
-        }
+//        else if let userID = user.id, let status = self.userInvitationStatus[userID] {
+//            cell.rightSubtitle.text = status.description
+//        } else {
+//            cell.rightSubtitle.text = ""
+//        }
         
         guard let url = user.thumbnailPhotoURL else { return cell }
         cell.icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in

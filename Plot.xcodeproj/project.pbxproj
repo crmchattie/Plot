@@ -86,6 +86,7 @@
 		106618AF24BA37D6003C3F36 /* PlaceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618AE24BA37D6003C3F36 /* PlaceDetailViewController.swift */; };
 		106618B124BA3C59003C3F36 /* PlaceDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618B024BA3C59003C3F36 /* PlaceDetailCell.swift */; };
 		106618B324BB655E003C3F36 /* PlaceExpandedDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618B224BB655E003C3F36 /* PlaceExpandedDetailCell.swift */; };
+		106774C825D96757002F78E7 /* FinancialHoldingFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774C725D96757002F78E7 /* FinancialHoldingFetcher.swift */; };
 		1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */; };
 		1069B2D02430EC880048244C /* IncomingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */; };
 		1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */; };
@@ -574,6 +575,7 @@
 		106618AE24BA37D6003C3F36 /* PlaceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceDetailViewController.swift; sourceTree = "<group>"; };
 		106618B024BA3C59003C3F36 /* PlaceDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceDetailCell.swift; sourceTree = "<group>"; };
 		106618B224BB655E003C3F36 /* PlaceExpandedDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceExpandedDetailCell.swift; sourceTree = "<group>"; };
+		106774C725D96757002F78E7 /* FinancialHoldingFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialHoldingFetcher.swift; sourceTree = "<group>"; };
 		1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingActivityMessageCell.swift; sourceTree = "<group>"; };
@@ -1343,6 +1345,7 @@
 				10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */,
 				1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */,
 				10DC5C3F25AF35C600D52722 /* FinancialMemberFetcher.swift */,
+				106774C725D96757002F78E7 /* FinancialHoldingFetcher.swift */,
 				10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */,
 			);
 			path = Support;
@@ -3035,6 +3038,7 @@
 				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,
 				4BAEE5DC212735E50045AB10 /* AnimationController.swift in Sources */,
 				4BAEE4FD21272D890045AB10 /* BaseVoiceMessageCell.swift in Sources */,
+				106774C825D96757002F78E7 /* FinancialHoldingFetcher.swift in Sources */,
 				1080871B2583E73D00FB9BB0 /* SummaryLineChartCell.swift in Sources */,
 				4BAEE5DB212735E50045AB10 /* ImageCell.swift in Sources */,
 				10F3032524EB746E00C04B8F /* AccountsTableViewController.swift in Sources */,

@@ -86,7 +86,6 @@ class NotificationsViewController: UIViewController {
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorColor = .clear
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 44
         view.addSubview(tableView)
         tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
         tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true

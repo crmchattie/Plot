@@ -18,8 +18,14 @@ protocol ActivityCellDelegate: class {
 class ActivityCell: BaseContainerTableViewCell {
     var invitationSegmentHeightConstraint: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
-    let invitationSegmentedControlTopAnchorRegular: CGFloat = 10
+    var invitationSegmentedControlTopAnchorRegular: CGFloat = 8
     let invitationSegmentHeightConstant: CGFloat = 29
+    
+    var iconViewHeightConstraint: NSLayoutConstraint!
+    var iconViewTopAnchor: NSLayoutConstraint!
+    var iconViewTopAnchorRegular: CGFloat = 8
+    let iconViewHeightConstant: CGFloat = 30
+    
     var invitation: Invitation?
     var participants: [User] = []
     let thumbnailsCount = 8
@@ -50,17 +56,6 @@ class ActivityCell: BaseContainerTableViewCell {
         return imageView
     }()
     
-    //blue dot on the left of cell
-    let newActivityIndicator: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.layer.masksToBounds = true
-        imageView.contentMode = .scaleAspectFill
-        imageView.isHidden = true
-        imageView.image = UIImage(named: "Oval")
-        return imageView
-    }()
-    
     let muteIndicator: UIImageView = {
         let muteIndicator = UIImageView()
         muteIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -84,15 +79,15 @@ class ActivityCell: BaseContainerTableViewCell {
     }()
     
     //activity type label (e.g. drinks, trip)
-//    let activityTypeLabel: UILabel = {
-//        let label = UILabel()
-//        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-//        label.adjustsFontForContentSizeCategory = true
-//        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//        label.numberOfLines = 1
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//        return label
-//    }()
+    let activityTypeLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
+        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.numberOfLines = 1
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     
     //activity participants label (e.g. whoever is invited to activity)
     let activityParticipantsLabel: UILabel = {
@@ -104,19 +99,7 @@ class ActivityCell: BaseContainerTableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    //activity address label (e.g. address of restaurant, initial lodgings with trip)
-//    let activityAddressLabel: UILabel = {
-//        let label = UILabel()
-//        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-//        label.adjustsFontForContentSizeCategory = true
-//        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//        label.numberOfLines = 1
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//        label.isUserInteractionEnabled = true
-//        return label
-//    }()
-    
+        
     let invitationSegmentedControl: UISegmentedControl = {
         let items = ["Accept" , "Decline"]
         let segmentedControl = UISegmentedControl(items: items)
@@ -156,20 +139,12 @@ class ActivityCell: BaseContainerTableViewCell {
         return button
     }()
     
-    let chatButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "chat"), for: .normal)
+    let iconView: UIView = {
+        let button = UIView()
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
-    let mapButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "map"), for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -178,15 +153,12 @@ class ActivityCell: BaseContainerTableViewCell {
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
         activityImageView.addSubview(startLabel)
-//        activityImageView.addSubview(activityTypeLabel)
-//        activityImageView.addSubview(activityAddressLabel)
-        activityImageView.addSubview(muteIndicator)
-        activityImageView.addSubview(newActivityIndicator)
-        activityImageView.addSubview(invitationSegmentedControl)
+        activityImageView.addSubview(activityTypeLabel)
         activityImageView.addSubview(badgeLabel)
         activityImageView.addSubview(activityTypeButton)
-        activityImageView.addSubview(chatButton)
-        activityImageView.addSubview(mapButton)
+        activityImageView.addSubview(muteIndicator)
+//        activityImageView.addSubview(iconView)
+        activityImageView.addSubview(invitationSegmentedControl)
         
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
@@ -201,52 +173,45 @@ class ActivityCell: BaseContainerTableViewCell {
         startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
         startLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
 //
-//        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
-//        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-//        activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
-//
-//        activityAddressLabel.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: 2).isActive = true
-//        activityAddressLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-//        activityAddressLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
+        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
         activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        
-        chatButton.topAnchor.constraint(equalTo: activityTypeButton.bottomAnchor, constant: 10).isActive = true
-        chatButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
-        chatButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        chatButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        
-        mapButton.topAnchor.constraint(equalTo: chatButton.bottomAnchor, constant: 10).isActive = true
-        mapButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
-        mapButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        mapButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
-        var x: CGFloat = 10
-        for _ in 0..<thumbnailsCount {
-            let icon = UIImageView()
-            activityImageView.addSubview(icon)
-            thumbnails.append(icon)
-            icon.translatesAutoresizingMaskIntoConstraints = false
-            icon.contentMode = .scaleAspectFill
-            icon.layer.cornerRadius = 15
-            icon.layer.masksToBounds = true
-            icon.image = UIImage(named: "UserpicIcon")
-            icon.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 8).isActive = true
-            icon.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: x).isActive = true
-            icon.widthAnchor.constraint(equalToConstant: 30).isActive = true
-            icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
-            icon.isHidden = true
-            x += 38
-        }
+//        var x: CGFloat = 10
+//        for _ in 0..<thumbnailsCount {
+//            let icon = UIImageView()
+//            iconView.addSubview(icon)
+//            thumbnails.append(icon)
+//            icon.translatesAutoresizingMaskIntoConstraints = false
+//            icon.contentMode = .scaleAspectFill
+//            icon.layer.cornerRadius = 15
+//            icon.layer.masksToBounds = true
+//            icon.image = UIImage(named: "UserpicIcon")
+//            icon.topAnchor.constraint(equalTo: iconView.topAnchor, constant: 0).isActive = true
+//            icon.leftAnchor.constraint(equalTo: iconView.leftAnchor, constant: x).isActive = true
+//            icon.widthAnchor.constraint(equalToConstant: 30).isActive = true
+//            icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
+//            icon.isHidden = true
+//            x += 38
+//        }
+//
+//        iconViewTopAnchor = iconView.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: iconViewTopAnchorRegular)
+//        iconViewTopAnchor.isActive = true
+//        iconView.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 0).isActive = true
+//        iconView.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: 0).isActive = true
+//        iconViewHeightConstraint = iconView.heightAnchor.constraint(equalToConstant: iconViewHeightConstant)
+//        iconViewHeightConstraint.isActive = true
         
-        invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: mapButton.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
+        invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
         invitationSegmentedControlTopAnchor.isActive = true
         invitationSegmentedControl.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
         invitationSegmentedControl.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        invitationSegmentedControl.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -5).isActive = true
+        invitationSegmentedControl.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
         invitationSegmentHeightConstraint = invitationSegmentedControl.heightAnchor.constraint(equalToConstant: invitationSegmentHeightConstant)
         invitationSegmentHeightConstraint.isActive = true
         
@@ -255,18 +220,11 @@ class ActivityCell: BaseContainerTableViewCell {
         muteIndicator.widthAnchor.constraint(equalToConstant: 15).isActive = true
         muteIndicator.heightAnchor.constraint(equalToConstant: 15).isActive = true
         
-        newActivityIndicator.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-        newActivityIndicator.centerYAnchor.constraint(equalTo: activityImageView.centerYAnchor).isActive = true
-        newActivityIndicator.widthAnchor.constraint(equalToConstant: 10).isActive = true
-        newActivityIndicator.heightAnchor.constraint(equalToConstant: 10).isActive = true
-        
-        badgeLabel.centerYAnchor.constraint(equalTo: chatButton.centerYAnchor).isActive = true
-        badgeLabel.rightAnchor.constraint(equalTo: chatButton.leftAnchor, constant: -10).isActive = true
+        badgeLabel.topAnchor.constraint(equalTo: activityTypeButton.bottomAnchor, constant: 10).isActive = true
+        badgeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
         invitationSegmentedControl.addTarget(self, action: #selector(ActivityCell.indexChangedSegmentedControl(_:)), for: .valueChanged)
-        mapButton.addTarget(self, action: #selector(ActivityCell.mapButtonTapped), for: .touchUpInside)
-        chatButton.addTarget(self, action: #selector(ActivityCell.chatButtonTapped), for: .touchUpInside)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -279,9 +237,9 @@ class ActivityCell: BaseContainerTableViewCell {
         activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         nameLabel.text = nil
         startLabel.text = nil
+        activityTypeLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
-        newActivityIndicator.isHidden = true
         nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
     }

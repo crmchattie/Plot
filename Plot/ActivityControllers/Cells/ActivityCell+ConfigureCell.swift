@@ -94,7 +94,7 @@ extension ActivityCell {
                 
         let isActivityMuted = activity.muted != nil && activity.muted!
         let activityName = activity.name
-                
+                        
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
                 
@@ -102,21 +102,16 @@ extension ActivityCell {
         startLabel.numberOfLines = dateTimeValueArray.0
         startLabel.text = dateTimeValueArray.1
                 
-//        if activity.category != nil {
-//            activityTypeLabel.text = activity.category
-//        } else {
-//            activityTypeLabel.text = nil
-//        }
-//        
-//        if activity.locationName != "locationName" && activity.locationName != "Location" && activity.locationName != nil {
-//            activityAddressLabel.text = activity.locationName
-//        } else {
-//            activityAddressLabel.text = nil
-//        }
+        if activity.category != nil {
+            activityTypeLabel.text = activity.category
+        } else {
+            activityTypeLabel.text = "Uncategorized"
+        }
         
         if let invitation = invitation {
-            invitationSegmentedControl.isHidden = false
+            invitationSegmentedControlTopAnchor.constant = invitationSegmentedControlTopAnchorRegular
             invitationSegmentHeightConstraint.constant = invitationSegmentHeightConstant
+            invitationSegmentedControl.isHidden = false
             if invitation.status != .pending {
                 let index = invitation.status == .accepted ? 0 : 1
                 invitationSegmentedControl.selectedSegmentIndex = index
@@ -127,8 +122,9 @@ extension ActivityCell {
                 invitationSegmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
             }
         } else {
-            invitationSegmentedControl.isHidden = true
+            invitationSegmentedControlTopAnchor.constant = 0
             invitationSegmentHeightConstraint.constant = 0
+            invitationSegmentedControl.isHidden = true
         }
         
         switch activity.activityType?.lowercased() {
@@ -166,25 +162,12 @@ extension ActivityCell {
         if badgeInt > 0 {
             badgeLabel.text = badgeString
             badgeLabel.isHidden = false
-            newActivityIndicator.isHidden = true
         } else {
-            newActivityIndicator.isHidden = true
             badgeLabel.isHidden = true
         }
         
-        loadParticipantsThumbnail(activity: activity)
+//        loadParticipantsThumbnail(activity: activity)
         
-        if activity.locationAddress == nil {
-            mapButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-        } else {
-            mapButton.tintColor = .systemBlue
-        }
-
-        if activity.conversationID == nil {
-            chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-        } else {
-            chatButton.tintColor = .systemBlue
-        }
         
     }
     
@@ -220,6 +203,13 @@ extension ActivityCell {
     func updateParticipantsThumbnail(activity: Activity, acceptedParticipants: [User]) {
         let participants = acceptedParticipants.filter({$0.id != Auth.auth().currentUser?.uid})
         let participantsCount = participants.count
+        if participantsCount != 0 {
+            iconViewTopAnchor.constant = iconViewTopAnchorRegular
+            iconViewHeightConstraint.constant = iconViewHeightConstant
+        } else {
+            iconViewTopAnchor.constant = 0
+            iconViewHeightConstraint.constant = 0
+        }
         for i in 0..<thumbnails.count {
             if i < participantsCount {
                 thumbnails[i].isHidden = false

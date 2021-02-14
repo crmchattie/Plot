@@ -445,11 +445,15 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         if section == .calendar {
             if !sortedActivities.isEmpty && networkController.activityService.askedforAuthorization {
                 for activity in sortedActivities {
-                    if let activityID = activity.activityID, let _ = self.networkController.activityService.invitations[activityID] {
-                        height += 174
-                    } else {
-                        height += 145
+                    let dummyCell = ActivityCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+                    var invitation: Invitation? = nil
+                    if let activityID = activity.activityID, let value = self.networkController.activityService.invitations[activityID] {
+                        invitation = value
                     }
+                    dummyCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+                    dummyCell.layoutIfNeeded()
+                    let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
+                    height += estimatedSize.height
                 }
                 return CGSize(width: self.collectionView.frame.size.width, height: height)
             } else {

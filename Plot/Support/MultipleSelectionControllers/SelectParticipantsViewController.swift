@@ -229,7 +229,6 @@ class SelectParticipantsViewController: UIViewController {
                 let text = "\(userNamesString) \(usersTitleString) added to the group"
                 self.informationMessageSender.sendInformatoinMessage(chatID: self.chatIDForUsersUpdate, membersIDs: membersIDs, text: text)
                 
-                //        ARSLineProgress.showSuccess()
                 self.removeSpinner()
                 self.navigationController?.view.isUserInteractionEnabled = true
                 self.navigationController?.popViewController(animated: true)

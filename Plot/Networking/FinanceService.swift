@@ -19,6 +19,7 @@ class FinanceService {
     let transactionFetcher = FinancialTransactionFetcher()
     let transactionRuleFetcher = FinancialTransactionRuleFetcher()
     let memberFetcher = FinancialMemberFetcher()
+    let holdingFetcher = FinancialHoldingFetcher()
 
     var transactions = [Transaction]() {
         didSet {
@@ -42,6 +43,16 @@ class FinanceService {
             if oldValue != members {
                 members.sort { (member1, member2) -> Bool in
                     return member1.name < member2.name
+                }
+                NotificationCenter.default.post(name: .financeUpdated, object: nil)
+            }
+        }
+    }
+    var holdings = [MXHolding]() {
+        didSet {
+            if oldValue != holdings {
+                holdings.sort { (holding1, holding2) -> Bool in
+                    return holding1.description < holding2.description
                 }
                 NotificationCenter.default.post(name: .financeUpdated, object: nil)
             }
@@ -78,6 +89,11 @@ class FinanceService {
                     self.observeTransactionsForCurrentUser()
                     completion()
                 }
+            }
+            
+            holdingFetcher.fetchHoldings { (firebaseHoldings) in
+                self.holdings = firebaseHoldings
+                self.observeHoldingsForCurrentUser()
             }
         }
     }
@@ -653,6 +669,24 @@ class FinanceService {
                 }
             }
         )
+    }
+    
+    func observeHoldingsForCurrentUser() {
+        self.holdingFetcher.observeHoldingForCurrentUser(holdingsAdded: { [weak self] holdingsAdded in
+            for holding in holdingsAdded {
+                if let index = self!.holdings.firstIndex(where: {$0.guid == holding.guid}) {
+                    self!.holdings[index] = holding
+                } else {
+                    self!.holdings.append(holding)
+                }
+            }
+        }, holdingsChanged: { [weak self] holdingsChanged in
+            for holding in holdingsChanged {
+                if let index = self!.holdings.firstIndex(where: {$0.guid == holding.guid}) {
+                    self!.holdings[index] = holding
+                }
+            }
+        })
     }
     
     private func updateFirebase(members: [MXMember], accounts: [MXAccount], transactions: [Transaction]) {

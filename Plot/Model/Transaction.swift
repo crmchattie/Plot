@@ -58,13 +58,13 @@ struct Transaction: Codable, Equatable, Hashable {
     var type: String?
     var updated_at: String
     var user_guid: String
-    var tags: [String]?
-    var should_link: Bool?
     var participantsIDs: [String]?
     var date_for_reports: String?
     var user_created: Bool?
-    var admin: String?
     var activityID: String?
+    var tags: [String]?
+    var should_link: Bool?
+    var admin: String?
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
