@@ -16,6 +16,8 @@ protocol UpdateAccountDelegate: class {
 
 class FinanceAccountViewController: FormViewController {
     var account: MXAccount!
+    var holdings = [MXHolding]()
+    var holdingFetcher = FinancialHoldingFetcher()
     
     var users = [User]()
     var filteredUsers = [User]()
@@ -53,6 +55,7 @@ class FinanceAccountViewController: FormViewController {
         navigationController?.navigationBar.layoutIfNeeded()
         
         numberFormatter.numberStyle = .currency
+        numberFormatter.maximumFractionDigits = 0
         dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
         
         setupVariables()
@@ -66,6 +69,7 @@ class FinanceAccountViewController: FormViewController {
                 }
             }
         }
+        
     }
     
     fileprivate func configureTableView() {
@@ -120,6 +124,34 @@ class FinanceAccountViewController: FormViewController {
             account = MXAccount(name: "Account Name", balance: 0.0, created_at: date, guid: ID, user_guid: currentUser, type: .any, subtype: .any, user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
         }
+        
+        if account.type == .investment {
+            holdingFetcher.fetchHoldings { (firebaseHoldings) in
+                self.holdings = firebaseHoldings.filter({$0.account_guid == self.account.guid})
+                self.holdings.sort(by: {$0.symbol ?? $0.description < $1.symbol ?? $1.description})
+                self.addHoldingsSection()
+            }
+        }
+    
+    }
+    
+    func addHoldingsSection() {
+        if !self.holdings.isEmpty {
+            self.form.insert(Section("Positions"), at: 1)
+            for holding in holdings {
+                form.last!
+                    <<< DecimalRow() {
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.title = holding.symbol ?? holding.description
+                        $0.formatter = numberFormatter
+                        $0.value = holding.market_value
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    }
+            }
+        }
     }
     
     @IBAction func cancel(_ sender: AnyObject) {
@@ -170,23 +202,23 @@ class FinanceAccountViewController: FormViewController {
                 }
             }
             
-//            <<< TextAreaRow("Description") {
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                $0.placeholder = $0.tag
-//                $0.value = account.description
-//                }.cellUpdate({ (cell, row) in
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                }).onChange { row in
-//                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("description")
-//                    reference.setValue(row.value)
-//                    self.account.description = row.value
-//                }
+            //            <<< TextAreaRow("Description") {
+            //                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            //                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            //                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+            //                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            //                $0.placeholder = $0.tag
+            //                $0.value = account.description
+            //                }.cellUpdate({ (cell, row) in
+            //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            //                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+            //                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            //                }).onChange { row in
+            //                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("description")
+            //                    reference.setValue(row.value)
+            //                    self.account.description = row.value
+            //                }
             
             <<< PushRow<String>("Type") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -227,42 +259,42 @@ class FinanceAccountViewController: FormViewController {
         
         if let subtype = account.subtype, subtype != .none {
             form.last!
-            <<< PushRow<String>("Subtype") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.title = row.tag
-                row.value = subtype.name
-                row.options = []
-                MXAccountSubType.allCases.forEach {
-                    row.options?.append($0.name)
-                }
-            }.onPresent { from, to in
-                to.dismissOnSelection = false
-                to.dismissOnChange = false
-                to.enableDeselection = false
-                to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Subtype"
-                    to.tableView.separatorStyle = .none
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                <<< PushRow<String>("Subtype") { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    row.title = row.tag
+                    row.value = subtype.name
+                    row.options = []
+                    MXAccountSubType.allCases.forEach {
+                        row.options?.append($0.name)
+                    }
+                }.onPresent { from, to in
+                    to.dismissOnSelection = false
+                    to.dismissOnChange = false
+                    to.enableDeselection = false
+                    to.selectableRowCellUpdate = { cell, row in
+                        to.title = "Subtype"
+                        to.tableView.separatorStyle = .none
+                        to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    }
+                }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    if !(self.account?.user_created ?? false) {
+                        row.cell.accessoryType = .none
+                    }
+                }.onChange { row in
+                    if let value = row.value, let subtype = MXAccountSubType(rawValue: value) {
+                        self.account.subtype = subtype
+                        let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("subtype")
+                        reference.setValue(value)
+                    }
                 }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                if !(self.account?.user_created ?? false) {
-                    row.cell.accessoryType = .none
-                }
-            }.onChange { row in
-                if let value = row.value, let subtype = MXAccountSubType(rawValue: value) {
-                    self.account.subtype = subtype
-                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("subtype")
-                    reference.setValue(value)
-                }
-            }
         }
         
         form.last!
@@ -343,40 +375,40 @@ class FinanceAccountViewController: FormViewController {
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange { row in
-                if let value = row.value {
-                    self.updateTheDate()
-                    self.account.available_balance = value
-                    Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("available_balance").setValue(value)
+                }.onChange { row in
+                    if let value = row.value {
+                        self.updateTheDate()
+                        self.account.available_balance = value
+                        Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("available_balance").setValue(value)
+                    }
                 }
-            }
         }
         
         if let paymentDueDate = account.payment_due_at {
             form.last!
-            <<< DateInlineRow("Payment Due Date") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
-                if let date = isodateFormatter.date(from: paymentDueDate) {
-                    $0.value = date
+                <<< DateInlineRow("Payment Due Date") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.title = $0.tag
+                    $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
+                    if let date = isodateFormatter.date(from: paymentDueDate) {
+                        $0.value = date
+                    }
+                }.onChange { row in
+                    if let value = row.value {
+                        self.updateTheDate()
+                        let date = self.isodateFormatter.string(from: value)
+                        self.account.payment_due_at = date
+                        let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("payment_due_at")
+                        reference.setValue(date)
+                    }
                 }
-            }.onChange { row in
-                if let value = row.value {
-                    self.updateTheDate()
-                    let date = self.isodateFormatter.string(from: value)
-                    self.account.payment_due_at = date
-                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("payment_due_at")
-                    reference.setValue(date)
-                }
-            }
         }
         
         if let minimum = account.minimum_payment {
             form.last!
-            <<< DecimalRow("Minimum Payment Due") {
+                <<< DecimalRow("Minimum Payment Due") {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = $0.tag
@@ -385,13 +417,13 @@ class FinanceAccountViewController: FormViewController {
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange { row in
-                if let value = row.value {
-                    self.updateTheDate()
-                    self.account.minimum_payment = value
-                    Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("minimum_payment").setValue(value)
+                }.onChange { row in
+                    if let value = row.value {
+                        self.updateTheDate()
+                        self.account.minimum_payment = value
+                        Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("minimum_payment").setValue(value)
+                    }
                 }
-            }
         }
         
         form.last!
@@ -410,25 +442,23 @@ class FinanceAccountViewController: FormViewController {
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
         
-        form +++
-            Section()
-//            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.title = row.tag
-//                if active {
-//                    row.title = self.userNamesString
-//                }
-//                }.onCellSelection({ _,_ in
-//                    self.openParticipantsInviter()
-//                }).cellUpdate { cell, row in
-//                    cell.accessoryType = .disclosureIndicator
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.textLabel?.textAlignment = .left
-//                }
+        //            <<< ButtonRow("Participants") { row in
+        //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                row.cell.textLabel?.textAlignment = .left
+        //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                row.cell.accessoryType = .disclosureIndicator
+        //                row.title = row.tag
+        //                if active {
+        //                    row.title = self.userNamesString
+        //                }
+        //                }.onCellSelection({ _,_ in
+        //                    self.openParticipantsInviter()
+        //                }).cellUpdate { cell, row in
+        //                    cell.accessoryType = .disclosureIndicator
+        //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                    cell.textLabel?.textAlignment = .left
+        //                }
     }
     
     fileprivate func updateTheDate() {
@@ -459,7 +489,7 @@ class FinanceAccountViewController: FormViewController {
         var uniqueUsers = users
         for participant in selectedFalconUsers {
             if let userIndex = users.firstIndex(where: { (user) -> Bool in
-                return user.id == participant.id }) {
+                                                    return user.id == participant.id }) {
                 uniqueUsers[userIndex] = participant
             } else {
                 uniqueUsers.append(participant)
@@ -509,7 +539,7 @@ class FinanceAccountViewController: FormViewController {
         }
         self.navigationController?.view.isUserInteractionEnabled = false
     }
-
+    
     func hideActivityIndicator() {
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
@@ -549,7 +579,7 @@ extension FinanceAccountViewController: UpdateInvitees {
                 let createAccount = AccountActions(account: self.account, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createAccount.updateAccountParticipants()
                 self.hideActivityIndicator()
-
+                
             }
             
         }

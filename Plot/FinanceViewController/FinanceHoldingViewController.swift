@@ -286,6 +286,7 @@ class FinanceHoldingViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
+                $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
                 if let date = isodateFormatter.date(from: holding.updated_at) {
                     $0.value = date
                 }
