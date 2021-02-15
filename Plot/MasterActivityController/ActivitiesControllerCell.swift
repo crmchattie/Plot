@@ -67,19 +67,6 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
         return UITableView.automaticDimension
     }
     
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        let dummyCell = ActivityCell(frame: .init(x: 0, y: 0, width: self.tableView.frame.size.width, height: 1000))
-//        let activity = activities[indexPath.row]
-//        var invitation: Invitation? = nil
-//        if let activityID = activity.activityID, let value = invitations[activityID] {
-//            invitation = value
-//        }
-//        dummyCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
-//        dummyCell.layoutIfNeeded()
-//        let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.tableView.frame.size.width, height: 1000))
-//        return estimatedSize.height
-//    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if activities.count == 0 {
             viewPlaceholder.add(for: tableView, title: .emptyActivities, subtitle: .emptyActivities, priority: .medium, position: .fill)

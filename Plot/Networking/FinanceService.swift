@@ -32,7 +32,10 @@ class FinanceService {
         didSet {
             if oldValue != accounts {
                 accounts.sort { (account1, account2) -> Bool in
-                    return account1.name < account2.name
+                    if account1.should_link == account2.should_link {
+                        return account1.name < account2.name
+                    }
+                    return account1.should_link ?? false && !(account2.should_link ?? false)
                 }
                 NotificationCenter.default.post(name: .financeUpdated, object: nil)
             }

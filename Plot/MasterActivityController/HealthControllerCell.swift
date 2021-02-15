@@ -19,11 +19,9 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.contentInset.bottom = 0
         return collectionView
     }()
     
@@ -85,12 +83,22 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.collectionView.frame.size.width - 30, height: 90)
-        
+//        var height: CGFloat = 0
+//        let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+//        let key = healthMetricSections[indexPath.section]
+//        if let metrics = healthMetrics[key] {
+//            let metric = metrics[indexPath.row]
+//            dummyCell.configure(metric)
+//            dummyCell.layoutIfNeeded()
+//            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+//            print("estimatedHeight \(estimatedSize.height)")
+//            height = estimatedSize.height
+//        }
+        return CGSize(width: self.collectionView.frame.size.width - 30, height: 85)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {        
-        return CGSize(width: self.collectionView.frame.size.width, height: 35)
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: self.collectionView.frame.size.width, height: 40)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -98,6 +106,7 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
             let key = healthMetricSections[indexPath.section]
             let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
             sectionHeader.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            sectionHeader.subTitleLabel.isHidden = true
             sectionHeader.titleLabel.text = key.capitalized
             return sectionHeader
         } else { //No footer in this case but can add option for that

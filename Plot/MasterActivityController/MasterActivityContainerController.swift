@@ -303,60 +303,54 @@ class MasterActivityContainerController: UIViewController {
         accountLevel = .bs_type
         transactionLevel = .group
         
-        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet]
+        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .investments]
         
         let members = networkController.financeService.members
         let accounts = networkController.financeService.accounts
         let transactions = networkController.financeService.transactions
+        let holdings = networkController.financeService.holdings
                 
         var sections: [SectionType] = []
         var groups = [SectionType: [AnyHashable]]()
-                        
-        let dispatchGroup = DispatchGroup()
-        
+                                
         for section in setSections {
-            dispatchGroup.enter()
             if section.type == "Issues" {
-                dispatchGroup.enter()
                 var challengedMembers = [MXMember]()
                 for member in members {
-                    dispatchGroup.enter()
                     if member.connection_status != .connected && member.connection_status != .created && member.connection_status != .updated && member.connection_status != .delayed && member.connection_status != .resumed && member.connection_status != .pending {
                         challengedMembers.append(member)
                     }
-                    dispatchGroup.leave()
                 }
                 if !challengedMembers.isEmpty {
-                    sections.append(.financialIssues)
+                    sections.append(section)
                     groups[section] = challengedMembers
-                    dispatchGroup.leave()
-                } else {
-                    dispatchGroup.leave()
                 }
             } else if section.type == "Accounts" {
                 if section.subType == "Balance Sheet" {
-                    dispatchGroup.enter()
                     categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, _) in
                         if !accountsList.isEmpty {
-                            sections.append(.balanceSheet)
+                            sections.append(section)
                             groups[section] = accountsList
                         }
-                        dispatchGroup.leave()
                     }
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
-                    dispatchGroup.enter()
                     categorizeTransactions(transactions: transactions, start: Date().startOfMonth, end: Date().endOfMonth, level: transactionLevel) { (transactionsList, _) in
                         if !transactionsList.isEmpty {
-                            sections.append(.incomeStatement)
+                            sections.append(section)
                             groups[section] = transactionsList
                         }
-                        dispatchGroup.leave()
                     }
                 }
+            } else if section.type == "Investments" {
+                if !holdings.isEmpty {
+                    var filteredHoldings = holdings.filter({$0.should_link ?? true})
+                    filteredHoldings.sort(by: {$0.symbol ?? $0.description < $1.symbol ?? $1.description})
+                    sections.append(section)
+                    groups[section] = filteredHoldings
+                }
             }
-            dispatchGroup.leave()
         }
         
         completion(sections, groups)
@@ -461,34 +455,91 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             }
         } else if section == .health {
             if !healthMetrics.isEmpty && networkController.healthService.askedforAuthorization {
-                height += CGFloat(healthMetricSections.count * 30)
+                height += CGFloat(healthMetricSections.count * 40)
                 for key in healthMetricSections {
                     if let metrics = healthMetrics[key] {
-                        height += CGFloat(metrics.count * 95)
+                        height += CGFloat(metrics.count * 93)
+//                        for metric in metrics {
+//                            let dummyCell = HealthMetricCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+//                            dummyCell.configure(metric)
+//                            dummyCell.layoutIfNeeded()
+//                            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+//                            height += estimatedSize.height
+//                        }
                     }
                 }
-                height += 25
                 return CGSize(width: self.collectionView.frame.size.width, height: height)
             } else {
                 return CGSize(width: self.collectionView.frame.size.width - 30, height: 300)
             }
         } else {
             if !financeSections.isEmpty {
-                height += CGFloat(financeSections.count * 50)
+                height += CGFloat(financeSections.count * 40)
                 for section in financeSections {
                     if section == .financialIssues {
                         if let group = financeGroups[section] as? [MXMember] {
                             height += CGFloat(group.count * 70)
                         }
+                    } else if section == .investments {
+                        let object = financeGroups[section]
+//                        if let object = object as? [TransactionDetails] {
+//                            let totalItems = object.count - 1
+//                            for index in 0...totalItems {
+//                                let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+//                                dummyCell.mode = .small
+//                                if index == 0 {
+//                                    dummyCell.firstPosition = true
+//                                }
+//                                if index == totalItems {
+//                                    dummyCell.lastPosition = true
+//                                }
+//                                dummyCell.transactionDetails = object[index]
+//                                dummyCell.layoutIfNeeded()
+//                                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
+//                                height += estimatedSize.height
+//                            }
+//                        } else if let object = object as? [AccountDetails] {
+//                            let totalItems = object.count - 1
+//                            for index in 0...totalItems {
+//                                let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+//                                dummyCell.mode = .small
+//                                if index == 0 {
+//                                    dummyCell.firstPosition = true
+//                                }
+//                                if index == totalItems {
+//                                    dummyCell.lastPosition = true
+//                                }
+//                                dummyCell.accountDetails = object[index]
+//                                dummyCell.layoutIfNeeded()
+//                                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
+//                                height += estimatedSize.height
+//                            }
+//                        } else
+                        if let object = object as? [MXHolding] {
+                            let totalItems = object.count - 1
+                            for index in 0...totalItems {
+                                let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+                                dummyCell.mode = .small
+                                if index == 0 {
+                                    dummyCell.firstPosition = true
+                                }
+                                if index == totalItems {
+                                    dummyCell.lastPosition = true
+                                }
+                                dummyCell.holding = object[index]
+                                dummyCell.layoutIfNeeded()
+                                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
+                                height += estimatedSize.height
+                            }
+                        }
                     } else {
                         if let group = financeGroups[section] as? [AccountDetails] {
-                            height += CGFloat(group.count * 25)
+                            height += CGFloat(group.count * 26) + 15
                         } else if let group = financeGroups[section] as? [TransactionDetails] {
-                            height += CGFloat(group.count * 25)
+                            height += CGFloat(group.count * 26) + 15
                         }
                     }
                 }
-                height += 35
                 return CGSize(width: self.collectionView.frame.size.width, height: height)
             } else {
                 return CGSize(width: self.collectionView.frame.size.width - 30, height: 300)
@@ -501,7 +552,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: view.frame.width, height: 25)
+        return CGSize(width: view.frame.width, height: 30)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

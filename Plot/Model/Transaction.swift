@@ -207,6 +207,7 @@ struct TransactionDetails: Codable, Equatable, Hashable {
     var category: String?
     var topLevelCategory: String?
     var group: String
+    var currencyCode: String?
 }
 
 struct MXTransactionRuleResult: Codable {
@@ -273,7 +274,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.category, amount: -transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.category, amount: -transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
             case .top:
@@ -288,7 +289,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: -transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: -transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
             case .group:
@@ -303,7 +304,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.group, amount: -transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.group, amount: -transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
             case .none:
@@ -318,7 +319,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.category, amount: -transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.category, amount: -transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
                 if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.top_level_category && $0.level == .top && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
@@ -332,7 +333,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: -transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: -transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
                 if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.group && $0.level == .group && $0.group == transaction.group}) {
@@ -346,7 +347,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.group, amount: -transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.group, amount: -transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
             }
@@ -364,7 +365,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.category, amount: transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.category, amount: transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
             case .top:
@@ -379,7 +380,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
             case .group:
@@ -394,7 +395,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.group, amount: transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.group, amount: transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
             case .none:
@@ -409,7 +410,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.category, amount: transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.category, amount: transaction.amount, level: .category, category: transaction.category, topLevelCategory: transaction.top_level_category, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
                 if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.top_level_category && $0.level == .top && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
@@ -423,7 +424,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.top_level_category, amount: transaction.amount, level: .top, category: nil, topLevelCategory: transaction.top_level_category, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
                 if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.group && $0.level == .group && $0.group == transaction.group}) {
@@ -437,7 +438,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     
                     transactionsDict[transactionDetail] = transactions
                 } else {
-                    let transactionDetail = TransactionDetails(name: transaction.group, amount: transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group)
+                    let transactionDetail = TransactionDetails(name: transaction.group, amount: transaction.amount, level: .group, category: nil, topLevelCategory: nil, group: transaction.group, currencyCode: transaction.currency_code ?? "USD")
                     transactionsDict[transactionDetail] = [transaction]
                 }
             }
@@ -473,7 +474,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     transactions.append(contentsOf: transactionsDict[transactionDetail] ?? [])
                 }
                 
-                let expenseTransactionDetail = TransactionDetails(name: group, amount: amount, level: .group, category: nil, topLevelCategory: nil, group: group)
+                let expenseTransactionDetail = TransactionDetails(name: group, amount: amount, level: .group, category: nil, topLevelCategory: nil, group: group, currencyCode: "USD")
                 
                 if amount != 0.0 {
                     sortedTransactionsList.append(expenseTransactionDetail)
@@ -483,7 +484,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                 if let incomeTransactionDetail = transactionsList.first(where: { ($0.level == .group && $0.group == "Income") }), let incomeTransactions = transactionsDict[incomeTransactionDetail] {
                     let diffAmount = incomeTransactionDetail.amount + expenseTransactionDetail.amount
                     let diffTransactions = incomeTransactions + transactions
-                    let diffTransactionDetail = TransactionDetails(name: "Difference", amount: diffAmount, level: .group, category: nil, topLevelCategory: nil, group: "Difference")
+                    let diffTransactionDetail = TransactionDetails(name: "Difference", amount: diffAmount, level: .group, category: nil, topLevelCategory: nil, group: "Difference", currencyCode: "USD")
                     sortedTransactionsList.insert(diffTransactionDetail, at: 0)
                     transactionsDict[diffTransactionDetail] = diffTransactions
                 }

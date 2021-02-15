@@ -47,6 +47,9 @@ class FinanceViewController: UIViewController {
     var members: [MXMember] {
         return networkController.financeService.members
     }
+    var holdings: [MXHolding] {
+        return networkController.financeService.holdings
+    }
     var institutionDict: [String: String] {
         return networkController.financeService.institutionDict
     }
@@ -57,7 +60,6 @@ class FinanceViewController: UIViewController {
         return networkController.userService.users
     }
             
-    var setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .financialAccounts, .transactions]
     var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
     
@@ -201,7 +203,7 @@ class FinanceViewController: UIViewController {
         accountLevel = .none
         transactionLevel = .none
         
-        setSections = [.financialIssues, .incomeStatement, .balanceSheet, .financialAccounts, .transactions]
+        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .financialAccounts, .investments, .transactions]
                 
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()
@@ -221,7 +223,7 @@ class FinanceViewController: UIViewController {
                     dispatchGroup.leave()
                 }
                 if !challengedMembers.isEmpty {
-                    self.sections.append(.financialIssues)
+                    self.sections.append(section)
                     self.groups[section] = challengedMembers
                     dispatchGroup.leave()
                 } else {
@@ -232,7 +234,7 @@ class FinanceViewController: UIViewController {
                     dispatchGroup.enter()
                     categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, accountsDict) in
                         if !accountsList.isEmpty {
-                            self.sections.append(.balanceSheet)
+                            self.sections.append(section)
                             self.groups[section] = accountsList
                         }
                         dispatchGroup.leave()
@@ -240,7 +242,7 @@ class FinanceViewController: UIViewController {
                 } else if section.subType == "Accounts" {
                     dispatchGroup.enter()
                     if !accounts.isEmpty {
-                        self.sections.append(.financialAccounts)
+                        self.sections.append(section)
                         self.groups[section] = accounts
                         dispatchGroup.leave()
                     } else {
@@ -252,7 +254,7 @@ class FinanceViewController: UIViewController {
                     dispatchGroup.enter()
                     categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
-                            self.sections.append(.incomeStatement)
+                            self.sections.append(section)
                             self.groups[section] = transactionsList
                         }
                         dispatchGroup.leave()
@@ -260,7 +262,8 @@ class FinanceViewController: UIViewController {
                 } else if section.subType == "Transactions" {
                     if !transactions.isEmpty {
                         dispatchGroup.enter()
-                        var filteredTransactions = transactions.filter { (transaction) -> Bool in
+                        var filteredTransactions = transactions.filter({$0.should_link ?? true})
+                        filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
                             if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
                                 if transactionDate > startDate && endDate > transactionDate {
                                     return true
@@ -273,7 +276,7 @@ class FinanceViewController: UIViewController {
                             return false
                         }
                         if !filteredTransactions.isEmpty {
-                            self.sections.append(.transactions)
+                            self.sections.append(section)
                             filteredTransactions = filteredTransactions.sorted(by: { (transaction1, transaction2) -> Bool in
                                 if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
                                     return date1 > date2
@@ -286,6 +289,13 @@ class FinanceViewController: UIViewController {
                             dispatchGroup.leave()
                         }
                     }
+                }
+            } else if section.type == "Investments" {
+                if !holdings.isEmpty {
+                    var filteredHoldings = holdings.filter({$0.should_link ?? true})
+                    filteredHoldings.sort(by: {$0.symbol ?? $0.description < $1.symbol ?? $1.description})
+                    self.sections.append(section)
+                    self.groups[section] = filteredHoldings
                 }
             }
             dispatchGroup.leave()
@@ -415,6 +425,10 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 cell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
                 cell.accountDetails = object[indexPath.item]
+            } else if let object = object as? [MXHolding] {
+                cell.firstPosition = true
+                cell.lastPosition = true
+                cell.holding = object[indexPath.item]
             } else if let object = object as? [Transaction] {
                 cell.firstPosition = true
                 cell.lastPosition = true
@@ -452,6 +466,10 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 dummyCell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
                 dummyCell.accountDetails = object[indexPath.item]
+            } else if let object = object as? [MXHolding] {
+                dummyCell.firstPosition = true
+                dummyCell.lastPosition = true
+                dummyCell.holding = object[indexPath.item]
             } else if let object = object as? [Transaction] {
                 dummyCell.firstPosition = true
                 dummyCell.lastPosition = true
@@ -488,7 +506,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         let section = sections[section]
-        if section == .transactions || section == .financialAccounts || section == .financialIssues {
+        if section == .transactions || section == .financialAccounts || section == .financialIssues || section == .investments {
             return 10
         }
         return 0
@@ -512,7 +530,6 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         } else if let object = object as? [Transaction] {
             if section.subType == "Transactions" {
                 let destination = FinanceTransactionViewController()
-//                destination.delegate = self
                 destination.transaction = object[indexPath.item]
                 destination.users = users
                 destination.filteredUsers = filteredUsers
@@ -525,7 +542,6 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         } else if let object = object as? [MXAccount] {
             if section.subType == "Accounts" {
                 let destination = FinanceAccountViewController()
-//                destination.delegate = self
                 destination.account = object[indexPath.item]
                 destination.users = users
                 destination.filteredUsers = filteredUsers

@@ -54,6 +54,13 @@ struct UserHolding: Codable, Equatable, Hashable {
     var muted: Bool?
 }
 
+struct HoldingDetails: Codable, Equatable, Hashable {
+    var name: String
+    var balance: Double
+    var currencyCode: String?
+}
+
+
 enum MXHoldingType: String, CaseIterable, Codable {
     case unknownType = "UNKNOWN_TYPE"
     case equity = "EQUITY"
@@ -226,3 +233,28 @@ enum MXHoldingSubType: String, CaseIterable, Codable {
         }
     }
 }
+
+func categorizeHoldings(holdings: [MXHolding], completion: @escaping ([HoldingDetails], [HoldingDetails: [MXHolding]]) -> ()) {
+    var holdingsList = [HoldingDetails]()
+    var holdingsDict = [HoldingDetails: [MXHolding]]()
+    for holding in holdings {
+        guard holding.should_link ?? true else { continue }
+        if let index = holdingsDict.keys.firstIndex(where: {$0.name == holding.symbol ?? holding.description}) {
+            var holdingDetail = holdingsDict.keys[index]
+            var holdings = holdingsDict[holdingDetail]
+            
+            holdingsDict[holdingDetail] = nil
+            
+            holdingDetail.balance += holding.market_value ?? 0
+            holdings!.append(holding)
+            
+            holdingsDict[holdingDetail] = holdings
+        } else {
+            let holdingDetail = HoldingDetails(name: holding.symbol ?? holding.description, balance: holding.market_value ?? 0, currencyCode: holding.currency_code)
+            holdingsDict[holdingDetail] = [holding]
+        }
+    }
+    holdingsList = Array(holdingsDict.keys)
+    completion(holdingsList, holdingsDict)
+}
+

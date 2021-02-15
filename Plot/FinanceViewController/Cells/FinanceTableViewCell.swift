@@ -14,7 +14,7 @@ class FinanceTableViewCell: UITableViewCell {
         didSet {
             if let transaction = transaction {
                 let numberFormatter = NumberFormatter()
-                numberFormatter.currencyCode = "USD"
+                numberFormatter.currencyCode = transaction.currency_code ?? "USD"
                 numberFormatter.numberStyle = .currency
                 
                 let isodateFormatter = ISO8601DateFormatter()
@@ -28,7 +28,7 @@ class FinanceTableViewCell: UITableViewCell {
                     middleLabel.text = "Amount: \(amount)"
                 }
                 if let date = isodateFormatter.date(from: transaction.transacted_at) {
-                    bottomLabel.text = "Transacted On: \(dateFormatterPrint.string(from: date))"
+                    bottomLabel.text = "Transacted: \(dateFormatterPrint.string(from: date))"
                 }
                 IV.isHidden = !(transaction.should_link ?? true)
                 IV.image = UIImage(systemName: "checkmark")
@@ -42,12 +42,12 @@ class FinanceTableViewCell: UITableViewCell {
         didSet {
             if let account = account {
                 let numberFormatter = NumberFormatter()
-                numberFormatter.currencyCode = "USD"
+                numberFormatter.currencyCode = account.currency_code ?? "USD"
                 numberFormatter.numberStyle = .currency
                 
                 let isodateFormatter = ISO8601DateFormatter()
                 let dateFormatterPrint = DateFormatter()
-                dateFormatterPrint.dateFormat = "MMM dd, yyyy"
+                dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
                 
                 categoryLabel.isHidden = true
                 
@@ -58,7 +58,7 @@ class FinanceTableViewCell: UITableViewCell {
                     middleLabel.text = "Balance: \(balance)"
                 }
                 if let date = isodateFormatter.date(from: account.updated_at) {
-                    bottomLabel.text = "Last Updated On: \(dateFormatterPrint.string(from: date))"
+                    bottomLabel.text = "Last Updated: \(dateFormatterPrint.string(from: date))"
                 }
                 IV.isHidden = !(account.should_link ?? true)
                 IV.image = UIImage(systemName: "checkmark")

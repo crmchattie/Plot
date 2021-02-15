@@ -133,7 +133,7 @@ class NotificationsViewController: UIViewController {
         super.viewDidLayoutSubviews()
         segmentedControl.frame = CGRect(x: view.frame.width * 0.125, y: 10, width: view.frame.width * 0.75, height: 30)
         var frame = view.frame
-        frame.origin.y = segmentedControl.frame.maxY
+        frame.origin.y = segmentedControl.frame.maxY + 10
         frame.size.height -= frame.origin.y
         tableView.frame = frame
     }

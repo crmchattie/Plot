@@ -18,7 +18,7 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
     let kHeaderCell = "HeaderCell"
     let kFinanceCollectionViewCell = "FinanceCollectionViewCell"
     let kFinanceCollectionViewMemberCell = "FinanceCollectionViewMemberCell"
-    
+        
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -87,6 +87,8 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
                 cell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
                 cell.accountDetails = object[indexPath.item]
+            } else if let object = object as? [MXHolding] {
+                cell.holding = object[indexPath.item]
             }
             return cell
         } else {
@@ -121,6 +123,8 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
                 dummyCell.transaction = object[indexPath.item]
             } else if let object = object as? [MXAccount] {
                 dummyCell.account = object[indexPath.item]
+            } else if let object = object as? [MXHolding] {
+                dummyCell.holding = object[indexPath.item]
             }
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))

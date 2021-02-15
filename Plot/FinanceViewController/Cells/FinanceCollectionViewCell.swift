@@ -18,12 +18,14 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 accountDetails = nil
                 transaction = nil
                 account = nil
+                holding = nil
                 
                 let numberFormatter = NumberFormatter()
-                numberFormatter.currencyCode = "USD"
+                numberFormatter.currencyCode = transactionDetails.currencyCode ?? "USD"
                 numberFormatter.numberStyle = .currency
                 numberFormatter.maximumFractionDigits = 0
                 
+                subcategoryLabel.isHidden = true
                 middleLabel.isHidden = true
                 bottomLabel.isHidden = true
                 imageView.isHidden = true
@@ -88,12 +90,14 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 transactionDetails = nil
                 transaction = nil
                 account = nil
+                holding = nil
                 
                 let numberFormatter = NumberFormatter()
-                numberFormatter.currencyCode = "USD"
+                numberFormatter.currencyCode = accountDetails.currencyCode ?? "USD"
                 numberFormatter.numberStyle = .currency
                 numberFormatter.maximumFractionDigits = 0
                 
+                subcategoryLabel.isHidden = true
                 middleLabel.isHidden = true
                 bottomLabel.isHidden = true
                 imageView.isHidden = true
@@ -146,15 +150,107 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    var holding: MXHolding! {
+        didSet {
+            if let holding = holding {
+                transactionDetails = nil
+                accountDetails = nil
+                transaction = nil
+                account = nil
+                
+                let numberFormatter = NumberFormatter()
+                numberFormatter.currencyCode = holding.currency_code ?? "USD"
+                numberFormatter.numberStyle = .currency
+                numberFormatter.maximumFractionDigits = 0
+                
+                nameLabel.text = holding.symbol ?? holding.description
+                                      
+                if mode == .small {
+                    subcategoryLabel.isHidden = true
+                    middleLabel.isHidden = true
+                    bottomLabel.isHidden = true
+                    imageView.isHidden = true
+
+                    nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
+                    categoryLabel.font = UIFont.preferredFont(forTextStyle: .headline)
+
+                    topHeightConstraint = 5
+                                                    
+                    if let marketValue = holding.market_value, let amount = numberFormatter.string(from: marketValue as NSNumber) {
+                        categoryLabel.text = "\(amount)"
+                    }
+                    
+//                    if let marketValue = holding.market_value, let costBasis = holding.cost_basis, costBasis != 0 {
+//                        let percentFormatter = NumberFormatter()
+//                        percentFormatter.numberStyle = .percent
+//                        percentFormatter.positivePrefix = percentFormatter.plusSign
+//                        percentFormatter.maximumFractionDigits = 0
+//                        percentFormatter.minimumFractionDigits = 0
+//
+//                        let percent = marketValue / costBasis - 1
+//                        if percent < 0 {
+//                            subcategoryLabel.textColor = .systemRed
+//                        } else {
+//                            subcategoryLabel.textColor = .systemGreen
+//                        }
+//                        if let percentText = percentFormatter.string(from: NSNumber(value: percent)) {
+//                            subcategoryLabel.isHidden = false
+//                            subcategoryLabel.text = percentText
+//                        }
+//                    }
+                } else {
+                    let isodateFormatter = ISO8601DateFormatter()
+                    let dateFormatterPrint = DateFormatter()
+                    dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
+                    
+                    categoryLabel.isHidden = true
+                    subcategoryLabel.isHidden = true
+                    topHeightConstraint = 10
+                    
+                    if let marketValue = holding.market_value, let amount = numberFormatter.string(from: marketValue as NSNumber), let costBasis = holding.cost_basis, costBasis != 0 {
+                        let percentFormatter = NumberFormatter()
+                        percentFormatter.numberStyle = .percent
+                        percentFormatter.positivePrefix = percentFormatter.plusSign
+                        percentFormatter.maximumFractionDigits = 0
+                        percentFormatter.minimumFractionDigits = 0
+                        
+                        let percent = marketValue / costBasis - 1
+                        if let percentText = percentFormatter.string(from: NSNumber(value: percent)) {
+                            let fullText = "Market Value: \(amount) (\(percentText))"
+                            if percent < 0 {
+                                let attributedText = fullText.setColor(.systemRed, ofSubstring: "(\(percentText))")
+                                middleLabel.attributedText = attributedText
+                            } else {
+                                let attributedText = fullText.setColor(.systemGreen, ofSubstring: "(\(percentText))")
+                                middleLabel.attributedText = attributedText
+                            }
+                        }
+                    } else if let marketValue = holding.market_value, let amount = numberFormatter.string(from: marketValue as NSNumber) {
+                        middleLabel.text = "Market Value: \(amount)"
+                    }
+                    if let updated_at = holding.updated_at, let date = isodateFormatter.date(from: updated_at) {
+                        bottomLabel.text = "Last Updated: \(dateFormatterPrint.string(from: date))"
+                    }
+                    imageView.isHidden = !(holding.should_link ?? true)
+                    imageView.image = UIImage(systemName: "checkmark")
+                    imageView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(weight: .bold)
+                }
+                
+                setupViews()
+            }
+        }
+    }
+    
     var transaction: Transaction! {
         didSet {
             if let transaction = transaction {
                 transactionDetails = nil
                 accountDetails = nil
                 account = nil
+                holding = nil
                 
                 let numberFormatter = NumberFormatter()
-                numberFormatter.currencyCode = "USD"
+                numberFormatter.currencyCode = transaction.currency_code
                 numberFormatter.numberStyle = .currency
                 numberFormatter.maximumFractionDigits = 0
                 
@@ -163,6 +259,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
                 
                 categoryLabel.isHidden = true
+                subcategoryLabel.isHidden = true
                 topHeightConstraint = 10
                                 
                 nameLabel.text = transaction.description
@@ -170,7 +267,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     middleLabel.text = "Amount: \(amount)"
                 }
                 if let date = isodateFormatter.date(from: transaction.transacted_at) {
-                    bottomLabel.text = "Transacted On: \(dateFormatterPrint.string(from: date))"
+                    bottomLabel.text = "Transacted: \(dateFormatterPrint.string(from: date))"
                 }
                 imageView.isHidden = !(transaction.should_link ?? true)
                 imageView.image = UIImage(systemName: "checkmark")
@@ -188,15 +285,16 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 transaction = nil
                 
                 let numberFormatter = NumberFormatter()
-                numberFormatter.currencyCode = "USD"
+                numberFormatter.currencyCode = account.currency_code
                 numberFormatter.numberStyle = .currency
                 numberFormatter.maximumFractionDigits = 0
                 
                 let isodateFormatter = ISO8601DateFormatter()
                 let dateFormatterPrint = DateFormatter()
-                dateFormatterPrint.dateFormat = "MMM dd, yyyy"
+                dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
                 
                 categoryLabel.isHidden = true
+                subcategoryLabel.isHidden = true
                 topHeightConstraint = 10
                                 
                 nameLabel.text = account.name
@@ -205,7 +303,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     middleLabel.text = "Balance: \(balance)"
                 }
                 if let date = isodateFormatter.date(from: account.updated_at) {
-                    bottomLabel.text = "Last Updated On: \(dateFormatterPrint.string(from: date))"
+                    bottomLabel.text = "Last Updated: \(dateFormatterPrint.string(from: date))"
                 }
                 imageView.isHidden = !(account.should_link ?? true)
                 imageView.image = UIImage(systemName: "checkmark")
@@ -235,6 +333,15 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     let categoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.numberOfLines = 0
+        label.textAlignment = .right
+        return label
+    }()
+    
+    let subcategoryLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .right
@@ -291,7 +398,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         
         let verticalStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
 
-        let stackView = UIStackView(arrangedSubviews: [verticalStackView, UIView(), imageView, categoryLabel])
+        let stackView = UIStackView(arrangedSubviews: [verticalStackView, UIView(), imageView, subcategoryLabel, categoryLabel])
         stackView.spacing = 2
         stackView.alignment = .center
         stackView.distribution = .fill
@@ -306,18 +413,27 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         bottomHeightConstraint = 0
         firstPosition = false
         lastPosition = false
+        
+        nameLabel.text = nil
+        categoryLabel.text = nil
+        subcategoryLabel.text = nil
+        middleLabel.text = nil
+        bottomLabel.text = nil
                 
         nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         categoryLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        subcategoryLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
         middleLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
         bottomLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
         
         nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
         categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        subcategoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         middleLabel.font = UIFont.preferredFont(forTextStyle: .body)
         bottomLabel.font = UIFont.preferredFont(forTextStyle: .body)
         
         categoryLabel.isHidden = false
+        subcategoryLabel.isHidden = false
         middleLabel.isHidden = false
         bottomLabel.isHidden = false
         imageView.isHidden = false

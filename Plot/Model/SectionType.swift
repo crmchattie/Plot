@@ -121,6 +121,7 @@ enum SectionType: Hashable, CaseIterable {
     case sleep
     case mood
     case mindfulness
+    case investments
     
     
     var name: String {
@@ -233,6 +234,7 @@ enum SectionType: Hashable, CaseIterable {
         case .sleep: return "Sleep Schedule"
         case .mood: return "Mood"
         case .mindfulness: return "Mindfulness"
+        case .investments: return "Investments"
         }
     }
     
@@ -257,6 +259,7 @@ enum SectionType: Hashable, CaseIterable {
         case .calendarMix: return "Calendar Mix"
         case .cashFlowSummary: return "Financial Summary"
         case .spendingMix: return "Spending Summary"
+        case .investments: return "Investments"
         }
     }
     
@@ -280,6 +283,7 @@ enum SectionType: Hashable, CaseIterable {
         case .balanceSheet: return "Balance Sheet"
         case .financialAccounts: return "Accounts"
         case .financialIssues: return "Issues"
+        case .investments: return "Investments"
         case .ingredients, .groceryItems, .restaurantItems: return "Food Products"
         case .calendar: return "Set up Calendar by connecting your Apple Calendar or Gmail Account"
         case .health: return "Set up Health by connecting the Apple Health App"
@@ -315,19 +319,20 @@ enum SectionType: Hashable, CaseIterable {
         case .calendarMix: return "calendarMix"
         case .cashFlowSummary: return "cashFlowSummary"
         case .spendingMix: return "spendingMix"
+        case .investments: return "Investments"
         }
     }
     
     var price: [Int] {
         switch self {
-        case .custom, .events, .music, .sports, .artstheatre, .family, .film, .miscellaneous, .workouts, .hiit, .cardio, .yoga, .strength, .quick, .medium, .recipes, .american, .italian, .mexican, .breakfast, .dessert, .vegetarian, .search, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .vegetarianFood, .comfortFood, .spanishFood, .food, .seafoodFood, .nightlife, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .club, .recreation, .games, .active, .sightseeingThemeParks, .recreationThemeParks, .shopping, .parks, .water, .land, .consumerables, .clothes, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites, .sightseeing, .generalShop, .generalFood, .generalDrinks, .generalCoffee, .generalArts, .generalOutdoors, .trending, .topFood, .topShop, .topRec, .topDrinks, .topSights, .activity, .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .transactions, .incomeStatement, .balanceSheet, .financialAccounts, .financialIssues, .customMeal, .customWorkout, .ingredients, .groceryItems, .restaurantItems, .customTransaction, .customFinancialAccount, .customTransactionRule, .calendar, .health, .finances, .activitySummary, .calendarMix, .cashFlowSummary, .spendingMix, .sleep, .work, .mood, .mindfulness, .calendarSummary: return []
+        case .custom, .events, .music, .sports, .artstheatre, .family, .film, .miscellaneous, .workouts, .hiit, .cardio, .yoga, .strength, .quick, .medium, .recipes, .american, .italian, .mexican, .breakfast, .dessert, .vegetarian, .search, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .vegetarianFood, .comfortFood, .spanishFood, .food, .seafoodFood, .nightlife, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .club, .recreation, .games, .active, .sightseeingThemeParks, .recreationThemeParks, .shopping, .parks, .water, .land, .consumerables, .clothes, .museums, .artGalleries, .publicArt, .historicalSites, .memorialSites, .sightseeing, .generalShop, .generalFood, .generalDrinks, .generalCoffee, .generalArts, .generalOutdoors, .trending, .topFood, .topShop, .topRec, .topDrinks, .topSights, .activity, .transactionCategories, .transactionTopLevelCategories, .transactionGroups, .transactions, .incomeStatement, .balanceSheet, .financialAccounts, .financialIssues, .customMeal, .customWorkout, .ingredients, .groceryItems, .restaurantItems, .customTransaction, .customFinancialAccount, .customTransactionRule, .calendar, .health, .finances, .activitySummary, .calendarMix, .cashFlowSummary, .spendingMix, .sleep, .work, .mood, .mindfulness, .calendarSummary, .investments: return []
         case .cheapEats: return [1]
         }
     }
     
     var searchTerm: String {
         switch self {
-        case .custom, .customMeal, .customWorkout, .ingredients, .groceryItems, .restaurantItems, .customTransaction, .customFinancialAccount, .customTransactionRule, .calendar, .health, .finances, .activitySummary, .calendarSummary, .calendarMix, .cashFlowSummary, .spendingMix, .sleep, .work, .mood, .mindfulness: return ""
+        case .custom, .customMeal, .customWorkout, .ingredients, .groceryItems, .restaurantItems, .customTransaction, .customFinancialAccount, .customTransactionRule, .calendar, .health, .finances, .activitySummary, .calendarSummary, .calendarMix, .cashFlowSummary, .spendingMix, .sleep, .work, .mood, .mindfulness, .investments: return ""
         case .food, .topFood: return "4d4b7105d754a06374d81259"
         case .cheapEats: return "4d4b7105d754a06374d81259"
         case .americanFood: return "4bf58dd8d48988d14e941735"
@@ -405,7 +410,7 @@ enum SectionType: Hashable, CaseIterable {
     
     var image: String {
         switch self {
-        case .custom, .search, .ingredients, .groceryItems, .restaurantItems, .customTransaction, .customFinancialAccount, .customWorkout, .customMeal, .customTransactionRule, .activitySummary, .calendarMix, .calendarSummary, .cashFlowSummary, .spendingMix, .sleep, .work, .mood, .mindfulness: return ""
+        case .custom, .search, .ingredients, .groceryItems, .restaurantItems, .customTransaction, .customFinancialAccount, .customWorkout, .customMeal, .customTransactionRule, .activitySummary, .calendarMix, .calendarSummary, .cashFlowSummary, .spendingMix, .sleep, .work, .mood, .mindfulness, .investments: return ""
         case .food, .cheapEats, .americanFood, .asianFood, .breakfastFood, .bakeryFood, .coffeeFood, .dessertFood, .fastFood, .frenchFood, .indianFood, .italianFood, .mexicanFood, .middleeastFood, .seafoodFood, .vegetarianFood, .comfortFood, .spanishFood, .generalFood, .generalCoffee, .topFood: return "food"
         case .nightlife, .topDrinks, .club, .beachBar, .beerBar, .beerGarden, .cocktailBar, .diveBar, .pub, .karaokeBar, .sportsBar, .whiskeyBar, .wineBar, .brewery, .generalDrinks: return "nightlife"
         case .recreation, .topRec, .games, .recreationThemeParks, .active, .parks, .water, .land, .generalOutdoors: return "recreation"

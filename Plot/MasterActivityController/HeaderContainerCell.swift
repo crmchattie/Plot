@@ -49,9 +49,7 @@ class HeaderContainerCell: UICollectionReusableView {
     }
     
     func setupViews() {
-                
-        view.constrainHeight(25)
-        
+                        
         addSubview(view)
         view.addSubview(titleLabel)
         view.addSubview(subTitleLabel)
