@@ -228,7 +228,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     } else if let marketValue = holding.market_value, let amount = numberFormatter.string(from: marketValue as NSNumber) {
                         middleLabel.text = "Market Value: \(amount)"
                     }
-                    if let updated_at = holding.updated_at, let date = isodateFormatter.date(from: updated_at) {
+                    if let date = isodateFormatter.date(from: holding.updated_at) {
                         bottomLabel.text = "Last Updated: \(dateFormatterPrint.string(from: date))"
                     }
                     imageView.isHidden = !(holding.should_link ?? true)

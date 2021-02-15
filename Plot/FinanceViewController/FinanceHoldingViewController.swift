@@ -1,9 +1,9 @@
 //
-//  FinanceTransactionViewController.swift
+//  FinanceHoldingViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 9/16/20.
-//  Copyright © 2020 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 2/15/21.
+//  Copyright © 2021 Immature Creations. All rights reserved.
 //
 
 import UIKit
@@ -11,12 +11,12 @@ import Eureka
 import Firebase
 import CodableFirebase
 
-protocol UpdateTransactionDelegate: class {
-    func updateTransaction(transaction: Transaction)
+protocol UpdateHoldingDelegate: class {
+    func updateHolding(holding: MXHolding)
 }
 
-class FinanceTransactionViewController: FormViewController {
-    var transaction: Transaction!
+class FinanceHoldingViewController: FormViewController {
+    var holding: MXHolding!
     var accounts = [MXAccount]()
     var accountFetcher = FinancialAccountFetcher()
     
@@ -32,7 +32,7 @@ class FinanceTransactionViewController: FormViewController {
     //added for CreateActivityViewController
     var movingBackwards: Bool = false
     
-    weak var delegate : UpdateTransactionDelegate?
+    weak var delegate : UpdateHoldingDelegate?
     
     var status = false
     
@@ -61,20 +61,14 @@ class FinanceTransactionViewController: FormViewController {
         navigationController?.navigationBar.layoutIfNeeded()
         
         numberFormatter.numberStyle = .currency
-        dateFormatterPrint.dateFormat = "E, MMM dd, yyyy"
+        dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
         setupVariables()
         configureTableView()
         initializeForm()
                 
-        if !status {
+        if !(holding.user_created ?? false) {
             for row in form.rows {
-                if row.tag != "Should Link" {
-                    row.baseCell.isUserInteractionEnabled = false
-                }
-            }
-        } else if !(transaction?.user_created ?? false) {
-            for row in form.rows {
-                if row.tag == "Account" || row.tag == "Date" {
+                if row.tag != "Should Link" && row.tag != "Tags" && row.tag != "Participants" && row.tag != "Description" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -83,19 +77,19 @@ class FinanceTransactionViewController: FormViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         if movingBackwards {
-            self.delegate?.updateTransaction(transaction: transaction)
+            self.delegate?.updateHolding(holding: holding)
         }
     }
     
     fileprivate func setupVariables() {
-        if let _ = transaction {
-            title = "Transaction"
+        if let _ = holding {
+            title = "Holding"
             active = true
-            numberFormatter.currencyCode = transaction.currency_code
+            numberFormatter.currencyCode = holding.currency_code
             
             var participantCount = self.selectedFalconUsers.count
             // If user is creating this activity (admin)
-            if transaction.admin == nil || transaction.admin == Auth.auth().currentUser?.uid {
+            if holding.admin == nil || holding.admin == Auth.auth().currentUser?.uid {
                 participantCount += 1
             }
             
@@ -109,21 +103,13 @@ class FinanceTransactionViewController: FormViewController {
                 inviteesRow.title = self.userNamesString
                 inviteesRow.updateCell()
             }
-            
-            if transaction.admin == nil, let currentUser = Auth.auth().currentUser?.uid {
-                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("admin")
-                reference.setValue(currentUser)
-                transaction.admin = currentUser
-            }
         } else if let currentUser = Auth.auth().currentUser?.uid {
-            title = "New Transaction"
-            let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).childByAutoId().key ?? ""
+            title = "New Holding"
+            let ID = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
-            transaction = Transaction(description: "Transaction Name", amount: 0.0, created_at: date, guid: ID, user_guid: currentUser, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: currentUser)
+            holding = MXHolding(description: "Holding Name", market_value: 0, created_at: date, guid: ID, user_guid: currentUser, holding_type: .unknownType, user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
         }
-        
-        status = transaction.status == .posted
         
         accountFetcher.fetchAccounts { (firebaseAccounts) in
             self.accounts = firebaseAccounts
@@ -134,7 +120,7 @@ class FinanceTransactionViewController: FormViewController {
                 self.accounts.forEach {
                     row.options?.append($0.name.capitalized)
                 }
-                if self.transaction.account_name == nil, let value = self.transaction.account_guid {
+                if self.holding.account_name == nil, let value = self.holding.account_guid {
                     if let account = self.accounts.first(where: { $0.guid == value }) {
                         row.value = account.name
                     }
@@ -142,7 +128,6 @@ class FinanceTransactionViewController: FormViewController {
                 row.updateCell()
             }
         }
-        
     }
     
     fileprivate func configureTableView() {
@@ -157,8 +142,7 @@ class FinanceTransactionViewController: FormViewController {
         
         if active {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-            let dotsBarButton = UIBarButtonItem(image: UIImage(named: "dots"), style: .plain, target: self, action: #selector(goToExtras))
-            navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
+            navigationItem.rightBarButtonItems = [addBarButton]
         } else {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
@@ -175,13 +159,13 @@ class FinanceTransactionViewController: FormViewController {
     
     @IBAction func create(_ sender: AnyObject) {
         movingBackwards = false
-        if transaction.user_created ?? false {
+        if holding.user_created ?? false {
             self.showActivityIndicator()
-            let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createTransaction.createNewTransaction()
+            let createHolding = HoldingActions(holding: self.holding, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            createHolding.createNewHolding()
             self.hideActivityIndicator()
         }
-        self.delegate?.updateTransaction(transaction: transaction)
+        self.delegate?.updateHolding(holding: holding)
         if active {
             self.navigationController?.popViewController(animated: true)
         } else {
@@ -191,7 +175,7 @@ class FinanceTransactionViewController: FormViewController {
     
     fileprivate func initializeForm() {
         form +++
-            Section(footer: "If status is pending, values cannot be changed")
+            Section()
             
             <<< TextRow("Name") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -200,7 +184,7 @@ class FinanceTransactionViewController: FormViewController {
                 $0.placeholder = $0.tag
                 if active {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
-                    $0.value = transaction.description
+                    $0.value = holding.description
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                     $0.cell.textField.becomeFirstResponder()
@@ -212,8 +196,8 @@ class FinanceTransactionViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value {
                     if let currentUser = Auth.auth().currentUser?.uid {
-                        self.transaction.description = value
-                        let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("description")
+                        self.holding.description = value
+                        let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("description")
                         reference.setValue(value)
                     }
                 }
@@ -224,136 +208,168 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }
             
+        if let symbol = holding.symbol, symbol != holding.description {
+            form.last!
+            <<< TextRow("Symbol") {
+                $0.cell.isUserInteractionEnabled = false
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.title = $0.tag
+                $0.value = symbol
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }
+        
+        if let type = holding.holding_type {
+            form.last!
+            <<< PushRow<String>("Type") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.title = row.tag
+                row.value = type.name
+                row.options = []
+                MXHoldingType.allCases.forEach {
+                    row.options?.append($0.name)
+                }
+            }.onPresent { from, to in
+                to.dismissOnSelection = false
+                to.dismissOnChange = false
+                to.enableDeselection = false
+                to.selectableRowCellUpdate = { cell, row in
+                    to.title = "Type"
+                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.tableView.separatorStyle = .none
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                if !(self.holding?.user_created ?? false) {
+                    row.cell.accessoryType = .none
+                }
+            }.onChange { row in
+                if let value = row.value, let type = MXHoldingType(rawValue: value) {
+                    self.holding.holding_type = type
+                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.holding.guid).child("holding_type")
+                    reference.setValue(value)
+                }
+            }
+        }
+                
 //            <<< TextAreaRow("Description") {
 //                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                $0.placeholder = $0.tag
-//                $0.value = transaction.transactionDescription
+//                $0.value = holding.holdingDescription
 //                }.cellUpdate({ (cell, row) in
 //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                }).onChange { row in
-//                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transactionDescription")
-//                    self.transaction.transactionDescription = row.value
+//                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("holdingDescription")
+//                    self.holding.holdingDescription = row.value
 //                    reference.setValue(row.value)
 //                }
             
-            <<< DateInlineRow("Transacted On") {
+        form.last!
+            <<< DateInlineRow("Updated On") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
-                if let date = isodateFormatter.date(from: transaction.transacted_at) {
+                if let date = isodateFormatter.date(from: holding.updated_at) {
                     $0.value = date
                 }
             }.onChange { row in
                 if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
                     let date = self.isodateFormatter.string(from: value)
-                    self.transaction.transacted_at = date
-                    let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("transacted_at")
+                    self.holding.updated_at = date
+                    let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("updated_at")
                     reference.setValue(date)
                 }
             }
             
-            <<< DateInlineRow("Financial Profile Date") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
-                if let reportDate = transaction.date_for_reports, reportDate != "", let date = isodateFormatter.date(from: reportDate) {
-                    $0.value = date
-                } else if let date = isodateFormatter.date(from: transaction.transacted_at) {
-                    $0.value = date
-                }
-            }.onChange { row in
-                if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
-                    let date = self.isodateFormatter.string(from: value)
-                    self.transaction.date_for_reports = date
-                    let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("date_for_reports")
-                    reference.setValue(date)
-                }
-            }
-            
-            <<< DecimalRow("Amount") {
-                $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
+        if let costBasis = holding.cost_basis, costBasis != 0 {
+            form.last!
+            <<< DecimalRow("Cost Basis") {
+                $0.cell.isUserInteractionEnabled = holding.user_created ?? false
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
-                $0.value = transaction.amount
+                $0.value = costBasis
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
-                    self.transaction.amount = value
-                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("amount")
+                    self.holding.cost_basis = value
+                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("cost_basis")
+                    reference.setValue(value)
+                }
+            }
+        }
+            
+        form.last!
+            <<< DecimalRow("Market Value") {
+                $0.cell.isUserInteractionEnabled = holding.user_created ?? false
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.title = $0.tag
+                $0.formatter = numberFormatter
+                $0.value = holding.market_value
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }.onChange { row in
+                if let value = row.value {
+                    self.holding.market_value = value
+                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("market_value")
                     reference.setValue(value)
                 }
             }
             
-            //need to add change to amount or amount per rows
-            <<< IntRow("splitNumber") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = "Split amount by"
-                $0.value = transaction.splitNumber
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange { row in
-                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("splitNumber")
-                if let value = row.value {
-                    self.transaction.splitNumber = value
-                    reference.setValue(value)
-                    if let row: DecimalRow = self.form.rowBy(tag: "Per Person Amount"), self.transaction.amount != 0, value != 0 {
-                        row.value = self.transaction.amount / Double(value)
-                        row.updateCell()
+        if let marketValue = holding.market_value, let costBasis = holding.cost_basis, costBasis != 0 {
+            form.last!
+                <<< DecimalRow("Total Return") {
+                    let percentFormatter = NumberFormatter()
+                    percentFormatter.numberStyle = .percent
+                    percentFormatter.positivePrefix = percentFormatter.plusSign
+                    percentFormatter.maximumFractionDigits = 0
+                    percentFormatter.minimumFractionDigits = 0
+                    
+                    $0.cell.isUserInteractionEnabled = holding.user_created ?? false
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.title = $0.tag
+                    $0.formatter = percentFormatter
+                    $0.value = marketValue / costBasis - 1
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    if marketValue / costBasis - 1 < 0 {
+                        cell.textField?.textColor = .systemRed
+                    } else {
+                        cell.textField?.textColor = .systemGreen
                     }
-                } else {
-                    self.transaction.splitNumber = nil
-                    reference.removeValue()
                 }
-            }
+        }
             
-            <<< DecimalRow("Per Person Amount") {
-                $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.formatter = numberFormatter
-                $0.hidden = "$splitNumber == nil || $splitNumber == 0"
-                if let splitNumber = transaction.splitNumber, splitNumber != 0 {
-                    $0.value = transaction.amount / Double(splitNumber)
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-            
-            <<< TextRow("Status") {
-                $0.cell.isUserInteractionEnabled = false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.value = transaction.status.name
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-            
+        form.last!
             <<< CheckRow("Should Link") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.tintColor = FalconPalette.defaultBlue
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.accessoryType = .checkmark
-                if self.transaction.should_link ?? true {
+                if self.holding.should_link ?? true {
                     $0.title = "Included in Financial Profile"
                     $0.value = true
                 } else {
@@ -369,8 +385,8 @@ class FinanceTransactionViewController: FormViewController {
                 row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
                 row.updateCell()
                 if let currentUser = Auth.auth().currentUser?.uid {
-                    self.transaction.should_link = row.value
-                    let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("should_link")
+                    self.holding.should_link = row.value
+                    let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("should_link")
                     reference.setValue(row.value!)
                 }
             }
@@ -380,7 +396,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.title = row.tag
-                if let value = transaction.account_name {
+                if let value = holding.account_name {
                     row.value = value
                 }
                 row.options = []
@@ -400,64 +416,16 @@ class FinanceTransactionViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                if !(self.transaction?.user_created ?? false) {
+                if !(self.holding?.user_created ?? false) {
                     row.cell.accessoryType = .none
                 }
             }.onChange({ row in
                 if let currentUser = Auth.auth().currentUser?.uid {
-                    self.transaction.account_name = row.value
-                    let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("account_name")
+                    self.holding.account_name = row.value
+                    let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("account_name")
                     reference.setValue(row.value)
                 }
             })
-            
-            <<< LabelRow("Group") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                row.value = transaction.group
-            }.onCellSelection({ _, row in
-                self.openLevel(level: row.tag!, value: row.value!)
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-        
-            <<< LabelRow("Category") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                row.value = transaction.top_level_category
-            }.onCellSelection({ _, row in
-                self.openLevel(level: row.tag!, value: row.value!)
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-        
-            <<< LabelRow("Subcategory") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                row.value = transaction.category
-            }.onCellSelection({ _, row in
-                self.openLevel(level: row.tag!, value: row.value!)
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
         
             <<< LabelRow("Tags") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -498,40 +466,13 @@ class FinanceTransactionViewController: FormViewController {
         
     }
     
-    @objc func goToExtras() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        alert.addAction(UIAlertAction(title: "Create Transaction Rule", style: .default, handler: { (_) in
-            self.createRule()
-        }))
-
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-        }))
-
-        self.present(alert, animated: true)
-        
-    }
-    
-    func createRule() {
-        let destination = FinanceTransactionRuleViewController()
-        destination.transaction = transaction
-        self.navigationController?.pushViewController(destination, animated: true)
-    }
-    
-    @objc fileprivate func openLevel(level: String, value: String) {
-        let destination = FinanceTransactionLevelViewController()
-        destination.delegate = self
-        destination.level = level
-        destination.value = value
-        self.navigationController?.pushViewController(destination, animated: true)
-    }
-    
     @objc fileprivate func openTags() {
+        print("openTags")
         let destination = FinanceTagsViewController()
         destination.delegate = self
-        destination.tags = transaction.tags
-        destination.ID = transaction.guid
-        destination.type = "transaction"
+        destination.tags = holding.tags
+        destination.ID = holding.guid
+        destination.type = "holding"
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -559,15 +500,15 @@ class FinanceTransactionViewController: FormViewController {
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
-    func getSelectedFalconUsers(forTransaction transaction: Transaction, completion: @escaping ([User])->()) {
-        guard let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+    func getSelectedFalconUsers(forHolding holding: MXHolding, completion: @escaping ([User])->()) {
+        guard let participantsIDs = holding.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         var selectedFalconUsers = [User]()
         let group = DispatchGroup()
         for id in participantsIDs {
             // Only if the current user is created this activity
-            if transaction.admin == currentUserID && id == currentUserID {
+            if holding.admin == currentUserID && id == currentUserID {
                 continue
             }
             
@@ -602,33 +543,14 @@ class FinanceTransactionViewController: FormViewController {
     
 }
 
-extension FinanceTransactionViewController: UpdateTransactionLevelDelegate {
-    func update(value: String, level: String) {
-        if let row: LabelRow = form.rowBy(tag: level), let currentUser = Auth.auth().currentUser?.uid {
-            row.value = value
-            row.updateCell()
-            if level == "Subcategory" {
-                transaction.category = value
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("category").setValue(value)
-            } else if level == "Category" {
-                transaction.top_level_category = value
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("top_level_category").setValue(value)
-            } else {
-                transaction.group = value
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("group").setValue(value)
-            }
-        }
-    }
-}
-
-extension FinanceTransactionViewController: UpdateInvitees {
+extension FinanceHoldingViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants"), let currentUser = Auth.auth().currentUser?.uid {
             if !selectedFalconUsers.isEmpty {
                 self.selectedFalconUsers = selectedFalconUsers
                 var participantCount = self.selectedFalconUsers.count
                 // If user is creating this activity (admin)
-                if transaction.admin == nil || transaction.admin == Auth.auth().currentUser?.uid {
+                if holding.admin == nil || holding.admin == Auth.auth().currentUser?.uid {
                     participantCount += 1
                 }
                 
@@ -648,24 +570,24 @@ extension FinanceTransactionViewController: UpdateInvitees {
             }
             if active {
                 self.showActivityIndicator()
-                let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createTransaction.updateTransactionParticipants()
+                let createHolding = HoldingActions(holding: self.holding, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createHolding.updateHoldingParticipants()
                 self.hideActivityIndicator()
             }
             
-            transaction.participantsIDs = []
-            if transaction.admin == currentUser {
-                transaction.participantsIDs!.append(currentUser)
+            holding.participantsIDs = []
+            if holding.admin == currentUser {
+                holding.participantsIDs!.append(currentUser)
             }
             for selectedUser in selectedFalconUsers {
                 guard let id = selectedUser.id else { continue }
-                transaction.participantsIDs!.append(id)
+                holding.participantsIDs!.append(id)
             }
         }
     }
 }
 
-extension FinanceTransactionViewController: UITextViewDelegate {
+extension FinanceHoldingViewController: UITextViewDelegate {
     
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == FalconPalette.defaultBlue {
@@ -688,8 +610,9 @@ extension FinanceTransactionViewController: UITextViewDelegate {
     
 }
 
-extension FinanceTransactionViewController: UpdateTagsDelegate {
+extension FinanceHoldingViewController: UpdateTagsDelegate {
     func updateTags(tags: [String]?) {
-        transaction.tags = tags
+        holding.tags = tags
     }
 }
+

@@ -126,32 +126,24 @@ extension ActivityCell {
             invitationSegmentHeightConstraint.constant = 0
             invitationSegmentedControl.isHidden = true
         }
-        
-        switch activity.activityType?.lowercased() {
-        case "recipe":
-            activityTypeButton.setImage(UIImage(named: "recipe"), for: .normal)
-        case "workout":
-            activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
-        case "event":
-            activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+                
+        switch activity.category?.lowercased() {
         case "sleep":
             activityTypeButton.setImage(UIImage(named: "sleep"), for: .normal)
-        case "work":
-            activityTypeButton.setImage(UIImage(named: "work"), for: .normal)
-        case "food":
-            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
         case "meal":
             activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
-        case "nightlife":
+        case "work":
+            activityTypeButton.setImage(UIImage(named: "work"), for: .normal)
+        case "social":
             activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
-        case "recreation":
-            activityTypeButton.setImage(UIImage(named: "recreation"), for: .normal)
-        case "shopping":
-            activityTypeButton.setImage(UIImage(named: "shopping"), for: .normal)
-        case "sightseeing":
-            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
-        case "mindfulness":
-            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
+        case "leisure":
+            activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
+        case "exercise":
+            activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
+        case "family":
+            activityTypeButton.setImage(UIImage(named: "family"), for: .normal)
+        case "personal":
+            activityTypeButton.setImage(UIImage(named: "personal"), for: .normal)
         default:
             activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
         }

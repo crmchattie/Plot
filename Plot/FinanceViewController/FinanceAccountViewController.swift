@@ -53,38 +53,9 @@ class FinanceAccountViewController: FormViewController {
         navigationController?.navigationBar.layoutIfNeeded()
         
         numberFormatter.numberStyle = .currency
-        dateFormatterPrint.dateFormat = "MMM dd, yyyy"
+        dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
         
-        if let _ = account {
-            title = "Account"
-            active = true
-            numberFormatter.currencyCode = account.currency_code
-            
-            var participantCount = self.selectedFalconUsers.count
-            // If user is creating this activity (admin)
-            if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
-                participantCount += 1
-            }
-            
-            if participantCount > 1 {
-                self.userNamesString = "\(participantCount) participants"
-            } else {
-                self.userNamesString = "1 participant"
-            }
-            
-            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-            }
-            
-        } else if let currentUser = Auth.auth().currentUser?.uid {
-            title = "New Account"
-            let ID = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).childByAutoId().key ?? ""
-            let date = isodateFormatter.string(from: Date())
-            account = MXAccount(name: "Account Name", balance: 0.0, created_at: date, guid: ID, user_guid: currentUser, type: .any, subtype: .any, user_created: true, admin: currentUser)
-            numberFormatter.currencyCode = "USD"
-        }
-        
+        setupVariables()
         configureTableView()
         initializeForm()
         
@@ -117,6 +88,38 @@ class FinanceAccountViewController: FormViewController {
             navigationItem.leftBarButtonItem = cancelBarButton
         }
         
+    }
+    
+    func setupVariables() {
+        if let _ = account {
+            title = "Account"
+            active = true
+            numberFormatter.currencyCode = account.currency_code
+            
+            var participantCount = self.selectedFalconUsers.count
+            // If user is creating this activity (admin)
+            if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
+                participantCount += 1
+            }
+            
+            if participantCount > 1 {
+                self.userNamesString = "\(participantCount) participants"
+            } else {
+                self.userNamesString = "1 participant"
+            }
+            
+            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
+                inviteesRow.title = self.userNamesString
+                inviteesRow.updateCell()
+            }
+            
+        } else if let currentUser = Auth.auth().currentUser?.uid {
+            title = "New Account"
+            let ID = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).childByAutoId().key ?? ""
+            let date = isodateFormatter.string(from: Date())
+            account = MXAccount(name: "Account Name", balance: 0.0, created_at: date, guid: ID, user_guid: currentUser, type: .any, subtype: .any, user_created: true, admin: currentUser)
+            numberFormatter.currencyCode = "USD"
+        }
     }
     
     @IBAction func cancel(_ sender: AnyObject) {
@@ -263,7 +266,7 @@ class FinanceAccountViewController: FormViewController {
         }
         
         form.last!
-            <<< TextRow("Last Updated On") {
+            <<< TextRow("Last Updated") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag

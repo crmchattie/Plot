@@ -703,6 +703,18 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
     
+    func openHolding(holding: MXHolding) {
+        let destination = FinanceHoldingViewController()
+        destination.holding = holding
+        destination.users = networkController.userService.users
+        destination.filteredUsers = networkController.userService.users
+        destination.hidesBottomBarWhenPushed = true
+        self.getParticipants(transaction: nil, account: nil, holding: holding) { (participants) in
+            destination.selectedFalconUsers = participants
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
     func openMember(member: MXMember) {
         openMXConnect(current_member_guid: member.guid)
     }
@@ -999,6 +1011,87 @@ extension MasterActivityContainerController {
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
+        }
+    }
+    
+    func getParticipants(transaction: Transaction?, account: MXAccount?, holding: MXHolding?, completion: @escaping ([User])->()) {
+        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            var participants: [User] = []
+            for id in participantsIDs {
+                if transaction.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                completion(participants)
+            }
+        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            var participants: [User] = []
+            
+            for id in participantsIDs {
+                if account.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                completion(participants)
+            }
+        } else if let holding = holding, let participantsIDs = holding.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            var participants: [User] = []
+            
+            for id in participantsIDs {
+                if holding.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                completion(participants)
+            }
+        } else {
+            let participants: [User] = []
+            completion(participants)
         }
     }
     

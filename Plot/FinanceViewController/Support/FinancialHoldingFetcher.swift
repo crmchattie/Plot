@@ -54,8 +54,6 @@ class FinancialHoldingFetcher: NSObject {
                                     _holding.pinned = userHolding.pinned
                                     holdings.append(_holding)
                                 }
-                            } else {
-                                print("failed to convert \(userHolding.description)")
                             }
                             group.leave()
                         })

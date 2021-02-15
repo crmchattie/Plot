@@ -14,7 +14,7 @@ let activitiesEntity = "activities"
 let userActivitiesEntity = "user-activities"
 
 let userActivityCategoriesEntity = "user-activities-categories"
-var activityCategories = ["Sleep", "Meal", "Work", "Social", "Leisure", "Exercise", "Family", "Personal", "Mindfulness", "Uncategorized", "Not Applicable"]
+var activityCategories = ["Sleep", "Meal", "Work", "Social", "Leisure", "Exercise", "Family", "Personal", "Uncategorized", "Not Applicable"]
 
 class Activity: NSObject, NSCopying, Codable {
     var activityID: String?

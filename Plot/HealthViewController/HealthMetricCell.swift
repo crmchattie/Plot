@@ -185,7 +185,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
                 }
             }
         case .heartRate:
-            imageName = "heart-rate"
+            imageName = "heart-filled"
         case .weight:
             imageName = "body-weight-scales"
         case .sleep:

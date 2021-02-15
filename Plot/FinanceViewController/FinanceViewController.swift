@@ -306,7 +306,7 @@ class FinanceViewController: UIViewController {
         }
     }
     
-    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
+    func getParticipants(transaction: Transaction?, account: MXAccount?, holding: MXHolding?, completion: @escaping ([User])->()) {
         if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             let ID = transaction.guid
@@ -347,6 +347,39 @@ class FinanceViewController: UIViewController {
             
             for id in participantsIDs {
                 if account.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let holding = holding, let participantsIDs = holding.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = holding.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            
+            for id in participantsIDs {
+                if holding.admin == currentUserID && id == currentUserID {
                     continue
                 }
                 
@@ -534,7 +567,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 destination.users = users
                 destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
-                self.getParticipants(transaction: object[indexPath.item], account: nil) { (participants) in
+                self.getParticipants(transaction: object[indexPath.item], account: nil, holding: nil) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
@@ -546,7 +579,20 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 destination.users = users
                 destination.filteredUsers = filteredUsers
                 destination.hidesBottomBarWhenPushed = true
-                self.getParticipants(transaction: nil, account: object[indexPath.item]) { (participants) in
+                self.getParticipants(transaction: nil, account: object[indexPath.item], holding: nil) { (participants) in
+                    destination.selectedFalconUsers = participants
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
+            }
+        } else if let object = object as? [MXHolding] {
+            if section.subType == "Investments" {
+                let destination = FinanceHoldingViewController()
+                destination.holding = object[indexPath.item]
+                destination.accounts = accounts
+                destination.users = users
+                destination.filteredUsers = filteredUsers
+                destination.hidesBottomBarWhenPushed = true
+                self.getParticipants(transaction: nil, account: nil, holding: object[indexPath.item]) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
                 }

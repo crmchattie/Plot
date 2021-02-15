@@ -10,6 +10,7 @@ protocol FinanceControllerCellDelegate: class {
     func openTransactionDetails(transactionDetails: TransactionDetails)
     func openAccountDetails(accountDetails: AccountDetails)
     func openMember(member: MXMember)
+    func openHolding(holding: MXHolding)
 }
 
 class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -174,6 +175,11 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
             if section.subType == "Balance Sheet" {
                 let accountDetails = object[indexPath.item]
                 delegate?.openAccountDetails(accountDetails: accountDetails)
+            }
+        } else if let object = object as? [MXHolding] {
+            if section.subType == "Investments" {
+                let holding = object[indexPath.item]
+                delegate?.openHolding(holding: holding)
             }
         } else if let object = object as? [MXMember] {
             if section.type == "Issues" {

@@ -18,24 +18,25 @@ struct MXHoldingResult: Codable {
 }
 
 struct MXHolding: Codable, Equatable, Hashable {
-    let account_guid: String?
-    let cost_basis: Double?
-    let created_at: String
-    let currency_code: String?
-    let cusip: String?
-    let daily_change: Double?
-    let description: String
-    let guid: String?
-    let holding_type: MXHoldingType?
-    let id: String?
-    let market_value: Double?
-    let member_guid: String?
-    let metadata: String?
-    let purchase_price: String?
-    let shares: Double?
-    let symbol: String?
-    let updated_at: String?
-    let user_guid: String?
+    var account_guid: String?
+    var account_name: String?
+    var cost_basis: Double?
+    var created_at: String
+    var currency_code: String?
+    var cusip: String?
+    var daily_change: Double?
+    var description: String
+    var guid: String
+    var holding_type: MXHoldingType?
+    var id: String?
+    var market_value: Double?
+    var member_guid: String?
+    var metadata: String?
+    var purchase_price: String?
+    var shares: Double?
+    var symbol: String?
+    var updated_at: String
+    var user_guid: String
     var participantsIDs: [String]?
     var tags: [String]?
     var should_link: Bool?
@@ -43,6 +44,18 @@ struct MXHolding: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var user_created: Bool?
+    
+    init(description: String, market_value: Double, created_at: String, guid: String, user_guid: String, holding_type: MXHoldingType, user_created: Bool?, admin: String) {
+        self.description = description
+        self.market_value = market_value
+        self.created_at = created_at
+        self.updated_at = created_at
+        self.guid = guid
+        self.user_guid = user_guid
+        self.holding_type = holding_type
+        self.user_created = user_created
+    }
 }
 
 struct UserHolding: Codable, Equatable, Hashable {
