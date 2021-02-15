@@ -720,19 +720,13 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     }
     
     func openMXConnect(current_member_guid: String?) {
-        Service.shared.fetchMXConnectURL(current_member_guid: current_member_guid) { (search, err) in
-            if let search = search, let url = search["url"] {
-                DispatchQueue.main.async {
-                    let destination = WebViewController()
-                    destination.urlString = url
-                    destination.controllerTitle = ""
-                    destination.delegate = self
-                    let navigationViewController = UINavigationController(rootViewController: destination)
-                    navigationViewController.modalPresentationStyle = .fullScreen
-                    self.present(navigationViewController, animated: true, completion: nil)
-                }
-            }
-        }
+        let destination = WebViewController()
+        destination.current_member_guid = current_member_guid
+        destination.controllerTitle = ""
+        destination.delegate = self
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        navigationViewController.modalPresentationStyle = .fullScreen
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
 }

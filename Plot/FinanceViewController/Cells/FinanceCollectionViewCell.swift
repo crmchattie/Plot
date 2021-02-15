@@ -267,7 +267,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     middleLabel.text = "Amount: \(amount)"
                 }
                 if let date = isodateFormatter.date(from: transaction.transacted_at) {
-                    bottomLabel.text = "Transacted: \(dateFormatterPrint.string(from: date))"
+                    bottomLabel.text = "Transacted On: \(dateFormatterPrint.string(from: date))"
                 }
                 imageView.isHidden = !(transaction.should_link ?? true)
                 imageView.image = UIImage(systemName: "checkmark")

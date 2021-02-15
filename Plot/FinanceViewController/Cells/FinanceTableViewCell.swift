@@ -28,7 +28,7 @@ class FinanceTableViewCell: UITableViewCell {
                     middleLabel.text = "Amount: \(amount)"
                 }
                 if let date = isodateFormatter.date(from: transaction.transacted_at) {
-                    bottomLabel.text = "Transacted: \(dateFormatterPrint.string(from: date))"
+                    bottomLabel.text = "Transacted On: \(dateFormatterPrint.string(from: date))"
                 }
                 IV.isHidden = !(transaction.should_link ?? true)
                 IV.image = UIImage(systemName: "checkmark")

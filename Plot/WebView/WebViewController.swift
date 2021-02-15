@@ -23,9 +23,19 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     weak var delegate : EndedWebViewDelegate?
     
+    var current_member_guid: String?
+    
     let appScheme = "appscheme://"
     let mxScheme = "mx://"
     let atriumScheme = "atrium://"
+    
+    let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.hidesWhenStopped = true
+        spinner.startAnimating()
+        return spinner
+    }()
     
     override func loadView() {
         let webConfiguration = WKWebViewConfiguration()
@@ -53,8 +63,22 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
             let myRequest = URLRequest(url: myURL)
             webView.load(myRequest)
             webView.allowsBackForwardNavigationGestures = true
+        } else {
+            fetchData()
         }
         
+    }
+    
+    func fetchData() {
+        Service.shared.fetchMXConnectURL(current_member_guid: current_member_guid) { (search, err) in
+            if let search = search, let url = search["url"], let myURL = URL(string: url) {
+                DispatchQueue.main.async {
+                    let myRequest = URLRequest(url: myURL)
+                    self.webView.load(myRequest)
+                    self.webView.allowsBackForwardNavigationGestures = true
+                }
+            }
+        }
     }
     
     @IBAction func done(_ sender: AnyObject) {

@@ -281,7 +281,7 @@ class FinanceHoldingViewController: FormViewController {
 //                }
             
         form.last!
-            <<< DateInlineRow("Updated On") {
+            <<< DateInlineRow("Last Updated") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
