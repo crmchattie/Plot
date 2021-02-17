@@ -90,8 +90,6 @@ class ChooseListTableViewController: UITableViewController {
         configureTableView()
         setupSearchController()
         
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 105
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -111,6 +109,9 @@ class ChooseListTableViewController: UITableViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
         
+        tableView = UITableView(frame: .zero, style: .insetGrouped)
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 105
         tableView.register(ListCell.self, forCellReuseIdentifier: listCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

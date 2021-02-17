@@ -39,6 +39,7 @@ class ChooseTransactionTableViewController: UITableViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
 
+        tableView = UITableView(frame: .zero, style: .insetGrouped)
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
@@ -132,7 +133,7 @@ class ChooseTransactionTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
                         
         let cell = tableView.dequeueReusableCell(withIdentifier: kFinanceTableViewCell, for: indexPath) as? FinanceTableViewCell ?? FinanceTableViewCell()
-        
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         if let filteredTransactions = filteredTransactions {
             cell.transaction = filteredTransactions[indexPath.row]
         }

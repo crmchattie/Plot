@@ -35,7 +35,6 @@ protocol ChooseChatDelegate: class {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?)
 }
 
-
 class ChooseChatTableViewController: UITableViewController {
     
     fileprivate let newGroupCellID = "newGroupCellID"
@@ -73,13 +72,8 @@ class ChooseChatTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         configureTableView()
         setupSearchController()
-        
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 105
-        
         handleReloadTable()
     }
     
@@ -93,8 +87,11 @@ class ChooseChatTableViewController: UITableViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
 
+        tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(UserCell.self, forCellReuseIdentifier: userCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 105
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor

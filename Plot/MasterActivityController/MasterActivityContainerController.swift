@@ -255,7 +255,7 @@ class MasterActivityContainerController: UIViewController {
     func scrollToFirstActivityWithDate(_ completion: @escaping ([Activity]) -> Void) {
         let allActivities = networkController.activityService.activities
         let totalNumberOfActivities = allActivities.count
-        let numberOfActivities = 4
+        let numberOfActivities = 3
         if totalNumberOfActivities < numberOfActivities {
             completion(allActivities)
             return
@@ -283,6 +283,7 @@ class MasterActivityContainerController: UIViewController {
             }
         }
         
+        activities = []
         for i in 1...numberOfActivities {
             activities.insert(allActivities[totalNumberOfActivities - i], at: 0)
         }

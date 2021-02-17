@@ -116,6 +116,7 @@ class FinanceTableViewCell: UITableViewCell {
     let IV = UIImageView(cornerRadius: 8)
     
     func setupViews() {
+        
         let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
         labelStackView.spacing = 2
         
