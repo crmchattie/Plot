@@ -1,27 +1,19 @@
 //
-//  FinanceViewController.swift
+//  FinanceDetailViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/21/20.
-//  Copyright © 2020 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 2/17/21.
+//  Copyright © 2021 Immature Creations. All rights reserved.
 //
+
 
 import UIKit
 import Firebase
 import CodableFirebase
 
-class FinanceViewController: UIViewController {
-    var networkController: NetworkController
-    
-    init(networkController: NetworkController) {
-        self.networkController = networkController
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+class FinanceDetailViewController: UIViewController {
+    var networkController = NetworkController()
+        
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
@@ -60,6 +52,7 @@ class FinanceViewController: UIViewController {
         return networkController.userService.users
     }
             
+    var setSections = [SectionType]()
     var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
     
@@ -84,7 +77,6 @@ class FinanceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        title = "Finance"
         
         customSegmented.delegate = self
         collectionView.dataSource = self
@@ -131,19 +123,22 @@ class FinanceViewController: UIViewController {
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
-        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        customSegmented.constrainHeight(30)
-                        
-        view.addSubview(customSegmented)
-        view.addSubview(collectionView)
-
-        customSegmented.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
-        
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         navigationItem.rightBarButtonItem = newItemBarButton
-                
+        
+        if setSections.contains(.transactions) {
+            customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            customSegmented.constrainHeight(30)
+                            
+            view.addSubview(customSegmented)
+            view.addSubview(collectionView)
 
+            customSegmented.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+            collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
+        } else {
+            view.addSubview(collectionView)
+            collectionView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        }
     }
     
     @objc fileprivate func newItem() {
@@ -196,9 +191,7 @@ class FinanceViewController: UIViewController {
         var transactionLevel: TransactionCatLevel!
         accountLevel = .none
         transactionLevel = .none
-        
-        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .transactions, .investments, .financialAccounts]
-                
+                        
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()
                         
@@ -426,21 +419,14 @@ class FinanceViewController: UIViewController {
     }
 }
 
-extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension FinanceDetailViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return sections.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sec = sections[section]
-        if sec == .transactions || sec == .financialAccounts || sec == .investments {
-            if groups[sec]?.count ?? 0 < 10 {
-                return groups[sec]?.count ?? 0
-            }
-            return 10
-        } else {
-            return groups[sec]?.count ?? 0
-        }
+        return groups[sec]?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -524,7 +510,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: self.collectionView.frame.size.width, height: 40)
+        return CGSize(width: self.collectionView.frame.size.width, height: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -533,15 +519,8 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
         header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         header.delegate = self
-        header.sectionType = section
         header.titleLabel.text = section.name
-        if (section == .transactions || section == .financialAccounts || section == .investments) && groups[section]?.count ?? 0 > 10 {
-            header.subTitleLabel.isUserInteractionEnabled = true
-            header.subTitleLabel.isHidden = false
-        } else {
-            header.subTitleLabel.isUserInteractionEnabled = false
-            header.subTitleLabel.isHidden = true
-        }
+        header.subTitleLabel.isHidden = true
         return header
     }
     
@@ -611,17 +590,13 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     }
 }
 
-extension FinanceViewController: HeaderCellDelegate {
+extension FinanceDetailViewController: HeaderCellDelegate {
     func viewTapped(sectionType: SectionType) {
-        let destination = FinanceDetailViewController()
-        destination.title = sectionType.name
-        destination.networkController = networkController
-        destination.setSections = [sectionType]
-        navigationController?.pushViewController(destination, animated: true)
+        
     }
 }
 
-//extension FinanceViewController: UpdateFinancialsDelegate {
+//extension FinanceDetailViewController: UpdateFinancialsDelegate {
 //    func updateTransactions(transactions: [Transaction]) {
 //        for transaction in transactions {
 //            if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
@@ -640,7 +615,7 @@ extension FinanceViewController: HeaderCellDelegate {
 //    }
 //}
 //
-//extension FinanceViewController: UpdateAccountDelegate {
+//extension FinanceDetailViewController: UpdateAccountDelegate {
 //    func updateAccount(account: MXAccount) {
 //        if let index = networkController.financeService.accounts.firstIndex(of: account) {
 //            networkController.financeService.accounts[index] = account
@@ -649,7 +624,7 @@ extension FinanceViewController: HeaderCellDelegate {
 //    }
 //}
 //
-//extension FinanceViewController: UpdateTransactionDelegate {
+//extension FinanceDetailViewController: UpdateTransactionDelegate {
 //    func updateTransaction(transaction: Transaction) {
 //        if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
 //            networkController.financeService.transactions[index] = transaction
@@ -658,7 +633,7 @@ extension FinanceViewController: HeaderCellDelegate {
 //    }
 //}
 
-extension FinanceViewController: EndedWebViewDelegate {
+extension FinanceDetailViewController: EndedWebViewDelegate {
     func updateMXMembers() {
         sections.removeAll(where: { $0 == .financialIssues })
         groups[.financialIssues] = nil
@@ -667,7 +642,7 @@ extension FinanceViewController: EndedWebViewDelegate {
     }
 }
 
-extension FinanceViewController: CustomSegmentedControlDelegate {
+extension FinanceDetailViewController: CustomSegmentedControlDelegate {
     func changeToIndex(index:Int) {
         if index == 0 {
             startDate = Date().localTime.startOfDay
@@ -686,5 +661,4 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
         
     }
 }
-
 

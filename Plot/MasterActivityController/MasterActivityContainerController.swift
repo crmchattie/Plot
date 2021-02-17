@@ -72,16 +72,12 @@ class MasterActivityContainerController: UIViewController {
             }
         }
         if let workoutMetrics = metrics[HealthMetricCategory.workouts.rawValue] {
-            metrics[HealthMetricCategory.workouts.rawValue] = workoutMetrics.filter({ $0.type.name == HealthMetricType.activeEnergy.name})
-            if metrics[HealthMetricCategory.workouts.rawValue] == [] {
-                metrics[HealthMetricCategory.workouts.rawValue] = nil
-            }
+            metrics[HealthMetricCategory.general.rawValue]?.append(contentsOf: workoutMetrics.filter({ $0.type.name == HealthMetricType.activeEnergy.name}))
+            metrics[HealthMetricCategory.workouts.rawValue] = nil
         }
         if let nutritionMetrics = metrics[HealthMetricCategory.nutrition.rawValue] {
-            metrics[HealthMetricCategory.nutrition.rawValue] = nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name})
-            if metrics[HealthMetricCategory.nutrition.rawValue] == [] {
-                metrics[HealthMetricCategory.nutrition.rawValue] = nil
-            }
+            metrics[HealthMetricCategory.general.rawValue]?.append(contentsOf: nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name}))
+            metrics[HealthMetricCategory.nutrition.rawValue] = nil
         }
         return metrics
     }
@@ -258,40 +254,39 @@ class MasterActivityContainerController: UIViewController {
     
     func scrollToFirstActivityWithDate(_ completion: @escaping ([Activity]) -> Void) {
         let allActivities = networkController.activityService.activities
-        var activities = [Activity]()
-        let currentDate = Date().localTime
-        var index = 0
-        var activityFound = false
-        if allActivities.count < 3 {
+        let totalNumberOfActivities = allActivities.count
+        let numberOfActivities = 4
+        if totalNumberOfActivities < numberOfActivities {
             completion(allActivities)
             return
         }
+        var index = 0
+        var activities = [Activity]()
+        let currentDate = Date().localTime
         for activity in allActivities {
             if let startInterval = activity.startDateTime?.doubleValue, let endInterval = activity.endDateTime?.doubleValue {
                 let startDate = Date(timeIntervalSince1970: startInterval)
                 let endDate = Date(timeIntervalSince1970: endInterval)
                 if currentDate < startDate || currentDate < endDate {
-                    activityFound = true
-                    break
+                    if index < totalNumberOfActivities - (numberOfActivities - 1) {
+                        if activities.count < numberOfActivities {
+                            activities.append(allActivities[index])
+                        } else {
+                            completion(activities)
+                            return
+                        }
+                    } else {
+                        break
+                    }
                 }
                 index += 1
-                
             }
         }
         
-        let numberOfActivities = networkController.activityService.activities.count
-        if activityFound && index < numberOfActivities - 2 {
-            activities.append(allActivities[index])
-            for i in 0...1 {
-                activities.append(allActivities[index + i + 1])
-            }
-            completion(activities)
-        } else {
-            activities.append(allActivities[numberOfActivities - 3])
-            activities.append(allActivities[numberOfActivities - 2])
-            activities.append(allActivities[numberOfActivities - 1])
-            completion(activities)
+        for i in 1...numberOfActivities {
+            activities.insert(allActivities[totalNumberOfActivities - i], at: 0)
         }
+        completion(activities)
     }
     
     func grabFinancialItems(_ completion: @escaping ([SectionType], [SectionType: [AnyHashable]]) -> Void) {
@@ -344,9 +339,8 @@ class MasterActivityContainerController: UIViewController {
                     }
                 }
             } else if section.type == "Investments" {
-                if !holdings.isEmpty {
-                    var filteredHoldings = holdings.filter({$0.should_link ?? true})
-                    filteredHoldings.sort(by: {$0.symbol ?? $0.description < $1.symbol ?? $1.description})
+                let filteredHoldings = holdings.filter({$0.should_link ?? true})
+                if !filteredHoldings.isEmpty {
                     sections.append(section)
                     groups[section] = filteredHoldings
                 }

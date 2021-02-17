@@ -32,10 +32,10 @@ class FinanceService {
         didSet {
             if oldValue != accounts {
                 accounts.sort { (account1, account2) -> Bool in
-                    if account1.should_link == account2.should_link {
+                    if account1.should_link ?? true == account2.should_link ?? true {
                         return account1.name < account2.name
                     }
-                    return account1.should_link ?? false && !(account2.should_link ?? false)
+                    return account1.should_link ?? true && !(account2.should_link ?? true)
                 }
                 NotificationCenter.default.post(name: .financeUpdated, object: nil)
             }
@@ -55,7 +55,10 @@ class FinanceService {
         didSet {
             if oldValue != holdings {
                 holdings.sort { (holding1, holding2) -> Bool in
-                    return holding1.market_value ?? 0 > holding2.market_value ?? 0
+                    if holding1.should_link ?? true == holding2.should_link ?? true {
+                        return holding1.market_value ?? 0 > holding2.market_value ?? 0
+                    }
+                    return holding1.should_link ?? true && !(holding2.should_link ?? true)
                 }
                 NotificationCenter.default.post(name: .financeUpdated, object: nil)
             }

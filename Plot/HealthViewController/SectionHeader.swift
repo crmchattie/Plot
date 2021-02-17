@@ -11,6 +11,8 @@ import Foundation
 class SectionHeader: UICollectionReusableView {
     weak var delegate: HeaderCellDelegate?
     
+    var sectionType: SectionType!
+    
     let view: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -67,9 +69,9 @@ class SectionHeader: UICollectionReusableView {
     }
     
     @objc func viewTapped(_ sender: UITapGestureRecognizer) {
-        guard let labelText = titleLabel.text else {
+        guard let sectionType = sectionType else {
             return
         }
-        self.delegate?.viewTapped(labelText: labelText)
+        self.delegate?.viewTapped(sectionType: sectionType)
     }
 }

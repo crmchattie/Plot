@@ -89,6 +89,7 @@
 		106774C825D96757002F78E7 /* FinancialHoldingFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774C725D96757002F78E7 /* FinancialHoldingFetcher.swift */; };
 		106774F825DAF76E002F78E7 /* FinanceHoldingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774F725DAF76E002F78E7 /* FinanceHoldingViewController.swift */; };
 		106774FC25DAFA8D002F78E7 /* FinancialHoldingActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774FB25DAFA8D002F78E7 /* FinancialHoldingActions.swift */; };
+		1067750025DD665C002F78E7 /* FinanceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774FF25DD665C002F78E7 /* FinanceDetailViewController.swift */; };
 		1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */; };
 		1069B2D02430EC880048244C /* IncomingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */; };
 		1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */; };
@@ -580,6 +581,7 @@
 		106774C725D96757002F78E7 /* FinancialHoldingFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialHoldingFetcher.swift; sourceTree = "<group>"; };
 		106774F725DAF76E002F78E7 /* FinanceHoldingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceHoldingViewController.swift; sourceTree = "<group>"; };
 		106774FB25DAFA8D002F78E7 /* FinancialHoldingActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialHoldingActions.swift; sourceTree = "<group>"; };
+		106774FF25DD665C002F78E7 /* FinanceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceDetailViewController.swift; sourceTree = "<group>"; };
 		1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingActivityMessageCell.swift; sourceTree = "<group>"; };
@@ -1125,6 +1127,7 @@
 			isa = PBXGroup;
 			children = (
 				1082C89424F0A8F500CF6491 /* FinanceViewController.swift */,
+				106774FF25DD665C002F78E7 /* FinanceDetailViewController.swift */,
 				100B9F622564539300A80C87 /* FinanceDetailService.swift */,
 				100B9F5C2564536E00A80C87 /* FinanceDetailViewModel.swift */,
 				105CB18D2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift */,
@@ -2917,6 +2920,7 @@
 				10B6B31625410D37008037AD /* FinanceTagsViewController.swift in Sources */,
 				265D4313259D203C00755EC2 /* ActivityBuilder.swift in Sources */,
 				10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */,
+				1067750025DD665C002F78E7 /* FinanceDetailViewController.swift in Sources */,
 				26E8E3A6238B2CA9000F30C8 /* NotificationsViewController.swift in Sources */,
 				10F3032C24EC6FD300C04B8F /* MXInstitution.swift in Sources */,
 				10E0F616259A727000A1D86E /* ListService.swift in Sources */,

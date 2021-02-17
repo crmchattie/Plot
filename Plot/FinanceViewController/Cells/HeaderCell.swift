@@ -9,12 +9,14 @@
 import Foundation
 
 protocol HeaderCellDelegate: class {
-    func viewTapped(labelText: String)
+    func viewTapped(sectionType: SectionType)
 }
 
 class HeaderCell: UICollectionReusableView {
     
     weak var delegate: HeaderCellDelegate?
+    
+    var sectionType: SectionType!
     
     let view: UIView = {
         let view = UIView()
@@ -72,9 +74,9 @@ class HeaderCell: UICollectionReusableView {
     }
     
     @objc func viewTapped(_ sender: UITapGestureRecognizer) {
-        guard let labelText = titleLabel.text else {
+        guard let sectionType = sectionType else {
             return
         }
-        self.delegate?.viewTapped(labelText: labelText)
+        self.delegate?.viewTapped(sectionType: sectionType)
     }
 }
