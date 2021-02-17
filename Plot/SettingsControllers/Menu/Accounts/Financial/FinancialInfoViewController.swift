@@ -38,9 +38,7 @@ class FinancialInfoViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let identifier = "cell"
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.accessoryType = .disclosureIndicator
@@ -69,6 +67,5 @@ class FinancialInfoViewController: UITableViewController {
             destination.networkController = networkController
             navigationController?.pushViewController(destination, animated: true)
         }
-        tableView.deselectRow(at: indexPath, animated: true)
     }
 }

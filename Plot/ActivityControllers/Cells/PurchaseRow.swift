@@ -43,7 +43,6 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
         textLabel?.textColor = .clear
-        selectionStyle = .none
         
         backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         contentView.addSubview(nameLabel)

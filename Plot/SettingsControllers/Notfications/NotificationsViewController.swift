@@ -49,7 +49,7 @@ class NotificationsViewController: UIViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
                 
-        self.title = invitationsText
+        self.title = notificationsText
         
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
@@ -85,6 +85,7 @@ class NotificationsViewController: UIViewController {
         tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorColor = .clear
+        tableView.sectionHeaderHeight = 0
         tableView.rowHeight = UITableView.automaticDimension
         view.addSubview(tableView)
         tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true

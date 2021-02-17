@@ -55,7 +55,7 @@ class FinanceService {
         didSet {
             if oldValue != holdings {
                 holdings.sort { (holding1, holding2) -> Bool in
-                    return holding1.description < holding2.description
+                    return holding1.market_value ?? 0 > holding2.market_value ?? 0
                 }
                 NotificationCenter.default.post(name: .financeUpdated, object: nil)
             }
@@ -132,19 +132,16 @@ class FinanceService {
             let transactionDate = isodateFormatter.date(from: transaction.transacted_at) ?? Date()
             //older than 14 days
             if transactionDate < lastFortNight! {
-                print("transaction older than 14 days \(transaction.guid)")
-//                deleteTransaction(transaction_guid: transaction.guid)
+                deleteTransaction(transaction_guid: transaction.guid)
                 continue
             }
             //matches posted transaction's GUID
             if let _ = postedTransactions.firstIndex(where: {$0.guid == transaction.guid}) {
-                print("transaction matches posted transaction's GUID \(transaction.guid)")
-//                deleteTransaction(transaction_guid: transaction.guid)
+                deleteTransaction(transaction_guid: transaction.guid)
                 continue
             }
             //posted transaction matches name and merchant (time (amount - tips)
             if let _ = postedTransactions.firstIndex(where: {$0.description == transaction.description && $0.transacted_at == transaction.transacted_at && $0.account_guid == transaction.account_guid}) {
-                print("transaction matches posted transaction's description, time, account \(transaction.guid)")
 //                deleteTransaction(transaction_guid: transaction.guid)
                 continue
             }

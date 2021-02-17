@@ -27,7 +27,6 @@ class GroupAdminControlsTableViewCell: UITableViewCell {
     super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
     
     backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-    selectionColor = ThemeManager.currentTheme().cellSelectionColor
     contentView.layer.cornerRadius = 10
     contentView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     contentView.translatesAutoresizingMaskIntoConstraints = false

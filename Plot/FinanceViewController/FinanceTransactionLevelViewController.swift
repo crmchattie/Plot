@@ -156,7 +156,6 @@ class FinanceTransactionLevelViewController: FormViewController {
             }
         } else if level == "Category" {
             for title in topLevelCategories {
-                print("title \(title)")
                 form.last!
                     <<< ListCheckRow<String>() {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

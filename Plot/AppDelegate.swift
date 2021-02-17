@@ -39,7 +39,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     let invitationsFetcher = InvitationsFetcher()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        ThemeManager.applyTheme(theme: ThemeManager.currentTheme())
         FirebaseApp.configure()
         Database.database().isPersistenceEnabled = true
         userDefaults.configureInitialLaunch()

@@ -49,7 +49,6 @@ class AccountSettingsController: UITableViewController {
         configureTableView()
         configureContainerView()
         listenChanges()
-        configureNavigationBar()
         addObservers()
     }
     
@@ -117,7 +116,6 @@ class AccountSettingsController: UITableViewController {
         nightMode.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
         nightMode.addTarget(self, action: #selector(rightBarButtonDidTap(sender:)), for: .touchUpInside)
         nightMode.isSelected = Bool(ThemeManager.currentTheme().rawValue)
-        
         let rightBarButton = UIBarButtonItem(customView: nightMode)
         navigationItem.setRightBarButton(rightBarButton, animated: false)
     }
@@ -182,7 +180,6 @@ class AccountSettingsController: UITableViewController {
     
     @objc fileprivate func rightBarButtonDidTap(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        
         if sender.isSelected {
             let theme = Theme.Dark
             ThemeManager.applyTheme(theme: theme)
@@ -309,7 +306,6 @@ extension AccountSettingsController {
         let cell = tableView.dequeueReusableCell(withIdentifier: accountSettingsCellId,
                                                  for: indexPath) as? AccountSettingsTableViewCell ?? AccountSettingsTableViewCell()
         cell.accessoryType = .disclosureIndicator
-        
         if indexPath.section == 0 {
             cell.icon.image = firstSection[indexPath.row].icon
             cell.title.text = firstSection[indexPath.row].title
@@ -366,8 +362,7 @@ extension AccountSettingsController {
         
         if indexPath.section == 1 {
             logoutButtonTapped()
-        }
-        
+        }        
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

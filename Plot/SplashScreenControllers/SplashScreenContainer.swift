@@ -24,7 +24,6 @@ class SplashScreenContainer: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         doesDeviceHaveBiometrics()
     }
     

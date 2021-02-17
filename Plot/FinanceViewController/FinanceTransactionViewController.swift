@@ -74,7 +74,7 @@ class FinanceTransactionViewController: FormViewController {
             }
         } else if !(transaction?.user_created ?? false) {
             for row in form.rows {
-                if row.tag == "Account" || row.tag == "Date" {
+                if row.tag == "Account" || row.tag == "Transacted On" || row.tag == "Name" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -271,6 +271,20 @@ class FinanceTransactionViewController: FormViewController {
                 } else if let date = isodateFormatter.date(from: transaction.transacted_at) {
                     $0.value = date
                 }
+            }.onExpandInlineRow { cell, row, inlineRow in
+                inlineRow.cellUpdate() { cell, row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.datePicker.datePickerMode = .date
+                    if #available(iOS 13.4, *) {
+                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    }
+                }
+                let color = cell.detailTextLabel?.textColor
+                row.onCollapseInlineRow { cell, _, _ in
+                    cell.detailTextLabel?.textColor = color
+                }
+                cell.detailTextLabel?.textColor = cell.tintColor
             }.onChange { row in
                 if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
                     let date = self.isodateFormatter.string(from: value)

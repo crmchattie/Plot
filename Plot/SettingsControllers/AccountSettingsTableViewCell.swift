@@ -20,12 +20,9 @@ class AccountSettingsTableViewCell: UITableViewCell {
     var title: UILabel = {
         var title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
-        //    title.font = UIFont.systemFont(ofSize: 18)
         title.font = UIFont.preferredFont(forTextStyle: .body)
         title.adjustsFontForContentSizeCategory = true
-        
         title.textColor = ThemeManager.currentTheme().generalTitleColor
-        
         return title
     }()
     
@@ -34,7 +31,6 @@ class AccountSettingsTableViewCell: UITableViewCell {
         let separator = UIView()
         separator.translatesAutoresizingMaskIntoConstraints = false
         separator.backgroundColor = UIColor.clear
-        
         return separator
     }()
     

@@ -91,7 +91,6 @@ class CreateActivityViewController: FormViewController {
             active = true
             if activity.activityID != nil {
                 activityID = activity.activityID!
-                print("activityID \(activityID)")
             }
             if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
                 locationName = localName

@@ -64,6 +64,8 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
             webView.load(myRequest)
             webView.allowsBackForwardNavigationGestures = true
         } else {
+//            view.addSubview(activityIndicatorView)
+//            activityIndicatorView.centerInSuperview()
             fetchData()
         }
         
@@ -73,6 +75,9 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         Service.shared.fetchMXConnectURL(current_member_guid: current_member_guid) { (search, err) in
             if let search = search, let url = search["url"], let myURL = URL(string: url) {
                 DispatchQueue.main.async {
+//                    self.spinner.isHidden = true
+//                    self.spinner.stopAnimating()
+//                    self.spinner.removeFromSuperview()
                     let myRequest = URLRequest(url: myURL)
                     self.webView.load(myRequest)
                     self.webView.allowsBackForwardNavigationGestures = true
@@ -84,6 +89,14 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     @IBAction func done(_ sender: AnyObject) {
         self.delegate?.updateMXMembers()
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+
+    }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+
     }
     
     func webView(_ webView: WKWebView,

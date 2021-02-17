@@ -286,8 +286,7 @@ class FinanceViewController: UIViewController {
                 }
             } else if section.type == "Investments" {
                 if !holdings.isEmpty {
-                    var filteredHoldings = holdings.filter({$0.should_link ?? true})
-                    filteredHoldings.sort(by: {$0.symbol ?? $0.description < $1.symbol ?? $1.description})
+                    let filteredHoldings = holdings.filter({$0.should_link ?? true})
                     self.sections.append(section)
                     self.groups[section] = filteredHoldings
                 }

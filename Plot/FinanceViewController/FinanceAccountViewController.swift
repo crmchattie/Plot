@@ -128,7 +128,7 @@ class FinanceAccountViewController: FormViewController {
         if account.type == .investment {
             holdingFetcher.fetchHoldings { (firebaseHoldings) in
                 self.holdings = firebaseHoldings.filter({$0.account_guid == self.account.guid})
-                self.holdings.sort(by: {$0.symbol ?? $0.description < $1.symbol ?? $1.description})
+                self.holdings.sort(by: {$0.market_value ?? 0 > $1.market_value ?? 0})
                 self.addHoldingsSection()
             }
         }
@@ -141,6 +141,7 @@ class FinanceAccountViewController: FormViewController {
             for holding in holdings {
                 form.last!
                     <<< DecimalRow() {
+                        $0.cell.isUserInteractionEnabled = false
                         $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                         $0.title = holding.symbol ?? holding.description

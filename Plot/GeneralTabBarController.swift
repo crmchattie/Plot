@@ -44,16 +44,12 @@ class GeneralTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 12.0, *) {
-            if self.traitCollection.userInterfaceStyle == .dark {
-                let theme = Theme.Dark
-                ThemeManager.applyTheme(theme: theme)
-            } else {
-                let theme = Theme.Default
-                ThemeManager.applyTheme(theme: theme)
-            }
+        if self.traitCollection.userInterfaceStyle == .dark {
+            let theme = Theme.Dark
+            ThemeManager.applyTheme(theme: theme)
         } else {
-            // Fallback on earlier versions
+            let theme = Theme.Default
+            ThemeManager.applyTheme(theme: theme)
         }
         
         appDelegate.loadNotifications()
