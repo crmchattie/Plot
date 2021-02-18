@@ -10,11 +10,12 @@ import Foundation
 
 class ActivityCategorySelector {
     static var keywordsMap = ["Exercise": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
-                       "Work": ["meeting", "assignment", "project", "standup"],
-                       "Social": ["party"],
+                       "Work": ["meeting", "assignment", "project", "standup", "work"],
+                       "Social": ["party", "birthday"],
                        "Family": ["family"],
-                       "Personal": ["appointment", "consultation", "therapy"],
-                       "Meal": ["dinner", "lunch", "meal", "breakfast"]
+                       "Personal": ["appointment", "consultation", "therapy", "haircut"],
+                       "Meal": ["dinner", "lunch", "meal", "breakfast"],
+                       "Leisure": ["trip", "vacation"]
     ]
     
     class func selectCategory(for activity: Activity) -> String {

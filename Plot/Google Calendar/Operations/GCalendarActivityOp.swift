@@ -71,26 +71,26 @@ class GCalendarActivityOp: AsyncOperation {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         update(activity: activity)
         activity.category = ActivityCategorySelector.selectCategory(for: activity)
-        activity.activityType = CustomType.iOSCalendarEvent.categoryText
+        activity.activityType = CustomType.googleCalendarEvent.categoryText
         return activity
     }
     
     private func update(activity: Activity) {
         activity.name = event.summary
-        activity.activityDescription = event.description
+        activity.activityDescription = event.descriptionProperty
         activity.locationName = event.location
         if let start = event.start?.date, let end = event.end?.date {
             activity.allDay = true
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)
-            activity.startTimeZone = event.start?.timeZone
+            activity.startTimeZone = event.start?.timeZone ?? TimeZone.current.identifier
             activity.endDateTime = NSNumber(value: end.date.addingTimeInterval(-86400).timeIntervalSince1970)
-            activity.endTimeZone = event.end?.timeZone
+            activity.endTimeZone = event.end?.timeZone ?? TimeZone.current.identifier
         } else if let start = event.start?.dateTime, let end = event.end?.dateTime {
             activity.allDay = false
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)
-            activity.startTimeZone = event.start?.timeZone
+            activity.startTimeZone = event.start?.timeZone ?? TimeZone.current.identifier
             activity.endDateTime = NSNumber(value: end.date.timeIntervalSince1970)
-            activity.endTimeZone = event.end?.timeZone
+            activity.endTimeZone = event.end?.timeZone ?? TimeZone.current.identifier
         }
     }
     

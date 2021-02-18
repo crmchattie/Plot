@@ -255,19 +255,21 @@ class MasterActivityContainerController: UIViewController {
     func scrollToFirstActivityWithDate(_ completion: @escaping ([Activity]) -> Void) {
         let allActivities = networkController.activityService.activities
         let totalNumberOfActivities = allActivities.count
-        let numberOfActivities = 3
+        let numberOfActivities = 4
         if totalNumberOfActivities < numberOfActivities {
             completion(allActivities)
             return
         }
         var index = 0
         var activities = [Activity]()
-        let currentDate = Date().localTime
+        let currentDate = Date()
+        print("currentDate \(currentDate)")
         for activity in allActivities {
-            if let startInterval = activity.startDateTime?.doubleValue, let endInterval = activity.endDateTime?.doubleValue {
-                let startDate = Date(timeIntervalSince1970: startInterval)
-                let endDate = Date(timeIntervalSince1970: endInterval)
+            if let startDate = activity.startDate, let endDate = activity.endDate {
                 if currentDate < startDate || currentDate < endDate {
+                    print("activity \(activity.name)")
+                    print("startDate \(startDate)")
+                    print("endDate \(endDate)")
                     if index < totalNumberOfActivities - (numberOfActivities - 1) {
                         if activities.count < numberOfActivities {
                             activities.append(allActivities[index])

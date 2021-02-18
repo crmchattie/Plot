@@ -196,7 +196,7 @@ extension ActivityService {
         }
         
         for activity in self.activities {
-            if activity.activityType == "calendarEvent" || activity.activityType == CustomType.iOSCalendarEvent.categoryText, let activityID = activity.activityID {
+            if activity.activityType == "calendarEvent" || activity.activityType == CustomType.iOSCalendarEvent.categoryText || activity.activityType == CustomType.googleCalendarEvent.categoryText, let activityID = activity.activityID {
                 let activityReference = Database.database().reference().child(activitiesEntity).child(activityID)
                 let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID)
                 activityReference.removeValue()

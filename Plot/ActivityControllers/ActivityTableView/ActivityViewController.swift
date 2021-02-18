@@ -431,9 +431,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         var index = 0
         var activityFound = false
         for activity in self.filteredActivities {
-            if let startInterval = activity.startDateTime?.doubleValue, let endInterval = activity.endDateTime?.doubleValue {
-                let startDate = Date(timeIntervalSince1970: startInterval)
-                let endDate = Date(timeIntervalSince1970: endInterval)
+            if let startDate = activity.startDate, let endDate = activity.endDate {
                 if date < startDate || date < endDate {
                     activityFound = true
                     break

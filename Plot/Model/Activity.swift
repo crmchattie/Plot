@@ -475,7 +475,7 @@ class Activity: NSObject, NSCopying, Codable {
 }
 
 enum CustomType: String, Equatable, Hashable {
-    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness, calendar
+    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness, calendar, googleCalendarEvent
     
     var name: String {
         switch self {
@@ -492,6 +492,7 @@ enum CustomType: String, Equatable, Hashable {
         case .work: return "Work"
         case .mood: return "Mood"
         case .iOSCalendarEvent: return "Apple Calendar Event"
+        case .googleCalendarEvent: return "Google Calendar Event"
         case .mindfulness: return "Mindfulness"
         case .calendar: return "Calendar"
 
@@ -513,6 +514,7 @@ enum CustomType: String, Equatable, Hashable {
         case .work: return "Start of Work"
         case .mood: return "Add a mood"
         case .iOSCalendarEvent: return "Apple Calendar Event"
+        case .googleCalendarEvent: return "Google Calendar Event"
         case .mindfulness: return "Add mindfulness minutes"
         case .calendar: return "Add new calendar"
         }
@@ -528,7 +530,7 @@ enum CustomType: String, Equatable, Hashable {
         case .flight: return "Look up your flight details based on flight number, airline or airport"
         case .sleep: return "Wake Up"
         case .work: return "End of Work"
-        case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent, .mindfulness, .calendar: return ""
+        case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent, .mindfulness, .calendar, .googleCalendarEvent: return ""
         }
     }
     
@@ -547,6 +549,7 @@ enum CustomType: String, Equatable, Hashable {
         case .work: return "work"
         case .mood: return "mood"
         case .iOSCalendarEvent: return ""
+        case .googleCalendarEvent: return ""
         case .mindfulness: return "mindfulness"
         case .calendar: return "calendar"
         }
