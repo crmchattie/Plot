@@ -144,8 +144,8 @@ class FinanceService {
                 continue
             }
             //posted transaction matches name and merchant (time (amount - tips)
-            if let _ = postedTransactions.firstIndex(where: {$0.description == transaction.description && $0.transacted_at == transaction.transacted_at && $0.account_guid == transaction.account_guid}) {
-//                deleteTransaction(transaction_guid: transaction.guid)
+            if let _ = postedTransactions.firstIndex(where: {$0.description == transaction.description && $0.transacted_at == transaction.transacted_at && $0.account_guid == transaction.account_guid && $0.description == transaction.description}) {
+                deleteTransaction(transaction_guid: transaction.guid)
                 continue
             }
         }
@@ -155,16 +155,8 @@ class FinanceService {
         if let currentUserId = Auth.auth().currentUser?.uid, let index = self.transactions.firstIndex(where: {$0.guid == transaction_guid}) {
             self.transactions.remove(at: index)
             let reference = Database.database().reference()
-            reference.child(userFinancialTransactionsEntity).child(currentUserId).child(transaction_guid).observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists() {
-                    reference.child(userFinancialTransactionsEntity).child(currentUserId).child(transaction_guid).removeValue()
-                }
-            })
-            reference.child(financialTransactionsEntity).child(transaction_guid).observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists() {
-                    reference.child(financialTransactionsEntity).child(transaction_guid).removeValue()
-                }
-            })
+            reference.child(userFinancialTransactionsEntity).child(currentUserId).child(transaction_guid).removeValue()
+            reference.child(financialTransactionsEntity).child(transaction_guid).removeValue()
         }
     }
     
@@ -177,19 +169,35 @@ class FinanceService {
     func deleteMXMemberFB(member: MXMember) {
         let current_member_guid = member.guid
         if let currentUserId = Auth.auth().currentUser?.uid, let index = self.members.firstIndex(where: {$0.guid == current_member_guid}) {
+            
             self.members.remove(at: index)
-            self.memberAccountsDict[member] = nil
             let reference = Database.database().reference()
-            reference.child(userFinancialMembersEntity).child(currentUserId).child(current_member_guid).observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists() {
-                    reference.child(userFinancialTransactionsEntity).child(currentUserId).child(current_member_guid).removeValue()
+            reference.child(userFinancialMembersEntity).child(currentUserId).child(current_member_guid).removeValue()
+            reference.child(financialMembersEntity).child(current_member_guid).removeValue()
+            
+            let accounts = self.memberAccountsDict[member]
+            self.memberAccountsDict[member] = nil
+            if let accounts = accounts {
+                deleteMXAccountsFB(accounts: accounts)
+            } else {
+                var memberAccounts = [MXAccount]()
+                for account in self.accounts {
+                    if account.member_guid == member.guid {
+                        memberAccounts.append(account)
+                    }
                 }
-            })
-            reference.child(financialMembersEntity).child(current_member_guid).observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists() {
-                    reference.child(financialTransactionsEntity).child(current_member_guid).removeValue()
-                }
-            })
+                deleteMXAccountsFB(accounts: memberAccounts)
+            }
+        }
+    }
+    
+    func deleteMXAccountsFB(accounts: [MXAccount]) {
+        if let currentUserId = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference()
+            for account in accounts {
+                reference.child(userFinancialAccountsEntity).child(currentUserId).child(account.guid).removeValue()
+                reference.child(financialAccountsEntity).child(account.guid).removeValue()
+            }
         }
     }
     

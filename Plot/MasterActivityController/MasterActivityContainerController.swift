@@ -263,13 +263,9 @@ class MasterActivityContainerController: UIViewController {
         var index = 0
         var activities = [Activity]()
         let currentDate = Date()
-        print("currentDate \(currentDate)")
         for activity in allActivities {
             if let startDate = activity.startDate, let endDate = activity.endDate {
                 if currentDate < startDate || currentDate < endDate {
-                    print("activity \(activity.name)")
-                    print("startDate \(startDate)")
-                    print("endDate \(endDate)")
                     if index < totalNumberOfActivities - (numberOfActivities - 1) {
                         if activities.count < numberOfActivities {
                             activities.append(allActivities[index])
