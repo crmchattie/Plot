@@ -137,7 +137,7 @@ extension ActivityCell {
         case "social":
             activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
         case "leisure":
-            activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
+            activityTypeButton.setImage(UIImage(named: "leisure"), for: .normal)
         case "exercise":
             activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
         case "family":
