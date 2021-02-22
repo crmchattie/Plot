@@ -430,9 +430,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     func scrollToFirstActivityWithDate(date: Date, animated: Bool) {
         var index = 0
         var activityFound = false
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         for activity in self.filteredActivities {
-            if let startDate = activity.startDate, let endDate = activity.endDate {
-                if date < startDate || date < endDate {
+            if let endDate = activity.endDateWTZ {
+                if (date < endDate) || (activity.allDay ?? false && calendar.compare(date, to: endDate, toGranularity: .day) != .orderedDescending) {
                     activityFound = true
                     break
                 }

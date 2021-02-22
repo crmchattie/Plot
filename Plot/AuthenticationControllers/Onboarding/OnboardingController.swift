@@ -16,7 +16,7 @@ class OnboardingController: UIViewController {
     super.viewDidLoad()
     
     //set-up interface with the help of OnboardingContainerView file
-    view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     view.addSubview(onboardingContainerView)
     onboardingContainerView.frame = view.bounds
     setColorsAccordingToTheme()

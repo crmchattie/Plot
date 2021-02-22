@@ -27,7 +27,7 @@ extension AccountSettingsController: UITextViewDelegate {
     }
     
     func tableHeaderHeight() -> CGFloat {
-        return 190 + estimateFrameForText(userProfileContainerView.bio.text, width: userProfileContainerView.bio.textContainer.size.width - 10).height
+        return 180 + estimateFrameForText(userProfileContainerView.bio.text, width: userProfileContainerView.bio.textContainer.size.width - 10).height
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
@@ -71,7 +71,6 @@ extension AccountSettingsController { /* user name editing */
     }
     
     @objc func nameEditingChanged() {
-        
         if userProfileContainerView.name.text!.count == 0 ||
             userProfileContainerView.name.text!.trimmingCharacters(in: .whitespaces).isEmpty {
             
@@ -88,14 +87,16 @@ extension AccountSettingsController { /* user name editing */
     }
     
     @objc func cancelBarButtonPressed() {
-        
         userProfileContainerView.name.text = currentName
         userProfileContainerView.bio.text = currentBio
+        userProfileContainerView.name.endEditing(true)
+        userProfileContainerView.bio.endEditing(true)
         userProfileContainerView.name.resignFirstResponder()
         userProfileContainerView.bio.resignFirstResponder()
+        userProfileContainerView.phone.resignFirstResponder()
+        userProfileContainerView.email.resignFirstResponder()
         navigationItem.leftBarButtonItem = nil
         navigationItem.rightBarButtonItem = nil
-        configureNavigationBar()
         view.setNeedsLayout()
     }
     
@@ -105,32 +106,18 @@ extension AccountSettingsController { /* user name editing */
             return
         }
         
-        //    ARSLineProgress.ars_showOnView(self.view)
-        if let navController = self.navigationController {
-            self.showSpinner(onView: navController.view)
-        } else {
-            self.showSpinner(onView: self.view)
-        }
         self.view.isUserInteractionEnabled = false
         navigationItem.leftBarButtonItem = nil
         navigationItem.rightBarButtonItem = nil
-        configureNavigationBar()
         userProfileContainerView.name.resignFirstResponder()
         userProfileContainerView.bio.resignFirstResponder()
-        
         
         let userNameReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
         userNameReference.updateChildValues(["name": userProfileContainerView.name.text!,
                                              "bio": userProfileContainerView.bio.text!]) { (error, reference) in
-                                                
                                                 if error != nil {
-                                                    //        ARSLineProgress.showFail()
-                                                    self.removeSpinner()
                                                     self.view.isUserInteractionEnabled = true
                                                 }
-                                                
-                                                //      ARSLineProgress.showSuccess()
-                                                self.removeSpinner()
                                                 self.view.isUserInteractionEnabled = true
         }
     }

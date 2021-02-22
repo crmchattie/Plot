@@ -19,7 +19,7 @@ class EnterVerificationCodeController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         view.addSubview(enterVerificationContainerView)
         enterVerificationContainerView.frame = view.bounds
         enterVerificationContainerView.resend.addTarget(self, action: #selector(sendSMSConfirmation), for: .touchUpInside)

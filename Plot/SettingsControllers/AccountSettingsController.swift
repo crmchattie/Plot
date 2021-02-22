@@ -23,7 +23,7 @@ class AccountSettingsController: UITableViewController {
                         ( icon: UIImage(named: "FinancialAccounts") , title: "Financial Info" ),
 //                        ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
                         ( icon: UIImage(named: "Privacy") , title: "Privacy and Security" ),
-                        ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
+//                        ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
                         ( icon: UIImage(named: "DataStorage") , title: "Data and Storage")]
     
     var secondSection = [( icon: UIImage(named: "Logout") , title: "Log Out")]
@@ -96,29 +96,36 @@ class AccountSettingsController: UITableViewController {
     fileprivate func configureContainerView() {
         userProfileContainerView.name.addTarget(self, action: #selector(nameDidBeginEditing), for: .editingDidBegin)
         userProfileContainerView.name.addTarget(self, action: #selector(nameEditingChanged), for: .editingChanged)
+        userProfileContainerView.phone.addTarget(self, action: #selector(changePhoneNumber), for: .editingDidBegin)
+        userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
         userProfileContainerView.profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openUserProfilePicture)))
         userProfileContainerView.bio.delegate = self
+        userProfileContainerView.email.delegate = self
         userProfileContainerView.name.delegate = self
+        userProfileContainerView.phone.delegate = self
         userProfileContainerView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         userProfileContainerView.bio.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         userProfileContainerView.userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        userProfileContainerView.email.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor
+        userProfileContainerView.phone.textColor = ThemeManager.currentTheme().generalTitleColor
         userProfileContainerView.bio.textColor = ThemeManager.currentTheme().generalTitleColor
+        userProfileContainerView.email.textColor = ThemeManager.currentTheme().generalTitleColor
         userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
     }
-    
-    func configureNavigationBar() {
-        nightMode.setImage(UIImage(named: "defaultTheme"), for: .normal)
-        nightMode.setImage(UIImage(named: "darkTheme"), for: .selected)
-        nightMode.imageView?.contentMode = .scaleAspectFit
-        nightMode.contentEdgeInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-        nightMode.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        nightMode.addTarget(self, action: #selector(rightBarButtonDidTap(sender:)), for: .touchUpInside)
-        nightMode.isSelected = Bool(ThemeManager.currentTheme().rawValue)
-        let rightBarButton = UIBarButtonItem(customView: nightMode)
-        navigationItem.setRightBarButton(rightBarButton, animated: false)
-    }
+//
+//    func configureNavigationBar() {
+//        nightMode.setImage(UIImage(named: "defaultTheme"), for: .normal)
+//        nightMode.setImage(UIImage(named: "darkTheme"), for: .selected)
+//        nightMode.imageView?.contentMode = .scaleAspectFit
+//        nightMode.contentEdgeInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+//        nightMode.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+//        nightMode.addTarget(self, action: #selector(rightBarButtonDidTap(sender:)), for: .touchUpInside)
+//        nightMode.isSelected = Bool(ThemeManager.currentTheme().rawValue)
+//        let rightBarButton = UIBarButtonItem(customView: nightMode)
+//        navigationItem.setRightBarButton(rightBarButton, animated: false)
+//    }
     
     @objc fileprivate func changeTheme() {
         nightMode.isSelected = Bool(ThemeManager.currentTheme().rawValue)
@@ -140,11 +147,14 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         userProfileContainerView.bio.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         userProfileContainerView.userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        userProfileContainerView.email.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         userProfileContainerView.profileImageView.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.userData.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor
+        userProfileContainerView.phone.textColor = ThemeManager.currentTheme().generalTitleColor
         userProfileContainerView.bio.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.bio.textColor = ThemeManager.currentTheme().generalTitleColor
+        userProfileContainerView.email.textColor = ThemeManager.currentTheme().generalTitleColor
         userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         tableView.reloadData()
@@ -196,7 +206,6 @@ class AccountSettingsController: UITableViewController {
     }
     
     func listenChanges() {
-        
         if let currentUser = Auth.auth().currentUser?.uid {
             
             let photoURLReference = Database.database().reference().child("users").child(currentUser).child("photoURL")
@@ -236,6 +245,30 @@ class AccountSettingsController: UITableViewController {
                 }
             })
         }
+    }
+    
+    @objc func changePhoneNumber() {
+        cancelBarButtonPressed()
+        AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
+        let controller = ChangePhoneNumberController()
+        let destination = UINavigationController(rootViewController: controller)
+        destination.navigationBar.shadowImage = UIImage()
+        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.hidesBottomBarWhenPushed = true
+        destination.navigationBar.isTranslucent = false
+        present(destination, animated: true, completion: nil)
+    }
+    
+    @objc func changeEmail() {
+        cancelBarButtonPressed()
+        AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
+        let controller = ChooseEmailController()
+        let destination = UINavigationController(rootViewController: controller)
+        destination.navigationBar.shadowImage = UIImage()
+        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.hidesBottomBarWhenPushed = true
+        destination.navigationBar.isTranslucent = false
+        present(destination, animated: true, completion: nil)
     }
     
     func logoutButtonTapped () {
@@ -343,17 +376,6 @@ extension AccountSettingsController {
             }
             
             if indexPath.row == 3 {
-                AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
-                let controller = ChangePhoneNumberController()
-                let destination = UINavigationController(rootViewController: controller)
-                destination.navigationBar.shadowImage = UIImage()
-                destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
-                destination.hidesBottomBarWhenPushed = true
-                destination.navigationBar.isTranslucent = false
-                present(destination, animated: true, completion: nil)
-            }
-            
-            if indexPath.row == 4 {
                 let destination = StorageTableViewController()
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)

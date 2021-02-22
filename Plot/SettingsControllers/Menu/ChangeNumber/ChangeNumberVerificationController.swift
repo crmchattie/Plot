@@ -13,7 +13,6 @@ class ChangeNumberVerificationController: EnterVerificationCodeController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    setRightBarButton(with: "Confirm")
   }
   
   override func rightBarButtonDidTap() {

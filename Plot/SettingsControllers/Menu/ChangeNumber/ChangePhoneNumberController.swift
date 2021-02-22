@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 class ChangePhoneNumberController: EnterPhoneNumberController {
   
   override func configurePhoneNumberContainerView() {
@@ -18,7 +17,7 @@ class ChangePhoneNumberController: EnterPhoneNumberController {
     navigationItem.leftBarButtonItem = leftBarButton
     phoneNumberContainerView.instructions.text = "Please confirm your country code\nand enter your NEW phone number."
 		let attributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor]
-    phoneNumberContainerView.phoneNumber.attributedPlaceholder = NSAttributedString(string: "New phone number", attributes: attributes)
+    phoneNumberContainerView.phoneNumber.attributedPlaceholder = NSAttributedString(string: "New Phone Number", attributes: attributes)
   }
   
   override func rightBarButtonDidTap() {

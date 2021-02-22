@@ -769,6 +769,30 @@ extension Activity {
     }
 }
 
+extension Activity {
+    var startDateWTZ: Date? {
+        guard let startDateTime = startDateTime?.doubleValue else {
+            return nil
+        }
+        let timezone = TimeZone(identifier: startTimeZone ?? "UTC")!
+        let timezoneOffset =  timezone.secondsFromGMT()
+        let epochDate = startDateTime
+        let timezoneEpochOffset = (epochDate + Double(timezoneOffset))
+        return Date(timeIntervalSince1970: timezoneEpochOffset)
+    }
+    
+    var endDateWTZ: Date? {
+        guard let endDateTime = endDateTime?.doubleValue else {
+            return nil
+        }
+        let timezone = TimeZone(identifier: endTimeZone ?? "UTC")!
+        let timezoneOffset =  timezone.secondsFromGMT()
+        let epochDate = endDateTime
+        let timezoneEpochOffset = (epochDate + Double(timezoneOffset))
+        return Date(timeIntervalSince1970: timezoneEpochOffset)
+    }
+}
+
 func dateToGLTRDate(date: Date, allDay: Bool, timeZone: TimeZone?) -> GTLRCalendar_EventDateTime? {
     guard let timeZone = timeZone else {
         return nil

@@ -83,24 +83,27 @@ class UserProfileContainerView: UIView {
         phone.keyboardType = .numberPad
         phone.placeholder = "Phone number"
         phone.borderStyle = .none
-        phone.isEnabled = false
-        phone.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//        phone.isEnabled = false
+        phone.textColor = ThemeManager.currentTheme().generalTitleColor
         phone.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         return phone
     }()
     
-    let bioPlaceholderLabel: UILabel = {
-        let bioPlaceholderLabel = UILabel()
-        bioPlaceholderLabel.text = "Bio"
-        bioPlaceholderLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        bioPlaceholderLabel.adjustsFontForContentSizeCategory = true
-        bioPlaceholderLabel.sizeToFit()
-        bioPlaceholderLabel.textAlignment = .center
-        bioPlaceholderLabel.backgroundColor = .clear
-        bioPlaceholderLabel.translatesAutoresizingMaskIntoConstraints = false
-        bioPlaceholderLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        
-        return bioPlaceholderLabel
+    let email: PasteRestrictedTextField = {
+        let textField = PasteRestrictedTextField()
+        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.textAlignment = .center
+        textField.keyboardType = .emailAddress
+        textField.attributedPlaceholder = NSAttributedString(string: "Email",
+                                     attributes: [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor])
+        textField.borderStyle = .none
+        textField.layer.cornerRadius = 10
+        textField.autocorrectionType = .no
+        textField.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        textField.textColor = ThemeManager.currentTheme().generalTitleColor
+        textField.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        return textField
     }()
     
     let userData: UIView = {
@@ -128,8 +131,20 @@ class UserProfileContainerView: UIView {
         bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         bio.textContainer.lineBreakMode = .byTruncatingTail
         bio.returnKeyType = .done
-        
         return bio
+    }()
+    
+    let bioPlaceholderLabel: UILabel = {
+        let bioPlaceholderLabel = UILabel()
+        bioPlaceholderLabel.text = "Bio"
+        bioPlaceholderLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        bioPlaceholderLabel.adjustsFontForContentSizeCategory = true
+        bioPlaceholderLabel.sizeToFit()
+        bioPlaceholderLabel.textAlignment = .center
+        bioPlaceholderLabel.backgroundColor = .clear
+        bioPlaceholderLabel.translatesAutoresizingMaskIntoConstraints = false
+        bioPlaceholderLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        return bioPlaceholderLabel
     }()
     
     let countLabel: UILabel = {
@@ -155,6 +170,7 @@ class UserProfileContainerView: UIView {
         addSubview(addPhotoLabel)
         addSubview(userData)
         addSubview(bio)
+//        addSubview(email)
         addSubview(countLabel)
         userData.addSubview(name)
         userData.addSubview(phone)
@@ -184,8 +200,11 @@ class UserProfileContainerView: UIView {
             phone.rightAnchor.constraint(equalTo: userData.rightAnchor, constant: 0),
             phone.heightAnchor.constraint(equalToConstant: 50),
             
-            bio.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+//            email.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+//            email.heightAnchor.constraint(equalToConstant: 50),
             
+            bio.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+                        
             countLabel.widthAnchor.constraint(equalToConstant: 30),
             countLabel.heightAnchor.constraint(equalToConstant: 30),
             countLabel.rightAnchor.constraint(equalTo: bio.rightAnchor, constant: -5),
@@ -210,6 +229,8 @@ class UserProfileContainerView: UIView {
                 profileImageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
                 bio.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
                 bio.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
+//                email.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
+//                email.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
                 userData.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
             ])
         } else {
@@ -217,6 +238,8 @@ class UserProfileContainerView: UIView {
                 profileImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
                 bio.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
                 bio.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
+//                email.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
+//                email.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
                 userData.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
             ])
         }

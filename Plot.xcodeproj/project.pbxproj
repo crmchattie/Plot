@@ -90,6 +90,10 @@
 		106774F825DAF76E002F78E7 /* FinanceHoldingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774F725DAF76E002F78E7 /* FinanceHoldingViewController.swift */; };
 		106774FC25DAFA8D002F78E7 /* FinancialHoldingActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774FB25DAFA8D002F78E7 /* FinancialHoldingActions.swift */; };
 		1067750025DD665C002F78E7 /* FinanceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774FF25DD665C002F78E7 /* FinanceDetailViewController.swift */; };
+		1067753625E1AB19002F78E7 /* ChangeEmailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1067753525E1AB19002F78E7 /* ChangeEmailController.swift */; };
+		1067753E25E1AE01002F78E7 /* ChangeEmailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1067753D25E1AE01002F78E7 /* ChangeEmailView.swift */; };
+		1067754225E1B590002F78E7 /* ChooseEmailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1067754125E1B590002F78E7 /* ChooseEmailView.swift */; };
+		1067754825E1B767002F78E7 /* ChooseEmailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1067754725E1B767002F78E7 /* ChooseEmailController.swift */; };
 		1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */; };
 		1069B2D02430EC880048244C /* IncomingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */; };
 		1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */; };
@@ -582,6 +586,10 @@
 		106774F725DAF76E002F78E7 /* FinanceHoldingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceHoldingViewController.swift; sourceTree = "<group>"; };
 		106774FB25DAFA8D002F78E7 /* FinancialHoldingActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialHoldingActions.swift; sourceTree = "<group>"; };
 		106774FF25DD665C002F78E7 /* FinanceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceDetailViewController.swift; sourceTree = "<group>"; };
+		1067753525E1AB19002F78E7 /* ChangeEmailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeEmailController.swift; sourceTree = "<group>"; };
+		1067753D25E1AE01002F78E7 /* ChangeEmailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeEmailView.swift; sourceTree = "<group>"; };
+		1067754125E1B590002F78E7 /* ChooseEmailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseEmailView.swift; sourceTree = "<group>"; };
+		1067754725E1B767002F78E7 /* ChooseEmailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseEmailController.swift; sourceTree = "<group>"; };
 		1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingActivityMessageCell.swift; sourceTree = "<group>"; };
@@ -1105,6 +1113,17 @@
 				1082C89924F16E2A00CF6491 /* Cells */,
 			);
 			path = ListViewController;
+			sourceTree = "<group>";
+		};
+		1067753425E1AB04002F78E7 /* ChangeEmail */ = {
+			isa = PBXGroup;
+			children = (
+				1067754725E1B767002F78E7 /* ChooseEmailController.swift */,
+				1067754125E1B590002F78E7 /* ChooseEmailView.swift */,
+				1067753525E1AB19002F78E7 /* ChangeEmailController.swift */,
+				1067753D25E1AE01002F78E7 /* ChangeEmailView.swift */,
+			);
+			path = ChangeEmail;
 			sourceTree = "<group>";
 		};
 		1082B66523EF25D300A27046 /* DetailControllers */ = {
@@ -1698,6 +1717,7 @@
 				4BAEE46021272B380045AB10 /* NotificationsAndSounds */,
 				4BAEE45121272B380045AB10 /* PrivacyAndSecurity */,
 				4BAEE45321272B380045AB10 /* ChangeNumber */,
+				1067753425E1AB04002F78E7 /* ChangeEmail */,
 				4BAEE45821272B380045AB10 /* Storage */,
 			);
 			path = Menu;
@@ -2814,6 +2834,7 @@
 				26D37B6A2556004B00F7131B /* HealthDetailSampleCell.swift in Sources */,
 				4BAEE5F2212735E50045AB10 /* UserDefaultsManager.swift in Sources */,
 				4BAEE50721272D890045AB10 /* ContactDataTableViewCell.swift in Sources */,
+				1067753E25E1AE01002F78E7 /* ChangeEmailView.swift in Sources */,
 				10E8E50325923C070076BE42 /* BaseContainerCell.swift in Sources */,
 				4BAEE54E212735880045AB10 /* Message.swift in Sources */,
 				10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */,
@@ -2961,8 +2982,10 @@
 				4BAEE5E0212735E50045AB10 /* UIImageExtensions.swift in Sources */,
 				10DE97372475801400D4A7E8 /* ListCell+ConfigureCell.swift in Sources */,
 				4BAEE4F121272D890045AB10 /* UserinfoHeaderTableViewCell.swift in Sources */,
+				1067754225E1B590002F78E7 /* ChooseEmailView.swift in Sources */,
 				109F849023D607C6002C0044 /* RecipeTypeViewController.swift in Sources */,
 				106431D1258AE41800D02658 /* SummaryHorizontalBarChart.swift in Sources */,
+				1067753625E1AB19002F78E7 /* ChangeEmailController.swift in Sources */,
 				1026185425756B3300CF6F0A /* SummaryPieChartCell.swift in Sources */,
 				100A53EC23E0DD9C004AA952 /* ActivityHeaderCell.swift in Sources */,
 				106774F825DAF76E002F78E7 /* FinanceHoldingViewController.swift in Sources */,
@@ -2973,6 +2996,7 @@
 				26E3179B2379FB72007D1F21 /* ActivityTypeViewController.swift in Sources */,
 				10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */,
 				4BAEE46F21272B380045AB10 /* NotificationsTableViewController.swift in Sources */,
+				1067754825E1B767002F78E7 /* ChooseEmailController.swift in Sources */,
 				4BAEE50421272D890045AB10 /* AutoSizingCollectionViewFlowLayout.swift in Sources */,
 				10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */,
 				10F5CFF625CB7E3B0078C821 /* GFetchCalendarEventsOp.swift in Sources */,

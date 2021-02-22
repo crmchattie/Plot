@@ -262,10 +262,12 @@ class MasterActivityContainerController: UIViewController {
         }
         var index = 0
         var activities = [Activity]()
-        let currentDate = Date()
+        let currentDate = Date().localTime
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         for activity in allActivities {
-            if let startDate = activity.startDate, let endDate = activity.endDate {
-                if currentDate < startDate || currentDate < endDate {
+            if let endDate = activity.endDateWTZ {
+                if (currentDate < endDate) || (activity.allDay ?? false && calendar.compare(currentDate, to: endDate, toGranularity: .day) != .orderedDescending) {
                     if index < totalNumberOfActivities - (numberOfActivities - 1) {
                         if activities.count < numberOfActivities {
                             activities.append(allActivities[index])

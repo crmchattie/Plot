@@ -20,7 +20,7 @@ class UserProfileController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         view.addSubview(userProfileContainerView)
         
         configureNavigationBar()
@@ -45,10 +45,7 @@ class UserProfileController: UIViewController {
     }
     
     fileprivate func configureColorsAccordingToTheme() {
-        userProfileContainerView.profileImageView.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
-        userProfileContainerView.userData.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.bio.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
         userProfileContainerView.bio.textColor = ThemeManager.currentTheme().generalTitleColor
         userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
@@ -122,18 +119,10 @@ extension UserProfileController {
     }
     
     func updateUserData() {
-        if let navController = self.navigationController {
-            self.showSpinner(onView: navController.view)
-        } else {
-            self.showSpinner(onView: self.view)
-        }
-        
-        
         let userReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
         userReference.updateChildValues(["name": userProfileContainerView.name.text!,
                                          "phoneNumber": userProfileContainerView.phone.text!,
                                          "bio": userProfileContainerView.bio.text!]) { (_, _) in
-            self.removeSpinner()
             Analytics.logEvent(AnalyticsEventSignUp, parameters: [
                 AnalyticsParameterMethod: self.method
             ])
@@ -145,7 +134,6 @@ extension UserProfileController {
 }
 
 extension UserProfileController: UITextViewDelegate {
-    
     func textViewDidBeginEditing(_ textView: UITextView) {
         userProfileContainerView.bioPlaceholderLabel.isHidden = true
         userProfileContainerView.countLabel.text = "\(userProfileContainerView.bioMaxCharactersCount - userProfileContainerView.bio.text.count)"

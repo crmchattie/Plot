@@ -45,8 +45,8 @@ class EnterPhoneNumberContainerView: UIView {
         selectCountry.contentHorizontalAlignment = .center
         selectCountry.contentVerticalAlignment = .center
         selectCountry.titleLabel?.sizeToFit()
-        selectCountry.backgroundColor = ThemeManager.currentTheme().controlButtonsColor
-        selectCountry.layer.cornerRadius = 25
+        selectCountry.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        selectCountry.layer.cornerRadius = 10
         selectCountry.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10.0, bottom: 0.0, right: 10.0)
         selectCountry.titleLabel?.font = UIFont.systemFont(ofSize: 18)
         selectCountry.addTarget(self, action: #selector(EnterPhoneNumberController.openCountryCodesList), for: .touchUpInside)
@@ -85,9 +85,8 @@ class EnterPhoneNumberContainerView: UIView {
     var phoneContainer: UIView = {
         var phoneContainer = UIView()
         phoneContainer.translatesAutoresizingMaskIntoConstraints = false
-        phoneContainer.layer.cornerRadius = 25
-        phoneContainer.layer.borderWidth = 1
-        phoneContainer.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
+        phoneContainer.layer.cornerRadius = 10
+        phoneContainer.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         return phoneContainer
     }()
     

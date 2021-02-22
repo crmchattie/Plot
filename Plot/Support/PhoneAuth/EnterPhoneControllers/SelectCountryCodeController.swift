@@ -17,7 +17,6 @@ public var countryCode = NSLocale.current.regionCode
 fileprivate var savedContentOffset = CGPoint(x: 0, y: -50)
 fileprivate var savedCountryCode = String()
 
-
 class SelectCountryCodeController: UITableViewController {
     
     let countries = Country().countries
