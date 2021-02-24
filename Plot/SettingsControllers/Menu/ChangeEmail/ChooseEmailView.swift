@@ -38,7 +38,7 @@ class ChooseEmailView: UIView {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Google", for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(ThemeManager.currentTheme().generalTitleColor, for: .normal)
         button.contentHorizontalAlignment = .center
         button.contentVerticalAlignment = .center
         button.titleLabel?.sizeToFit()
@@ -53,7 +53,7 @@ class ChooseEmailView: UIView {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Email", for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(ThemeManager.currentTheme().generalTitleColor, for: .normal)
         button.contentHorizontalAlignment = .center
         button.contentVerticalAlignment = .center
         button.titleLabel?.sizeToFit()

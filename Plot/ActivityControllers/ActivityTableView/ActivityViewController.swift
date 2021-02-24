@@ -264,27 +264,35 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func newItem() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
+        if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
+                let destination = CreateActivityViewController()
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Calendar", style: .default, handler: { (_) in
+                self.newCalendar()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+        } else {
             let destination = CreateActivityViewController()
             destination.users = self.networkController.userService.users
             destination.filteredUsers = self.networkController.userService.users
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Calendar", style: .default, handler: { (_) in
-            self.newCalendar()
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
+        }
     }
     
     @objc func newCalendar() {
@@ -295,9 +303,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 self.networkController.activityService.updatePrimaryCalendar(value: googleString)
             }))
         }
-        alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
-            GIDSignIn.sharedInstance()?.signIn()
-        }))
+        
+        if !networkController.activityService.calendars.keys.contains(googleString) {
+            alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance()?.signIn()
+            }))
+        }
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")

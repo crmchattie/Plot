@@ -106,7 +106,7 @@ class LocationCell: LBTAListCell<LocationStruct> {
         typeButton.constrainWidth(30)
         typeButton.constrainHeight(30)
         
-        backgroundColor = .systemBackground
+        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
         setupShadow(opacity: 0.2, radius: 5, offset: .zero, color: .black)
         layer.cornerRadius = 5

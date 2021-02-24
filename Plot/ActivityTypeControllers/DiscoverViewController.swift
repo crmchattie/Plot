@@ -20,8 +20,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
-    var customTypes: [CustomType] = [.basic, .calendar, .meal, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
-    var sections: [SectionType] = [.activity, .calendar, .customMeal, .customWorkout, .mindfulness, .customTransaction, .customFinancialAccount, .customTransactionRule]
+    var customTypes: [CustomType] = [.basic, .meal, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
+    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mindfulness, .customTransaction, .customFinancialAccount, .customTransactionRule]
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0
@@ -283,9 +283,12 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 self.networkController.activityService.updatePrimaryCalendar(value: icloudString)
             }))
         }
-        alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
-            GIDSignIn.sharedInstance()?.signIn()
-        }))
+        
+        if !networkController.activityService.calendars.keys.contains(googleString) {
+            alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance()?.signIn()
+            }))
+        }
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")

@@ -130,11 +130,11 @@ class FinanceService {
     func removePendingTransactions() {
         let pendingTransactions = self.transactions.filter{($0.status == .pending)}
         let postedTransactions = self.transactions.filter{($0.status == .posted)}
-        let lastFortNight = Calendar.current.date(byAdding: .day, value: -14, to: Date())
+        let lastWeek = Calendar.current.date(byAdding: .day, value: -7, to: Date())
         for transaction in pendingTransactions {
             let transactionDate = isodateFormatter.date(from: transaction.transacted_at) ?? Date()
             //older than 14 days
-            if transactionDate < lastFortNight! {
+            if transactionDate < lastWeek! {
                 deleteTransaction(transaction_guid: transaction.guid)
                 continue
             }
@@ -144,7 +144,7 @@ class FinanceService {
                 continue
             }
             //posted transaction matches name and merchant (time (amount - tips)
-            if let _ = postedTransactions.firstIndex(where: {$0.description == transaction.description && $0.transacted_at == transaction.transacted_at && $0.account_guid == transaction.account_guid && $0.description == transaction.description}) {
+            if let _ = postedTransactions.firstIndex(where: {$0.description == transaction.description && $0.transacted_at == transaction.transacted_at && $0.account_guid == transaction.account_guid}) {
                 deleteTransaction(transaction_guid: transaction.guid)
                 continue
             }

@@ -19,7 +19,7 @@ class ShareHeaderView: UIView {
     }()
         
     let tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         tableView.backgroundColor = UIColor(red: 245.0/255.0, green: 245.0/255.0, blue: 245.0/255.0, alpha: 1.0)
@@ -128,19 +128,6 @@ class ActivityCell: UITableViewCell {
         return label
     }()
     
-    //activity type label (e.g. drinks, trip)
-//    let activityTypeLabel: UILabel = {
-//        let label = UILabel()
-//        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-//        label.adjustsFontForContentSizeCategory = true
-//        label.textColor = .systemGray
-//        label.numberOfLines = 1
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//        label.sizeToFit()
-//
-//        return label
-//    }()
-    
     //activity participants label (e.g. whoever is invited to activity)
     let activityParticipantsLabel: UILabel = {
         let label = UILabel()
@@ -153,20 +140,6 @@ class ActivityCell: UITableViewCell {
         
         return label
     }()
-    
-    //activity address label (e.g. address of restaurant, initial lodgings with trip)
-//    let activityAddressLabel: UILabel = {
-//        let label = UILabel()
-//        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-//        label.adjustsFontForContentSizeCategory = true
-//        label.textColor = .systemGray
-//        label.numberOfLines = 1
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//        label.isUserInteractionEnabled = true
-//        label.sizeToFit()
-//
-//        return label
-//    }()
     
     let badgeLabel: UILabel = {
         let badgeLabel = UILabel()
@@ -215,72 +188,60 @@ class ActivityCell: UITableViewCell {
         return segmentedControl
     }()
     
+    let activityTypeLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
+        label.textColor = .systemGray
+        label.numberOfLines = 1
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     var invitationSegmentHeightConstraint: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
-    let invitationSegmentedControlTopAnchorRegular: CGFloat = 17
-    let invitationSegmentHeightConstant: CGFloat = 29
+    let invitationSegmentedControlTopAnchorRegular: CGFloat = 0
+    let invitationSegmentHeightConstant: CGFloat = 0
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
-        
-        backgroundColor = .white
-        contentView.backgroundColor = .white
-        
+                
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
         activityImageView.addSubview(startLabel)
-//        activityImageView.addSubview(activityTypeLabel)
-//        activityImageView.addSubview(activityAddressLabel)
-        activityImageView.addSubview(muteIndicator)
-        activityImageView.addSubview(newActivityIndicator)
-        activityImageView.addSubview(invitationSegmentedControl)
+        activityImageView.addSubview(activityTypeLabel)
         activityImageView.addSubview(badgeLabel)
         activityImageView.addSubview(activityTypeButton)
-        activityImageView.addSubview(chatButton)
-        activityImageView.addSubview(mapButton)
+        activityImageView.addSubview(muteIndicator)
+        activityImageView.addSubview(invitationSegmentedControl)
         
-        activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4).isActive = true
-        activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4).isActive = true
-        activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
-        activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
+        activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
+        activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
+        activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 0).isActive = true
+        activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 0).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -20).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
         startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
         startLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
-        
-//        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
-//        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-//        activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
 //
-//        activityAddressLabel.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: 2).isActive = true
-//        activityAddressLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-//        activityAddressLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
+        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
-        activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 5).isActive = true
-        activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        activityTypeButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
-        activityTypeButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
+        activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
+        activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
+        activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
-        chatButton.topAnchor.constraint(equalTo: activityTypeButton.bottomAnchor, constant: 5).isActive = true
-        chatButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        chatButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
-        chatButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
-        
-        mapButton.topAnchor.constraint(equalTo: chatButton.bottomAnchor, constant: 5).isActive = true
-        mapButton.bottomAnchor.constraint(lessThanOrEqualTo: invitationSegmentedControl.topAnchor, constant: -5).isActive = true
-        mapButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        mapButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
-        mapButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
-        
-        invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: mapButton.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
+        invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
         invitationSegmentedControlTopAnchor.isActive = true
-        invitationSegmentedControl.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 0).isActive = true
-        invitationSegmentedControl.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: 0).isActive = true
-        invitationSegmentedControl.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -5).isActive = true
+        invitationSegmentedControl.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
+        invitationSegmentedControl.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
+        invitationSegmentedControl.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
         invitationSegmentHeightConstraint = invitationSegmentedControl.heightAnchor.constraint(equalToConstant: invitationSegmentHeightConstant)
         invitationSegmentHeightConstraint.isActive = true
         
@@ -289,13 +250,8 @@ class ActivityCell: UITableViewCell {
         muteIndicator.widthAnchor.constraint(equalToConstant: 15).isActive = true
         muteIndicator.heightAnchor.constraint(equalToConstant: 15).isActive = true
         
-        newActivityIndicator.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-        newActivityIndicator.centerYAnchor.constraint(equalTo: activityImageView.centerYAnchor).isActive = true
-        newActivityIndicator.widthAnchor.constraint(equalToConstant: 10).isActive = true
-        newActivityIndicator.heightAnchor.constraint(equalToConstant: 10).isActive = true
-        
-        badgeLabel.topAnchor.constraint(equalTo: chatButton.topAnchor, constant: 25).isActive = true
-        badgeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -50).isActive = true
+        badgeLabel.topAnchor.constraint(equalTo: activityTypeButton.bottomAnchor, constant: 10).isActive = true
+        badgeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
     }
@@ -306,13 +262,11 @@ class ActivityCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        nameLabel.text = ""
-        startLabel.text = ""
-//        activityTypeLabel.text = ""
-//        activityAddressLabel.text = ""
+        nameLabel.text = nil
+        startLabel.text = nil
+        activityTypeLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
-        newActivityIndicator.isHidden = true
         nameLabel.textColor = .black
         activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
     }
@@ -394,8 +348,8 @@ class ActivityCell: UITableViewCell {
     
     func configureCell(for indexPath: IndexPath, activity: Activity) {
         
-        backgroundColor = .white
-        contentView.backgroundColor = .white
+        backgroundColor = #colorLiteral(red: 0.9489266276, green: 0.9490858912, blue: 0.9747040868, alpha: 1)
+        contentView.backgroundColor = #colorLiteral(red: 0.9489266276, green: 0.9490858912, blue: 0.9747040868, alpha: 1)
         activityImageView.backgroundColor = .white
         
         self.activity = activity
@@ -409,6 +363,12 @@ class ActivityCell: UITableViewCell {
         let dateTimeValueArray = dateTimeValue(forActivity: activity)
         startLabel.numberOfLines = dateTimeValueArray.0
         startLabel.text = dateTimeValueArray.1
+        
+        if activity.category != nil {
+            activityTypeLabel.text = activity.category
+        } else {
+            activityTypeLabel.text = "Uncategorized"
+        }
                 
 //        if activity.activityType != "nothing" && activity.activityType != nil {
 //            activityTypeLabel.text = activity.activityType?.capitalized
@@ -425,14 +385,24 @@ class ActivityCell: UITableViewCell {
         invitationSegmentedControl.isHidden = true
         invitationSegmentHeightConstraint.constant = 0
         
-                
-        if activity.recipeID != nil {
-            activityTypeButton.setImage(UIImage(named: "recipe"), for: .normal)
-        } else if activity.workoutID != nil {
+        switch activity.category?.lowercased() {
+        case "sleep":
+            activityTypeButton.setImage(UIImage(named: "sleep"), for: .normal)
+        case "meal":
+            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
+        case "work":
+            activityTypeButton.setImage(UIImage(named: "work"), for: .normal)
+        case "social":
+            activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
+        case "leisure":
+            activityTypeButton.setImage(UIImage(named: "leisure"), for: .normal)
+        case "exercise":
             activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
-        } else if activity.eventID != nil {
-            activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
-        } else {
+        case "family":
+            activityTypeButton.setImage(UIImage(named: "family"), for: .normal)
+        case "personal":
+            activityTypeButton.setImage(UIImage(named: "personal"), for: .normal)
+        default:
             activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
         }
                 

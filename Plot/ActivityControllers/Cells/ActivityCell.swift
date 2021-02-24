@@ -181,31 +181,6 @@ class ActivityCell: BaseContainerTableViewCell {
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
-//        var x: CGFloat = 10
-//        for _ in 0..<thumbnailsCount {
-//            let icon = UIImageView()
-//            iconView.addSubview(icon)
-//            thumbnails.append(icon)
-//            icon.translatesAutoresizingMaskIntoConstraints = false
-//            icon.contentMode = .scaleAspectFill
-//            icon.layer.cornerRadius = 15
-//            icon.layer.masksToBounds = true
-//            icon.image = UIImage(named: "UserpicIcon")
-//            icon.topAnchor.constraint(equalTo: iconView.topAnchor, constant: 0).isActive = true
-//            icon.leftAnchor.constraint(equalTo: iconView.leftAnchor, constant: x).isActive = true
-//            icon.widthAnchor.constraint(equalToConstant: 30).isActive = true
-//            icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
-//            icon.isHidden = true
-//            x += 38
-//        }
-//
-//        iconViewTopAnchor = iconView.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: iconViewTopAnchorRegular)
-//        iconViewTopAnchor.isActive = true
-//        iconView.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 0).isActive = true
-//        iconView.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: 0).isActive = true
-//        iconViewHeightConstraint = iconView.heightAnchor.constraint(equalToConstant: iconViewHeightConstant)
-//        iconViewHeightConstraint.isActive = true
         
         invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
         invitationSegmentedControlTopAnchor.isActive = true

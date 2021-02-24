@@ -56,7 +56,6 @@ class ShareViewController: UIViewController {
         shareHeaderView.tableView.delegate = self
         shareHeaderView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: Identifiers.ActivityCell)
         shareHeaderView.tableView.rowHeight = UITableView.automaticDimension
-        shareHeaderView.tableView.estimatedRowHeight = 40
         shareHeaderView.tableView.separatorStyle = .none
     }
     
@@ -315,6 +314,14 @@ extension ShareViewController: UITableViewDataSource {
 }
 
 extension ShareViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let activity = activitiesArray[indexPath.item]
         showActivityIndicator()

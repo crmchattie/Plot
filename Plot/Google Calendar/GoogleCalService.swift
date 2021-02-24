@@ -20,6 +20,7 @@ class GoogleCalService {
         GoogleCalSetupAssistant.setupGoogle { bool in
             if let user = GIDSignIn.sharedInstance()?.currentUser {
                 self.user = user
+                
             }
             completion(bool)
         }

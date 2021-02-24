@@ -217,8 +217,7 @@ class MasterActivityContainerController: UIViewController {
     
     func setNavBar() {
         let notificationsBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell"), style: .plain, target: self, action: #selector(goToNotifications))
-        let chatBarButton = UIBarButtonItem(image: UIImage(named: "chat"), style: .plain, target: self, action: #selector(goToChat))
-        navigationItem.leftBarButtonItems = [notificationsBarButton, chatBarButton]
+        navigationItem.leftBarButtonItem = notificationsBarButton
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         navigationItem.rightBarButtonItem = newItemBarButton

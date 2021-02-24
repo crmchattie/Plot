@@ -200,8 +200,12 @@ class CreateActivityViewController: FormViewController {
         } else {
             let dotsImage = UIImage(named: "dots")
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
-            let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-            navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
+            if let localName = activity.locationName, localName != "locationName", let _ = activity.locationAddress {
+                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
+            } else {
+                navigationItem.rightBarButtonItem = plusBarButton
+            }
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
     }
@@ -1911,20 +1915,20 @@ class CreateActivityViewController: FormViewController {
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if activity.conversationID == nil {
-            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
-                print("User click Approve button")
-                self.goToChat()
-
-            }))
-        } else {
-            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
-                print("User click Approve button")
-                self.goToChat()
-
-                
-            }))
-        }
+//        if activity.conversationID == nil {
+//            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
+//                print("User click Approve button")
+//                self.goToChat()
+//
+//            }))
+//        } else {
+//            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+//                print("User click Approve button")
+//                self.goToChat()
+//
+//
+//            }))
+//        }
             
         if let localName = activity.locationName, localName != "locationName", let _ = activity.locationAddress {
             alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in

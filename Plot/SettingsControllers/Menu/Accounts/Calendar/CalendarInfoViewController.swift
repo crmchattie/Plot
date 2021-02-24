@@ -36,9 +36,11 @@ class CalendarInfoViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
-        let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newCalendar))
-        navigationItem.rightBarButtonItem = barButton
-        
+        if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
+            let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newCalendar))
+            navigationItem.rightBarButtonItem = barButton
+        }
+                
         GIDSignIn.sharedInstance()?.presentingViewController = self
         
         addObservers()
@@ -67,9 +69,12 @@ class CalendarInfoViewController: UITableViewController {
                 self.networkController.activityService.updatePrimaryCalendar(value: icloudString)
             }))
         }
-        alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
-            GIDSignIn.sharedInstance()?.signIn()
-        }))
+        
+        if !calendars.keys.contains(googleString) {
+            alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance()?.signIn()
+            }))
+        }
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
