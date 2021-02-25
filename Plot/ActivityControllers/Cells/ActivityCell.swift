@@ -15,7 +15,7 @@ protocol ActivityCellDelegate: class {
     func openChat(forConversation conversationID: String?, activityID: String?)
 }
 
-class ActivityCell: BaseContainerTableViewCell {
+class ActivityCell: UITableViewCell {
     var invitationSegmentHeightConstraint: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchorRegular: CGFloat = 8

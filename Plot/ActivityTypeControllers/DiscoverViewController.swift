@@ -236,11 +236,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         }
     }
     
-    private func fetchData() {
-        guard currentReachabilityStatus != .notReachable else {
-            return
-        }
-        
+    private func fetchData() {        
         var snapshot = self.diffableDataSource.snapshot()
         snapshot.deleteAllItems()
         self.diffableDataSource.apply(snapshot)

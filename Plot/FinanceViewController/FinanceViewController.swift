@@ -189,9 +189,6 @@ class FinanceViewController: UIViewController {
     }
     
     private func updateCollectionView() {
-        guard currentReachabilityStatus != .notReachable else {
-            return
-        }
         var accountLevel: AccountCatLevel!
         var transactionLevel: TransactionCatLevel!
         accountLevel = .none

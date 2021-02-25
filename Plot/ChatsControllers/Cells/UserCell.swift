@@ -15,7 +15,7 @@ protocol ChatCellDelegate: class {
     func openActivity(forConversation conversation: Conversation)
 }
 
-class UserCell: BaseContainerTableViewCell {
+class UserCell: UITableViewCell {
     
     let thumbnailsCount = 9
     var thumbnails: [UIImageView] = []

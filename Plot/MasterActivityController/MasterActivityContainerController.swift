@@ -290,9 +290,6 @@ class MasterActivityContainerController: UIViewController {
     }
     
     func grabFinancialItems(_ completion: @escaping ([SectionType], [SectionType: [AnyHashable]]) -> Void) {
-        guard currentReachabilityStatus != .notReachable else {
-            return
-        }
         var accountLevel: AccountCatLevel!
         var transactionLevel: TransactionCatLevel!
         accountLevel = .bs_type

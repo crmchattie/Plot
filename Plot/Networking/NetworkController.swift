@@ -57,8 +57,6 @@ class NetworkController {
     
     func setupOtherVariables() {
         userService.grabContacts()
-        conversationService.grabConversations()
-        listService.grabLists()
     }
     
     func newUserItems() {
