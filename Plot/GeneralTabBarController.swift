@@ -63,6 +63,7 @@ class GeneralTabBarController: UITabBarController {
     fileprivate func configureTabBar(){
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor], for: .normal)
         tabBar.unselectedItemTintColor = ThemeManager.currentTheme().generalSubtitleColor
+        tabBar.barTintColor = ThemeManager.currentTheme().generalTitleColor
         tabBar.isTranslucent = false
         tabBar.layer.borderWidth = 0.50
         tabBar.layer.borderColor = UIColor.clear.cgColor

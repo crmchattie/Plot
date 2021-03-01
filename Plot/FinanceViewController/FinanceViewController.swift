@@ -70,8 +70,8 @@ class FinanceViewController: UIViewController {
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
-    var startDate = Date().startOfMonth
-    var endDate = Date().endOfMonth
+    var startDate = Date().localTime.startOfMonth
+    var endDate = Date().localTime.endOfMonth
     
     var hasViewAppeared = false
     

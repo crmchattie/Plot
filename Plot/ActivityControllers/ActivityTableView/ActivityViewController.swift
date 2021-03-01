@@ -539,16 +539,16 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    //    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
-    //        print("date \(date)")
-    //        let dateFormatter = DateFormatter()
-    //        dateFormatter.dateFormat = "yyyy/MM/dd"
-    //        let dateString = dateFormatter.string(from: date)
-    //        if self.activityDates.contains(dateString) {
-    //            return 1
-    //        }
-    //        return 0
-    //    }
+//    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
+//        print("date \(date)")
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "yyyy/MM/dd"
+//        let dateString = dateFormatter.string(from: date)
+//        if self.activityDates.contains(dateString) {
+//            return 1
+//        }
+//        return 0
+//    }
     
     // MARK: - Table view data source
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

@@ -328,7 +328,7 @@ class MasterActivityContainerController: UIViewController {
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
-                    categorizeTransactions(transactions: transactions, start: Date().startOfMonth, end: Date().endOfMonth, level: transactionLevel) { (transactionsList, _) in
+                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.endOfMonth, level: transactionLevel) { (transactionsList, _) in
                         if !transactionsList.isEmpty {
                             sections.append(section)
                             groups[section] = transactionsList
