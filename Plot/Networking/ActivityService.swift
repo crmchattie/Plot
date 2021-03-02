@@ -107,7 +107,6 @@ class ActivityService {
         print("grabGoogle")
         if let _ = Auth.auth().currentUser {
             self.googleCalManager.setupGoogle { askedforAuthorization in
-                print("setupGoogle \(askedforAuthorization)")
                 self.askedforAuthorization = askedforAuthorization
                 self.googleCalManager.syncGoogleCalActivities(existingActivities: self.activities, completion: {
                     self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activities, completion: {
@@ -158,12 +157,12 @@ class ActivityService {
                 if !snapshot.exists() {
                     self.updatePrimaryCalendarFB(value: value)
                 }
-                self.runCalendarFunctions(value: value)
             })
         }
     }
     
     func runCalendarFunctions(value: String) {
+        print("runCalendarFunctions")
         if value == primaryCalendar && value == icloudString {
             grabEventKit {}
         } else if value == primaryCalendar && value == googleString {
@@ -175,6 +174,7 @@ class ActivityService {
     func updatePrimaryCalendarFB(value: String) {
         if let currentUserId = Auth.auth().currentUser?.uid {
             self.primaryCalendar = value
+            self.runCalendarFunctions(value: value)
             let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
             reference.setValue(value)
         }

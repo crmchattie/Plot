@@ -681,6 +681,7 @@ extension MasterActivityContainerController {
         if !networkController.activityService.calendars.keys.contains(icloudString) {
             alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
                 self.networkController.activityService.updatePrimaryCalendar(value: icloudString)
+                self.collectionView.reloadData()
             }))
         }
         
@@ -700,8 +701,10 @@ extension MasterActivityContainerController {
     }
     
     private func userDidSignInGoogle(_ notification: Notification) {
+        print("userDidSignInGoogle")
         // Update screen after user successfully signed in
         networkController.activityService.updatePrimaryCalendar(value: googleString)
+        self.collectionView.reloadData()
     }
 }
 

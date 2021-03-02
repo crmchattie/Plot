@@ -151,7 +151,6 @@ class CalendarInfoViewController: UITableViewController {
         let sections = Array(calendars.keys)
         let section = sender.item
         networkController.activityService.updatePrimaryCalendarFB(value: sections[section])
-        networkController.activityService.runCalendarFunctions(value: sections[section])
         tableView.reloadData()
     }
 }
