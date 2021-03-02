@@ -42,7 +42,8 @@ class CalendarInfoViewController: UITableViewController {
             let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newCalendar))
             navigationItem.rightBarButtonItem = barButton
         }
-                
+        
+        GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
         
         addObservers()
@@ -155,9 +156,13 @@ class CalendarInfoViewController: UITableViewController {
     }
 }
 
-extension CalendarInfoViewController {
-    private func userDidSignInGoogle(_ notification: Notification) {
-        // Update screen after user successfully signed in
-        networkController.activityService.updatePrimaryCalendar(value: googleString)
+extension CalendarInfoViewController: GIDSignInDelegate {
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        print("signed in")
+        if (error == nil) {
+            self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+        } else {
+          print("\(error.localizedDescription)")
+        }
     }
 }

@@ -16,7 +16,7 @@ class OnboardingController: UIViewController {
     super.viewDidLoad()
     
     //set-up interface with the help of OnboardingContainerView file
-    view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     view.addSubview(onboardingContainerView)
     onboardingContainerView.frame = view.bounds
     setColorsAccordingToTheme()
@@ -26,7 +26,7 @@ class OnboardingController: UIViewController {
     let theme = ThemeManager.currentTheme()
     ThemeManager.applyTheme(theme: theme)
     //redundant and why do we pass the generalBackgroundColor back and forth between views
-    view.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     onboardingContainerView.backgroundColor = view.backgroundColor
   }
     

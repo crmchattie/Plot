@@ -17,6 +17,7 @@ class ChooseEmailController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         configureChangeEmailView()
+        GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
@@ -49,7 +50,7 @@ class ChooseEmailController: UIViewController {
     }
 }
 
-extension ChooseEmailController {
+extension ChooseEmailController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
         if error != nil {
             basicErrorAlertWith(title: "Error", message: error?.localizedDescription ?? "Oops! Something happened, try again later.", controller: self)

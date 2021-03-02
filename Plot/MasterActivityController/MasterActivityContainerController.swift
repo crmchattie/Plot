@@ -100,6 +100,7 @@ class MasterActivityContainerController: UIViewController {
         delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
         setApplicationBadge()
         
+        GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
@@ -642,7 +643,7 @@ extension MasterActivityContainerController: HeaderContainerCellDelegate {
     }
 }
 
-extension MasterActivityContainerController {
+extension MasterActivityContainerController: GIDSignInDelegate {
     func newCalendarItem() {
         if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -700,11 +701,13 @@ extension MasterActivityContainerController {
         })
     }
     
-    private func userDidSignInGoogle(_ notification: Notification) {
-        print("userDidSignInGoogle")
-        // Update screen after user successfully signed in
-        networkController.activityService.updatePrimaryCalendar(value: googleString)
-        self.collectionView.reloadData()
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        print("signed in")
+        if (error == nil) {
+            self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+        } else {
+          print("\(error.localizedDescription)")
+        }
     }
 }
 

@@ -151,6 +151,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         handleReloadTable()
         
+        GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
@@ -1121,9 +1122,13 @@ extension ActivityViewController: ChooseChatDelegate {
     }
 }
 
-extension ActivityViewController {
-    private func userDidSignInGoogle(_ notification: Notification) {
-        // Update screen after user successfully signed in
-        networkController.activityService.updatePrimaryCalendar(value: googleString)
+extension ActivityViewController: GIDSignInDelegate {
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        print("signed in")
+        if (error == nil) {
+            self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+        } else {
+          print("\(error.localizedDescription)")
+        }
     }
 }

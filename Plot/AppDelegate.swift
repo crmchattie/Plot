@@ -30,7 +30,7 @@ enum Identifiers {
 }
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -44,7 +44,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
         userDefaults.configureInitialLaunch()
         GIDSignIn.sharedInstance().clientID = "433321796976-14dht5ecttj96dnltoj7cf0arfr7e6bo.apps.googleusercontent.com"
         GIDSignIn.sharedInstance().scopes = ["https://www.googleapis.com/auth/calendar"]
-        GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.restorePreviousSignIn()
         //manually create window or default controller, thus ridding of Storyboard
         let tabBarController = GeneralTabBarController()
@@ -257,10 +256,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
                 notifications.append(contentsOf: items)
             }
         }
-    }
-    
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        
     }
 }
 

@@ -92,6 +92,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         managePresense()
+        GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
@@ -352,10 +353,14 @@ extension DiscoverViewController: EndedWebViewDelegate {
     }
 }
 
-extension DiscoverViewController {
-    private func userDidSignInGoogle(_ notification: Notification) {
-        // Update screen after user successfully signed in
-        networkController.activityService.updatePrimaryCalendar(value: googleString)
+extension DiscoverViewController: GIDSignInDelegate {
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        print("signed in")
+        if (error == nil) {
+            self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+        } else {
+          print("\(error.localizedDescription)")
+        }
     }
 }
 

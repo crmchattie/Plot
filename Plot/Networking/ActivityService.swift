@@ -156,6 +156,8 @@ class ActivityService {
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if !snapshot.exists() {
                     self.updatePrimaryCalendarFB(value: value)
+                } else {
+                    self.runCalendarFunctions(value: value)
                 }
             })
         }

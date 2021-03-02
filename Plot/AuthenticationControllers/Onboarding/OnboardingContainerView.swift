@@ -55,7 +55,7 @@ class OnboardingContainerView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         addSubview(logoImageView)
         addSubview(welcomeTitle)
         addSubview(startMessaging)
