@@ -111,7 +111,6 @@ class ActivityService {
     }
     
     func grabGoogle(_ completion: @escaping () -> Void) {
-        print("grabGoogle")
         if let _ = Auth.auth().currentUser {
             self.googleCalManager.setupGoogle { askedforAuthorization in
                 self.askedforAuthorization = askedforAuthorization
@@ -171,13 +170,16 @@ class ActivityService {
     }
     
     func runCalendarFunctions(value: String) {
-        print("runCalendarFunctions")
-        if value == primaryCalendar && value == icloudString {
-            grabEventKit {}
-        } else if value == primaryCalendar && value == googleString {
-            grabGoogle {}
+        if !askedforAuthorization {
+            grabActivities {}
+        } else {
+            if value == primaryCalendar && value == icloudString {
+                grabEventKit {}
+            } else if value == primaryCalendar && value == googleString {
+                grabGoogle {}
+            }
+            grabCalendars()
         }
-        grabCalendars()
     }
     
     func updatePrimaryCalendarFB(value: String) {
