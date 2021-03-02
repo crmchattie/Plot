@@ -353,7 +353,7 @@ extension DiscoverViewController: EndedWebViewDelegate {
 }
 
 extension DiscoverViewController {
-    @objc private func userDidSignInGoogle(_ notification: Notification) {
+    private func userDidSignInGoogle(_ notification: Notification) {
         // Update screen after user successfully signed in
         networkController.activityService.updatePrimaryCalendar(value: googleString)
     }

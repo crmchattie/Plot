@@ -12,6 +12,7 @@ import Firebase
 import CodableFirebase
 import LBTATools
 import HealthKit
+import GoogleSignIn
 
 fileprivate let activitiesControllerCell = "ActivitiesControllerCell"
 fileprivate let healthControllerCell = "HealthControllerCell"
@@ -587,9 +588,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         let section = sections[indexPath.section]
         if let _ = collectionView.cellForItem(at: indexPath) as? SetupCell {
             if section == .calendar {
-                networkController.activityService.grabActivities {
-                    collectionView.reloadData()
-                }
+                newCalendar()
             } else if section == .health {
                 networkController.healthService.grabHealth {
                     collectionView.reloadData()
@@ -638,6 +637,69 @@ extension MasterActivityContainerController {
 extension MasterActivityContainerController: HeaderContainerCellDelegate {
     func viewTapped(sectionType: SectionType) {
         goToVC(section: sectionType)
+    }
+}
+
+extension MasterActivityContainerController {
+    func newCalendarItem() {
+        if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
+                let destination = CreateActivityViewController()
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Calendar", style: .default, handler: { (_) in
+                self.newCalendar()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+        } else {
+            let destination = CreateActivityViewController()
+            destination.users = self.networkController.userService.users
+            destination.filteredUsers = self.networkController.userService.users
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
+    }
+    
+    func newCalendar() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if !networkController.activityService.calendars.keys.contains(icloudString) {
+            alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryCalendar(value: icloudString)
+            }))
+        }
+        
+        if !networkController.activityService.calendars.keys.contains(googleString) {
+            alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance()?.signIn()
+            }))
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+    }
+    
+    private func userDidSignInGoogle(_ notification: Notification) {
+        // Update screen after user successfully signed in
+        networkController.activityService.updatePrimaryCalendar(value: googleString)
     }
 }
 

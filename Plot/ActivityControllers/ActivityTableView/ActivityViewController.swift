@@ -1122,7 +1122,7 @@ extension ActivityViewController: ChooseChatDelegate {
 }
 
 extension ActivityViewController {
-    @objc private func userDidSignInGoogle(_ notification: Notification) {
+    private func userDidSignInGoogle(_ notification: Notification) {
         // Update screen after user successfully signed in
         networkController.activityService.updatePrimaryCalendar(value: googleString)
     }
