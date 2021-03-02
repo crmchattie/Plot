@@ -16,6 +16,7 @@ let googleString = "Google"
 extension NSNotification.Name {
     static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
     static let invitationsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".invitationsUpdated")
+    static let calendarsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".calendarsUpdated")
 }
 
 class ActivityService {
@@ -24,7 +25,13 @@ class ActivityService {
     
     var askedforAuthorization: Bool = false
     
-    var calendars = [String: [String]]()
+    var calendars = [String: [String]]() {
+        didSet {
+            if oldValue != calendars {
+                NotificationCenter.default.post(name: .calendarsUpdated, object: nil)
+            }
+        }
+    }
     
     var primaryCalendar = String()
 

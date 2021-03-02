@@ -75,12 +75,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: kActivityHeaderCell)
                 
         addObservers()
-        
-        if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
-            customTypes.insert(.calendar, at: 1)
-            sections.insert(.calendar, at: 1)
-        }
-        
+                
         for index in 0...sections.count - 1 {
             groups[sections[index]] = [customTypes[index]]
         }
@@ -120,6 +115,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateSections), name: .calendarsUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -139,6 +135,18 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.reloadData()
         
+    }
+    
+    @objc func updateSections() {
+        if !networkController.activityService.calendars.keys.contains(icloudString) && !networkController.activityService.calendars.keys.contains(googleString) {
+            customTypes.removeAll(where: {$0 == .calendar})
+            sections.removeAll(where: {$0 == .calendar})
+            fetchData()
+        } else if (!networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString)) && !sections.contains(.calendar) {
+            customTypes.insert(.calendar, at: 1)
+            sections.insert(.calendar, at: 1)
+            fetchData()
+        }
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
