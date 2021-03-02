@@ -104,8 +104,10 @@ class ActivityService {
     }
     
     func grabGoogle(_ completion: @escaping () -> Void) {
+        print("grabGoogle")
         if let _ = Auth.auth().currentUser {
             self.googleCalManager.setupGoogle { askedforAuthorization in
+                print("setupGoogle \(askedforAuthorization)")
                 self.askedforAuthorization = askedforAuthorization
                 self.googleCalManager.syncGoogleCalActivities(existingActivities: self.activities, completion: {
                     self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activities, completion: {

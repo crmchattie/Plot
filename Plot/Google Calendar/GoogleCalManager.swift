@@ -68,7 +68,7 @@ class GoogleCalManager {
             completion()
             return
         }
-        
+                
         isRunning = true
         
         let calendar = Calendar.current

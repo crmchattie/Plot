@@ -1622,8 +1622,6 @@
 			children = (
 				26B975E32363F8DE003BFBE3 /* Invitations */,
 				26391FEA235EC3B3002BB4C0 /* Extensions */,
-				10ED542C22CAEA41003797CF /* Plot.entitlements */,
-				4BE9F1DE219B457C00C6768F /* Pigeon-project.entitlements */,
 				4BAEE47221272C4F0045AB10 /* AuthenticationControllers */,
 				1051AC94244F8AF80066761C /* MasterActivityController */,
 				108841D0257003F70064C5F8 /* SummaryViewController */,
@@ -1652,6 +1650,8 @@
 				4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */,
 				4B4F453C1F32230C00A6FF96 /* Info.plist */,
 				10217A7923103377004CBA9E /* Plot-Bridging-Header.h */,
+				10ED542C22CAEA41003797CF /* Plot.entitlements */,
+				4BE9F1DE219B457C00C6768F /* Pigeon-project.entitlements */,
 			);
 			path = Plot;
 			sourceTree = "<group>";
@@ -2527,7 +2527,6 @@
 					};
 					4B4F452A1F32230C00A6FF96 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = G226F98322;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -3159,7 +3158,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3192,7 +3191,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -3350,7 +3349,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3391,7 +3390,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

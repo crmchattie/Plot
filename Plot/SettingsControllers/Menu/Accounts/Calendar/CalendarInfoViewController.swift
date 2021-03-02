@@ -131,16 +131,13 @@ class CalendarInfoViewController: UITableViewController {
         cell.isUserInteractionEnabled = false
         return cell
     }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-    }
-    
     @objc func updatePrimaryCalendar(_ sender: TapGesture) {
         let sections = Array(calendars.keys)
         let section = sender.item
         networkController.activityService.updatePrimaryCalendarFB(value: sections[section])
         networkController.activityService.runCalendarFunctions(value: sections[section])
+        tableView.reloadData()
     }
 }
 

@@ -99,7 +99,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
-    var activityDates = [String]()
+    var activityDates = [String: Int]()
     
     var hasLoadedCalendarEventActivities = false
     var categoryUpdateDispatchGroup: DispatchGroup?
@@ -182,14 +182,14 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.calendar.backgroundColor = theme.generalBackgroundColor
         activityView.calendar.appearance.weekdayTextColor = theme.generalTitleColor
         activityView.calendar.appearance.headerTitleColor = theme.generalTitleColor
-        activityView.calendar.appearance.eventDefaultColor = theme.generalTitleColor
+        activityView.calendar.appearance.eventDefaultColor = FalconPalette.defaultBlue
+        activityView.calendar.appearance.eventSelectionColor = FalconPalette.defaultBlue
         activityView.calendar.appearance.titleDefaultColor = theme.generalTitleColor
         activityView.calendar.appearance.titleSelectionColor = theme.generalBackgroundColor
         activityView.calendar.appearance.selectionColor = theme.generalTitleColor
         activityView.calendar.appearance.todayColor = FalconPalette.defaultBlue
         activityView.calendar.appearance.todaySelectionColor = FalconPalette.defaultBlue
         activityView.arrowButton.tintColor = theme.generalTitleColor
-        activityView.calendar.appearance.eventSelectionColor = ThemeManager.currentTheme().generalTitleColor
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -406,6 +406,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         } else {
             checkIfThereAnyActivities(isEmpty: false)
         }
+        
+        compileActivityDates(activities: allActivities)
                 
         guard !isAppLoaded else { return }
         isAppLoaded = true
@@ -539,16 +541,15 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-//    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
-//        print("date \(date)")
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "yyyy/MM/dd"
-//        let dateString = dateFormatter.string(from: date)
-//        if self.activityDates.contains(dateString) {
-//            return 1
-//        }
-//        return 0
-//    }
+    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        let dateString = dateFormatter.string(from: date)
+        if let value = activityDates[dateString] {
+            return value
+        }
+        return 0
+    }
     
     // MARK: - Table view data source
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -838,23 +839,21 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     fileprivate func compileActivityDates(activities: [Activity]) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
-        
-        let activityDatesGroup = DispatchGroup()
+
+        let dispatchGroup = DispatchGroup()
         for activity in activities {
-            activityDatesGroup.enter()
-            if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval {
-                let startDate = Date(timeIntervalSince1970: startDate)
-                let endDate = Date(timeIntervalSince1970: endDate + 60)
-                let dayDurationInSeconds: TimeInterval = 60
+            dispatchGroup.enter()
+            if let startDate = activity.startDate, let endDate = activity.endDate {
+                let dayDurationInSeconds: TimeInterval = 86400
                 for activityDate in stride(from: startDate, to: endDate, by: dayDurationInSeconds) {
-                    activityDatesGroup.enter()
-                    activityDates.append(dateFormatter.string(from: activityDate))
-                    activityDatesGroup.leave()
+                    dispatchGroup.enter()
+                    activityDates[dateFormatter.string(from: activityDate), default: 0] += 1
+                    dispatchGroup.leave()
                 }
-                activityDatesGroup.leave()
+                dispatchGroup.leave()
             }
         }
-        activityDatesGroup.notify(queue: .main) {
+        dispatchGroup.notify(queue: .main) {
             self.activityView.calendar.reloadData()
         }
     }
