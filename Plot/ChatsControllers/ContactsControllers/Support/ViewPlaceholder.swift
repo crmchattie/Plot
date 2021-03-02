@@ -42,6 +42,7 @@ enum ViewPlaceholderTitle: String {
     case emptyMealProducts = "Please search for ingredients, grocery items and restaurant menu items above"
     case emptyTransactionRules = "You have not created any transaction rules"
     case emptyHealth = "You don't have any health metrics yet"
+    case emptyCalendars = "You are not connected to any calendars yet"
 }
 
 enum ViewPlaceholderSubtitle: String {
@@ -61,6 +62,7 @@ enum ViewPlaceholderSubtitle: String {
     case emptyAccounts = "You can add an account with the plus button in the upper right corner"
     case emptyTransactionRules = "You can add a transaction rule with the plus button in the upper right corner"
     case emptyHealth = "You can allow Plot to access health metrics from the Health App and/or add a metric with the plus button in the upper right corner"
+    case emptyCalendars = "You can add a calendar with the plus button in the upper right corner"
 }
 
 class ViewPlaceholder: UIView {

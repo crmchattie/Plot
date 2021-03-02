@@ -16,6 +16,8 @@ let primaryCalendarKey = "primary-calendar"
 class CalendarInfoViewController: UITableViewController {
     var networkController = NetworkController()
     
+    let viewPlaceholder = ViewPlaceholder()
+    
     var primaryCalendar: String {
         return networkController.activityService.primaryCalendar
     }
@@ -61,6 +63,14 @@ class CalendarInfoViewController: UITableViewController {
         }
     }
     
+    func checkIfThereAreAnyResults(isEmpty: Bool) {
+        guard isEmpty else {
+            viewPlaceholder.remove(from: tableView, priority: .medium)
+            return
+        }
+        viewPlaceholder.add(for: tableView, title: .emptyCalendars, subtitle: .emptyCalendars, priority: .medium, position: .top)
+    }
+    
     @objc func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
@@ -83,9 +93,14 @@ class CalendarInfoViewController: UITableViewController {
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
-    }
+//    }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
+        if calendars.keys.count == 0 {
+            checkIfThereAreAnyResults(isEmpty: true)
+        } else {
+            checkIfThereAreAnyResults(isEmpty: false)
+        }
         return calendars.keys.count
     }
     
