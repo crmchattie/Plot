@@ -76,6 +76,11 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 
         addObservers()
         
+        if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
+            customTypes.insert(.calendar, at: 1)
+            sections.insert(.calendar, at: 1)
+        }
+        
         for index in 0...sections.count - 1 {
             groups[sections[index]] = [customTypes[index]]
         }

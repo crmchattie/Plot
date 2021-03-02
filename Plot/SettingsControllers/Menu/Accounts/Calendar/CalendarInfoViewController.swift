@@ -93,7 +93,7 @@ class CalendarInfoViewController: UITableViewController {
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
-//    }
+    }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         if calendars.keys.count == 0 {
