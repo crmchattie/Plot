@@ -42,13 +42,10 @@ class EnterVerificationContainerView: UIView {
     verificationCode.keyboardType = .numberPad
     verificationCode.textColor = ThemeManager.currentTheme().generalTitleColor
     verificationCode.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-    verificationCode.backgroundColor = .clear
+    verificationCode.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     verificationCode.layer.cornerRadius = 10
-    verificationCode.layer.borderWidth = 1
 		verificationCode.attributedPlaceholder = NSAttributedString(string: "Code", attributes: [NSAttributedString.Key.foregroundColor:
-      ThemeManager.currentTheme().generalSubtitleColor])
-    verificationCode.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
-    
+      ThemeManager.currentTheme().generalSubtitleColor])    
     return verificationCode
   }()
   
