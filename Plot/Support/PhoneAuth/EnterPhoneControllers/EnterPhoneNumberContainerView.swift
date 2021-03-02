@@ -60,8 +60,7 @@ class EnterPhoneNumberContainerView: UIView {
         countryCode.text = "+1"
         countryCode.textAlignment = .center
         countryCode.textColor = ThemeManager.currentTheme().generalTitleColor
-        //    countryCode.font = UIFont.systemFont(ofSize: 18)
-        countryCode.font = UIFont.preferredFont(forTextStyle: .body)
+        countryCode.font = UIFont.preferredFont(forTextStyle: .title3)
         countryCode.adjustsFontForContentSizeCategory = true
         countryCode.sizeToFit()
         
@@ -70,7 +69,7 @@ class EnterPhoneNumberContainerView: UIView {
     
     let phoneNumber: UITextField = {
         let phoneNumber = UITextField()
-        phoneNumber.font = UIFont.preferredFont(forTextStyle: .body)
+        phoneNumber.font = UIFont.preferredFont(forTextStyle: .title3)
         phoneNumber.adjustsFontForContentSizeCategory = true
         phoneNumber.translatesAutoresizingMaskIntoConstraints = false
         phoneNumber.textAlignment = .center

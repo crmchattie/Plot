@@ -99,6 +99,8 @@ class MasterActivityContainerController: UIViewController {
         addObservers()
         delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
         setApplicationBadge()
+        
+        GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
