@@ -1384,7 +1384,9 @@ class CreateActivityViewController: FormViewController {
         }
         let reminder = EventAlert(rawValue: activity.reminder!)
         let reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
-        let triggerDate = Calendar.current.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")!
+        let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                     repeats: false)
         let identifier = "\(activityID)_Reminder"
