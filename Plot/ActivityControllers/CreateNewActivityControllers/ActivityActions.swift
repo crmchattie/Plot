@@ -131,7 +131,9 @@ class ActivityActions: NSObject {
         createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
         connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
         self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+            print("start updateInvitations")
             InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
+                print("finished updateInvitations")
             }
         })
         
@@ -275,16 +277,12 @@ class ActivityActions: NSObject {
             content.subtitle = formattedDate.0
         }
         let reminder = EventAlert(rawValue: activity.reminder!)
-        var reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-        reminderDate = reminderDate.addingTimeInterval(-seconds)
+        let reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
         let triggerDate = Calendar.current.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                     repeats: false)
         let identifier = "\(activityID)_Reminder"
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        
         center.add(request, withCompletionHandler: { (error) in
             if let error = error {
                 print(error)

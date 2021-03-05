@@ -665,7 +665,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 }
             }
         } else if let eventID = activity.eventID {
-            print("\(eventID)")
             dispatchGroup.enter()
             Service.shared.fetchEventsSegment(size: "50", id: eventID, keyword: "", attractionId: "", venueId: "", postalCode: "", radius: "", unit: "", startDateTime: "", endDateTime: "", city: "", stateCode: "", countryCode: "", classificationName: "", classificationId: "") { (search, err) in
                 if let events = search?.embedded?.events {
@@ -1124,7 +1123,6 @@ extension ActivityViewController: ChooseChatDelegate {
 
 extension ActivityViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        print("signed in")
         if (error == nil) {
             self.networkController.activityService.updatePrimaryCalendar(value: googleString)
         } else {

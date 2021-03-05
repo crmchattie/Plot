@@ -644,10 +644,7 @@ class ScheduleViewController: FormViewController {
             content.subtitle = formattedDate.0
         }
         let reminder = EventAlert(rawValue: schedule.reminder!)
-        var reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
-        let timezone = TimeZone(identifier: schedule.startTimeZone ?? "UTC")
-        let seconds = TimeInterval(timezone!.secondsFromGMT(for: Date()))
-        reminderDate = reminderDate.addingTimeInterval(-seconds)
+        let reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
         let triggerDate = Calendar.current.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                     repeats: false)

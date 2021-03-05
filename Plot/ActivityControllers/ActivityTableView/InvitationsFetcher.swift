@@ -176,7 +176,6 @@ class InvitationsFetcher: NSObject {
             let dispatchGroup = DispatchGroup()
             var acceptedParticipant: [User] = []
             for user in participants {
-                
                 dispatchGroup.enter()
                 guard let userID = user.id else {
                     dispatchGroup.leave()
