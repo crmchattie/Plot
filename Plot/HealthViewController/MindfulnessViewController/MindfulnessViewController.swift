@@ -231,16 +231,6 @@ class MindfulnessViewController: FormViewController {
 //                }
 //            }
             
-            <<< TextRow("Length") {
-                $0.cell.isUserInteractionEnabled = false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-            
             <<< DateTimeInlineRow("Starts") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -329,6 +319,16 @@ class MindfulnessViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 
+            }
+        
+            <<< TextRow("Length") {
+                $0.cell.isUserInteractionEnabled = false
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.title = $0.tag
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
     }
     

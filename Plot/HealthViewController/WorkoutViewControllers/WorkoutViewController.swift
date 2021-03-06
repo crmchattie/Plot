@@ -301,18 +301,6 @@ class WorkoutViewController: FormViewController {
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-            <<< TextRow("Length") {
-                $0.cell.isUserInteractionEnabled = false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange({ _ in
-                self.updateCalories()
-            })
-            
             <<< DateTimeInlineRow("Starts") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -402,6 +390,18 @@ class WorkoutViewController: FormViewController {
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 
             }
+        
+            <<< TextRow("Length") {
+                $0.cell.isUserInteractionEnabled = false
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.title = $0.tag
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }.onChange({ _ in
+                self.updateCalories()
+            })
             
 //            <<< ButtonRow("Participants") { row in
 //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

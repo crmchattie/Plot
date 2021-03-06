@@ -267,23 +267,23 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         latitude = array[0]
                         longitude = array[1]
                         
-                        switch activity.activityType {
-                        case "recipe":
-                            type = "recipe"
-                        case "workout":
-                            type = "workout"
-                        case "event":
-                            type = "event"
-                        case "food":
+                        switch activity.category?.lowercased() {
+                        case "sleep":
+                            type = "sleep"
+                        case "meal":
                             type = "food"
-                        case "nightlife":
+                        case "work":
+                            type = "work"
+                        case "social":
                             type = "nightlife"
-                        case "recreation":
-                            type = "recreation"
-                        case "shopping":
-                            type = "shopping"
-                        case "sightseeing":
-                            type = "sightseeing"
+                        case "leisure":
+                            type = "leisure"
+                        case "exercise":
+                            type = "workout"
+                        case "family":
+                            type = "family"
+                        case "personal":
+                            type = "personal"
                         default:
                             type = "activity"
                         }
