@@ -33,9 +33,7 @@ class EnterPhoneNumberController: UIViewController {
     
     @objc func leftBarButtonDidTap() {
         phoneNumberContainerView.phoneNumber.resignFirstResponder()
-        self.dismiss(animated: true) {
-            AppUtility.lockOrientation(.allButUpsideDown)
-        }
+        self.dismiss(animated: true)
     }
     
     fileprivate func setCountry() {

@@ -262,7 +262,7 @@ class AccountSettingsController: UITableViewController {
     @objc func changeEmail() {
         cancelBarButtonPressed()
         AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
-        let controller = ChooseEmailController()
+        let controller = ChangeEmailController()
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
         destination.navigationBar.setBackgroundImage(UIImage(), for: .default)

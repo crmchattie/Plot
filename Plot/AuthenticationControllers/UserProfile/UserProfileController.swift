@@ -40,6 +40,7 @@ class UserProfileController: UIViewController {
         userProfileContainerView.bioPlaceholderLabel.isHidden = !userProfileContainerView.bio.text.isEmpty
         userProfileContainerView.addPhotoLabel.isHidden = (userProfileContainerView.profileImageView.image == nil)
         userProfileContainerView.profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openUserProfilePicture)))
+        userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
         userProfileContainerView.bio.delegate = self
         userProfileContainerView.name.delegate = self
     }
@@ -66,6 +67,16 @@ class UserProfileController: UIViewController {
         avatarOpener.delegate = self
         avatarOpener.handleAvatarOpening(avatarView: userProfileContainerView.profileImageView, at: self,
                                          isEditButtonEnabled: true, title: .user)
+    }
+    
+    @objc func changeEmail() {
+        let controller = ChangeEmailController()
+        let destination = UINavigationController(rootViewController: controller)
+        destination.navigationBar.shadowImage = UIImage()
+        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.hidesBottomBarWhenPushed = true
+        destination.navigationBar.isTranslucent = false
+        present(destination, animated: true, completion: nil)
     }
 }
 

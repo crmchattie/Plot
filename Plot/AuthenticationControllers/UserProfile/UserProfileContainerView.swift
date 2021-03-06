@@ -170,7 +170,7 @@ class UserProfileContainerView: UIView {
         addSubview(addPhotoLabel)
         addSubview(userData)
         addSubview(bio)
-//        addSubview(email)
+        addSubview(email)
         addSubview(countLabel)
         userData.addSubview(name)
         userData.addSubview(phone)
@@ -200,10 +200,10 @@ class UserProfileContainerView: UIView {
             phone.rightAnchor.constraint(equalTo: userData.rightAnchor, constant: 0),
             phone.heightAnchor.constraint(equalToConstant: 50),
             
-//            email.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
-//            email.heightAnchor.constraint(equalToConstant: 50),
+            email.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+            email.heightAnchor.constraint(equalToConstant: 50),
             
-            bio.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+            bio.topAnchor.constraint(equalTo: email.bottomAnchor, constant: 10),
                         
             countLabel.widthAnchor.constraint(equalToConstant: 30),
             countLabel.heightAnchor.constraint(equalToConstant: 30),
@@ -214,7 +214,6 @@ class UserProfileContainerView: UIView {
             bioPlaceholderLabel.centerYAnchor.constraint(equalTo: bio.centerYAnchor, constant: 0),
         ])
         
-        //    bioPlaceholderLabel.font = UIFont.systemFont(ofSize: 20)//(bio.font!.pointSize - 1)
         bioPlaceholderLabel.isHidden = !bio.text.isEmpty
         
         if profileImageView.image != nil {
@@ -229,8 +228,8 @@ class UserProfileContainerView: UIView {
                 profileImageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
                 bio.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
                 bio.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
-//                email.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
-//                email.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
+                email.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
+                email.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
                 userData.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
             ])
         } else {
@@ -238,8 +237,8 @@ class UserProfileContainerView: UIView {
                 profileImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
                 bio.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
                 bio.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
-//                email.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
-//                email.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
+                email.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
+                email.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
                 userData.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
             ])
         }

@@ -33,9 +33,7 @@ class ChooseEmailController: UIViewController {
     }
     
     @objc func leftBarButtonDidTap() {
-        self.dismiss(animated: true) {
-            AppUtility.lockOrientation(.allButUpsideDown)
-        }
+        self.dismiss(animated: true)
     }
     
     var isVerificationSent = false
@@ -74,9 +72,7 @@ extension ChooseEmailController: GIDSignInDelegate {
                         return
                     }
                     
-                    self.dismiss(animated: true) {
-                        AppUtility.lockOrientation(.allButUpsideDown)
-                    }
+                    self.dismiss(animated: true)
                 }
             }
         }

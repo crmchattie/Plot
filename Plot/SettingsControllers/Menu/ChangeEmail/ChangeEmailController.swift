@@ -28,6 +28,13 @@ class ChangeEmailController: UIViewController {
         changeEmailView.instructions.text = "Please enter your email."
         let attributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor]
         changeEmailView.email.attributedPlaceholder = NSAttributedString(string: "New Email", attributes: attributes)
+        let leftBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(leftBarButtonDidTap))
+        navigationItem.leftBarButtonItem = leftBarButton
+    }
+    
+
+    @objc func leftBarButtonDidTap() {
+        self.dismiss(animated: true)
     }
         
     @objc func textFieldDidChange(_ textField: UITextField) {

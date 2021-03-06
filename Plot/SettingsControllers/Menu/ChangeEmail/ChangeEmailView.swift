@@ -41,6 +41,7 @@ class ChangeEmailView: UIView {
         email.translatesAutoresizingMaskIntoConstraints = false
         email.textAlignment = .center
         email.keyboardType = .emailAddress
+        email.autocapitalizationType = .none
         email.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         email.textColor = ThemeManager.currentTheme().generalTitleColor
         email.addTarget(self, action: #selector(EnterPhoneNumberController.textFieldDidChange(_:)), for: .editingChanged)
@@ -58,13 +59,12 @@ class ChangeEmailView: UIView {
     let nextView: UIButton = {
         let next = UIButton()
         next.translatesAutoresizingMaskIntoConstraints = false
-        next.setTitle("Sign In", for: .normal)
+        next.setTitle("Add", for: .normal)
         next.contentVerticalAlignment = .center
         next.contentHorizontalAlignment = .center
         next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
         next.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .highlighted)
         next.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .disabled)
-        
         return next
     }()
     
