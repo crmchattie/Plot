@@ -272,62 +272,44 @@ class AccountSettingsController: UITableViewController {
     }
     
     func logoutButtonTapped () {
-        
-        let firebaseAuth = Auth.auth()
         guard let uid = Auth.auth().currentUser?.uid else { return }
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: "Error signing out", message: noInternetError, controller: self)
             return
             
         }
-        //    ARSLineProgress.ars_showOnView(self.tableView)
-        if let navController = self.navigationController {
-            self.showSpinner(onView: navController.view)
-        } else {
-            self.showSpinner(onView: self.view)
-        }
-        
-        let userReference = Database.database().reference().child("users").child(uid).child("notificationTokens")
-        userReference.removeValue { (error, reference) in
-            self.removeSpinner()
-            
-            Database.database().reference(withPath: ".info/connected").removeAllObservers()
-            
-            if error != nil {
-                basicErrorAlertWith(title: "Error signing out", message: "Try again later", controller: self)
-                return
-            }
-            
-            let onlineStatusReference = Database.database().reference().child("users").child(uid).child("OnlineStatus")
-            onlineStatusReference.setValue(ServerValue.timestamp())
-            
-            do {
-                try firebaseAuth.signOut()
-            } catch let signOutError as NSError {
-                //        ARSLineProgress.hide()
-                basicErrorAlertWith(title: "Error signing out", message: signOutError.localizedDescription, controller: self)
-                return
-            }
-            AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
-            UIApplication.shared.applicationIconBadgeNumber = 0
-            
-            let destination = OnboardingController()
-            
-            let newNavigationController = UINavigationController(rootViewController: destination)
-            newNavigationController.navigationBar.shadowImage = UIImage()
-            newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
 
-            newNavigationController.modalPresentationStyle = .fullScreen
-            newNavigationController.navigationBar.isTranslucent = false
-            newNavigationController.modalTransitionStyle = .crossDissolve
-            //      ARSLineProgress.hide()
+        #warning("Not sure if still used.")
+        Database.database().reference(withPath: ".info/connected").removeAllObservers()
 
-            self.present(newNavigationController, animated: true, completion: {
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearUserData"), object: nil)
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearContacts"), object: nil)
-                self.tabBarController?.selectedIndex = Tabs.home.rawValue
-            })
+        let onlineStatusReference = Database.database().reference().child("users").child(uid).child("OnlineStatus")
+        onlineStatusReference.setValue(ServerValue.timestamp())
+
+        do {
+            try Auth.auth().signOut()
+        } catch let signOutError as NSError {
+            basicErrorAlertWith(title: "Error signing out", message: signOutError.localizedDescription, controller: self)
+            return
         }
+
+        AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
+        UIApplication.shared.applicationIconBadgeNumber = 0
+
+        let destination = OnboardingController()
+
+        let newNavigationController = UINavigationController(rootViewController: destination)
+        newNavigationController.navigationBar.shadowImage = UIImage()
+        newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
+
+        newNavigationController.modalPresentationStyle = .fullScreen
+        newNavigationController.navigationBar.isTranslucent = false
+        newNavigationController.modalTransitionStyle = .crossDissolve
+
+        present(newNavigationController, animated: true, completion: {
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearUserData"), object: nil)
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearContacts"), object: nil)
+            self.tabBarController?.selectedIndex = Tabs.home.rawValue
+        })
     }
 }
 

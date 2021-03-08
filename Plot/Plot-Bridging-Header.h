@@ -9,8 +9,6 @@
 #ifndef Plot_Bridging_Header_h
 #define Plot_Bridging_Header_h
 
-#import "FSCalendar.h"
-
 #import "GTMAppAuth/GTMAppAuth.h"
 #import "GTMSessionFetcher/GTMSessionFetcherLogging.h"
 #import "GTLRCalendar.h"

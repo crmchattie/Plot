@@ -17,7 +17,7 @@ target 'Plot' do
   pod 'Eureka' 
   pod 'SplitRow'
   pod 'ViewRow'
-  pod 'FSCalendar'
+  pod 'FSCalendar', :modular_headers => true
   pod 'CodableFirebase'
   pod 'FloatingPanel'
   pod 'Charts'
