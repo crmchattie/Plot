@@ -289,12 +289,11 @@ class AccountSettingsController: UITableViewController {
         
         let userReference = Database.database().reference().child("users").child(uid).child("notificationTokens")
         userReference.removeValue { (error, reference) in
+            self.removeSpinner()
             
             Database.database().reference(withPath: ".info/connected").removeAllObservers()
             
             if error != nil {
-                //        ARSLineProgress.hide()
-                self.removeSpinner()
                 basicErrorAlertWith(title: "Error signing out", message: "Try again later", controller: self)
                 return
             }
@@ -304,10 +303,8 @@ class AccountSettingsController: UITableViewController {
             
             do {
                 try firebaseAuth.signOut()
-                
             } catch let signOutError as NSError {
                 //        ARSLineProgress.hide()
-                self.removeSpinner()
                 basicErrorAlertWith(title: "Error signing out", message: signOutError.localizedDescription, controller: self)
                 return
             }
@@ -319,11 +316,12 @@ class AccountSettingsController: UITableViewController {
             let newNavigationController = UINavigationController(rootViewController: destination)
             newNavigationController.navigationBar.shadowImage = UIImage()
             newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
-            
+
+            newNavigationController.modalPresentationStyle = .fullScreen
             newNavigationController.navigationBar.isTranslucent = false
             newNavigationController.modalTransitionStyle = .crossDissolve
             //      ARSLineProgress.hide()
-            self.removeSpinner()
+
             self.present(newNavigationController, animated: true, completion: {
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearUserData"), object: nil)
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearContacts"), object: nil)
