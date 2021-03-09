@@ -472,6 +472,8 @@
 		4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */; };
 		4ED658A2BE8AC368D77831D1 /* libPods-ShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */; };
 		A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53D0336E7A51EFB22060D82 /* libPods-Plot.a */; };
+		F9C05FA825F7D608009E892A /* NotificationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C05FA725F7D608009E892A /* NotificationConstants.swift */; };
+		F9C05FAE25F7D720009E892A /* RuleConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C05FAD25F7D720009E892A /* RuleConstants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -971,10 +973,11 @@
 		4BB46C6B2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatLogController+ChatHistoryFetcherDelegate.swift"; sourceTree = "<group>"; };
 		4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsFetcher.swift; sourceTree = "<group>"; };
-		4BE9F1DE219B457C00C6768F /* Pigeon-project.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Pigeon-project.entitlements"; sourceTree = "<group>"; };
 		91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ShareExtension/Pods-ShareExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.debug.xcconfig"; sourceTree = "<group>"; };
 		E53D0336E7A51EFB22060D82 /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9C05FA725F7D608009E892A /* NotificationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationConstants.swift; sourceTree = "<group>"; };
+		F9C05FAD25F7D720009E892A /* RuleConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleConstants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1620,6 +1623,7 @@
 		4B4F452D1F32230C00A6FF96 /* Plot */ = {
 			isa = PBXGroup;
 			children = (
+				F9C05FA625F7D5F5009E892A /* Constants */,
 				26B975E32363F8DE003BFBE3 /* Invitations */,
 				26391FEA235EC3B3002BB4C0 /* Extensions */,
 				4BAEE47221272C4F0045AB10 /* AuthenticationControllers */,
@@ -1651,7 +1655,6 @@
 				4B4F453C1F32230C00A6FF96 /* Info.plist */,
 				10217A7923103377004CBA9E /* Plot-Bridging-Header.h */,
 				10ED542C22CAEA41003797CF /* Plot.entitlements */,
-				4BE9F1DE219B457C00C6768F /* Pigeon-project.entitlements */,
 			);
 			path = Plot;
 			sourceTree = "<group>";
@@ -2457,6 +2460,15 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		F9C05FA625F7D5F5009E892A /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				F9C05FA725F7D608009E892A /* NotificationConstants.swift */,
+				F9C05FAD25F7D720009E892A /* RuleConstants.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3077,6 +3089,7 @@
 				1080871B2583E73D00FB9BB0 /* SummaryLineChartCell.swift in Sources */,
 				4BAEE5DB212735E50045AB10 /* ImageCell.swift in Sources */,
 				10F3032524EB746E00C04B8F /* AccountsTableViewController.swift in Sources */,
+				F9C05FAE25F7D720009E892A /* RuleConstants.swift in Sources */,
 				2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */,
 				4BAEE5D3212735E50045AB10 /* RoundProgressView.swift in Sources */,
 				26036762256CC4DA00FE9142 /* EventKitSetupAssistant.swift in Sources */,
@@ -3115,6 +3128,7 @@
 				10E8E5312592C7D30076BE42 /* BackEnabledNavigationController.swift in Sources */,
 				4BAEE5BD212735E50045AB10 /* INSPhoto.swift in Sources */,
 				4BAEE49921272C5E0045AB10 /* ContactsController+SearchHandlers.swift in Sources */,
+				F9C05FA825F7D608009E892A /* NotificationConstants.swift in Sources */,
 				103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */,
 				4BAEE5CF212735E50045AB10 /* CollectionViewLeftAlignFlowLayout.swift in Sources */,
 				4BA1E77F2152518700391BCB /* ChatLogController+MessageSenderDelegate.swift in Sources */,

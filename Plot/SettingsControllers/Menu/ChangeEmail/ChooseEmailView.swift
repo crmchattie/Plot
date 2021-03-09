@@ -98,7 +98,6 @@ class ChooseEmailView: UIView {
             emailView.rightAnchor.constraint(equalTo: title.rightAnchor),
             emailView.leftAnchor.constraint(equalTo: title.leftAnchor),
             emailView.heightAnchor.constraint(equalToConstant: heightConstant),
-            
         ])
     }
     

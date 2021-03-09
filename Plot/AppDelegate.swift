@@ -53,9 +53,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = tabBarController
         //make window visible
         window?.makeKeyAndVisible()
-        //set backgroundColor to theme
-        window?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
+        //        //set backgroundColor to theme
+        //        window?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        //
         tabBarController.presentOnboardingController()
         
         //register after user is no longer new user
@@ -179,6 +179,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             })
         }
     }
+
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        userActivity.webpageURL.flatMap(handlePasswordlessSignIn) ?? false
+    }
+
+    func handlePasswordlessSignIn(withURL url: URL) -> Bool {
+        if Auth.auth().isSignIn(withEmailLink: url.absoluteString) {
+            // Get email passed in the parameter for verification.
+            let email = URLComponents(string: url.absoluteString)?.queryItems?
+                .first(where: { $0.name == "link" })
+                .flatMap({ URLComponents(string: $0.value ?? "")?.queryItems ?? [] })?
+                .first(where: { $0.name == "continueUrl" })
+                .flatMap({ URLComponents(string: $0.value ?? "")?.queryItems ?? [] })?
+                .first(where: { $0.name == "email" })
+                .map { $0.value }
+
+            guard let verifiedEmail = email else { return false }
+
+            NotificationCenter.default.post(name: .emailVerified, object: verifiedEmail)
+
+            return true
+        }
+        return false
+    }
     
     // listen for user notifications
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
@@ -215,29 +239,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                      options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         return GIDSignIn.sharedInstance().handle(url)
     }
-    
-    func applicationWillResignActive(_ application: UIApplication) {
-        
-        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-    }
-    
-    func applicationDidEnterBackground(_ application: UIApplication) {
-        // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-        // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-    }
-    
-    func applicationWillEnterForeground(_ application: UIApplication) {
-        // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-    }
-    
-    func applicationDidBecomeActive(_ application: UIApplication) {
-    }
-    
-    func applicationWillTerminate(_ application: UIApplication) {
-        // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-    }
-    
+
     var documentsDirectory: String {
         return NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0]
     }
@@ -260,6 +262,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 // MARK: - UNUserNotificationCenterDelegate
+
 extension AppDelegate: UNUserNotificationCenterDelegate {
     
     func saveUserNotification(notification: UNNotification) {
