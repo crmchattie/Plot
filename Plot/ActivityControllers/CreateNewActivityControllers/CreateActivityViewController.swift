@@ -452,12 +452,21 @@ class CreateActivityViewController: FormViewController {
                     }
                     $0.updateCell()
                 } else {
-                    $0.dateFormatter?.timeZone = .current
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    if let startDateTime = startDateTime {
+                        $0.dateFormatter?.timeZone = .current
+                        let original = startDateTime
+                        let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        $0.value = rounded
+                        self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    } else {
+                        $0.dateFormatter?.timeZone = .current
+                        let original = Date()
+                        let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        $0.value = rounded
+                        self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    }
                 }
                 self.startDateTime = $0.value
                 }.onChange { [weak self] row in
@@ -550,12 +559,21 @@ class CreateActivityViewController: FormViewController {
                     }
                     $0.updateCell()
                 } else {
-                    $0.dateFormatter?.timeZone = .current
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    if let endDateTime = endDateTime {
+                        $0.dateFormatter?.timeZone = .current
+                        let original = endDateTime
+                        let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        $0.value = rounded
+                        self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    } else {
+                        $0.dateFormatter?.timeZone = .current
+                        let original = Date()
+                        let rounded = Date(timeIntervalSinceReferenceDate:
+                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        $0.value = rounded
+                        self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    }
                 }
                 self.endDateTime = $0.value
                 }.onChange { [weak self] row in

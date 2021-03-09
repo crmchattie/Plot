@@ -18,7 +18,7 @@ class TimeZoneViewController: UIViewController {
     var searchCompleter = MKLocalSearchCompleter()
     var searchResults = [MKLocalSearchCompletion]()
     var searchBar: UISearchBar?
-    let searchResultsTableView = UITableView()
+    let searchResultsTableView = UITableView(frame: .zero, style: .insetGrouped)
     weak var delegate : UpdateTimeZoneDelegate?
     
     var startOrEndTimeZone: String?
@@ -63,8 +63,6 @@ class TimeZoneViewController: UIViewController {
     }
     
     fileprivate func setupTableView() {
-        
-        
         view.addSubview(searchResultsTableView)
         searchResultsTableView.translatesAutoresizingMaskIntoConstraints = false
         searchResultsTableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
