@@ -167,8 +167,11 @@ class GeneralTabBarController: UITabBarController {
         homeController.tabBarItem = homeTabItem
         discoverController.tabBarItem = discoverTabItem
         settingsController.tabBarItem = settingsTabItem
-        
-        let tabBarControllers = [discoverNavigationController, homeNavigationController as UIViewController,  settingsNavigationController]
+
+        let analyticsController = UINavigationController(rootViewController: AnalyticsViewController())
+        analyticsController.navigationBar.prefersLargeTitles = true
+
+        let tabBarControllers = [discoverNavigationController, homeNavigationController as UIViewController,  settingsNavigationController, analyticsController]
         viewControllers = tabBarControllers
         selectedIndex = Tabs.home.rawValue
     }

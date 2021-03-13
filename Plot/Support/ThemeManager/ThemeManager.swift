@@ -27,7 +27,7 @@ struct ThemeManager {
         let textAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
         UINavigationBar.appearance().titleTextAttributes = textAttributes
         UINavigationBar.appearance().largeTitleTextAttributes = textAttributes
-        UINavigationBar.appearance().backgroundColor = theme.barBackgroundColor
+//        UINavigationBar.appearance().backgroundColor = theme.barBackgroundColor
         UITableViewCell.appearance().selectionColor = ThemeManager.currentTheme().cellSelectionColor
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
         

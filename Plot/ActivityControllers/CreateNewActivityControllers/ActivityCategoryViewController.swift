@@ -44,23 +44,18 @@ class ActivityCategoryViewController: FormViewController {
     fileprivate func updateCategories() {
         form.removeAll()
         if let currentUser = Auth.auth().currentUser?.uid {
-            let dispatchGroup = DispatchGroup()
-            let reference = Database.database().reference()
             categories = activityCategories.sorted()
-            dispatchGroup.enter()
-            reference.child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
+            Database.database().reference().child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                 if snapshot.exists(), let values = snapshot.value as? [String: String] {
                     let array = Array(values.values)
                     self.categories.append(contentsOf: array)
                     self.categories = self.categories.sorted()
                 }
-                dispatchGroup.leave()
+                DispatchQueue.main.async {
+                    activityIndicatorView.stopAnimating()
+                    self.initializeForm()
+                }
             })
-            
-            dispatchGroup.notify(queue: .main) {
-                activityIndicatorView.stopAnimating()
-                self.initializeForm()
-            }
         }
     }
     
