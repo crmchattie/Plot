@@ -98,4 +98,16 @@ extension Date {
     var lastYear: Date {
         return Calendar.current.date(byAdding: .year, value: -1, to: self)!
     }
+    
+    func daysSince(_ date: Date) -> Int {
+        Calendar.current.dateComponents([.day], from: date, to: self).day ?? 0
+    }
+    
+    func addDays(_ days: Int) -> Date {
+        Calendar.current.date(byAdding: .day, value: days, to: self)!
+    }
+    
+    func isSameDay(as date: Date) -> Bool {
+        Calendar.current.isDate(self, inSameDayAs: date)
+    }
 }

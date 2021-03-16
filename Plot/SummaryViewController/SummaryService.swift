@@ -10,10 +10,15 @@ import Foundation
 import HealthKit
 
 protocol SummaryServiceInterface {
-    func getSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Swift.Void)
+    func getSamples(
+        segmentType: TimeSegmentType,
+        activities: [Activity]?,
+        transactions: [Transaction]?,
+        completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Swift.Void)
 }
 
 class SummaryService: SummaryServiceInterface {
+    
     func getSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Swift.Void) {
         getStatisticalSamples(segmentType: segmentType, activities: activities, transactions: transactions, completion: completion)
     }
@@ -100,7 +105,6 @@ class SummaryService: SummaryServiceInterface {
                 if !entries.isEmpty {
                     barChartEntries[.cashFlowSummary] = entries
                 }
-                    
 
                     
                     

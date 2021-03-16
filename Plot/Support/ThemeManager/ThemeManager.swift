@@ -28,6 +28,7 @@ struct ThemeManager {
         UINavigationBar.appearance().titleTextAttributes = textAttributes
         UINavigationBar.appearance().largeTitleTextAttributes = textAttributes
 //        UINavigationBar.appearance().backgroundColor = theme.barBackgroundColor
+        #warning("I would remove this globally. Ideally cells have selection styles that are updated automatically.")
         UITableViewCell.appearance().selectionColor = ThemeManager.currentTheme().cellSelectionColor
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
         
@@ -345,5 +346,3 @@ open class ChartColors: NSObject
         ]
     }
 }
-
-

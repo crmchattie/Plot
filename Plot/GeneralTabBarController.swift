@@ -10,8 +10,7 @@ import UIKit
 import Firebase
 import Contacts
 
-//update this file to update nav bar
-
+// Update this file to update nav bar
 enum Tabs: Int {
     case discover = 0
     case home = 1
@@ -32,6 +31,10 @@ class GeneralTabBarController: UITabBarController {
     let homeController = MasterActivityContainerController()
     let discoverController = DiscoverViewController()
     let settingsController = AccountSettingsController()
+    
+    lazy var analyticsController: AnalyticsViewController = {
+        AnalyticsViewController(viewModel: .init(networkController: networkController))
+    }()
     
     var window: UIWindow?
     
@@ -69,7 +72,6 @@ class GeneralTabBarController: UITabBarController {
         tabBar.layer.borderColor = UIColor.clear.cgColor
         tabBar.clipsToBounds = true
         setTabs()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -92,16 +94,12 @@ class GeneralTabBarController: UITabBarController {
             return
         }
         
-        if #available(iOS 12.0, *) {
-            if self.traitCollection.userInterfaceStyle == .dark {
-                let theme = Theme.Dark
-                ThemeManager.applyTheme(theme: theme)
-            } else if self.traitCollection.userInterfaceStyle == .light {
-                let theme = Theme.Default
-                ThemeManager.applyTheme(theme: theme)
-            }
-        } else {
-            // Fallback on earlier versions
+        if self.traitCollection.userInterfaceStyle == .dark {
+            let theme = Theme.Dark
+            ThemeManager.applyTheme(theme: theme)
+        } else if self.traitCollection.userInterfaceStyle == .light {
+            let theme = Theme.Default
+            ThemeManager.applyTheme(theme: theme)
         }
     }
     
@@ -167,11 +165,17 @@ class GeneralTabBarController: UITabBarController {
         homeController.tabBarItem = homeTabItem
         discoverController.tabBarItem = discoverTabItem
         settingsController.tabBarItem = settingsTabItem
-
-        let analyticsController = UINavigationController(rootViewController: AnalyticsViewController())
-        analyticsController.navigationBar.prefersLargeTitles = true
-
-        let tabBarControllers = [discoverNavigationController, homeNavigationController as UIViewController,  settingsNavigationController, analyticsController]
+        
+        let analyticsNavigationController = UINavigationController(rootViewController: analyticsController)
+        analyticsNavigationController.navigationBar.prefersLargeTitles = true
+        analyticsNavigationController.tabBarItem = UITabBarItem(title: nil,
+                                                                image: UIImage(systemName: "chart.pie"),
+                                                                selectedImage: UIImage(systemName: "chart.pie.fill"))
+        
+        let tabBarControllers = [discoverNavigationController,
+                                 homeNavigationController,
+                                 settingsNavigationController,
+                                 analyticsNavigationController]
         viewControllers = tabBarControllers
         selectedIndex = Tabs.home.rawValue
     }

@@ -114,7 +114,6 @@ class SummaryViewController: UIViewController {
         collectionView.register(SummaryTimeBarChartCell.self, forCellWithReuseIdentifier: summaryTimeBarChartCell)
         collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
         
-        
         view.addSubview(customSegmented)
         view.addSubview(collectionView)
         view.addSubview(activityIndicatorView)

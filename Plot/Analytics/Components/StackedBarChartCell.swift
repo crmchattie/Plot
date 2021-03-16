@@ -8,16 +8,16 @@
 
 import UIKit
 import Charts
+import Combine
 
 class StackedBarChartCell: UITableViewCell {
 
-    private let viewModel = StackedBarChartViewModel()
+    private var viewModel: StackedBarChartViewModel?
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textColor = .secondaryLabel
-        label.text = "Daily Average"
         return label
     }()
 
@@ -25,7 +25,6 @@ class StackedBarChartCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
         label.textColor = .label
-        label.text = "6h 1m"
         return label
     }()
 
@@ -45,6 +44,9 @@ class StackedBarChartCell: UITableViewCell {
         chart.xAxis.gridLineDashLengths = [2, 2]
         chart.xAxis.labelPosition = .bottom
         chart.xAxis.labelTextColor = .secondaryLabel
+        
+        chart.rightAxis.valueFormatter = HourValueFormatter()
+        chart.rightAxis.axisMinimum = 0
 
         return chart
     }()
@@ -56,6 +58,17 @@ class StackedBarChartCell: UITableViewCell {
         stackView.distribution = .fillProportionally
         return stackView
     }()
+    
+    
+    private var subscription: AnyCancellable?
+    
+    func configure(with viewModel: StackedBarChartViewModel) {
+        self.viewModel = viewModel
+        subscription = viewModel.onChange.sink { _  in
+            self.updateData()
+        }
+        updateData()
+    }
 
     // MARK: - Lifecycle
 
@@ -86,26 +99,30 @@ class StackedBarChartCell: UITableViewCell {
             stack.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
             chartView.heightAnchor.constraint(equalToConstant: 150)
         ])
+    }
+    
+    private func updateData() {
+        categoriesStackView.arrangedSubviews.forEach {
+            categoriesStackView.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        guard let viewModel = viewModel else {
+            #warning("reset chart state on detail")
+            return
+        }
+        
         chartView.data = viewModel.chartData
+        
+        titleLabel.text = viewModel.title
+        valueLabel.text = viewModel.description
 
-        #warning("Delete later")
-        let social = CategoryTimeView()
-        social.titleLabel.text = "Social"
-        social.titleLabel.textColor = .blue
-        social.subtitleLabel.text = "4h 10m"
-        categoriesStackView.addArrangedSubview(social)
-
-        let productivity = CategoryTimeView()
-        productivity.titleLabel.text = "Productivity & Finance"
-        productivity.titleLabel.textColor = .orange
-        productivity.subtitleLabel.text = "3h 5m"
-        categoriesStackView.addArrangedSubview(productivity)
-
-        let work = CategoryTimeView()
-        work.titleLabel.text = "Work"
-        work.titleLabel.textColor = .lightGray
-        work.subtitleLabel.text = "6h 30m"
-        categoriesStackView.addArrangedSubview(work)
+        viewModel.categories.forEach { category in
+            let categoryView = CategoryTimeView()
+            categoryView.titleLabel.text = category.title
+            categoryView.titleLabel.textColor = category.color
+            categoryView.subtitleLabel.text = category.value
+            categoriesStackView.addArrangedSubview(categoryView)
+        }
     }
 }
 
@@ -127,14 +144,12 @@ private class CategoryTimeView: UIStackView {
 
     init() {
         super.init(frame: .zero)
-//        super.init(arrangedSubviews: [])
         initUI()
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
 
     // MARK: - UI
 

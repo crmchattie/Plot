@@ -472,6 +472,11 @@
 		4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */; };
 		4ED658A2BE8AC368D77831D1 /* libPods-ShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */; };
 		A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53D0336E7A51EFB22060D82 /* libPods-Plot.a */; };
+		F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */; };
+		F9773A5A2601339A00D1B204 /* ActivityStackedBarChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A592601339A00D1B204 /* ActivityStackedBarChartViewModel.swift */; };
+		F9773A862601453500D1B204 /* HourValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A852601453500D1B204 /* HourValueFormatter.swift */; };
+		F9773A8B26014AE700D1B204 /* AnalyticsDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */; };
+		F9773A8F26014C7B00D1B204 /* AnalyticsDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8E26014C7B00D1B204 /* AnalyticsDetailViewModel.swift */; };
 		F9B82C8325FAB1670072BE74 /* AnalyticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C8225FAB1670072BE74 /* AnalyticsViewController.swift */; };
 		F9B82C8A25FAB1F40072BE74 /* StackedBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C8925FAB1F40072BE74 /* StackedBarChartCell.swift */; };
 		F9B82C9025FAB1FE0072BE74 /* StackedBarChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C8F25FAB1FE0072BE74 /* StackedBarChartViewModel.swift */; };
@@ -980,6 +985,11 @@
 		91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ShareExtension/Pods-ShareExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.debug.xcconfig"; sourceTree = "<group>"; };
 		E53D0336E7A51EFB22060D82 /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
+		F9773A592601339A00D1B204 /* ActivityStackedBarChartViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityStackedBarChartViewModel.swift; sourceTree = "<group>"; };
+		F9773A852601453500D1B204 /* HourValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourValueFormatter.swift; sourceTree = "<group>"; };
+		F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewController.swift; sourceTree = "<group>"; };
+		F9773A8E26014C7B00D1B204 /* AnalyticsDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewModel.swift; sourceTree = "<group>"; };
 		F9B82C8225FAB1670072BE74 /* AnalyticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewController.swift; sourceTree = "<group>"; };
 		F9B82C8925FAB1F40072BE74 /* StackedBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackedBarChartCell.swift; sourceTree = "<group>"; };
 		F9B82C8F25FAB1FE0072BE74 /* StackedBarChartViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackedBarChartViewModel.swift; sourceTree = "<group>"; };
@@ -1545,6 +1555,7 @@
 				269105F3253E8E2E00A02C5F /* DateValueFormatter.swift */,
 				269105F4253E8E2E00A02C5F /* LargeValueFormatter.swift */,
 				106431D4258C10FE00D02658 /* ChartValueFormatter.swift */,
+				F9773A852601453500D1B204 /* HourValueFormatter.swift */,
 			);
 			path = Formatters;
 			sourceTree = "<group>";
@@ -2470,11 +2481,22 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		F9773A8926014AC300D1B204 /* Analytics Detail */ = {
+			isa = PBXGroup;
+			children = (
+				F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */,
+				F9773A8E26014C7B00D1B204 /* AnalyticsDetailViewModel.swift */,
+			);
+			path = "Analytics Detail";
+			sourceTree = "<group>";
+		};
 		F9B82C8125FAB0B80072BE74 /* Analytics */ = {
 			isa = PBXGroup;
 			children = (
+				F9773A8926014AC300D1B204 /* Analytics Detail */,
 				F9B82C8825FAB1C10072BE74 /* Components */,
 				F9B82C8225FAB1670072BE74 /* AnalyticsViewController.swift */,
+				F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */,
 			);
 			path = Analytics;
 			sourceTree = "<group>";
@@ -2484,6 +2506,7 @@
 			children = (
 				F9B82C8925FAB1F40072BE74 /* StackedBarChartCell.swift */,
 				F9B82C8F25FAB1FE0072BE74 /* StackedBarChartViewModel.swift */,
+				F9773A592601339A00D1B204 /* ActivityStackedBarChartViewModel.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -2847,6 +2870,7 @@
 				4BAEE46D21272B380045AB10 /* SwitchObject.swift in Sources */,
 				103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */,
 				10C766E325321732003C8E1F /* FinanceTransactionRuleViewController.swift in Sources */,
+				F9773A8B26014AE700D1B204 /* AnalyticsDetailViewController.swift in Sources */,
 				4BAEE49821272C5E0045AB10 /* ViewPlaceholder.swift in Sources */,
 				2666F4CE257DEA63001EF86B /* ActivityCategorySelector.swift in Sources */,
 				4BAEE5D2212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift in Sources */,
@@ -2860,6 +2884,7 @@
 				1082C89724F0A91500CF6491 /* HealthViewController.swift in Sources */,
 				10C7F92525A520ED004E9277 /* ActiveEnergyOperation.swift in Sources */,
 				4BAEE4E921272D890045AB10 /* MediaPickerControllerNew.swift in Sources */,
+				F9773A8F26014C7B00D1B204 /* AnalyticsDetailViewModel.swift in Sources */,
 				4BAEE52121272D890045AB10 /* ChatLogController+CollectionDelegate.swift in Sources */,
 				4BAEE5E3212735E50045AB10 /* ThemeManager.swift in Sources */,
 				10217A7723102CA4004CBA9E /* ActivityView.swift in Sources */,
@@ -3113,6 +3138,7 @@
 				10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */,
 				4BAEE47F21272C4F0045AB10 /* UserProfileContainerView.swift in Sources */,
 				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,
+				F9773A5A2601339A00D1B204 /* ActivityStackedBarChartViewModel.swift in Sources */,
 				4BAEE5DC212735E50045AB10 /* AnimationController.swift in Sources */,
 				4BAEE4FD21272D890045AB10 /* BaseVoiceMessageCell.swift in Sources */,
 				106774C825D96757002F78E7 /* FinancialHoldingFetcher.swift in Sources */,
@@ -3144,6 +3170,7 @@
 				269105E6253D464300A02C5F /* HealthDetailViewController.swift in Sources */,
 				4BAEE48321272C4F0045AB10 /* UserProfileAvatarOpenerDelegate.swift in Sources */,
 				1026185025756B2400CF6F0A /* SummaryHKChartCell.swift in Sources */,
+				F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */,
 				108BDE6924B5104900BE2CBA /* FoodTypeViewController.swift in Sources */,
 				1080871F2585057400FB9BB0 /* MoodActions.swift in Sources */,
 				4BAEE46C21272B380045AB10 /* SwitchTableViewCell.swift in Sources */,
@@ -3161,6 +3188,7 @@
 				4BAEE5BD212735E50045AB10 /* INSPhoto.swift in Sources */,
 				4BAEE49921272C5E0045AB10 /* ContactsController+SearchHandlers.swift in Sources */,
 				F9C05FA825F7D608009E892A /* NotificationConstants.swift in Sources */,
+				F9773A862601453500D1B204 /* HourValueFormatter.swift in Sources */,
 				103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */,
 				4BAEE5CF212735E50045AB10 /* CollectionViewLeftAlignFlowLayout.swift in Sources */,
 				4BA1E77F2152518700391BCB /* ChatLogController+MessageSenderDelegate.swift in Sources */,

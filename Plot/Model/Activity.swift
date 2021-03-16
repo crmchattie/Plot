@@ -495,7 +495,6 @@ enum CustomType: String, Equatable, Hashable {
         case .googleCalendarEvent: return "Google Calendar Event"
         case .mindfulness: return "Mindfulness"
         case .calendar: return "Calendar"
-
         }
     }
     
