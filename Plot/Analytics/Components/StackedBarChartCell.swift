@@ -30,23 +30,29 @@ class StackedBarChartCell: UITableViewCell {
 
     private lazy var chartView: BarChartView = {
         let chart = BarChartView()
+        
         chart.legend.enabled = false
         chart.pinchZoomEnabled = false
         chart.doubleTapToZoomEnabled = false
         chart.setScaleEnabled(false)
+        chart.highlightPerTapEnabled = false
+        chart.highlightPerDragEnabled = false
+        chart.minOffset = 0
 
         chart.leftAxis.enabled = false
+        chart.leftAxis.axisMinimum = 0
+        chart.rightAxis.axisMinimum = 0
         chart.rightAxis.drawAxisLineEnabled = false
         chart.rightAxis.labelTextColor = .secondaryLabel
-        chart.minOffset = 0
+        chart.rightAxis.valueFormatter = HourValueFormatter()
+        chart.xAxis.yOffset = 1
 
         chart.xAxis.gridColor = .secondaryLabel
         chart.xAxis.gridLineDashLengths = [2, 2]
         chart.xAxis.labelPosition = .bottom
+        chart.xAxis.centerAxisLabelsEnabled = true
         chart.xAxis.labelTextColor = .secondaryLabel
-        
-        chart.rightAxis.valueFormatter = HourValueFormatter()
-        chart.rightAxis.axisMinimum = 0
+        chart.xAxis.valueFormatter = WeekdayValueFormatter()
 
         return chart
     }()
@@ -58,7 +64,6 @@ class StackedBarChartCell: UITableViewCell {
         stackView.distribution = .fillProportionally
         return stackView
     }()
-    
     
     private var subscription: AnyCancellable?
     
@@ -83,7 +88,7 @@ class StackedBarChartCell: UITableViewCell {
 
     private func initUI() {
         selectionStyle = .none
-        backgroundColor = .secondarySystemBackground
+        backgroundColor = .tertiarySystemBackground
 
         let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel, chartView, categoriesStackView])
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -107,7 +112,7 @@ class StackedBarChartCell: UITableViewCell {
             $0.removeFromSuperview()
         }
         guard let viewModel = viewModel else {
-            #warning("reset chart state on detail")
+            chartView.data = nil
             return
         }
         
@@ -120,7 +125,7 @@ class StackedBarChartCell: UITableViewCell {
             let categoryView = CategoryTimeView()
             categoryView.titleLabel.text = category.title
             categoryView.titleLabel.textColor = category.color
-            categoryView.subtitleLabel.text = category.value
+            categoryView.subtitleLabel.text = category.formattedValue
             categoriesStackView.addArrangedSubview(categoryView)
         }
     }

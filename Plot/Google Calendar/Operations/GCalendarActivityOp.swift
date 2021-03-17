@@ -70,7 +70,7 @@ class GCalendarActivityOp: AsyncOperation {
     private func createActivity(for activityID: String) -> Activity {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         update(activity: activity)
-        activity.category = ActivityCategorySelector.selectCategory(for: activity)
+        activity.category = ActivityCategory.categorize(activity).rawValue
         activity.activityType = CustomType.googleCalendarEvent.categoryText
         return activity
     }

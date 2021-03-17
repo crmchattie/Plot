@@ -213,6 +213,7 @@ extension SummaryViewController: CustomSegmentedControlDelegate {
 }
 
 extension SummaryViewController: ChartViewDelegate {
+    
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
         
     }

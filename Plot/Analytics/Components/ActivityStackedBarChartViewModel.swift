@@ -36,11 +36,14 @@ struct ActivityStackedBarChartViewModel: StackedBarChartViewModel {
         for (index, (category, stats)) in items.enumerated() {
             let total = stats.reduce(0, { $0 + $1.value * 60 })
             let totalString = dateFormatter.string(from: total) ?? "NaN"
-            categories.append(CategorySummaryViewModel(title: category, color: colors[index], value: totalString))
+            categories.append(CategorySummaryViewModel(title: category,
+                                                       color: colors[index],
+                                                       value: total,
+                                                       formattedValue: totalString))
             average += total
         }
         average /= 7
-        self.categories = categories
+        self.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
         
         description = dateFormatter.string(from: average) ?? "NaN"
         
@@ -50,8 +53,7 @@ struct ActivityStackedBarChartViewModel: StackedBarChartViewModel {
             let yValues = items.map {
                 $0.value.filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })
             }
-            return BarChartDataEntry(x: Double(index) + 0.5,
-                                     yValues: yValues)
+            return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues)
         }
         
         let chartDataSet = BarChartDataSet(entries: dataEntries)

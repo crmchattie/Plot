@@ -44,7 +44,7 @@ class ActivityCategoryViewController: FormViewController {
     fileprivate func updateCategories() {
         form.removeAll()
         if let currentUser = Auth.auth().currentUser?.uid {
-            categories = activityCategories.sorted()
+            categories = ActivityCategory.allCases.map({ $0.rawValue }).sorted()
             Database.database().reference().child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                 if snapshot.exists(), let values = snapshot.value as? [String: String] {
                     let array = Array(values.values)

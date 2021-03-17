@@ -39,7 +39,8 @@ class AnalyticsViewController: UITableViewController {
         guard viewModel.items.count > section else { return }
         switch viewModel.items[section] {
         case is ActivityStackedBarChartViewModel:
-            let viewModel = AnalyticsDetailViewModel(chartViewModel: self.viewModel.items[section])
+            let viewModel = AnalyticsDetailViewModel(chartViewModel: self.viewModel.items[section],
+                                                     networkController: self.viewModel.networkController)
             let controller = AnalyticsDetailViewController(viewModel: viewModel)
             navigationController?.pushViewController(controller, animated: true)
         case is HealthStackedBarChartViewModel:
@@ -67,11 +68,11 @@ extension AnalyticsViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(ofType: StackedBarChartCell.self, for: indexPath)
-            cell.configure(with: viewModel.items[indexPath.row])
+            cell.configure(with: viewModel.items[indexPath.section])
             return cell
         } else {
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-            cell.backgroundColor = .secondarySystemBackground
+            cell.backgroundColor = .tertiarySystemBackground
             cell.textLabel?.text = "See all activities"
             cell.accessoryType = .disclosureIndicator
             return cell

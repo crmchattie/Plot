@@ -18,11 +18,6 @@ class AnalyticsViewModel {
     
     init(networkController: NetworkController) {
         self.networkController = networkController
-//        items = [
-            
-//            HealthStackedBarChartViewModel(),
-//            FinancesStackedBarChartViewModel()
-//        ]
     }
     
     func fetchActivities(completion: @escaping (Result<Void, Error>) -> Void) {
@@ -34,6 +29,7 @@ class AnalyticsViewModel {
                 if let activities = stats?[.calendarSummary] {
                     self.items.append(ActivityStackedBarChartViewModel(items: activities))
                 }
+                self.items.append(HealthStackedBarChartViewModel())
                 DispatchQueue.main.async {
                     completion(.success(()))
                 }
@@ -41,14 +37,3 @@ class AnalyticsViewModel {
         }
     }
 }
-
-//private extension BarChartDataSet {
-//
-////    static func activityDataSet(items: [Statistic], startDate: Date, endDate: Date) -> BarChartDataSet {
-////        var entries: [BarChartDataEntry] = []
-////        for offset in 0..<endDate.daysSince(startDate) {
-////            if startDate.addDays(offset).is
-////        }
-////        return BarChartDataSet(entries: entries)
-////    }
-//}

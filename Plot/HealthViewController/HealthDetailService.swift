@@ -106,11 +106,9 @@ class HealthDetailService: HealthDetailServiceInterface {
         else if segmentType == .year {
             if case .steps = healthMetricType {
                 interval.day = 1
-            }
-            else if case .activeEnergy = healthMetricType {
+            } else if case .activeEnergy = healthMetricType {
                 interval.day = 1
-            }
-            else {
+            } else {
                 interval.month = 1
             }
             startDate = anchorDate.lastYear

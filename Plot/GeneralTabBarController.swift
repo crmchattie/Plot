@@ -162,15 +162,19 @@ class GeneralTabBarController: UITabBarController {
         let settingsTabItem = UITabBarItem(title: nil, image: settingsImage, selectedImage: nil)
         settingsTabItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
         
+        let analyticsTabitem = UITabBarItem(title: nil,
+                                            image: UIImage(systemName: "chart.pie"),
+                                            selectedImage: UIImage(systemName: "chart.pie.fill"))
+        analyticsTabitem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
+
+        
         homeController.tabBarItem = homeTabItem
         discoverController.tabBarItem = discoverTabItem
         settingsController.tabBarItem = settingsTabItem
         
         let analyticsNavigationController = UINavigationController(rootViewController: analyticsController)
         analyticsNavigationController.navigationBar.prefersLargeTitles = true
-        analyticsNavigationController.tabBarItem = UITabBarItem(title: nil,
-                                                                image: UIImage(systemName: "chart.pie"),
-                                                                selectedImage: UIImage(systemName: "chart.pie.fill"))
+        analyticsNavigationController.tabBarItem = analyticsTabitem
         
         let tabBarControllers = [discoverNavigationController,
                                  homeNavigationController,

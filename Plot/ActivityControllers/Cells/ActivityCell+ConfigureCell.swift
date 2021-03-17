@@ -101,12 +101,6 @@ extension ActivityCell {
         let dateTimeValueArray = dateTimeValue(forActivity: activity)
         startLabel.numberOfLines = dateTimeValueArray.0
         startLabel.text = dateTimeValueArray.1
-                
-        if activity.category != nil {
-            activityTypeLabel.text = activity.category
-        } else {
-            activityTypeLabel.text = "Uncategorized"
-        }
         
         if let invitation = invitation {
             invitationSegmentedControlTopAnchor.constant = invitationSegmentedControlTopAnchorRegular
@@ -126,26 +120,15 @@ extension ActivityCell {
             invitationSegmentHeightConstraint.constant = 0
             invitationSegmentedControl.isHidden = true
         }
-                        
-        switch activity.category?.lowercased() {
-        case "sleep":
-            activityTypeButton.setImage(UIImage(named: "sleep"), for: .normal)
-        case "meal":
-            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
-        case "work":
-            activityTypeButton.setImage(UIImage(named: "work"), for: .normal)
-        case "social":
-            activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
-        case "leisure":
-            activityTypeButton.setImage(UIImage(named: "leisure"), for: .normal)
-        case "exercise":
-            activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
-        case "family":
-            activityTypeButton.setImage(UIImage(named: "family"), for: .normal)
-        case "personal":
-            activityTypeButton.setImage(UIImage(named: "personal"), for: .normal)
-        default:
-            activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
+        
+        if let categoryValue = activity.category, let category = ActivityCategory(rawValue: categoryValue) {
+            activityTypeButton.setImage(category.icon, for: .normal)
+            activityTypeButton.tintColor = category.color
+            activityTypeLabel.text = category.rawValue
+        } else {
+            activityTypeButton.setImage(ActivityCategory.uncategorized.icon, for: .normal)
+            activityTypeButton.tintColor = ActivityCategory.uncategorized.color
+            activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }
         
         let badgeString = activity.badge?.toString()
@@ -157,10 +140,6 @@ extension ActivityCell {
         } else {
             badgeLabel.isHidden = true
         }
-        
-//        loadParticipantsThumbnail(activity: activity)
-        
-        
     }
     
     func loadParticipantsThumbnail(activity: Activity) {
