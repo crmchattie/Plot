@@ -15,15 +15,14 @@ enum ActivityFilterOption: String, CaseIterable {
     
     var initialRange: (Date, Date) {
         switch self {
-        case .weekly:
-            return (Date().startOfWeek, Date().endOfWeek)
-        case .monthly:
-            return (Date().startOfMonth, Date().endOfMonth)
-        case .yearly:
-            return (Date().startOfYear, Date().endOfYear)
+        case .weekly: return (Date().startOfWeek, Date().endOfWeek)
+        case .monthly: return (Date().startOfMonth, Date().endOfMonth)
+        case .yearly: return (Date().startOfYear, Date().endOfYear)
         }
     }
 }
+
+typealias DateRange = (startDate: Date, endDate: Date)
 
 protocol AnalyticsBreakdownViewModel {
     var onChange: PassthroughSubject<Void, Never> { get }
@@ -35,6 +34,16 @@ protocol AnalyticsBreakdownViewModel {
     var categories: [CategorySummaryViewModel] { get }
     
     var chartData: BarChartData { get }
+    
+    /// Fetch entries for the current analytics summary. Used on the detail list.
+    /// - Parameters:
+    ///   - range: Date range to fetch entries to
+    ///   - completion: returns a list of entries
+    func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void)
+}
+
+enum AnalyticsBreakdownEntry {
+    case activity(Activity)
 }
 
 struct CategorySummaryViewModel {

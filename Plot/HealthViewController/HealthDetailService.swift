@@ -71,7 +71,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             quantityType = type
         }
         else if case .activeEnergy = healthMetricType {
-            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.activeEnergyBurned), let healthMetricUnit = healthMetric.unit else {
+            guard let type = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned), let healthMetricUnit = healthMetric.unit else {
                 print("*** Unable to create a activeEnergy count type ***")
                 completion(nil, nil, nil)
                 return

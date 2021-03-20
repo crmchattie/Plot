@@ -1,5 +1,5 @@
 //
-//  ActivityStackedBarChartViewModel.swift
+//  ActivityAnalyticsBreakdownViewModel.swift
 //  Plot
 //
 //  Created by Botond Magyarosi on 16.03.2021.
@@ -17,7 +17,9 @@ private let dateFormatter: DateComponentsFormatter = {
     return formatter
 }()
 
-struct ActivityStackedBarChartViewModel: StackedBarChartViewModel {
+struct ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
+    
+    private let networkController: NetworkController
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = HourValueFormatter()
@@ -30,7 +32,12 @@ struct ActivityStackedBarChartViewModel: StackedBarChartViewModel {
     
     let chartData: BarChartData
 
-    init(items: [String: [Statistic]], range: (Date, Date)) {
+    init(
+        items: [String: [Statistic]],
+        range: (Date, Date),
+        networkController: NetworkController
+    ) {
+        self.networkController = networkController
         let colors = Array(ChartColors.palette().prefix(items.count))
         var categories: [CategorySummaryViewModel] = []
         var activityCount = 0
@@ -62,5 +69,17 @@ struct ActivityStackedBarChartViewModel: StackedBarChartViewModel {
         chartData = BarChartData(dataSets: [chartDataSet])
         chartData.barWidth = 0.5
         chartData.setDrawValues(false)
+    }
+    
+    func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
+        let entries = networkController.activityService.activities
+            .filter {
+                if let startDate = $0.startDate, let category = $0.category {
+                    return startDate >= range.startDate && startDate <= range.endDate && ActivityCategory(rawValue: category) != .notApplicable
+                }
+                return false
+            }
+            .map { AnalyticsBreakdownEntry.activity($0) }
+        completion(entries)
     }
 }

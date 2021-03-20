@@ -28,6 +28,7 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
     }
     
     func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?, Double) -> ()) {
+        print(healthMetric)
         healthDetailService.getSamples(for: healthMetric, segmentType: segmentType) { [weak self] (stats, samples, error) in
 
             var data: BarChartData?

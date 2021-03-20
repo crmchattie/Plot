@@ -45,6 +45,7 @@ class AnalyticsDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
+        
         navigationItem.title = "Activity breakdown"
         
         let rangeContainer = UIView()
@@ -75,10 +76,13 @@ class AnalyticsDetailViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             rangeContainer.widthAnchor.constraint(equalTo: view.widthAnchor)
         ])
+        
+        initBindings()
     }
     
     private func initBindings() {
-        viewModel.$activities
+        viewModel.$entries
+            .delay(for: .milliseconds(100), scheduler: DispatchQueue.main)
             .sink { [unowned self] _ in
                 self.tableView.reloadData()
             }
@@ -99,7 +103,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
     func numberOfSections(in tableView: UITableView) -> Int { 2 }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? 1 : viewModel.activities.count
+        return section == 0 ? 1 : viewModel.entries.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -108,14 +112,16 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
             cell.configure(with: viewModel.chartViewModel)
             return cell
         } else {
-            let cell = tableView.dequeueReusableCell(ofType: ActivityCell.self, for: indexPath)
-            cell.configureCell(for: indexPath, activity: viewModel.activities[indexPath.row], withInvitation: nil)
-            return cell
+            switch viewModel.entries[indexPath.row] {
+            case .activity(let activity):
+                let cell = tableView.dequeueReusableCell(ofType: ActivityCell.self, for: indexPath)
+                cell.configureCell(for: indexPath, activity: activity, withInvitation: nil)
+                return cell
+            }
         }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
     }
 }

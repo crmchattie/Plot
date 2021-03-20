@@ -13,37 +13,26 @@ import SwiftUI
 class AnalyticsDetailViewModel {
     
     private let networkController: NetworkController
-    private(set) var chartViewModel: StackedBarChartViewModel
+    private(set) var chartViewModel: AnalyticsBreakdownViewModel
     
     var filter: ActivityFilterOption = .weekly {
         didSet { updateRange() }
     }
     var range: (Date, Date) = (Date().startOfWeek, Date().endOfWeek)
     
-    @Published var activities: [Activity] = []
+    @Published private(set) var entries: [AnalyticsBreakdownEntry] = []
     
-    init(chartViewModel: StackedBarChartViewModel, networkController: NetworkController) {
+    init(chartViewModel: AnalyticsBreakdownViewModel, networkController: NetworkController) {
         self.chartViewModel = chartViewModel
         self.networkController = networkController
-        
         updateRange()
     }
     
     private func updateRange() {
-        switch filter {
-        case .weekly:
-            range = (Date().startOfWeek, Date().endOfWeek)
-        case .monthly:
-            range = (Date().startOfMonth, Date().endOfMonth)
-        case .yearly:
-            range = (Date().startOfYear, Date().endOfYear)
-        }
+        range = filter.initialRange
         
-        activities = networkController.activityService.activities.filter {
-            if let startDate = $0.startDate {
-                return startDate >= range.0 && startDate <= range.1
-            }
-            return false
+        chartViewModel.fetchEntries(range: range) { entries in
+            self.entries = entries
         }
     }
 }

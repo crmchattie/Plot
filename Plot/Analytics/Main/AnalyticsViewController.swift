@@ -54,24 +54,11 @@ class AnalyticsViewController: UITableViewController {
     
     private func openDetail(forSection section: Int) {
         guard viewModel.items.count > section else { return }
-        switch viewModel.items[section] {
-        case is ActivityStackedBarChartViewModel:
-            let viewModel = AnalyticsDetailViewModel(chartViewModel: self.viewModel.items[section],
-                                                     networkController: self.viewModel.networkController)
-            let controller = AnalyticsDetailViewController(viewModel: viewModel)
-            navigationController?.pushViewController(controller, animated: true)
-        case is HealthStackedBarChartViewModel:
-            let viewModel = AnalyticsDetailViewModel(chartViewModel: self.viewModel.items[section],
-                                                     networkController: self.viewModel.networkController)
-            let controller = AnalyticsDetailViewController(viewModel: viewModel)
-            navigationController?.pushViewController(controller, animated: true)
-        case is FinancesStackedBarChartViewModel:
-            #warning("Open detail.")
-            let controller = UIViewController()
-            navigationController?.pushViewController(controller, animated: true)
-        default:
-            break
-        }
+        let viewModel = AnalyticsDetailViewModel(chartViewModel: self.viewModel.items[section],
+                                                 networkController: self.viewModel.networkController)
+        let controller = AnalyticsDetailViewController(viewModel: viewModel)
+        controller.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(controller, animated: true)
     }
 }
 
@@ -98,14 +85,15 @@ extension AnalyticsViewController {
         }
     }
     
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        indexPath.row > 0 ? indexPath : nil
+    }
+    
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         viewModel.items[section].sectionTitle.capitalized
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath.row == 1 {
-            openDetail(forSection: indexPath.section)
-        }
+        openDetail(forSection: indexPath.section)
     }
 }

@@ -12,7 +12,7 @@ import Combine
 
 class StackedBarChartCell: UITableViewCell {
 
-    private var viewModel: StackedBarChartViewModel?
+    private var viewModel: AnalyticsBreakdownViewModel?
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -67,7 +67,7 @@ class StackedBarChartCell: UITableViewCell {
     
     private var subscription: AnyCancellable?
     
-    func configure(with viewModel: StackedBarChartViewModel) {
+    func configure(with viewModel: AnalyticsBreakdownViewModel) {
         self.viewModel = viewModel
         chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         subscription = viewModel.onChange.sink { _  in

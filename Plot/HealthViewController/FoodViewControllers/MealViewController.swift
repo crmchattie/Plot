@@ -483,7 +483,7 @@ class MealViewController: FormViewController {
                         for nutrient in productNutrients {
                             if let index = nutrients.firstIndex(where: {$0.title == nutrient.title}) {
                                 nutrients[index].amount! += nutrient.amount ?? 0
-                                nutrients[index].percentOfDailyNeeds! += nutrient.percentOfDailyNeeds ?? 0
+                                nutrients[index].percentOfDailyNeeds = (nutrients[index].percentOfDailyNeeds ?? 0) + (nutrient.percentOfDailyNeeds ?? 0)
                             } else {
                                 nutrients.append(nutrient)
                             }
@@ -496,7 +496,7 @@ class MealViewController: FormViewController {
                         for nutrient in productNutrients {
                             if let index = nutrients.firstIndex(where: {$0.title == nutrient.title}) {
                                 nutrients[index].amount! += nutrient.amount ?? 0
-                                nutrients[index].percentOfDailyNeeds! += nutrient.percentOfDailyNeeds ?? 0
+                                nutrients[index].percentOfDailyNeeds = (nutrients[index].percentOfDailyNeeds ?? 0) + (nutrient.percentOfDailyNeeds ?? 0)
                             } else {
                                 nutrients.append(nutrient)
                             }
@@ -509,7 +509,7 @@ class MealViewController: FormViewController {
                         for nutrient in productNutrients {
                             if let index = nutrients.firstIndex(where: {$0.title == nutrient.title}) {
                                 nutrients[index].amount! += nutrient.amount ?? 0
-                                nutrients[index].percentOfDailyNeeds! += nutrient.percentOfDailyNeeds ?? 0
+                                nutrients[index].percentOfDailyNeeds = (nutrients[index].percentOfDailyNeeds ?? 0) + (nutrient.percentOfDailyNeeds ?? 0)
                             } else {
                                 nutrients.append(nutrient)
                             }

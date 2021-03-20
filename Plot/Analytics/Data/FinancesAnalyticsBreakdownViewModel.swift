@@ -1,5 +1,5 @@
 //
-//  FinancesStackedBarChartViewModel.swift
+//  FinancesAnalyticsBreakdownViewModel.swift
 //  Plot
 //
 //  Created by Botond Magyarosi on 20.03.2021.
@@ -7,11 +7,11 @@
 //
 
 import Foundation
+import Combine
 import Charts
 
-// MARK: - FinancesStackedBarChartViewModel
-
-struct FinancesStackedBarChartViewModel: StackedBarChartViewModel {
+// Spending over time + net worth
+struct FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
@@ -33,5 +33,10 @@ struct FinancesStackedBarChartViewModel: StackedBarChartViewModel {
         chartData = BarChartData(dataSets: [chartDataSet])
         chartData.barWidth = 0.5
         chartData.setDrawValues(false)
+    }
+    
+    
+    func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
+        completion([])
     }
 }
