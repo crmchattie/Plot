@@ -25,6 +25,7 @@ class AnalyticsDetailViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(StackedBarChartCell.self)
+        tableView.register(ActivityCell.self)
         return tableView
     }()
 
@@ -57,6 +58,7 @@ class AnalyticsDetailViewController: UIViewController {
         
         view.addSubview(tableView)
         tableView.delegate = self
+        tableView.separatorStyle = .none
         tableView.dataSource = self
         tableView.tableHeaderView = rangeContainer
         
@@ -96,13 +98,14 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
             cell.configure(with: viewModel.chartViewModel)
             return cell
         } else {
-            let cell = UITableViewCell()
-            cell.textLabel?.text = viewModel.activities[indexPath.row].name
+            let cell = tableView.dequeueReusableCell(ofType: ActivityCell.self, for: indexPath)
+            cell.configureCell(for: indexPath, activity: viewModel.activities[indexPath.row], withInvitation: nil)
             return cell
         }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
     }
 }
