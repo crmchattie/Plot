@@ -51,11 +51,11 @@ enum ActivityCategory: String, CaseIterable {
         case .sleep: return ChartColors.palette()[0]
         case .meal: return ChartColors.palette()[1]
         case .work: return ChartColors.palette()[2]
-        case .social: return ChartColors.palette()[3]
-        case .leisure: return ChartColors.palette()[4]
-        case .excercise: return ChartColors.palette()[6]
-        case .family: return ChartColors.palette()[7]
-        case .personal: return ChartColors.palette()[8]
+        case .social: return ChartColors.palette()[4]
+        case .leisure: return ChartColors.palette()[6]
+        case .excercise: return ChartColors.palette()[7]
+        case .family: return ChartColors.palette()[8]
+        case .personal: return ChartColors.palette()[9]
         case .uncategorized,
              .notApplicable:
             return UIColor.lightGray

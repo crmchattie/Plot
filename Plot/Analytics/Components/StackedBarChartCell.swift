@@ -44,7 +44,7 @@ class StackedBarChartCell: UITableViewCell {
         chart.rightAxis.axisMinimum = 0
         chart.rightAxis.drawAxisLineEnabled = false
         chart.rightAxis.labelTextColor = .secondaryLabel
-        chart.rightAxis.valueFormatter = HourValueFormatter()
+        
         chart.xAxis.yOffset = 1
 
         chart.xAxis.gridColor = .secondaryLabel
@@ -69,6 +69,7 @@ class StackedBarChartCell: UITableViewCell {
     
     func configure(with viewModel: StackedBarChartViewModel) {
         self.viewModel = viewModel
+        chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         subscription = viewModel.onChange.sink { _  in
             self.updateData()
         }

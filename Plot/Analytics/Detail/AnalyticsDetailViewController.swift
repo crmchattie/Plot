@@ -7,16 +7,18 @@
 //
 
 import UIKit
+import Combine
 
 class AnalyticsDetailViewController: UIViewController {
     
     private let viewModel: AnalyticsDetailViewModel!
+    private var cancellables = Set<AnyCancellable>()
     
     private let rangeControlView: UISegmentedControl = {
         let control = UISegmentedControl(items: ActivityFilterOption.allCases.map { $0.rawValue} )
         control.selectedSegmentIndex = 0
         control.translatesAutoresizingMaskIntoConstraints = false
-        control.addTarget(self, action: #selector(rangeChanged), for: .touchUpInside)
+        control.addTarget(self, action: #selector(rangeChanged), for: .valueChanged)
         return control
     }()
     
@@ -43,7 +45,7 @@ class AnalyticsDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = "Analytics detail"
+        navigationItem.title = "Activity breakdown"
         
         let rangeContainer = UIView()
         rangeContainer.translatesAutoresizingMaskIntoConstraints = false
@@ -73,6 +75,14 @@ class AnalyticsDetailViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             rangeContainer.widthAnchor.constraint(equalTo: view.widthAnchor)
         ])
+    }
+    
+    private func initBindings() {
+        viewModel.$activities
+            .sink { [unowned self] _ in
+                self.tableView.reloadData()
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Actions

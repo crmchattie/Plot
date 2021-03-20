@@ -10,27 +10,44 @@ import UIKit
 
 class AnalyticsViewController: UITableViewController {
     
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.sizeToFit()
+        return activityIndicator
+    }()
+    
     private var viewModel: AnalyticsViewModel!
-
+    
     init(viewModel: AnalyticsViewModel) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
     }
-
+    
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     // MARK: - Lifecycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Analytics"
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = .top
+        
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(StackedBarChartCell.self)
         
+        view.addSubview(activityIndicator)
+        activityIndicator.center = view.center
+        activityIndicator.autoresizingMask = [.flexibleTopMargin,
+                                              .flexibleBottomMargin,
+                                              .flexibleLeftMargin,
+                                              .flexibleRightMargin]
+        activityIndicator.startAnimating()
         viewModel.fetchActivities { result in
+            self.activityIndicator.removeFromSuperview()
             self.tableView.reloadData()
         }
     }
@@ -44,8 +61,9 @@ class AnalyticsViewController: UITableViewController {
             let controller = AnalyticsDetailViewController(viewModel: viewModel)
             navigationController?.pushViewController(controller, animated: true)
         case is HealthStackedBarChartViewModel:
-            #warning("Open detail.")
-            let controller = UIViewController()
+            let viewModel = AnalyticsDetailViewModel(chartViewModel: self.viewModel.items[section],
+                                                     networkController: self.viewModel.networkController)
+            let controller = AnalyticsDetailViewController(viewModel: viewModel)
             navigationController?.pushViewController(controller, animated: true)
         case is FinancesStackedBarChartViewModel:
             #warning("Open detail.")
@@ -60,11 +78,11 @@ class AnalyticsViewController: UITableViewController {
 // MARK: - UITableViewDelegate & UITableViewDataSource
 
 extension AnalyticsViewController {
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int { viewModel.items.count }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { 2 }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(ofType: StackedBarChartCell.self, for: indexPath)
@@ -72,13 +90,14 @@ extension AnalyticsViewController {
             return cell
         } else {
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
+            cell.contentView.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
             cell.backgroundColor = .tertiarySystemBackground
             cell.textLabel?.text = "See all activities"
             cell.accessoryType = .disclosureIndicator
             return cell
         }
     }
-
+    
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         viewModel.items[section].sectionTitle.capitalized
     }

@@ -147,9 +147,10 @@ class ActivityCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                
+        selectionStyle = .default
+        contentView.backgroundColor = .systemBackground
+//        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
         activityImageView.addSubview(startLabel)
@@ -208,14 +209,14 @@ class ActivityCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//        contentView.backgroundColor = .tertiarySystemBackground // ThemeManager.currentTheme().generalBackgroundColor
+//        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         nameLabel.text = nil
         startLabel.text = nil
         activityTypeLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        nameLabel.textColor = .label
         activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
     }
     

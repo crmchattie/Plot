@@ -221,7 +221,6 @@ class FinanceBarChartViewController: UIViewController {
         l.font = UIFont(name: "HelveticaNeue-Light", size: 11)!
         l.xEntrySpace = 4
         
-        
         let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
                                   font: .systemFont(ofSize: 12),
                                   textColor: .white,

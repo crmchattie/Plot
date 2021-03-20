@@ -1,39 +1,21 @@
 //
-//  StackedBarChartViewModel.swift
+//  FinancesStackedBarChartViewModel.swift
 //  Plot
 //
-//  Created by Botond Magyarosi on 11/03/2021.
+//  Created by Botond Magyarosi on 20.03.2021.
 //  Copyright © 2021 Immature Creations. All rights reserved.
 //
 
 import Foundation
 import Charts
-import Combine
-
-protocol StackedBarChartViewModel {
-    var onChange: PassthroughSubject<Void, Never> { get }
-    
-    var sectionTitle: String { get }
-    var title: String { get }
-    var description: String { get }
-    var categories: [CategorySummaryViewModel] { get }
-    
-    var chartData: BarChartData { get }
-}
-
-struct CategorySummaryViewModel {
-    let title: String
-    let color: UIColor
-    let value: Double
-    let formattedValue: String
-}
 
 // MARK: - FinancesStackedBarChartViewModel
 
 struct FinancesStackedBarChartViewModel: StackedBarChartViewModel {
     
     let onChange = PassthroughSubject<Void, Never>()
-
+    let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
+    
     var sectionTitle: String = "Health"
     let title: String = "Daily average"
     let description: String = "6h 1m"

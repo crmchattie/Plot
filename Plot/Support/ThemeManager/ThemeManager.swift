@@ -27,9 +27,10 @@ struct ThemeManager {
         let textAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
         UINavigationBar.appearance().titleTextAttributes = textAttributes
         UINavigationBar.appearance().largeTitleTextAttributes = textAttributes
+        UINavigationBar.appearance().shadowImage = UIImage()
 //        UINavigationBar.appearance().backgroundColor = theme.barBackgroundColor
         #warning("I would remove this globally. Ideally cells have selection styles that are updated automatically.")
-        UITableViewCell.appearance().selectionColor = ThemeManager.currentTheme().cellSelectionColor
+//        UITableViewCell.appearance().selectionColor = ThemeManager.currentTheme().cellSelectionColor
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
         
         NotificationCenter.default.post(name: .themeUpdated, object: nil)
