@@ -10,8 +10,15 @@ import UIKit
 import Charts
 import Combine
 
+protocol StackedBarChartCellDelegate: AnyObject {
+    func nextTouched(on cell: StackedBarChartCell)
+    func previousTouched(on cell: StackedBarChartCell)
+}
+
 class StackedBarChartCell: UITableViewCell {
 
+    weak var delegate: StackedBarChartCellDelegate?
+    
     private var viewModel: AnalyticsBreakdownViewModel?
 
     private lazy var titleLabel: UILabel = {
@@ -26,6 +33,26 @@ class StackedBarChartCell: UITableViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
         label.textColor = .label
         return label
+    }()
+    
+    private lazy var nextButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setImage(UIImage(systemName: "chevron.right"), for: .normal)
+        button.addTarget(self, action: #selector(nextTouched), for: .touchUpInside)
+        button.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        return button
+    }()
+    
+    private lazy var previousButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setImage(UIImage(systemName: "chevron.left"), for: .normal)
+        button.addTarget(self, action: #selector(previousTouched), for: .touchUpInside)
+        button.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        return button
     }()
 
     private lazy var chartView: BarChartView = {
@@ -65,11 +92,16 @@ class StackedBarChartCell: UITableViewCell {
         return stackView
     }()
     
+    private lazy var prevNextStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [previousButton, nextButton])
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
     private var subscription: AnyCancellable?
     
     func configure(with viewModel: AnalyticsBreakdownViewModel) {
         self.viewModel = viewModel
-        chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         subscription = viewModel.onChange.sink { _  in
             self.updateData()
         }
@@ -97,13 +129,17 @@ class StackedBarChartCell: UITableViewCell {
         stack.spacing = 8
         stack.setCustomSpacing(0, after: titleLabel)
         contentView.addSubview(stack)
+        
+        contentView.addSubview(prevNextStackView)
 
         NSLayoutConstraint.activate([
             stack.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             stack.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
             stack.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             stack.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
-            chartView.heightAnchor.constraint(equalToConstant: 150)
+            chartView.heightAnchor.constraint(equalToConstant: 150),
+            prevNextStackView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+            prevNextStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor)
         ])
     }
     
@@ -117,7 +153,10 @@ class StackedBarChartCell: UITableViewCell {
             return
         }
         
+        chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         chartView.data = viewModel.chartData
+        
+        prevNextStackView.isHidden = !viewModel.canNavigate
         
         titleLabel.text = viewModel.title
         valueLabel.text = viewModel.description
@@ -129,6 +168,16 @@ class StackedBarChartCell: UITableViewCell {
             categoryView.subtitleLabel.text = category.formattedValue
             categoriesStackView.addArrangedSubview(categoryView)
         }
+    }
+    
+    // MARK: - Actios
+    
+    @objc private func nextTouched() {
+        delegate?.nextTouched(on: self)
+    }
+    
+    @objc private func previousTouched() {
+        delegate?.previousTouched(on: self)
     }
 }
 

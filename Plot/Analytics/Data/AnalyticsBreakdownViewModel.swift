@@ -15,10 +15,24 @@ enum ActivityFilterOption: String, CaseIterable {
     
     var initialRange: (Date, Date) {
         switch self {
-        case .weekly: return (Date().startOfWeek, Date().endOfWeek)
+        case .weekly: return (Date().weekStart, Date().weekEnd)
         case .monthly: return (Date().startOfMonth, Date().endOfMonth)
         case .yearly: return (Date().startOfYear, Date().endOfYear)
         }
+    }
+}
+
+private extension Date {
+    var weekStart: Date {
+        let calendar = Calendar(identifier: .iso8601)
+        let sunday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
+        return calendar.date(byAdding: .day, value: 1, to: sunday)!
+    }
+    
+    var weekEnd: Date {
+        let calendar = Calendar(identifier: .iso8601)
+        let sunday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
+        return calendar.date(byAdding: .day, value: 7, to: sunday)!
     }
 }
 
@@ -32,6 +46,8 @@ protocol AnalyticsBreakdownViewModel {
     var title: String { get }
     var description: String { get }
     var categories: [CategorySummaryViewModel] { get }
+    
+    var canNavigate: Bool { get set }
     
     var chartData: BarChartData { get }
     

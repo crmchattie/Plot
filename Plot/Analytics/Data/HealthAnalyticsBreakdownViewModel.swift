@@ -18,7 +18,8 @@ struct HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
-
+    var canNavigate: Bool
+    
     var sectionTitle: String = "Health"
     let title: String = "Daily average"
     let description: String
@@ -30,9 +31,11 @@ struct HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     init(
         summary: [HKActivitySummary],
         filterOption: ActivityFilterOption,
+        canNavigate: Bool,
         networkController: NetworkController
     ) {
         self.networkController = networkController
+        self.canNavigate = canNavigate
         let range = filterOption.initialRange
         
         let daysToCover = range.1.daysSince(range.0)

@@ -11,11 +11,17 @@ import Charts
 
 class WeekdayValueFormatter: IAxisValueFormatter {
     
+    let weekdaySymbols: [String] = {
+        var weekDays = Calendar.current.veryShortWeekdaySymbols
+        weekDays.shiftLeft(Calendar.current.firstWeekday - 1)
+        return weekDays
+    }()
+    
     func stringForValue(_ value: Double, axis: AxisBase?) -> String {
         let intValue = Int(value)
         guard value >= 0, intValue < Calendar.current.veryShortWeekdaySymbols.count else {
             return "\(intValue)"
         }
-        return Calendar.current.veryShortWeekdaySymbols[intValue]
+        return weekdaySymbols[intValue]
     }
 }

@@ -23,6 +23,7 @@ struct ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = HourValueFormatter()
+    var canNavigate: Bool
     
     let sectionTitle: String = "Activities"
     private(set) var title: String = "This week"
@@ -34,10 +35,12 @@ struct ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
 
     init(
         items: [String: [Statistic]],
+        canNavigate: Bool,
         range: (Date, Date),
         networkController: NetworkController
     ) {
         self.networkController = networkController
+        self.canNavigate = canNavigate
         let colors = Array(ChartColors.palette().prefix(items.count))
         var categories: [CategorySummaryViewModel] = []
         var activityCount = 0

@@ -31,7 +31,7 @@ class AnalyticsViewModel {
                                    transactions: nil) { (_, foo, bar, stats, err) in
             DispatchQueue.global(qos: .background).async {
                 if let activities = stats?[.calendarSummary] {
-                    self.items.append(ActivityAnalyticsBreakdownViewModel(items: activities,
+                    self.items.append(ActivityAnalyticsBreakdownViewModel(items: activities, canNavigate: false,
                                                                           range: self.range,
                                                                           networkController: self.networkController))
                 }
@@ -43,8 +43,6 @@ class AnalyticsViewModel {
         
         
         let type = HKQuantityType.quantityType(forIdentifier: .dietaryEnergyConsumed)!
-        
-        
         let eat = HKSampleQuery(sampleType: type, predicate: nil, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { (_, samples, error) in
             samples?.forEach { sample in
                 
@@ -60,7 +58,7 @@ class AnalyticsViewModel {
         
         let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: startDate, end: endDate)
         let query = HKActivitySummaryQuery(predicate: predicate) { (_, summary, error) in
-            self.items.append(HealthAnalyticsBreakdownViewModel(summary: summary ?? [], filterOption: .weekly, networkController: self.networkController))
+            self.items.append(HealthAnalyticsBreakdownViewModel(summary: summary ?? [], filterOption: .weekly, canNavigate: false, networkController: self.networkController))
         }
         let store = HKHealthStore()
         store.execute(query)

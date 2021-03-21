@@ -54,6 +54,8 @@ class AnalyticsViewController: UITableViewController {
     
     private func openDetail(forSection section: Int) {
         guard viewModel.items.count > section else { return }
+        var chartViewModel = viewModel.items[section]
+        chartViewModel.canNavigate = false
         let viewModel = AnalyticsDetailViewModel(chartViewModel: self.viewModel.items[section],
                                                  networkController: self.viewModel.networkController)
         let controller = AnalyticsDetailViewController(viewModel: viewModel)

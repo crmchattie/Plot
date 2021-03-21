@@ -15,6 +15,7 @@ struct FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
+    var canNavigate: Bool
     
     var sectionTitle: String = "Health"
     let title: String = "Daily average"
@@ -24,7 +25,8 @@ struct FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let chartData: BarChartData
 
-    init() {
+    init(canNavigate: Bool) {
+        self.canNavigate = canNavigate
         let dataEntries = (0..<7).map {
             BarChartDataEntry(x: Double($0) + 0.5, yValues: [Double.random(in: 0...20), Double.random(in: 0...20), Double.random(in: 0...20)])
         }
