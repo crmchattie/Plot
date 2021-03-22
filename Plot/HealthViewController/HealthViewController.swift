@@ -36,6 +36,9 @@ class HealthViewController: UIViewController {
         return networkController.healthService.healthMetrics
     }
     
+    var filters: [filter] = [.search]
+    var filterDictionary = [String: [String]]()
+    
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -81,7 +84,8 @@ class HealthViewController: UIViewController {
     
     private func configureView() {
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-        navigationItem.rightBarButtonItem = newItemBarButton
+        let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
         
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
@@ -135,6 +139,15 @@ class HealthViewController: UIViewController {
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
+    }
+    
+    @objc fileprivate func filter() {
+        let destination = FilterViewController()
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        destination.delegate = self
+        destination.filters = filters
+        destination.filterDictionary = filterDictionary
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func openMetric(metric: HealthMetric) {
@@ -207,4 +220,16 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
             return UICollectionReusableView()
         }
     }
+}
+
+extension HealthViewController: UpdateFilter {
+    func updateFilter(filterDictionary : [String: [String]]) {
+        print("filterDictionary \(filterDictionary)")
+        if !filterDictionary.values.isEmpty {
+            self.filterDictionary = filterDictionary
+        } else {
+            self.filterDictionary = filterDictionary
+        }
+    }
+        
 }

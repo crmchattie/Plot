@@ -109,7 +109,7 @@ class ConversationsFetcher: NSObject {
         conversationReference = Database.database().reference().child("user-messages").child(currentUserID).child(chatID).child(messageMetaDataFirebaseFolder)
         let element = (handle: DatabaseHandle(), currentUserID: currentUserID, chatID: chatID)
         conversationReferenceHandle.insert(element, at: 0)
-        conversationReference.keepSynced(true)
+//        conversationReference.keepSynced(true)
         conversationReferenceHandle[0].handle = conversationReference.observe( .value, with: { (snapshot) in
             
             guard var dictionary = snapshot.value as? [String: AnyObject], snapshot.exists() else { return }
