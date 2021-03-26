@@ -19,5 +19,4 @@ class AuthVerificationController: EnterVerificationCodeController {
         super.rightBarButtonDidTap()
         authenticate()
     }
-    
 }

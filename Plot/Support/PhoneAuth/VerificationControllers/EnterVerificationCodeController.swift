@@ -179,8 +179,7 @@ class EnterVerificationCodeController: UIViewController {
             } catch {
                 destination.userProfileContainerView.phone.text = self.enterVerificationContainerView.titleNumber.text
             }
-            destination.checkIfUserDataExists(completionHandler: { (isCompleted) in
-                guard isCompleted else {self.removeSpinner(); return }
+            destination.checkIfUserDataExists(completionHandler: { _ in
                 self.removeSpinner()
                 guard self.navigationController != nil else { return }
                 if !(self.navigationController!.topViewController!.isKind(of: UserProfileController.self)) {

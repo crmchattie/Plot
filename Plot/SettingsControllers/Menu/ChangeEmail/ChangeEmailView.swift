@@ -42,6 +42,7 @@ class ChangeEmailView: UIView {
         email.textAlignment = .center
         email.keyboardType = .emailAddress
         email.autocapitalizationType = .none
+        email.autocorrectionType = .no
         email.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         email.textColor = ThemeManager.currentTheme().generalTitleColor
         email.addTarget(self, action: #selector(EnterPhoneNumberController.textFieldDidChange(_:)), for: .editingChanged)

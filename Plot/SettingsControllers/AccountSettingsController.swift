@@ -82,6 +82,7 @@ class AccountSettingsController: UITableViewController {
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(clearUserData), name: NSNotification.Name(rawValue: "clearUserData"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(emailVerified), name: .emailVerified, object: nil)
     }
     
     fileprivate func configureTableView() {
@@ -126,7 +127,21 @@ class AccountSettingsController: UITableViewController {
 //        let rightBarButton = UIBarButtonItem(customView: nightMode)
 //        navigationItem.setRightBarButton(rightBarButton, animated: false)
 //    }
-    
+
+    @objc private func emailVerified(_ notification: Notification) {
+        guard let email = notification.object as? String, email.isValidEmail else { return }
+
+        userProfileContainerView.email.text = email
+
+        let userNameReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
+        userNameReference.updateChildValues(["email": email])
+
+        // Dismiss Change email controller if presented
+        if (presentedViewController as? UINavigationController)?.viewControllers.first is ChangeEmailController {
+            dismiss(animated: true, completion: nil)
+        }
+    }
+
     @objc fileprivate func changeTheme() {
         nightMode.isSelected = Bool(ThemeManager.currentTheme().rawValue)
         
