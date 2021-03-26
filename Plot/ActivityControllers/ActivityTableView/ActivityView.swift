@@ -10,6 +10,12 @@ import UIKit
 import FSCalendar
 
 let kCalendarScope = "CalendarScope"
+let kCalendarView = "CalendarView"
+
+enum CalendarView: String {
+    case list
+    case daily
+}
 
 class ActivityView: UIView {
     

@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import Firebase
 
 protocol UpdateFilter: class {
     func updateFilter(filterDictionary : [String: [String]])
@@ -15,32 +16,34 @@ protocol UpdateFilter: class {
 
 
 class FilterViewController: FormViewController {
+    
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
           
     weak var delegate : UpdateFilter?
     
     var filters = [filter]()
     
     var filterDictionary = [String: [String]]()
-    
-    let chevronUpBlack: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "chevronRightBlack")!.withRenderingMode(.alwaysTemplate)
-        imageView.tintColor = ThemeManager.currentTheme().generalTitleColor
-        return imageView
-    }()
-    
-    let chevronDownBlack: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "chevronRightBlack")!.withRenderingMode(.alwaysTemplate)
-        imageView.tintColor = ThemeManager.currentTheme().generalTitleColor
-        return imageView
-    }()
                 
     override func viewDidLoad() {
     super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.layoutIfNeeded()
         
         configureTableView()
         initializeForm()
+        fetchData()
         
     }
 
@@ -99,21 +102,22 @@ class FilterViewController: FormViewController {
                     self.form.removeAll()
                     self.initializeForm()
                 })
-        form +++ Section("Only include \(filters[0].activity) you have favorited")
-            <<< CheckRow("Favorited \(filters[0].activity)") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.title = $0.tag
-                $0.value = Bool(self.filterDictionary["favorites"]?[0] ?? "false")
-                }.onCellSelection({ _,row in
-                    if row.value == true {
-                        self.filterDictionary["favorites"] = ["\(row.value!)"]
-                        print(self.filterDictionary)
-                    } else {
-                        self.filterDictionary["favorites"] = nil
-                        print(self.filterDictionary)
-                    }
-                })
+        
+//        form +++ Section("Only include \(filters[0].activity) you have favorited")
+//            <<< CheckRow("Favorited \(filters[0].activity)") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.title = $0.tag
+//                $0.value = Bool(self.filterDictionary["favorites"]?[0] ?? "false")
+//                }.onCellSelection({ _,row in
+//                    if row.value == true {
+//                        self.filterDictionary["favorites"] = ["\(row.value!)"]
+//                        print(self.filterDictionary)
+//                    } else {
+//                        self.filterDictionary["favorites"] = nil
+//                        print(self.filterDictionary)
+//                    }
+//                })
         
         for filter in filters {
             if filter.typeOfSection == "single" {
@@ -121,7 +125,7 @@ class FilterViewController: FormViewController {
                     <<< CheckRow(filter.rawValue) {
                     $0.title = filter.titleText
                     $0.value = false
-                    $0.cell.accessoryView = UIImageView(image: UIImage(named: "chevronDownBlack")!.withRenderingMode(.alwaysTemplate))
+                    $0.cell.accessoryView = UIImageView(image: UIImage(systemName: "chevron.down"))
                     $0.cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -131,8 +135,8 @@ class FilterViewController: FormViewController {
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                         cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     }).onCellSelection({ (cell, row) in
-                        let name = row.value! ? "chevronUpBlack" : "chevronDownBlack"
-                        cell.accessoryView = UIImageView(image: UIImage(named: name)!.withRenderingMode(.alwaysTemplate))
+                        let name = row.value! ? "chevron.up" : "chevron.down"
+                        cell.accessoryView = UIImageView(image: UIImage(systemName: name))
                         cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
                         row.updateCell()
                     })
@@ -171,7 +175,7 @@ class FilterViewController: FormViewController {
                     <<< CheckRow(filter.rawValue) {
                         $0.title = filter.titleText
                         $0.value = false
-                        $0.cell.accessoryView = UIImageView(image: UIImage(named: "chevronDownBlack")!.withRenderingMode(.alwaysTemplate))
+                        $0.cell.accessoryView = UIImageView(image: UIImage(systemName: "chevron.down"))
                         $0.cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
                         $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -181,8 +185,8 @@ class FilterViewController: FormViewController {
                             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                             cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                         }).onCellSelection({ (cell, row) in
-                            let name = row.value! ? "chevronUpBlack" : "chevronDownBlack"
-                            cell.accessoryView = UIImageView(image: UIImage(named: name)!.withRenderingMode(.alwaysTemplate))
+                            let name = row.value! ? "chevron.up" : "chevron.down"
+                            cell.accessoryView = UIImageView(image: UIImage(systemName: name))
                             cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
                             row.updateCell()
                         })
@@ -286,7 +290,148 @@ class FilterViewController: FormViewController {
                         self?.filterDictionary["\(filter.rawValue)"] = [dateString]
                     }
                 }
+            } else if filter.typeOfSection == "search" {
+                form +++ Section(filter.descriptionText)
+                <<< TextRow("\(filter.rawValue)") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.placeholder = $0.tag?.capitalized
+                    if filterDictionary["\(filter.rawValue)"] != nil, let value = filterDictionary["\(filter.rawValue)"] {
+                        $0.value = value[0]
+                        $0.updateCell()
+                    }
+                    }.onChange() { [unowned self] row in
+                        if let value = row.value {
+                            self.filterDictionary["\(filter.rawValue)"] = [value]
+                        } else {
+                            self.filterDictionary["\(filter.rawValue)"] = nil
+                        }
+                    }
             }
+        }
+    }
+    
+    func fetchData() {
+        if filters.contains(.calendarCategory) {
+            if let currentUser = Auth.auth().currentUser?.uid {
+                let reference = Database.database().reference()
+                var categories = activityCategories.sorted()
+                reference.child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
+                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                        let array = Array(values.values)
+                        categories.append(contentsOf: array)
+                        categories = categories.sorted()
+                    }
+                    if let row: CheckRow = self.form.rowBy(tag: filter.calendarCategory.rawValue), let sectionIndex = row.section?.index {
+                        var section = self.form.allSections[sectionIndex]
+                        categories.forEach {
+                            let choice = $0
+                            section.insert(
+                                ListCheckRow<String>("\(choice)_\(filter.calendarCategory.rawValue)"){ row in
+                                    row.title = choice
+                                    row.selectableValue = choice
+                                    row.value = nil
+                                    row.hidden = .function([filter.calendarCategory.rawValue], { form -> Bool in
+                                        let row: RowOf<Bool>! = form.rowBy(tag: filter.calendarCategory.rawValue)
+                                        return row.value ?? false == false
+                                    })
+                                    }.cellSetup { (cell, row) in
+                                        if self.filterDictionary.keys.contains(filter.calendarCategory.rawValue), let choiceList = self.filterDictionary[filter.calendarCategory.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                                            row.value = choice
+                                        }
+                                        cell.accessoryType = .checkmark
+                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                                }.onChange({ row in
+                                    if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
+                                        let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
+                                        let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                                        if row.value != nil {
+                                            if var choiceList = self.filterDictionary[filter], !choiceList.isEmpty {
+                                                if choiceList.contains(choice) {
+                                                    return
+                                                } else {
+                                                    choiceList.append(choice)
+                                                    self.filterDictionary[filter] = choiceList
+                                                }
+                                            } else {
+                                                self.filterDictionary[filter] = [choice]
+                                            }
+                                        } else {
+                                            if var choiceList = self.filterDictionary[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
+                                                choiceList.remove(at: indexChoice)
+                                                self.filterDictionary[filter] = choiceList
+                                            } else {
+                                                self.filterDictionary[filter] = nil
+                                            }
+                                        }
+                                    }
+                                })
+                                , at: section.count)
+                        }
+                    }
+                })
+            }
+        }
+        if filters.contains(.financeAccount) {
+            let accountFetcher = FinancialAccountFetcher()
+            accountFetcher.fetchAccounts { (firebaseAccounts) in
+                let accounts = firebaseAccounts.sorted { (account1, account2) -> Bool in
+                    return account1.name < account2.name
+                }
+                if let row: CheckRow = self.form.rowBy(tag: filter.financeAccount.rawValue), let sectionIndex = row.section?.index {
+                    var section = self.form.allSections[sectionIndex]
+                    accounts.forEach {
+                        let choice = $0.name
+                        section.insert(
+                            ListCheckRow<String>("\(choice)_\(filter.financeAccount.rawValue)"){ row in
+                                row.title = choice
+                                row.selectableValue = choice
+                                row.value = nil
+                                row.hidden = .function([filter.financeAccount.rawValue], { form -> Bool in
+                                    let row: RowOf<Bool>! = form.rowBy(tag: filter.financeAccount.rawValue)
+                                    return row.value ?? false == false
+                                })
+                                }.cellSetup { (cell, row) in
+                                    if self.filterDictionary.keys.contains(filter.financeAccount.rawValue), let choiceList = self.filterDictionary[filter.financeAccount.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                                        row.value = choice
+                                    }
+                                    cell.accessoryType = .checkmark
+                                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                            }.onChange({ row in
+                                if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
+                                    let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
+                                    let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                                    if row.value != nil {
+                                        if var choiceList = self.filterDictionary[filter], !choiceList.isEmpty {
+                                            if choiceList.contains(choice) {
+                                                return
+                                            } else {
+                                                choiceList.append(choice)
+                                                self.filterDictionary[filter] = choiceList
+                                            }
+                                        } else {
+                                            self.filterDictionary[filter] = [choice]
+                                        }
+                                    } else {
+                                        if var choiceList = self.filterDictionary[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
+                                            choiceList.remove(at: indexChoice)
+                                            self.filterDictionary[filter] = choiceList
+                                        } else {
+                                            self.filterDictionary[filter] = nil
+                                        }
+                                    }
+                                }
+                            })
+                            , at: section.count)
+                    }
+                }
+            }
+
         }
     }
     

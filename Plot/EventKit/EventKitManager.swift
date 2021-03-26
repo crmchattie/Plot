@@ -64,6 +64,7 @@ class EventKitManager {
     }
     
     func syncActivitiesToEventKit(activities: [Activity], completion: @escaping () -> Void)  {
+        print("syncActivitiesToEventKit")
         guard !isRunning, isAuthorized else {
             completion()
             return

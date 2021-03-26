@@ -24,7 +24,7 @@ class FinanceViewController: UIViewController {
     
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         layout.scrollDirection = .vertical
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -76,6 +76,9 @@ class FinanceViewController: UIViewController {
     var hasViewAppeared = false
     
     var participants: [String: [User]] = [:]
+    
+    var filters: [filter] = [.financeLevel, .financeAccount]
+    var filterDictionary = [String: [String]]()
     
     @objc fileprivate func handleDismiss(button: UIButton) {
         dismiss(animated: true, completion: nil)
@@ -141,7 +144,8 @@ class FinanceViewController: UIViewController {
         collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-        navigationItem.rightBarButtonItem = newItemBarButton
+        let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
                 
 
     }
@@ -176,6 +180,15 @@ class FinanceViewController: UIViewController {
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
+    }
+    
+    @objc fileprivate func filter() {
+        let destination = FilterViewController()
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        destination.delegate = self
+        destination.filters = filters
+        destination.filterDictionary = filterDictionary
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func openMXConnect(current_member_guid: String?) {
@@ -682,6 +695,18 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
         updateCollectionView()
         
     }
+}
+
+extension FinanceViewController: UpdateFilter {
+    func updateFilter(filterDictionary : [String: [String]]) {
+        print("filterDictionary \(filterDictionary)")
+        if !filterDictionary.values.isEmpty {
+            self.filterDictionary = filterDictionary
+        } else {
+            self.filterDictionary = filterDictionary
+        }
+    }
+        
 }
 
 

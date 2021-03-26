@@ -18,7 +18,7 @@ class LocationFinderTableViewController: UIViewController {
     var searchCompleter = MKLocalSearchCompleter()
     var searchResults = [MKLocalSearchCompletion]()
     var searchBar: UISearchBar?
-    let searchResultsTableView = UITableView()
+    let searchResultsTableView = UITableView(frame: .zero, style: .insetGrouped)
     weak var delegate : UpdateLocationDelegate?
     
     var locationName = "Location"

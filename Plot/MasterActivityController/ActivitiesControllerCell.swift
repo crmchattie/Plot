@@ -69,7 +69,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if activities.count == 0 {
-            viewPlaceholder.add(for: tableView, title: .emptyActivities, subtitle: .emptyActivities, priority: .medium, position: .fill)
+            viewPlaceholder.add(for: tableView, title: .emptyActivitiesMain, subtitle: .emptyActivitiesMain, priority: .medium, position: .fill)
         } else {
             viewPlaceholder.remove(from: tableView, priority: .medium)
         }

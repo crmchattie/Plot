@@ -105,6 +105,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     var hasLoadedCalendarEventActivities = false
     var categoryUpdateDispatchGroup: DispatchGroup?
     
+    var calendarView: CalendarView = .list
+    var filters: [filter] = [.search, .calendarView, .calendarCategory]
+    var filterDictionary = [String: [String]]()
+    
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd"
@@ -176,7 +180,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func activitiesUpdated() {
-        handleReloadActivities()
+        handleReloadTable()
     }
     
     fileprivate func applyCalendarTheme() {
@@ -215,8 +219,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     fileprivate func configureView() {
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-        let searchBarButton =  UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-        navigationItem.rightBarButtonItems = [newItemBarButton, searchBarButton]
+        let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
         
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
@@ -249,6 +253,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         let scopeGesture = UIPanGestureRecognizer(target: activityView.calendar, action: #selector(activityView.calendar.handleScopeGesture(_:)));
         activityView.calendar.addGestureRecognizer(scopeGesture)
         
+        calendarView = getCalendarView()
+        
         activityView.tableView.dataSource = self
         activityView.tableView.delegate = self
         activityView.tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
@@ -270,9 +276,16 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
+                let calendar = Calendar.current
+                var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.activityView.calendar.selectedDate ?? Date())
+                dateComponents.hour = calendar.component(.hour, from: Date())
+                dateComponents.minute = calendar.component(.minute, from: Date())
+                
                 let destination = CreateActivityViewController()
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
+                destination.startDateTime = calendar.date(from: dateComponents)
+                destination.endDateTime = calendar.date(from: dateComponents)
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             }))
@@ -289,9 +302,16 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 print("completion block")
             })
         } else {
+            let calendar = Calendar.current
+            var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.activityView.calendar.selectedDate ?? Date())
+            dateComponents.hour = calendar.component(.hour, from: Date())
+            dateComponents.minute = calendar.component(.minute, from: Date())
+            
             let destination = CreateActivityViewController()
             destination.users = self.networkController.userService.users
             destination.filteredUsers = self.networkController.userService.users
+            destination.startDateTime = calendar.date(from: dateComponents)
+            destination.endDateTime = calendar.date(from: dateComponents)
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -319,6 +339,15 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
+    }
+    
+    @objc fileprivate func filter() {
+        let destination = FilterViewController()
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        destination.delegate = self
+        destination.filters = filters
+        destination.filterDictionary = filterDictionary
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     @objc fileprivate func search() {
@@ -399,35 +428,32 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func handleReloadTable() {
-        handleReloadActivities()
-        let allActivities = pinnedActivities + activities
-        saveDataToSharedContainer(activities: allActivities)
-        
-        if allActivities.count == 0 {
-            checkIfThereAnyActivities(isEmpty: true)
-        } else {
-            checkIfThereAnyActivities(isEmpty: false)
-        }
-        
-        compileActivityDates(activities: allActivities)
-                
         guard !isAppLoaded else { return }
         isAppLoaded = true
         
+        handleReloadActivities(animated: false)
+        
+        let allActivities = pinnedActivities + activities
+        saveDataToSharedContainer(activities: allActivities)
+        compileActivityDates(activities: allActivities)
+        
         activityView.tableView.layoutIfNeeded()
-        scrollToFirstActivityWithDate(date: Date().localTime, animated: false)
+        scrollToFirstActivityWithDate(animated: false)
         
     }
     
-    func handleReloadActivities() {
-        filteredPinnedActivities = pinnedActivities
-        filteredActivities = activities
-        activityView.tableView.reloadData()
+    func handleReloadActivities(animated: Bool) {
+        if calendarView == .list {
+            filteredPinnedActivities = pinnedActivities
+            filteredActivities = activities
+            scrollToFirstActivityWithDate(animated: animated)
+        } else {
+            filterEvents()
+        }
     }
     
     func handleReloadTableAftersearchBarCancelButtonClicked() {
-        handleReloadActivities()
-        activityView.tableView.reloadData()
+        handleReloadActivities(animated: true)
     }
     
     func handleReloadTableAfterSearch() {
@@ -442,7 +468,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         self.activityView.tableView.reloadData()
     }
     
-    func scrollToFirstActivityWithDate(date: Date, animated: Bool) {
+    func scrollToFirstActivityWithDate(animated: Bool) {
+        let date = activityView.calendar.selectedDate?.localTime ?? Date().localTime
         var index = 0
         var activityFound = false
         var calendar = Calendar.current
@@ -477,6 +504,24 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 }
             }
         }
+    }
+    
+    func filterEvents() {
+        let startDate = activityView.calendar.selectedDate?.startOfDay
+        let endDate = activityView.calendar.selectedDate?.endOfDay
+        filteredActivities = activities.filter({ (activity) -> Bool in
+            if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate {
+                if activityStartDate > startDate && endDate > activityStartDate {
+                    return true
+                } else if activityEndDate.timeIntervalSince(activityStartDate) > 86399 && activityEndDate > startDate && endDate > activityEndDate {
+                    return true
+                } else if startDate > activityStartDate && activityEndDate > endDate {
+                    return true
+                }
+            }
+            return false
+        })
+        self.activityView.tableView.reloadData()
     }
     
     // MARK:- UIGestureRecognizerDelegate
@@ -516,22 +561,22 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.calendarHeightConstraint?.constant = bounds.height
         activityView.updateArrowDirection(down: calendar.scope == .week)
         activityView.layoutIfNeeded()
-        saveCalendar(scope: calendar.scope)
+        saveCalendarScope(scope: calendar.scope)
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
         let dateString = selectedDateFormatter.string(from: date)
         title = dateString
-        self.scrollToFirstActivityWithDate(date: date, animated: true)
+        handleReloadActivities(animated: true)
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
         let dateString = selectedDateFormatter.string(from: calendar.currentPage)
         title = dateString
-        self.scrollToFirstActivityWithDate(date: calendar.currentPage, animated: true)
+        handleReloadActivities(animated: true)
     }
     
-    func saveCalendar(scope: FSCalendarScope) {
+    func saveCalendarScope(scope: FSCalendarScope) {
         UserDefaults.standard.setValue(scope.rawValue, forKey: kCalendarScope)
     }
     
@@ -540,6 +585,18 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             return scope
         } else {
             return .week
+        }
+    }
+    
+    func saveCalendarView() {
+        UserDefaults.standard.setValue(calendarView.rawValue, forKey: kCalendarView)
+    }
+    
+    func getCalendarView() -> CalendarView {
+        if let value = UserDefaults.standard.value(forKey: kCalendarView) as? String, let view = CalendarView(rawValue: value) {
+            return view
+        } else {
+            return .list
         }
     }
     
@@ -583,6 +640,12 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if filteredPinnedActivities.count == 0 && filteredActivities.count == 0 {
+            checkIfThereAnyActivities(isEmpty: true)
+        } else {
+            checkIfThereAnyActivities(isEmpty: false)
+        }
+        
         if section == 0 {
             return filteredPinnedActivities.count
         } else {
@@ -838,18 +901,21 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func compileActivityDates(activities: [Activity]) {
+        activityDates = [String: Int]()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
-
         let dispatchGroup = DispatchGroup()
         for activity in activities {
             dispatchGroup.enter()
+            dateFormatter.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
             if let startDate = activity.startDate, let endDate = activity.endDate {
-                let dayDurationInSeconds: TimeInterval = 86400
-                for activityDate in stride(from: startDate, to: endDate, by: dayDurationInSeconds) {
-                    dispatchGroup.enter()
-                    activityDates[dateFormatter.string(from: activityDate), default: 0] += 1
-                    dispatchGroup.leave()
+                if activity.allDay ?? false && endDate.timeIntervalSince(startDate) < 86399 {
+                    activityDates[dateFormatter.string(from: startDate), default: 0] += 1
+                } else {
+                    let dayDurationInSeconds: TimeInterval = 86399
+                    for activityDate in stride(from: startDate, to: endDate, by: dayDurationInSeconds) {
+                        activityDates[dateFormatter.string(from: activityDate), default: 0] += 1
+                    }
                 }
                 dispatchGroup.leave()
             }
@@ -1130,4 +1196,16 @@ extension ActivityViewController: GIDSignInDelegate {
           print("\(error.localizedDescription)")
         }
     }
+}
+
+extension ActivityViewController: UpdateFilter {
+    func updateFilter(filterDictionary : [String: [String]]) {
+        print("filterDictionary \(filterDictionary)")
+        if !filterDictionary.values.isEmpty {
+            self.filterDictionary = filterDictionary
+        } else {
+            self.filterDictionary = filterDictionary
+        }
+    }
+        
 }
