@@ -20,13 +20,15 @@ private let dateFormatter: DateComponentsFormatter = {
 struct ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     private let networkController: NetworkController
+    private let summaryService = SummaryService()
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = HourValueFormatter()
     var canNavigate: Bool
+    var range: DateRange
     
     let sectionTitle: String = "Activities"
-    private(set) var title: String = "This week"
+    private(set) var title: String
     private(set) var description: String
     
     var categories: [CategorySummaryViewModel]
@@ -36,12 +38,14 @@ struct ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     init(
         items: [String: [Statistic]],
         canNavigate: Bool,
-        range: (Date, Date),
+        range: DateRange,
         networkController: NetworkController
     ) {
         self.networkController = networkController
         self.canNavigate = canNavigate
-        let colors = Array(ChartColors.palette().prefix(items.count))
+        self.range = range
+        
+        let colors = items.count > 0 ? Array(ChartColors.palette().prefix(items.count)) : []
         var categories: [CategorySummaryViewModel] = []
         var activityCount = 0
         for (index, (category, stats)) in items.enumerated() {
@@ -55,12 +59,14 @@ struct ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
         }
         self.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
         
+        title = DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
+            .format(range: range)
+        
         description = "\(activityCount) activities"
         
-        let firstDay = range.0
-        let daysToCover = range.1.daysSince(range.0)
-        let dataEntries = (0..<daysToCover).map { index -> BarChartDataEntry in
-            let current = firstDay.addDays(index)
+        let daysToCover = range.endDate.daysSince(range.startDate)
+        let dataEntries = (0...daysToCover).map { index -> BarChartDataEntry in
+            let current = range.startDate.addDays(index)
             let yValues = items.map {
                 $0.value.filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })
             }
@@ -68,11 +74,31 @@ struct ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
         }
         
         let chartDataSet = BarChartDataSet(entries: dataEntries)
-        chartDataSet.colors = colors
+        if !items.isEmpty {
+            chartDataSet.colors = colors
+        }
         chartData = BarChartData(dataSets: [chartDataSet])
         chartData.barWidth = 0.5
         chartData.setDrawValues(false)
     }
+    
+//    private func loadData() {
+//        summaryService.getSamples(segmentType: .week,
+//                                   activities: networkController.activityService.activities,
+//                                   transactions: nil) { (_, foo, bar, stats, err) in
+//            DispatchQueue.global(qos: .background).async {
+//                let activities = stats?[.calendarSummary] ?? [:]
+//                self.items.append(ActivityAnalyticsBreakdownViewModel(items: activities, canNavigate: false,
+//                                                                      range: self.range,
+//                                                                      networkController: self.networkController))
+//                DispatchQueue.main.async {
+//                    completion(.success(()))
+//                }
+//            }
+//
+//        summaryService.getSamples(segmentType: .week, activities: <#T##[Activity]?#>, transactions: <#T##[Transaction]?#>, completion: <#T##([HKActivitySummary]?, [SectionType : [Entry]]?, [SectionType : [Entry]]?, [SectionType : [String : [Statistic]]]?, Error?) -> Void#>)
+//        networkController.activityService
+//    }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
         let entries = networkController.activityService.activities

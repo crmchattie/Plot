@@ -16,6 +16,7 @@ struct FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
     var canNavigate: Bool
+    var range: DateRange
     
     var sectionTitle: String = "Health"
     let title: String = "Daily average"
@@ -25,8 +26,12 @@ struct FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let chartData: BarChartData
 
-    init(canNavigate: Bool) {
+    init(
+        canNavigate: Bool,
+        range: DateRange
+    ) {
         self.canNavigate = canNavigate
+        self.range = range
         let dataEntries = (0..<7).map {
             BarChartDataEntry(x: Double($0) + 0.5, yValues: [Double.random(in: 0...20), Double.random(in: 0...20), Double.random(in: 0...20)])
         }
@@ -36,7 +41,6 @@ struct FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
         chartData.barWidth = 0.5
         chartData.setDrawValues(false)
     }
-    
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
         completion([])

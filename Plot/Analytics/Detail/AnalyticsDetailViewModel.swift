@@ -15,24 +15,39 @@ class AnalyticsDetailViewModel {
     private let networkController: NetworkController
     private(set) var chartViewModel: AnalyticsBreakdownViewModel
     
-    var filter: ActivityFilterOption = .weekly {
+    var range: DateRange = .init(type: .week) {
         didSet { updateRange() }
     }
-    var range: (Date, Date) = (Date().startOfWeek, Date().endOfWeek)
     
-    @Published private(set) var entries: [AnalyticsBreakdownEntry] = []
+    var entries = CurrentValueSubject<[AnalyticsBreakdownEntry], Never>([])
     
-    init(chartViewModel: AnalyticsBreakdownViewModel, networkController: NetworkController) {
+    init(
+        chartViewModel: AnalyticsBreakdownViewModel,
+        networkController: NetworkController
+    ) {
         self.chartViewModel = chartViewModel
         self.networkController = networkController
-        updateRange()
+        reloadData()
+    }
+    
+    private func reloadData() {
+        chartViewModel.fetchEntries(range: range) { entries in
+            self.entries.send(entries)
+        }
     }
     
     private func updateRange() {
-        range = filter.initialRange
-        
-        chartViewModel.fetchEntries(range: range) { entries in
-            self.entries = entries
-        }
+        chartViewModel = ActivityAnalyticsBreakdownViewModel(items: [:], canNavigate: true, range: range, networkController: networkController)
+        reloadData()
+    }
+    
+    // MARK: - Actions
+    
+    func loadPreviousSegment() {
+        range.previous()
+    }
+    
+    func loadNextSegment() {
+        range.next()
     }
 }

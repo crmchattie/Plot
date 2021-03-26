@@ -104,13 +104,7 @@ class ActivityCell: UITableViewCell {
         let items = ["Accept" , "Decline"]
         let segmentedControl = UISegmentedControl(items: items)
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
-        
-        if #available(iOS 13.0, *) {
-            segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-        } else {
-            // Fallback on earlier versions
-        }
-        
+        segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
         return segmentedControl
     }()
     
@@ -148,8 +142,8 @@ class ActivityCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         selectionStyle = .default
+        activityImageView.backgroundColor = .tertiarySystemBackground
         contentView.backgroundColor = .systemBackground
-//        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
@@ -163,8 +157,8 @@ class ActivityCell: UITableViewCell {
         
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-        activityImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 0).isActive = true
-        activityImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 0).isActive = true
+        activityImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        activityImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
@@ -209,8 +203,6 @@ class ActivityCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-//        contentView.backgroundColor = .tertiarySystemBackground // ThemeManager.currentTheme().generalBackgroundColor
-//        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         nameLabel.text = nil
         startLabel.text = nil
         activityTypeLabel.text = nil
@@ -218,6 +210,11 @@ class ActivityCell: UITableViewCell {
         muteIndicator.isHidden = true
         nameLabel.textColor = .label
         activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
+    }
+    
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        super.setHighlighted(highlighted, animated: animated)
+        activityImageView.backgroundColor = UIColor.tertiarySystemBackground.withAlphaComponent(highlighted ? 0.7 : 1)
     }
     
     @objc func indexChangedSegmentedControl(_ sender: UISegmentedControl) {

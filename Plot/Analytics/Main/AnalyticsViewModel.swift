@@ -9,6 +9,7 @@
 import Foundation
 import Charts
 import HealthKit
+import Combine
 
 class AnalyticsViewModel {
     
@@ -19,7 +20,7 @@ class AnalyticsViewModel {
     let networkController: NetworkController
     
     private(set) var items: [AnalyticsBreakdownViewModel] = []
-    private let range = ActivityFilterOption.weekly.initialRange
+    private let range = DateRange(type: .week)
     
     init(networkController: NetworkController) {
         self.networkController = networkController
@@ -30,38 +31,58 @@ class AnalyticsViewModel {
                                    activities: networkController.activityService.activities,
                                    transactions: nil) { (_, foo, bar, stats, err) in
             DispatchQueue.global(qos: .background).async {
-                if let activities = stats?[.calendarSummary] {
-                    self.items.append(ActivityAnalyticsBreakdownViewModel(items: activities, canNavigate: false,
-                                                                          range: self.range,
-                                                                          networkController: self.networkController))
-                }
+                let activities = stats?[.calendarSummary] ?? [:]
+                self.items.append(ActivityAnalyticsBreakdownViewModel(items: activities, canNavigate: false,
+                                                                      range: self.range,
+                                                                      networkController: self.networkController))
                 DispatchQueue.main.async {
                     completion(.success(()))
                 }
             }
         }
         
+        fetchHealth { (energyResult, activityResult) in
+            self.items.append(HealthAnalyticsBreakdownViewModel(activity: activityResult,
+                                                                energyConsumed: energyResult,
+                                                                range: self.range,
+                                                                canNavigate: false,
+                                                                networkController: self.networkController))
+        }
+    }
+    
+    private func fetchHealth(completion: @escaping (_ eneryResult: [HKQuantitySample], _ activityResult: [HKActivitySummary]) -> Void) {
+        let healthStore = HKHealthStore()
+        let predicate: NSPredicate = {
+            let units: Set<Calendar.Component> = [.day, .month, .year]
+            var startDate = Calendar.current.dateComponents(units, from: range.startDate)
+            startDate.calendar = .current
+            var endDate = Calendar.current.dateComponents(units, from: range.endDate)
+            endDate.calendar = .current
+            return HKQuery.predicate(forActivitySummariesBetweenStart: startDate, end: endDate)
+        }()
+        
+        let group = DispatchGroup()
+        var eneryResult: [HKQuantitySample] = []
+        var activityResult: [HKActivitySummary] = []
         
         let type = HKQuantityType.quantityType(forIdentifier: .dietaryEnergyConsumed)!
-        let eat = HKSampleQuery(sampleType: type, predicate: nil, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { (_, samples, error) in
-            samples?.forEach { sample in
-                
-            }
+        let caloriesConsumedQuery = HKSampleQuery(sampleType: type, predicate: nil, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { (_, samples, error) in
+            eneryResult = samples?.compactMap { $0 as? HKQuantitySample } ?? []
+            group.leave()
         }
-
         
-        let units: Set<Calendar.Component> = [.day, .month, .year]
-        var startDate = Calendar.current.dateComponents(units, from: range.0)
-        startDate.calendar = .current
-        var endDate = Calendar.current.dateComponents(units, from: range.1)
-        endDate.calendar = .current
-        
-        let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: startDate, end: endDate)
-        let query = HKActivitySummaryQuery(predicate: predicate) { (_, summary, error) in
-            self.items.append(HealthAnalyticsBreakdownViewModel(summary: summary ?? [], filterOption: .weekly, canNavigate: false, networkController: self.networkController))
+        let activityQuery = HKActivitySummaryQuery(predicate: predicate) { (_, summary, error) in
+            activityResult = summary ?? []
+            group.leave()
         }
-        let store = HKHealthStore()
-        store.execute(query)
-        store.execute(eat)
+        
+        group.enter()
+        healthStore.execute(activityQuery)
+        group.enter()
+        healthStore.execute(caloriesConsumedQuery)
+        
+        group.notify(queue: .main) {
+            completion(eneryResult, activityResult)
+        }
     }
 }

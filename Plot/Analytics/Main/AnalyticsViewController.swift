@@ -55,8 +55,8 @@ class AnalyticsViewController: UITableViewController {
     private func openDetail(forSection section: Int) {
         guard viewModel.items.count > section else { return }
         var chartViewModel = viewModel.items[section]
-        chartViewModel.canNavigate = false
-        let viewModel = AnalyticsDetailViewModel(chartViewModel: self.viewModel.items[section],
+        chartViewModel.canNavigate = true
+        let viewModel = AnalyticsDetailViewModel(chartViewModel: chartViewModel,
                                                  networkController: self.viewModel.networkController)
         let controller = AnalyticsDetailViewController(viewModel: viewModel)
         controller.hidesBottomBarWhenPushed = true

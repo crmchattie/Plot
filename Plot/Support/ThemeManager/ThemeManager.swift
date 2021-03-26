@@ -23,8 +23,8 @@ struct ThemeManager {
         UITabBar.appearance().barStyle = theme.barStyle
         UINavigationBar.appearance().isTranslucent = false
         UINavigationBar.appearance().barStyle = theme.barStyle
-        UINavigationBar.appearance().barTintColor = theme.barBackgroundColor
-        let textAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
+        UINavigationBar.appearance().barTintColor = .secondarySystemBackground
+        let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
         UINavigationBar.appearance().titleTextAttributes = textAttributes
         UINavigationBar.appearance().largeTitleTextAttributes = textAttributes
         UINavigationBar.appearance().shadowImage = UIImage()
@@ -48,6 +48,7 @@ struct ThemeManager {
         }
     }
 }
+
 enum Theme: Int {
     case Default, Dark
     

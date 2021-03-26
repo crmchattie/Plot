@@ -19,9 +19,10 @@ struct HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
     var canNavigate: Bool
+    var range: DateRange
     
     var sectionTitle: String = "Health"
-    let title: String = "Daily average"
+    let title: String
     let description: String
     
     var categories: [CategorySummaryViewModel] = []
@@ -29,36 +30,59 @@ struct HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     let chartData: BarChartData
 
     init(
-        summary: [HKActivitySummary],
-        filterOption: ActivityFilterOption,
+        activity: [HKActivitySummary],
+        energyConsumed: [HKQuantitySample],
+        range: DateRange,
         canNavigate: Bool,
         networkController: NetworkController
     ) {
         self.networkController = networkController
         self.canNavigate = canNavigate
-        let range = filterOption.initialRange
+        self.range = range
         
-        let daysToCover = range.1.daysSince(range.0)
+        let daysToCover = range.endDate.daysSince(range.startDate)
         
-        var values: [Int: Double] = [:]
+        var energyValues: [Int: Double] = [:]
+        var dietaryValues: [Int: Double] = [:]
         var average: Double = 0
-        summary.forEach { summary in
+        activity.forEach { summary in
             guard let entryDate = summary.dateComponents(for: .current).date else { return }
-            let indexInRange = entryDate.daysSince(range.0)
+            let indexInRange = entryDate.daysSince(range.startDate)
             let value = summary.activeEnergyBurned.doubleValue(for: HKUnit.kilocalorie())
-            values[indexInRange] = value
+            energyValues[indexInRange] = value
             average += value
         }
         average /= Double(daysToCover)
         description = "\(Int(average)) kcal"
         
-        let dataEntries = (0..<daysToCover).map {
-            BarChartDataEntry(x: Double($0) + 0.5, y: values[$0] ?? 0)
+        title = DateRangeFormatter(currentWeek: "Daily average", currentMonth: "Monthly average", currentYear: "Yearly average")
+            .format(range: range)
+        
+        energyConsumed.forEach { summary in
+            let indexInRange = summary.startDate.daysSince(range.startDate)
+            let value = summary.quantity.doubleValue(for: HKUnit.kilocalorie())
+            dietaryValues[indexInRange] = value
         }
         
-        let chartDataSet = BarChartDataSet(entries: dataEntries)
+        let dataEntries = (0...daysToCover).map {
+            BarChartDataEntry(x: Double($0) + 0.5, y: energyValues[$0] ?? 0)
+        }
+        
+        let dataEntries2 = (0...daysToCover).map {
+            BarChartDataEntry(x: Double($0) + 0.5, y: dietaryValues[$0] ?? 0)
+        }
+        
+        let chartDataSet = BarChartDataSet(dataEntries)
         chartDataSet.colors = [.red]
-        chartData = BarChartData(dataSets: [chartDataSet])
+        let dataSet2 = BarChartDataSet(dataEntries2)
+        dataSet2.colors = [.green]
+        chartData = BarChartData(dataSets: [chartDataSet, dataSet2])
+//        float barSpace = 0.02f; // x2 dataset
+//        float barWidth = 0.45f; // x2 dataset
+        chartData.groupBars(fromX: 0, groupSpace: 0.1, barSpace: 0.2)
+//        chartData.groupWidth(groupSpace: 0.1, barSpace: 0.1)
+//        // make this BarData object grouped
+//        [d groupBarsFromX:0.0 groupSpace:groupSpace barSpace:barSpace]; // start at x = 0
         chartData.barWidth = 0.5
         chartData.setDrawValues(false)
     }

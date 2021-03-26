@@ -15,7 +15,7 @@ class AnalyticsDetailViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     private let rangeControlView: UISegmentedControl = {
-        let control = UISegmentedControl(items: ActivityFilterOption.allCases.map { $0.rawValue} )
+        let control = UISegmentedControl(items: DateRangeType.allCases.map { $0.filterTitle } )
         control.selectedSegmentIndex = 0
         control.translatesAutoresizingMaskIntoConstraints = false
         control.addTarget(self, action: #selector(rangeChanged), for: .valueChanged)
@@ -81,8 +81,8 @@ class AnalyticsDetailViewController: UIViewController {
     }
     
     private func initBindings() {
-        viewModel.$entries
-            .delay(for: .milliseconds(100), scheduler: DispatchQueue.main)
+        viewModel.entries
+            .receive(on: DispatchQueue.main)
             .sink { [unowned self] _ in
                 self.tableView.reloadData()
             }
@@ -92,7 +92,7 @@ class AnalyticsDetailViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
-        viewModel.filter = ActivityFilterOption.allCases[sender.selectedSegmentIndex]
+        viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
     }
 }
 
@@ -103,18 +103,20 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
     func numberOfSections(in tableView: UITableView) -> Int { 2 }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? 1 : viewModel.entries.count
+        return section == 0 ? 1 : viewModel.entries.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(ofType: StackedBarChartCell.self, for: indexPath)
+            cell.delegate = self
             cell.configure(with: viewModel.chartViewModel)
             return cell
         } else {
-            switch viewModel.entries[indexPath.row] {
+            switch viewModel.entries.value[indexPath.row] {
             case .activity(let activity):
                 let cell = tableView.dequeueReusableCell(ofType: ActivityCell.self, for: indexPath)
+//                cell.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: <#T##CGFloat#>, bottom: <#T##CGFloat#>, trailing: <#T##CGFloat#>)
                 cell.configureCell(for: indexPath, activity: activity, withInvitation: nil)
                 return cell
             }
@@ -123,5 +125,18 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+}
+
+// MARK: - StackedBarChartCellDelegate
+
+extension AnalyticsDetailViewController: StackedBarChartCellDelegate {
+    
+    func previousTouched(on cell: StackedBarChartCell) {
+        viewModel.loadPreviousSegment()
+    }
+    
+    func nextTouched(on cell: StackedBarChartCell) {
+        viewModel.loadNextSegment()
     }
 }

@@ -10,34 +10,6 @@ import Foundation
 import Charts
 import Combine
 
-enum ActivityFilterOption: String, CaseIterable {
-    case weekly = "Weekly", monthly = "Monthly", yearly = "Yearly"
-    
-    var initialRange: (Date, Date) {
-        switch self {
-        case .weekly: return (Date().weekStart, Date().weekEnd)
-        case .monthly: return (Date().startOfMonth, Date().endOfMonth)
-        case .yearly: return (Date().startOfYear, Date().endOfYear)
-        }
-    }
-}
-
-private extension Date {
-    var weekStart: Date {
-        let calendar = Calendar(identifier: .iso8601)
-        let sunday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
-        return calendar.date(byAdding: .day, value: 1, to: sunday)!
-    }
-    
-    var weekEnd: Date {
-        let calendar = Calendar(identifier: .iso8601)
-        let sunday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
-        return calendar.date(byAdding: .day, value: 7, to: sunday)!
-    }
-}
-
-typealias DateRange = (startDate: Date, endDate: Date)
-
 protocol AnalyticsBreakdownViewModel {
     var onChange: PassthroughSubject<Void, Never> { get }
     var verticalAxisValueFormatter: IAxisValueFormatter { get }
@@ -48,6 +20,7 @@ protocol AnalyticsBreakdownViewModel {
     var categories: [CategorySummaryViewModel] { get }
     
     var canNavigate: Bool { get set }
+    var range: DateRange { get set }
     
     var chartData: BarChartData { get }
     
