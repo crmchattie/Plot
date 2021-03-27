@@ -10,7 +10,14 @@ import Foundation
 import Charts
 import Combine
 
-protocol AnalyticsBreakdownViewModel {
+struct CategorySummaryViewModel {
+    let title: String
+    let color: UIColor
+    let value: Double
+    let formattedValue: String
+}
+
+protocol AnalyticsBreakdownViewModel: AnyObject {
     var onChange: PassthroughSubject<Void, Never> { get }
     var verticalAxisValueFormatter: IAxisValueFormatter { get }
     
@@ -20,9 +27,14 @@ protocol AnalyticsBreakdownViewModel {
     var categories: [CategorySummaryViewModel] { get }
     
     var canNavigate: Bool { get set }
-    var range: DateRange { get set }
     
-    var chartData: BarChartData { get }
+    var range: DateRange { get set }
+    func updateRange(_ newRange: DateRange)
+
+    var chartData: ChartData? { get }
+    
+    /// Load data asyncronously.
+    func loadData(completion: (() -> Void)?)
     
     /// Fetch entries for the current analytics summary. Used on the detail list.
     /// - Parameters:
@@ -31,13 +43,14 @@ protocol AnalyticsBreakdownViewModel {
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void)
 }
 
-enum AnalyticsBreakdownEntry {
-    case activity(Activity)
+extension AnalyticsBreakdownViewModel {
+    
+    func updateRange(_ newRange: DateRange) {
+        self.range = newRange
+        loadData(completion: nil)
+    }
 }
 
-struct CategorySummaryViewModel {
-    let title: String
-    let color: UIColor
-    let value: Double
-    let formattedValue: String
+enum AnalyticsBreakdownEntry {
+    case activity(Activity)
 }

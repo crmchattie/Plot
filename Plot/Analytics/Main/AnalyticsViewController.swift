@@ -46,7 +46,7 @@ class AnalyticsViewController: UITableViewController {
                                               .flexibleLeftMargin,
                                               .flexibleRightMargin]
         activityIndicator.startAnimating()
-        viewModel.fetchActivities { result in
+        viewModel.fetchActivities {
             self.activityIndicator.removeFromSuperview()
             self.tableView.reloadData()
         }
@@ -54,7 +54,7 @@ class AnalyticsViewController: UITableViewController {
     
     private func openDetail(forSection section: Int) {
         guard viewModel.items.count > section else { return }
-        var chartViewModel = viewModel.items[section]
+        let chartViewModel = viewModel.items[section]
         chartViewModel.canNavigate = true
         let viewModel = AnalyticsDetailViewModel(chartViewModel: chartViewModel,
                                                  networkController: self.viewModel.networkController)

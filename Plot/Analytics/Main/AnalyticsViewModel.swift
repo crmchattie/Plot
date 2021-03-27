@@ -26,27 +26,33 @@ class AnalyticsViewModel {
         self.networkController = networkController
     }
     
-    func fetchActivities(completion: @escaping (Result<Void, Error>) -> Void) {
-        activityService.getSamples(segmentType: .week,
-                                   activities: networkController.activityService.activities,
-                                   transactions: nil) { (_, foo, bar, stats, err) in
-            DispatchQueue.global(qos: .background).async {
-                let activities = stats?[.calendarSummary] ?? [:]
-                self.items.append(ActivityAnalyticsBreakdownViewModel(items: activities, canNavigate: false,
-                                                                      range: self.range,
-                                                                      networkController: self.networkController))
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
-            }
+    func fetchActivities(completion: @escaping () -> Void) {
+        let group = DispatchGroup()
+
+        let activitiesViewModel = ActivityAnalyticsBreakdownViewModel(canNavigate: false, range: range, networkController: networkController)
+        group.enter()
+        activitiesViewModel.loadData {
+            group.leave()
         }
         
-        fetchHealth { (energyResult, activityResult) in
-            self.items.append(HealthAnalyticsBreakdownViewModel(activity: activityResult,
-                                                                energyConsumed: energyResult,
-                                                                range: self.range,
-                                                                canNavigate: false,
-                                                                networkController: self.networkController))
+        group.enter()
+        let healthViewModel = HealthAnalyticsBreakdownViewModel(range: range, canNavigate: false, networkController: networkController)
+        healthViewModel.loadData {
+            group.leave()
+        }
+//
+//        fetchHealth { (energyResult, activityResult) in
+//            self.items.append(HealthAnalyticsBreakdownViewModel(activity: activityResult,
+//                                                                energyConsumed: energyResult,
+//                                                                range: self.range,
+//                                                                canNavigate: false,
+//                                                                networkController: self.networkController))
+//
+//        }
+        
+        group.notify(queue: .main) {
+            self.items = [activitiesViewModel, healthViewModel]
+            completion()
         }
     }
     

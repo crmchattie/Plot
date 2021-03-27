@@ -37,7 +37,7 @@ class AnalyticsDetailViewModel {
     }
     
     private func updateRange() {
-        chartViewModel = ActivityAnalyticsBreakdownViewModel(items: [:], canNavigate: true, range: range, networkController: networkController)
+        chartViewModel.updateRange(range)
         reloadData()
     }
     

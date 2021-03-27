@@ -11,7 +11,7 @@ import Combine
 import Charts
 
 // Spending over time + net worth
-struct FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
+class FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
@@ -24,7 +24,7 @@ struct FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
 
     var categories: [CategorySummaryViewModel] = []
     
-    let chartData: BarChartData
+    private(set) var chartData: ChartData? = nil
 
     init(
         canNavigate: Bool,
@@ -37,9 +37,15 @@ struct FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
         }
         let chartDataSet = BarChartDataSet(entries: dataEntries)
         chartDataSet.colors = [.blue, .orange, .darkGray]
-        chartData = BarChartData(dataSets: [chartDataSet])
+        let chartData = BarChartData(dataSets: [chartDataSet])
         chartData.barWidth = 0.5
         chartData.setDrawValues(false)
+        
+        self.chartData = chartData
+    }
+    
+    func loadData(completion: (() -> Void)?) {
+        
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
