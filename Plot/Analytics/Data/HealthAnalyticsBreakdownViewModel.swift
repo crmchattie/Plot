@@ -19,7 +19,6 @@ class HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
-    var canNavigate: Bool
     var range: DateRange
     
     var sectionTitle: String = "Health"
@@ -32,17 +31,17 @@ class HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
 
     init(
         range: DateRange,
-        canNavigate: Bool,
         networkController: NetworkController
     ) {
         self.networkController = networkController
-        self.canNavigate = canNavigate
         self.range = range
         
         updateTitle()
     }
     
     func loadData(completion: (() -> Void)?) {
+        updateTitle()
+        
         let predicate: NSPredicate = {
             let units: Set<Calendar.Component> = [.day, .month, .year]
             var startDate = Calendar.current.dateComponents(units, from: range.startDate)
@@ -73,7 +72,7 @@ class HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
         healthStore.execute(caloriesConsumedQuery)
         
         group.notify(queue: .main) {
-            let daysToCover = self.range.endDate.daysSince(self.range.startDate)
+            let daysInRange = self.range.daysInRange
             
             var energyValues: [Int: Double] = [:]
             var dietaryValues: [Int: Double] = [:]
@@ -85,7 +84,7 @@ class HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
                 energyValues[indexInRange] = value
                 average += value
             }
-            average /= Double(daysToCover)
+            average /= Double(daysInRange)
             self.description = "\(Int(average)) kcal"
     
             eneryResult.forEach { summary in
@@ -94,11 +93,11 @@ class HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
                 dietaryValues[indexInRange] = value
             }
     
-            let dataEntries = (0...daysToCover).map {
+            let dataEntries = (0...daysInRange).map {
                 BarChartDataEntry(x: Double($0) + 0.5, y: energyValues[$0] ?? 0)
             }
     
-            let dataEntries2 = (0...daysToCover).map {
+            let dataEntries2 = (0...daysInRange).map {
                 BarChartDataEntry(x: Double($0) + 0.5, y: dietaryValues[$0] ?? 0)
             }
     

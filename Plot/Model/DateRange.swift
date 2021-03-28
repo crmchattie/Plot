@@ -71,6 +71,10 @@ struct DateRange {
             endDate = startDate.yEnd
         }
     }
+    
+    var daysInRange: Int {
+        endDate.daysSince(startDate)
+    }
 }
 
 private extension Date {

@@ -24,7 +24,6 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = HourValueFormatter()
-    var canNavigate: Bool
     var range: DateRange
     
     let sectionTitle: String = "Activities"
@@ -36,12 +35,10 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     private(set) var chartData: ChartData? = nil
 
     init(
-        canNavigate: Bool,
         range: DateRange,
         networkController: NetworkController
     ) {
         self.networkController = networkController
-        self.canNavigate = canNavigate
         self.range = range
         
         updateTitle()
@@ -70,8 +67,8 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
                 
                 self.description = "\(activityCount) activities"
                 
-                let daysToCover = self.range.endDate.daysSince(self.range.startDate)
-                let dataEntries = (0...daysToCover).map { index -> BarChartDataEntry in
+                let daysInRange = self.range.daysInRange
+                let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
                     let current = self.range.startDate.addDays(index)
                     let yValues = activities.map {
                         $0.value.filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })

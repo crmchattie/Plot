@@ -13,6 +13,10 @@ import Combine
 
 class AnalyticsViewModel {
     
+    struct Section {
+        let title: String
+    }
+    
     private let activityService = SummaryService()
     private let healthDetailService = HealthDetailService()
     private let healthService = HealthService()
@@ -26,69 +30,30 @@ class AnalyticsViewModel {
         self.networkController = networkController
     }
     
-    func fetchActivities(completion: @escaping () -> Void) {
+    func loadData(completion: @escaping () -> Void) {
         let group = DispatchGroup()
 
-        let activitiesViewModel = ActivityAnalyticsBreakdownViewModel(canNavigate: false, range: range, networkController: networkController)
+        let activitiesViewModel = ActivityAnalyticsBreakdownViewModel(range: range, networkController: networkController)
         group.enter()
         activitiesViewModel.loadData {
             group.leave()
         }
         
         group.enter()
-        let healthViewModel = HealthAnalyticsBreakdownViewModel(range: range, canNavigate: false, networkController: networkController)
+        let healthViewModel = HealthAnalyticsBreakdownViewModel(range: range, networkController: networkController)
         healthViewModel.loadData {
             group.leave()
         }
-//
-//        fetchHealth { (energyResult, activityResult) in
-//            self.items.append(HealthAnalyticsBreakdownViewModel(activity: activityResult,
-//                                                                energyConsumed: energyResult,
-//                                                                range: self.range,
-//                                                                canNavigate: false,
-//                                                                networkController: self.networkController))
-//
-//        }
+        
+        group.enter()
+        let financeViewModel = FinancesAnalyticsBreakdownViewModel(range: range, networkController: networkController)
+        financeViewModel.loadData {
+            group.leave()
+        }
         
         group.notify(queue: .main) {
-            self.items = [activitiesViewModel, healthViewModel]
+            self.items = [activitiesViewModel, healthViewModel, financeViewModel]
             completion()
-        }
-    }
-    
-    private func fetchHealth(completion: @escaping (_ eneryResult: [HKQuantitySample], _ activityResult: [HKActivitySummary]) -> Void) {
-        let healthStore = HKHealthStore()
-        let predicate: NSPredicate = {
-            let units: Set<Calendar.Component> = [.day, .month, .year]
-            var startDate = Calendar.current.dateComponents(units, from: range.startDate)
-            startDate.calendar = .current
-            var endDate = Calendar.current.dateComponents(units, from: range.endDate)
-            endDate.calendar = .current
-            return HKQuery.predicate(forActivitySummariesBetweenStart: startDate, end: endDate)
-        }()
-        
-        let group = DispatchGroup()
-        var eneryResult: [HKQuantitySample] = []
-        var activityResult: [HKActivitySummary] = []
-        
-        let type = HKQuantityType.quantityType(forIdentifier: .dietaryEnergyConsumed)!
-        let caloriesConsumedQuery = HKSampleQuery(sampleType: type, predicate: nil, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { (_, samples, error) in
-            eneryResult = samples?.compactMap { $0 as? HKQuantitySample } ?? []
-            group.leave()
-        }
-        
-        let activityQuery = HKActivitySummaryQuery(predicate: predicate) { (_, summary, error) in
-            activityResult = summary ?? []
-            group.leave()
-        }
-        
-        group.enter()
-        healthStore.execute(activityQuery)
-        group.enter()
-        healthStore.execute(caloriesConsumedQuery)
-        
-        group.notify(queue: .main) {
-            completion(eneryResult, activityResult)
         }
     }
 }

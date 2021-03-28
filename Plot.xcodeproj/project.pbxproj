@@ -473,6 +473,7 @@
 		A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53D0336E7A51EFB22060D82 /* libPods-Plot.a */; };
 		F916C764260E66170062F952 /* DateRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C763260E66170062F952 /* DateRange.swift */; };
 		F916C768260E793F0062F952 /* DateRangeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C767260E793F0062F952 /* DateRangeFormatter.swift */; };
+		F916C8DA2610C3090062F952 /* Sequence+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C8D92610C3090062F952 /* Sequence+Utility.swift */; };
 		F926576F2607440A00593FE1 /* Collection+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F926576E2607440A00593FE1 /* Collection+Utility.swift */; };
 		F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */; };
 		F94EDC4D260667A000B97FF6 /* FinancesAnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* FinancesAnalyticsBreakdownViewModel.swift */; };
@@ -992,6 +993,7 @@
 		E53D0336E7A51EFB22060D82 /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F916C763260E66170062F952 /* DateRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRange.swift; sourceTree = "<group>"; };
 		F916C767260E793F0062F952 /* DateRangeFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangeFormatter.swift; sourceTree = "<group>"; };
+		F916C8D92610C3090062F952 /* Sequence+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Utility.swift"; sourceTree = "<group>"; };
 		F926576E2607440A00593FE1 /* Collection+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Utility.swift"; sourceTree = "<group>"; };
 		F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		F94EDC4C260667A000B97FF6 /* FinancesAnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesAnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
@@ -1525,6 +1527,7 @@
 			children = (
 				26391FEB235EC3CE002BB4C0 /* Date+Extension.swift */,
 				F926576E2607440A00593FE1 /* Collection+Utility.swift */,
+				F916C8D92610C3090062F952 /* Sequence+Utility.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2821,6 +2824,7 @@
 				10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */,
 				4BAEE46E21272B380045AB10 /* Biometrics.swift in Sources */,
 				F94EDC4D260667A000B97FF6 /* FinancesAnalyticsBreakdownViewModel.swift in Sources */,
+				F916C8DA2610C3090062F952 /* Sequence+Utility.swift in Sources */,
 				4BAEE4F221272D890045AB10 /* SelectChatTableViewController.swift in Sources */,
 				10FBC8B724BFE58F00D0E6B5 /* Activitylist.swift in Sources */,
 				10B4AE3524FEC5BC005B967B /* FinanceAccountViewController.swift in Sources */,

@@ -26,8 +26,6 @@ protocol AnalyticsBreakdownViewModel: AnyObject {
     var description: String { get }
     var categories: [CategorySummaryViewModel] { get }
     
-    var canNavigate: Bool { get set }
-    
     var range: DateRange { get set }
     func updateRange(_ newRange: DateRange)
 
@@ -53,4 +51,5 @@ extension AnalyticsBreakdownViewModel {
 
 enum AnalyticsBreakdownEntry {
     case activity(Activity)
+    case transaction(Transaction)
 }

@@ -28,6 +28,7 @@ class AnalyticsDetailViewController: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(StackedBarChartCell.self)
         tableView.register(ActivityCell.self)
+        tableView.register(FinanceTableViewCell.self)
         return tableView
     }()
 
@@ -109,6 +110,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(ofType: StackedBarChartCell.self, for: indexPath)
+            cell.prevNextStackView.isHidden = false
             cell.delegate = self
             cell.configure(with: viewModel.chartViewModel)
             return cell
@@ -116,8 +118,11 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
             switch viewModel.entries.value[indexPath.row] {
             case .activity(let activity):
                 let cell = tableView.dequeueReusableCell(ofType: ActivityCell.self, for: indexPath)
-//                cell.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: <#T##CGFloat#>, bottom: <#T##CGFloat#>, trailing: <#T##CGFloat#>)
                 cell.configureCell(for: indexPath, activity: activity, withInvitation: nil)
+                return cell
+            case .transaction(let transaction):
+                let cell = tableView.dequeueReusableCell(ofType: FinanceTableViewCell.self, for: indexPath)
+                cell.transaction = transaction
                 return cell
             }
         }

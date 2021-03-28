@@ -8,18 +8,25 @@
 
 import Foundation
 
+private let isodateFormatter = ISO8601DateFormatter()
+private let dateFormatterPrint: DateFormatter = {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "E, MMM d, yyyy"
+    return dateFormatter
+}()
+
+private let numberFormatter: NumberFormatter = {
+    let numberFormatter = NumberFormatter()
+    numberFormatter.numberStyle = .currency
+    return numberFormatter
+}()
+
 class FinanceTableViewCell: UITableViewCell {
     
     var transaction: Transaction! {
         didSet {
             if let transaction = transaction {
-                let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = transaction.currency_code ?? "USD"
-                numberFormatter.numberStyle = .currency
-                
-                let isodateFormatter = ISO8601DateFormatter()
-                let dateFormatterPrint = DateFormatter()
-                dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
                 
                 categoryLabel.isHidden = true
                 
@@ -41,13 +48,7 @@ class FinanceTableViewCell: UITableViewCell {
     var account: MXAccount! {
         didSet {
             if let account = account {
-                let numberFormatter = NumberFormatter()
                 numberFormatter.currencyCode = account.currency_code ?? "USD"
-                numberFormatter.numberStyle = .currency
-                
-                let isodateFormatter = ISO8601DateFormatter()
-                let dateFormatterPrint = DateFormatter()
-                dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
                 
                 categoryLabel.isHidden = true
                 
@@ -142,5 +143,4 @@ class FinanceTableViewCell: UITableViewCell {
         bottomLabel.font = UIFont.preferredFont(forTextStyle: .body)
         IV.isHidden = false
     }
-    
 }

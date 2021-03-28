@@ -9,34 +9,60 @@
 import Foundation
 
 protocol FinanceDetailServiceInterface {
-    func getSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Swift.Void)
+    func getSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
+    
+    func getSamples(for range: DateRange, accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
 }
 
 class FinanceDetailService: FinanceDetailServiceInterface {
     func getSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Swift.Void) {
 
-        getStatisticalSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: accounts, transactions: transactions, completion: completion)
+        getStatisticalSamples(accountDetails: accountDetails,
+                              transactionDetails: transactionDetails,
+                              segmentType: segmentType,
+                              range: nil,
+                              accounts: accounts,
+                              transactions: transactions,
+                              completion: completion)
+    }
+    
+    func getSamples(for range: DateRange, accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
+        getStatisticalSamples(accountDetails: accountDetails,
+                              transactionDetails: transactionDetails,
+                              segmentType: .day,
+                              range: range,
+                              accounts: accounts,
+                              transactions: transactions,
+                              completion: completion)
     }
 
-    private func getStatisticalSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
+    private func getStatisticalSamples(
+        accountDetails: AccountDetails?,
+        transactionDetails: TransactionDetails?,
+        segmentType: TimeSegmentType,
+        range: DateRange?,
+        accounts: [MXAccount]?,
+        transactions: [Transaction]?,
+        completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void
+    ) {
 
         let anchorDate = Date()
         var startDate = anchorDate
         var endDate = anchorDate
 
-        if segmentType == .day {
+        if let range = range {
+            startDate = range.startDate
+            endDate = range.endDate
+        } else if segmentType == .day {
             startDate = Date().localTime.startOfDay
             endDate = Date().localTime.endOfDay
-        }
-        else if segmentType == .week {
+        } else if segmentType == .week {
             startDate = Date().localTime.startOfWeek
             endDate = Date().localTime.endOfWeek
-        }
-        else if segmentType == .month {
+        } else if segmentType == .month {
             startDate = Date().localTime.startOfMonth
             endDate = Date().localTime.endOfMonth
-        }
-        else if segmentType == .year {
+        } else if segmentType == .year {
             startDate = Date().localTime.startOfYear
             endDate = Date().localTime.endOfYear
         }

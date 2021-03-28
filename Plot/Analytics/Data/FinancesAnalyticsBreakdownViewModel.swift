@@ -13,42 +13,106 @@ import Charts
 // Spending over time + net worth
 class FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
+    private let networkController: NetworkController
+    private let financeService = FinanceDetailService()
+    
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
-    var canNavigate: Bool
     var range: DateRange
     
-    var sectionTitle: String = "Health"
-    let title: String = "Daily average"
-    let description: String = "6h 1m"
+    var sectionTitle: String = "Finance"
+    private(set) var title: String = "-"
+    private(set) var description: String = "_"
 
     var categories: [CategorySummaryViewModel] = []
     
     private(set) var chartData: ChartData? = nil
+    private var transactions: [Transaction] = []
 
     init(
-        canNavigate: Bool,
-        range: DateRange
+        range: DateRange,
+        networkController: NetworkController
     ) {
-        self.canNavigate = canNavigate
         self.range = range
-        let dataEntries = (0..<7).map {
-            BarChartDataEntry(x: Double($0) + 0.5, yValues: [Double.random(in: 0...20), Double.random(in: 0...20), Double.random(in: 0...20)])
+        self.networkController = networkController
+        updateTitle()
+    }
+    
+    func loadData(completion: (() -> Void)?) {
+        updateTitle()
+        let daysInRange = range.daysInRange
+        
+        let accounts = networkController.financeService.accounts
+        
+        transactions = networkController.financeService.transactions
+            .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
+            .filter { transaction -> Bool in
+                #warning("This is extremely unoptimal. A stored Date object should be saved inside the Transaction.")
+                guard let date = dateFormatter.date(from: transaction.created_at) else { return false }
+                return range.startDate <= date && date <= range.endDate
+            }
+        
+        var incomeValue: Double = 0
+        var expenseValue: Double = 0
+        
+        var categoryValues: [[Double]] = []
+        var categoryColors: [UIColor] = []
+        var categories: [CategorySummaryViewModel] = []
+        transactions.grouped(by: \.top_level_category).forEach { (category, transactions) in
+            var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
+            var sum: Double = 0
+            transactions.forEach { transaction in
+                guard let day = dateFormatter.date(from: transaction.created_at) else { return }
+                let daysInBetween = day.daysSince(range.startDate)
+                if transaction.is_income ?? false {
+                    incomeValue += transaction.amount
+                    values[daysInBetween] += transaction.amount
+                } else {
+                    expenseValue += transaction.amount
+                    values[daysInBetween] -= transaction.amount
+                }
+                sum += transaction.amount
+            }
+            
+            let categoryColor = topLevelCategoryColor(category)
+            categories.append(CategorySummaryViewModel(title: category,
+                                                       color: categoryColor,
+                                                       value: sum,
+                                                       formattedValue: "$\(Int(sum))"))
+            categoryColors.append(categoryColor)
+            categoryValues.append(values)
         }
+        
+        self.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
+        
+        description = "out $\(Int(expenseValue)), in $\(Int(incomeValue))"
+        let dataEntries = (0...daysInRange).map { index in
+            BarChartDataEntry(x: Double(index) + 0.5, yValues: categoryValues.map { $0[index] })
+        }
+        
         let chartDataSet = BarChartDataSet(entries: dataEntries)
-        chartDataSet.colors = [.blue, .orange, .darkGray]
+        if !categoryColors.isEmpty {
+            chartDataSet.colors = categoryColors
+        }
         let chartData = BarChartData(dataSets: [chartDataSet])
         chartData.barWidth = 0.5
         chartData.setDrawValues(false)
         
         self.chartData = chartData
-    }
-    
-    func loadData(completion: (() -> Void)?) {
-        
+        onChange.send()
+        completion?()
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        completion([])
+        completion(transactions.map { .transaction($0) })
+    }
+    
+    // MARK: - Private
+    
+    private func updateTitle() {
+        title = DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
+            .format(range: range)
     }
 }
+
+private let dateFormatter = ISO8601DateFormatter()

@@ -32,6 +32,7 @@ class StackedBarChartCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
         label.textColor = .label
+        label.numberOfLines = 0
         return label
     }()
     
@@ -67,8 +68,8 @@ class StackedBarChartCell: UITableViewCell {
         chart.minOffset = 0
 
         chart.leftAxis.enabled = false
-        chart.leftAxis.axisMinimum = 0
-        chart.rightAxis.axisMinimum = 0
+//        chart.leftAxis.axisMinimum = 0
+//        chart.rightAxis.axisMinimum = 0
         chart.rightAxis.drawAxisLineEnabled = false
         chart.rightAxis.labelTextColor = .secondaryLabel
         
@@ -92,8 +93,9 @@ class StackedBarChartCell: UITableViewCell {
         return stackView
     }()
     
-    private lazy var prevNextStackView: UIStackView = {
+    private(set) lazy var prevNextStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [previousButton, nextButton])
+        stackView.isHidden = true
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -155,8 +157,6 @@ class StackedBarChartCell: UITableViewCell {
         
         chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         chartView.data = viewModel.chartData
-        
-        prevNextStackView.isHidden = !viewModel.canNavigate
         
         titleLabel.text = viewModel.title
         valueLabel.text = viewModel.description
