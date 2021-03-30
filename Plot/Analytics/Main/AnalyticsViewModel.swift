@@ -15,7 +15,8 @@ class AnalyticsViewModel {
     
     struct Section {
         let title: String
-        let items: [AnalyticsBreakdownViewModel]
+        let items: [StackedBarChartViewModel]
+        fileprivate let dataSources: [AnalyticsDataSource]
     }
     
     private let activityService = SummaryService()
@@ -34,38 +35,42 @@ class AnalyticsViewModel {
     func loadData(completion: @escaping () -> Void) {
         let group = DispatchGroup()
 
-        print(range.startDate, range.endDate)
-        let activitiesViewModel = ActivityAnalyticsBreakdownViewModel(range: range, networkController: networkController)
+        let activitiesDataSource = ActivityAnalyticsDataSource(range: range, networkController: networkController)
         group.enter()
-        activitiesViewModel.loadData {
+        activitiesDataSource.loadData {
             group.leave()
         }
         
         group.enter()
-        let healthViewModel = HealthAnalyticsBreakdownViewModel(range: range, networkController: networkController)
-        healthViewModel.loadData {
+        let healthDataSource = HealthAnalyticsDataSource(range: range, networkController: networkController)
+        healthDataSource.loadData {
             group.leave()
         }
         
         group.enter()
-        let financeViewModel = TransactionAnalyticsBreakdownViewModel(range: range, networkController: networkController)
-        financeViewModel.loadData {
+        let financeDataSource = TransactionAnalyticsDataSource(range: range, networkController: networkController)
+        financeDataSource.loadData {
             group.leave()
         }
         
         group.enter()
-        let netWorthViewModel = NetWorthAnalyticsBreakdownViewModel(range: range, networkController: networkController)
+        let netWorthViewModel = NetWorthAnalyticsDataSource(range: range, networkController: networkController)
         netWorthViewModel.loadData {
             group.leave()
         }
         
         group.notify(queue: .main) {
             self.sections = [
-                Section(title: "Activities", items: [activitiesViewModel]),
-                Section(title: "Health", items: [healthViewModel]),
-                Section(title: "Finance", items: [financeViewModel, netWorthViewModel])
+                Section(title: "Activities", items: [activitiesDataSource.chartViewModel.value], dataSources: [activitiesDataSource]),
+                Section(title: "Health", items: [healthDataSource.chartViewModel.value], dataSources: [healthDataSource]),
+                Section(title: "Finance", items: [financeDataSource.chartViewModel.value, netWorthViewModel.chartViewModel.value], dataSources: [financeDataSource, netWorthViewModel])
             ]
             completion()
         }
+    }
+    
+    func makeDetailViewModel(for indexPath: IndexPath) -> AnalyticsDetailViewModel {
+        let dataSource = sections[indexPath.section].dataSources[indexPath.row / 2]
+        return AnalyticsDetailViewModel(dataSource: dataSource, networkController: networkController)
     }
 }

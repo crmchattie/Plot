@@ -13,33 +13,33 @@ import SwiftUI
 class AnalyticsDetailViewModel {
     
     private let networkController: NetworkController
-    private(set) var chartViewModel: AnalyticsBreakdownViewModel
+    private let dataSource: AnalyticsDataSource
     
-    var title: String { chartViewModel.title }
-    
+    var title: String { dataSource.title }
     var range: DateRange = .init(type: .week) {
         didSet { updateRange() }
     }
-    
+    let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     var entries = CurrentValueSubject<[AnalyticsBreakdownEntry], Never>([])
     
     init(
-        chartViewModel: AnalyticsBreakdownViewModel,
+        dataSource: AnalyticsDataSource,
         networkController: NetworkController
     ) {
-        self.chartViewModel = chartViewModel
+        self.dataSource = dataSource
+        self.chartViewModel = dataSource.chartViewModel
         self.networkController = networkController
         reloadData()
     }
     
     private func reloadData() {
-        chartViewModel.fetchEntries(range: range) { entries in
+        dataSource.fetchEntries(range: range) { entries in
             self.entries.send(entries)
         }
     }
     
     private func updateRange() {
-        chartViewModel.updateRange(range)
+        dataSource.updateRange(range)
         reloadData()
     }
     

@@ -475,24 +475,28 @@
 		F916C764260E66170062F952 /* DateRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C763260E66170062F952 /* DateRange.swift */; };
 		F916C768260E793F0062F952 /* DateRangeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C767260E793F0062F952 /* DateRangeFormatter.swift */; };
 		F916C8DA2610C3090062F952 /* Sequence+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C8D92610C3090062F952 /* Sequence+Utility.swift */; };
-		F916C9082610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C9072610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift */; };
+		F916C9082610D0E10062F952 /* NetWorthAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C9072610D0E10062F952 /* NetWorthAnalyticsDataSource.swift */; };
 		F926576F2607440A00593FE1 /* Collection+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F926576E2607440A00593FE1 /* Collection+Utility.swift */; };
 		F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */; };
-		F94EDC4D260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift */; };
-		F9773A5A2601339A00D1B204 /* ActivityAnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A592601339A00D1B204 /* ActivityAnalyticsBreakdownViewModel.swift */; };
-		F9773A862601453500D1B204 /* HourValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A852601453500D1B204 /* HourValueFormatter.swift */; };
+		F94EDC4D260667A000B97FF6 /* TransactionAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */; };
+		F9773A5A2601339A00D1B204 /* ActivityAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A592601339A00D1B204 /* ActivityAnalyticsDataSource.swift */; };
+		F9773A862601453500D1B204 /* HourAxisValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */; };
 		F9773A8B26014AE700D1B204 /* AnalyticsDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */; };
 		F9773A8F26014C7B00D1B204 /* AnalyticsDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8E26014C7B00D1B204 /* AnalyticsDetailViewModel.swift */; };
-		F983298C2602A7B300EB51F7 /* HealthAnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983298B2602A7B300EB51F7 /* HealthAnalyticsBreakdownViewModel.swift */; };
+		F983298C2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983298B2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift */; };
 		F98329952602B25100EB51F7 /* ActivityCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98329942602B25100EB51F7 /* ActivityCategory.swift */; };
 		F9B82C8325FAB1670072BE74 /* AnalyticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C8225FAB1670072BE74 /* AnalyticsViewController.swift */; };
 		F9B82C8A25FAB1F40072BE74 /* StackedBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C8925FAB1F40072BE74 /* StackedBarChartCell.swift */; };
-		F9B82C9025FAB1FE0072BE74 /* AnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C8F25FAB1FE0072BE74 /* AnalyticsBreakdownViewModel.swift */; };
+		F9B82C9025FAB1FE0072BE74 /* AnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C8F25FAB1FE0072BE74 /* AnalyticsDataSource.swift */; };
 		F9B82C9425FAB2690072BE74 /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C9325FAB2690072BE74 /* ReusableView.swift */; };
 		F9C05FA825F7D608009E892A /* NotificationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C05FA725F7D608009E892A /* NotificationConstants.swift */; };
 		F9C05FAE25F7D720009E892A /* RuleConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C05FAD25F7D720009E892A /* RuleConstants.swift */; };
 		F9DD16BD2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD16BC2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift */; };
-		F9E5BD0B260298D200CA027D /* WeekdayValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E5BD0A260298D200CA027D /* WeekdayValueFormatter.swift */; };
+		F9DD16C12613D04400B8374D /* StackedBarChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD16C02613D04400B8374D /* StackedBarChartViewModel.swift */; };
+		F9DD16C52613D57A00B8374D /* MonthAxisValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD16C42613D57A00B8374D /* MonthAxisValueFormatter.swift */; };
+		F9DD16FF2613E65F00B8374D /* AnalyticsLineChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD16FE2613E65F00B8374D /* AnalyticsLineChartCell.swift */; };
+		F9DD17032613E67300B8374D /* AnalyticsBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD17022613E67300B8374D /* AnalyticsBarChartCell.swift */; };
+		F9E5BD0B260298D200CA027D /* WeekdayAxisValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E5BD0A260298D200CA027D /* WeekdayAxisValueFormatter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -998,24 +1002,28 @@
 		F916C763260E66170062F952 /* DateRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRange.swift; sourceTree = "<group>"; };
 		F916C767260E793F0062F952 /* DateRangeFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangeFormatter.swift; sourceTree = "<group>"; };
 		F916C8D92610C3090062F952 /* Sequence+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Utility.swift"; sourceTree = "<group>"; };
-		F916C9072610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetWorthAnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
+		F916C9072610D0E10062F952 /* NetWorthAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetWorthAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F926576E2607440A00593FE1 /* Collection+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Utility.swift"; sourceTree = "<group>"; };
 		F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
-		F94EDC4C260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
-		F9773A592601339A00D1B204 /* ActivityAnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
-		F9773A852601453500D1B204 /* HourValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourValueFormatter.swift; sourceTree = "<group>"; };
+		F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		F9773A592601339A00D1B204 /* ActivityAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourAxisValueFormatter.swift; sourceTree = "<group>"; };
 		F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewController.swift; sourceTree = "<group>"; };
 		F9773A8E26014C7B00D1B204 /* AnalyticsDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewModel.swift; sourceTree = "<group>"; };
-		F983298B2602A7B300EB51F7 /* HealthAnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
+		F983298B2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F98329942602B25100EB51F7 /* ActivityCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCategory.swift; sourceTree = "<group>"; };
 		F9B82C8225FAB1670072BE74 /* AnalyticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewController.swift; sourceTree = "<group>"; };
 		F9B82C8925FAB1F40072BE74 /* StackedBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackedBarChartCell.swift; sourceTree = "<group>"; };
-		F9B82C8F25FAB1FE0072BE74 /* AnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
+		F9B82C8F25FAB1FE0072BE74 /* AnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F9B82C9325FAB2690072BE74 /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
 		F9C05FA725F7D608009E892A /* NotificationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationConstants.swift; sourceTree = "<group>"; };
 		F9C05FAD25F7D720009E892A /* RuleConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleConstants.swift; sourceTree = "<group>"; };
 		F9DD16BC2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseAnalyticsDataPointsView.swift; sourceTree = "<group>"; };
-		F9E5BD0A260298D200CA027D /* WeekdayValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayValueFormatter.swift; sourceTree = "<group>"; };
+		F9DD16C02613D04400B8374D /* StackedBarChartViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackedBarChartViewModel.swift; sourceTree = "<group>"; };
+		F9DD16C42613D57A00B8374D /* MonthAxisValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthAxisValueFormatter.swift; sourceTree = "<group>"; };
+		F9DD16FE2613E65F00B8374D /* AnalyticsLineChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsLineChartCell.swift; sourceTree = "<group>"; };
+		F9DD17022613E67300B8374D /* AnalyticsBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsBarChartCell.swift; sourceTree = "<group>"; };
+		F9E5BD0A260298D200CA027D /* WeekdayAxisValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayAxisValueFormatter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1578,8 +1586,9 @@
 				269105F3253E8E2E00A02C5F /* DateValueFormatter.swift */,
 				269105F4253E8E2E00A02C5F /* LargeValueFormatter.swift */,
 				106431D4258C10FE00D02658 /* ChartValueFormatter.swift */,
-				F9773A852601453500D1B204 /* HourValueFormatter.swift */,
-				F9E5BD0A260298D200CA027D /* WeekdayValueFormatter.swift */,
+				F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */,
+				F9E5BD0A260298D200CA027D /* WeekdayAxisValueFormatter.swift */,
+				F9DD16C42613D57A00B8374D /* MonthAxisValueFormatter.swift */,
 			);
 			path = Formatters;
 			sourceTree = "<group>";
@@ -2506,11 +2515,11 @@
 		F94EDC442606671F00B97FF6 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				F9B82C8F25FAB1FE0072BE74 /* AnalyticsBreakdownViewModel.swift */,
-				F9773A592601339A00D1B204 /* ActivityAnalyticsBreakdownViewModel.swift */,
-				F983298B2602A7B300EB51F7 /* HealthAnalyticsBreakdownViewModel.swift */,
-				F94EDC4C260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift */,
-				F916C9072610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift */,
+				F9B82C8F25FAB1FE0072BE74 /* AnalyticsDataSource.swift */,
+				F9773A592601339A00D1B204 /* ActivityAnalyticsDataSource.swift */,
+				F983298B2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift */,
+				F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */,
+				F916C9072610D0E10062F952 /* NetWorthAnalyticsDataSource.swift */,
 				F916C767260E793F0062F952 /* DateRangeFormatter.swift */,
 			);
 			path = Data;
@@ -2561,6 +2570,9 @@
 			isa = PBXGroup;
 			children = (
 				F9B82C8925FAB1F40072BE74 /* StackedBarChartCell.swift */,
+				F9DD16C02613D04400B8374D /* StackedBarChartViewModel.swift */,
+				F9DD16FE2613E65F00B8374D /* AnalyticsLineChartCell.swift */,
+				F9DD17022613E67300B8374D /* AnalyticsBarChartCell.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -2840,7 +2852,7 @@
 				4B4F45431F32246000A6FF96 /* GeneralTabBarController.swift in Sources */,
 				10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */,
 				4BAEE46E21272B380045AB10 /* Biometrics.swift in Sources */,
-				F94EDC4D260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift in Sources */,
+				F94EDC4D260667A000B97FF6 /* TransactionAnalyticsDataSource.swift in Sources */,
 				F916C8DA2610C3090062F952 /* Sequence+Utility.swift in Sources */,
 				4BAEE4F221272D890045AB10 /* SelectChatTableViewController.swift in Sources */,
 				10FBC8B724BFE58F00D0E6B5 /* Activitylist.swift in Sources */,
@@ -2852,8 +2864,8 @@
 				4BAEE5E1212735E50045AB10 /* ImagePickerTrayController.swift in Sources */,
 				10196F0224411B5600B6AFDF /* MapActivityViewController.swift in Sources */,
 				106618B324BB655E003C3F36 /* PlaceExpandedDetailCell.swift in Sources */,
-				F9B82C9025FAB1FE0072BE74 /* AnalyticsBreakdownViewModel.swift in Sources */,
-				F9E5BD0B260298D200CA027D /* WeekdayValueFormatter.swift in Sources */,
+				F9B82C9025FAB1FE0072BE74 /* AnalyticsDataSource.swift in Sources */,
+				F9E5BD0B260298D200CA027D /* WeekdayAxisValueFormatter.swift in Sources */,
 				F916C764260E66170062F952 /* DateRange.swift in Sources */,
 				109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */,
 				10DFC3EB255CC3EA00565DAD /* MealActions.swift in Sources */,
@@ -2908,6 +2920,7 @@
 				1080872B2585064300FB9BB0 /* SleepFetcher.swift in Sources */,
 				26836B552514916B00AFC2D7 /* HealthMetricCell.swift in Sources */,
 				4BAEE46B21272B380045AB10 /* SwitchTableViewController.swift in Sources */,
+				F9DD16C12613D04400B8374D /* StackedBarChartViewModel.swift in Sources */,
 				10DA3A222465C74500E6B491 /* IngredientDetailViewController.swift in Sources */,
 				102BE8C4243CB7EF00722E7B /* CustomUIPickers.swift in Sources */,
 				26B975E72363F9C6003BFBE3 /* InvitationsViewController.swift in Sources */,
@@ -2947,6 +2960,7 @@
 				4BAEE52221272D890045AB10 /* InformationMessageCell.swift in Sources */,
 				108087372585072300FB9BB0 /* MindfulnessActions.swift in Sources */,
 				4BAEE48121272C4F0045AB10 /* UserProfileController+keyboardHandlers.swift in Sources */,
+				F9DD16FF2613E65F00B8374D /* AnalyticsLineChartCell.swift in Sources */,
 				1082C89724F0A91500CF6491 /* HealthViewController.swift in Sources */,
 				10C7F92525A520ED004E9277 /* ActiveEnergyOperation.swift in Sources */,
 				4BAEE4E921272D890045AB10 /* MediaPickerControllerNew.swift in Sources */,
@@ -2972,7 +2986,7 @@
 				109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */,
 				4BAEE5BB212735E50045AB10 /* INSPhotosOverlayView.swift in Sources */,
 				26036778256DC76900FE9142 /* EKSyncCalendarEventsOp.swift in Sources */,
-				F983298C2602A7B300EB51F7 /* HealthAnalyticsBreakdownViewModel.swift in Sources */,
+				F983298C2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift in Sources */,
 				10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */,
 				4BAEE50C21272D890045AB10 /* UserInfoTableViewController+handlers.swift in Sources */,
 				4BAEE50921272D890045AB10 /* SelectedMediaCollectionCell+timerHandlers.swift in Sources */,
@@ -3063,7 +3077,7 @@
 				10B541E625479D4300CC9023 /* GroceryProductDetailViewController.swift in Sources */,
 				1034A08225C8507A006D3DB8 /* GoogleCalSetupAssistant.swift in Sources */,
 				4BA1E778215250BF00391BCB /* MessageSender.swift in Sources */,
-				F916C9082610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift in Sources */,
+				F916C9082610D0E10062F952 /* NetWorthAnalyticsDataSource.swift in Sources */,
 				269105F5253E8E2E00A02C5F /* IntAxisValueFormatter.swift in Sources */,
 				26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */,
 				4BAEE4F021272D890045AB10 /* AddGroupMembersController.swift in Sources */,
@@ -3184,6 +3198,7 @@
 				1034A01325BF8015006D3DB8 /* EKPlotActivityOp.swift in Sources */,
 				10F3033224EC700C00C04B8F /* Transaction.swift in Sources */,
 				10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */,
+				F9DD16C52613D57A00B8374D /* MonthAxisValueFormatter.swift in Sources */,
 				106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */,
 				4BAEE4ED21272D890045AB10 /* LeaveGroupAndChangeAdminController.swift in Sources */,
 				2603677E256DC86300FE9142 /* EKCalendarActivityOp.swift in Sources */,
@@ -3204,12 +3219,13 @@
 				108BDE7124B5108D00BE2CBA /* ShoppingTypeViewController.swift in Sources */,
 				F9B82C8325FAB1670072BE74 /* AnalyticsViewController.swift in Sources */,
 				10DF1F1025D2EDF4009FABA7 /* CalendarAccountView.swift in Sources */,
+				F9DD17032613E67300B8374D /* AnalyticsBarChartCell.swift in Sources */,
 				10FBC8BB24BFEF7E00D0E6B5 /* ActivitylistActions.swift in Sources */,
 				1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */,
 				10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */,
 				4BAEE47F21272C4F0045AB10 /* UserProfileContainerView.swift in Sources */,
 				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,
-				F9773A5A2601339A00D1B204 /* ActivityAnalyticsBreakdownViewModel.swift in Sources */,
+				F9773A5A2601339A00D1B204 /* ActivityAnalyticsDataSource.swift in Sources */,
 				4BAEE5DC212735E50045AB10 /* AnimationController.swift in Sources */,
 				4BAEE4FD21272D890045AB10 /* BaseVoiceMessageCell.swift in Sources */,
 				106774C825D96757002F78E7 /* FinancialHoldingFetcher.swift in Sources */,
@@ -3260,7 +3276,7 @@
 				4BAEE5BD212735E50045AB10 /* INSPhoto.swift in Sources */,
 				4BAEE49921272C5E0045AB10 /* ContactsController+SearchHandlers.swift in Sources */,
 				F9C05FA825F7D608009E892A /* NotificationConstants.swift in Sources */,
-				F9773A862601453500D1B204 /* HourValueFormatter.swift in Sources */,
+				F9773A862601453500D1B204 /* HourAxisValueFormatter.swift in Sources */,
 				103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */,
 				4BAEE5CF212735E50045AB10 /* CollectionViewLeftAlignFlowLayout.swift in Sources */,
 				4BA1E77F2152518700391BCB /* ChatLogController+MessageSenderDelegate.swift in Sources */,

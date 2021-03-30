@@ -1,5 +1,5 @@
 //
-//  WeekdayValueFormatter.swift
+//  WeekdayAxisValueFormatter.swift
 //  Plot
 //
 //  Created by Botond Magyarosi on 17.03.2021.
@@ -9,7 +9,7 @@
 import Foundation
 import Charts
 
-class WeekdayValueFormatter: IAxisValueFormatter {
+class WeekdayAxisValueFormatter: IAxisValueFormatter {
     
     let weekdaySymbols: [String] = {
         var weekDays = Calendar.current.veryShortWeekdaySymbols

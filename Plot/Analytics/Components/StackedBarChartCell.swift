@@ -19,7 +19,7 @@ class StackedBarChartCell: UITableViewCell {
 
     weak var delegate: StackedBarChartCellDelegate?
     
-    private var viewModel: AnalyticsBreakdownViewModel?
+    private(set) var viewModel: StackedBarChartViewModel?
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -55,34 +55,18 @@ class StackedBarChartCell: UITableViewCell {
         button.widthAnchor.constraint(equalToConstant: 44).isActive = true
         return button
     }()
-
-    private(set) lazy var chartView: BarChartView = {
-        let chart = BarChartView()
-        
-        chart.legend.enabled = false
-        chart.pinchZoomEnabled = false
-        chart.doubleTapToZoomEnabled = false
-        chart.setScaleEnabled(false)
-        chart.highlightPerTapEnabled = false
-        chart.highlightPerDragEnabled = false
-        chart.minOffset = 0
-
-        chart.leftAxis.enabled = false
-        chart.rightAxis.drawAxisLineEnabled = false
-        chart.rightAxis.labelTextColor = .secondaryLabel
-        
-        chart.xAxis.yOffset = 1
-
-        chart.xAxis.gridColor = .secondaryLabel
-        chart.xAxis.gridLineDashLengths = [2, 2]
-        chart.xAxis.labelPosition = .bottom
-        chart.xAxis.centerAxisLabelsEnabled = true
-        chart.xAxis.labelTextColor = .secondaryLabel
-        chart.xAxis.valueFormatter = WeekdayValueFormatter()
-
-        return chart
+    
+    lazy var prevNextStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [previousButton, nextButton])
+        stackView.isHidden = true
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
     }()
-
+    
+    lazy var chartContainer: UIView = {
+        UIView()
+    }()
+    
     private lazy var categoriesStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.spacing = 16
@@ -91,20 +75,10 @@ class StackedBarChartCell: UITableViewCell {
         return stackView
     }()
     
-    private(set) lazy var prevNextStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [previousButton, nextButton])
-        stackView.isHidden = true
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
     private var subscription: AnyCancellable?
     
-    func configure(with viewModel: AnalyticsBreakdownViewModel) {
+    func configure(with viewModel: StackedBarChartViewModel) {
         self.viewModel = viewModel
-        subscription = viewModel.onChange.sink { _  in
-            self.updateData()
-        }
         updateData()
     }
 
@@ -119,11 +93,11 @@ class StackedBarChartCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func initUI() {
+    func initUI() {
         selectionStyle = .none
         backgroundColor = .tertiarySystemBackground
 
-        let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel, chartView, categoriesStackView])
+        let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel, chartContainer, categoriesStackView])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.spacing = 8
@@ -137,32 +111,18 @@ class StackedBarChartCell: UITableViewCell {
             stack.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
             stack.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             stack.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
-            chartView.heightAnchor.constraint(equalToConstant: 150),
+            chartContainer.heightAnchor.constraint(equalToConstant: 150),
             prevNextStackView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
             prevNextStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor)
         ])
     }
     
-    private func updateData() {
+    func updateData() {
         categoriesStackView.arrangedSubviews.forEach {
             categoriesStackView.removeArrangedSubview($0)
             $0.removeFromSuperview()
         }
-        guard let viewModel = viewModel else {
-            chartView.data = nil
-            return
-        }
-        
-        if viewModel.fixToZeroOnVertical {
-            chartView.leftAxis.axisMinimum = 0
-            chartView.rightAxis.axisMinimum = 0
-        } else {
-            chartView.leftAxis.resetCustomAxisMin()
-            chartView.rightAxis.resetCustomAxisMin()
-        }
-        
-        chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
-        chartView.data = viewModel.chartData
+        guard let viewModel = viewModel else { return }
         
         titleLabel.text = viewModel.rangeDescription
         valueLabel.text = viewModel.rangeAverageValue

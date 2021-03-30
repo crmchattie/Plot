@@ -1,5 +1,5 @@
 //
-//  HourValueFormatter.swift
+//  HourAxisValueFormatter.swift
 //  Plot
 //
 //  Created by Botond Magyarosi on 16.03.2021.
@@ -9,7 +9,7 @@
 import Foundation
 import Charts
 
-public class HourValueFormatter: NSObject, IAxisValueFormatter {
+public class HourAxisValueFormatter: NSObject, IAxisValueFormatter {
     
     private let formatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()

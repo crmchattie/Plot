@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class AnalyticsViewController: UITableViewController {
     
@@ -36,8 +37,14 @@ class AnalyticsViewController: UITableViewController {
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .top
         
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil.circle.fill"),
+                                                            style: .plain,
+                                                            target: self,
+                                                            action: #selector(showConfig))
+        
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(StackedBarChartCell.self)
+        tableView.register(AnalyticsBarChartCell.self)
+        tableView.register(AnalyticsLineChartCell.self)
         
         view.addSubview(activityIndicator)
         activityIndicator.center = view.center
@@ -53,12 +60,14 @@ class AnalyticsViewController: UITableViewController {
     }
     
     private func openDetail(for indexPath: IndexPath) {
-        let chartViewModel = viewModel.sections[indexPath.section].items[indexPath.row / 2]
-        let viewModel = AnalyticsDetailViewModel(chartViewModel: chartViewModel,
-                                                 networkController: self.viewModel.networkController)
-        let controller = AnalyticsDetailViewController(viewModel: viewModel)
+        let controller = AnalyticsDetailViewController(viewModel: viewModel.makeDetailViewModel(for: indexPath))
         controller.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    @objc private func showConfig() {
+        let controller = UIHostingController(rootView: ChooseAnalyticsDataPointsView())
+        navigationController?.present(controller, animated: true)
     }
 }
 
@@ -74,9 +83,17 @@ extension AnalyticsViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row % 2 == 0 {
-            let cell = tableView.dequeueReusableCell(ofType: StackedBarChartCell.self, for: indexPath)
-            cell.configure(with: viewModel.sections[indexPath.section].items[indexPath.row / 2])
-            return cell
+            let cellViewModel = viewModel.sections[indexPath.section].items[indexPath.row / 2]
+            switch cellViewModel.chartType {
+            case .continous:
+                let cell = tableView.dequeueReusableCell(ofType: AnalyticsLineChartCell.self, for: indexPath)
+                cell.configure(with: cellViewModel)
+                return cell
+            case .values:
+                let cell = tableView.dequeueReusableCell(ofType: AnalyticsBarChartCell.self, for: indexPath)
+                cell.configure(with: cellViewModel)
+                return cell
+            }
         } else {
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
             cell.backgroundColor = .tertiarySystemBackground

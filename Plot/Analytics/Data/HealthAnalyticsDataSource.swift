@@ -1,5 +1,5 @@
 //
-//  HealthAnalyticsBreakdownViewModel.swift
+//  HealthAnalyticsDataSource.swift
 //  Plot
 //
 //  Created by Botond Magyarosi on 17.03.2021.
@@ -11,37 +11,40 @@ import Charts
 import Combine
 import HealthKit
 
+private func getTitle(range: DateRange) -> String {
+    DateRangeFormatter(currentWeek: "Daily average", currentMonth: "Monthly average", currentYear: "Yearly average")
+        .format(range: range)
+}
+
 // Active calories + consumed calories
-class HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
+class HealthAnalyticsDataSource: AnalyticsDataSource {
     
     private let networkController: NetworkController
     private let healthStore = HKHealthStore()
     
     let onChange = PassthroughSubject<Void, Never>()
-    let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
-    let fixToZeroOnVertical: Bool = true
     var range: DateRange
-    
+
     var title: String = "Health"
-    private(set) var rangeDescription: String = ""
-    private(set) var rangeAverageValue: String = "-"
+    let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     
-    var categories: [CategorySummaryViewModel] = []
-
-    private(set) var chartData: ChartData? = nil
-
     init(
         range: DateRange,
         networkController: NetworkController
     ) {
         self.networkController = networkController
         self.range = range
-        
-        updateTitle()
+     
+
+        chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
+                                                        rangeDescription: getTitle(range: range),
+                                                        horizontalAxisValueFormatter: range.axisValueFormatter))
     }
     
     func loadData(completion: (() -> Void)?) {
-        updateTitle()
+        var newChartViewModel = chartViewModel.value
+        newChartViewModel.rangeDescription = getTitle(range: range)
+        newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
         
         let predicate: NSPredicate = {
             let units: Set<Calendar.Component> = [.day, .month, .year]
@@ -90,7 +93,7 @@ class HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
                 average = 0
             }
             
-            self.rangeAverageValue = "\(Int(average)) kcal"
+            newChartViewModel.rangeAverageValue = "\(Int(average)) kcal"
     
             eneryResult.forEach { summary in
                 let indexInRange = summary.startDate.daysSince(range.startDate)
@@ -120,8 +123,9 @@ class HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
             chartData.barWidth = 0.5
             chartData.setDrawValues(false)
     
-            self.chartData = chartData
+            newChartViewModel.chartData = chartData
             
+            self.chartViewModel.send(newChartViewModel)
             self.onChange.send()
             completion?()
         }
@@ -130,12 +134,5 @@ class HealthAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
         print(networkController.healthService.nutrition)
         completion([])
-    }
-    
-    // MARK: - Private
-    
-    private func updateTitle() {
-        rangeDescription = DateRangeFormatter(currentWeek: "Daily average", currentMonth: "Monthly average", currentYear: "Yearly average")
-            .format(range: range)
     }
 }

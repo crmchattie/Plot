@@ -1,5 +1,5 @@
 //
-//  TransactionAnalyticsBreakdownViewModel.swift
+//  TransactionAnalyticsDataSource.swift
 //  Plot
 //
 //  Created by Botond Magyarosi on 20.03.2021.
@@ -10,24 +10,23 @@ import Foundation
 import Combine
 import Charts
 
-// Spending over time + net worth
-class TransactionAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
+private func getTitle(range: DateRange) -> String {
+    DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
+        .format(range: range)
+}
+
+class TransactionAnalyticsDataSource: AnalyticsDataSource {
     
     private let networkController: NetworkController
     private let financeService = FinanceDetailService()
     
     let onChange = PassthroughSubject<Void, Never>()
-    let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
-    let fixToZeroOnVertical: Bool = false
     var range: DateRange
     
     var title: String = "Transactions"
-    private(set) var rangeDescription: String = "-"
-    private(set) var rangeAverageValue: String = "_"
-
-    var categories: [CategorySummaryViewModel] = []
     
-    private(set) var chartData: ChartData? = nil
+    let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
+    
     private var transactions: [Transaction] = []
     
     init(
@@ -36,11 +35,18 @@ class TransactionAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     ) {
         self.range = range
         self.networkController = networkController
-        updateTitle()
+        
+        chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
+                                                        rangeDescription: getTitle(range: range),
+                                                        horizontalAxisValueFormatter: range.axisValueFormatter,
+                                                        fixToZeroOnVertical: false))
     }
     
     func loadData(completion: (() -> Void)?) {
-        updateTitle()
+        var newChartViewModel = chartViewModel.value
+        newChartViewModel.rangeDescription = getTitle(range: range)
+        newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
+        
         let daysInRange = range.daysInRange
         
         transactions = networkController.financeService.transactions
@@ -57,6 +63,7 @@ class TransactionAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
         var categoryValues: [[Double]] = []
         var categoryColors: [UIColor] = []
         var categories: [CategorySummaryViewModel] = []
+        
         transactions.grouped(by: \.top_level_category).forEach { (category, transactions) in
             var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
             var sum: Double = 0
@@ -82,35 +89,33 @@ class TransactionAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
             categoryValues.append(values)
         }
         
-        self.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
+        newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
+        newChartViewModel.rangeAverageValue = "out $\(Int(expenseValue)), in $\(Int(incomeValue))"
         
-        rangeAverageValue = "out $\(Int(expenseValue)), in $\(Int(incomeValue))"
         let dataEntries = (0...daysInRange).map { index in
             BarChartDataEntry(x: Double(index) + 0.5, yValues: categoryValues.map { $0[index] })
         }
         
-        let chartDataSet = BarChartDataSet(entries: dataEntries)
-        if !categoryColors.isEmpty {
-            chartDataSet.colors = categoryColors
+        if !transactions.isEmpty {
+            let chartDataSet = BarChartDataSet(entries: dataEntries)
+            if !categoryColors.isEmpty {
+                chartDataSet.colors = categoryColors
+            }
+            let chartData = BarChartData(dataSets: [chartDataSet])
+            chartData.barWidth = 0.5
+            chartData.setDrawValues(false)
+            newChartViewModel.chartData = chartData
+        } else {
+            newChartViewModel.chartData = nil
         }
-        let chartData = BarChartData(dataSets: [chartDataSet])
-        chartData.barWidth = 0.5
-        chartData.setDrawValues(false)
         
-        self.chartData = chartData
+        chartViewModel.send(newChartViewModel)
         onChange.send()
         completion?()
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
         completion(transactions.map { .transaction($0) })
-    }
-    
-    // MARK: - Private
-    
-    private func updateTitle() {
-        rangeDescription = DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
-            .format(range: range)
     }
 }
 

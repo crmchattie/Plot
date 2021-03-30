@@ -11,12 +11,25 @@ import SwiftUI
 struct ChooseAnalyticsDataPointsView: View {
     @SwiftUI.State private var trackActivities = true
     @SwiftUI.State private var trackEnergy = true
+    @SwiftUI.State private var trackCashFlow = true
+    @SwiftUI.State private var trackNetWorth = true
     
     var body: some View {
-        List {
-            Section(header: Text("Calendar")) {
-                Toggle("Activities", isOn: $trackActivities)
+        NavigationView {
+            List {
+                Section(header: Text("Calendar")) {
+                    Toggle("Activities", isOn: $trackActivities)
+                }
+                Section(header: Text("Health")) {
+                    Toggle("Energy", isOn: $trackEnergy)
+                }
+                Section(header: Text("Finance")) {
+                    Toggle("Cash flow", isOn: $trackCashFlow)
+                    Toggle("Net worth", isOn: $trackNetWorth)
+                }
             }
+            .listStyle(GroupedListStyle())
+            .navigationBarTitle(Text("Data points"))
         }
     }
 }

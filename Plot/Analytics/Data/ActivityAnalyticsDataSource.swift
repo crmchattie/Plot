@@ -1,5 +1,5 @@
 //
-//  ActivityAnalyticsBreakdownViewModel.swift
+//  ActivityAnalyticsDataSource.swift
 //  Plot
 //
 //  Created by Botond Magyarosi on 16.03.2021.
@@ -10,31 +10,30 @@ import Foundation
 import Charts
 import Combine
 
-private let dateFormatter: DateComponentsFormatter = {
-    let formatter = DateComponentsFormatter()
-    formatter.unitsStyle = .abbreviated
-    formatter.allowedUnits = [.hour, .minute]
-    return formatter
-}()
+private func getTitle(range: DateRange) -> String {
+    DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
+        .format(range: range)
+}
 
-class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
+class ActivityAnalyticsDataSource: AnalyticsDataSource {
     
     private let networkController: NetworkController
     private let summaryService = SummaryService()
     
     let onChange = PassthroughSubject<Void, Never>()
-    let verticalAxisValueFormatter: IAxisValueFormatter = HourValueFormatter()
-    let fixToZeroOnVertical: Bool = true
     var range: DateRange
     
+    let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
+    
     let title: String = "Activities"
-    private(set) var rangeDescription: String = ""
-    private(set) var rangeAverageValue: String = "-"
     
-    private(set) var categories: [CategorySummaryViewModel] = []
+    private lazy var dateFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .abbreviated
+        formatter.allowedUnits = [.hour, .minute]
+        return formatter
+    }()
     
-    private(set) var chartData: ChartData? = nil
-
     init(
         range: DateRange,
         networkController: NetworkController
@@ -42,31 +41,45 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
         self.networkController = networkController
         self.range = range
         
-        updateTitle()
+        chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
+                                                        rangeDescription: getTitle(range: range),
+                                                        horizontalAxisValueFormatter: range.axisValueFormatter,
+                                                        verticalAxisValueFormatter: HourAxisValueFormatter()))
     }
     
     func loadData(completion: (() -> Void)?) {
-        updateTitle()
+        var newChartViewModel = chartViewModel.value
+        newChartViewModel.rangeDescription = getTitle(range: range)
+        newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
+        
         summaryService.getSamples(for: range, activities: networkController.activityService.activities) { stats in
+            let activities = stats[.calendarSummary] ?? [:]
+            
+            guard !activities.isEmpty else {
+                newChartViewModel.chartData = nil
+                newChartViewModel.categories = []
+                newChartViewModel.rangeAverageValue = "0 activities"
+                self.chartViewModel.send(newChartViewModel)
+                self.onChange.send(())
+                completion?()
+                return
+            }
+            
             DispatchQueue.global(qos: .background).async {
-                let activities = stats[.calendarSummary] ?? [:]
-                
                 let colors = activities.count > 0 ? Array(ChartColors.palette().prefix(activities.count)) : []
                 var categories: [CategorySummaryViewModel] = []
                 var activityCount = 0
                 for (index, (category, stats)) in activities.enumerated() {
                     let total = stats.reduce(0, { $0 + $1.value * 60 })
-                    let totalString = dateFormatter.string(from: total) ?? "NaN"
+                    let totalString = self.dateFormatter.string(from: total) ?? "NaN"
                     categories.append(CategorySummaryViewModel(title: category,
                                                                color: colors[index],
                                                                value: total,
                                                                formattedValue: totalString))
                     activityCount += stats.count
                 }
-                self.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
-                
-                
-                self.rangeAverageValue = "\(activityCount) activities"
+                newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
+                newChartViewModel.rangeAverageValue = "\(activityCount) activities"
                 
                 let daysInRange = self.range.daysInRange
                 let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
@@ -78,18 +91,13 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
                 }
                 
                 DispatchQueue.main.async {
-                    if !activities.isEmpty {
-                        let chartDataSet = BarChartDataSet(entries: dataEntries)
-                        let chartData = BarChartData(dataSets: [chartDataSet])
-                        chartDataSet.colors = colors
-                        chartData.barWidth = 0.5
-                        chartData.setDrawValues(false)
-                        self.chartData = chartData
-                    } else {
-                        self.chartData = nil
-                    }
-                    self.onChange.send(())
-                    completion?()
+                    let chartDataSet = BarChartDataSet(entries: dataEntries)
+                    let chartData = BarChartData(dataSets: [chartDataSet])
+                    chartDataSet.colors = colors
+                    chartData.barWidth = 0.5
+                    chartData.setDrawValues(false)
+                    newChartViewModel.chartData = chartData
+                    self.chartViewModel.send(newChartViewModel)
                 }
             }
         }
@@ -105,12 +113,5 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
             }
             .map { AnalyticsBreakdownEntry.activity($0) }
         completion(entries)
-    }
-    
-    // MARK: - Title
-    
-    private func updateTitle() {
-        rangeDescription = DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
-            .format(range: range)
     }
 }

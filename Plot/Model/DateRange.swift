@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Charts
 
 enum DateRangeType: CaseIterable {
     case week, month, year
@@ -74,6 +75,14 @@ struct DateRange {
     
     var daysInRange: Int {
         endDate.daysSince(startDate)
+    }
+    
+    var axisValueFormatter: IAxisValueFormatter? {
+        switch type {
+        case .week: return WeekdayAxisValueFormatter()
+        case .month: return nil
+        case .year: return MonthAxisValueFormatter()
+        }
     }
 }
 

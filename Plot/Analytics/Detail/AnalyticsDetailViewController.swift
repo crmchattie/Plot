@@ -26,7 +26,8 @@ class AnalyticsDetailViewController: UIViewController {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(StackedBarChartCell.self)
+        tableView.register(AnalyticsBarChartCell.self)
+        tableView.register(AnalyticsLineChartCell.self)
         tableView.register(ActivityCell.self)
         tableView.register(FinanceTableViewCell.self)
         return tableView
@@ -109,12 +110,23 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
-            let cell = tableView.dequeueReusableCell(ofType: StackedBarChartCell.self, for: indexPath)
-            cell.prevNextStackView.isHidden = false
-            cell.chartView.highlightPerTapEnabled = true
-            cell.delegate = self
-            cell.configure(with: viewModel.chartViewModel)
-            return cell
+            let chartViewModel = viewModel.chartViewModel.value
+            switch chartViewModel.chartType {
+            case .continous:
+                let cell = tableView.dequeueReusableCell(ofType: AnalyticsLineChartCell.self, for: indexPath)
+                cell.prevNextStackView.isHidden = false
+                cell.chartView.highlightPerTapEnabled = true
+                cell.delegate = self
+                cell.configure(with: chartViewModel)
+                return cell
+            case .values:
+                let cell = tableView.dequeueReusableCell(ofType: AnalyticsBarChartCell.self, for: indexPath)
+                cell.prevNextStackView.isHidden = false
+                cell.chartView.highlightPerTapEnabled = true
+                cell.delegate = self
+                cell.configure(with: chartViewModel)
+                return cell
+            }
         } else {
             switch viewModel.entries.value[indexPath.row] {
             case .activity(let activity):
