@@ -19,16 +19,19 @@ struct CategorySummaryViewModel {
 
 protocol AnalyticsBreakdownViewModel: AnyObject {
     var onChange: PassthroughSubject<Void, Never> { get }
+    var fixToZeroOnVertical: Bool { get }
     var verticalAxisValueFormatter: IAxisValueFormatter { get }
     
-    var sectionTitle: String { get }
     var title: String { get }
-    var description: String { get }
+    
+    /// Range description shown on the chart.
+    var rangeDescription: String { get }
+    var rangeAverageValue: String { get }
     var categories: [CategorySummaryViewModel] { get }
     
     var range: DateRange { get set }
     func updateRange(_ newRange: DateRange)
-
+    
     var chartData: ChartData? { get }
     
     /// Load data asyncronously.

@@ -471,12 +471,14 @@
 		4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */; };
 		4ED658A2BE8AC368D77831D1 /* libPods-ShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */; };
 		A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53D0336E7A51EFB22060D82 /* libPods-Plot.a */; };
+		F902FFC92613B55900EF5881 /* ColorHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F902FFC82613B55900EF5881 /* ColorHash.swift */; };
 		F916C764260E66170062F952 /* DateRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C763260E66170062F952 /* DateRange.swift */; };
 		F916C768260E793F0062F952 /* DateRangeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C767260E793F0062F952 /* DateRangeFormatter.swift */; };
 		F916C8DA2610C3090062F952 /* Sequence+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C8D92610C3090062F952 /* Sequence+Utility.swift */; };
+		F916C9082610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C9072610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift */; };
 		F926576F2607440A00593FE1 /* Collection+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F926576E2607440A00593FE1 /* Collection+Utility.swift */; };
 		F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */; };
-		F94EDC4D260667A000B97FF6 /* FinancesAnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* FinancesAnalyticsBreakdownViewModel.swift */; };
+		F94EDC4D260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift */; };
 		F9773A5A2601339A00D1B204 /* ActivityAnalyticsBreakdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A592601339A00D1B204 /* ActivityAnalyticsBreakdownViewModel.swift */; };
 		F9773A862601453500D1B204 /* HourValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A852601453500D1B204 /* HourValueFormatter.swift */; };
 		F9773A8B26014AE700D1B204 /* AnalyticsDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */; };
@@ -489,6 +491,7 @@
 		F9B82C9425FAB2690072BE74 /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C9325FAB2690072BE74 /* ReusableView.swift */; };
 		F9C05FA825F7D608009E892A /* NotificationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C05FA725F7D608009E892A /* NotificationConstants.swift */; };
 		F9C05FAE25F7D720009E892A /* RuleConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C05FAD25F7D720009E892A /* RuleConstants.swift */; };
+		F9DD16BD2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD16BC2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift */; };
 		F9E5BD0B260298D200CA027D /* WeekdayValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E5BD0A260298D200CA027D /* WeekdayValueFormatter.swift */; };
 /* End PBXBuildFile section */
 
@@ -991,12 +994,14 @@
 		91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ShareExtension/Pods-ShareExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.debug.xcconfig"; sourceTree = "<group>"; };
 		E53D0336E7A51EFB22060D82 /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F902FFC82613B55900EF5881 /* ColorHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHash.swift; sourceTree = "<group>"; };
 		F916C763260E66170062F952 /* DateRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRange.swift; sourceTree = "<group>"; };
 		F916C767260E793F0062F952 /* DateRangeFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangeFormatter.swift; sourceTree = "<group>"; };
 		F916C8D92610C3090062F952 /* Sequence+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Utility.swift"; sourceTree = "<group>"; };
+		F916C9072610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetWorthAnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
 		F926576E2607440A00593FE1 /* Collection+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Utility.swift"; sourceTree = "<group>"; };
 		F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
-		F94EDC4C260667A000B97FF6 /* FinancesAnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesAnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
+		F94EDC4C260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
 		F9773A592601339A00D1B204 /* ActivityAnalyticsBreakdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAnalyticsBreakdownViewModel.swift; sourceTree = "<group>"; };
 		F9773A852601453500D1B204 /* HourValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourValueFormatter.swift; sourceTree = "<group>"; };
 		F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewController.swift; sourceTree = "<group>"; };
@@ -1009,6 +1014,7 @@
 		F9B82C9325FAB2690072BE74 /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
 		F9C05FA725F7D608009E892A /* NotificationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationConstants.swift; sourceTree = "<group>"; };
 		F9C05FAD25F7D720009E892A /* RuleConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleConstants.swift; sourceTree = "<group>"; };
+		F9DD16BC2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseAnalyticsDataPointsView.swift; sourceTree = "<group>"; };
 		F9E5BD0A260298D200CA027D /* WeekdayValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayValueFormatter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1433,6 +1439,7 @@
 				10E93D5624BE43B700F6EE18 /* UIView+Layout.swift */,
 				10E93D5424BE43B600F6EE18 /* VerticalStackView.swift */,
 				F9B82C9325FAB2690072BE74 /* ReusableView.swift */,
+				F902FFC82613B55900EF5881 /* ColorHash.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2502,7 +2509,8 @@
 				F9B82C8F25FAB1FE0072BE74 /* AnalyticsBreakdownViewModel.swift */,
 				F9773A592601339A00D1B204 /* ActivityAnalyticsBreakdownViewModel.swift */,
 				F983298B2602A7B300EB51F7 /* HealthAnalyticsBreakdownViewModel.swift */,
-				F94EDC4C260667A000B97FF6 /* FinancesAnalyticsBreakdownViewModel.swift */,
+				F94EDC4C260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift */,
+				F916C9072610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift */,
 				F916C767260E793F0062F952 /* DateRangeFormatter.swift */,
 			);
 			path = Data;
@@ -2540,6 +2548,7 @@
 		F9B82C8125FAB0B80072BE74 /* Analytics */ = {
 			isa = PBXGroup;
 			children = (
+				F9DD16BB2613C90400B8374D /* Choose to track */,
 				F94EDC452606673400B97FF6 /* Main */,
 				F9773A8926014AC300D1B204 /* Detail */,
 				F9B82C8825FAB1C10072BE74 /* Components */,
@@ -2563,6 +2572,14 @@
 				F9C05FAD25F7D720009E892A /* RuleConstants.swift */,
 			);
 			path = Constants;
+			sourceTree = "<group>";
+		};
+		F9DD16BB2613C90400B8374D /* Choose to track */ = {
+			isa = PBXGroup;
+			children = (
+				F9DD16BC2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift */,
+			);
+			path = "Choose to track";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2823,7 +2840,7 @@
 				4B4F45431F32246000A6FF96 /* GeneralTabBarController.swift in Sources */,
 				10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */,
 				4BAEE46E21272B380045AB10 /* Biometrics.swift in Sources */,
-				F94EDC4D260667A000B97FF6 /* FinancesAnalyticsBreakdownViewModel.swift in Sources */,
+				F94EDC4D260667A000B97FF6 /* TransactionAnalyticsBreakdownViewModel.swift in Sources */,
 				F916C8DA2610C3090062F952 /* Sequence+Utility.swift in Sources */,
 				4BAEE4F221272D890045AB10 /* SelectChatTableViewController.swift in Sources */,
 				10FBC8B724BFE58F00D0E6B5 /* Activitylist.swift in Sources */,
@@ -3016,6 +3033,7 @@
 				1034A07E25C84FF0006D3DB8 /* GoogleCalService.swift in Sources */,
 				2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */,
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
+				F902FFC92613B55900EF5881 /* ColorHash.swift in Sources */,
 				104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */,
 				10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */,
 				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
@@ -3045,6 +3063,7 @@
 				10B541E625479D4300CC9023 /* GroceryProductDetailViewController.swift in Sources */,
 				1034A08225C8507A006D3DB8 /* GoogleCalSetupAssistant.swift in Sources */,
 				4BA1E778215250BF00391BCB /* MessageSender.swift in Sources */,
+				F916C9082610D0E10062F952 /* NetWorthAnalyticsBreakdownViewModel.swift in Sources */,
 				269105F5253E8E2E00A02C5F /* IntAxisValueFormatter.swift in Sources */,
 				26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */,
 				4BAEE4F021272D890045AB10 /* AddGroupMembersController.swift in Sources */,
@@ -3082,6 +3101,7 @@
 				4BAEE51621272D890045AB10 /* GroupAdminControlsTableViewCell.swift in Sources */,
 				107BC99B258FB32B008E6DD5 /* ActiveDaysRow.swift in Sources */,
 				10196F0324411B5600B6AFDF /* ScheduleViewController.swift in Sources */,
+				F9DD16BD2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift in Sources */,
 				10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */,
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,
 				106D758B2442447C0039B534 /* ActivityActions.swift in Sources */,

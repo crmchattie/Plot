@@ -24,11 +24,12 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = HourValueFormatter()
+    let fixToZeroOnVertical: Bool = true
     var range: DateRange
     
-    let sectionTitle: String = "Activities"
-    private(set) var title: String = ""
-    private(set) var description: String = "-"
+    let title: String = "Activities"
+    private(set) var rangeDescription: String = ""
+    private(set) var rangeAverageValue: String = "-"
     
     private(set) var categories: [CategorySummaryViewModel] = []
     
@@ -65,7 +66,7 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
                 self.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
                 
                 
-                self.description = "\(activityCount) activities"
+                self.rangeAverageValue = "\(activityCount) activities"
                 
                 let daysInRange = self.range.daysInRange
                 let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
@@ -76,17 +77,17 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
                     return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues)
                 }
                 
-                let chartDataSet = BarChartDataSet(entries: dataEntries)
-                if !activities.isEmpty {
-                    chartDataSet.colors = colors
-                }
-                
-                let chartData = BarChartData(dataSets: [chartDataSet])
-                chartData.barWidth = 0.5
-                chartData.setDrawValues(false)
-                
                 DispatchQueue.main.async {
-                    self.chartData = chartData
+                    if !activities.isEmpty {
+                        let chartDataSet = BarChartDataSet(entries: dataEntries)
+                        let chartData = BarChartData(dataSets: [chartDataSet])
+                        chartDataSet.colors = colors
+                        chartData.barWidth = 0.5
+                        chartData.setDrawValues(false)
+                        self.chartData = chartData
+                    } else {
+                        self.chartData = nil
+                    }
                     self.onChange.send(())
                     completion?()
                 }
@@ -109,7 +110,7 @@ class ActivityAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     // MARK: - Title
     
     private func updateTitle() {
-        title = DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
+        rangeDescription = DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
             .format(range: range)
     }
 }

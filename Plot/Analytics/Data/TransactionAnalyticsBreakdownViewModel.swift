@@ -1,5 +1,5 @@
 //
-//  FinancesAnalyticsBreakdownViewModel.swift
+//  TransactionAnalyticsBreakdownViewModel.swift
 //  Plot
 //
 //  Created by Botond Magyarosi on 20.03.2021.
@@ -11,24 +11,25 @@ import Combine
 import Charts
 
 // Spending over time + net worth
-class FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
+class TransactionAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     
     private let networkController: NetworkController
     private let financeService = FinanceDetailService()
     
     let onChange = PassthroughSubject<Void, Never>()
     let verticalAxisValueFormatter: IAxisValueFormatter = IntAxisValueFormatter()
+    let fixToZeroOnVertical: Bool = false
     var range: DateRange
     
-    var sectionTitle: String = "Finance"
-    private(set) var title: String = "-"
-    private(set) var description: String = "_"
+    var title: String = "Transactions"
+    private(set) var rangeDescription: String = "-"
+    private(set) var rangeAverageValue: String = "_"
 
     var categories: [CategorySummaryViewModel] = []
     
     private(set) var chartData: ChartData? = nil
     private var transactions: [Transaction] = []
-
+    
     init(
         range: DateRange,
         networkController: NetworkController
@@ -41,8 +42,6 @@ class FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     func loadData(completion: (() -> Void)?) {
         updateTitle()
         let daysInRange = range.daysInRange
-        
-        let accounts = networkController.financeService.accounts
         
         transactions = networkController.financeService.transactions
             .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
@@ -85,7 +84,7 @@ class FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
         
         self.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
         
-        description = "out $\(Int(expenseValue)), in $\(Int(incomeValue))"
+        rangeAverageValue = "out $\(Int(expenseValue)), in $\(Int(incomeValue))"
         let dataEntries = (0...daysInRange).map { index in
             BarChartDataEntry(x: Double(index) + 0.5, yValues: categoryValues.map { $0[index] })
         }
@@ -110,7 +109,7 @@ class FinancesAnalyticsBreakdownViewModel: AnalyticsBreakdownViewModel {
     // MARK: - Private
     
     private func updateTitle() {
-        title = DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
+        rangeDescription = DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
             .format(range: range)
     }
 }

@@ -15,6 +15,8 @@ class AnalyticsDetailViewModel {
     private let networkController: NetworkController
     private(set) var chartViewModel: AnalyticsBreakdownViewModel
     
+    var title: String { chartViewModel.title }
+    
     var range: DateRange = .init(type: .week) {
         didSet { updateRange() }
     }

@@ -56,7 +56,7 @@ class StackedBarChartCell: UITableViewCell {
         return button
     }()
 
-    private lazy var chartView: BarChartView = {
+    private(set) lazy var chartView: BarChartView = {
         let chart = BarChartView()
         
         chart.legend.enabled = false
@@ -68,8 +68,6 @@ class StackedBarChartCell: UITableViewCell {
         chart.minOffset = 0
 
         chart.leftAxis.enabled = false
-//        chart.leftAxis.axisMinimum = 0
-//        chart.rightAxis.axisMinimum = 0
         chart.rightAxis.drawAxisLineEnabled = false
         chart.rightAxis.labelTextColor = .secondaryLabel
         
@@ -155,11 +153,19 @@ class StackedBarChartCell: UITableViewCell {
             return
         }
         
+        if viewModel.fixToZeroOnVertical {
+            chartView.leftAxis.axisMinimum = 0
+            chartView.rightAxis.axisMinimum = 0
+        } else {
+            chartView.leftAxis.resetCustomAxisMin()
+            chartView.rightAxis.resetCustomAxisMin()
+        }
+        
         chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         chartView.data = viewModel.chartData
         
-        titleLabel.text = viewModel.title
-        valueLabel.text = viewModel.description
+        titleLabel.text = viewModel.rangeDescription
+        valueLabel.text = viewModel.rangeAverageValue
 
         viewModel.categories.forEach { category in
             let categoryView = CategoryTimeView()

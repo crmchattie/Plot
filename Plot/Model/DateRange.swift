@@ -101,8 +101,7 @@ private extension Date {
     
     var wStart: Date {
         let calendar = Calendar.current
-        let sunday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
-        return calendar.date(byAdding: .day, value: 1, to: sunday)!
+        return calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
     }
     
     var wEnd: Date {

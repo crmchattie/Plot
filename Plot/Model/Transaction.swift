@@ -20,11 +20,11 @@ func topLevelCategoryColor(_ value: String) -> UIColor {
     if value == "Uncategorized" {
         return UIColor.lightGray
     }
-    let hash = abs(value.hash) % (256*256*256)
-    let red = hash >> 16
-    let green = (hash & 0x00FF00) >> 8
-    let blue = (hash & 0x0000FF)
-    return UIColor(red: CGFloat(red)/255.0, green: CGFloat(green)/255.0, blue: CGFloat(blue)/255.0, alpha: 1.0)
+    
+    let saturation = CGFloat(0.70)
+    let lightness = CGFloat(0.70)
+
+    return ColorHash(value, [saturation], [lightness]).color
 }
 var financialTransactionsGroups = ["Income", "Bills", "Discretionary", "Kids", "Living", "Transfer", "Work", "Uncategorized"]
 

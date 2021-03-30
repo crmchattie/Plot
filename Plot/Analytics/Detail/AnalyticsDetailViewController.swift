@@ -47,7 +47,7 @@ class AnalyticsDetailViewController: UIViewController {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
         
-        navigationItem.title = "Activity breakdown"
+        navigationItem.title = viewModel.title
         
         let rangeContainer = UIView()
         rangeContainer.translatesAutoresizingMaskIntoConstraints = false
@@ -111,6 +111,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(ofType: StackedBarChartCell.self, for: indexPath)
             cell.prevNextStackView.isHidden = false
+            cell.chartView.highlightPerTapEnabled = true
             cell.delegate = self
             cell.configure(with: viewModel.chartViewModel)
             return cell

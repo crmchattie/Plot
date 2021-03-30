@@ -15,6 +15,7 @@ class AnalyticsViewModel {
     
     struct Section {
         let title: String
+        let items: [AnalyticsBreakdownViewModel]
     }
     
     private let activityService = SummaryService()
@@ -23,7 +24,7 @@ class AnalyticsViewModel {
     
     let networkController: NetworkController
     
-    private(set) var items: [AnalyticsBreakdownViewModel] = []
+    private(set) var sections: [Section] = []
     private let range = DateRange(type: .week)
     
     init(networkController: NetworkController) {
@@ -33,6 +34,7 @@ class AnalyticsViewModel {
     func loadData(completion: @escaping () -> Void) {
         let group = DispatchGroup()
 
+        print(range.startDate, range.endDate)
         let activitiesViewModel = ActivityAnalyticsBreakdownViewModel(range: range, networkController: networkController)
         group.enter()
         activitiesViewModel.loadData {
@@ -46,13 +48,23 @@ class AnalyticsViewModel {
         }
         
         group.enter()
-        let financeViewModel = FinancesAnalyticsBreakdownViewModel(range: range, networkController: networkController)
+        let financeViewModel = TransactionAnalyticsBreakdownViewModel(range: range, networkController: networkController)
         financeViewModel.loadData {
             group.leave()
         }
         
+        group.enter()
+        let netWorthViewModel = NetWorthAnalyticsBreakdownViewModel(range: range, networkController: networkController)
+        netWorthViewModel.loadData {
+            group.leave()
+        }
+        
         group.notify(queue: .main) {
-            self.items = [activitiesViewModel, healthViewModel, financeViewModel]
+            self.sections = [
+                Section(title: "Activities", items: [activitiesViewModel]),
+                Section(title: "Health", items: [healthViewModel]),
+                Section(title: "Finance", items: [financeViewModel, netWorthViewModel])
+            ]
             completion()
         }
     }

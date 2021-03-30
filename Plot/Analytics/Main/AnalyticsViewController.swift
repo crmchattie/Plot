@@ -52,9 +52,8 @@ class AnalyticsViewController: UITableViewController {
         }
     }
     
-    private func openDetail(forSection section: Int) {
-        guard viewModel.items.count > section else { return }
-        let chartViewModel = viewModel.items[section]
+    private func openDetail(for indexPath: IndexPath) {
+        let chartViewModel = viewModel.sections[indexPath.section].items[indexPath.row / 2]
         let viewModel = AnalyticsDetailViewModel(chartViewModel: chartViewModel,
                                                  networkController: self.viewModel.networkController)
         let controller = AnalyticsDetailViewController(viewModel: viewModel)
@@ -67,20 +66,21 @@ class AnalyticsViewController: UITableViewController {
 
 extension AnalyticsViewController {
     
-    override func numberOfSections(in tableView: UITableView) -> Int { viewModel.items.count }
+    override func numberOfSections(in tableView: UITableView) -> Int { viewModel.sections.count }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { 2 }
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        viewModel.sections[section].items.count * 2
+    }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.row == 0 {
+        if indexPath.row % 2 == 0 {
             let cell = tableView.dequeueReusableCell(ofType: StackedBarChartCell.self, for: indexPath)
-            cell.configure(with: viewModel.items[indexPath.section])
+            cell.configure(with: viewModel.sections[indexPath.section].items[indexPath.row / 2])
             return cell
         } else {
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-            cell.contentView.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
             cell.backgroundColor = .tertiarySystemBackground
-            cell.textLabel?.text = "See all activities"
+            cell.textLabel?.text = "See detail"
             cell.accessoryType = .disclosureIndicator
             return cell
         }
@@ -91,10 +91,10 @@ extension AnalyticsViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        viewModel.items[section].sectionTitle.capitalized
+        viewModel.sections[section].title.capitalized
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        openDetail(forSection: indexPath.section)
+        openDetail(for: indexPath)
     }
 }
