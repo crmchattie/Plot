@@ -35,6 +35,15 @@ class AnalyticsLineChartCell: StackedBarChartCell {
         chart.xAxis.centerAxisLabelsEnabled = true
         chart.xAxis.labelTextColor = .secondaryLabel
         chart.xAxis.valueFormatter = WeekdayAxisValueFormatter()
+        
+        let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
+                                  font: .systemFont(ofSize: 12),
+                                  textColor: .white,
+                                  insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
+                                  xAxisValueFormatter: DayAxisValueFormatter(chart: chart), units: "")
+        marker.chartView = chart
+        marker.minimumSize = CGSize(width: 80, height: 40)
+        chart.marker = marker
 
         return chart
     }()

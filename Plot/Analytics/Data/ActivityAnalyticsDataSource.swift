@@ -20,7 +20,6 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
     private let networkController: NetworkController
     private let summaryService = SummaryService()
     
-    let onChange = PassthroughSubject<Void, Never>()
     var range: DateRange
     
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
@@ -60,7 +59,6 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 newChartViewModel.categories = []
                 newChartViewModel.rangeAverageValue = "0 activities"
                 self.chartViewModel.send(newChartViewModel)
-                self.onChange.send(())
                 completion?()
                 return
             }
@@ -98,7 +96,6 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                     chartData.setDrawValues(false)
                     newChartViewModel.chartData = chartData
                     self.chartViewModel.send(newChartViewModel)
-                    self.onChange.send()
                     completion?()
                 }
             }

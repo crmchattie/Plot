@@ -20,7 +20,6 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
     private let networkController: NetworkController
     private let financeService = FinanceDetailService()
     
-    let onChange = PassthroughSubject<Void, Never>()
     var range: DateRange
     
     var title: String = "Transactions"
@@ -110,7 +109,6 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         }
         
         chartViewModel.send(newChartViewModel)
-        onChange.send()
         completion?()
     }
     

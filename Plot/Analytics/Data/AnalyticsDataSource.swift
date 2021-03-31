@@ -10,9 +10,7 @@ import Foundation
 import Charts
 import Combine
 
-protocol AnalyticsDataSource: AnyObject {
-    var onChange: PassthroughSubject<Void, Never> { get }
-    
+protocol AnalyticsDataSource: AnyObject {    
     var title: String { get }
     
     var range: DateRange { get set }

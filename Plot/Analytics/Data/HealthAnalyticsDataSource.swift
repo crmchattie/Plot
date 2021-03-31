@@ -22,7 +22,6 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
     private let networkController: NetworkController
     private let healthStore = HKHealthStore()
     
-    let onChange = PassthroughSubject<Void, Never>()
     var range: DateRange
 
     var title: String = "Health"
@@ -126,7 +125,6 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
             newChartViewModel.chartData = chartData
             
             self.chartViewModel.send(newChartViewModel)
-            self.onChange.send()
             completion?()
         }
     }

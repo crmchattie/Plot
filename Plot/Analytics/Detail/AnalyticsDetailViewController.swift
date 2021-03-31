@@ -89,6 +89,13 @@ class AnalyticsDetailViewController: UIViewController {
                 self.tableView.reloadData()
             }
             .store(in: &cancellables)
+        
+        viewModel.chartViewModel
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] _ in
+                self.tableView.reloadData()
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Actions
@@ -116,6 +123,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsLineChartCell.self, for: indexPath)
                 cell.prevNextStackView.isHidden = false
                 cell.chartView.highlightPerTapEnabled = true
+                cell.chartView.highlightPerDragEnabled = true
                 cell.delegate = self
                 cell.configure(with: chartViewModel)
                 return cell
@@ -123,6 +131,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsBarChartCell.self, for: indexPath)
                 cell.prevNextStackView.isHidden = false
                 cell.chartView.highlightPerTapEnabled = true
+                cell.chartView.highlightPerDragEnabled = true
                 cell.delegate = self
                 cell.configure(with: chartViewModel)
                 return cell

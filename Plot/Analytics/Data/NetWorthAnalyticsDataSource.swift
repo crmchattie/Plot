@@ -20,7 +20,6 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
     private let networkController: NetworkController
     private let financeService = FinanceDetailService()
     
-    let onChange = PassthroughSubject<Void, Never>()
     var range: DateRange
     
     var title: String = "Net worth"
@@ -92,7 +91,6 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
             }
             
             let chartDataSet = LineChartDataSet(entries: dataEntries)
-//            chartDataSet.colors = [.green]
             chartDataSet.fillColor = .green
             chartDataSet.drawFilledEnabled = true
             chartDataSet.drawCirclesEnabled = false
@@ -102,7 +100,6 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
             newChartViewModel.chartData = chartData
             
             self.chartViewModel.send(newChartViewModel)
-            self.onChange.send()
             completion?()
         }
     }
