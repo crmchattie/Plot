@@ -98,6 +98,8 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                     chartData.setDrawValues(false)
                     newChartViewModel.chartData = chartData
                     self.chartViewModel.send(newChartViewModel)
+                    self.onChange.send()
+                    completion?()
                 }
             }
         }

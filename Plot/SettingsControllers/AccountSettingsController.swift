@@ -87,12 +87,11 @@ class AccountSettingsController: UITableViewController {
     }
     
     fileprivate func configureTableView() {
-//        tableView.separatorStyle = .none
         tableView.sectionHeaderHeight = 0
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.tableHeaderView = userProfileContainerView
         tableView.register(AccountSettingsTableViewCell.self, forCellReuseIdentifier: accountSettingsCellId)
-        tableView.backgroundColor = .clear
+        tableView.backgroundColor = .secondarySystemBackground
     }
     
     fileprivate func configureContainerView() {

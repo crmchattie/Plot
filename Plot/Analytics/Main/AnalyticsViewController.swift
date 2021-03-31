@@ -37,11 +37,6 @@ class AnalyticsViewController: UITableViewController {
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .top
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil.circle.fill"),
-                                                            style: .plain,
-                                                            target: self,
-                                                            action: #selector(showConfig))
-        
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(AnalyticsBarChartCell.self)
         tableView.register(AnalyticsLineChartCell.self)
@@ -63,11 +58,6 @@ class AnalyticsViewController: UITableViewController {
         let controller = AnalyticsDetailViewController(viewModel: viewModel.makeDetailViewModel(for: indexPath))
         controller.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(controller, animated: true)
-    }
-    
-    @objc private func showConfig() {
-        let controller = UIHostingController(rootView: ChooseAnalyticsDataPointsView())
-        navigationController?.present(controller, animated: true)
     }
 }
 

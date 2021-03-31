@@ -491,7 +491,6 @@
 		F9B82C9425FAB2690072BE74 /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B82C9325FAB2690072BE74 /* ReusableView.swift */; };
 		F9C05FA825F7D608009E892A /* NotificationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C05FA725F7D608009E892A /* NotificationConstants.swift */; };
 		F9C05FAE25F7D720009E892A /* RuleConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C05FAD25F7D720009E892A /* RuleConstants.swift */; };
-		F9DD16BD2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD16BC2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift */; };
 		F9DD16C12613D04400B8374D /* StackedBarChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD16C02613D04400B8374D /* StackedBarChartViewModel.swift */; };
 		F9DD16C52613D57A00B8374D /* MonthAxisValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD16C42613D57A00B8374D /* MonthAxisValueFormatter.swift */; };
 		F9DD16FF2613E65F00B8374D /* AnalyticsLineChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DD16FE2613E65F00B8374D /* AnalyticsLineChartCell.swift */; };
@@ -1018,7 +1017,6 @@
 		F9B82C9325FAB2690072BE74 /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
 		F9C05FA725F7D608009E892A /* NotificationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationConstants.swift; sourceTree = "<group>"; };
 		F9C05FAD25F7D720009E892A /* RuleConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleConstants.swift; sourceTree = "<group>"; };
-		F9DD16BC2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseAnalyticsDataPointsView.swift; sourceTree = "<group>"; };
 		F9DD16C02613D04400B8374D /* StackedBarChartViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackedBarChartViewModel.swift; sourceTree = "<group>"; };
 		F9DD16C42613D57A00B8374D /* MonthAxisValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthAxisValueFormatter.swift; sourceTree = "<group>"; };
 		F9DD16FE2613E65F00B8374D /* AnalyticsLineChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsLineChartCell.swift; sourceTree = "<group>"; };
@@ -2557,7 +2555,6 @@
 		F9B82C8125FAB0B80072BE74 /* Analytics */ = {
 			isa = PBXGroup;
 			children = (
-				F9DD16BB2613C90400B8374D /* Choose to track */,
 				F94EDC452606673400B97FF6 /* Main */,
 				F9773A8926014AC300D1B204 /* Detail */,
 				F9B82C8825FAB1C10072BE74 /* Components */,
@@ -2584,14 +2581,6 @@
 				F9C05FAD25F7D720009E892A /* RuleConstants.swift */,
 			);
 			path = Constants;
-			sourceTree = "<group>";
-		};
-		F9DD16BB2613C90400B8374D /* Choose to track */ = {
-			isa = PBXGroup;
-			children = (
-				F9DD16BC2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift */,
-			);
-			path = "Choose to track";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3115,7 +3104,6 @@
 				4BAEE51621272D890045AB10 /* GroupAdminControlsTableViewCell.swift in Sources */,
 				107BC99B258FB32B008E6DD5 /* ActiveDaysRow.swift in Sources */,
 				10196F0324411B5600B6AFDF /* ScheduleViewController.swift in Sources */,
-				F9DD16BD2613C93B00B8374D /* ChooseAnalyticsDataPointsView.swift in Sources */,
 				10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */,
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,
 				106D758B2442447C0039B534 /* ActivityActions.swift in Sources */,
