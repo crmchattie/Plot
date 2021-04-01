@@ -37,7 +37,9 @@ class AccountSettingsController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .tertiarySystemBackground
+        navigationItem.title = "Settings"
+        
+//        view.backgroundColor = .tertiarySystemBackground
         
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -88,10 +90,11 @@ class AccountSettingsController: UITableViewController {
     
     fileprivate func configureTableView() {
         tableView.sectionHeaderHeight = 0
+        tableView.separatorStyle = .none
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.tableHeaderView = userProfileContainerView
         tableView.register(AccountSettingsTableViewCell.self, forCellReuseIdentifier: accountSettingsCellId)
-        tableView.backgroundColor = .secondarySystemBackground
+//        tableView.backgroundColor = .secondarySystemBackground
     }
     
     fileprivate func configureContainerView() {

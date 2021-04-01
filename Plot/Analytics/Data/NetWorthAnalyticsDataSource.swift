@@ -56,16 +56,12 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
         
-        let daysInRange = range.daysInRange
-        
         let accounts = networkController.financeService.accounts
         let transactions = networkController.financeService.transactions
         
         let detail = AccountDetails(name: "Net Worth", balance: 0, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth, currencyCode: "USD")
-        print("get")
-        financeService.getSamples(for: range, accountDetails: detail, transactionDetails: nil, accounts: accounts, transactions: transactions) { [range] (stats, _, _, _) in
+        financeService.getSamples(for: range, segment: range.timeSegment, accountDetails: detail, transactionDetails: nil, accounts: accounts, transactions: transactions) { [range] (stats, _, _, _) in
             let stats = stats ?? []
-            print("receive")
             
             self.transactions = self.networkController.financeService.transactions
                 .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
@@ -93,7 +89,8 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
             }
             
             let chartDataSet = LineChartDataSet(entries: dataEntries)
-            chartDataSet.fillColor = .green
+            chartDataSet.fillColor = .systemBlue
+            chartDataSet.fillAlpha = 0.5
             chartDataSet.drawFilledEnabled = true
             chartDataSet.drawCirclesEnabled = false
             let chartData = LineChartData(dataSets: [chartDataSet])

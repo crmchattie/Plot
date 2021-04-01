@@ -17,7 +17,7 @@ protocol SummaryServiceInterface {
         transactions: [Transaction]?,
         completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Void)
     
-    func getSamples(for range: DateRange, activities: [Activity], completion: @escaping ([SectionType: [String: [Statistic]]]) -> Void)
+    func getSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([SectionType: [String: [Statistic]]]) -> Void)
 }
 
 class SummaryService: SummaryServiceInterface {
@@ -26,8 +26,8 @@ class SummaryService: SummaryServiceInterface {
         getStatisticalSamples(segmentType: segmentType, range: nil, activities: activities, transactions: transactions, completion: completion)
     }
     
-    func getSamples(for range: DateRange, activities: [Activity], completion: @escaping ([SectionType : [String : [Statistic]]]) -> Void) {
-        getStatisticalSamples(segmentType: .day, range: range, activities: activities, transactions: nil) { (_, _, _, stats, _) in
+    func getSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([SectionType : [String : [Statistic]]]) -> Void) {
+        getStatisticalSamples(segmentType: segment, range: range, activities: activities, transactions: nil) { (_, _, _, stats, _) in
             completion(stats ?? [:])
         }
     }
@@ -83,7 +83,7 @@ class SummaryService: SummaryServiceInterface {
                     }
                 }
                 
-                let totalValue: Double = endDate.timeIntervalSince(startDate)                
+                let totalValue: Double = endDate.timeIntervalSince(startDate)
                 for (key, value) in categoryDict {
                     let entry = Entry(label: key.capitalized, value: value / totalValue, icon: nil)
                     entries.append(entry)
@@ -145,6 +145,7 @@ class SummaryService: SummaryServiceInterface {
                 dispatchGroup.leave()
             }
         }
+        
         dispatchGroup.notify(queue: .main) {
             completion(activitySummary, pieChartEntries, barChartEntries, barChartStats, nil)
         }

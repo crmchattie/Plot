@@ -23,7 +23,7 @@ class AnalyticsDetailViewController: UIViewController {
     }()
     
     private let tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .grouped)
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(AnalyticsBarChartCell.self)
@@ -63,7 +63,6 @@ class AnalyticsDetailViewController: UIViewController {
         
         view.addSubview(tableView)
         tableView.delegate = self
-        tableView.separatorStyle = .none
         tableView.dataSource = self
         tableView.tableHeaderView = rangeContainer
         

@@ -598,6 +598,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
         }
     }
     categoryDict["No Activities"] = totalValue
+    
     completion(categoryDict, activitiesDict)
 }
 
@@ -617,7 +618,7 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
                     continue
                 }
                 activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
-                    if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
+                    if activityDict[activityCategory] != nil {
                         var acStats = statistics[activityCategory]
                         var acActivityList = activityDict[activityCategory]
                         acStats!.append(contentsOf: stats)
@@ -723,14 +724,15 @@ func activityListStats(activities: [Activity], activityCategory: String, start: 
     var statistics = [Statistic]()
     var activityList = [Activity]()
     for activity in activities {
-        if let startDateTime = activity.startDateTime {
-            let activityDate = Date(timeIntervalSince1970: startDateTime as! TimeInterval)
-            if activityDate < start || end < activityDate {
-                continue
-            }
-            if activityDate < date || nextDate < activityDate {
-                continue
-            }
+        guard let startDateTime = activity.startDateTime else {
+            continue
+        }
+        let activityDate = Date(timeIntervalSince1970: startDateTime.doubleValue)
+        if activityDate < start || end <= activityDate {
+            continue
+        }
+        if activityDate < date || nextDate <= activityDate {
+            continue
         }
         if let type = activity.category, type == activityCategory {
             let duration = (Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)) / 60

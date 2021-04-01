@@ -37,7 +37,7 @@ class AnalyticsViewController: UITableViewController {
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .top
         
-        tableView.rowHeight = UITableView.automaticDimension
+//        tableView.rowHeight = UITableView.automaticDimension
         tableView.register(AnalyticsBarChartCell.self)
         tableView.register(AnalyticsLineChartCell.self)
         

@@ -84,6 +84,14 @@ struct DateRange {
         case .year: return MonthAxisValueFormatter()
         }
     }
+    
+    var timeSegment: TimeSegmentType {
+        switch type {
+        case .week: return .week
+        case .month: return .month
+        case .year: return .year
+        }
+    }
 }
 
 private extension Date {

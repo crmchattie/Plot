@@ -29,7 +29,6 @@ class GeneralTabBarController: UITabBarController {
     fileprivate var isNewUser = false
     
     let homeController = MasterActivityContainerController()
-    let discoverController = DiscoverViewController()
     let settingsController = AccountSettingsController()
     
     lazy var analyticsController: AnalyticsViewController = {
@@ -109,14 +108,13 @@ class GeneralTabBarController: UITabBarController {
         
         let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
         let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
-                   
+        
         //if new user, do nothing; if existing user with old version of app, load other variables
         //if existing user with current version, load everything
         if !isNewUser {
             if let previousVersion = previousVersion, let currentAppVersion = currentAppVersion, currentAppVersion.compare(previousVersion, options: .numeric) != .orderedDescending {
                 networkController.setupKeyVariables {
                     self.homeController.networkController = self.networkController
-                    self.discoverController.networkController = self.networkController
                     self.settingsController.networkController = self.networkController
                     self.networkController.setupOtherVariables()
                 }
@@ -129,57 +127,28 @@ class GeneralTabBarController: UITabBarController {
         }
     }
     
+    private func wrapInNavigationController(
+        _ viewController: UIViewController,
+        icon: UIImage,
+        selectedIcon: UIImage? = nil
+    ) -> UINavigationController {
+        let controller = UINavigationController(rootViewController: viewController)
+        controller.navigationBar.prefersLargeTitles = true
+        controller.navigationItem.largeTitleDisplayMode = .always
+        let tabBarItem = UITabBarItem(title: nil, image: icon, selectedImage: selectedIcon)
+        tabBarItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
+        controller.tabBarItem = tabBarItem
+        return controller
+    }
+    
     fileprivate func setTabs() {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "EEEE, MMM d"
-        let dateString = dateFormatter.string(from: Date())
-        
-        homeController.title = dateString
-        discoverController.title = "Discover"
-        settingsController.title = "Settings"
-                
-        let homeNavigationController = UINavigationController(rootViewController: homeController)
-        let discoverNavigationController = UINavigationController(rootViewController: discoverController)
-        let settingsNavigationController = UINavigationController(rootViewController: settingsController)
-        
-        homeNavigationController.navigationBar.prefersLargeTitles = true
-        homeNavigationController.navigationItem.largeTitleDisplayMode = .always
-        settingsNavigationController.navigationBar.prefersLargeTitles = true
-        settingsNavigationController.navigationItem.largeTitleDisplayMode = .always
-        discoverNavigationController.navigationBar.prefersLargeTitles = true
-        discoverNavigationController.navigationItem.largeTitleDisplayMode = .always
-                
-        let homeImage = UIImage(named: "home")
-        let discoverImage = UIImage(named: "discover")
-        let settingsImage = UIImage(named: "settings")
-        
-        let homeTabItem = UITabBarItem(title: nil, image: homeImage, selectedImage: nil)
-        homeTabItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
-        
-        let discoverTabItem = UITabBarItem(title: nil, image: discoverImage, selectedImage: nil)
-        discoverTabItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
-        
-        let settingsTabItem = UITabBarItem(title: nil, image: settingsImage, selectedImage: nil)
-        settingsTabItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
-        
-        let analyticsTabitem = UITabBarItem(title: nil,
-                                            image: UIImage(systemName: "chart.pie"),
-                                            selectedImage: UIImage(systemName: "chart.pie.fill"))
-        analyticsTabitem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
-
-        
-        homeController.tabBarItem = homeTabItem
-        discoverController.tabBarItem = discoverTabItem
-        settingsController.tabBarItem = settingsTabItem
-        
-        let analyticsNavigationController = UINavigationController(rootViewController: analyticsController)
-        analyticsNavigationController.navigationBar.prefersLargeTitles = true
-        analyticsNavigationController.tabBarItem = analyticsTabitem
-        
-        let tabBarControllers = [discoverNavigationController,
-                                 homeNavigationController,
-                                 settingsNavigationController,
-                                 analyticsNavigationController]
+        let tabBarControllers = [
+            wrapInNavigationController(analyticsController,
+                                       icon: UIImage(systemName: "chart.pie")!,
+                                       selectedIcon: UIImage(systemName: "chart.pie.fill")!),
+            wrapInNavigationController(homeController, icon: UIImage(named: "home")!),
+            wrapInNavigationController(settingsController, icon: UIImage(named: "settings")!)
+        ]
         viewControllers = tabBarControllers
         selectedIndex = Tabs.home.rawValue
     }
@@ -202,7 +171,6 @@ extension GeneralTabBarController: ManageAppearanceHome {
         isAppLoaded = true
         print("manageAppearanceHome")
         let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
-        _ = discoverController.view
         _ = settingsController.view
         guard state else { return }
         if isBiometricalAuthEnabled {

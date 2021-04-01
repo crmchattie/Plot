@@ -94,6 +94,13 @@ class MasterActivityContainerController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navigationItem.title = {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "EEEE, MMM d"
+            return dateFormatter.string(from: Date())
+        }()
+        
         setupViews()
         setNavBar()
         addObservers()
@@ -133,7 +140,7 @@ class MasterActivityContainerController: UIViewController {
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
-        edgesForExtendedLayout = UIRectEdge.top
+        edgesForExtendedLayout = .top
         
         layout.scrollDirection = UICollectionView.ScrollDirection.vertical
         collectionView.setCollectionViewLayout(layout, animated: true)
@@ -220,12 +227,13 @@ class MasterActivityContainerController: UIViewController {
     }
     
     func setNavBar() {
-        let notificationsBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell"), style: .plain, target: self, action: #selector(goToNotifications))
-        navigationItem.leftBarButtonItem = notificationsBarButton
-        
-        let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-        navigationItem.rightBarButtonItem = newItemBarButton
-        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "notification-bell"),
+                                                           style: .plain,
+                                                           target: self,
+                                                           action: #selector(goToNotifications))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
+                                                            target: self,
+                                                            action: #selector(newItem))
     }
     
     func setApplicationBadge() {
@@ -633,7 +641,9 @@ extension MasterActivityContainerController {
     }
     
     @objc fileprivate func newItem() {
-        tabBarController?.selectedIndex = 0
+        let discoverController = DiscoverViewController()
+        discoverController.networkController = networkController
+        present(UINavigationController(rootViewController: discoverController), animated: true)
     }
 }
 
