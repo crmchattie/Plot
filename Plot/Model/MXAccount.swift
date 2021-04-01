@@ -675,7 +675,7 @@ func accountDetailsOverTimeChartData(accounts: [MXAccount], accountDetails: [Acc
         while nextDate.compare(end) != .orderedDescending {
             for accountDetail in accountDetails {
                 accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
-                    if accountDict[accountDetail] != nil, accountDict[accountDetail] != nil {
+                    if accountDict[accountDetail] != nil {
                         var tdStats = statistics[accountDetail]
                         var tdAccountList = accountDict[accountDetail]
                         tdStats!.append(contentsOf: stats)

@@ -64,6 +64,7 @@ class GoogleCalService {
                                 dispatchGroup.leave()
                                 return
                             }
+                            print(items.map({ $0.recurrence }))
                             events.append(contentsOf: items)
                             dispatchGroup.leave()
                         })

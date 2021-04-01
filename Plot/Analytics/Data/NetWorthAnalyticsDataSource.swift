@@ -62,8 +62,10 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
         let transactions = networkController.financeService.transactions
         
         let detail = AccountDetails(name: "Net Worth", balance: 0, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth, currencyCode: "USD")
+        print("get")
         financeService.getSamples(for: range, accountDetails: detail, transactionDetails: nil, accounts: accounts, transactions: transactions) { [range] (stats, _, _, _) in
             let stats = stats ?? []
+            print("receive")
             
             self.transactions = self.networkController.financeService.transactions
                 .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
