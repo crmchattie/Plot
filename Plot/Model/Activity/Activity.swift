@@ -34,6 +34,7 @@ class Activity: NSObject, NSCopying, Codable {
     var startTimeZone: String?
     var endDateTime: NSNumber?
     var endTimeZone: String?
+    var recurrences: [String]?
     var reminder: String?
     var notes: String?
     var schedule: [Activity]?
@@ -74,6 +75,7 @@ class Activity: NSObject, NSCopying, Codable {
         case activityOriginalPhotoURL
         case activityThumbnailPhotoURL
         case reminder
+        case recurrences
         case notes
         case schedule
         case purchases
@@ -178,6 +180,7 @@ class Activity: NSObject, NSCopying, Codable {
         startTimeZone = dictionary?["startTimeZone"] as? String
         endDateTime = dictionary?["endDateTime"] as? NSNumber
         endTimeZone = dictionary?["endTimeZone"] as? String
+        recurrences = dictionary?["recurrences"] as? [String]
         reminder = dictionary?["reminder"] as? String
         notes = dictionary?["notes"] as? String
         isGroupActivity = dictionary?["isGroupActivity"] as? Bool
@@ -279,6 +282,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.endDateTime as AnyObject? {
             dictionary["endDateTime"] = value
+        }
+        
+        if let value = self.recurrences as AnyObject? {
+            dictionary["recurrences"] = value
         }
         
         if let value = self.endTimeZone as AnyObject? {
@@ -434,6 +441,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.endTimeZone as AnyObject? {
             dictionary["endTimeZone"] = value
+        }
+        
+        if let value = self.recurrences as AnyObject? {
+            dictionary["recurrences"] = value
         }
         
         if let value = self.reminder as AnyObject? {
