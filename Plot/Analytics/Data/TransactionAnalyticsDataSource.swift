@@ -55,6 +55,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
                 guard let date = dateFormatter.date(from: transaction.created_at) else { return false }
                 return range.startDate <= date && date <= range.endDate
             }
+            .sorted(by: { $0.created_at > $1.created_at })
         
         var incomeValue: Double = 0
         var expenseValue: Double = 0

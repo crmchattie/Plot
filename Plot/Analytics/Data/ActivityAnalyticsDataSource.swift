@@ -114,6 +114,8 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 }
                 return false
             }
+            // at this point all activities should have a startDate (see above)
+            .sorted(by: { $0.startDate! > $1.startDate! })
             .map { AnalyticsBreakdownEntry.activity($0) }
         completion(entries)
     }
