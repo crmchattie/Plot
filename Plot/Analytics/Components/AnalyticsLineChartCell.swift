@@ -13,38 +13,7 @@ class AnalyticsLineChartCell: StackedBarChartCell {
     
     private(set) lazy var chartView: LineChartView = {
         let chart = LineChartView()
-        
-        chart.legend.enabled = false
-        chart.pinchZoomEnabled = false
-        chart.doubleTapToZoomEnabled = false
-        chart.setScaleEnabled(false)
-        chart.highlightPerTapEnabled = false
-        chart.highlightPerDragEnabled = false
-        chart.minOffset = 0
-        chart.noDataText = "No data available for the selected period"
-
-        chart.leftAxis.enabled = false
-        chart.rightAxis.drawAxisLineEnabled = false
-        chart.rightAxis.labelTextColor = .secondaryLabel
-        
-        chart.xAxis.yOffset = 1
-
-        chart.xAxis.gridColor = .secondaryLabel
-        chart.xAxis.gridLineDashLengths = [2, 2]
-        chart.xAxis.labelPosition = .bottom
-        chart.xAxis.centerAxisLabelsEnabled = true
-        chart.xAxis.labelTextColor = .secondaryLabel
-        chart.xAxis.valueFormatter = WeekdayAxisValueFormatter()
-        
-        let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
-                                  font: .systemFont(ofSize: 12),
-                                  textColor: .white,
-                                  insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
-                                  xAxisValueFormatter: DayAxisValueFormatter(chart: chart), units: "")
-        marker.chartView = chart
-        marker.minimumSize = CGSize(width: 80, height: 40)
-        chart.marker = marker
-
+        chart.defaultChartStyle()
         return chart
     }()
     

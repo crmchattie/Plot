@@ -41,10 +41,14 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
+        
+        let format = DateFormatter()
+        format.dateStyle = .full
+        
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
-        
+
         let predicate: NSPredicate = {
             let units: Set<Calendar.Component> = [.day, .month, .year]
             var startDate = Calendar.current.dateComponents(units, from: range.startDate)
@@ -81,7 +85,9 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
             var dietaryValues: [Int: Double] = [:]
             var average: Double = 0
             activityResult.forEach { summary in
-                guard let entryDate = summary.dateComponents(for: .current).date else { return }
+                var components = summary.dateComponents(for: .current)
+                components.timeZone = .current
+                guard let entryDate = components.date else { return }
                 let indexInRange = entryDate.daysSince(range.startDate)
                 let value = summary.activeEnergyBurned.doubleValue(for: HKUnit.kilocalorie())
                 energyValues[indexInRange] = value
@@ -130,7 +136,6 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        print(networkController.healthService.nutrition)
         completion([])
     }
 }

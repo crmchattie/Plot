@@ -377,6 +377,7 @@ class MasterActivityContainerController: UIViewController {
 }
 
 extension MasterActivityContainerController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return sections.count
     }

@@ -112,9 +112,7 @@ extension ActivityCell {
             } else {
                 invitationSegmentedControl.selectedSegmentIndex = -1
             }
-            if #available(iOS 13.0, *) {
-                invitationSegmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-            }
+            invitationSegmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
         } else {
             invitationSegmentedControlTopAnchor.constant = 0
             invitationSegmentHeightConstraint.constant = 0

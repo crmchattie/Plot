@@ -6,7 +6,7 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-fileprivate let chartViewHeight: CGFloat = 260
+fileprivate let chartViewHeight: CGFloat = 200
 fileprivate let chartViewTopMargin: CGFloat = 10
 
 import UIKit
@@ -43,6 +43,9 @@ class FinanceBarChartViewController: UIViewController {
     lazy var chartView: BarChartView = {
         let chartView = BarChartView()
         chartView.translatesAutoresizingMaskIntoConstraints = false
+        chartView.defaultChartStyle()
+        chartView.highlightPerTapEnabled = true
+        chartView.highlightPerDragEnabled = true
         return chartView
     }()
     
@@ -115,8 +118,7 @@ class FinanceBarChartViewController: UIViewController {
         configureView()
         configureChart()
         
-        fetchData()
-                
+        fetchData()           
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -153,12 +155,12 @@ class FinanceBarChartViewController: UIViewController {
             backgroundChartView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
             backgroundChartViewHeightAnchor!,
             
-            chartView.topAnchor.constraint(equalTo: backgroundChartView.topAnchor),
+            chartView.topAnchor.constraint(equalTo: backgroundChartView.topAnchor, constant: 16),
             chartView.leftAnchor.constraint(equalTo: backgroundChartView.leftAnchor, constant: 16),
             chartView.rightAnchor.constraint(equalTo: backgroundChartView.rightAnchor, constant: -16),
-            chartView.bottomAnchor.constraint(equalTo: backgroundChartView.bottomAnchor),
+            chartView.bottomAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: -16),
             
-            tableView.topAnchor.constraint(equalTo: chartView.bottomAnchor, constant: 10),
+            tableView.topAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: 10),
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
@@ -174,17 +176,6 @@ class FinanceBarChartViewController: UIViewController {
     }
     
     func configureChart() {
-        
-        chartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        chartView.chartDescription?.enabled = false
-        
-        chartView.dragEnabled = false
-        chartView.setScaleEnabled(false)
-        chartView.pinchZoomEnabled = false
-        
-        chartView.drawBarShadowEnabled = false
-        chartView.drawValueAboveBarEnabled = false
-        
         chartView.maxVisibleCount = 60
         
         let xAxis = chartView.xAxis
@@ -194,7 +185,6 @@ class FinanceBarChartViewController: UIViewController {
         xAxis.labelFont = .systemFont(ofSize: 10)
         xAxis.granularity = 1
         xAxis.labelCount = 5
-        xAxis.drawGridLinesEnabled = false
                                 
         chartView.rightAxis.enabled = true
         chartView.leftAxis.enabled = false
@@ -208,19 +198,7 @@ class FinanceBarChartViewController: UIViewController {
         rightAxis.labelCount = 8
         rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
         rightAxis.spaceTop = 0.15
-        rightAxis.drawGridLinesEnabled = false
-        
-        chartView.legend.enabled = false
-        let l = chartView.legend
-        l.horizontalAlignment = .left
-        l.verticalAlignment = .bottom
-        l.orientation = .horizontal
-        l.drawInside = false
-        l.form = .circle
-        l.formSize = 9
-        l.font = UIFont(name: "HelveticaNeue-Light", size: 11)!
-        l.xEntrySpace = 4
-        
+
         let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
                                   font: .systemFont(ofSize: 12),
                                   textColor: .white,
@@ -248,7 +226,8 @@ class FinanceBarChartViewController: UIViewController {
         barButton.title = chartView.isHidden ? "Show Chart" : "Hide Chart"
     }
     
-    // MARK: HealthKit Data
+    // MARK: - HealthKit Data
+    
     func fetchData() {
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         

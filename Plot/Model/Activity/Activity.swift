@@ -605,12 +605,12 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
 func activitiesOverTimeChartData(activities: [Activity], activityCategories: [String], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([String: [Statistic]], [String: [Activity]]) -> ()) {
     var statistics = [String: [Statistic]]()
     var activityDict = [String: [Activity]]()
-    let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
-    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+    let calendar = Calendar.current // NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+//    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
     var date = start
     switch segmentType {
     case .day:
-        var nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
+        var nextDate = calendar.date(byAdding: .hour, value: 1, to: date)!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for activityCategory in activityCategories {
@@ -633,10 +633,10 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
             }
             // Advance by one day:
             date = nextDate
-            nextDate = calendar.date(byAdding: .hour, value: 1, to: nextDate, options: [])!
+            nextDate = calendar.date(byAdding: .hour, value: 1, to: date)!
         }
     case .week:
-        var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+        var nextDate = calendar.date(byAdding: .day, value: 1, to: date)!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for activityCategory in activityCategories {
@@ -660,10 +660,10 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
             
             // Advance by one day:
             date = nextDate
-            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate, options: [])!
+            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate)!
         }
     case .month:
-        var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
+        var nextDate = calendar.date(byAdding: .day, value: 1, to: date)!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for activityCategory in activityCategories {
@@ -687,10 +687,10 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
             
             // Advance by one day:
             date = nextDate
-            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate, options: [])!
+            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate)!
         }
     case .year:
-        var nextDate = calendar.date(byAdding: .month, value: 1, to: date, options: [])!
+        var nextDate = calendar.date(byAdding: .month, value: 1, to: date)!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for activityCategory in activityCategories {
@@ -714,7 +714,7 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
             
             // Advance by one day:
             date = nextDate
-            nextDate = calendar.date(byAdding: .month, value: 1, to: nextDate, options: [])!
+            nextDate = calendar.date(byAdding: .month, value: 1, to: nextDate)!
         }
     }
     completion(statistics, activityDict)

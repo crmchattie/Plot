@@ -65,7 +65,9 @@ class AnalyticsDetailViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableHeaderView = rangeContainer
-        
+        if viewModel.title == "Activities" {
+            tableView.separatorStyle = .none
+        }
         tableView.tableHeaderView?.layoutIfNeeded()
         tableView.tableHeaderView?.frame.size.width = self.view.bounds.width
         tableView.tableHeaderView = self.tableView.tableHeaderView

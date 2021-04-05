@@ -51,7 +51,6 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
         
-        
         summaryService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.activities) { stats in
             let activities = stats[.calendarSummary] ?? [:]
             

@@ -479,6 +479,7 @@
 		F926576F2607440A00593FE1 /* Collection+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F926576E2607440A00593FE1 /* Collection+Utility.swift */; };
 		F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */; };
 		F94EDC4D260667A000B97FF6 /* TransactionAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */; };
+		F95D8EF4261B8C2F006DED56 /* Charts+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95D8EF3261B8C2F006DED56 /* Charts+Style.swift */; };
 		F9773A5A2601339A00D1B204 /* ActivityAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A592601339A00D1B204 /* ActivityAnalyticsDataSource.swift */; };
 		F9773A862601453500D1B204 /* HourAxisValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */; };
 		F9773A8B26014AE700D1B204 /* AnalyticsDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */; };
@@ -1005,6 +1006,7 @@
 		F926576E2607440A00593FE1 /* Collection+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Utility.swift"; sourceTree = "<group>"; };
 		F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		F95D8EF3261B8C2F006DED56 /* Charts+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Charts+Style.swift"; sourceTree = "<group>"; };
 		F9773A592601339A00D1B204 /* ActivityAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourAxisValueFormatter.swift; sourceTree = "<group>"; };
 		F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewController.swift; sourceTree = "<group>"; };
@@ -1572,6 +1574,7 @@
 				269105EA253E8DD700A02C5F /* BalloonMarker.swift */,
 				269105EB253E8DD700A02C5F /* RadarMarkerView.swift */,
 				269105EC253E8DD700A02C5F /* XYMarkerView.swift */,
+				F95D8EF3261B8C2F006DED56 /* Charts+Style.swift */,
 			);
 			path = ChartsComponents;
 			sourceTree = "<group>";
@@ -3121,6 +3124,7 @@
 				10DE97372475801400D4A7E8 /* ListCell+ConfigureCell.swift in Sources */,
 				4BAEE4F121272D890045AB10 /* UserinfoHeaderTableViewCell.swift in Sources */,
 				1067754225E1B590002F78E7 /* ChooseEmailView.swift in Sources */,
+				F95D8EF4261B8C2F006DED56 /* Charts+Style.swift in Sources */,
 				109F849023D607C6002C0044 /* RecipeTypeViewController.swift in Sources */,
 				106431D1258AE41800D02658 /* SummaryHorizontalBarChart.swift in Sources */,
 				1067753625E1AB19002F78E7 /* ChangeEmailController.swift in Sources */,

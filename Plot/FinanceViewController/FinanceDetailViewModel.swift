@@ -57,30 +57,13 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 maxValue *= 1.2
                 
                 let dataSet = LineChartDataSet(entries: entries, label: nil)
-                dataSet.drawIconsEnabled = false
-                dataSet.mode = .cubicBezier
-                dataSet.setColor(UIColor.systemBlue)
-                dataSet.setCircleColor(UIColor.systemBlue)
-                dataSet.drawCirclesEnabled = false
-                dataSet.drawValuesEnabled = false
-                dataSet.circleRadius = 3
-                dataSet.drawCircleHoleEnabled = false
-                dataSet.valueFont = .systemFont(ofSize: 9)
-                dataSet.formSize = 15
-                dataSet.lineWidth = 0
-                
-                let colorTop = UIColor.systemBlue.cgColor
-                let colorBottom = UIColor.systemBlue.cgColor
-                let gradientColors = [colorBottom, colorTop] as CFArray
-                let gradient = CGGradient(colorsSpace: nil, colors: gradientColors as CFArray, locations: nil)!
-                dataSet.fillAlpha = 1
-                dataSet.fill = Fill(linearGradient: gradient, angle: 90)
-                
+                dataSet.fillColor = .systemBlue
+                dataSet.fillAlpha = 0.5
                 dataSet.drawFilledEnabled = true
-                dataSet.axisDependency = .right
+                dataSet.drawCirclesEnabled = false
                 
                 lineChartData = LineChartData(dataSet: dataSet)
-                lineChartData?.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
+                lineChartData?.setDrawValues(false)
             }
             
             DispatchQueue.main.async {

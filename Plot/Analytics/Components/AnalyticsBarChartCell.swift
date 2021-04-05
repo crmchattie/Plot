@@ -13,29 +13,7 @@ class AnalyticsBarChartCell: StackedBarChartCell {
     
     private(set) lazy var chartView: BarChartView = {
         let chart = BarChartView()
-        
-        chart.legend.enabled = false
-        chart.pinchZoomEnabled = false
-        chart.doubleTapToZoomEnabled = false
-        chart.setScaleEnabled(false)
-        chart.highlightPerTapEnabled = false
-        chart.highlightPerDragEnabled = false
-        chart.minOffset = 0
-        chart.noDataText = "No data available for the selected period"
-
-        chart.leftAxis.enabled = false
-        chart.rightAxis.drawAxisLineEnabled = false
-        chart.rightAxis.labelTextColor = .secondaryLabel
-        
-        chart.xAxis.yOffset = 1
-
-        chart.xAxis.gridColor = .secondaryLabel
-        chart.xAxis.gridLineDashLengths = [2, 2]
-        chart.xAxis.labelPosition = .bottom
-        chart.xAxis.centerAxisLabelsEnabled = true
-        chart.xAxis.labelTextColor = .secondaryLabel
-        chart.xAxis.valueFormatter = WeekdayAxisValueFormatter()
-
+        chart.defaultChartStyle()
         return chart
     }()
     
