@@ -23,13 +23,17 @@ struct ThemeManager {
         UITabBar.appearance().barStyle = theme.barStyle
         UINavigationBar.appearance().isTranslucent = false
         UINavigationBar.appearance().barStyle = theme.barStyle
-        UINavigationBar.appearance().barTintColor = .secondarySystemBackground
+        UINavigationBar.appearance().barTintColor = UIColor { (traitCollection) -> UIColor in
+            if traitCollection.userInterfaceStyle == .dark {
+                return .black
+            } else {
+                return #colorLiteral(red: 0.9489266276, green: 0.9490858912, blue: 0.9747040868, alpha: 1)
+            }
+        }
         let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
         UINavigationBar.appearance().titleTextAttributes = textAttributes
         UINavigationBar.appearance().largeTitleTextAttributes = textAttributes
         UINavigationBar.appearance().shadowImage = UIImage()
-//        UINavigationBar.appearance().backgroundColor = theme.barBackgroundColor
-        #warning("I would remove this globally. Ideally cells have selection styles that are updated automatically.")
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
         
         NotificationCenter.default.post(name: .themeUpdated, object: nil)
