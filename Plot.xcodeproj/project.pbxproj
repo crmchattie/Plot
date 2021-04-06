@@ -477,6 +477,7 @@
 		F916C8DA2610C3090062F952 /* Sequence+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C8D92610C3090062F952 /* Sequence+Utility.swift */; };
 		F916C9082610D0E10062F952 /* NetWorthAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C9072610D0E10062F952 /* NetWorthAnalyticsDataSource.swift */; };
 		F926576F2607440A00593FE1 /* Collection+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F926576E2607440A00593FE1 /* Collection+Utility.swift */; };
+		F932E05B261CE1FB007E4336 /* UIViewController+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F932E05A261CE1FB007E4336 /* UIViewController+Navigation.swift */; };
 		F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */; };
 		F94EDC4D260667A000B97FF6 /* TransactionAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */; };
 		F95D8EF4261B8C2F006DED56 /* Charts+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95D8EF3261B8C2F006DED56 /* Charts+Style.swift */; };
@@ -1004,6 +1005,7 @@
 		F916C8D92610C3090062F952 /* Sequence+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Utility.swift"; sourceTree = "<group>"; };
 		F916C9072610D0E10062F952 /* NetWorthAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetWorthAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F926576E2607440A00593FE1 /* Collection+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Utility.swift"; sourceTree = "<group>"; };
+		F932E05A261CE1FB007E4336 /* UIViewController+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Navigation.swift"; sourceTree = "<group>"; };
 		F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F95D8EF3261B8C2F006DED56 /* Charts+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Charts+Style.swift"; sourceTree = "<group>"; };
@@ -1150,6 +1152,7 @@
 				10E8E506259295260076BE42 /* HeaderContainerCell.swift */,
 				10E8E5302592C7D20076BE42 /* BackEnabledNavigationController.swift */,
 				1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */,
+				F932E05A261CE1FB007E4336 /* UIViewController+Navigation.swift */,
 			);
 			path = MasterActivityController;
 			sourceTree = "<group>";
@@ -3006,6 +3009,7 @@
 				102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */,
 				4B4F452F1F32230C00A6FF96 /* AppDelegate.swift in Sources */,
 				1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */,
+				F932E05B261CE1FB007E4336 /* UIViewController+Navigation.swift in Sources */,
 				4BAEE48221272C4F0045AB10 /* UserProfileController.swift in Sources */,
 				4BAEE50A21272D890045AB10 /* GroupAdminControlsTableViewController+NameEditing.swift in Sources */,
 				4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */,

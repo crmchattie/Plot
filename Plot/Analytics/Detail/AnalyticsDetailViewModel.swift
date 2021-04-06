@@ -12,7 +12,7 @@ import SwiftUI
 
 class AnalyticsDetailViewModel {
     
-    private let networkController: NetworkController
+    let networkController: NetworkController
     private let dataSource: AnalyticsDataSource
     
     var title: String { dataSource.title }

@@ -8,11 +8,21 @@
 
 import UIKit
 import Combine
+import Firebase
 
-class AnalyticsDetailViewController: UIViewController {
+class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
+    
+    var networkController: NetworkController { viewModel.networkController }
     
     private let viewModel: AnalyticsDetailViewModel!
     private var cancellables = Set<AnyCancellable>()
+    
+    // activities
+    var activitiesParticipants: [String : [User]] = [:]
+    // transaction
+    var users = [User]()
+    var filteredUsers = [User]()
+    var participants: [String: [User]] = [:]
     
     private let rangeControlView: UISegmentedControl = {
         let control = UISegmentedControl(items: DateRangeType.allCases.map { $0.filterTitle } )
@@ -32,9 +42,9 @@ class AnalyticsDetailViewController: UIViewController {
         tableView.register(FinanceTableViewCell.self)
         return tableView
     }()
-
+    
     // MARK: - Lifecycle
-
+    
     init(viewModel: AnalyticsDetailViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -83,6 +93,18 @@ class AnalyticsDetailViewController: UIViewController {
         initBindings()
     }
     
+    func showActivityIndicator() {
+        if let tabController = self.tabBarController {
+            self.showSpinner(onView: tabController.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+    
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
+    
     private func initBindings() {
         viewModel.entries
             .receive(on: DispatchQueue.main)
@@ -101,8 +123,93 @@ class AnalyticsDetailViewController: UIViewController {
     
     // MARK: - Actions
     
+    private func showTranscationDetail(transaction: Transaction) {
+        let destination = FinanceTransactionViewController()
+        destination.transaction = transaction
+        destination.users = users
+        destination.filteredUsers = filteredUsers
+        destination.delegate = self
+        self.getParticipants(transaction: transaction, account: nil) { (participants) in
+            destination.selectedFalconUsers = participants
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
         viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
+    }
+    
+    // MARK: - Data
+    
+    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
+        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = transaction.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if transaction.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            let ID = account.guid
+            let olderParticipants = self.participants[ID]
+            var participants: [User] = []
+            for id in participantsIDs {
+                if account.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                if let first = olderParticipants?.filter({$0.id == id}).first {
+                    participants.append(first)
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                self.participants[ID] = participants
+                completion(participants)
+            }
+        } else {
+            let participants: [User] = []
+            completion(participants)
+        }
     }
 }
 
@@ -153,6 +260,15 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        guard indexPath.section > 0 else { return }
+        
+        switch viewModel.entries.value[indexPath.row] {
+        case .activity(let activity):
+            showActivityDetail(activity: activity)
+        case .transaction(let transaction):
+            showTranscationDetail(transaction: transaction)
+        }
     }
 }
 
@@ -166,5 +282,21 @@ extension AnalyticsDetailViewController: StackedBarChartCellDelegate {
     
     func nextTouched(on cell: StackedBarChartCell) {
         viewModel.loadNextSegment()
+    }
+}
+
+// MARK: - UpdateTransactionDelegate
+
+extension AnalyticsDetailViewController: UpdateTransactionDelegate {
+    
+    func updateTransaction(transaction: Transaction) {
+        guard let index = viewModel.entries.value.firstIndex(where: {
+            if case .transaction(let trs) = $0 {
+                return trs == transaction
+            }
+            return false
+        }) else { return }
+        viewModel.entries.value[index] = .transaction(transaction)
+        tableView.reloadData()
     }
 }

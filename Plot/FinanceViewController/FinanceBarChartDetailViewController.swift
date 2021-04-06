@@ -118,7 +118,7 @@ class FinanceBarChartViewController: UIViewController {
         configureView()
         configureChart()
         
-        fetchData()           
+        fetchData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -317,6 +317,7 @@ class FinanceBarChartViewController: UIViewController {
 }
 
 extension FinanceBarChartViewController: ChartViewDelegate {
+    
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
         
     }
@@ -335,6 +336,7 @@ extension FinanceBarChartViewController: ChartViewDelegate {
 }
 
 extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return UIView()
     }
