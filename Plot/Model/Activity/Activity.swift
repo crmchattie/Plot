@@ -560,13 +560,15 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
     var totalValue: Double = end.timeIntervalSince(start)
     // create dateFormatter with UTC time format
     for activity in activities {
-        if let startDateTime = activity.startDateTime {
-            let activityDate = Date(timeIntervalSince1970: startDateTime as! TimeInterval)
-            if activityDate < start || end < activityDate {
-                continue
-            }
+        guard let activityStartDate = activity.startDateTime.map({ Date(timeIntervalSince1970: $0.doubleValue) }),
+              let activityEndDate = activity.endDateTime.map({ Date(timeIntervalSince1970: $0.doubleValue) }) else { return }
+        
+        // Skipping activities that are outside of the interest range.
+        if activityStartDate > end || activityEndDate <= start {
+            continue
         }
-        let duration = Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)
+        
+        let duration = activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970
         if let type = activity.category {
             guard type != "Not Applicable" else { continue }
             totalValue -= duration
@@ -607,115 +609,42 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
     var activityDict = [String: [Activity]]()
     let calendar = Calendar.current
     var date = start
-    switch segmentType {
-    case .day:
-        var nextDate = calendar.date(byAdding: .hour, value: 1, to: date)!
-        // While date <= endDate ...
-        while nextDate.compare(end) != .orderedDescending {
-            for activityCategory in activityCategories {
-                if activityCategory == "No Activities" {
-                    continue
-                }
-                activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
-                    if activityDict[activityCategory] != nil {
-                        var acStats = statistics[activityCategory]
-                        var acActivityList = activityDict[activityCategory]
-                        acStats!.append(contentsOf: stats)
-                        acActivityList!.append(contentsOf: activities)
-                        statistics[activityCategory] = acStats
-                        activityDict[activityCategory] = acActivityList
-                    } else {
-                        statistics[activityCategory] = stats
-                        activityDict[activityCategory] = activities
-                    }
+    
+    let component: Calendar.Component = {
+        switch segmentType {
+        case .day: return .hour
+        case .week: return .day
+        case .month: return .day
+        case .year: return .month
+        }
+    }()
+    
+    var nextDate = calendar.date(byAdding: component, value: 1, to: date)!
+    while date < end {
+        for activityCategory in activityCategories {
+            if activityCategory == "No Activities" {
+                continue
+            }
+            activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
+                if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
+                    var acStats = statistics[activityCategory]
+                    var acActivityList = activityDict[activityCategory]
+                    acStats!.append(contentsOf: stats)
+                    acActivityList!.append(contentsOf: activities)
+                    statistics[activityCategory] = acStats
+                    activityDict[activityCategory] = acActivityList
+                } else {
+                    statistics[activityCategory] = stats
+                    activityDict[activityCategory] = activities
                 }
             }
-            // Advance by one day:
-            date = nextDate
-            nextDate = calendar.date(byAdding: .hour, value: 1, to: date)!
         }
-    case .week:
-        var nextDate = calendar.date(byAdding: .day, value: 1, to: date)!
-        // While date <= endDate ...
-        while nextDate.compare(end) != .orderedDescending {
-            for activityCategory in activityCategories {
-                if activityCategory == "No Activities" {
-                    continue
-                }
-                activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
-                    if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
-                        var acStats = statistics[activityCategory]
-                        var acActivityList = activityDict[activityCategory]
-                        acStats!.append(contentsOf: stats)
-                        acActivityList!.append(contentsOf: activities)
-                        statistics[activityCategory] = acStats
-                        activityDict[activityCategory] = acActivityList
-                    } else {
-                        statistics[activityCategory] = stats
-                        activityDict[activityCategory] = activities
-                    }
-                }
-            }
-            
-            // Advance by one day:
-            date = nextDate
-            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate)!
-        }
-    case .month:
-        var nextDate = calendar.date(byAdding: .day, value: 1, to: date)!
-        // While date <= endDate ...
-        while nextDate.compare(end) != .orderedDescending {
-            for activityCategory in activityCategories {
-                if activityCategory == "No Activities" {
-                    continue
-                }
-                activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
-                    if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
-                        var acStats = statistics[activityCategory]
-                        var acActivityList = activityDict[activityCategory]
-                        acStats!.append(contentsOf: stats)
-                        acActivityList!.append(contentsOf: activities)
-                        statistics[activityCategory] = acStats
-                        activityDict[activityCategory] = acActivityList
-                    } else {
-                        statistics[activityCategory] = stats
-                        activityDict[activityCategory] = activities
-                    }
-                }
-            }
-            
-            // Advance by one day:
-            date = nextDate
-            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate)!
-        }
-    case .year:
-        var nextDate = calendar.date(byAdding: .month, value: 1, to: date)!
-        // While date <= endDate ...
-        while nextDate.compare(end) != .orderedDescending {
-            for activityCategory in activityCategories {
-                if activityCategory == "No Activities" {
-                    continue
-                }
-                activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
-                    if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
-                        var acStats = statistics[activityCategory]
-                        var acActivityList = activityDict[activityCategory]
-                        acStats!.append(contentsOf: stats)
-                        acActivityList!.append(contentsOf: activities)
-                        statistics[activityCategory] = acStats
-                        activityDict[activityCategory] = acActivityList
-                    } else {
-                        statistics[activityCategory] = stats
-                        activityDict[activityCategory] = activities
-                    }
-                }
-            }
-            
-            // Advance by one day:
-            date = nextDate
-            nextDate = calendar.date(byAdding: .month, value: 1, to: nextDate)!
-        }
+        
+        // Advance by one day:
+        date = nextDate
+        nextDate = calendar.date(byAdding: component, value: 1, to: nextDate)!
     }
+    
     completion(statistics, activityDict)
 }
 
@@ -740,7 +669,7 @@ func activityListStats(
               var activityEndDate = activity.endDateTime.map({ Date(timeIntervalSince1970: $0.doubleValue) }) else { return }
         
         // Skipping activities that are outside of the interest range.
-        if activityStartDate >= chunkEnd || activityEndDate < chunkStart {
+        if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
             continue
         }
         
@@ -756,7 +685,7 @@ func activityListStats(
         if let type = activity.category, type == activityCategory {
             let duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
             if statistics.isEmpty {
-                let stat = Statistic(date: chunkEnd, value: duration)
+                let stat = Statistic(date: chunkStart, value: duration)
                 statistics.append(stat)
                 activityList.append(activity)
             } else {

@@ -54,8 +54,6 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         summaryService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.activities) { stats in
             let activities = stats[.calendarSummary] ?? [:]
             
-            print(activities)
-            
             guard !activities.isEmpty else {
                 newChartViewModel.chartData = nil
                 newChartViewModel.categories = []
@@ -110,8 +108,8 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
         let entries = networkController.activityService.activities
             .filter {
-                if let startDate = $0.startDate, let category = $0.category {
-                    return startDate >= range.startDate && startDate <= range.endDate && ActivityCategory(rawValue: category) != .notApplicable
+                if let startDate = $0.startDate, let endDate = $0.endDate, let category = $0.category {
+                    return startDate < range.endDate && endDate > range.startDate && ActivityCategory(rawValue: category) != .notApplicable
                 }
                 return false
             }
