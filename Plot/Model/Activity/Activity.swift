@@ -605,8 +605,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
 func activitiesOverTimeChartData(activities: [Activity], activityCategories: [String], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([String: [Statistic]], [String: [Activity]]) -> ()) {
     var statistics = [String: [Statistic]]()
     var activityDict = [String: [Activity]]()
-    let calendar = Calendar.current // NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
-//    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+    let calendar = Calendar.current
     var date = start
     switch segmentType {
     case .day:
@@ -617,7 +616,7 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
                 if activityCategory == "No Activities" {
                     continue
                 }
-                activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
+                activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
                     if activityDict[activityCategory] != nil {
                         var acStats = statistics[activityCategory]
                         var acActivityList = activityDict[activityCategory]
@@ -643,7 +642,7 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
                 if activityCategory == "No Activities" {
                     continue
                 }
-                activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
+                activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
                     if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                         var acStats = statistics[activityCategory]
                         var acActivityList = activityDict[activityCategory]
@@ -670,7 +669,7 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
                 if activityCategory == "No Activities" {
                     continue
                 }
-                activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
+                activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
                     if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                         var acStats = statistics[activityCategory]
                         var acActivityList = activityDict[activityCategory]
@@ -697,7 +696,7 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
                 if activityCategory == "No Activities" {
                     continue
                 }
-                activityListStats(activities: activities, activityCategory: activityCategory, start: start, end: end, date: date, nextDate: nextDate) { (stats, activities) in
+                activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
                     if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                         var acStats = statistics[activityCategory]
                         var acActivityList = activityDict[activityCategory]
@@ -720,28 +719,48 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
     completion(statistics, activityDict)
 }
 
-func activityListStats(activities: [Activity], activityCategory: String, start: Date, end: Date, date: Date, nextDate: Date, completion: @escaping ([Statistic], [Activity]) -> ()) {
+/// Categorize a list of activities, filtering down to a specific chunk [chunkStart, chunkEnd]
+/// - Parameters:
+///   - activities: A list of activities to analize.
+///   - activityCategory: no idea what this is.
+///   - chunkStart: Start date in which the activities are split and categorized.
+///   - chunkEnd: Start date in which the activities are split and categorized.
+///   - completion: list of statistical elements and activities.
+func activityListStats(
+    activities: [Activity],
+    activityCategory: String,
+    chunkStart: Date,
+    chunkEnd: Date,
+    completion: @escaping ([Statistic], [Activity]) -> ()
+) {
     var statistics = [Statistic]()
     var activityList = [Activity]()
     for activity in activities {
-        guard let startDateTime = activity.startDateTime else {
+        guard var activityStartDate = activity.startDateTime.map({ Date(timeIntervalSince1970: $0.doubleValue) }),
+              var activityEndDate = activity.endDateTime.map({ Date(timeIntervalSince1970: $0.doubleValue) }) else { return }
+        
+        // Skipping activities that are outside of the interest range.
+        if activityStartDate >= chunkEnd || activityEndDate < chunkStart {
             continue
         }
-        let activityDate = Date(timeIntervalSince1970: startDateTime.doubleValue)
-        if activityDate < start || end <= activityDate {
-            continue
+        
+        // Truncate events that out of the [chunkStart, chunkEnd] range.
+        // Multi-day events, chunked into single day `Statistic`s are the best example.
+        if activityStartDate < chunkStart {
+            activityStartDate = chunkStart
         }
-        if activityDate < date || nextDate <= activityDate {
-            continue
+        if activityEndDate > chunkEnd {
+            activityEndDate = chunkEnd
         }
+        
         if let type = activity.category, type == activityCategory {
-            let duration = (Double(truncating: activity.endDateTime!) - Double(truncating: activity.startDateTime!)) / 60
+            let duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
             if statistics.isEmpty {
-                let stat = Statistic(date: nextDate, value: duration)
+                let stat = Statistic(date: chunkEnd, value: duration)
                 statistics.append(stat)
                 activityList.append(activity)
             } else {
-                if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
+                if let index = statistics.firstIndex(where: { $0.date == chunkEnd }) {
                     statistics[index].value += duration
                     activityList.append(activity)
                 }

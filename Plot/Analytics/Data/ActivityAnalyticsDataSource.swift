@@ -54,6 +54,8 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         summaryService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.activities) { stats in
             let activities = stats[.calendarSummary] ?? [:]
             
+            print(activities)
+            
             guard !activities.isEmpty else {
                 newChartViewModel.chartData = nil
                 newChartViewModel.categories = []
