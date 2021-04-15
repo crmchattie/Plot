@@ -23,12 +23,17 @@ struct ThemeManager {
         UITabBar.appearance().barStyle = theme.barStyle
         UINavigationBar.appearance().isTranslucent = false
         UINavigationBar.appearance().barStyle = theme.barStyle
-        UINavigationBar.appearance().barTintColor = theme.barBackgroundColor
-        let textAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
+        UINavigationBar.appearance().barTintColor = UIColor { (traitCollection) -> UIColor in
+            if traitCollection.userInterfaceStyle == .dark {
+                return .black
+            } else {
+                return #colorLiteral(red: 0.9489266276, green: 0.9490858912, blue: 0.9747040868, alpha: 1)
+            }
+        }
+        let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
         UINavigationBar.appearance().titleTextAttributes = textAttributes
         UINavigationBar.appearance().largeTitleTextAttributes = textAttributes
-        UINavigationBar.appearance().backgroundColor = theme.barBackgroundColor
-        UITableViewCell.appearance().selectionColor = ThemeManager.currentTheme().cellSelectionColor
+        UINavigationBar.appearance().shadowImage = UIImage()
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
         
         NotificationCenter.default.post(name: .themeUpdated, object: nil)
@@ -46,6 +51,7 @@ struct ThemeManager {
         }
     }
 }
+
 enum Theme: Int {
     case Default, Dark
     
@@ -345,5 +351,3 @@ open class ChartColors: NSObject
         ]
     }
 }
-
-

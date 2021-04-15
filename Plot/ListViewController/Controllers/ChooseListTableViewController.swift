@@ -305,6 +305,7 @@ class ChooseListTableViewController: UITableViewController {
     }
     
     // MARK: - Table view data source
+    
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }

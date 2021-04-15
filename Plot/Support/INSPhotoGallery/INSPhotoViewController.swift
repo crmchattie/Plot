@@ -40,7 +40,7 @@ open class INSPhotoViewController: UIViewController, UIScrollViewDelegate {
     }()
     
     lazy private(set) var activityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView(style: .white)
+        let activityIndicator = UIActivityIndicatorView(style: .medium)
         activityIndicator.startAnimating()
         return activityIndicator
     }()

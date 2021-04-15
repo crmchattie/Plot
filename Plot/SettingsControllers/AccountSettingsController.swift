@@ -37,6 +37,9 @@ class AccountSettingsController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.title = "Settings"
+        
+//        view.backgroundColor = .tertiarySystemBackground
         
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -86,12 +89,12 @@ class AccountSettingsController: UITableViewController {
     }
     
     fileprivate func configureTableView() {
-        tableView.separatorStyle = .none
         tableView.sectionHeaderHeight = 0
+        tableView.separatorStyle = .none
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.tableHeaderView = userProfileContainerView
         tableView.register(AccountSettingsTableViewCell.self, forCellReuseIdentifier: accountSettingsCellId)
-        tableView.backgroundColor = .clear
+//        tableView.backgroundColor = .secondarySystemBackground
     }
     
     fileprivate func configureContainerView() {
@@ -223,34 +226,25 @@ class AccountSettingsController: UITableViewController {
     func listenChanges() {
         if let currentUser = Auth.auth().currentUser?.uid {
             
-            let photoURLReference = Database.database().reference().child("users").child(currentUser).child("photoURL")
-            photoURLReference.observe(.value, with: { (snapshot) in
-                if let url = snapshot.value as? String {
-                    self.userProfileContainerView.profileImageView.sd_setImage(with: URL(string: url) , placeholderImage: nil, options: [.scaleDownLargeImages, .continueInBackground], completed: nil)
+            Database.database().reference().child("users").child(currentUser).observe(.value, with: { snapshot in
+                guard let userInfo = snapshot.value as? [String: Any] else { return }
+                
+                if let photoUrl = userInfo["photoURL"] as? String {
+                    self.userProfileContainerView.profileImageView.sd_setImage(with: URL(string: photoUrl), placeholderImage: nil, options: [.scaleDownLargeImages, .continueInBackground], completed: nil)
                     self.userProfileContainerView.addPhotoLabel.isHidden = true
                 }
-            })
-            
-            let nameReference = Database.database().reference().child("users").child(currentUser).child("name")
-            nameReference.observe(.value, with: { (snapshot) in
-                if let name = snapshot.value as? String {
+                if let name = userInfo["name"] as? String {
                     self.userProfileContainerView.name.text = name
                     self.currentName = name
                 }
-            })
-            
-            let bioReference = Database.database().reference().child("users").child(currentUser).child("bio")
-            bioReference.observe(.value, with: { (snapshot) in
-                if let bio = snapshot.value as? String {
+                if let bio = userInfo["bio"] as? String {
                     self.userProfileContainerView.bio.text = bio
                     self.userProfileContainerView.bioPlaceholderLabel.isHidden = !self.userProfileContainerView.bio.text.isEmpty
                     self.currentBio = bio
                 }
-            })
-            
-            let phoneNumberReference = Database.database().reference().child("users").child(currentUser).child("phoneNumber")
-            phoneNumberReference.observe(.value, with: { (snapshot) in
-                if let phoneNumber = snapshot.value as? String {
+                self.userProfileContainerView.email.text = userInfo["email"] as? String
+                
+                if let phoneNumber = userInfo["phoneNumber"] as? String {
                     do {
                         let phoneNumber = try self.phoneNumberKit.parse(phoneNumber)
                         self.userProfileContainerView.phone.text = self.phoneNumberKit.format(phoneNumber, toType: .international)

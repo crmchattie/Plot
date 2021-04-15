@@ -40,7 +40,6 @@ class SummaryTimeBarChartCell: UICollectionViewCell {
                 let xAxis = chartView.xAxis
                 dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
                 xAxis.valueFormatter = dayAxisValueFormatter
-                print("dayAxisValueFormatter \(dayAxisValueFormatter?.formatType)")
                 xAxis.labelPosition = .bottom
                 xAxis.labelFont = .systemFont(ofSize: 10)
                 xAxis.granularity = 1

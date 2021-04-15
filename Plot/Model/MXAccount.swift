@@ -670,12 +670,12 @@ func accountDetailsOverTimeChartData(accounts: [MXAccount], accountDetails: [Acc
     var date = start
     switch segmentType {
     case .day:
-        var nextDate = calendar.date(byAdding: .hour, value: 1, to: date, options: [])!
+        var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for accountDetail in accountDetails {
                 accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
-                    if accountDict[accountDetail] != nil, accountDict[accountDetail] != nil {
+                    if accountDict[accountDetail] != nil {
                         var tdStats = statistics[accountDetail]
                         var tdAccountList = accountDict[accountDetail]
                         tdStats!.append(contentsOf: stats)
@@ -694,7 +694,7 @@ func accountDetailsOverTimeChartData(accounts: [MXAccount], accountDetails: [Acc
             }
             // Advance by one day:
             date = nextDate
-            nextDate = calendar.date(byAdding: .hour, value: 1, to: nextDate, options: [])!
+            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate, options: [])!
         }
     case .week:
         var nextDate = calendar.date(byAdding: .day, value: 1, to: date, options: [])!

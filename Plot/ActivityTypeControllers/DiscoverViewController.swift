@@ -55,17 +55,13 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     
     override func viewDidLoad() {
-        super.viewDidLoad()        
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
+        super.viewDidLoad()
+        navigationItem.title = "Discover"
         navigationController?.navigationBar.layoutIfNeeded()
-                
-        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
-        edgesForExtendedLayout = UIRectEdge.top
+        edgesForExtendedLayout = .top
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
@@ -73,15 +69,14 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: kActivityHeaderCell)
-                
+
         addObservers()
-                
+
         for index in 0...sections.count - 1 {
             groups[sections[index]] = [customTypes[index]]
         }
-                
+
         fetchData()
-                
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -176,7 +171,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             switch activityType {
             case .basic:
                 let destination = CreateActivityViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
                 destination.activities = self.networkController.activityService.activities
@@ -186,51 +180,43 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 self.newCalendar()
             case .flight:
                 let destination = FlightSearchViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             case .meal:
                 let destination = MealViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.users = self.networkController.userService.users
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             case .workout:
                 let destination = WorkoutViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             case .mindfulness:
                 let destination = MindfulnessViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             case .mood:
                 let destination = MoodViewController()
-                destination.hidesBottomBarWhenPushed = true
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             case .sleep:
                 let destination = SchedulerViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.type = activityType
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             case .work:
                 let destination = SchedulerViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.type = activityType
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             case .transaction:
                 let destination = FinanceTransactionViewController()
-                destination.hidesBottomBarWhenPushed = true
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
                 let navigationViewController = UINavigationController(rootViewController: destination)
@@ -239,7 +225,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 self.openMXConnect(current_member_guid: nil)
             case .transactionRule:
                 let destination = FinanceTransactionRuleViewController()
-                destination.hidesBottomBarWhenPushed = true
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             default:

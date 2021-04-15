@@ -33,7 +33,7 @@ final class WeatherCell: Cell<[DailyWeatherElement]>, CellType, UICollectionView
     }()
     
     let activityIndicatorView: UIActivityIndicatorView = {
-        let aiv = UIActivityIndicatorView(style: .white)
+        let aiv = UIActivityIndicatorView(style: .medium)
         aiv.color = .darkGray
         aiv.startAnimating()
         aiv.hidesWhenStopped = true

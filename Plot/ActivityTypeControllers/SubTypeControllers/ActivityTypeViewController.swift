@@ -162,8 +162,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         groups[.custom] = customTypes
         
         fetchData()
-        
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -1541,6 +1539,7 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
 }
 
 extension ActivityTypeViewController: UpdateLocationDelegate {
+    
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
         for (_, value) in locationAddress {
             lat = value[0]

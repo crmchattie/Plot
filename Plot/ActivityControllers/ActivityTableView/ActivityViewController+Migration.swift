@@ -165,7 +165,7 @@ extension ActivityViewController {
                 }
                 
                 if category.isEmpty {
-                    category = ActivityCategorySelector.selectCategory(for: activity)
+                    category = ActivityCategory.categorize(activity).rawValue
                 }
             
                 activity.category = category

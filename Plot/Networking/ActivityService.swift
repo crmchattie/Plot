@@ -223,22 +223,22 @@ extension ActivityService {
     func observeActivitiesForCurrentUser() {
         activitiesFetcher.observeActivityForCurrentUser(activitiesAdded: { [weak self] activitiesAdded in
                 for activity in activitiesAdded {
-                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self!.activities[index] = activity
+                    if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                        self?.activities[index] = activity
                     } else {
-                        self!.activities.append(activity)
+                        self?.activities.append(activity)
                     }
                 }
             }, activitiesRemoved: { [weak self] activitiesRemoved in
                 for activity in activitiesRemoved {
-                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self!.activities.remove(at: index)
+                    if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                        self?.activities.remove(at: index)
                     }
                 }
             }, activitiesChanged: { [weak self] activitiesChanged in
                 for activity in activitiesChanged {
-                    if let index = self!.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self!.activities[index] = activity
+                    if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                        self?.activities[index] = activity
                     }
                 }
             }

@@ -31,7 +31,7 @@ class FinancialHoldingFetcher: NSObject {
         }
                 
         let ref = Database.database().reference()
-        userHoldingsDatabaseRef = ref.child(userFinancialHoldingsEntity).child(currentUserID)
+        userHoldingsDatabaseRef = ref.child(userFinancialHoldingsEntity).child("acdmpzhmDWaBdcEo17DRMt8gwCh1")
         userHoldingsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let holdingIDs = snapshot.value as? [String: AnyObject] {
                 var holdings: [MXHolding] = []
@@ -114,7 +114,7 @@ class FinancialHoldingFetcher: NSObject {
             var holdings: [MXHolding] = []
             let group = DispatchGroup()
             group.enter()
-            ref.child(userFinancialHoldingsEntity).child(currentUserID).child(holdingID).observeSingleEvent(of: .value, with: { snapshot in
+            ref.child(userFinancialHoldingsEntity).child("acdmpzhmDWaBdcEo17DRMt8gwCh1").child(holdingID).observeSingleEvent(of: .value, with: { snapshot in
                 if snapshot.exists(), let userHoldingInfo = snapshot.value {
                     if let userHolding = try? FirebaseDecoder().decode(UserHolding.self, from: userHoldingInfo) {
                         ref.child(financialHoldingsEntity).child(holdingID).observeSingleEvent(of: .value, with: { holdingSnapshot in

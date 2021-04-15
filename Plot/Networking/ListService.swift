@@ -33,8 +33,7 @@ class ListService {
             }
             dispatchGroup.enter()
             activitylistFetcher.fetchActivitylists { (activitylists) in
-                for activitylist in activitylists {
-                    if activitylist.name == "nothing" { continue }
+                for activitylist in activitylists where activitylist.name != "nothing" {
                     if let items = activitylist.items, Array(items.keys)[0] == "name" { continue }
                     self.activitylists.append(activitylist)
                 }
@@ -43,8 +42,7 @@ class ListService {
             }
             dispatchGroup.enter()
             grocerylistFetcher.fetchGrocerylists { (grocerylists) in
-                for grocerylist in grocerylists {
-                    if grocerylist.name == "nothing" { continue }
+                for grocerylist in grocerylists where grocerylist.name == "nothing" {
                     self.grocerylists.append(grocerylist)
                 }
                 self.observeGrocerylistsForCurrentUser()

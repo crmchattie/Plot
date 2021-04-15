@@ -10,15 +10,29 @@ import Foundation
 import HealthKit
 
 protocol SummaryServiceInterface {
-    func getSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Swift.Void)
+    
+    func getSamples(
+        segmentType: TimeSegmentType,
+        activities: [Activity]?,
+        transactions: [Transaction]?,
+        completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Void)
+    
+    func getSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([SectionType: [String: [Statistic]]]) -> Void)
 }
 
 class SummaryService: SummaryServiceInterface {
+    
     func getSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Swift.Void) {
-        getStatisticalSamples(segmentType: segmentType, activities: activities, transactions: transactions, completion: completion)
+        getStatisticalSamples(segmentType: segmentType, range: nil, activities: activities, transactions: transactions, completion: completion)
+    }
+    
+    func getSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([SectionType : [String : [Statistic]]]) -> Void) {
+        getStatisticalSamples(segmentType: segment, range: range, activities: activities, transactions: nil) { (_, _, _, stats, _) in
+            completion(stats ?? [:])
+        }
     }
 
-    private func getStatisticalSamples(segmentType: TimeSegmentType, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Void) {
+    private func getStatisticalSamples(segmentType: TimeSegmentType, range: DateRange?, activities: [Activity]?, transactions: [Transaction]?, completion: @escaping ([HKActivitySummary]?, [SectionType: [Entry]]?, [SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Void) {
 
         let dispatchGroup = DispatchGroup()
         var activitySummary: [HKActivitySummary]?
@@ -29,20 +43,20 @@ class SummaryService: SummaryServiceInterface {
         let anchorDate = Date()
         var startDate = anchorDate
         var endDate = anchorDate
-
-        if segmentType == .day {
+        
+        if let range = range {
+            startDate = range.startDate
+            endDate = range.endDate
+        } else if segmentType == .day {
             startDate = Date().localTime.startOfDay
             endDate = Date().localTime.endOfDay
-        }
-        else if segmentType == .week {
+        } else if segmentType == .week {
             startDate = Date().localTime.startOfWeek
             endDate = Date().localTime.endOfWeek
-        }
-        else if segmentType == .month {
+        } else if segmentType == .month {
             startDate = Date().localTime.startOfMonth
             endDate = Date().localTime.endOfMonth
-        }
-        else if segmentType == .year {
+        } else if segmentType == .year {
             startDate = Date().localTime.startOfYear
             endDate = Date().localTime.endOfYear
         }
@@ -69,7 +83,7 @@ class SummaryService: SummaryServiceInterface {
                     }
                 }
                 
-                let totalValue: Double = endDate.timeIntervalSince(startDate)                
+                let totalValue: Double = endDate.timeIntervalSince(startDate)
                 for (key, value) in categoryDict {
                     let entry = Entry(label: key.capitalized, value: value / totalValue, icon: nil)
                     entries.append(entry)
@@ -100,7 +114,6 @@ class SummaryService: SummaryServiceInterface {
                 if !entries.isEmpty {
                     barChartEntries[.cashFlowSummary] = entries
                 }
-                    
 
                     
                     
@@ -132,6 +145,7 @@ class SummaryService: SummaryServiceInterface {
                 dispatchGroup.leave()
             }
         }
+        
         dispatchGroup.notify(queue: .main) {
             completion(activitySummary, pieChartEntries, barChartEntries, barChartStats, nil)
         }

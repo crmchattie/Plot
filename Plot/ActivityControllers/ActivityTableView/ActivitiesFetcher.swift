@@ -28,7 +28,7 @@ class ActivitiesFetcher: NSObject {
             completion([])
             return
         }
-                
+
         let ref = Database.database().reference()
         userActivitiesDatabaseRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID)
         userActivitiesDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
