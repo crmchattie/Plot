@@ -144,8 +144,7 @@ class GeneralTabBarController: UITabBarController {
     fileprivate func setTabs() {
         let tabBarControllers = [
             wrapInNavigationController(analyticsController,
-                                       icon: UIImage(systemName: "chart.pie")!,
-                                       selectedIcon: UIImage(systemName: "chart.pie.fill")!),
+                                       icon: UIImage(named: "chart")!),
             wrapInNavigationController(homeController, icon: UIImage(named: "home")!),
             wrapInNavigationController(settingsController, icon: UIImage(named: "settings")!)
         ]

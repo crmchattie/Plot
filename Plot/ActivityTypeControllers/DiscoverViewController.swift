@@ -69,6 +69,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: kActivityHeaderCell)
+        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+        navigationItem.rightBarButtonItem = doneBarButton
 
         addObservers()
 
@@ -84,6 +86,10 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         managePresense()
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
+    }
+    
+    @IBAction func done(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     fileprivate func managePresense() {
@@ -174,59 +180,49 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
                 destination.activities = self.networkController.activityService.activities
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             case .calendar:
                 self.newCalendar()
             case .flight:
                 let destination = FlightSearchViewController()
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             case .meal:
                 let destination = MealViewController()
                 destination.users = self.networkController.userService.users
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             case .workout:
                 let destination = WorkoutViewController()
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             case .mindfulness:
                 let destination = MindfulnessViewController()
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             case .mood:
                 let destination = MoodViewController()
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             case .sleep:
                 let destination = SchedulerViewController()
                 destination.type = activityType
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             case .work:
                 let destination = SchedulerViewController()
                 destination.type = activityType
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             case .transaction:
                 let destination = FinanceTransactionViewController()
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             case .financialAccount:
                 self.openMXConnect(current_member_guid: nil)
             case .transactionRule:
                 let destination = FinanceTransactionRuleViewController()
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             default:
                 print("default")
             }

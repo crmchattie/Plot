@@ -162,8 +162,8 @@ class FinanceTransactionViewController: FormViewController {
         } else {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-            navigationItem.leftBarButtonItem = cancelBarButton
+//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+//            navigationItem.leftBarButtonItem = cancelBarButton
         
         }
         
@@ -182,11 +182,7 @@ class FinanceTransactionViewController: FormViewController {
             self.hideActivityIndicator()
         }
         self.delegate?.updateTransaction(transaction: transaction)
-        if active {
-            self.navigationController?.popViewController(animated: true)
-        } else {
-            self.dismiss(animated: true, completion: nil)
-        }
+        self.navigationController?.popViewController(animated: true)
     }
     
     fileprivate func initializeForm() {

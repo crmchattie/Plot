@@ -103,8 +103,8 @@ class MindfulnessViewController: FormViewController {
         } else {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
             navigationItem.rightBarButtonItem = addBarButton
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-            navigationItem.leftBarButtonItem = cancelBarButton
+//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+//            navigationItem.leftBarButtonItem = cancelBarButton
         }
     }
     
@@ -172,7 +172,7 @@ class MindfulnessViewController: FormViewController {
             let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createMindfulness.createNewMindfulness()
             self.hideActivityIndicator()
-            self.dismiss(animated: true, completion: nil)
+            self.navigationController?.popViewController(animated: true)
 
         }
     }

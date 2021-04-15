@@ -74,8 +74,8 @@ class FinanceTransactionRuleViewController: FormViewController {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
         } else {
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-            navigationItem.leftBarButtonItem = cancelBarButton
+//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+//            navigationItem.leftBarButtonItem = cancelBarButton
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
         }
@@ -95,11 +95,7 @@ class FinanceTransactionRuleViewController: FormViewController {
             } catch let error {
                 print(error)
             }
-            if active {
-                self.navigationController?.popViewController(animated: true)
-            } else {
-                self.dismiss(animated: true, completion: nil)
-            }
+            self.navigationController?.popViewController(animated: true)
         }
     }
     

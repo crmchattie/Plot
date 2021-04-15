@@ -195,8 +195,8 @@ class CreateActivityViewController: FormViewController {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
             navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = false
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-            navigationItem.leftBarButtonItem = cancelBarButton
+//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+//            navigationItem.leftBarButtonItem = cancelBarButton
         } else {
             let dotsImage = UIImage(named: "dots")
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
@@ -1875,11 +1875,7 @@ class CreateActivityViewController: FormViewController {
             let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
             createActivity.createNewActivity()
             hideActivityIndicator()
-            if active {
-                self.navigationController?.popViewController(animated: true)
-            } else {
-                self.dismiss(animated: true, completion: nil)
-            }
+            self.navigationController?.popViewController(animated: true)
         }
     }
     

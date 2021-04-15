@@ -316,7 +316,7 @@ class FilterViewController: FormViewController {
         if filters.contains(.calendarCategory) {
             if let currentUser = Auth.auth().currentUser?.uid {
                 let reference = Database.database().reference()
-                var categories = activityCategories.sorted()
+                var categories = ActivityCategory.allCases.map({ $0.rawValue }).sorted()
                 reference.child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
                         let array = Array(values.values)

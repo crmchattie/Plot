@@ -143,7 +143,7 @@ class ActivityCell: UITableViewCell {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         selectionStyle = .default
         activityImageView.backgroundColor = .tertiarySystemBackground
-        contentView.backgroundColor = .systemBackground
+        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
 
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
@@ -203,6 +203,7 @@ class ActivityCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         nameLabel.text = nil
         startLabel.text = nil
         activityTypeLabel.text = nil
