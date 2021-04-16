@@ -24,7 +24,13 @@ extension ActivityViewController: UISearchBarDelegate, UISearchControllerDelegat
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
+        filteredPinnedActivities = searchText.isEmpty ? pinnedActivities :
+            pinnedActivities.filter({ (activity) -> Bool in
+                if let name = activity.name {
+                    return name.lowercased().contains(searchText.lowercased())
+                }
+                return ("").lowercased().contains(searchText.lowercased())
+            })
         filteredActivities = searchText.isEmpty ? activities :
             activities.filter({ (activity) -> Bool in
                 if let name = activity.name {

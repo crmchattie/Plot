@@ -35,8 +35,10 @@ class HealthViewController: UIViewController {
     var healthMetrics: [String: [HealthMetric]] {
         return networkController.healthService.healthMetrics
     }
+    var filteredHealthMetricSections = [String]()
+    var filteredHealthMetrics = [String: [HealthMetric]]()
     
-    var filters: [filter] = [.search]
+    var filters: [filter] = [.search, .healthCategory]
     var filterDictionary = [String: [String]]()
     
     let collectionView: UICollectionView = {
@@ -62,6 +64,9 @@ class HealthViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         
+        filteredHealthMetricSections = healthMetricSections
+        filteredHealthMetrics = healthMetrics
+        
         configureView()
         addObservers()
     }
@@ -84,8 +89,8 @@ class HealthViewController: UIViewController {
     
     private func configureView() {
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-        let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
-        navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
+//        let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        navigationItem.rightBarButtonItems = [newItemBarButton]
         
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
@@ -163,18 +168,18 @@ class HealthViewController: UIViewController {
 
 extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return healthMetricSections.count
+        return filteredHealthMetricSections.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let key = healthMetricSections[section]
-        return healthMetrics[key]?.count ?? 0
+        let key = filteredHealthMetricSections[section]
+        return filteredHealthMetrics[key]?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
-        let key = healthMetricSections[indexPath.section]
-        if let metrics = healthMetrics[key] {
+        let key = filteredHealthMetricSections[indexPath.section]
+        if let metrics = filteredHealthMetrics[key] {
             let metric = metrics[indexPath.row]
             cell.configure(metric)
         }
@@ -183,8 +188,8 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let key = healthMetricSections[indexPath.section]
-        if let metrics = healthMetrics[key] {
+        let key = filteredHealthMetricSections[indexPath.section]
+        if let metrics = filteredHealthMetrics[key] {
             let metric = metrics[indexPath.row]
             openMetric(metric: metric)
         }
@@ -193,8 +198,8 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var height: CGFloat = 0
         let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
-        let key = healthMetricSections[indexPath.section]
-        if let metrics = healthMetrics[key] {
+        let key = filteredHealthMetricSections[indexPath.section]
+        if let metrics = filteredHealthMetrics[key] {
             let metric = metrics[indexPath.row]
             dummyCell.configure(metric)
             dummyCell.layoutIfNeeded()
@@ -210,7 +215,7 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
-            let key = healthMetricSections[indexPath.section]
+            let key = filteredHealthMetricSections[indexPath.section]
             let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
             sectionHeader.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             sectionHeader.subTitleLabel.isHidden = true
@@ -224,12 +229,59 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
 
 extension HealthViewController: UpdateFilter {
     func updateFilter(filterDictionary : [String: [String]]) {
-        print("filterDictionary \(filterDictionary)")
-        if !filterDictionary.values.isEmpty {
-            self.filterDictionary = filterDictionary
-        } else {
-            self.filterDictionary = filterDictionary
-        }
+        self.filterDictionary = filterDictionary
+        updateCollectionViewWFilters()
+    }
+    
+    func updateCollectionViewWFilters() {
+//        filteredHealthMetricSections = healthMetricSections
+//        filteredHealthMetrics = healthMetrics
+//        let dispatchGroup = DispatchGroup()
+//        if let value = filterDictionary["calendarView"], let view = CalendarView(rawValue: value[0].lowercased()), self.calendarView != view {
+//            self.calendarView = view
+//        }
+//        if let value = filterDictionary["search"] {
+//            dispatchGroup.enter()
+//            self.calendarView = .list
+//            let searchText = value[0]
+//            filteredPinnedActivities = filteredPinnedActivities.filter({ (activity) -> Bool in
+//                    if let name = activity.name {
+//                        return name.lowercased().contains(searchText.lowercased())
+//                    }
+//                    return ("").lowercased().contains(searchText.lowercased())
+//                })
+//            filteredActivities = filteredActivities.filter({ (activity) -> Bool in
+//                    if let name = activity.name {
+//                        return name.lowercased().contains(searchText.lowercased())
+//                    }
+//                    return ("").lowercased().contains(searchText.lowercased())
+//                })
+//            dispatchGroup.leave()
+//        }
+//        if let categories = filterDictionary["calendarCategory"] {
+//            dispatchGroup.enter()
+//            self.calendarView = .list
+//            filteredPinnedActivities = filteredPinnedActivities.filter({ (activity) -> Bool in
+//                if let category = activity.category {
+//                    return categories.contains(category)
+//                }
+//                return false
+//            })
+//            filteredActivities = filteredActivities.filter({ (activity) -> Bool in
+//                if let category = activity.category {
+//                    return categories.contains(category)
+//                }
+//                return false
+//            })
+//            dispatchGroup.leave()
+//        }
+//
+//        dispatchGroup.notify(queue: .main) {
+//            self.activityView.tableView.reloadData()
+//            self.activityView.tableView.layoutIfNeeded()
+//            self.handleReloadActivities(animated: false)
+//            self.saveCalendarView()
+//        }
     }
         
 }

@@ -61,7 +61,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     fileprivate var sharedContainer : UserDefaults?
     
     let activityView = ActivityView()
-            
+    
     var searchBar: UISearchBar?
     var searchController: UISearchController?
     
@@ -109,6 +109,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     var filters: [filter] = [.search, .calendarView, .calendarCategory]
     var filterDictionary = [String: [String]]()
     
+    var selectedDate = Date().localTime
+    
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd"
@@ -128,25 +130,25 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         panGesture.minimumNumberOfTouches = 1
         panGesture.maximumNumberOfTouches = 2
         return panGesture
-        }()
+    }()
     
-//    let closeButton: UIButton = {
-//        let button = UIButton(type: .system)
-//        button.setImage(UIImage(named: "close"), for: .normal)
-//        button.tintColor = .systemBlue
-//        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
-//        return button
-//    }()
+    //    let closeButton: UIButton = {
+    //        let button = UIButton(type: .system)
+    //        button.setImage(UIImage(named: "close"), for: .normal)
+    //        button.tintColor = .systemBlue
+    //        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+    //        return button
+    //    }()
     
     @objc fileprivate func handleDismiss(button: UIButton) {
         dismiss(animated: true, completion: nil)
     }
-                
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
         
-        let dateString = selectedDateFormatter.string(from: Date().localTime)
+        let dateString = selectedDateFormatter.string(from: selectedDate)
         title = dateString
         
         configureView()
@@ -180,7 +182,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func activitiesUpdated() {
-        handleReloadTable()
+        activityView.tableView.reloadData()
     }
     
     fileprivate func applyCalendarTheme() {
@@ -225,7 +227,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
         edgesForExtendedLayout = UIRectEdge.top
-
+        
         view.addSubview(activityView)
         
         activityView.translatesAutoresizingMaskIntoConstraints = false
@@ -277,7 +279,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             
             alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
                 let calendar = Calendar.current
-                var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.activityView.calendar.selectedDate ?? Date())
+                var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.selectedDate)
                 dateComponents.hour = calendar.component(.hour, from: Date())
                 dateComponents.minute = calendar.component(.minute, from: Date())
                 
@@ -303,7 +305,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             })
         } else {
             let calendar = Calendar.current
-            var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.activityView.calendar.selectedDate ?? Date())
+            var dateComponents = calendar.dateComponents([.day, .month, .year], from: selectedDate)
             dateComponents.hour = calendar.component(.hour, from: Date())
             dateComponents.minute = calendar.component(.minute, from: Date())
             
@@ -342,6 +344,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func filter() {
+        filterDictionary["calendarView"] = [calendarView.rawValue.capitalized]
         let destination = FilterViewController()
         let navigationViewController = UINavigationController(rootViewController: destination)
         destination.delegate = self
@@ -431,25 +434,91 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         guard !isAppLoaded else { return }
         isAppLoaded = true
         
-        handleReloadActivities(animated: false)
-        
+        filteredPinnedActivities = pinnedActivities
+        filteredActivities = activities
+                
         let allActivities = pinnedActivities + activities
         saveDataToSharedContainer(activities: allActivities)
         compileActivityDates(activities: allActivities)
         
         activityView.tableView.layoutIfNeeded()
-        scrollToFirstActivityWithDate(animated: false)
+        handleReloadActivities(animated: false)
         
     }
     
     func handleReloadActivities(animated: Bool) {
         if calendarView == .list {
-            filteredPinnedActivities = pinnedActivities
-            filteredActivities = activities
             scrollToFirstActivityWithDate(animated: animated)
         } else {
             filterEvents()
         }
+    }
+    
+    func scrollToFirstActivityWithDate(animated: Bool) {
+        let date = selectedDate
+        var index = 0
+        var activityFound = false
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        for activity in self.filteredActivities {
+            if let endDate = activity.endDateWTZ {
+                if (date < endDate) || (activity.allDay ?? false && calendar.compare(date, to: endDate, toGranularity: .day) != .orderedDescending) {
+                    activityFound = true
+                    break
+                }
+                index += 1
+            }
+        }
+        
+        if activityFound {
+            let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
+            if index < numberOfRows {
+                let indexPath = IndexPath(row: index, section: 1)
+                self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
+                if !animated {
+                    self.activityView.tableView.reloadData()
+                }
+            }
+        } else if !activityFound {
+            let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
+            if numberOfRows > 0 {
+                let indexPath = IndexPath(row: numberOfRows - 1, section: 1)
+                self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
+                if !animated {
+                    self.activityView.tableView.reloadData()
+                }
+            }
+        }
+    }
+    
+    func filterEvents() {
+        let startDate = selectedDate.startOfDay
+        let endDate = selectedDate.endOfDay
+        filteredPinnedActivities = pinnedActivities.filter({ (activity) -> Bool in
+            if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate {
+                if activityStartDate > startDate && endDate > activityStartDate {
+                    return true
+                } else if activityEndDate.timeIntervalSince(activityStartDate) > 86399 && activityEndDate > startDate && endDate > activityEndDate {
+                    return true
+                } else if startDate > activityStartDate && activityEndDate > endDate {
+                    return true
+                }
+            }
+            return false
+        })
+        filteredActivities = activities.filter({ (activity) -> Bool in
+            if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate {
+                if activityStartDate > startDate && endDate > activityStartDate {
+                    return true
+                } else if activityEndDate.timeIntervalSince(activityStartDate) > 86399 && activityEndDate > startDate && endDate > activityEndDate {
+                    return true
+                } else if startDate > activityStartDate && activityEndDate > endDate {
+                    return true
+                }
+            }
+            return false
+        })
+        self.activityView.tableView.reloadData()
     }
     
     func handleReloadTableAftersearchBarCancelButtonClicked() {
@@ -465,62 +534,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
         }
         
-        self.activityView.tableView.reloadData()
-    }
-    
-    func scrollToFirstActivityWithDate(animated: Bool) {
-        let date = activityView.calendar.selectedDate?.localTime ?? Date().localTime
-        var index = 0
-        var activityFound = false
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
-        for activity in self.filteredActivities {
-            if let endDate = activity.endDateWTZ {
-                if (date < endDate) || (activity.allDay ?? false && calendar.compare(date, to: endDate, toGranularity: .day) != .orderedDescending) {
-                    activityFound = true
-                    break
-                }
-                index += 1
-            }
-        }
-                
-        let numberOfSections = activityView.tableView.numberOfSections
-        if activityFound && numberOfSections > 1 {
-            let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
-            if index < numberOfRows {
-                let indexPath = IndexPath(row: index, section: 1)
-                self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
-                if !animated {
-                    self.activityView.tableView.reloadRows(at: [indexPath], with: .none)
-                }
-            }
-        } else if !activityFound {
-            let numberOfRows = self.activityView.tableView.numberOfRows(inSection: 1)
-            if numberOfRows > 0 {
-                let indexPath = IndexPath(row: numberOfRows - 1, section: 1)
-                self.activityView.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
-                if !animated {
-                    self.activityView.tableView.reloadRows(at: [indexPath], with: .none)
-                }
-            }
-        }
-    }
-    
-    func filterEvents() {
-        let startDate = activityView.calendar.selectedDate?.startOfDay
-        let endDate = activityView.calendar.selectedDate?.endOfDay
-        filteredActivities = activities.filter({ (activity) -> Bool in
-            if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate {
-                if activityStartDate > startDate && endDate > activityStartDate {
-                    return true
-                } else if activityEndDate.timeIntervalSince(activityStartDate) > 86399 && activityEndDate > startDate && endDate > activityEndDate {
-                    return true
-                } else if startDate > activityStartDate && activityEndDate > endDate {
-                    return true
-                }
-            }
-            return false
-        })
         self.activityView.tableView.reloadData()
     }
     
@@ -565,13 +578,15 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        let dateString = selectedDateFormatter.string(from: date)
+        self.selectedDate = date
+        let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        let dateString = selectedDateFormatter.string(from: calendar.currentPage)
+        self.selectedDate = calendar.currentPage
+        let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)
     }
@@ -1045,7 +1060,7 @@ extension ActivityViewController: ActivityCellDelegate {
         destination.sections = [.activity]
         destination.locations = [.activity: locations]
         navigationController?.pushViewController(destination, animated: true)
-    
+        
     }
     
     func openChat(forConversation conversationID: String?, activityID: String?) {
@@ -1127,7 +1142,7 @@ extension ActivityViewController: ChooseChatDelegate {
         if let activityID = activityID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
             Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-
+            
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activities != nil {
                     var activities = conversation.activities!
@@ -1163,7 +1178,7 @@ extension ActivityViewController: ChooseChatDelegate {
                         }
                         for ID in activity.checklistIDs! {
                             Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
-
+                            
                         }
                     }
                     if activity.packinglistIDs != nil {
@@ -1175,9 +1190,9 @@ extension ActivityViewController: ChooseChatDelegate {
                             let updatedPackinglists = [packinglistsEntity: activity.packinglistIDs! as AnyObject]
                             Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
                         }
-                       for ID in activity.packinglistIDs! {
+                        for ID in activity.packinglistIDs! {
                             Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
-
+                            
                         }
                     }
                 }
@@ -1193,19 +1208,65 @@ extension ActivityViewController: GIDSignInDelegate {
         if (error == nil) {
             self.networkController.activityService.updatePrimaryCalendar(value: googleString)
         } else {
-          print("\(error.localizedDescription)")
+            print("\(error.localizedDescription)")
         }
     }
 }
 
 extension ActivityViewController: UpdateFilter {
     func updateFilter(filterDictionary : [String: [String]]) {
-        print("filterDictionary \(filterDictionary)")
-        if !filterDictionary.values.isEmpty {
-            self.filterDictionary = filterDictionary
-        } else {
-            self.filterDictionary = filterDictionary
+        self.filterDictionary = filterDictionary
+        updateTableViewWFilters()
+    }
+    
+    func updateTableViewWFilters() {
+        filteredPinnedActivities = pinnedActivities
+        filteredActivities = activities
+        let dispatchGroup = DispatchGroup()
+        if let value = filterDictionary["calendarView"], let view = CalendarView(rawValue: value[0].lowercased()), self.calendarView != view {
+            self.calendarView = view
+        }
+        if let value = filterDictionary["search"] {
+            dispatchGroup.enter()
+            self.calendarView = .list
+            let searchText = value[0]
+            filteredPinnedActivities = filteredPinnedActivities.filter({ (activity) -> Bool in
+                    if let name = activity.name {
+                        return name.lowercased().contains(searchText.lowercased())
+                    }
+                    return ("").lowercased().contains(searchText.lowercased())
+                })
+            filteredActivities = filteredActivities.filter({ (activity) -> Bool in
+                    if let name = activity.name {
+                        return name.lowercased().contains(searchText.lowercased())
+                    }
+                    return ("").lowercased().contains(searchText.lowercased())
+                })
+            dispatchGroup.leave()
+        }
+        if let categories = filterDictionary["calendarCategory"] {
+            dispatchGroup.enter()
+            self.calendarView = .list
+            filteredPinnedActivities = filteredPinnedActivities.filter({ (activity) -> Bool in
+                if let category = activity.category {
+                    return categories.contains(category)
+                }
+                return false
+            })
+            filteredActivities = filteredActivities.filter({ (activity) -> Bool in
+                if let category = activity.category {
+                    return categories.contains(category)
+                }
+                return false
+            })
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.activityView.tableView.reloadData()
+            self.activityView.tableView.layoutIfNeeded()
+            self.handleReloadActivities(animated: false)
+            self.saveCalendarView()
         }
     }
-        
 }
