@@ -400,7 +400,8 @@ class FinanceDetailViewController: UIViewController {
     }
     
     func openTransactionDetails(transactionDetails: TransactionDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: transactions, financeDetailService: FinanceDetailService())
+        let accounts = transactions.compactMap({ $0.account_guid })
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: transactions, filterAccounts: accounts, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
@@ -410,7 +411,7 @@ class FinanceDetailViewController: UIViewController {
     }
     
     func openAccountDetails(accountDetails: AccountDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: accounts, transactionDetails: nil, transactions: nil, financeDetailService: FinanceDetailService())
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: accounts, transactionDetails: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
