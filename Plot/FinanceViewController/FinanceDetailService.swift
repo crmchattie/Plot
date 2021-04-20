@@ -9,14 +9,14 @@
 import Foundation
 
 protocol FinanceDetailServiceInterface {
-    func getSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
+    func getSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
     
     func getSamples(for range: DateRange, segment: TimeSegmentType, accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
 }
 
 class FinanceDetailService: FinanceDetailServiceInterface {
     
-    func getSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Swift.Void) {
+    func getSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Swift.Void) {
 
         getStatisticalSamples(accountDetails: accountDetails,
                               transactionDetails: transactionDetails,
@@ -24,6 +24,7 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                               range: nil,
                               accounts: accounts,
                               transactions: transactions,
+                              filterAccounts: filterAccounts,
                               completion: completion)
     }
     
@@ -34,6 +35,7 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                               range: range,
                               accounts: accounts,
                               transactions: transactions,
+                              filterAccounts: nil,
                               completion: completion)
     }
 
@@ -44,6 +46,7 @@ class FinanceDetailService: FinanceDetailServiceInterface {
         range: DateRange?,
         accounts: [MXAccount]?,
         transactions: [Transaction]?,
+        filterAccounts: [String]?,
         completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void
     ) {
 
@@ -79,7 +82,7 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                     }
                 }
             } else if let transactionDetails = transactionDetails, let transactions = transactions {
-                transactionDetailsOverTimeChartData(transactions: transactions, transactionDetails: [transactionDetails], start: startDate, end: endDate, segmentType: segmentType) { (statisticDict, transactionDict) in
+                transactionDetailsOverTimeChartData(transactions: transactions, transactionDetails: [transactionDetails], start: startDate, end: endDate, segmentType: segmentType, accounts: filterAccounts ?? [""]) { (statisticDict, transactionDict) in
                     if let statistics = statisticDict[transactionDetails], let transactions = transactionDict[transactionDetails] {
                         let isodateFormatter = ISO8601DateFormatter()
                         var sortTransactions = transactions

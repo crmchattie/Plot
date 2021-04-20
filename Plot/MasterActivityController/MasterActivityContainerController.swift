@@ -341,7 +341,8 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
-                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.endOfMonth, level: transactionLevel) { (transactionsList, _) in
+                    let accounts = transactions.compactMap({ $0.account_guid })
+                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.endOfMonth, level: transactionLevel, accounts: accounts) { (transactionsList, _) in
                         if !transactionsList.isEmpty {
                             sections.append(section)
                             groups[section] = transactionsList

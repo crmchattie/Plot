@@ -239,7 +239,8 @@ class FinanceDetailViewController: UIViewController {
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
                     dispatchGroup.enter()
-                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel) { (transactionsList, transactionsDict) in
+                    let accounts = transactions.compactMap({ $0.account_guid })
+                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, accounts: accounts) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
                             self.sections.append(section)
                             self.groups[section] = transactionsList

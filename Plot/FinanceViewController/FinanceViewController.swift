@@ -204,8 +204,13 @@ class FinanceViewController: UIViewController {
     private func updateCollectionView() {
         var accountLevel: AccountCatLevel!
         var transactionLevel: TransactionCatLevel!
-        accountLevel = .none
-        transactionLevel = .none
+        if let level = filterDictionary["financeLevel"], level[0] == "Top" {
+            accountLevel = .bs_type
+            transactionLevel = .group
+        } else {
+            accountLevel = .none
+            transactionLevel = .none
+        }
         
         let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .transactions, .investments, .financialAccounts]
                 
@@ -254,9 +259,15 @@ class FinanceViewController: UIViewController {
                     }
                 }
             } else if section.type == "Transactions" {
+                var accounts = [String]()
+                if let filterAccounts = filterDictionary["financeAccount"] {
+                    accounts = filterAccounts
+                } else {
+                    accounts = transactions.compactMap({ $0.account_guid })
+                }
                 if section.subType == "Income Statement" {
                     dispatchGroup.enter()
-                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel) { (transactionsList, transactionsDict) in
+                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, accounts: accounts) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
                             self.sections.append(section)
                             self.groups[section] = transactionsList
@@ -267,13 +278,17 @@ class FinanceViewController: UIViewController {
                     if !transactions.isEmpty {
                         dispatchGroup.enter()
                         var filteredTransactions = transactions.filter { (transaction) -> Bool in
-                            if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                                if transactionDate > startDate && endDate > transactionDate {
-                                    return true
-                                }
-                            } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-                                if transactionDate > startDate && endDate > transactionDate {
-                                    return true
+                            if let account = transaction.account_guid {
+                                if accounts.contains(account) {
+                                    if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
+                                        if transactionDate > startDate && endDate > transactionDate {
+                                            return true
+                                        }
+                                    } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                                        if transactionDate > startDate && endDate > transactionDate {
+                                            return true
+                                        }
+                                    }
                                 }
                             }
                             return false
@@ -416,7 +431,13 @@ class FinanceViewController: UIViewController {
     }
     
     func openTransactionDetails(transactionDetails: TransactionDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: transactions, financeDetailService: FinanceDetailService())
+        var accounts = [String]()
+        if let filterAccounts = filterDictionary["financeAccount"] {
+            accounts = filterAccounts
+        } else {
+            accounts = transactions.compactMap({ $0.account_guid })
+        }
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: transactions, filterAccounts: accounts, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
@@ -426,7 +447,7 @@ class FinanceViewController: UIViewController {
     }
     
     func openAccountDetails(accountDetails: AccountDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: accounts, transactionDetails: nil, transactions: nil, financeDetailService: FinanceDetailService())
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: accounts, transactionDetails: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
@@ -699,12 +720,8 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
 
 extension FinanceViewController: UpdateFilter {
     func updateFilter(filterDictionary : [String: [String]]) {
-        print("filterDictionary \(filterDictionary)")
-        if !filterDictionary.values.isEmpty {
-            self.filterDictionary = filterDictionary
-        } else {
-            self.filterDictionary = filterDictionary
-        }
+        self.filterDictionary = filterDictionary
+        updateCollectionView()
     }
         
 }

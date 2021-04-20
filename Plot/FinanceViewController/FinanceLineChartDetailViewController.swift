@@ -31,7 +31,7 @@ class FinanceLineChartDetailViewController: UIViewController {
     var filteredUsers = [User]()
     
     var participants: [String: [User]] = [:]
-    
+        
     private var viewModel: FinanceDetailViewModelInterface
     var dayAxisValueFormatter: DayAxisValueFormatter?
     var backgroundChartViewHeightAnchor: NSLayoutConstraint?

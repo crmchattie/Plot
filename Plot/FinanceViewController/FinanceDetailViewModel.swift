@@ -15,6 +15,7 @@ protocol FinanceDetailViewModelInterface {
     var accounts: [MXAccount]? { get set }
     var transactions: [Transaction]? { get set }
     
+    
     func fetchLineChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double) -> ())
     
     func fetchBarChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?, Double) -> ())
@@ -29,8 +30,9 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
     var allTransactions: [Transaction]?
     var accounts: [MXAccount]?
     var transactions: [Transaction]?
+    var filterAccounts: [String]?
     
-    init(accountDetails: AccountDetails?, accounts: [MXAccount]?, transactionDetails: TransactionDetails?, transactions: [Transaction]?, financeDetailService: FinanceDetailServiceInterface) {
+    init(accountDetails: AccountDetails?, accounts: [MXAccount]?, transactionDetails: TransactionDetails?, transactions: [Transaction]?, filterAccounts: [String]?, financeDetailService: FinanceDetailServiceInterface) {
         self.accountDetails = accountDetails
         self.allAccounts = accounts
         self.accounts = accounts
@@ -38,10 +40,11 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
         self.allTransactions = transactions
         self.transactions = transactions
         self.financeDetailService = financeDetailService
+        self.filterAccounts = filterAccounts
     }
     
     func fetchLineChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double) -> ()) {
-        financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: allAccounts, transactions: allTransactions) { [weak self] (stats, accounts, transactions, err) in
+        financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: allAccounts, transactions: allTransactions, filterAccounts: filterAccounts) { [weak self] (stats, accounts, transactions, err) in
             
             var lineChartData: LineChartData?
             var maxValue: Double = 0
@@ -75,7 +78,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
     }
     
     func fetchBarChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?, Double) -> ()) {
-        financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: allAccounts, transactions: allTransactions) { [weak self] (stats, accounts, transactions, err) in
+        financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: allAccounts, transactions: allTransactions, filterAccounts: filterAccounts) { [weak self] (stats, accounts, transactions, err) in
             
             var barChartData: BarChartData?
             var maxValue: Double = 0

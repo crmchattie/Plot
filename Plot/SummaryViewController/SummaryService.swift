@@ -97,7 +97,8 @@ class SummaryService: SummaryServiceInterface {
         
         if let transactions = transactions {
             dispatchGroup.enter()
-            categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: .none) { (transactionDetailsList, _) in
+            let accounts = transactions.compactMap({ $0.account_guid })
+            categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: .none, accounts: accounts) { (transactionDetailsList, _) in
                 //total groups excluding 'Expense'
                 var totalValue : Double = 0
                 var entries = [Entry]()

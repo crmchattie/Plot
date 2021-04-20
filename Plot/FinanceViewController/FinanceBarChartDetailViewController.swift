@@ -24,7 +24,7 @@ class FinanceBarChartViewController: UIViewController {
     
     var users = [User]()
     var filteredUsers = [User]()
-    
+        
     var participants: [String: [User]] = [:]
     
     private var viewModel: FinanceDetailViewModelInterface
