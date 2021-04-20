@@ -149,6 +149,7 @@ class FilterViewController: FormViewController {
                             return row.value ?? false == false
                         })
                         }.cellSetup { (cell, row) in
+                            print("filter.rawValue \(filter.rawValue)")
                             if self.filterDictionary.keys.contains(filter.rawValue), let choiceList = self.filterDictionary[filter.rawValue], let _ = choiceList.firstIndex(of: choice) {
                                 row.value = choice
                             }
@@ -379,14 +380,15 @@ class FilterViewController: FormViewController {
             let accountFetcher = FinancialAccountFetcher()
             accountFetcher.fetchAccounts { (firebaseAccounts) in
                 let accounts = firebaseAccounts.sorted { (account1, account2) -> Bool in
-                    return account1.name < account2.name
+                    return account1.name > account2.name
                 }
                 if let row: CheckRow = self.form.rowBy(tag: filter.financeAccount.rawValue), let sectionIndex = row.section?.index {
                     var section = self.form.allSections[sectionIndex]
                     accounts.forEach {
                         let choice = $0.name
+                        let guid = $0.guid
                         section.insert(
-                            ListCheckRow<String>("\(choice)_\(filter.financeAccount.rawValue)"){ row in
+                            ListCheckRow<String>("\(guid)_\(filter.financeAccount.rawValue)"){ row in
                                 row.title = choice
                                 row.selectableValue = choice
                                 row.value = nil
@@ -395,7 +397,7 @@ class FilterViewController: FormViewController {
                                     return row.value ?? false == false
                                 })
                                 }.cellSetup { (cell, row) in
-                                    if self.filterDictionary.keys.contains(filter.financeAccount.rawValue), let choiceList = self.filterDictionary[filter.financeAccount.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                                    if self.filterDictionary.keys.contains(filter.financeAccount.rawValue), let choiceList = self.filterDictionary[filter.financeAccount.rawValue], let _ = choiceList.firstIndex(of: guid) {
                                         row.value = choice
                                     }
                                     cell.accessoryType = .checkmark

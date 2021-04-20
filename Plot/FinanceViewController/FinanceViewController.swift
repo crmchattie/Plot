@@ -10,6 +10,13 @@ import UIKit
 import Firebase
 import CodableFirebase
 
+let kFinanceLevel = "FinanceLevel"
+
+enum FinanceLevel: String {
+    case all
+    case top
+}
+
 class FinanceViewController: UIViewController {
     var networkController: NetworkController
     
@@ -76,6 +83,8 @@ class FinanceViewController: UIViewController {
     var hasViewAppeared = false
     
     var participants: [String: [User]] = [:]
+    
+    var financeLevel: FinanceLevel = .all
     
     var filters: [filter] = [.financeLevel, .financeAccount]
     var filterDictionary = [String: [String]]()
@@ -146,6 +155,8 @@ class FinanceViewController: UIViewController {
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
+        
+        financeLevel = getFinanceLevel()
                 
 
     }
@@ -183,6 +194,7 @@ class FinanceViewController: UIViewController {
     }
     
     @objc fileprivate func filter() {
+        filterDictionary["financeLevel"] = [financeLevel.rawValue.capitalized]
         let destination = FilterViewController()
         let navigationViewController = UINavigationController(rootViewController: destination)
         destination.delegate = self
@@ -201,15 +213,29 @@ class FinanceViewController: UIViewController {
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
+    func saveFinanceLevel() {
+        UserDefaults.standard.setValue(financeLevel.rawValue, forKey: kFinanceLevel)
+    }
+    
+    func getFinanceLevel() -> FinanceLevel {
+        if let value = UserDefaults.standard.value(forKey: kFinanceLevel) as? String, let view = FinanceLevel(rawValue: value) {
+            return view
+        } else {
+            return .all
+        }
+    }
+    
     private func updateCollectionView() {
         var accountLevel: AccountCatLevel!
         var transactionLevel: TransactionCatLevel!
         if let level = filterDictionary["financeLevel"], level[0] == "Top" {
             accountLevel = .bs_type
             transactionLevel = .group
+            financeLevel = .top
         } else {
             accountLevel = .none
             transactionLevel = .none
+            financeLevel = .all
         }
         
         let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .transactions, .investments, .financialAccounts]
@@ -321,7 +347,9 @@ class FinanceViewController: UIViewController {
         }
         
         dispatchGroup.notify(queue: .main) {
+            print("moving forward")
             self.collectionView.reloadData()
+            self.saveFinanceLevel()
         }
     }
     
@@ -487,10 +515,21 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 cell.lastPosition = true
             }
             if let object = object as? [TransactionDetails] {
+                if let level = filterDictionary["financeLevel"], level[0] == "Top" {
+                    cell.mode = .small
+                } else {
+                    cell.mode = .fullscreen
+                }
                 cell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
+                if let level = filterDictionary["financeLevel"], level[0] == "Top" {
+                    cell.mode = .small
+                } else {
+                    cell.mode = .fullscreen
+                }
                 cell.accountDetails = object[indexPath.item]
             } else if let object = object as? [MXHolding] {
+                cell.mode = .fullscreen
                 cell.firstPosition = true
                 cell.lastPosition = true
                 cell.holding = object[indexPath.item]
@@ -528,10 +567,21 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 dummyCell.lastPosition = true
             }
             if let object = object as? [TransactionDetails] {
+                if let level = filterDictionary["financeLevel"], level[0] == "Top" {
+                    dummyCell.mode = .small
+                } else {
+                    dummyCell.mode = .fullscreen
+                }
                 dummyCell.transactionDetails = object[indexPath.item]
             } else if let object = object as? [AccountDetails] {
+                if let level = filterDictionary["financeLevel"], level[0] == "Top" {
+                    dummyCell.mode = .small
+                } else {
+                    dummyCell.mode = .fullscreen
+                }
                 dummyCell.accountDetails = object[indexPath.item]
             } else if let object = object as? [MXHolding] {
+                dummyCell.mode = .fullscreen
                 dummyCell.firstPosition = true
                 dummyCell.lastPosition = true
                 dummyCell.holding = object[indexPath.item]
@@ -723,7 +773,6 @@ extension FinanceViewController: UpdateFilter {
         self.filterDictionary = filterDictionary
         updateCollectionView()
     }
-        
 }
 
 
