@@ -64,6 +64,7 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
             let stats = stats ?? []
             
             self.transactions = self.networkController.financeService.transactions
+                .filter { $0.should_link ?? true }
                 .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
                 .filter { transaction -> Bool in
                     guard let date = self.dateFormatter.date(from: transaction.created_at) else { return false }

@@ -49,6 +49,8 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         let daysInRange = range.daysInRange
         
         transactions = networkController.financeService.transactions
+            .filter { $0.should_link ?? true }
+            .filter { $0.top_level_category != "Investments" && $0.category != "Investments" }
             .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
             .filter { transaction -> Bool in
                 #warning("This is extremely unoptimal. A stored Date object should be saved inside the Transaction.")
@@ -64,13 +66,13 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         var categoryColors: [UIColor] = []
         var categories: [CategorySummaryViewModel] = []
         
-        transactions.grouped(by: \.top_level_category).forEach { (category, transactions) in
+        transactions.grouped(by: \.group).forEach { (category, transactions) in
             var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
             var sum: Double = 0
             transactions.forEach { transaction in
                 guard let day = dateFormatter.date(from: transaction.created_at) else { return }
                 let daysInBetween = day.daysSince(range.startDate)
-                if transaction.is_income ?? false {
+                if transaction.type == "CREDIT" {
                     incomeValue += transaction.amount
                     values[daysInBetween] += transaction.amount
                 } else {

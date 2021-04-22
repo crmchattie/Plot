@@ -261,6 +261,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
         guard transaction.should_link ?? true else { continue }
+        guard transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
         guard accounts.contains(transaction.account_guid ?? "") else { continue }
         if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date), let start = start, let end = end {
             if transactionDate < start || end < transactionDate {
