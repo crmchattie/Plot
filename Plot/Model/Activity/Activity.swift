@@ -34,6 +34,10 @@ class Activity: NSObject, NSCopying, Codable {
     var startTimeZone: String?
     var endDateTime: NSNumber?
     var endTimeZone: String?
+    // A list of RFC-5545 (iCal) expressions.
+    // https://tools.ietf.org/html/rfc5545
+    //
+    // Both Google and iCloud events are transfomed into this expression.
     var recurrences: [String]?
     var reminder: String?
     var notes: String?

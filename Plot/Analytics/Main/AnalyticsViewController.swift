@@ -17,10 +17,11 @@ class AnalyticsViewController: UITableViewController {
         return activityIndicator
     }()
     
-    private var viewModel: AnalyticsViewModel!
+    var viewModel: AnalyticsViewModel? {
+        didSet { loadData() }
+    }
     
-    init(viewModel: AnalyticsViewModel) {
-        self.viewModel = viewModel
+    init() {
         super.init(style: .insetGrouped)
     }
     
@@ -41,6 +42,11 @@ class AnalyticsViewController: UITableViewController {
         tableView.register(AnalyticsBarChartCell.self)
         tableView.register(AnalyticsLineChartCell.self)
         
+        
+        
+    }
+    
+    private func loadData() {
         view.addSubview(activityIndicator)
         activityIndicator.center = view.center
         activityIndicator.autoresizingMask = [.flexibleTopMargin,
@@ -48,13 +54,14 @@ class AnalyticsViewController: UITableViewController {
                                               .flexibleLeftMargin,
                                               .flexibleRightMargin]
         activityIndicator.startAnimating()
-        viewModel.loadData {
+        viewModel?.loadData {
             self.activityIndicator.removeFromSuperview()
             self.tableView.reloadData()
         }
     }
     
     private func openDetail(for indexPath: IndexPath) {
+        guard let viewModel = viewModel else { return }
         let controller = AnalyticsDetailViewController(viewModel: viewModel.makeDetailViewModel(for: indexPath))
         controller.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(controller, animated: true)
@@ -65,15 +72,15 @@ class AnalyticsViewController: UITableViewController {
 
 extension AnalyticsViewController {
     
-    override func numberOfSections(in tableView: UITableView) -> Int { viewModel.sections.count }
+    override func numberOfSections(in tableView: UITableView) -> Int { viewModel?.sections.count ?? 0 }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.sections[section].items.count * 2
+        viewModel!.sections[section].items.count * 2
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row % 2 == 0 {
-            let cellViewModel = viewModel.sections[indexPath.section].items[indexPath.row / 2]
+            let cellViewModel = viewModel!.sections[indexPath.section].items[indexPath.row / 2]
             switch cellViewModel.chartType {
             case .continous:
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsLineChartCell.self, for: indexPath)
@@ -98,7 +105,7 @@ extension AnalyticsViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        viewModel.sections[section].title.capitalized
+        viewModel!.sections[section].title.capitalized
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

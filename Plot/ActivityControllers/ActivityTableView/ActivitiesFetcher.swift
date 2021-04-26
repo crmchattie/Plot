@@ -32,42 +32,58 @@ class ActivitiesFetcher: NSObject {
         let ref = Database.database().reference()
         userActivitiesDatabaseRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID)
         userActivitiesDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
-            if snapshot.exists(), let activityIDs = snapshot.value as? [String: AnyObject] {
-                var activities: [Activity] = []
-                let group = DispatchGroup()
-                for (activityID, userActivityInfo) in activityIDs {
-                    if let dictionary = userActivityInfo as? [String: AnyObject] {
-                        let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
-                        group.enter()
-                        ref.child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
-                            if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
-                                let activity = Activity(dictionary: activitySnapshotValue)
-                                activity.showExtras = userActivity.showExtras
-                                activity.calendarExport = userActivity.calendarExport
-                                activity.reminder = userActivity.reminder
-                                activity.badge = userActivity.badge
-                                activity.muted = userActivity.muted
-                                activity.pinned = userActivity.pinned
+            guard snapshot.exists(), let activityIDs = snapshot.value as? [String: AnyObject] else {
+                return completion([])
+            }
+            var activities: [Activity] = []
+            let group = DispatchGroup()
+            for (activityID, userActivityInfo) in activityIDs {
+                if let dictionary = userActivityInfo as? [String: AnyObject] {
+                    let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
+                    group.enter()
+                    ref.child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
+                        if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
+                            let activity = Activity(dictionary: activitySnapshotValue)
+                            activity.showExtras = userActivity.showExtras
+                            activity.calendarExport = userActivity.calendarExport
+                            activity.reminder = userActivity.reminder
+                            activity.badge = userActivity.badge
+                            activity.muted = userActivity.muted
+                            activity.pinned = userActivity.pinned
+                            
+                            // Handles recurring events.
+                            if let rules = activity.recurrences, !rules.isEmpty {
+                                let dates = iCalUtility()
+                                    .recurringDates(forRules: rules, startDate: activity.startDate!)
+                                print(rules, dates)
+
+                                let duration = activity.endDate!.timeIntervalSince(activity.endDate!)
+
+                                for date in dates {
+                                    let newAcitivty = activity.copy() as! Activity
+                                    newAcitivty.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                    newAcitivty.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                                    activities.append(newAcitivty)
+                                }
+                            } else {
                                 activities.append(activity)
                             }
-                            group.leave()
-                        })
-                    } else {
-                        group.enter()
-                        ref.child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
-                            if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
-                                let activity = Activity(dictionary: activitySnapshotValue)
-                                activities.append(activity)
-                            }
-                            group.leave()
-                        })
-                    }
+                        }
+                        group.leave()
+                    })
+                } else {
+                    group.enter()
+                    ref.child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
+                        if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
+                            let activity = Activity(dictionary: activitySnapshotValue)
+                            activities.append(activity)
+                        }
+                        group.leave()
+                    })
                 }
-                group.notify(queue: .main) {
-                    completion(activities)
-                }
-            } else {
-                completion([])
+            }
+            group.notify(queue: .main) {
+                completion(activities)
             }
         })
     }
@@ -102,7 +118,6 @@ class ActivitiesFetcher: NSObject {
                 self.getActivitiesFromSnapshot(snapshot: snapshot, completion: completion)
             }
         })
-        
     }
     
     func getActivitiesFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Activity])->()) {

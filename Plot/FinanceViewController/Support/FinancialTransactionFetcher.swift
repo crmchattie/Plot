@@ -31,7 +31,7 @@ class FinancialTransactionFetcher: NSObject {
         }
                 
         let ref = Database.database().reference()
-        userTransactionsDatabaseRef = ref.child(userFinancialTransactionsEntity).child("acdmpzhmDWaBdcEo17DRMt8gwCh1")
+        userTransactionsDatabaseRef = ref.child(userFinancialTransactionsEntity).child(currentUserID)
         userTransactionsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let transactionIDs = snapshot.value as? [String: AnyObject] {
                 var transactions: [Transaction] = []
@@ -129,7 +129,7 @@ class FinancialTransactionFetcher: NSObject {
             var transactions: [Transaction] = []
             let group = DispatchGroup()
             group.enter()
-            ref.child(userFinancialTransactionsEntity).child("acdmpzhmDWaBdcEo17DRMt8gwCh1").child(transactionID).observeSingleEvent(of: .value, with: { snapshot in
+            ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transactionID).observeSingleEvent(of: .value, with: { snapshot in
                 if snapshot.exists(), let userTransactionInfo = snapshot.value {
                     if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: userTransactionInfo) {
                         ref.child(financialTransactionsEntity).child(transactionID).observeSingleEvent(of: .value, with: { transactionSnapshot in

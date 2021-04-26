@@ -30,7 +30,7 @@ class FinancialAccountFetcher: NSObject {
         }
                 
         let ref = Database.database().reference()
-        userAccountsDatabaseRef = ref.child(userFinancialAccountsEntity).child("acdmpzhmDWaBdcEo17DRMt8gwCh1")
+        userAccountsDatabaseRef = ref.child(userFinancialAccountsEntity).child(currentUserID)
         userAccountsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let accountIDs = snapshot.value as? [String: AnyObject] {
                 var accounts: [MXAccount] = []
@@ -114,7 +114,7 @@ class FinancialAccountFetcher: NSObject {
             var accounts: [MXAccount] = []
             let group = DispatchGroup()
             group.enter()
-            ref.child(userFinancialAccountsEntity).child("acdmpzhmDWaBdcEo17DRMt8gwCh1").child(accountID).observeSingleEvent(of: .value, with: { snapshot in
+            ref.child(userFinancialAccountsEntity).child(currentUserID).child(accountID).observeSingleEvent(of: .value, with: { snapshot in
                 if snapshot.exists(), let userAccountInfo = snapshot.value {
                     if let userAccount = try? FirebaseDecoder().decode(UserAccount.self, from: userAccountInfo) {
                         ref.child(financialAccountsEntity).child(accountID).observeSingleEvent(of: .value, with: { accountSnapshot in

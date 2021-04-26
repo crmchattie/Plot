@@ -70,6 +70,13 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
                     return range.startDate <= date && date <= range.endDate
                 }
             
+            if stats.isEmpty {
+                newChartViewModel.chartData = nil
+                self.chartViewModel.send(newChartViewModel)
+                completion?()
+                return
+            }
+            
             var dataEntries: [ChartDataEntry] = []
             var maxValue: Double = 0
             var firstValue: Double?

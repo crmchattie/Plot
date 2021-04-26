@@ -157,6 +157,7 @@ class CalendarInfoViewController: UITableViewController {
 }
 
 extension CalendarInfoViewController: GIDSignInDelegate {
+    
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         print("signed in")
         if (error == nil) {
