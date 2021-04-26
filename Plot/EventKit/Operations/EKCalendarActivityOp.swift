@@ -84,9 +84,9 @@ class EKCalendarActivityOp: AsyncOperation {
         activity.allDay = event.isAllDay
         activity.startTimeZone = event.timeZone?.identifier ?? TimeZone.current.identifier
         activity.endTimeZone = event.timeZone?.identifier ?? TimeZone.current.identifier
+        activity.recurrences = event.recurrenceRules?.map { $0.iCalRuleString() }
         activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
-        
     }
     
     private func deleteActivity() {

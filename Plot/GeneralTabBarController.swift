@@ -30,11 +30,8 @@ class GeneralTabBarController: UITabBarController {
     
     let homeController = MasterActivityContainerController()
     let settingsController = AccountSettingsController()
-    
-    lazy var analyticsController: AnalyticsViewController = {
-        AnalyticsViewController(viewModel: .init(networkController: networkController))
-    }()
-    
+    let analyticsController = AnalyticsViewController()
+
     var window: UIWindow?
     
     let splashContainer: SplashScreenContainer = {
@@ -116,6 +113,7 @@ class GeneralTabBarController: UITabBarController {
                 networkController.setupKeyVariables {
                     self.homeController.networkController = self.networkController
                     self.settingsController.networkController = self.networkController
+                    self.analyticsController.viewModel = .init(networkController: self.networkController)
                     self.networkController.setupOtherVariables()
                 }
             } else {

@@ -27,7 +27,7 @@ class GSyncCalendarEventsOp: AsyncOperation {
     
     private func startRequest() {
         for event in events {
-            if !existingEvents.contains(where: {$0.summary == event.summary && $0.start == event.start && $0.end == event.end}) && !existingActivities.contains(where: {$0.name == event.summary && $0.startDate == event.startDate && $0.endDate == event.endDate}) {
+            if !existingEvents.contains(where: { $0.identifier == event.identifier }) && !existingActivities.contains(where: {$0.name == event.summary && $0.startDate == event.startDate && $0.endDate == event.endDate}) {
                 existingEvents.append(event)
                 let op = GCalendarActivityOp(event: event)
                 queue.addOperation(op)

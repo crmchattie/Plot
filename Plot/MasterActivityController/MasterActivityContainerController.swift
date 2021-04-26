@@ -651,12 +651,14 @@ extension MasterActivityContainerController {
 }
 
 extension MasterActivityContainerController: HeaderContainerCellDelegate {
+    
     func viewTapped(sectionType: SectionType) {
         goToVC(section: sectionType)
     }
 }
 
 extension MasterActivityContainerController: GIDSignInDelegate {
+    
     func newCalendarItem() {
         if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -715,7 +717,6 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     }
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        print("signed in")
         if (error == nil) {
             self.networkController.activityService.updatePrimaryCalendar(value: googleString)
         } else {

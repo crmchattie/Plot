@@ -79,6 +79,7 @@ class GCalendarActivityOp: AsyncOperation {
         activity.name = event.summary
         activity.activityDescription = event.descriptionProperty
         activity.locationName = event.location
+        activity.recurrences = event.recurrence
         if let start = event.start?.date, let end = event.end?.date {
             activity.allDay = true
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)
