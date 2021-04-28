@@ -39,4 +39,5 @@ extension AnalyticsDataSource {
 enum AnalyticsBreakdownEntry {
     case activity(Activity)
     case transaction(Transaction)
+    case account(MXAccount)
 }

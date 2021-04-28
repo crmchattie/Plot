@@ -133,6 +133,18 @@ class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
         }
     }
     
+    private func showAccountDetail(account: MXAccount) {
+        let destination = FinanceAccountViewController()
+        destination.account = account
+        destination.users = users
+        destination.filteredUsers = filteredUsers
+        destination.delegate = self
+        self.getParticipants(transaction: nil, account: account) { (participants) in
+            destination.selectedFalconUsers = participants
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
         viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
     }
@@ -252,6 +264,10 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 let cell = tableView.dequeueReusableCell(ofType: FinanceTableViewCell.self, for: indexPath)
                 cell.transaction = transaction
                 return cell
+            case .account(let account):
+                let cell = tableView.dequeueReusableCell(ofType: FinanceTableViewCell.self, for: indexPath)
+                cell.account = account
+                return cell
             }
         }
     }
@@ -266,6 +282,8 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
             showActivityDetail(activity: activity)
         case .transaction(let transaction):
             showTranscationDetail(transaction: transaction)
+        case .account(let account):
+            showAccountDetail(account: account)
         }
     }
 }
@@ -286,7 +304,6 @@ extension AnalyticsDetailViewController: StackedBarChartCellDelegate {
 // MARK: - UpdateTransactionDelegate
 
 extension AnalyticsDetailViewController: UpdateTransactionDelegate {
-    
     func updateTransaction(transaction: Transaction) {
         guard let index = viewModel.entries.value.firstIndex(where: {
             if case .transaction(let trs) = $0 {
@@ -295,6 +312,21 @@ extension AnalyticsDetailViewController: UpdateTransactionDelegate {
             return false
         }) else { return }
         viewModel.entries.value[index] = .transaction(transaction)
+        tableView.reloadData()
+    }
+}
+
+// MARK: - UpdateAccountDelegate
+
+extension AnalyticsDetailViewController: UpdateAccountDelegate {
+    func updateAccount(account: MXAccount) {
+        guard let index = viewModel.entries.value.firstIndex(where: {
+            if case .account(let acct) = $0 {
+                return acct == account
+            }
+            return false
+        }) else { return }
+        viewModel.entries.value[index] = .account(account)
         tableView.reloadData()
     }
 }

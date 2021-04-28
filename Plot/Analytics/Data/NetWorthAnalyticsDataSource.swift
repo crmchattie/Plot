@@ -26,7 +26,7 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
     
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
 
-    private var transactions: [Transaction] = []
+    private var accounts: [MXAccount] = []
     
     private lazy var dateFormatter = ISO8601DateFormatter()
 
@@ -57,19 +57,14 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
         newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
         
         let accounts = networkController.financeService.accounts
-        let transactions = networkController.financeService.transactions
         
         let detail = AccountDetails(name: "Net Worth", balance: 0, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth, currencyCode: "USD")
-        financeService.getSamples(for: range, segment: range.timeSegment, accountDetails: detail, transactionDetails: nil, accounts: accounts, transactions: transactions) { [range] (stats, _, _, _) in
+        financeService.getSamples(for: range, segment: range.timeSegment, accountDetails: detail, transactionDetails: nil, accounts: accounts, transactions: nil) { (stats, _, _, _) in
             let stats = stats ?? []
             
-            self.transactions = self.networkController.financeService.transactions
+            self.accounts = self.networkController.financeService.accounts
                 .filter { $0.should_link ?? true }
-                .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
-                .filter { transaction -> Bool in
-                    guard let date = self.dateFormatter.date(from: transaction.created_at) else { return false }
-                    return range.startDate <= date && date <= range.endDate
-                }
+                .sorted(by: { $0.updated_at > $1.updated_at })
             
             if stats.isEmpty {
                 newChartViewModel.chartData = nil
@@ -83,6 +78,8 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
             var firstValue: Double?
             var lastValue: Double?
             for (index, stat) in stats.enumerated() {
+                print("date \(stat.date)")
+                print("value \(stat.value)")
                 maxValue = max(maxValue, stat.value)
                 if firstValue == nil { firstValue = stat.value }
                 else { lastValue = stat.value }
@@ -112,6 +109,6 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        completion(transactions.map { .transaction($0) })
+        completion(accounts.map { .account($0) })
     }
 }

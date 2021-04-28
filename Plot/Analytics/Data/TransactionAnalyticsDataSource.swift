@@ -92,7 +92,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         }
         
         newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
-        newChartViewModel.rangeAverageValue = "Out $\(Int(expenseValue)), In $\(Int(incomeValue))"
+        newChartViewModel.rangeAverageValue = "In $\(Int(incomeValue)), Out $\(Int(expenseValue))"
         
         let dataEntries = (0...daysInRange).map { index in
             BarChartDataEntry(x: Double(index) + 0.5, yValues: categoryValues.map { $0[index] })
