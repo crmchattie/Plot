@@ -698,7 +698,12 @@ func activityListStats(
         }
         
         if let type = activity.category, type == activityCategory {
-            let duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
+            var duration: Double = 0
+            if activity.allDay ?? false {
+                duration = 1440
+            } else {
+                duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
+            }
             if statistics.isEmpty {
                 let stat = Statistic(date: chunkStart, value: duration)
                 statistics.append(stat)

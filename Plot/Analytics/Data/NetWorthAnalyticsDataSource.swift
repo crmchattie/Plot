@@ -33,8 +33,8 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
     private lazy var currencyFormatter: NumberFormatter = {
         let numberFormatter = NumberFormatter()
         numberFormatter.currencyCode = "USD"
-        numberFormatter.positivePrefix = "+"
         numberFormatter.numberStyle = .currency
+        numberFormatter.maximumFractionDigits = 0
         return numberFormatter
     }()
 
@@ -78,8 +78,6 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
             var firstValue: Double?
             var lastValue: Double?
             for (index, stat) in stats.enumerated() {
-                print("date \(stat.date)")
-                print("value \(stat.value)")
                 maxValue = max(maxValue, stat.value)
                 if firstValue == nil { firstValue = stat.value }
                 else { lastValue = stat.value }
