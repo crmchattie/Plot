@@ -67,6 +67,8 @@ class FinanceBarChartViewController: UIViewController {
     
     lazy var units = "currency"
     
+    var selectedIndex = 2
+    
     init(viewModel: FinanceDetailViewModelInterface) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -104,7 +106,7 @@ class FinanceBarChartViewController: UIViewController {
         changeTheme()
         
         view.addSubview(segmentedControl)
-        segmentedControl.selectedSegmentIndex = 2
+        segmentedControl.selectedSegmentIndex = selectedIndex
 
         backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         view.addSubview(backgroundChartView)
@@ -314,6 +316,19 @@ class FinanceBarChartViewController: UIViewController {
             completion(participants)
         }
     }
+    
+    func showActivityIndicator() {
+        if let tabController = self.tabBarController {
+            self.showSpinner(onView: tabController.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+    
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
+    
 }
 
 extension FinanceBarChartViewController: ChartViewDelegate {

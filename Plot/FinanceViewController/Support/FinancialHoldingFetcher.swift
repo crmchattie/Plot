@@ -25,7 +25,7 @@ class FinancialHoldingFetcher: NSObject {
     fileprivate var isGroupAlreadyFinished = false
     
     func fetchHoldings(completion: @escaping ([MXHolding])->()) {
-        guard let _ = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             completion([])
             return
         }
@@ -106,7 +106,7 @@ class FinancialHoldingFetcher: NSObject {
     
     func getHoldingsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([MXHolding])->()) {
         if snapshot.exists() {
-            guard let _ = Auth.auth().currentUser?.uid else {
+            guard let currentUserID = Auth.auth().currentUser?.uid else {
                 return
             }
             let holdingID = snapshot.key

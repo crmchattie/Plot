@@ -85,6 +85,8 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     }
     var financeSections = [SectionType]()
     var financeGroups = [SectionType: [AnyHashable]]()
+    var transactionsDictionary = [TransactionDetails: [Transaction]]()
+    var accountsDictionary = [AccountDetails: [MXAccount]]()
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -332,20 +334,22 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
                 }
             } else if section.type == "Accounts" {
                 if section.subType == "Balance Sheet" {
-                    categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, _) in
+                    categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, accountsDict) in
                         if !accountsList.isEmpty {
                             sections.append(section)
                             groups[section] = accountsList
+                            self.accountsDictionary = accountsDict
                         }
                     }
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
                     let accounts = transactions.compactMap({ $0.account_guid })
-                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.endOfMonth, level: transactionLevel, accounts: accounts) { (transactionsList, _) in
+                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.endOfMonth, level: transactionLevel, accounts: accounts) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
                             sections.append(section)
                             groups[section] = transactionsList
+                            self.transactionsDictionary = transactionsDict
                         }
                     }
                 }
@@ -763,7 +767,7 @@ extension MasterActivityContainerController: HealthControllerCellDelegate {
 extension MasterActivityContainerController: FinanceControllerCellDelegate {
     func openTransactionDetails(transactionDetails: TransactionDetails) {
         let accounts = networkController.financeService.transactions.compactMap({ $0.account_guid })
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: networkController.financeService.transactions, filterAccounts: accounts, financeDetailService: FinanceDetailService())
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: networkController.financeService.transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: accounts, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = networkController.userService.users
@@ -773,7 +777,7 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     }
     
     func openAccountDetails(accountDetails: AccountDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: networkController.financeService.accounts, transactionDetails: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: networkController.financeService.accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = networkController.userService.users

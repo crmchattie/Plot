@@ -41,20 +41,20 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     categoryLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
                     if transactionDetails.group == "Income", let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                     } else if let amount = numberFormatter.string(from: transactionDetails.amount * -1 as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                     }
                 case .top:
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .callout)
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .callout)
                     
                     if transactionDetails.group == "Income", let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                         topHeightConstraint = 20
 
                     } else if let amount = numberFormatter.string(from: transactionDetails.amount * -1 as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                         topHeightConstraint = 5
 
                     }
@@ -74,9 +74,9 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     }
                     
                     if (transactionDetails.group == "Income" || transactionDetails.group == "Difference"), let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                     } else if let amount = numberFormatter.string(from: transactionDetails.amount * -1 as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                     }
                 }
                 setupViews()
@@ -113,7 +113,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     categoryLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     
                     if let amount = numberFormatter.string(from: accountDetails.balance as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                     }
                 case .subtype:
                     topHeightConstraint = 5
@@ -121,7 +121,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .callout)
                     
                     if let amount = numberFormatter.string(from: accountDetails.balance as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                     }
                 case .type:
                     topHeightConstraint = 20
@@ -129,7 +129,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
                     
                     if let amount = numberFormatter.string(from: accountDetails.balance as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                     }
                 case .bs_type:
                     if mode == .fullscreen {
@@ -142,7 +142,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                     
                     if let amount = numberFormatter.string(from: accountDetails.balance as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                     }
                 }
                 setupViews()
@@ -177,7 +177,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     topHeightConstraint = 5
                                                     
                     if let marketValue = holding.market_value, let amount = numberFormatter.string(from: marketValue as NSNumber) {
-                        categoryLabel.text = "\(amount)"
+                        categoryLabel.text = amount
                     }
                     
 //                    if let marketValue = holding.market_value, let costBasis = holding.cost_basis, costBasis != 0 {

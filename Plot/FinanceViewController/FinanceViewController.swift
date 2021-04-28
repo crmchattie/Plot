@@ -66,6 +66,11 @@ class FinanceViewController: UIViewController {
     var filteredUsers: [User] {
         return networkController.userService.users
     }
+    
+    var selectedIndex = 2
+    
+    var transactionsDictionary = [TransactionDetails: [Transaction]]()
+    var accountsDictionary = [AccountDetails: [MXAccount]]()
             
     var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
@@ -271,6 +276,7 @@ class FinanceViewController: UIViewController {
                         if !accountsList.isEmpty {
                             self.sections.append(section)
                             self.groups[section] = accountsList
+                            self.accountsDictionary = accountsDict
                         }
                         dispatchGroup.leave()
                     }
@@ -297,6 +303,7 @@ class FinanceViewController: UIViewController {
                         if !transactionsList.isEmpty {
                             self.sections.append(section)
                             self.groups[section] = transactionsList
+                            self.transactionsDictionary = transactionsDict
                         }
                         dispatchGroup.leave()
                     }
@@ -465,8 +472,9 @@ class FinanceViewController: UIViewController {
         } else {
             accounts = transactions.compactMap({ $0.account_guid })
         }
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: transactions, filterAccounts: accounts, financeDetailService: FinanceDetailService())
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: accounts, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
+        financeDetailViewController.selectedIndex = selectedIndex
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
         financeDetailViewController.filteredUsers = filteredUsers
@@ -475,8 +483,9 @@ class FinanceViewController: UIViewController {
     }
     
     func openAccountDetails(accountDetails: AccountDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: accounts, transactionDetails: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
+        financeDetailViewController.selectedIndex = selectedIndex
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
         financeDetailViewController.filteredUsers = filteredUsers
@@ -617,10 +626,10 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         header.sectionType = section
         header.titleLabel.text = section.name
         if (section == .transactions || section == .financialAccounts || section == .investments) && groups[section]?.count ?? 0 > 10 {
-            header.subTitleLabel.isUserInteractionEnabled = true
+            header.view.isUserInteractionEnabled = true
             header.subTitleLabel.isHidden = false
         } else {
-            header.subTitleLabel.isUserInteractionEnabled = false
+            header.view.isUserInteractionEnabled = false
             header.subTitleLabel.isHidden = true
         }
         return header
@@ -698,6 +707,7 @@ extension FinanceViewController: HeaderCellDelegate {
         destination.title = sectionType.name
         destination.networkController = networkController
         destination.setSections = [sectionType]
+        destination.selectedIndex = selectedIndex
         navigationController?.pushViewController(destination, animated: true)
     }
 }
@@ -764,7 +774,7 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
             endDate = Date().localTime.endOfYear
         }
         updateCollectionView()
-        
+        selectedIndex = index
     }
 }
 

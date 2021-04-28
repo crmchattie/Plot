@@ -15,7 +15,6 @@ protocol FinanceDetailViewModelInterface {
     var accounts: [MXAccount]? { get set }
     var transactions: [Transaction]? { get set }
     
-    
     func fetchLineChartData(for segmentType: TimeSegmentType, completion: @escaping (LineChartData?, Double) -> ())
     
     func fetchBarChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?, Double) -> ())
@@ -32,12 +31,12 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
     var transactions: [Transaction]?
     var filterAccounts: [String]?
     
-    init(accountDetails: AccountDetails?, accounts: [MXAccount]?, transactionDetails: TransactionDetails?, transactions: [Transaction]?, filterAccounts: [String]?, financeDetailService: FinanceDetailServiceInterface) {
+    init(accountDetails: AccountDetails?, allAccounts: [MXAccount]?, accounts: [MXAccount]?, transactionDetails: TransactionDetails?, allTransactions: [Transaction]?, transactions: [Transaction]?, filterAccounts: [String]?, financeDetailService: FinanceDetailServiceInterface) {
         self.accountDetails = accountDetails
-        self.allAccounts = accounts
+        self.allAccounts = allAccounts
         self.accounts = accounts
         self.transactionDetails = transactionDetails
-        self.allTransactions = transactions
+        self.allTransactions = allTransactions
         self.transactions = transactions
         self.financeDetailService = financeDetailService
         self.filterAccounts = filterAccounts

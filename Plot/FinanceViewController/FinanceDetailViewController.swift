@@ -51,6 +51,7 @@ class FinanceDetailViewController: UIViewController {
     var filteredUsers: [User] {
         return networkController.userService.users
     }
+    var selectedIndex = 2
             
     var setSections = [SectionType]()
     var sections = [SectionType]()
@@ -86,6 +87,7 @@ class FinanceDetailViewController: UIViewController {
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
         collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
         
+        updateIndex()
         setupMainView()
         addObservers()
         updateCollectionView()
@@ -125,6 +127,8 @@ class FinanceDetailViewController: UIViewController {
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         navigationItem.rightBarButtonItem = newItemBarButton
+        
+        customSegmented.selectedIndex = selectedIndex
         
         if setSections.contains(.transactions) {
             customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -181,6 +185,23 @@ class FinanceDetailViewController: UIViewController {
         let navigationViewController = UINavigationController(rootViewController: destination)
         navigationViewController.modalPresentationStyle = .fullScreen
         self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    private func updateIndex() {
+        if selectedIndex == 0 {
+            startDate = Date().localTime.startOfDay
+            endDate = Date().localTime.endOfDay
+        } else if selectedIndex == 1 {
+            startDate = Date().localTime.startOfWeek
+            endDate = Date().localTime.endOfWeek
+        } else if selectedIndex == 2 {
+            startDate = Date().localTime.startOfMonth
+            endDate = Date().localTime.endOfMonth
+        } else {
+            startDate = Date().localTime.startOfYear
+            endDate = Date().localTime.endOfYear
+        }
+        updateCollectionView()
     }
     
     private func updateCollectionView() {
@@ -401,7 +422,7 @@ class FinanceDetailViewController: UIViewController {
     
     func openTransactionDetails(transactionDetails: TransactionDetails) {
         let accounts = transactions.compactMap({ $0.account_guid })
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, accounts: nil, transactionDetails: transactionDetails, transactions: transactions, filterAccounts: accounts, financeDetailService: FinanceDetailService())
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: transactions, transactions: transactions, filterAccounts: accounts, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
@@ -411,7 +432,7 @@ class FinanceDetailViewController: UIViewController {
     }
     
     func openAccountDetails(accountDetails: AccountDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, accounts: accounts, transactionDetails: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: accounts, accounts: accounts, transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
 //        financeDetailViewController.delegate = self
         financeDetailViewController.users = users
@@ -646,21 +667,8 @@ extension FinanceDetailViewController: EndedWebViewDelegate {
 
 extension FinanceDetailViewController: CustomSegmentedControlDelegate {
     func changeToIndex(index:Int) {
-        if index == 0 {
-            startDate = Date().localTime.startOfDay
-            endDate = Date().localTime.endOfDay
-        } else if index == 1 {
-            startDate = Date().localTime.startOfWeek
-            endDate = Date().localTime.endOfWeek
-        } else if index == 2 {
-            startDate = Date().localTime.startOfMonth
-            endDate = Date().localTime.endOfMonth
-        } else {
-            startDate = Date().localTime.startOfYear
-            endDate = Date().localTime.endOfYear
-        }
-        updateCollectionView()
-        
+        selectedIndex = index
+        updateIndex()
     }
 }
 

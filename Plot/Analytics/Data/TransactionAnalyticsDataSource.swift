@@ -54,10 +54,10 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
             .filter { transaction -> Bool in
                 #warning("This is extremely unoptimal. A stored Date object should be saved inside the Transaction.")
-                guard let date = dateFormatter.date(from: transaction.created_at) else { return false }
+                guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
                 return range.startDate <= date && date <= range.endDate
             }
-            .sorted(by: { $0.created_at > $1.created_at })
+            .sorted(by: { $0.transacted_at > $1.transacted_at })
         
         var incomeValue: Double = 0
         var expenseValue: Double = 0
@@ -79,8 +79,8 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
                     expenseValue += transaction.amount
                     values[daysInBetween] -= transaction.amount
                 }
-                sum += transaction.amount
             }
+            sum += incomeValue - expenseValue
             
             let categoryColor = topLevelCategoryColor(category)
             categories.append(CategorySummaryViewModel(title: category,
@@ -92,7 +92,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         }
         
         newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
-        newChartViewModel.rangeAverageValue = "out $\(Int(expenseValue)), in $\(Int(incomeValue))"
+        newChartViewModel.rangeAverageValue = "Out $\(Int(expenseValue)), In $\(Int(incomeValue))"
         
         let dataEntries = (0...daysInRange).map { index in
             BarChartDataEntry(x: Double(index) + 0.5, yValues: categoryValues.map { $0[index] })
