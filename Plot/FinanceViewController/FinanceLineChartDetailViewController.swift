@@ -70,6 +70,12 @@ class FinanceLineChartDetailViewController: UIViewController {
     
     lazy var barButton = UIBarButtonItem()
     
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.sizeToFit()
+        return activityIndicator
+    }()
+    
     lazy var units = "currency"
     
     var selectedIndex = 2
@@ -110,6 +116,8 @@ class FinanceLineChartDetailViewController: UIViewController {
         addObservers()
         changeTheme()
         
+        view.addSubview(activityIndicator)
+        
         view.addSubview(segmentedControl)
         segmentedControl.selectedSegmentIndex = selectedIndex
 
@@ -124,7 +132,7 @@ class FinanceLineChartDetailViewController: UIViewController {
         
         configureView()
         
-        fetchData()
+        fetchData(useAll: false)
                 
     }
     
@@ -149,6 +157,12 @@ class FinanceLineChartDetailViewController: UIViewController {
     }
     
     private func configureView() {
+        
+        activityIndicator.center = view.center
+        activityIndicator.autoresizingMask = [.flexibleTopMargin,
+                                              .flexibleBottomMargin,
+                                              .flexibleLeftMargin,
+                                              .flexibleRightMargin]
         
         backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
         backgroundChartViewTopAnchor = backgroundChartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
@@ -182,49 +196,8 @@ class FinanceLineChartDetailViewController: UIViewController {
         tableView.estimatedRowHeight = 105
     }
     
-//    func configureChart() {
-//        chartView.defaultChartStyle()
-//        chartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//        chartView.chartDescription?.enabled = false
-//        chartView.dragEnabled = false
-//        chartView.setScaleEnabled(false)
-//        chartView.pinchZoomEnabled = false
-//
-//        let xAxis = chartView.xAxis
-//        xAxis.labelPosition = .bottom
-//        xAxis.labelFont = .systemFont(ofSize: 10)
-//        xAxis.setLabelCount(6, force: true)
-//        dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
-//        xAxis.valueFormatter = dayAxisValueFormatter
-//        xAxis.drawGridLinesEnabled = false
-//        xAxis.avoidFirstLastClippingEnabled = true
-//
-//        let rightAxisFormatter = NumberFormatter()
-//        rightAxisFormatter.numberStyle = .currency
-//        rightAxisFormatter.maximumFractionDigits = 0
-//        let rightAxis = chartView.rightAxis
-//        rightAxis.removeAllLimitLines()
-//        rightAxis.drawLimitLinesBehindDataEnabled = true
-//        rightAxis.drawGridLinesEnabled = false
-//        rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
-//
-//        chartView.leftAxis.enabled = false
-//
-//        let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
-//                                  font: .systemFont(ofSize: 12),
-//                                  textColor: .white,
-//                                  insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
-//                                  xAxisValueFormatter: dayAxisValueFormatter!, units: units)
-//        marker.chartView = chartView
-//        marker.minimumSize = CGSize(width: 80, height: 40)
-//        chartView.marker = marker
-//
-//        chartView.legend.form = .line
-//        chartView.legend.enabled = false
-//    }
-    
     @objc func changeSegment(_ segmentedControl: UISegmentedControl) {
-        fetchData()
+        fetchData(useAll: true)
     }
     
     @objc private func hideUnhideTapped() {
@@ -241,11 +214,19 @@ class FinanceLineChartDetailViewController: UIViewController {
     }
     
     // MARK: HealthKit Data
-    func fetchData() {
+    func fetchData(useAll: Bool) {
+        activityIndicator.startAnimating()
+        
+        backgroundChartView.isHidden = true
+        tableView.isHidden = true
+        
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        viewModel.fetchLineChartData(for: segmentType) { [weak self] (lineChartData, maxValue) in
+        viewModel.fetchLineChartData(segmentType: segmentType, useAll: useAll) { [weak self] (lineChartData, maxValue) in
             guard let weakSelf = self else { return }
+            weakSelf.backgroundChartView.isHidden = false
+            weakSelf.tableView.isHidden = false
+            
             weakSelf.chartView.data = lineChartData
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
@@ -253,6 +234,7 @@ class FinanceLineChartDetailViewController: UIViewController {
             weakSelf.chartView.notifyDataSetChanged()
             
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
+            weakSelf.activityIndicator.stopAnimating()
             weakSelf.tableView.reloadData()
         }
     }
@@ -428,7 +410,7 @@ extension FinanceLineChartDetailViewController: UpdateAccountDelegate {
     func updateAccount(account: MXAccount) {
         if let index = viewModel.accounts!.firstIndex(of: account) {
             viewModel.accounts![index] = account
-            fetchData()
+            fetchData(useAll: true)
         }
     }
 }
@@ -437,7 +419,7 @@ extension FinanceLineChartDetailViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         if let index = viewModel.transactions!.firstIndex(of: transaction) {
             viewModel.transactions![index] = transaction
-            fetchData()
+            fetchData(useAll: true)
         }
     }
 }

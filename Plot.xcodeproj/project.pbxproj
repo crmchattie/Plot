@@ -225,6 +225,7 @@
 		10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5424BE43B600F6EE18 /* VerticalStackView.swift */; };
 		10E93D5924BE43B700F6EE18 /* BetterSnappingLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5524BE43B600F6EE18 /* BetterSnappingLayout.swift */; };
 		10E93D5A24BE43B700F6EE18 /* UIView+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5624BE43B700F6EE18 /* UIView+Layout.swift */; };
+		10ED76B22639F899002838F5 /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 10ED76B12639F899002838F5 /* FacebookCore */; };
 		10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */; };
 		10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EE245C5B8000C80AAF /* Checklist.swift */; };
 		10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27F0245C6B6400C80AAF /* Packinglist.swift */; };
@@ -1048,6 +1049,7 @@
 				2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */,
 				10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */,
 				A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */,
+				10ED76B22639F899002838F5 /* FacebookCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2635,6 +2637,7 @@
 			name = Plot;
 			packageProductDependencies = (
 				10E93D4824BE2E7A00F6EE18 /* LBTATools */,
+				10ED76B12639F899002838F5 /* FacebookCore */,
 			);
 			productName = "Pigeon-project";
 			productReference = 4B4F452B1F32230C00A6FF96 /* Plot.app */;
@@ -2695,6 +2698,7 @@
 			mainGroup = 4B4F45221F32230C00A6FF96;
 			packageReferences = (
 				10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */,
+				10ED76B02639F899002838F5 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 			);
 			productRefGroup = 4B4F452C1F32230C00A6FF96 /* Products */;
 			projectDirPath = "";
@@ -3624,6 +3628,14 @@
 				minimumVersion = 1.0.17;
 			};
 		};
+		10ED76B02639F899002838F5 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -3631,6 +3643,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */;
 			productName = LBTATools;
+		};
+		10ED76B12639F899002838F5 /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 10ED76B02639F899002838F5 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

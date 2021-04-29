@@ -639,6 +639,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
         guard transaction.should_link ?? true else { continue }
+        guard transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
         guard accounts.contains(transaction.account_guid ?? "") else { continue }
         if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
             if transactionDate < start || end < transactionDate {

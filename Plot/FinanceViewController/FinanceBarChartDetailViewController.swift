@@ -65,6 +65,12 @@ class FinanceBarChartViewController: UIViewController {
     
     lazy var barButton = UIBarButtonItem()
     
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.sizeToFit()
+        return activityIndicator
+    }()
+    
     lazy var units = "currency"
     
     var selectedIndex = 2
@@ -105,6 +111,8 @@ class FinanceBarChartViewController: UIViewController {
         addObservers()
         changeTheme()
         
+        view.addSubview(activityIndicator)
+        
         view.addSubview(segmentedControl)
         segmentedControl.selectedSegmentIndex = selectedIndex
 
@@ -120,7 +128,7 @@ class FinanceBarChartViewController: UIViewController {
         configureView()
         configureChart()
         
-        fetchData()
+        fetchData(useAll: false)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -144,6 +152,13 @@ class FinanceBarChartViewController: UIViewController {
     }
     
     private func configureView() {
+        
+        activityIndicator.center = view.center
+        activityIndicator.autoresizingMask = [.flexibleTopMargin,
+                                              .flexibleBottomMargin,
+                                              .flexibleLeftMargin,
+                                              .flexibleRightMargin]
+        activityIndicator.startAnimating()
         
         backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
         backgroundChartViewTopAnchor = backgroundChartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
@@ -212,7 +227,7 @@ class FinanceBarChartViewController: UIViewController {
     }
     
     @objc func changeSegment(_ segmentedControl: UISegmentedControl) {
-        fetchData()
+        fetchData(useAll: true)
     }
     
     @objc private func hideUnhideTapped() {
@@ -230,11 +245,20 @@ class FinanceBarChartViewController: UIViewController {
     
     // MARK: - HealthKit Data
     
-    func fetchData() {
+    func fetchData(useAll: Bool) {
+        activityIndicator.startAnimating()
+        
+        backgroundChartView.isHidden = true
+        tableView.isHidden = true
+        
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        viewModel.fetchBarChartData(for: segmentType) { [weak self] (barChartData, maxValue) in
+        viewModel.fetchBarChartData(segmentType: segmentType, useAll: useAll) { [weak self] (barChartData, maxValue) in
             guard let weakSelf = self else { return }
+            
+            weakSelf.backgroundChartView.isHidden = false
+            weakSelf.tableView.isHidden = false
+            
             weakSelf.chartView.data = barChartData
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
@@ -242,6 +266,7 @@ class FinanceBarChartViewController: UIViewController {
             weakSelf.chartView.notifyDataSetChanged()
             
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
+            weakSelf.activityIndicator.stopAnimating()
             weakSelf.tableView.reloadData()
         }
     }
@@ -413,7 +438,7 @@ extension FinanceBarChartViewController: UpdateAccountDelegate {
     func updateAccount(account: MXAccount) {
         if let index = viewModel.accounts!.firstIndex(of: account) {
             viewModel.accounts![index] = account
-            fetchData()
+            fetchData(useAll: true)
         }
     }
 }
@@ -422,7 +447,7 @@ extension FinanceBarChartViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         if let index = viewModel.transactions!.firstIndex(of: transaction) {
             viewModel.transactions![index] = transaction
-            fetchData()
+            fetchData(useAll: true)
         }
     }
 }
