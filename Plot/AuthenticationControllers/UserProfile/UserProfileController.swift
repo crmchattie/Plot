@@ -112,6 +112,13 @@ extension UserProfileController {
             }
         })
         
+        let emailReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("email")
+        emailReference.observe(.value, with: { (snapshot) in
+            if snapshot.exists() {
+                self.userProfileContainerView.email.text = snapshot.value as? String
+            }
+        })
+                
         let photoReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("photoURL")
         photoReference.observe(.value, with: { (snapshot) in
             if snapshot.exists() {

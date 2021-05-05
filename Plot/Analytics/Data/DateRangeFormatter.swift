@@ -39,11 +39,11 @@ struct DateRangeFormatter {
                 return currentMonth
             }
             return monthFormatter.string(from: range.startDate) + " \(Calendar.current.component(.year, from: range.startDate))"
-        case .year:
-            if range.startDate < current && range.endDate > current {
-                return currentYear
-            }
-            return "\(Calendar.current.component(.year, from: range.startDate))"
+//        case .year:
+//            if range.startDate < current && range.endDate > current {
+//                return currentYear
+//            }
+//            return "\(Calendar.current.component(.year, from: range.startDate))"
         }
     }
 }

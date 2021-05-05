@@ -10,13 +10,14 @@ import Foundation
 import Charts
 
 enum DateRangeType: CaseIterable {
-    case week, month, year
+    case week, month
+//         year
     
     var initial: (Date, Date) {
         switch self {
         case .week: return (Date().wStart, Date().wEnd)
         case .month: return (Date().mStart, Date().mEnd)
-        case .year: return (Date().yStart, Date().yEnd)
+//        case .year: return (Date().yStart, Date().yEnd)
         }
     }
     
@@ -24,7 +25,7 @@ enum DateRangeType: CaseIterable {
         switch self {
         case .week: return "Weekly"
         case .month: return "Monthly"
-        case .year: return "Yearly"
+//        case .year: return "Yearly"
         }
     }
 }
@@ -53,9 +54,9 @@ struct DateRange {
         case .month:
             startDate = Calendar.current.date(byAdding: .month, value: 1, to: startDate)!
             endDate = startDate.mEnd
-        case .year:
-            startDate = Calendar.current.date(byAdding: .year, value: 1, to: startDate)!
-            endDate = startDate.yEnd
+//        case .year:
+//            startDate = Calendar.current.date(byAdding: .year, value: 1, to: startDate)!
+//            endDate = startDate.yEnd
         }
     }
     
@@ -67,9 +68,9 @@ struct DateRange {
         case .month:
             startDate = Calendar.current.date(byAdding: .month, value: -1, to: startDate)!
             endDate = startDate.mEnd
-        case .year:
-            startDate = Calendar.current.date(byAdding: .year, value: -1, to: startDate)!
-            endDate = startDate.yEnd
+//        case .year:
+//            startDate = Calendar.current.date(byAdding: .year, value: -1, to: startDate)!
+//            endDate = startDate.yEnd
         }
     }
     
@@ -81,7 +82,7 @@ struct DateRange {
         switch type {
         case .week: return WeekdayAxisValueFormatter()
         case .month: return nil
-        case .year: return MonthAxisValueFormatter()
+//        case .year: return MonthAxisValueFormatter()
         }
     }
     
@@ -89,7 +90,7 @@ struct DateRange {
         switch type {
         case .week: return .week
         case .month: return .month
-        case .year: return .year
+//        case .year: return .year
         }
     }
 }

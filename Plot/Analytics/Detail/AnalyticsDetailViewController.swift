@@ -91,6 +91,10 @@ class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
         initBindings()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        rangeChanged(rangeControlView)
+    }
+    
     func showActivityIndicator() {
         if let tabController = self.tabBarController {
             self.showSpinner(onView: tabController.view)
@@ -274,9 +278,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
         guard indexPath.section > 0 else { return }
-        
         switch viewModel.entries.value[indexPath.row] {
         case .activity(let activity):
             showActivityDetail(activity: activity)

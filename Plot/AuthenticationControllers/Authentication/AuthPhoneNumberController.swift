@@ -21,8 +21,8 @@ class AuthPhoneNumberController: EnterPhoneNumberController {
     super.rightBarButtonDidTap()
     let destination = AuthVerificationController()
     do {
-        let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!)
-        destination.enterVerificationContainerView.titleNumber.text = self.phoneNumberKit.format(phoneNumber, toType: .international)
+        let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.phoneNumber.text!)
+        destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + String(phoneNumber.nationalNumber)
     } catch {
         destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
     }

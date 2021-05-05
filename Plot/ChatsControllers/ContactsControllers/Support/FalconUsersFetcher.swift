@@ -176,6 +176,9 @@ class FalconUsersFetcher: NSObject {
     
     //need to redo fetchAndObserveFalconUser: fetch once and create user friendship node
     fileprivate func fetchAndObserveFalconUser(for preparedNumber: String, asynchronously: Bool) {
+        if userID == nil {
+            return
+        }
 //        print("Prepared Number: \(preparedNumber)")
         //create reference to database + reference + child("users"); just a url
         reference = Database.database().reference()
@@ -185,7 +188,7 @@ class FalconUsersFetcher: NSObject {
             //need to create friendship collection
             if snapshot.exists() {
                 guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                if snapshot.key == self.userID! { return }
+                if snapshot.key == self.userID { return }
                 
                 self.reference.child("relationships").child(self.userID!).child(snapshot.key).setValue("true")
                 

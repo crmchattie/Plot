@@ -30,6 +30,8 @@ class AnalyticsViewController: UITableViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    let viewPlaceholder = ViewPlaceholder()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -72,7 +74,14 @@ class AnalyticsViewController: UITableViewController {
 
 extension AnalyticsViewController {
     
-    override func numberOfSections(in tableView: UITableView) -> Int { viewModel?.sections.count ?? 0 }
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        if viewModel?.sections.count ?? 0 == 0 {
+            viewPlaceholder.add(for: tableView, title: .emptyAnalytics, subtitle: .emptyAnalytics, priority: .medium, position: .top)
+        } else {
+            viewPlaceholder.remove(from: tableView, priority: .medium)
+        }
+        return viewModel?.sections.count ?? 0
+    }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel!.sections[section].items.count * 2

@@ -44,6 +44,7 @@ enum ViewPlaceholderTitle: String {
     case emptyTransactionRules = "You have not created any transaction rules"
     case emptyHealth = "You don't have any health metrics yet"
     case emptyCalendars = "You are not connected to any calendars yet"
+    case emptyAnalytics = "Analytics about your calendar, health and finances will appear here once set-up"
 }
 
 enum ViewPlaceholderSubtitle: String {
@@ -65,6 +66,7 @@ enum ViewPlaceholderSubtitle: String {
     case emptyTransactionRules = "You can add a transaction rule with the plus button in the upper right corner"
     case emptyHealth = "You can allow Plot to access health metrics from the Health App and/or add a metric with the plus button in the upper right corner"
     case emptyCalendars = "You can add a calendar with the plus button in the upper right corner"
+    case emptyAnalytics = "Set-up your calendar, health and finances on the home tab"
 }
 
 class ViewPlaceholder: UIView {

@@ -68,7 +68,7 @@ class EnterPhoneNumberController: UIViewController {
         
         do {
             let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.phoneNumber.text!)
-            phoneNumberForVerification = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+            phoneNumberForVerification = String(phoneNumber.nationalNumber)
         } catch {
             phoneNumberForVerification = phoneNumberContainerView.phoneNumber.text!
         }
@@ -103,18 +103,18 @@ class EnterPhoneNumberController: UIViewController {
         var phoneNumberForVerification = String()
         
         do {
-            let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!)
-            phoneNumberForVerification = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+            let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.phoneNumber.text!)
+            phoneNumberForVerification = phoneNumberContainerView.countryCode.text! + String(phoneNumber.nationalNumber)
         } catch {
             phoneNumberForVerification = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
         }
-        
+                
         PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumberForVerification, uiDelegate: nil) { (verificationID, error) in
             if let error = error {
                 basicErrorAlertWith(title: "Error", message: error.localizedDescription + "\nPlease try again later.", controller: self)
                 return
             }
-            
+
             self.isVerificationSent = true
             userDefaults.updateObject(for: userDefaults.authVerificationID, with: verificationID)
         }

@@ -103,21 +103,19 @@ class GeneralTabBarController: UITabBarController {
         isNewUser = Auth.auth().currentUser == nil
         homeController.isNewUser = isNewUser
         
+        networkController.askPermissionToTrack()
+        
         let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
+//        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
         
         //if new user, do nothing; if existing user with old version of app, load other variables
         //if existing user with current version, load everything
         if !isNewUser {
-            if let previousVersion = previousVersion, let currentAppVersion = currentAppVersion, currentAppVersion.compare(previousVersion, options: .numeric) != .orderedDescending {
-                networkController.setupKeyVariables {
-                    self.homeController.networkController = self.networkController
-                    self.settingsController.networkController = self.networkController
-                    self.analyticsController.viewModel = .init(networkController: self.networkController)
-                    self.networkController.setupOtherVariables()
-                }
-            } else {
-                UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
+            UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
+            networkController.setupKeyVariables {
+                self.homeController.networkController = self.networkController
+                self.settingsController.networkController = self.networkController
+                self.analyticsController.viewModel = .init(networkController: self.networkController)
                 self.networkController.setupOtherVariables()
             }
         } else {

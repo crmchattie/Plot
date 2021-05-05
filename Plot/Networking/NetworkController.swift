@@ -22,6 +22,7 @@ class NetworkController {
     let userService = UserService()
     let conversationService = ConversationService()
     let listService = ListService()
+    let trackingService = TrackingService()
     
     init() {
         isRunning = false
@@ -57,6 +58,10 @@ class NetworkController {
     
     func setupOtherVariables() {
         userService.grabContacts()
+    }
+    
+    func askPermissionToTrack() {
+        trackingService.requestPermission()
     }
     
     func newUserItems() {

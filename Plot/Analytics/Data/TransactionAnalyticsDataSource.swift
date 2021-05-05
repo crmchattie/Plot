@@ -28,6 +28,14 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
     
     private var transactions: [Transaction] = []
     
+    private lazy var currencyFormatter: NumberFormatter = {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = "USD"
+        numberFormatter.numberStyle = .currency
+        numberFormatter.maximumFractionDigits = 0
+        return numberFormatter
+    }()
+    
     init(
         range: DateRange,
         networkController: NetworkController
@@ -70,7 +78,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
             var sum: Double = 0
             transactions.forEach { transaction in
-                guard let day = dateFormatter.date(from: transaction.created_at) else { return }
+                guard let day = dateFormatter.date(from: transaction.transacted_at) else { return }
                 let daysInBetween = day.daysSince(range.startDate)
                 if transaction.type == "CREDIT" {
                     incomeValue += transaction.amount
@@ -86,13 +94,13 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             categories.append(CategorySummaryViewModel(title: category,
                                                        color: categoryColor,
                                                        value: sum,
-                                                       formattedValue: "$\(Int(sum))"))
+                                                       formattedValue: self.currencyFormatter.string(from: NSNumber(value: sum))!))
             categoryColors.append(categoryColor)
             categoryValues.append(values)
         }
         
         newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
-        newChartViewModel.rangeAverageValue = "In $\(Int(incomeValue)), Out $\(Int(expenseValue))"
+        newChartViewModel.rangeAverageValue = "In \(self.currencyFormatter.string(from: NSNumber(value: incomeValue))!), Out \(self.currencyFormatter.string(from: NSNumber(value: expenseValue))!)"
         
         let dataEntries = (0...daysInRange).map { index in
             BarChartDataEntry(x: Double(index) + 0.5, yValues: categoryValues.map { $0[index] })
