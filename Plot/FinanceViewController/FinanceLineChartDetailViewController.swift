@@ -13,7 +13,7 @@ import Charts
 fileprivate let chartViewHeight: CGFloat = 200
 fileprivate let chartViewTopMargin: CGFloat = 10
 
-protocol UpdateFinancialsDelegate: class {
+protocol UpdateFinancialsDelegate: AnyObject {
     func updateTransactions(transactions: [Transaction])
     func updateAccounts(accounts: [MXAccount])
 }
@@ -104,6 +104,8 @@ class FinanceLineChartDetailViewController: UIViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
         
+        extendedLayoutIncludesOpaqueBars = true
+        
         barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
         navigationItem.rightBarButtonItem = barButton
         
@@ -167,7 +169,7 @@ class FinanceLineChartDetailViewController: UIViewController {
         backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
         backgroundChartViewTopAnchor = backgroundChartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
         NSLayoutConstraint.activate([
-            segmentedControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
+            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             segmentedControl.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             segmentedControl.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
             

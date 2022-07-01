@@ -24,7 +24,7 @@ import UIKit
  * This is marked as @objc because of Swift bug http://stackoverflow.com/questions/30100787/fatal-error-array-cannot-be-bridged-from-objective-c-why-are-you-even-trying when passing for example [INSPhoto] array
  * to INSPhotosViewController
  */
-@objc public protocol INSPhotoViewable: class {
+@objc public protocol INSPhotoViewable: AnyObject {
     var image: UIImage? { get }
     var thumbnailImage: UIImage? { get }
     var messageUID: String? { get }

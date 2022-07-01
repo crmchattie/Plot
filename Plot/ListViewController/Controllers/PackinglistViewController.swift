@@ -11,7 +11,7 @@ import Eureka
 import SplitRow
 import Firebase
 
-protocol UpdatePackinglistDelegate: class {
+protocol UpdatePackinglistDelegate: AnyObject {
     func updatePackinglist(packinglist: Packinglist)
 }
 

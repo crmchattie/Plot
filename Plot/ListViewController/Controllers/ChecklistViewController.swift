@@ -11,7 +11,7 @@ import Eureka
 import SplitRow
 import Firebase
 
-protocol UpdateChecklistDelegate: class {
+protocol UpdateChecklistDelegate: AnyObject {
     func updateChecklist(checklist: Checklist)
 }
 

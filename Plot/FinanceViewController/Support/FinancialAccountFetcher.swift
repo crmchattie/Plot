@@ -90,7 +90,7 @@ class FinancialAccountFetcher: NSObject {
                 let accountID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(financialAccountsEntity).child(accountID).observe(.value) { _ in
+                handle = ref.child(financialAccountsEntity).child(accountID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getAccountsFromSnapshot(snapshot: snapshot, completion: completion)
                 }

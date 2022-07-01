@@ -2700,7 +2700,7 @@
 			);
 			mainGroup = 4B4F45221F32230C00A6FF96;
 			packageReferences = (
-				10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */,
+				10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools.git" */,
 				10ED76B02639F899002838F5 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 			);
 			productRefGroup = 4B4F452C1F32230C00A6FF96 /* Products */;
@@ -3624,7 +3624,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */ = {
+		10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bhlvoong/LBTATools.git";
 			requirement = {
@@ -3645,7 +3645,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		10E93D4824BE2E7A00F6EE18 /* LBTATools */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */;
+			package = 10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools.git" */;
 			productName = LBTATools;
 		};
 		10ED76B12639F899002838F5 /* FacebookCore */ = {

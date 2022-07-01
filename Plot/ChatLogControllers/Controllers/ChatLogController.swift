@@ -15,7 +15,7 @@ import FTPopOverMenu_Swift
 import CropViewController
 
 
-protocol DeleteAndExitDelegate: class {
+protocol DeleteAndExitDelegate: AnyObject {
     func deleteAndExit(from conversationID: String)
 }
 
@@ -83,7 +83,7 @@ class ChatLogController: UICollectionViewController {
         var refreshControl = UIRefreshControl()
         refreshControl.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
         refreshControl.tintColor = ThemeManager.currentTheme().generalTitleColor
-        refreshControl.addTarget(self, action: #selector(performRefresh), for: .valueChanged)
+        refreshControl.addTarget(ChatLogController.self, action: #selector(performRefresh), for: .valueChanged)
         
         return refreshControl
     }()

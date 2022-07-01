@@ -6,7 +6,9 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-protocol HeaderContainerCellDelegate: class {
+import UIKit
+
+protocol HeaderContainerCellDelegate: AnyObject {
     func viewTapped(sectionType: SectionType)
 }
 
@@ -30,6 +32,12 @@ class HeaderContainerCell: UICollectionReusableView {
         return label
     }()
     
+    let spinnerView: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .medium)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+        
     let subTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "See All"
@@ -52,10 +60,13 @@ class HeaderContainerCell: UICollectionReusableView {
                         
         addSubview(view)
         view.addSubview(titleLabel)
+        view.addSubview(spinnerView)
         view.addSubview(subTitleLabel)
         
         view.anchor(top: topAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 0, left: 15, bottom: 0, right: 15))
         titleLabel.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: nil, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        spinnerView.anchor(top: nil, leading: titleLabel.trailingAnchor, bottom: nil, trailing: nil, padding: .init(top: 0, left: 10, bottom: 0, right: 0))
+        spinnerView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
         subTitleLabel.anchor(top: view.topAnchor, leading: nil, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         let viewTap = UITapGestureRecognizer(target: self, action: #selector(CompositionalHeader.viewTapped(_:)))
         view.addGestureRecognizer(viewTap)

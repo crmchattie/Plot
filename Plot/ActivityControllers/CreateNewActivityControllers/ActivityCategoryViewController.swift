@@ -10,7 +10,7 @@ import UIKit
 import Eureka
 import Firebase
 
-protocol UpdateActivityCategoryDelegate: class {
+protocol UpdateActivityCategoryDelegate: AnyObject {
     func update(value: String)
 }
 
@@ -22,8 +22,17 @@ class ActivityCategoryViewController: FormViewController {
     var oldValue = String()
     var value = String()
     
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.title = "Category"
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
         activityIndicatorView.startAnimating()

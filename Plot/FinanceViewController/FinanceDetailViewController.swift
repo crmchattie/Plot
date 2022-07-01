@@ -78,7 +78,7 @@ class FinanceDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        
+                
         customSegmented.delegate = self
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -120,6 +120,7 @@ class FinanceDetailViewController: UIViewController {
     }
     
     fileprivate func setupMainView() {
+        extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
@@ -137,11 +138,11 @@ class FinanceDetailViewController: UIViewController {
             view.addSubview(customSegmented)
             view.addSubview(collectionView)
 
-            customSegmented.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+            customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
             collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         } else {
             view.addSubview(collectionView)
-            collectionView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+            collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         }
     }
     

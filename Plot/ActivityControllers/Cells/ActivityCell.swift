@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import SDWebImage
 
-protocol ActivityCellDelegate: class {
+protocol ActivityCellDelegate: AnyObject {
     func openMap(forActivity activity: Activity)
     func openChat(forConversation conversationID: String?, activityID: String?)
 }

@@ -12,7 +12,7 @@ import Firebase
 import CodableFirebase
 import SwiftUI
 
-protocol UpdateListDelegate: class {
+protocol UpdateListDelegate: AnyObject {
     func updateRecipe(recipe: Recipe?)
     func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?)
 }

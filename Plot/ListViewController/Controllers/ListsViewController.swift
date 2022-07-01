@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-protocol ListViewControllerDataStore: class {
+protocol ListViewControllerDataStore: AnyObject {
     func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, activitylist: Activitylist?, packinglist: Packinglist?, completion: @escaping ([User])->())
 }
 

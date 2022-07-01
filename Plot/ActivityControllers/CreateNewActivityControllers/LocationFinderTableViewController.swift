@@ -9,7 +9,7 @@
 import UIKit
 import MapKit
 
-protocol UpdateLocationDelegate: class {
+protocol UpdateLocationDelegate: AnyObject {
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String)
 }
 
@@ -56,9 +56,7 @@ class LocationFinderTableViewController: UIViewController {
     }
     
     fileprivate func setupMainView() {
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
+        extendedLayoutIncludesOpaqueBars = true
         navigationItem.title = "Location"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     }

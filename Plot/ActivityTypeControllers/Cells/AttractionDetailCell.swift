@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol AttractionDetailCellDelegate: class {
+protocol AttractionDetailCellDelegate: AnyObject {
     func viewTapped(event: Event)
 }
 

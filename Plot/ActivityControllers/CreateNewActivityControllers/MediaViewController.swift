@@ -11,7 +11,7 @@ import SDWebImage
 import MobileCoreServices
 import QuickLook
 
-protocol UpdateActivityMediaDelegate: class {
+protocol UpdateActivityMediaDelegate: AnyObject {
     func updateActivityMedia(activityPhotos: [String], activityFiles: [String])
 }
 
@@ -63,9 +63,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     }
     
     fileprivate func setupMainView() {
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
+        extendedLayoutIncludesOpaqueBars = true
         
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
@@ -98,7 +96,6 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
         collectionView.isUserInteractionEnabled = true
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        collectionView.backgroundColor = theme.generalBackgroundColor
         view.addSubview(collectionView)
         
         collectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
@@ -119,7 +116,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        segmentedControl.frame = CGRect(x: view.frame.width * 0.125, y: 10, width: view.frame.width * 0.75, height: 30)
+        segmentedControl.frame = CGRect(x: view.frame.width * 0.125, y: view.safeAreaInsets.top + 10, width: view.frame.width * 0.75, height: 30)
         var frame = view.frame
         frame.origin.y = segmentedControl.frame.maxY + 10
         frame.size.height -= frame.origin.y

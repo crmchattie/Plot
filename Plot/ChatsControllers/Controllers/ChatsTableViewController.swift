@@ -32,11 +32,11 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 //update to change first controller shown
-//protocol ManageAppearanceChat: class {
+//protocol ManageAppearanceChat: AnyObject {
 //  func manageAppearanceChat(_ chatsController: ChatsTableViewController, didFinishLoadingWith state: Bool )
 //}
 
-protocol ChatsViewControllerDataStore: class {
+protocol ChatsViewControllerDataStore: AnyObject {
     func getParticipants(forConversation conversation: Conversation, completion: @escaping ([User])->())
 }
 

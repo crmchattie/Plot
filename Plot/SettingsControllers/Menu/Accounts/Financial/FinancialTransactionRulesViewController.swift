@@ -29,7 +29,6 @@ class FinancialTransactionRulesViewController: UITableViewController {
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
-        
         let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newTransactionRule))
         navigationItem.rightBarButtonItem = barButton
         
@@ -45,6 +44,8 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     @objc func newTransactionRule() {
         let destination = FinanceTransactionRuleViewController()
+        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+        destination.navigationItem.leftBarButtonItem = cancelBarButton
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
 

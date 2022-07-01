@@ -12,7 +12,7 @@ import Photos
 import AVFoundation
 import CropViewController
 
-protocol AvatarOpenerDelegate: class {
+protocol AvatarOpenerDelegate: AnyObject {
  func avatarOpener(avatarPickerDidPick image: UIImage)
  func avatarOpener(didPerformDeletionAction: Bool)
 }
@@ -68,8 +68,7 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
   func setupOverlay(isEditButonEnabled: Bool, title: AvatarOverlayTitle) {
     overlay.setOverlayTitle(title: title)
     overlay.navigationBar.barStyle = .black
-    overlay.navigationBar.isTranslucent = true
-    overlay.navigationBar.barTintColor = .black
+    overlay.navigationBar.barTintColor = UIColor.black
     let item = UIBarButtonItem(image: UIImage(named: "ShareExternalIcon"), style: .plain, target: self, action: #selector(toolbarTouchHandler))
     overlay.toolbar.setItems([item], animated: true)
     
@@ -143,11 +142,17 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
             case .denied, .restricted, .notDetermined:
               basicErrorAlertWith(title: basicTitleForAccessError, message: photoLibraryAccessDeniedMessageProfilePicture, controller: controller)
               break
-							@unknown default:
+          case .limited:
+              self.presentGallery()
+              break
+          @unknown default:
 								fatalError()
 					}
         }
-		@unknown default:
+    case .limited:
+        presentGallery()
+        break
+    @unknown default:
 			fatalError()
 		}
   }

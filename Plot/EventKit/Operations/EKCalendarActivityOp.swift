@@ -26,7 +26,6 @@ class EKCalendarActivityOp: AsyncOperation {
             self.finish()
             return
         }
-        
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(event.calendarItemIdentifier)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"] {
@@ -48,14 +47,12 @@ class EKCalendarActivityOp: AsyncOperation {
                     self?.finish()
                     return
                 }
-                
                 let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                 reference.updateChildValues(calendarEventActivityValue) { (_, _) in
                     let activity = weakSelf.createActivity(for: activityID)
                     let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                         let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-
                         let values: [String : Any] = ["isGroupActivity": false, "badge": 0]
                         userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                             self?.finish()

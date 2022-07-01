@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol HeaderCellDelegate: class {
+protocol HeaderCellDelegate: AnyObject {
     func viewTapped(sectionType: SectionType)
 }
 

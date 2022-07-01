@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import SDWebImage
 
-protocol ChatCellDelegate: class {
+protocol ChatCellDelegate: AnyObject {
     func getInfo(forConversation conversation: Conversation)
     func openActivity(forConversation conversation: Conversation)
 }

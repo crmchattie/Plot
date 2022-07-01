@@ -73,7 +73,6 @@ class FinancialTransactionFetcher: NSObject {
                             group.leave()
                         })
                     } else {
-                        print("else")
                         group.enter()
                         ref.child(financialTransactionsEntity).child(transactionID).observeSingleEvent(of: .value, with: { transactionSnapshot in
                             if transactionSnapshot.exists(), let transactionSnapshotValue = transactionSnapshot.value {
@@ -105,7 +104,7 @@ class FinancialTransactionFetcher: NSObject {
                 let transactionID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(financialTransactionsEntity).child(transactionID).observe(.value) { _ in
+                handle = ref.child(financialTransactionsEntity).child(transactionID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getTransactionsFromSnapshot(snapshot: snapshot, completion: completion)
                 }
@@ -177,7 +176,6 @@ class FinancialTransactionFetcher: NSObject {
                     })
                 }
             })
-            
             group.notify(queue: .main) {
                 completion(transactions)
             }

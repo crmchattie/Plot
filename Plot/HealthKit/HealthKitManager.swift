@@ -239,7 +239,7 @@ extension HealthKitManager: MetricOperationDelegate {
     }
 }
 
-protocol MetricOperationDelegate: class {
+protocol MetricOperationDelegate: AnyObject {
     func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String)
     func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String, _ activities: [Activity])
 }

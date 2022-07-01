@@ -44,15 +44,12 @@ class NotificationsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
-                
+                        
         self.title = notificationsText
         
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
+        navigationController?.navigationBar.backgroundColor = theme.barBackgroundColor
         
         let segmentTextContent = [
             notificationsText,

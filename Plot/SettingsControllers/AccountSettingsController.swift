@@ -28,7 +28,7 @@ class AccountSettingsController: UITableViewController {
     
     var secondSection = [( icon: UIImage(named: "Logout") , title: "Log Out")]
     
-    let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelBarButtonPressed))
+    let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonPressed))
     let doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
     var currentName = String()
     var currentBio = String()
@@ -158,8 +158,6 @@ class AccountSettingsController: UITableViewController {
         navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
         navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
         
-        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         
         userProfileContainerView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -225,7 +223,6 @@ class AccountSettingsController: UITableViewController {
     
     func listenChanges() {
         if let currentUser = Auth.auth().currentUser?.uid {
-            
             Database.database().reference().child("users").child(currentUser).observe(.value, with: { snapshot in
                 guard let userInfo = snapshot.value as? [String: Any] else { return }
                 
@@ -288,7 +285,7 @@ class AccountSettingsController: UITableViewController {
             
         }
 
-        #warning("Not sure if still used.")
+//        warning("Not sure if still used.")
         Database.database().reference(withPath: ".info/connected").removeAllObservers()
 
         let onlineStatusReference = Database.database().reference().child("users").child(uid).child("OnlineStatus")

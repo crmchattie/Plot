@@ -11,7 +11,7 @@ import Firebase
 import PhoneNumberKit
 import SDWebImage
 
-protocol FalconUsersUpdatesDelegate: class {
+protocol FalconUsersUpdatesDelegate: AnyObject {
     func falconUsers(shouldBeUpdatedTo users: [User])
 }
 

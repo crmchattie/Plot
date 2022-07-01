@@ -10,7 +10,7 @@ import UIKit
 import Eureka
 import Firebase
 
-protocol UpdateAccountDelegate: class {
+protocol UpdateAccountDelegate: AnyObject {
     func updateAccount(account: MXAccount)
 }
 
@@ -49,7 +49,7 @@ class FinanceAccountViewController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        
+                
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
@@ -88,10 +88,10 @@ class FinanceAccountViewController: FormViewController {
         } else {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
-//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-//            navigationItem.leftBarButtonItem = cancelBarButton
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
         }
-        
     }
     
     func setupVariables() {

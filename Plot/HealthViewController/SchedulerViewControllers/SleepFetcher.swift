@@ -61,7 +61,7 @@ class SleepFetcher: NSObject {
                 let sleepID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(sleepEntity).child(sleepID).observe(.value) { _ in
+                handle = ref.child(sleepEntity).child(sleepID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getSleepFromSnapshot(snapshot: snapshot, completion: completion)
                 }

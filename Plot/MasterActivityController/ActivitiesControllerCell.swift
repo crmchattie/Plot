@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-protocol ActivitiesControllerCellDelegate: class {
+protocol ActivitiesControllerCellDelegate: AnyObject {
     func cellTapped(activity: Activity)
     func openMap(forActivity activity: Activity)
     func openChat(forConversation conversationID: String?, activityID: String?)
@@ -91,6 +91,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("didSelectRowAt Event")
         let activity = activities[indexPath.row]
         delegate?.cellTapped(activity: activity)
     }

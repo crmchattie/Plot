@@ -18,13 +18,14 @@ class EnterVerificationCodeController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        extendedLayoutIncludesOpaqueBars = true
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         view.addSubview(enterVerificationContainerView)
         enterVerificationContainerView.frame = view.bounds
         enterVerificationContainerView.resend.addTarget(self, action: #selector(sendSMSConfirmation), for: .touchUpInside)
         enterVerificationContainerView.nextView.addTarget(self, action: #selector(rightBarButtonDidTap), for: .touchUpInside)
         enterVerificationContainerView.enterVerificationCodeController = self
+        
     }
     
     fileprivate func configureNavigationBar () {

@@ -100,13 +100,14 @@ class MealViewController: FormViewController {
     
     func setupRightBarButton() {
         if active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(close))
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
         } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
-//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-//            navigationItem.leftBarButtonItem = cancelBarButton
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
         }
     }
     
@@ -114,7 +115,7 @@ class MealViewController: FormViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
-    @objc fileprivate func close() {
+    @objc fileprivate func create() {
         if active {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             

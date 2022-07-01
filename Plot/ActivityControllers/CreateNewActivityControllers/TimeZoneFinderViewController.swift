@@ -9,7 +9,7 @@
 import UIKit
 import MapKit
 
-protocol UpdateTimeZoneDelegate: class {
+protocol UpdateTimeZoneDelegate: AnyObject {
     func updateTimeZone(startOrEndTimeZone: String, timeZone: TimeZone)
 }
 
@@ -55,6 +55,7 @@ class TimeZoneViewController: UIViewController {
     }
     
     fileprivate func setupMainView() {
+        extendedLayoutIncludesOpaqueBars = true
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
         }

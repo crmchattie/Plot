@@ -65,7 +65,7 @@ class FinancialTransactionRuleFetcher: NSObject {
                 let transactionRuleID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(userFinancialTransactionRulesEntity).child(transactionRuleID).observe(.value) { _ in
+                handle = ref.child(userFinancialTransactionRulesEntity).child(transactionRuleID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getTransactionRulesFromSnapshot(snapshot: snapshot, completion: completion)
                 }

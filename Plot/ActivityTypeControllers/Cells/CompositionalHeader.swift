@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol CompositionalHeaderDelegate: class {
+protocol CompositionalHeaderDelegate: AnyObject {
     func viewTapped(labelText: String)
 }
 

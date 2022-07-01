@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol ActivityExpandedDetailCellDelegate: class {
+protocol ActivityExpandedDetailCellDelegate: AnyObject {
     func servingsUpdated(servings: Int)
 }
 

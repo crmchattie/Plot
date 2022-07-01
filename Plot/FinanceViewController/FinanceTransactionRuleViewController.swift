@@ -74,10 +74,11 @@ class FinanceTransactionRuleViewController: FormViewController {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
         } else {
-//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-//            navigationItem.leftBarButtonItem = cancelBarButton
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
         }
         
     }

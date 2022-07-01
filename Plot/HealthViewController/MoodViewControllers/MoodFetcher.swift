@@ -61,7 +61,7 @@ class MoodFetcher: NSObject {
                 let moodID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(moodsEntity).child(moodID).observe(.value) { _ in
+                handle = ref.child(moodsEntity).child(moodID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getMoodsFromSnapshot(snapshot: snapshot, completion: completion)
                 }

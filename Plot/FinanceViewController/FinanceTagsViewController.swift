@@ -11,7 +11,7 @@ import Eureka
 import Firebase
 import CodableFirebase
 
-protocol UpdateTagsDelegate: class {
+protocol UpdateTagsDelegate: AnyObject {
     func updateTags(tags: [String]?)
 }
 
@@ -19,6 +19,8 @@ class FinanceTagsViewController: FormViewController {
     var tags: [String]?
     var ID: String!
     var type: String!
+    
+    var active: Bool = true
     
     weak var delegate : UpdateTagsDelegate?
     
@@ -51,7 +53,7 @@ class FinanceTagsViewController: FormViewController {
         definesPresentationContext = true
         navigationItem.title = "Tags"
         
-        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
         navigationItem.rightBarButtonItem = addBarButton
         
     }

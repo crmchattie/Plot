@@ -9,7 +9,7 @@
 import UIKit
 import LBTATools
 
-protocol EventDetailCellDelegate: class {
+protocol EventDetailCellDelegate: AnyObject {
     func viewTapped()
 }
 

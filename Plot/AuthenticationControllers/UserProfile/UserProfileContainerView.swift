@@ -50,7 +50,6 @@ class UserProfileContainerView: UIView {
         addPhotoLabel.numberOfLines = 2
         addPhotoLabel.textColor = FalconPalette.defaultBlue
         addPhotoLabel.textAlignment = .center
-        
         return addPhotoLabel
     }()
     
@@ -177,7 +176,7 @@ class UserProfileContainerView: UIView {
         bio.addSubview(bioPlaceholderLabel)
         
         NSLayoutConstraint.activate([
-            profileImageView.topAnchor.constraint(equalTo: topAnchor, constant: 30),
+            profileImageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 30),
             profileImageView.widthAnchor.constraint(equalToConstant: 100),
             profileImageView.heightAnchor.constraint(equalToConstant: 100),
             

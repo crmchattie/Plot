@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol UpdateFoodProductContainerDelegate: class {
+protocol UpdateFoodProductContainerDelegate: AnyObject {
     func updateFoodProductContainer(foodProductContainer: FoodProductContainer?, close: Bool?)
 }
 

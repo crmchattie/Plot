@@ -10,12 +10,12 @@ import UIKit
 import Firebase
 import Photos
 
-protocol MessagesDelegate: class {
+protocol MessagesDelegate: AnyObject {
   func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation)
   func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference)
 }
 
-protocol CollectionDelegate: class {
+protocol CollectionDelegate: AnyObject {
   func collectionView(update message: Message, reference: DatabaseReference)
   func collectionView(updateStatus reference: DatabaseReference, message: Message)
 }

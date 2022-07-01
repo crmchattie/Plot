@@ -179,7 +179,7 @@ class IngredientDetailViewController: FormViewController {
                 timer?.invalidate()
                 
                 timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (_) in
-                    self.fetchProductInfo(ingredientID: ingredient.id!, amount: self.ingredient.amount, unit: self.ingredient.unit)
+                    self.fetchProductInfo(ingredientID: self.ingredient.id!, amount: self.ingredient.amount, unit: self.ingredient.unit)
                 })
             }
         
@@ -216,7 +216,7 @@ class IngredientDetailViewController: FormViewController {
                     timer?.invalidate()
                     
                     timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-                        self.fetchProductInfo(ingredientID: ingredient.id!, amount: self.ingredient.amount, unit: self.ingredient.unit)
+                        self.fetchProductInfo(ingredientID: self.ingredient.id!, amount: self.ingredient.amount, unit: self.ingredient.unit)
                     })
                 }
         }

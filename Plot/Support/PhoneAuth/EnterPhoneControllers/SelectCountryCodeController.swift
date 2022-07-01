@@ -9,7 +9,7 @@
 import UIKit
 
 
-protocol CountryPickerDelegate: class {
+protocol CountryPickerDelegate: AnyObject {
     func countryPicker(_ picker: SelectCountryCodeController, didSelectCountryWithName name: String, code: String, dialCode: String)
 }
 
@@ -27,6 +27,7 @@ class SelectCountryCodeController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        extendedLayoutIncludesOpaqueBars = true
         configureView()
         configureSearchBar()
         configureTableView()

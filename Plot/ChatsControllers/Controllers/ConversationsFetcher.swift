@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import SDWebImage
 
-protocol ConversationUpdatesDelegate: class {
+protocol ConversationUpdatesDelegate: AnyObject {
     func conversations(didStartFetching: Bool)
     func conversations(didStartUpdatingData: Bool)
     func conversations(didFinishFetching: Bool, conversations: [Conversation])

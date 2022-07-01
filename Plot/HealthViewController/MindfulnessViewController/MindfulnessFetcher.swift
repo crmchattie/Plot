@@ -84,7 +84,7 @@ class MindfulnessFetcher: NSObject {
                 let mindfulnessID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(mindfulnessEntity).child(mindfulnessID).observe(.value) { _ in
+                handle = ref.child(mindfulnessEntity).child(mindfulnessID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getMindfulnessFromSnapshot(snapshot: snapshot, completion: completion)
                 }

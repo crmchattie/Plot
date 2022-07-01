@@ -66,6 +66,7 @@ class Activity: NSObject, NSCopying, Codable {
     var attractionID: String?
     var showExtras: Bool?
     var hkSampleID: String?
+    var completed: Bool?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -99,6 +100,8 @@ class Activity: NSObject, NSCopying, Codable {
         case attractionID
         case placeID
         case showExtras
+        case completed
+        case hkSampleID
     }
     
     init(dictionary: [String: AnyObject]?) {
@@ -206,6 +209,8 @@ class Activity: NSObject, NSCopying, Codable {
         attractionID = dictionary?["attractionID"] as? String
         placeID = dictionary?["placeID"] as? String
         showExtras = dictionary?["showExtras"] as? Bool
+        completed = dictionary?["completed"] as? Bool
+        hkSampleID = dictionary?["hkSampleID"] as? String
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -387,6 +392,18 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.placeID as AnyObject? {
             dictionary["placeID"] = value
+        }
+        
+        if let value = self.showExtras as AnyObject? {
+            dictionary["showExtras"] = value
+        }
+        
+        if let value = self.completed as AnyObject? {
+            dictionary["completed"] = value
+        }
+        
+        if let value = self.hkSampleID as AnyObject? {
+            dictionary["hkSampleID"] = value
         }
         
         return dictionary

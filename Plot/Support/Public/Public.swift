@@ -694,12 +694,12 @@ func libraryAccessChecking() -> Bool {
     switch status {
     case .authorized:
         return true
-        
     case .denied, .restricted :
         return false
-        
     case .notDetermined:
         return false
+    case .limited:
+        return true
     @unknown default:
         fatalError()
     }

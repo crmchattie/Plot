@@ -57,14 +57,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //        //set backgroundColor to theme
         //        window?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         //
+        tabBarController.showLaunchScreen()
+        
         tabBarController.presentOnboardingController()
         
         //register after user is no longer new user
         if Auth.auth().currentUser != nil {
             registerForPushNotifications(application: application)
         }
-
-        RunLoop.current.run(until: NSDate(timeIntervalSinceNow:2) as Date)
         
         ApplicationDelegate.shared.application(
                     application,
@@ -147,11 +147,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UNUserNotificationCenter.current().setNotificationCategories([chatCategory, activityCategory, checklistCategory, grocerylistCategory, activitylistCategory, mealCategory, workoutCategory, mindfulnessCategory, transactionCategory, accountCategory])
             
             //get application instance ID
-            InstanceID.instanceID().instanceID { (result, error) in
+            Messaging.messaging().token { (token, error) in
                 if let error = error {
                     print("Error fetching remote instance ID: \(error)")
-                } else if let result = result {
-                    print("Remote instance ID token: \(result.token)")
+                } else if let token = token {
+                    print("Remote instance ID token: \(token)")
                 }
             }
             

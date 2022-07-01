@@ -9,7 +9,7 @@
 import UIKit
 import Contacts
 
-protocol ContactsUpdatesDelegate: class {
+protocol ContactsUpdatesDelegate: AnyObject {
   func contacts(updateDatasource contacts: [CNContact])
   func contacts(handleAccessStatus: Bool)
 }

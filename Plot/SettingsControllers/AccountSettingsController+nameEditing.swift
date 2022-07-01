@@ -73,7 +73,6 @@ extension AccountSettingsController { /* user name editing */
     @objc func nameEditingChanged() {
         if userProfileContainerView.name.text!.count == 0 ||
             userProfileContainerView.name.text!.trimmingCharacters(in: .whitespaces).isEmpty {
-            
             doneBarButton.isEnabled = false
             
         } else {

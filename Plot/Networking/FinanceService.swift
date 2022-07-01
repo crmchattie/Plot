@@ -93,6 +93,7 @@ class FinanceService {
                     self.transactions = firebaseTransactions
                     self.removePendingTransactions()
                     self.observeTransactionsForCurrentUser()
+                    print("fetchFinance")
                     completion()
                 }
             }

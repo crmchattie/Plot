@@ -11,7 +11,7 @@ import Eureka
 import Firebase
 import CodableFirebase
 
-protocol UpdateTransactionDelegate: class {
+protocol UpdateTransactionDelegate: AnyObject {
     func updateTransaction(transaction: Transaction)
 }
 
@@ -157,16 +157,16 @@ class FinanceTransactionViewController: FormViewController {
         
         if active {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
             let dotsBarButton = UIBarButtonItem(image: UIImage(named: "dots"), style: .plain, target: self, action: #selector(goToExtras))
             navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
         } else {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
-//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-//            navigationItem.leftBarButtonItem = cancelBarButton
-        
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
         }
-        
     }
     
     @IBAction func cancel(_ sender: AnyObject) {

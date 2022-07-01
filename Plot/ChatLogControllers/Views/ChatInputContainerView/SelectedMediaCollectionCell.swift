@@ -38,7 +38,7 @@ class SelectedMediaCollectionCell: UICollectionViewCell {
     remove.translatesAutoresizingMaskIntoConstraints = false
     remove.setImage(UIImage(named: "remove"), for: .normal)
     remove.imageView?.contentMode = .scaleAspectFit
-    remove.addTarget(self, action: #selector(ChatInputContainerView.removeButtonDidTap), for: .touchUpInside)
+      remove.addTarget(SelectedMediaCollectionCell.self, action: #selector(ChatInputContainerView.removeButtonDidTap), for: .touchUpInside)
    
     return remove
   }()

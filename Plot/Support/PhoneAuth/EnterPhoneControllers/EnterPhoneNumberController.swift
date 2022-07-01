@@ -19,9 +19,13 @@ class EnterPhoneNumberController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        extendedLayoutIncludesOpaqueBars = true
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         configurePhoneNumberContainerView()
+        phoneNumberContainerView.phoneNumber.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        phoneNumberContainerView.selectCountry.addTarget(self, action: #selector(openCountryCodesList), for: .touchUpInside)
         setCountry()
+
     }
     
     func configurePhoneNumberContainerView() {

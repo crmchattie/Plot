@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol ActivityTypeCellDelegate: class {
+protocol ActivityTypeCellDelegate: AnyObject {
     func plusButtonTapped(type: AnyHashable)
     func shareButtonTapped(activityObject: ActivityObject)
     func bookmarkButtonTapped(type: Any)

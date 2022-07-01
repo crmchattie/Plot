@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol ListCellDelegate: class {
+protocol ListCellDelegate: AnyObject {
     func openActivity(activityID: String)
     func openChat(forConversation conversationID: String?, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?)
 }

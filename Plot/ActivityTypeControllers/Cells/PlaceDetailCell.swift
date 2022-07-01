@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol PlaceDetailCellDelegate: class {
+protocol PlaceDetailCellDelegate: AnyObject {
     func websiteTapped()
     func phoneNumberTapped()
 }

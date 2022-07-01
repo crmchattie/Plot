@@ -52,7 +52,10 @@ class User: NSObject {
 
 extension User { // local only
     var titleFirstLetter: String {
-        guard let name = name else {return "" }
-        return String(name[name.startIndex]).uppercased()
+        if name != "" && name != nil {
+            return String(name![name!.startIndex]).uppercased()
+        } else {
+            return ""
+        }
     }
 }

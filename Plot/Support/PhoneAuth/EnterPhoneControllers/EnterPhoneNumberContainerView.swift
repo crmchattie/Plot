@@ -49,8 +49,6 @@ class EnterPhoneNumberContainerView: UIView {
         selectCountry.layer.cornerRadius = 10
         selectCountry.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10.0, bottom: 0.0, right: 10.0)
         selectCountry.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        selectCountry.addTarget(self, action: #selector(EnterPhoneNumberController.openCountryCodesList), for: .touchUpInside)
-        
         return selectCountry
     }()
     
@@ -63,7 +61,6 @@ class EnterPhoneNumberContainerView: UIView {
         countryCode.font = UIFont.preferredFont(forTextStyle: .title3)
         countryCode.adjustsFontForContentSizeCategory = true
         countryCode.sizeToFit()
-        
         return countryCode
     }()
     
@@ -75,9 +72,7 @@ class EnterPhoneNumberContainerView: UIView {
         phoneNumber.textAlignment = .center
         phoneNumber.keyboardType = .numberPad
         phoneNumber.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        phoneNumber.textColor = ThemeManager.currentTheme().generalTitleColor
-        phoneNumber.addTarget(self, action: #selector(EnterPhoneNumberController.textFieldDidChange(_:)), for: .editingChanged)
-        
+        phoneNumber.textColor = ThemeManager.currentTheme().generalTitleColor        
         return phoneNumber
     }()
     
@@ -106,6 +101,7 @@ class EnterPhoneNumberContainerView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        
         addSubview(title)
         addSubview(instructions)
         addSubview(selectCountry)
@@ -123,7 +119,7 @@ class EnterPhoneNumberContainerView: UIView {
         
         NSLayoutConstraint.activate([
             
-            title.topAnchor.constraint(equalTo: topAnchor, constant: spacingConstant),
+            title.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: spacingConstant),
             title.rightAnchor.constraint(equalTo: rightAnchor, constant: rightConstant),
             title.leftAnchor.constraint(equalTo: leftAnchor, constant: leftConstant),
             title.centerXAnchor.constraint(equalTo: phoneContainer.centerXAnchor),

@@ -14,7 +14,7 @@ import Contacts
 import EventKit
 
 
-protocol UpdateScheduleDelegate: class {
+protocol UpdateScheduleDelegate: AnyObject {
     func updateSchedule(schedule: Activity)
     func updateIngredients(recipe: Recipe?, recipeID: String?)
 }
@@ -49,11 +49,7 @@ class ScheduleViewController: FormViewController {
     }
         
     override func viewDidLoad() {
-        super.viewDidLoad()
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
-        
+        super.viewDidLoad()        
         if schedule != nil {
             title = "Activity"
             active = true
@@ -88,15 +84,15 @@ class ScheduleViewController: FormViewController {
     }
     
     fileprivate func setupMainView() {
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
+        
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         
+        extendedLayoutIncludesOpaqueBars = true
+                
         if !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
             navigationItem.rightBarButtonItem = plusBarButton
@@ -205,20 +201,20 @@ class ScheduleViewController: FormViewController {
                     }
             }
             
-            <<< ButtonRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                }.onCellSelection({ _,_ in
-                    self.openParticipantsInviter()
-                }).cellUpdate { cell, row in
-                    cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.textLabel?.textAlignment = .left
-            }
+//            <<< ButtonRow("Participants") { row in
+//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                row.cell.textLabel?.textAlignment = .left
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                row.cell.accessoryType = .disclosureIndicator
+//                row.title = row.tag
+//                }.onCellSelection({ _,_ in
+//                    self.openParticipantsInviter()
+//                }).cellUpdate { cell, row in
+//                    cell.accessoryType = .disclosureIndicator
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.textLabel?.textAlignment = .left
+//            }
             
             <<< SwitchRow("All-day") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -763,8 +759,9 @@ class ScheduleViewController: FormViewController {
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        let latitude = locationAddress[locationName]![0]
-        let longitude = locationAddress[locationName]![1]
+        guard indexPath.row == 3, let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
+            return
+        }
         let ceo: CLGeocoder = CLGeocoder()
         let loc: CLLocation = CLLocation(latitude:latitude, longitude: longitude)
         var addressString : String = ""

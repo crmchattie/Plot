@@ -12,7 +12,7 @@ import SplitRow
 import Firebase
 import CodableFirebase
 
-protocol UpdateActivitylistDelegate: class {
+protocol UpdateActivitylistDelegate: AnyObject {
     func updateActivitylist(activitylist: Activitylist)
 }
 

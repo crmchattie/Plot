@@ -6,7 +6,7 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-protocol HealthControllerCellDelegate: class {
+protocol HealthControllerCellDelegate: AnyObject {
     func cellTapped(metric: HealthMetric)
 }
 

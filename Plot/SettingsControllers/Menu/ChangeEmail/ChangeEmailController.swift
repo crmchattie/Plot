@@ -15,6 +15,7 @@ class ChangeEmailController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        extendedLayoutIncludesOpaqueBars = true
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         configureChangeEmailView()
     }

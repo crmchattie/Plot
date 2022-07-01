@@ -25,7 +25,7 @@ enum Mode {
     case small, fullscreen
 }
 
-protocol ManageAppearanceHome: class {
+protocol ManageAppearanceHome: AnyObject {
     func manageAppearanceHome(_ homeController: MasterActivityContainerController, didFinishLoadingWith state: Bool )
 }
 
@@ -54,6 +54,10 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     var sections: [SectionType] = [.calendar, .health, .finances]
     
     var sortedActivities = [Activity]()
+    
+    var updatingActivities = true
+    var updatingHealth = true
+    var updatingFinances = true
     
     var healthMetricSections: [String] {
         var healthMetricSections = Array(healthMetrics.keys)
@@ -121,22 +125,15 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)        
+        super.viewDidAppear(animated)
+        print("viewDidAppear")
         if isNewUser {
             isNewUser = false
-            // authorize and grab contacts after new user logs in
             self.networkController.userService.grabContacts()
         }
     }
 
-    func setupViews() {                
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
-        
-        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
-        
+    func setupViews() {
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -160,10 +157,6 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         collectionView.register(HeaderContainerCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerContainerCell)
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
-    }
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -184,10 +177,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         navigationController?.navigationBar.titleTextAttributes = textAttributes
         navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
         navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-        
-        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
-        
+
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.reloadData()
@@ -195,6 +185,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     }
     
     @objc fileprivate func activitiesUpdated() {
+        self.updatingActivities = false
         scrollToFirstActivityWithDate({ (activities) in
             if self.sortedActivities != activities {
                 self.sortedActivities = activities
@@ -212,6 +203,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     }
     
     @objc fileprivate func healthUpdated() {
+        self.updatingHealth = false
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
@@ -219,6 +211,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     
     @objc fileprivate func financeUpdated() {
         self.grabFinancialItems { (sections, groups) in
+            self.updatingFinances = false
             if self.financeSections != sections || self.financeGroups != groups {
                 self.financeSections = sections
                 self.financeGroups = groups
@@ -361,7 +354,6 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
                 }
             }
         }
-        
         completion(sections, groups)
     }
     
@@ -573,6 +565,11 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             sectionHeader.sectionType = section
             if section == .calendar {
                 if !sortedActivities.isEmpty {
+                    if updatingActivities {
+                        sectionHeader.spinnerView.startAnimating()
+                    } else {
+                        sectionHeader.spinnerView.stopAnimating()
+                    }
                     sectionHeader.subTitleLabel.isHidden = false
                     sectionHeader.delegate = self
                 } else {
@@ -581,6 +578,11 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 }
             } else if section == .health {
                 if !healthMetrics.isEmpty {
+                    if updatingHealth {
+                        sectionHeader.spinnerView.startAnimating()
+                    } else {
+                        sectionHeader.spinnerView.stopAnimating()
+                    }
                     sectionHeader.subTitleLabel.isHidden = false
                     sectionHeader.delegate = self
                 } else {
@@ -589,6 +591,11 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 }
             } else {
                 if !financeSections.isEmpty {
+                    if updatingFinances {
+                        sectionHeader.spinnerView.startAnimating()
+                    } else {
+                        sectionHeader.spinnerView.stopAnimating()
+                    }
                     sectionHeader.subTitleLabel.isHidden = false
                     sectionHeader.delegate = self
                 } else {
@@ -655,14 +662,12 @@ extension MasterActivityContainerController {
 }
 
 extension MasterActivityContainerController: HeaderContainerCellDelegate {
-    
     func viewTapped(sectionType: SectionType) {
         goToVC(section: sectionType)
     }
 }
 
 extension MasterActivityContainerController: GIDSignInDelegate {
-    
     func newCalendarItem() {
         if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)

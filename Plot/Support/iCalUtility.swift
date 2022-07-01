@@ -17,7 +17,7 @@ import Foundation
 struct iCalUtility {
     
     func recurringDates(forRules rules: [String], startDate: Date) -> [Date] {
-        var recurringDates: [Date] = []
+        let recurringDates: [Date] = []
 
         for rule in rules {
             if rule.starts(with: "RRULE") {

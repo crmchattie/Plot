@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol ActivityDetailCellDelegate: class {
+protocol ActivityDetailCellDelegate: AnyObject {
     func plusButtonTapped()
     func shareButtonTapped()
     func bookmarkButtonTapped()

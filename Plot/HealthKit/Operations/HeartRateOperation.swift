@@ -22,7 +22,7 @@ class HeartRateOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        guard let sampleType = HKObjectType.quantityType(forIdentifier: .heartRate) else {
+        guard let _ = HKObjectType.quantityType(forIdentifier: .heartRate) else {
             self.finish()
             return
         }

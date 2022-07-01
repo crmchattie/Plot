@@ -14,26 +14,23 @@ extension EnterVerificationContainerView {
     
     func runTimer() {
         resend.isEnabled = false
-        timerLabel.isHidden = false
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,  selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
     }
     
     @objc func updateTimer() {
         if seconds < 1 {
             resetTimer()
-            timerLabel.isHidden = true
-            //      leftBarButton.isEnabled = true
             resend.isEnabled = true
         } else {
             seconds -= 1
-            timerLabel.text =  "The message has been sent!\nYou can try again in \(timeString(time: TimeInterval(seconds)))"
+//        timerLabel.text =  "The message has been sent!\nYou can try again in \(timeString(time: TimeInterval(seconds)))"
         }
     }
     
     func resetTimer() {
         timer.invalidate()
         seconds = 120
-        timerLabel.text =  "The message has been sent!\nYou can try again in \(timeString(time: TimeInterval(seconds)))"
+
     }
     
     func timeString(time:TimeInterval) -> String {

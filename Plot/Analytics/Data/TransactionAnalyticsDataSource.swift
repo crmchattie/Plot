@@ -61,7 +61,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             .filter { $0.top_level_category != "Investments" && $0.category != "Investments" }
             .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
             .filter { transaction -> Bool in
-                #warning("This is extremely unoptimal. A stored Date object should be saved inside the Transaction.")
+//                #warning("This is extremely unoptimal. A stored Date object should be saved inside the Transaction.")
                 guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
                 return range.startDate <= date && date <= range.endDate
             }

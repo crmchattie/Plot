@@ -31,7 +31,7 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     }
 }
 
-protocol ChooseListDelegate: class {
+protocol ChooseListDelegate: AnyObject {
     func chosenList(list: ListContainer)
 }
 

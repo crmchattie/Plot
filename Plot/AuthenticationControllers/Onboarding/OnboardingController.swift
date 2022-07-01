@@ -16,16 +16,19 @@ class OnboardingController: UIViewController {
     super.viewDidLoad()
     
     //set-up interface with the help of OnboardingContainerView file
+    extendedLayoutIncludesOpaqueBars = true
     view.addSubview(onboardingContainerView)
     onboardingContainerView.frame = view.bounds
     setColorsAccordingToTheme()
+    onboardingContainerView.startMessaging.addTarget(self, action: #selector(startMessagingDidTap), for: .touchUpInside)
+
   }
   
   fileprivate func setColorsAccordingToTheme() {
     let theme = ThemeManager.currentTheme()
     ThemeManager.applyTheme(theme: theme)
     //redundant and why do we pass the generalBackgroundColor back and forth between views
-    view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+    view.backgroundColor = ThemeManager.currentTheme().launchBackgroundColor
     onboardingContainerView.backgroundColor = view.backgroundColor
   }
     

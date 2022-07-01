@@ -171,7 +171,7 @@ open class ShoutView: UIView {
         let textOffsetX: CGFloat = 20
         var textOffsetY:CGFloat = 0
       
-          textOffsetY = UIApplication.shared.isStatusBarHidden ? 10 : 30
+        textOffsetY = UIApplication.shared.isStatusBarHidden ? 10 : 30
         if DeviceType.iPhoneX {
           textOffsetY = 10 + UIApplication.shared.statusBarFrame.height
         }

@@ -16,11 +16,11 @@ fileprivate let summaryValueBarChartCell = "SummaryValueBarChartCell"
 fileprivate let summaryHKChartCell = "SummaryHKChartCell"
 fileprivate let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
 
-protocol HomeBaseSummary: class {
+protocol HomeBaseSummary: AnyObject {
 //    func sendLists(lists: [ListContainer])
 }
 
-protocol SummaryViewControllerActivitiesDelegate: class {
+protocol SummaryViewControllerActivitiesDelegate: AnyObject {
     func update(_ summaryViewController: SummaryViewController, _ shouldFetchActivities: Bool)
 }
 

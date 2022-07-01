@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol CalendarDetailCellDelegate: class {
+protocol CalendarDetailCellDelegate: AnyObject {
     func locationViewTapped(labelText: String)
     func infoViewTapped()
     func participantsViewTapped(labelText: String)

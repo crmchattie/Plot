@@ -45,16 +45,16 @@ class AvatarOpenerOverlay: UIView {
     navigationBar.barStyle = .black
     navigationBar.isTranslucent = false
     navigationBar.clipsToBounds = true
-    navigationBar.barTintColor = .black
+    navigationBar.backgroundColor = UIColor.black
+    navigationBar.barTintColor = UIColor.black
     navigationBar.translatesAutoresizingMaskIntoConstraints = false
-    
     return navigationBar
   }()
   
   var toolbar: UIToolbar = {
     var toolbar = UIToolbar()
     toolbar.alpha = 0.8
-    toolbar.barTintColor = .black
+    toolbar.barTintColor = UIColor.black
     toolbar.barStyle = .black
     toolbar.isTranslucent = false
     toolbar.clipsToBounds = true

@@ -76,11 +76,15 @@ extension ChatLogController {
           break
         case .denied, .restricted, .notDetermined:
           break
-				@unknown default:
+        case .limited:
+            break
+        @unknown default:
 					fatalError()
 				}
       }
-		@unknown default:
+    case .limited:
+        break
+    @unknown default:
 			fatalError()
 		}
   }

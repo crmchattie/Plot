@@ -10,7 +10,7 @@ import UIKit
 import Eureka
 import Firebase
 
-protocol UpdateFilter: class {
+protocol UpdateFilter: AnyObject {
     func updateFilter(filterDictionary : [String: [String]])
 }
 

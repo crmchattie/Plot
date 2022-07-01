@@ -31,7 +31,7 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     }
 }
 
-protocol ChooseActivityDelegate: class {
+protocol ChooseActivityDelegate: AnyObject {
     func chosenActivity(mergeActivity: Activity)
 }
 
@@ -109,9 +109,9 @@ class ChooseActivityTableViewController: UITableViewController {
     }
     
     fileprivate func configureTableView() {
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+//        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+//        navigationController?.navigationBar.shadowImage = UIImage()
+//        navigationController?.navigationBar.layoutIfNeeded()
         
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.rowHeight = UITableView.automaticDimension

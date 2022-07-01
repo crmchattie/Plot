@@ -11,7 +11,7 @@ import UIKit
 fileprivate let healthMetricCellID = "HealthMetricCellID"
 fileprivate let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
 
-protocol HealthViewControllerActivitiesDelegate: class {
+protocol HealthViewControllerActivitiesDelegate: AnyObject {
     func update(_ healthViewController: HealthViewController, _ shouldFetchActivities: Bool)
 }
 
@@ -88,6 +88,7 @@ class HealthViewController: UIViewController {
     }
     
     private func configureView() {
+        extendedLayoutIncludesOpaqueBars = true
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
 //        let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton]
@@ -116,6 +117,9 @@ class HealthViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "Meal", style: .default, handler: { (_) in
             let destination = MealViewController()
             destination.users = self.networkController.userService.users
+            destination.filteredUsers = self.networkController.userService.users
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }))
@@ -124,6 +128,8 @@ class HealthViewController: UIViewController {
             let destination = WorkoutViewController()
             destination.users = self.networkController.userService.users
             destination.filteredUsers = self.networkController.userService.users
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }))
@@ -133,6 +139,8 @@ class HealthViewController: UIViewController {
             destination.hidesBottomBarWhenPushed = true
             destination.users = self.networkController.userService.users
             destination.filteredUsers = self.networkController.userService.users
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }))

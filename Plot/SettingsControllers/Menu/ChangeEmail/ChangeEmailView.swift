@@ -45,7 +45,7 @@ class ChangeEmailView: UIView {
         email.autocorrectionType = .no
         email.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         email.textColor = ThemeManager.currentTheme().generalTitleColor
-        email.addTarget(self, action: #selector(EnterPhoneNumberController.textFieldDidChange(_:)), for: .editingChanged)
+        email.addTarget(ChangeEmailView.self, action: #selector(EnterPhoneNumberController.textFieldDidChange(_:)), for: .editingChanged)
         return email
     }()
     
@@ -88,7 +88,7 @@ class ChangeEmailView: UIView {
         
         NSLayoutConstraint.activate([
             
-            title.topAnchor.constraint(equalTo: topAnchor, constant: spacingConstant),
+            title.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: spacingConstant),
             title.rightAnchor.constraint(equalTo: rightAnchor, constant: rightConstant),
             title.leftAnchor.constraint(equalTo: leftAnchor, constant: leftConstant),
             title.centerXAnchor.constraint(equalTo: emailView.centerXAnchor),

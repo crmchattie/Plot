@@ -86,7 +86,7 @@ class MealFetcher: NSObject {
                 let mealID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(mealsEntity).child(mealID).observe(.value) { _ in
+                handle = ref.child(mealsEntity).child(mealID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getMealsFromSnapshot(snapshot: snapshot, completion: completion)
                 }

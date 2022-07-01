@@ -83,7 +83,7 @@ class ChecklistFetcher: NSObject {
                 let checklistID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(checklistsEntity).child(checklistID).observe(.value) { _ in
+                handle = ref.child(checklistsEntity).child(checklistID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getChecklistsFromSnapshot(snapshot: snapshot, completion: completion)
                 }

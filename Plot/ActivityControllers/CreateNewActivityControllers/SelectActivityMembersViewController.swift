@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol UpdateInvitees: class {
+protocol UpdateInvitees: AnyObject {
     func updateInvitees(selectedFalconUsers : [User])
 }
 

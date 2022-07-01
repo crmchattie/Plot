@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol WorkoutDetailCellDelegate: class {
+protocol WorkoutDetailCellDelegate: AnyObject {
     func viewTapped()
 }
 

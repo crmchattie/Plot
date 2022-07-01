@@ -61,7 +61,7 @@ class WorkFetcher: NSObject {
                 let workID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(workEntity).child(workID).observe(.value) { _ in
+                handle = ref.child(workEntity).child(workID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getWorkFromSnapshot(snapshot: snapshot, completion: completion)
                 }

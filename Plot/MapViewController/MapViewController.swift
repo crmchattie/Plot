@@ -69,6 +69,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         addAnnotations()
         setupLocationsCarousel()
         locationsController.mapViewController = self
+        
+        extendedLayoutIncludesOpaqueBars = true
     }
     
     let locationsController = LocationsCarouselController(scrollDirection: .horizontal)
@@ -76,7 +78,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     fileprivate func setupLocationsCarousel() {
         let locationsView = locationsController.view!
         view.addSubview(locationsView)
-        locationsView.anchor(top: nil, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 10, right: 0), size: .init(width: 0, height: 100))
+        locationsView.anchor(top: nil, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 10, right: 0), size: .init(width: 0, height: 100))
     }
     
     var listener: Any!

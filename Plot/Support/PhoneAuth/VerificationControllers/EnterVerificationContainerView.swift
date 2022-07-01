@@ -10,7 +10,7 @@ import UIKit
 
 class EnterVerificationContainerView: UIView {
     
-  let leftBarButton = UIBarButtonItem(title: "Resend", style: .done, target: self, action: nil)
+    let leftBarButton = UIBarButtonItem(title: "Resend", style: .done, target: EnterVerificationContainerView.self, action: nil)
 
   let titleNumber: UILabel = {
     let titleNumber = UILabel()
@@ -53,6 +53,7 @@ class EnterVerificationContainerView: UIView {
     let resend = UIButton()
     resend.translatesAutoresizingMaskIntoConstraints = false
     resend.setTitle("Resend", for: .normal)
+    resend.setTitle("Sent!", for: .disabled)
     resend.contentVerticalAlignment = .center
     resend.contentHorizontalAlignment = .center
     resend.setTitleColor(FalconPalette.defaultBlue, for: .normal)
@@ -82,19 +83,6 @@ class EnterVerificationContainerView: UIView {
   
   var timer = Timer()
   
-  var timerLabel: UILabel = {
-    var timerLabel = UILabel()
-    timerLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-    timerLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-    timerLabel.adjustsFontForContentSizeCategory = true
-    timerLabel.translatesAutoresizingMaskIntoConstraints = false
-    timerLabel.textAlignment = .center
-    timerLabel.sizeToFit()
-    timerLabel.numberOfLines = 0
-    
-    return timerLabel
-  }()
-  
   override init(frame: CGRect) {
     super.init(frame: frame)
   
@@ -103,10 +91,9 @@ class EnterVerificationContainerView: UIView {
     addSubview(verificationCode)
     addSubview(nextView)
     addSubview(resend)
-    addSubview(timerLabel)
   
     NSLayoutConstraint.activate([
-      titleNumber.topAnchor.constraint(equalTo: topAnchor),
+      titleNumber.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
       titleNumber.leadingAnchor.constraint(equalTo: leadingAnchor),
       titleNumber.trailingAnchor.constraint(equalTo: trailingAnchor),
       titleNumber.heightAnchor.constraint(equalToConstant: 70),
@@ -131,10 +118,6 @@ class EnterVerificationContainerView: UIView {
       nextView.trailingAnchor.constraint(equalTo: trailingAnchor),
       nextView.heightAnchor.constraint(equalToConstant: 45),
       
-      timerLabel.topAnchor.constraint(equalTo: verificationCode.bottomAnchor, constant: 0),
-      timerLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-      timerLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-      timerLabel.heightAnchor.constraint(equalToConstant: 35)
     ])
   }
   

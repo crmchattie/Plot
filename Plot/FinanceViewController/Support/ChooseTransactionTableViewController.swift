@@ -6,7 +6,7 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-protocol ChooseTransactionDelegate: class {
+protocol ChooseTransactionDelegate: AnyObject {
     func chosenTransaction(transaction: Transaction)
 }
 

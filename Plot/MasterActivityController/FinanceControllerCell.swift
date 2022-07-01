@@ -6,7 +6,7 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-protocol FinanceControllerCellDelegate: class {
+protocol FinanceControllerCellDelegate: AnyObject {
     func openTransactionDetails(transactionDetails: TransactionDetails)
     func openAccountDetails(accountDetails: AccountDetails)
     func openMember(member: MXMember)

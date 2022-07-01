@@ -36,11 +36,11 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 let activityCellID = "activityCellID"
 let notificationCellID = "notificationCellID"
 
-protocol UpdateInvitationDelegate: class {
+protocol UpdateInvitationDelegate: AnyObject {
     func updateInvitation(invitation: Invitation)
 }
 
-protocol ActivityViewControllerDataStore: class {
+protocol ActivityViewControllerDataStore: AnyObject {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->())
 }
 
@@ -220,6 +220,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func configureView() {
+        extendedLayoutIncludesOpaqueBars = true
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
@@ -231,7 +232,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         view.addSubview(activityView)
         
         activityView.translatesAutoresizingMaskIntoConstraints = false
-        activityView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        activityView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         activityView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         activityView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         activityView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
@@ -269,10 +270,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         applyCalendarTheme()
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
-    }
-    
     @objc fileprivate func newItem() {
         if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -288,6 +285,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 destination.filteredUsers = self.networkController.userService.users
                 destination.startDateTime = calendar.date(from: dateComponents)
                 destination.endDateTime = calendar.date(from: dateComponents)
+                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                destination.navigationItem.leftBarButtonItem = cancelBarButton
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             }))

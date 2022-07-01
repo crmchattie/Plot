@@ -81,7 +81,7 @@ class GrocerylistFetcher: NSObject {
                 let grocerylistID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(grocerylistsEntity).child(grocerylistID).observe(.value) { _ in
+                handle = ref.child(grocerylistsEntity).child(grocerylistID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getGrocerylistsFromSnapshot(snapshot: snapshot, completion: completion)
                 }

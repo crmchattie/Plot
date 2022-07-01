@@ -9,7 +9,7 @@
 import UIKit
 import WebKit
 
-protocol EndedWebViewDelegate: class {
+protocol EndedWebViewDelegate: AnyObject {
     func updateMXMembers()
 }
 
@@ -50,6 +50,8 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        extendedLayoutIncludesOpaqueBars = true
+        
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never

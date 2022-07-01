@@ -92,6 +92,15 @@ enum Theme: Int {
         }
     }
     
+    var launchBackgroundColor: UIColor {
+        switch self {
+        case .Default:
+            return .white
+        case .Dark:
+            return .black
+        }
+    }
+    
     var barBackgroundColor: UIColor {
         switch self {
         case .Default:

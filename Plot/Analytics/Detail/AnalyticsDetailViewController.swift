@@ -28,7 +28,7 @@ class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
         let control = UISegmentedControl(items: DateRangeType.allCases.map { $0.filterTitle } )
         control.selectedSegmentIndex = 0
         control.translatesAutoresizingMaskIntoConstraints = false
-        control.addTarget(self, action: #selector(rangeChanged), for: .valueChanged)
+        control.addTarget(AnalyticsDetailViewController.self, action: #selector(rangeChanged), for: .valueChanged)
         return control
     }()
     

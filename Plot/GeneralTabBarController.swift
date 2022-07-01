@@ -40,6 +40,21 @@ class GeneralTabBarController: UITabBarController {
         return splashContainer
     }()
     
+    let launchScreenView: UIView = {
+        let launchScreenView = UIView()
+        launchScreenView.translatesAutoresizingMaskIntoConstraints = false
+        launchScreenView.layer.masksToBounds = true
+        return launchScreenView
+    }()
+    
+    let plotLogoView: UIImageView = {
+        let plotLogoView = UIImageView()
+        plotLogoView.translatesAutoresizingMaskIntoConstraints = false
+        plotLogoView.layer.masksToBounds = true
+        plotLogoView.image = UIImage(named: "plotLogo")
+        return plotLogoView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -57,22 +72,31 @@ class GeneralTabBarController: UITabBarController {
         setOnlineStatus()
         loadVariables()
         configureTabBar()
+        setTabs()
     }
     
     fileprivate func configureTabBar(){
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor], for: .normal)
         tabBar.unselectedItemTintColor = ThemeManager.currentTheme().generalSubtitleColor
-        tabBar.barTintColor = ThemeManager.currentTheme().generalTitleColor
+        tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        tabBar.barStyle = ThemeManager.currentTheme().barStyle
         tabBar.isTranslucent = false
         tabBar.layer.borderWidth = 0.50
         tabBar.layer.borderColor = UIColor.clear.cgColor
         tabBar.clipsToBounds = true
-        setTabs()
+        
+        if #available(iOS 15, *) {
+            let tabBarApperance = UITabBarAppearance()
+            tabBarApperance.configureWithOpaqueBackground()
+            tabBarApperance.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+            UITabBar.appearance().barTintColor = ThemeManager.currentTheme().barBackgroundColor
+            UITabBar.appearance().scrollEdgeAppearance = tabBarApperance
+            UITabBar.appearance().standardAppearance = tabBarApperance
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         if onceToken == 0 {
             splashContainer.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             view.addSubview(splashContainer)
@@ -97,6 +121,7 @@ class GeneralTabBarController: UITabBarController {
             let theme = Theme.Default
             ThemeManager.applyTheme(theme: theme)
         }
+        configureTabBar()
     }
     
     fileprivate func loadVariables() {
@@ -107,7 +132,6 @@ class GeneralTabBarController: UITabBarController {
         
         let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
 //        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
-        
         //if new user, do nothing; if existing user with old version of app, load other variables
         //if existing user with current version, load everything
         if !isNewUser {
@@ -117,9 +141,11 @@ class GeneralTabBarController: UITabBarController {
                 self.settingsController.networkController = self.networkController
                 self.analyticsController.viewModel = .init(networkController: self.networkController)
                 self.networkController.setupOtherVariables()
+                self.removeLaunchScreenView()
             }
         } else {
             UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
+            self.removeLaunchScreenView()
         }
     }
     
@@ -131,6 +157,7 @@ class GeneralTabBarController: UITabBarController {
         let controller = UINavigationController(rootViewController: viewController)
         controller.navigationBar.prefersLargeTitles = true
         controller.navigationItem.largeTitleDisplayMode = .always
+        controller.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
         let tabBarItem = UITabBarItem(title: nil, image: icon, selectedImage: selectedIcon)
         tabBarItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
         controller.tabBarItem = tabBarItem
@@ -156,7 +183,29 @@ class GeneralTabBarController: UITabBarController {
         newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
         newNavigationController.modalTransitionStyle = .crossDissolve
         newNavigationController.modalPresentationStyle = .fullScreen
+        self.removeLaunchScreenView()
         present(newNavigationController, animated: false, completion: nil)
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return ThemeManager.currentTheme().statusBarStyle
+    }
+    
+    func showLaunchScreen() {
+        launchScreenView.backgroundColor = ThemeManager.currentTheme().launchBackgroundColor
+        view.addSubview(launchScreenView)
+        launchScreenView.fillSuperview()
+        launchScreenView.addSubview(plotLogoView)
+        plotLogoView.heightAnchor.constraint(equalToConstant: 310).isActive = true
+        plotLogoView.widthAnchor.constraint(equalToConstant: 310).isActive = true
+        plotLogoView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        plotLogoView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    }
+    
+    func removeLaunchScreenView() {
+        DispatchQueue.main.async {
+            self.launchScreenView.removeFromSuperview()
+        }
     }
 }
 
@@ -164,7 +213,6 @@ extension GeneralTabBarController: ManageAppearanceHome {
     func manageAppearanceHome(_ homeController: MasterActivityContainerController, didFinishLoadingWith state: Bool) {
         guard !isAppLoaded else { return }
         isAppLoaded = true
-        print("manageAppearanceHome")
         let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
         _ = settingsController.view
         guard state else { return }

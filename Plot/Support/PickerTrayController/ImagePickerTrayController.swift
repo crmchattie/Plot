@@ -18,7 +18,7 @@ public enum ImagePickerMediaType {
     case imageAndVideo
 }
 
-@objc public protocol ImagePickerTrayControllerDelegate: class {
+@objc public protocol ImagePickerTrayControllerDelegate: AnyObject {
     
     @objc optional func controller(_ controller: ImagePickerTrayController, willSelectAsset asset: PHAsset, at indexPath: IndexPath)
     @objc optional func controller(_ controller: ImagePickerTrayController, didSelectAsset asset: PHAsset, at indexPath: IndexPath?)
@@ -300,10 +300,16 @@ public class ImagePickerTrayController: UIViewController {
           case .denied, .restricted, .notDetermined:
             basicErrorAlertWith(title: basicTitleForAccessError, message: cameraAccessDeniedMessage, controller: self)
             break
-						@unknown default:
-							fatalError()
-					}
+          case .limited:
+              self.cameraController.takePicture()
+              break
+          @unknown default:
+              fatalError()
+            }
         }
+      case .limited:
+          cameraController.takePicture()
+          break
       @unknown default:
             fatalError()
         }

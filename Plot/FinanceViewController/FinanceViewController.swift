@@ -143,7 +143,8 @@ class FinanceViewController: UIViewController {
     }
     
     fileprivate func setupMainView() {
-        edgesForExtendedLayout = UIRectEdge.top
+        extendedLayoutIncludesOpaqueBars = true
+        
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -154,7 +155,7 @@ class FinanceViewController: UIViewController {
         view.addSubview(customSegmented)
         view.addSubview(collectionView)
 
-        customSegmented.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
@@ -173,6 +174,8 @@ class FinanceViewController: UIViewController {
             let destination = FinanceTransactionViewController()
             destination.users = self.networkController.userService.users
             destination.filteredUsers = self.networkController.userService.users
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }))
@@ -185,6 +188,8 @@ class FinanceViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "Transaction Rule", style: .default, handler: { (_) in
             print("User click Edit button")
             let destination = FinanceTransactionRuleViewController()
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }))

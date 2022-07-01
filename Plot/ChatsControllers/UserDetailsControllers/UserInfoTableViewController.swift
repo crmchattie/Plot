@@ -65,7 +65,7 @@ class UserInfoTableViewController: UITableViewController {
     
     fileprivate func getUserInfo() {
         userReference = Database.database().reference().child("users").child(conversationID)
-        handle = userReference.observe(.value) { (snapshot) in
+        handle = userReference.observe(.childChanged) { (snapshot) in
             if snapshot.exists() {
                 guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
                 dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")

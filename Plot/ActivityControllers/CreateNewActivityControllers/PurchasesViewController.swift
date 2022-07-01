@@ -11,7 +11,7 @@ import Eureka
 import SplitRow
 import Firebase
 
-protocol UpdatePurchasesDelegate: class {
+protocol UpdatePurchasesDelegate: AnyObject {
     func updatePurchases(purchase: Purchase)
 }
 
@@ -73,19 +73,24 @@ class PurchasesViewController: FormViewController {
     }
     
     fileprivate func setupMainView() {
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
         navigationItem.title = "New Purchase"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+        
         navigationItem.rightBarButtonItem =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
         navigationItem.rightBarButtonItem?.isEnabled = false
         
+        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        navigationItem.leftBarButtonItem = cancelBarButton
         
+        
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     fileprivate func initializeForm() {

@@ -240,6 +240,7 @@ class HealthService {
                             self?.healthMetrics = metrics
                             self?.healthMetricSections = Array(metrics.keys)
                         }
+                        print("loadHealthKitActivities completion")
                         completion()
                     }
                 }

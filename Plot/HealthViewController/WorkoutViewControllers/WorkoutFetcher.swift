@@ -84,7 +84,7 @@ class WorkoutFetcher: NSObject {
                 let workoutID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(workoutsEntity).child(workoutID).observe(.value) { _ in
+                handle = ref.child(workoutsEntity).child(workoutID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getWorkoutsFromSnapshot(snapshot: snapshot, completion: completion)
                 }

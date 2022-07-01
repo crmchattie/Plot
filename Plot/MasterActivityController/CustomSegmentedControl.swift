@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol CustomSegmentedControlDelegate:class {
+protocol CustomSegmentedControlDelegate: AnyObject {
     func changeToIndex(index:Int)
 }
 

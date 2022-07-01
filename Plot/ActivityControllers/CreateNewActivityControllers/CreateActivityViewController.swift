@@ -181,8 +181,6 @@ class CreateActivityViewController: FormViewController {
         navigationController?.navigationBar.layoutIfNeeded()
         
         extendedLayoutIncludesOpaqueBars = true
-        definesPresentationContext = true
-        edgesForExtendedLayout = UIRectEdge.top
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -195,8 +193,11 @@ class CreateActivityViewController: FormViewController {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
             navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = false
-//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-//            navigationItem.leftBarButtonItem = cancelBarButton
+            
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
+            
         } else {
             let dotsImage = UIImage(named: "dots")
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
@@ -375,28 +376,28 @@ class CreateActivityViewController: FormViewController {
                 }
             
         
-            <<< ButtonRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                if self.acceptedParticipant.count > 0 {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = self.userNamesString
-                }
-                }.onCellSelection({ _,_ in
-                    self.openParticipantsInviter()
-                }).cellUpdate { cell, row in
-                    cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textAlignment = .left
-                    if row.title == "Participants" {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    } else {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
-                }
+//            <<< ButtonRow("Participants") { row in
+//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                row.cell.textLabel?.textAlignment = .left
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                row.cell.accessoryType = .disclosureIndicator
+//                row.title = row.tag
+//                if self.acceptedParticipant.count > 0 {
+//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    row.title = self.userNamesString
+//                }
+//                }.onCellSelection({ _,_ in
+//                    self.openParticipantsInviter()
+//                }).cellUpdate { cell, row in
+//                    cell.accessoryType = .disclosureIndicator
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textLabel?.textAlignment = .left
+//                    if row.title == "Participants" {
+//                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    } else {
+//                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    }
+//                }
             
             <<< SwitchRow("All-day") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

@@ -10,7 +10,7 @@ import UIKit
 import Eureka
 import Firebase
 
-protocol UpdateTransactionLevelDelegate: class {
+protocol UpdateTransactionLevelDelegate: AnyObject {
     func update(value: String, level: String)
 }
 

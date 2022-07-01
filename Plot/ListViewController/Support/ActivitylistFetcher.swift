@@ -83,7 +83,7 @@ class ActivitylistFetcher: NSObject {
                 let activitylistID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(activitylistsEntity).child(activitylistID).observe(.value) { _ in
+                handle = ref.child(activitylistsEntity).child(activitylistID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getActivitylistsFromSnapshot(snapshot: snapshot, completion: completion)
                 }
