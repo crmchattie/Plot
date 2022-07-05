@@ -131,9 +131,7 @@ class ActivityActions: NSObject {
         createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
         connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
         self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-            print("start updateInvitations")
             InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
-                print("finished updateInvitations")
             }
         })
         

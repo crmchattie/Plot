@@ -182,6 +182,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func activitiesUpdated() {
+        filteredPinnedActivities = pinnedActivities
+        filteredActivities = activities
         activityView.tableView.reloadData()
     }
     
@@ -281,8 +283,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 dateComponents.minute = calendar.component(.minute, from: Date())
                 
                 let destination = CreateActivityViewController()
-                destination.users = self.networkController.userService.users
-                destination.filteredUsers = self.networkController.userService.users
+                destination.users = self.users
+                destination.filteredUsers = self.filteredUsers
+                destination.activities = self.filteredActivities + self.filteredPinnedActivities
+                destination.conversations = self.conversations
+                destination.transactions = self.networkController.financeService.transactions
                 destination.startDateTime = calendar.date(from: dateComponents)
                 destination.endDateTime = calendar.date(from: dateComponents)
                 let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
@@ -309,8 +314,11 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             dateComponents.minute = calendar.component(.minute, from: Date())
             
             let destination = CreateActivityViewController()
-            destination.users = self.networkController.userService.users
-            destination.filteredUsers = self.networkController.userService.users
+            destination.users = self.users
+            destination.filteredUsers = self.filteredUsers
+            destination.activities = self.filteredActivities + self.filteredPinnedActivities
+            destination.conversations = self.conversations
+            destination.transactions = self.networkController.financeService.transactions
             destination.startDateTime = calendar.date(from: dateComponents)
             destination.endDateTime = calendar.date(from: dateComponents)
             let navigationViewController = UINavigationController(rootViewController: destination)
@@ -892,6 +900,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             destination.filteredUsers = filteredUsers
             destination.activities = filteredActivities + filteredPinnedActivities
             destination.conversations = conversations
+            destination.transactions = networkController.financeService.transactions
             self.getParticipants(forActivity: activity) { (participants) in
                 InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                     destination.acceptedParticipant = acceptedParticipant

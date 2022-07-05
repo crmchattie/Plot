@@ -12,7 +12,7 @@ import Firebase
 extension AccountSettingsController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        doneBarButtonPressed()
+        updateBarButtonPressed()
         textField.resignFirstResponder()
         return true
     }
@@ -56,7 +56,7 @@ extension AccountSettingsController: UITextViewDelegate {
         
         if(text == "\n") {
             textView.resignFirstResponder()
-            doneBarButtonPressed()
+            updateBarButtonPressed()
             return false
         }
         
@@ -73,16 +73,15 @@ extension AccountSettingsController { /* user name editing */
     @objc func nameEditingChanged() {
         if userProfileContainerView.name.text!.count == 0 ||
             userProfileContainerView.name.text!.trimmingCharacters(in: .whitespaces).isEmpty {
-            doneBarButton.isEnabled = false
-            
+            updateBarButton.isEnabled = false
         } else {
-            doneBarButton.isEnabled = true
+            updateBarButton.isEnabled = true
         }
     }
     
     func setEditingBarButtons() {
         navigationItem.leftBarButtonItem = cancelBarButton
-        navigationItem.rightBarButtonItem = doneBarButton
+        navigationItem.rightBarButtonItem = updateBarButton
     }
     
     @objc func cancelBarButtonPressed() {
@@ -95,11 +94,11 @@ extension AccountSettingsController { /* user name editing */
         userProfileContainerView.phone.resignFirstResponder()
         userProfileContainerView.email.resignFirstResponder()
         navigationItem.leftBarButtonItem = nil
-        navigationItem.rightBarButtonItem = nil
+        navigationItem.rightBarButtonItem = doneBarButton
         view.setNeedsLayout()
     }
     
-    @objc func doneBarButtonPressed() {
+    @objc func updateBarButtonPressed() {
         if currentReachabilityStatus == .notReachable {
             basicErrorAlertWith(title: "No internet", message: noInternetError, controller: self)
             return
@@ -107,7 +106,7 @@ extension AccountSettingsController { /* user name editing */
         
         self.view.isUserInteractionEnabled = false
         navigationItem.leftBarButtonItem = nil
-        navigationItem.rightBarButtonItem = nil
+        navigationItem.rightBarButtonItem = doneBarButton
         userProfileContainerView.name.resignFirstResponder()
         userProfileContainerView.bio.resignFirstResponder()
         

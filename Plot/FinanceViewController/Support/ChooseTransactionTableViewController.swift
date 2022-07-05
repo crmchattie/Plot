@@ -30,28 +30,44 @@ class ChooseTransactionTableViewController: UITableViewController {
     weak var delegate : ChooseTransactionDelegate?
     
     var movingBackwards = false
+    
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.sizeToFit()
+        return activityIndicator
+    }()
         
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Choose Transaction"
-        
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.layoutIfNeeded()
-
+        
+        view.addSubview(activityIndicator)
+        
+        activityIndicator.center = view.center
+        activityIndicator.autoresizingMask = [.flexibleTopMargin,
+                                              .flexibleBottomMargin,
+                                              .flexibleLeftMargin,
+                                              .flexibleRightMargin]
+        
+        activityIndicator.startAnimating()
+        
         tableView = UITableView(frame: .zero, style: .insetGrouped)
+        
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         tableView.register(FinanceTableViewCell.self, forCellReuseIdentifier: kFinanceTableViewCell)
-        setupSearchController()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeTransaction))
         
-        self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
-            self.transactions = firebaseTransactions
-            self.handleReloadTable()
-        }
+        handleReloadTable()
+        setupSearchController()
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeTransaction))
+        print("viewLoaded")
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -69,7 +85,6 @@ class ChooseTransactionTableViewController: UITableViewController {
     }
     
     fileprivate func setupSearchController() {
-        
         if #available(iOS 11.0, *) {
             searchController = UISearchController(searchResultsController: nil)
             searchController?.searchResultsUpdater = self
@@ -89,19 +104,23 @@ class ChooseTransactionTableViewController: UITableViewController {
     
     func handleReloadTable() {
         if transactions != nil {
-            filteredTransactions = transactions.filter{ !existingTransactions.contains($0) }
-            filteredTransactions.sort { (transaction1, transaction2) -> Bool in
-                if transaction1.should_link ?? true == transaction2.should_link ?? true {
-                    if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
-                        return date1 > date2
+            DispatchQueue.global(qos: .background).async {
+                self.filteredTransactions = self.transactions.filter{ !self.existingTransactions.contains($0) }
+                self.filteredTransactions.sort { (transaction1, transaction2) -> Bool in
+                    if transaction1.should_link ?? true == transaction2.should_link ?? true {
+                        if let date1 = self.isodateFormatter.date(from: transaction1.transacted_at), let date2 = self.isodateFormatter.date(from: transaction2.transacted_at) {
+                            return date1 > date2
+                        }
+                        return transaction1.description < transaction2.description
                     }
-                    return transaction1.description < transaction2.description
+                    return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
                 }
-                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
             }
         }
-        tableView.reloadData()
-        
+        activityIndicator.stopAnimating()
     }
     
     
@@ -131,7 +150,6 @@ class ChooseTransactionTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-                        
         let cell = tableView.dequeueReusableCell(withIdentifier: kFinanceTableViewCell, for: indexPath) as? FinanceTableViewCell ?? FinanceTableViewCell()
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         if let filteredTransactions = filteredTransactions {
@@ -141,7 +159,6 @@ class ChooseTransactionTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         let transaction = filteredTransactions[indexPath.row]
         delegate?.chosenTransaction(transaction: transaction)
         movingBackwards = false

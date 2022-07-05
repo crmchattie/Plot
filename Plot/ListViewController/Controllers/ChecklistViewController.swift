@@ -98,7 +98,7 @@ class ChecklistViewController: FormViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if self.movingBackwards && !comingFromLists {
+        if movingBackwards && !comingFromLists {
             updateLists()
             delegate?.updateChecklist(checklist: checklist)
         }

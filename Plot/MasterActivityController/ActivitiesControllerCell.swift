@@ -91,7 +91,6 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("didSelectRowAt Event")
         let activity = activities[indexPath.row]
         delegate?.cellTapped(activity: activity)
     }

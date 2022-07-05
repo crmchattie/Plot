@@ -91,10 +91,10 @@ class MoodViewController: FormViewController {
             let createMood = MoodActions(mood: mood, active: active, currentUser: currentUser)
             createMood.createNewMood()
             self.hideActivityIndicator()
-            if active {
-                self.navigationController?.popViewController(animated: true)
-            } else {
+            if navigationItem.leftBarButtonItem != nil {
                 self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
             }
         }
     }

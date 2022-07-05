@@ -127,7 +127,11 @@ class MealViewController: FormViewController {
                 let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createMeal.createNewMeal()
                 self.hideActivityIndicator()
-                self.navigationController?.popViewController(animated: true)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
                 
             }))
             
@@ -155,7 +159,11 @@ class MealViewController: FormViewController {
                     createNewMeal.createNewMeal()
                     self.hideActivityIndicator()
 
-                    self.navigationController?.popViewController(animated: true)
+                    if self.navigationItem.leftBarButtonItem != nil {
+                        self.dismiss(animated: true, completion: nil)
+                    } else {
+                        self.navigationController?.popViewController(animated: true)
+                    }
                 }
                 
                 
@@ -176,7 +184,11 @@ class MealViewController: FormViewController {
             let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createMeal.createNewMeal()
             self.hideActivityIndicator()
-            self.navigationController?.popViewController(animated: true)
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         }
     }
     

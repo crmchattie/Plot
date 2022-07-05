@@ -18,9 +18,8 @@ class FinancialInfoViewController: UITableViewController {
         navigationItem.largeTitleDisplayMode = .never
         
         title = "Financial Information"
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
-        tableView.backgroundColor = view.backgroundColor
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
     }

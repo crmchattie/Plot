@@ -127,7 +127,11 @@ class WorkoutViewController: FormViewController {
                 let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createWorkout.createNewWorkout()
                 self.hideActivityIndicator()
-                self.navigationController?.popViewController(animated: true)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
                 
             }))
             
@@ -155,7 +159,11 @@ class WorkoutViewController: FormViewController {
                     createNewWorkout.createNewWorkout()
                     self.hideActivityIndicator()
                     
-                    self.navigationController?.popViewController(animated: true)
+                    if self.navigationItem.leftBarButtonItem != nil {
+                        self.dismiss(animated: true, completion: nil)
+                    } else {
+                        self.navigationController?.popViewController(animated: true)
+                    }
                 }
                 
                 
@@ -174,7 +182,11 @@ class WorkoutViewController: FormViewController {
             workoutActions = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             workoutActions?.createNewWorkout()
             self.hideActivityIndicator()
-            self.navigationController?.popViewController(animated: true)
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
 
         }
         

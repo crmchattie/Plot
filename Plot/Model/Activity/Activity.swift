@@ -12,7 +12,6 @@ import CodableFirebase
 
 let activitiesEntity = "activities"
 let userActivitiesEntity = "user-activities"
-
 let userActivityCategoriesEntity = "user-activities-categories"
 
 class Activity: NSObject, NSCopying, Codable {
@@ -67,6 +66,7 @@ class Activity: NSObject, NSCopying, Codable {
     var showExtras: Bool?
     var hkSampleID: String?
     var completed: Bool?
+    var isTask: Bool?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -102,6 +102,7 @@ class Activity: NSObject, NSCopying, Codable {
         case showExtras
         case completed
         case hkSampleID
+        case isTask
     }
     
     init(dictionary: [String: AnyObject]?) {
@@ -210,6 +211,7 @@ class Activity: NSObject, NSCopying, Codable {
         placeID = dictionary?["placeID"] as? String
         showExtras = dictionary?["showExtras"] as? Bool
         completed = dictionary?["completed"] as? Bool
+        isTask = dictionary?["isTask"] as? Bool
         hkSampleID = dictionary?["hkSampleID"] as? String
     }
     
@@ -400,6 +402,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.completed as AnyObject? {
             dictionary["completed"] = value
+        }
+        
+        if let value = self.isTask as AnyObject? {
+            dictionary["isTask"] = value
         }
         
         if let value = self.hkSampleID as AnyObject? {

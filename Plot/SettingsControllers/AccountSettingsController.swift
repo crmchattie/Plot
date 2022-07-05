@@ -29,7 +29,8 @@ class AccountSettingsController: UITableViewController {
     var secondSection = [( icon: UIImage(named: "Logout") , title: "Log Out")]
     
     let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonPressed))
-    let doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
+    let updateBarButton = UIBarButtonItem(title: "Update", style: .done, target: self, action:  #selector(updateBarButtonPressed))
+    var doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
     var currentName = String()
     var currentBio = String()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
@@ -38,9 +39,7 @@ class AccountSettingsController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Settings"
-        
-//        view.backgroundColor = .tertiarySystemBackground
-        
+                
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
@@ -51,6 +50,7 @@ class AccountSettingsController: UITableViewController {
         
         configureTableView()
         configureContainerView()
+        configureNavigationBar()
         listenChanges()
         addObservers()
     }
@@ -89,12 +89,12 @@ class AccountSettingsController: UITableViewController {
     }
     
     fileprivate func configureTableView() {
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.sectionHeaderHeight = 0
         tableView.separatorStyle = .none
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.tableHeaderView = userProfileContainerView
         tableView.register(AccountSettingsTableViewCell.self, forCellReuseIdentifier: accountSettingsCellId)
-//        tableView.backgroundColor = .secondarySystemBackground
     }
     
     fileprivate func configureContainerView() {
@@ -118,18 +118,17 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
         userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
     }
-//
-//    func configureNavigationBar() {
-//        nightMode.setImage(UIImage(named: "defaultTheme"), for: .normal)
-//        nightMode.setImage(UIImage(named: "darkTheme"), for: .selected)
-//        nightMode.imageView?.contentMode = .scaleAspectFit
-//        nightMode.contentEdgeInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-//        nightMode.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-//        nightMode.addTarget(self, action: #selector(rightBarButtonDidTap(sender:)), for: .touchUpInside)
-//        nightMode.isSelected = Bool(ThemeManager.currentTheme().rawValue)
-//        let rightBarButton = UIBarButtonItem(customView: nightMode)
-//        navigationItem.setRightBarButton(rightBarButton, animated: false)
-//    }
+
+    func configureNavigationBar() {
+        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
+        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+        doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
+        navigationItem.rightBarButtonItem = doneBarButton
+    }
+    
+    @objc func doneBarButtonPressed() {
+        self.dismiss(animated: true, completion: nil)
+    }
 
     @objc private func emailVerified(_ notification: Notification) {
         guard let email = notification.object as? String, email.isValidEmail else { return }

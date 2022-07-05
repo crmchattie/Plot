@@ -166,7 +166,11 @@ class FinanceHoldingViewController: FormViewController {
             self.hideActivityIndicator()
         }
         self.delegate?.updateHolding(holding: holding)
-        self.navigationController?.popViewController(animated: true)
+        if navigationItem.leftBarButtonItem != nil {
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
     }
     
     fileprivate func initializeForm() {

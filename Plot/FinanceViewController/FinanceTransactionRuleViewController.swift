@@ -96,7 +96,11 @@ class FinanceTransactionRuleViewController: FormViewController {
             } catch let error {
                 print(error)
             }
-            self.navigationController?.popViewController(animated: true)
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         }
     }
     

@@ -312,18 +312,6 @@ class FinanceLineChartDetailViewController: UIViewController {
         }
     }
     
-    func showActivityIndicator() {
-        if let tabController = self.tabBarController {
-            self.showSpinner(onView: tabController.view)
-        }
-        self.navigationController?.view.isUserInteractionEnabled = false
-    }
-    
-    func hideActivityIndicator() {
-        self.navigationController?.view.isUserInteractionEnabled = true
-        self.removeSpinner()
-    }
-    
 }
 
 extension FinanceLineChartDetailViewController: ChartViewDelegate {

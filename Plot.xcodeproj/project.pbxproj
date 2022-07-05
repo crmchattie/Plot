@@ -63,6 +63,9 @@
 		1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103946892549FD4B005CED3A /* FoodProductContainer.swift */; };
 		103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */; };
 		103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103E968922C2B309007D6668 /* PurchaseRow.swift */; };
+		103F492C286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103F492B286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift */; };
+		103F492E286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103F492D286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift */; };
+		103F493028731C0D009E4242 /* CreateActivityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103F492F28731C0C009E4242 /* CreateActivityViewModel.swift */; };
 		1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1040E582242AA05D00304D05 /* MessageViewController.swift */; };
 		104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1046252F2571B4D40026C214 /* SummaryViewModel.swift */; };
 		104625362571B4FD0026C214 /* SummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104625352571B4FD0026C214 /* SummaryService.swift */; };
@@ -138,7 +141,7 @@
 		109F849023D607C6002C0044 /* RecipeTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109F848F23D607C6002C0044 /* RecipeTypeViewController.swift */; };
 		109F849923D6860D002C0044 /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109F849823D6860D002C0044 /* FilterViewController.swift */; };
 		109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */; };
-		109FEB3D22A7003000621D2F /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3C22A7003000621D2F /* Schedule.swift */; };
+		109FEB3D22A7003000621D2F /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3C22A7003000621D2F /* Task.swift */; };
 		109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB4122A9C3DD00621D2F /* Purchase.swift */; };
 		10A18D3A2458E1A5006990F2 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18D392458E1A5006990F2 /* PurchasesViewController.swift */; };
 		10A2AE9F2508131700D49A0C /* FinanceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */; };
@@ -588,6 +591,9 @@
 		103946892549FD4B005CED3A /* FoodProductContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodProductContainer.swift; sourceTree = "<group>"; };
 		103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionLevelViewController.swift; sourceTree = "<group>"; };
 		103E968922C2B309007D6668 /* PurchaseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseRow.swift; sourceTree = "<group>"; };
+		103F492B286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MasterActivityContainerController+CollectionView.swift"; sourceTree = "<group>"; };
+		103F492D286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MasterActivityContainerController+StartupMethods.swift"; sourceTree = "<group>"; };
+		103F492F28731C0C009E4242 /* CreateActivityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateActivityViewModel.swift; sourceTree = "<group>"; };
 		1040E582242AA05D00304D05 /* MessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
 		1046252F2571B4D40026C214 /* SummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewModel.swift; sourceTree = "<group>"; };
 		104625352571B4FD0026C214 /* SummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryService.swift; sourceTree = "<group>"; };
@@ -664,7 +670,7 @@
 		109F848F23D607C6002C0044 /* RecipeTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeTypeViewController.swift; sourceTree = "<group>"; };
 		109F849823D6860D002C0044 /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
 		109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleRow.swift; sourceTree = "<group>"; };
-		109FEB3C22A7003000621D2F /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
+		109FEB3C22A7003000621D2F /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		109FEB4122A9C3DD00621D2F /* Purchase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Purchase.swift; sourceTree = "<group>"; };
 		10A18D392458E1A5006990F2 /* PurchasesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchasesViewController.swift; sourceTree = "<group>"; };
 		10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -1152,6 +1158,8 @@
 			isa = PBXGroup;
 			children = (
 				1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */,
+				103F492B286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift */,
+				103F492D286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift */,
 				10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */,
 				10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */,
 				10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */,
@@ -1395,6 +1403,7 @@
 			isa = PBXGroup;
 			children = (
 				10196EF524411B5600B6AFDF /* CreateActivityViewController.swift */,
+				103F492F28731C0C009E4242 /* CreateActivityViewModel.swift */,
 				10196EF624411B5600B6AFDF /* CreateActivityViewController+UpdateInvitees.swift */,
 				10196EF424411B5600B6AFDF /* ActivityAvatarOpenerDelegate.swift */,
 				10196EEF24411B5500B6AFDF /* LocationFinderTableViewController.swift */,
@@ -2192,7 +2201,7 @@
 				4BAEE54A212735880045AB10 /* Message.swift */,
 				4BAEE54B212735880045AB10 /* User.swift */,
 				4BAEE54C212735880045AB10 /* MediaObject.swift */,
-				109FEB3C22A7003000621D2F /* Schedule.swift */,
+				109FEB3C22A7003000621D2F /* Task.swift */,
 				109FEB4122A9C3DD00621D2F /* Purchase.swift */,
 				10EE27EE245C5B8000C80AAF /* Checklist.swift */,
 				10FBC8B624BFE58F00D0E6B5 /* Activitylist.swift */,
@@ -2700,7 +2709,7 @@
 			);
 			mainGroup = 4B4F45221F32230C00A6FF96;
 			packageReferences = (
-				10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools.git" */,
+				10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */,
 				10ED76B02639F899002838F5 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 			);
 			productRefGroup = 4B4F452C1F32230C00A6FF96 /* Products */;
@@ -2919,6 +2928,7 @@
 				4BAEE49721272C5E0045AB10 /* FalconUsersFetcher.swift in Sources */,
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
 				4BA1E7832152582F00391BCB /* ChatLogController+DataSource.swift in Sources */,
+				103F492C286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift in Sources */,
 				10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */,
 				260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */,
 				10D3410024ABD741009269B7 /* ActivityContainer.swift in Sources */,
@@ -3060,6 +3070,7 @@
 				F902FFC92613B55900EF5881 /* ColorHash.swift in Sources */,
 				104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */,
 				10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */,
+				103F492E286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift in Sources */,
 				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
 				4BAEE5CD212735E50045AB10 /* SelectParticipantsTableView.swift in Sources */,
 				10196F0424411B5600B6AFDF /* ActivityAvatarOpenerDelegate.swift in Sources */,
@@ -3167,6 +3178,7 @@
 				1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */,
 				10E8E4F725923B320076BE42 /* ActivitiesControllerCell.swift in Sources */,
 				4BAEE5EA212735E50045AB10 /* Country.swift in Sources */,
+				103F493028731C0D009E4242 /* CreateActivityViewModel.swift in Sources */,
 				2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */,
 				4BAEE4FE21272D890045AB10 /* OutgoingVoiceMessageCell.swift in Sources */,
 				108BDE6D24B5106900BE2CBA /* SightseeingTypeViewController.swift in Sources */,
@@ -3182,7 +3194,7 @@
 				108BDE6B24B5105900BE2CBA /* NightlifeTypeViewController.swift in Sources */,
 				109F848E23D60113002C0044 /* ActivitySubTypeViewController.swift in Sources */,
 				26B453AB254F8FCA00C63093 /* HealthDetailService.swift in Sources */,
-				109FEB3D22A7003000621D2F /* Schedule.swift in Sources */,
+				109FEB3D22A7003000621D2F /* Task.swift in Sources */,
 				4BAEE4EC21272D890045AB10 /* UserInfoCreateContactTableViewController.swift in Sources */,
 				10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */,
 				10C766E525321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift in Sources */,
@@ -3624,7 +3636,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools.git" */ = {
+		10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bhlvoong/LBTATools.git";
 			requirement = {
@@ -3645,7 +3657,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		10E93D4824BE2E7A00F6EE18 /* LBTATools */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools.git" */;
+			package = 10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */;
 			productName = LBTATools;
 		};
 		10ED76B12639F899002838F5 /* FacebookCore */ = {

@@ -38,6 +38,7 @@ class ActivityService {
     var activities = [Activity]() {
         didSet {
             if oldValue != activities {
+                print("oldValue != activities")
                 activities.sort { (activity1, activity2) -> Bool in
                     return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
                 }
@@ -237,6 +238,8 @@ extension ActivityService {
                 for activity in activitiesChanged {
                     if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
                         self?.activities[index] = activity
+                    } else {
+                        self?.activities.append(activity)
                     }
                 }
             }

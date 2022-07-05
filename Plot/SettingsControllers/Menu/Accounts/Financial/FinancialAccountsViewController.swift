@@ -27,9 +27,8 @@ class FinancialAccountsViewController: UITableViewController {
         navigationItem.largeTitleDisplayMode = .never
         
         title = "Accounts"
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView = UITableView(frame: view.frame, style: .insetGrouped)
-        tableView.backgroundColor = view.backgroundColor
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         

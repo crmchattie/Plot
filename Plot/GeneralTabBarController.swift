@@ -31,8 +31,6 @@ class GeneralTabBarController: UITabBarController {
     let homeController = MasterActivityContainerController()
     let settingsController = AccountSettingsController()
     let analyticsController = AnalyticsViewController()
-
-    var window: UIWindow?
     
     let splashContainer: SplashScreenContainer = {
         let splashContainer = SplashScreenContainer()
@@ -113,7 +111,6 @@ class GeneralTabBarController: UITabBarController {
         guard UIApplication.shared.applicationState == .inactive else {
             return
         }
-        
         if self.traitCollection.userInterfaceStyle == .dark {
             let theme = Theme.Dark
             ThemeManager.applyTheme(theme: theme)
@@ -214,7 +211,6 @@ extension GeneralTabBarController: ManageAppearanceHome {
         guard !isAppLoaded else { return }
         isAppLoaded = true
         let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
-        _ = settingsController.view
         guard state else { return }
         if isBiometricalAuthEnabled {
             splashContainer.authenticationWithTouchID()

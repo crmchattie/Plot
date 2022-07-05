@@ -158,7 +158,11 @@ class SchedulerViewController: FormViewController {
                 createWork.createNewWork()
             }
             self.hideActivityIndicator()
-            self.navigationController?.popViewController(animated: true)
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         }
     }
     

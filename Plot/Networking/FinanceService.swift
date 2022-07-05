@@ -93,7 +93,6 @@ class FinanceService {
                     self.transactions = firebaseTransactions
                     self.removePendingTransactions()
                     self.observeTransactionsForCurrentUser()
-                    print("fetchFinance")
                     completion()
                 }
             }
@@ -224,6 +223,8 @@ class FinanceService {
             for account in accountsChanged {
                 if let index = self!.accounts.firstIndex(where: {$0.guid == account.guid}) {
                     self!.accounts[index] = account
+                } else {
+                    self!.accounts.append(account)
                 }
             }
         })
@@ -242,6 +243,8 @@ class FinanceService {
             for transaction in transactionsChanged {
                 if let index = self!.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
                     self!.transactions[index] = transaction
+                } else {
+                    self!.transactions.append(transaction)
                 }
             }
         })
@@ -281,6 +284,8 @@ class FinanceService {
                 for transactionRule in transactionRulesChanged {
                     if let index = self!.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
                         self!.transactionRules[index] = transactionRule
+                    } else {
+                        self!.transactionRules.append(transactionRule)
                     }
                     if !self!.transactions.isEmpty {
                         for index in 0...self!.transactions.count - 1 {

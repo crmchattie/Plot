@@ -24,9 +24,8 @@ class FinancialTransactionRulesViewController: UITableViewController {
         navigationItem.largeTitleDisplayMode = .never
         
         title = "Transaction Rules"
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
-        tableView.backgroundColor = view.backgroundColor
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newTransactionRule))

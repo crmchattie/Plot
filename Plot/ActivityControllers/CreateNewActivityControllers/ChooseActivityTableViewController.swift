@@ -96,7 +96,7 @@ class ChooseActivityTableViewController: UITableViewController {
         
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
         if needDelegate && movingBackwards {
             let activity = Activity(dictionary: ["activityID": "" as AnyObject])
             delegate?.chosenActivity(mergeActivity: activity)
@@ -232,7 +232,6 @@ class ChooseActivityTableViewController: UITableViewController {
         
         cell.delegate = self
         cell.activityViewControllerDataStore = self
-        
         
         let activity = filteredActivities[indexPath.row]
         

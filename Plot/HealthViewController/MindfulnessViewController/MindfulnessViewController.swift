@@ -125,7 +125,11 @@ class MindfulnessViewController: FormViewController {
                 let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createMindfulness.createNewMindfulness()
                 self.hideActivityIndicator()
-                self.navigationController?.popViewController(animated: true)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
                 
             }))
             
@@ -153,7 +157,11 @@ class MindfulnessViewController: FormViewController {
                     createNewMindfulness.createNewMindfulness()
                     self.hideActivityIndicator()
                     
-                    self.navigationController?.popViewController(animated: true)
+                    if self.navigationItem.leftBarButtonItem != nil {
+                        self.dismiss(animated: true, completion: nil)
+                    } else {
+                        self.navigationController?.popViewController(animated: true)
+                    }
                 }
                 
                 
@@ -173,7 +181,11 @@ class MindfulnessViewController: FormViewController {
             let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createMindfulness.createNewMindfulness()
             self.hideActivityIndicator()
-            self.navigationController?.popViewController(animated: true)
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
 
         }
     }

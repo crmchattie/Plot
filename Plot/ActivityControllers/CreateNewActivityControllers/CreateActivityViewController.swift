@@ -30,6 +30,7 @@ class CreateActivityViewController: FormViewController {
     var userInvitationStatus: [String: Status] = [:]
     var conversations = [Conversation]()
     var activities = [Activity]()
+    var transactions = [Transaction]()
     var conversation: Conversation!
     let avatarOpener = AvatarOpener()
     var locationName : String = "locationName"
@@ -95,7 +96,7 @@ class CreateActivityViewController: FormViewController {
             if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
                 locationName = localName
                 locationAddress = localAddress
-                self.weatherRow()
+//                self.weatherRow()
             }
             if activity.schedule != nil {
                 for schedule in activity.schedule! {
@@ -481,7 +482,7 @@ class CreateActivityViewController: FormViewController {
                     if self!.active {
                         self!.scheduleReminder()
                     }
-                    self!.weatherRow()
+//                    self!.weatherRow()
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                     inlineRow.cellUpdate { (cell, row) in
                         row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -585,7 +586,7 @@ class CreateActivityViewController: FormViewController {
                     }
                     self!.activity.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.endDateTime = row.value
-                    self!.weatherRow()
+//                    self!.weatherRow()
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                 inlineRow.cellUpdate { (cell, row) in
                     row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -1012,6 +1013,8 @@ class CreateActivityViewController: FormViewController {
         let rowNumber : Int = indexes.first!.row
         let rowType = rows[0].self
         
+        print("rowsHaveBeenRemoved")
+        
         DispatchQueue.main.async { [weak self] in
             if rowType is ScheduleRow {
                 if self!.scheduleList.indices.contains(self!.scheduleIndex) {
@@ -1033,7 +1036,8 @@ class CreateActivityViewController: FormViewController {
 //                    self!.purchaseBreakdown()
                 }
                 self!.updateLists(type: "purchases")
-            } else if rowType is ButtonRow {
+            } else if rowType is ButtonRow, rows[0].title != "Add Activity",  rows[0].title != "Add Checklist", rows[0].title != "Add Transaction" {
+                print("ButtonRow")
                 if self!.listList.indices.contains(self!.listIndex) {
                     self!.listList.remove(at: rowNumber)
                 }
@@ -1777,14 +1781,19 @@ class CreateActivityViewController: FormViewController {
                 destination.movingBackwards = true
                 destination.users = self.purchaseUsers
                 destination.filteredUsers = self.purchaseUsers
+                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                destination.navigationItem.leftBarButtonItem = cancelBarButton
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
+                print("Existing")
                 let destination = ChooseTransactionTableViewController()
                 destination.delegate = self
                 destination.movingBackwards = true
                 destination.existingTransactions = self.purchaseList
+                destination.transactions = self.transactions
+                print("moving on")
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             }))
@@ -1870,13 +1879,21 @@ class CreateActivityViewController: FormViewController {
             let createActivity = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
             createActivity.createNewActivity()
             hideActivityIndicator()
-            self.navigationController?.popViewController(animated: true)
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         } else {
             showActivityIndicator()
             let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
             createActivity.createNewActivity()
             hideActivityIndicator()
-            self.navigationController?.popViewController(animated: true)
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         }
     }
     
@@ -2388,7 +2405,7 @@ extension CreateActivityViewController: UpdateLocationDelegate {
                 } else {
                     self.activity.locationAddress![newLocationName] = value
                 }
-                self.weatherRow()
+//                self.weatherRow()
             }
         }
     }
@@ -2548,7 +2565,7 @@ extension CreateActivityViewController: UpdateTransactionDelegate {
                 }
                 updateLists(type: "purchases")
             }
-            else {
+            else if mvs.allRows.count > 1 {
                 mvs.remove(at: purchaseIndex)
             }
         }
@@ -2557,7 +2574,6 @@ extension CreateActivityViewController: UpdateTransactionDelegate {
 
 extension CreateActivityViewController: ChooseTransactionDelegate {
     func chosenTransaction(transaction: Transaction) {
-        print("transaction \(transaction.description)")
         if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
             let purchaseRow = mvs.allRows[purchaseIndex]
             if transaction.description != "Transaction Name" {
@@ -2570,7 +2586,7 @@ extension CreateActivityViewController: ChooseTransactionDelegate {
                 }
                 updateLists(type: "purchases")
             }
-            else {
+            else if mvs.allRows.count > 1 {
                 mvs.remove(at: purchaseIndex)
             }
 //            purchaseBreakdown()
@@ -2595,7 +2611,7 @@ extension CreateActivityViewController: UpdateChecklistDelegate {
                 }
                 updateLists(type: "lists")
             }
-            else {
+            else if mvs.allRows.count > 1 {
                 mvs.remove(at: listIndex)
             }
         }
@@ -2619,7 +2635,7 @@ extension CreateActivityViewController: UpdateActivitylistDelegate {
                 }
                 updateLists(type: "lists")
             }
-            else {
+            else if mvs.allRows.count > 1 {
                 mvs.remove(at: listIndex)
             }
         }
@@ -2642,7 +2658,7 @@ extension CreateActivityViewController: UpdatePackinglistDelegate {
                     listList.append(list)
                 }
                 updateLists(type: "lists")
-            } else {
+            } else if mvs.allRows.count > 1 {
                 mvs.remove(at: listIndex)
             }
         }
@@ -2665,7 +2681,7 @@ extension CreateActivityViewController: UpdateGrocerylistDelegate {
                     listList.append(list)
                 }
                 updateLists(type: "lists")
-            } else {
+            } else if mvs.allRows.count > 1 {
                 mvs.remove(at: grocerylistIndex)
                 activity.grocerylistID = nil
             }
@@ -2691,7 +2707,7 @@ extension CreateActivityViewController: ChooseListDelegate {
                     }
                     updateLists(type: "lists")
                 }
-                else {
+                else if mvs.allRows.count > 1 {
                     mvs.remove(at: listIndex)
                 }
             }
@@ -2711,7 +2727,7 @@ extension CreateActivityViewController: ChooseListDelegate {
                     }
                     updateLists(type: "lists")
                 }
-                else {
+                else if mvs.allRows.count > 1 {
                     mvs.remove(at: listIndex)
                 }
             }
@@ -2731,7 +2747,7 @@ extension CreateActivityViewController: ChooseListDelegate {
                     }
                     grocerylistIndex = listIndex
                     updateLists(type: "lists")
-                } else {
+                } else if mvs.allRows.count > 1 {
                     mvs.remove(at: listIndex)
                 }
             }
@@ -2750,12 +2766,12 @@ extension CreateActivityViewController: ChooseListDelegate {
                         listList.append(list)
                     }
                     updateLists(type: "lists")
-                } else {
+                } else if mvs.allRows.count > 1 {
                     mvs.remove(at: listIndex)
                 }
             }
         } else {
-            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection, mvs.allRows.count > 1 {
                 mvs.remove(at: listIndex)
             }
         }

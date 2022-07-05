@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 private let keywordsMap = ["Exercise": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
                            "Work": ["meeting", "assignment", "project", "standup", "work"],
@@ -58,7 +59,7 @@ enum ActivityCategory: String, CaseIterable {
         case .personal: return ChartColors.palette()[9]
         case .uncategorized,
              .notApplicable:
-            return UIColor.lightGray
+            return UIColor.systemBlue
         }
     }
     

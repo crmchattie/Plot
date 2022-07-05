@@ -52,6 +52,12 @@ class HealthDetailViewController: UIViewController {
         return tableView
     }()
     
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.sizeToFit()
+        return activityIndicator
+    }()
+    
     lazy var barButton = UIBarButtonItem()
         
     init(viewModel: HealthDetailViewModelInterface) {
@@ -107,6 +113,8 @@ class HealthDetailViewController: UIViewController {
         addObservers()
         changeTheme()
         
+        view.addSubview(activityIndicator)
+        
         view.addSubview(segmentedControl)
         segmentedControl.selectedSegmentIndex = 0
         
@@ -126,6 +134,12 @@ class HealthDetailViewController: UIViewController {
     }
     
     private func configureView() {
+        activityIndicator.center = view.center
+        activityIndicator.autoresizingMask = [.flexibleTopMargin,
+                                              .flexibleBottomMargin,
+                                              .flexibleLeftMargin,
+                                              .flexibleRightMargin]
+        
         backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
         backgroundChartViewTopAnchor = backgroundChartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
         NSLayoutConstraint.activate([
@@ -201,8 +215,15 @@ class HealthDetailViewController: UIViewController {
     func fetchHealthKitData() {
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
+        backgroundChartView.isHidden = true
+        tableView.isHidden = true
+        
+        activityIndicator.startAnimating()
+        
         viewModel.fetchChartData(for: segmentType) { [weak self] (data, maxValue) in
             guard let weakSelf = self else { return }
+            weakSelf.backgroundChartView.isHidden = false
+            weakSelf.tableView.isHidden = false
             
             weakSelf.chartView.data = data
             weakSelf.chartView.rightAxis.axisMinimum = 0
@@ -211,6 +232,7 @@ class HealthDetailViewController: UIViewController {
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.notifyDataSetChanged()
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
+            weakSelf.activityIndicator.stopAnimating()
             weakSelf.tableView.reloadData()
         }
     }

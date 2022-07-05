@@ -47,19 +47,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         GIDSignIn.sharedInstance().scopes = ["https://www.googleapis.com/auth/calendar"]
         GIDSignIn.sharedInstance()?.restorePreviousSignIn()
         //manually create window or default controller, thus ridding of Storyboard
-        let tabBarController = GeneralTabBarController()
+        let masterController = MasterActivityContainerController()
+        let controller = UINavigationController(rootViewController: masterController)
+        controller.navigationBar.prefersLargeTitles = true
+        controller.navigationItem.largeTitleDisplayMode = .always
+        
         // set-up window
         window = UIWindow(frame: UIScreen.main.bounds)
         //set window = tabBarController
-        window?.rootViewController = tabBarController
+        window?.rootViewController = controller
         //make window visible
         window?.makeKeyAndVisible()
-        //        //set backgroundColor to theme
-        //        window?.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        //
-        tabBarController.showLaunchScreen()
-        
-        tabBarController.presentOnboardingController()
         
         //register after user is no longer new user
         if Auth.auth().currentUser != nil {
@@ -173,16 +171,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     fileprivate func setFCMToken()  {
         if let uid = Auth.auth().currentUser?.uid, let fcmToken = Messaging.messaging().fcmToken {
-            let fcmReference = Database.database().reference().child("users").child(uid).child("fcmToken")
-            fcmReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists() {
-                    if let firebaseToken = snapshot.value as? String, fcmToken != firebaseToken {
+            DispatchQueue.main.async {
+                let fcmReference = Database.database().reference().child("users").child(uid).child("fcmToken")
+                fcmReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists() {
+                        if let firebaseToken = snapshot.value as? String, fcmToken != firebaseToken {
+                            fcmReference.setValue(fcmToken)
+                        }
+                    } else {
                         fcmReference.setValue(fcmToken)
                     }
-                } else {
-                    fcmReference.setValue(fcmToken)
-                }
-            })
+                })
+            }
         }
     }
 
