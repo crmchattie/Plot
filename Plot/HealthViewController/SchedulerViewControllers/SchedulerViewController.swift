@@ -30,9 +30,7 @@ class SchedulerViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         title = "\(type.rawValue.capitalized) Schedule"
 

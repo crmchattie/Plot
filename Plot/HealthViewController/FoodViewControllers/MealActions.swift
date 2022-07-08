@@ -87,6 +87,7 @@ class MealActions: NSObject {
             // Store nutritions in healthkit
             if let samples = HealthKitSampleBuilder.createHKNutritions(from: meal), samples.count > 0 {
                 HealthKitService.storeSamples(samples: samples) { (_, _) in
+                    
                 }
             }
             

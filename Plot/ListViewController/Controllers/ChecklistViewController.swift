@@ -55,9 +55,7 @@ class ChecklistViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         configureTableView()
                 
@@ -128,19 +126,14 @@ class ChecklistViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if !active {
-            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-            navigationItem.rightBarButtonItem = plusBarButton
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-            navigationItem.leftBarButtonItem = cancelBarButton
-        } else {
-            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(close))
-            navigationItem.rightBarButtonItem = plusBarButton
+        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
+        navigationItem.rightBarButtonItem = plusBarButton
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
     }
     
     @IBAction func cancel(_ sender: AnyObject) {
-        checklist.name = "CheckListName"
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -156,7 +149,7 @@ class ChecklistViewController: FormViewController {
             createChecklist.createNewChecklist()
             self.hideActivityIndicator()
             delegate?.updateChecklist(checklist: checklist)
-            if !active {
+            if navigationItem.leftBarButtonItem != nil {
                 self.dismiss(animated: true, completion: nil)
             } else {
                 self.navigationController?.popViewController(animated: true)
@@ -653,9 +646,9 @@ class ChecklistViewController: FormViewController {
                 if !mvs.isEmpty {
                     var checklistDict = [String : Bool]()
                     for element in mvs {
-                        let value = element as! SplitRowValue<Swift.String, Swift.Bool>
-                        if let text = value.left, let state = value.right {
-                            checklistDict[text] = state
+                        if let value = element as? SplitRowValue<Swift.String, Swift.Bool>, let text = value.left, let state = value.right {
+                            let newText = text.removeCharacters()
+                            checklistDict[newText] = state
                         }
                     }
                     self.checklist.items = checklistDict

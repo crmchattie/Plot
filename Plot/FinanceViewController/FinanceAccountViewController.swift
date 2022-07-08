@@ -50,9 +50,7 @@ class FinanceAccountViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
                 
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         numberFormatter.numberStyle = .currency
         numberFormatter.maximumFractionDigits = 0
@@ -234,11 +232,13 @@ class FinanceAccountViewController: FormViewController {
                     row.options?.append($0.name)
                 }
             }.onPresent { from, to in
+                to.tableViewStyle = .insetGrouped
                 to.dismissOnSelection = false
                 to.dismissOnChange = false
                 to.enableDeselection = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Type"
+                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -273,12 +273,15 @@ class FinanceAccountViewController: FormViewController {
                         row.options?.append($0.name)
                     }
                 }.onPresent { from, to in
+                    to.tableViewStyle = .insetGrouped
                     to.dismissOnSelection = false
                     to.dismissOnChange = false
                     to.enableDeselection = false
                     to.selectableRowCellUpdate = { cell, row in
                         to.title = "Subtype"
                         to.tableView.separatorStyle = .none
+                        to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+                        to.tableViewStyle = .insetGrouped
                         to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

@@ -104,9 +104,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
                         
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()

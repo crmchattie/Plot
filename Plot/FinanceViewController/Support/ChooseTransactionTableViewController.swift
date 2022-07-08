@@ -40,9 +40,7 @@ class ChooseTransactionTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Choose Transaction"
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         view.addSubview(activityIndicator)
         

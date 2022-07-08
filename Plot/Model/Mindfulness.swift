@@ -13,17 +13,21 @@ let mindfulnessEntity = "mindfulness"
 
 struct Mindfulness: Codable, Equatable, Hashable {
     var id: String
-    var name: String?
-    var startDateTime: Date?
-    var endDateTime: Date?
+    var name: String
+    var admin: String?
     var length: Int?
     var lastModifiedDate: Date?
     var createdDate: Date?
+    var startDateTime: Date?
+    var endDateTime: Date?
     var participantsIDs: [String]?
-    var admin: String?
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var transactionIDs: [String]?
+    var activityID: String?
+    var healthExport: Bool?
+    var user_created: Bool?
 }
 
 func ==(lhs: Mindfulness, rhs: Mindfulness) -> Bool {

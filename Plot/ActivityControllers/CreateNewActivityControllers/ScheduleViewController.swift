@@ -568,7 +568,8 @@ class ScheduleViewController: FormViewController {
             var checklistDict = [String : Bool]()
             for element in mvs {
                 if let value = element as? SplitRowValue<Swift.String, Swift.Bool>, let text = value.left, let state = value.right {
-                    checklistDict[text] = state
+                    let newText = text.removeCharacters()
+                    checklistDict[newText] = state
                 }
             }
             if schedule.checklist != nil {

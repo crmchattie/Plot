@@ -59,10 +59,6 @@ extension MasterActivityContainerController {
         present(newNavigationController, animated: false, completion: nil)
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
-    }
-    
     func showLaunchScreen() {
         launchScreenView.backgroundColor = ThemeManager.currentTheme().launchBackgroundColor
         navigationController?.view.addSubview(launchScreenView)

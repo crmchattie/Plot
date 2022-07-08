@@ -56,9 +56,7 @@ class FinanceHoldingViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
@@ -235,11 +233,13 @@ class FinanceHoldingViewController: FormViewController {
                     row.options?.append($0.name)
                 }
             }.onPresent { from, to in
+                to.tableViewStyle = .insetGrouped
                 to.dismissOnSelection = false
                 to.dismissOnChange = false
                 to.enableDeselection = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Type"
+                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -405,8 +405,10 @@ class FinanceHoldingViewController: FormViewController {
                     row.options?.append($0.name.capitalized)
                 }
             }.onPresent { from, to in
+                to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Accounts"
+                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

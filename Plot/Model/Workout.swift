@@ -15,6 +15,7 @@ let userWorkoutsEntity = "user-custom-workouts"
 struct Workout: Codable, Equatable, Hashable {
     var id: String
     var name: String
+    var admin: String?
     var type: String?
     var participantsIDs: [String]?
     var lastModifiedDate: Date?
@@ -23,10 +24,14 @@ struct Workout: Codable, Equatable, Hashable {
     var endDateTime: Date?
     var length: Int?
     var totalEnergyBurned: Double?
-    var admin: String?
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var transactionID: String?
+    var activityID: String?
+    var healthExport: Bool?
+    var user_created: Bool?
+
 }
 
 func ==(lhs: Workout, rhs: Workout) -> Bool {

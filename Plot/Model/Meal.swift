@@ -14,6 +14,7 @@ let userMealsEntity = "user-meals"
 struct Meal: Codable, Equatable, Hashable {
     var id: String
     var name: String
+    var admin: String?
     var type: String?
     var amount: Double?
     var productContainer: [FoodProductContainer]?
@@ -23,16 +24,14 @@ struct Meal: Codable, Equatable, Hashable {
     var createdDate: Date?
     var startDateTime: Date?
     var endDateTime: Date?
-    var admin: String?
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
-    
-    init(id: String, name: String, admin: String) {
-        self.id = id
-        self.name = name
-        self.admin = admin
-    }
+    var transactionID: String?
+    var activityID: String?
+    var healthExport: Bool?
+    var user_created: Bool?
+
 }
 
 struct BasicIngredient: Codable, Equatable, Hashable {

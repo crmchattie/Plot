@@ -97,9 +97,7 @@ class FinanceBarChartViewController: UIViewController {
         
         extendedLayoutIncludesOpaqueBars = true
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
         navigationItem.rightBarButtonItem = barButton

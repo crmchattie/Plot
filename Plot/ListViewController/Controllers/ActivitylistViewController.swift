@@ -58,9 +58,7 @@ class ActivitylistViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         configureTableView()
         
@@ -136,11 +134,9 @@ class ActivitylistViewController: FormViewController {
             let dotsImage = UIImage(named: "dots")
             if #available(iOS 11.0, *) {
                 let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
-                
                 let dotsBarButton = UIButton(type: .system)
                 dotsBarButton.setImage(dotsImage, for: .normal)
                 dotsBarButton.addTarget(self, action: #selector(goToExtras), for: .touchUpInside)
-                
                 navigationItem.rightBarButtonItems = [plusBarButton, UIBarButtonItem(customView: dotsBarButton)]
             } else {
                 let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))

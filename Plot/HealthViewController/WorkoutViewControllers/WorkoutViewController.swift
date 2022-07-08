@@ -12,6 +12,10 @@ import SplitRow
 import Firebase
 import CodableFirebase
 
+protocol UpdateWorkoutDelegate: AnyObject {
+    func updateWorkout(workout: Workout)
+}
+
 class WorkoutViewController: FormViewController {    
     var workout: Workout!
     
@@ -21,15 +25,20 @@ class WorkoutViewController: FormViewController {
     
     var userNames : [String] = []
     var userNamesString: String = ""
-    
-    fileprivate var active: Bool = false
-    
+        
     fileprivate var productIndex: Int = 0
     
     let numberFormatter = NumberFormatter()
     
     var timer: Timer?
     var workoutActions: WorkoutActions?
+    
+    //added for CreateActivityViewController
+    var movingBackwards: Bool = false
+    var active: Bool = false
+    var comingFromActivity: Bool = false
+    
+    weak var delegate : UpdateWorkoutDelegate?
     
     init() {
         super.init(style: .insetGrouped)
@@ -44,10 +53,6 @@ class WorkoutViewController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
         
         numberFormatter.numberStyle = .decimal
         
@@ -77,7 +82,7 @@ class WorkoutViewController: FormViewController {
             title = "New Workout"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
-                workout = Workout(id: ID, name: "WorkoutName", admin: currentUserID)
+                workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil)
             }
         }
         configureTableView()
@@ -99,15 +104,10 @@ class WorkoutViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-        } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
-            }
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+        navigationItem.rightBarButtonItem = addBarButton
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
     }
     
@@ -282,8 +282,10 @@ class WorkoutViewController: FormViewController {
                     row.options?.append($0.rawValue.capitalized)
                 }
             }.onPresent { from, to in
+                to.title = "Type"
+                to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Type"
+                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -296,7 +298,6 @@ class WorkoutViewController: FormViewController {
             }.onChange({ row in
                 self.workout.type = row.value
                 self.updateCalories()
-                
                 if row.value == nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                 } else if self.workout.name != "WorkoutName" {

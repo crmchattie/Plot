@@ -12,11 +12,13 @@ import SplitRow
 import Firebase
 import CodableFirebase
 
+protocol UpdateMindfulnessDelegate: AnyObject {
+    func updateMindfulness(mindfulness: Mindfulness)
+}
+
 class MindfulnessViewController: FormViewController {
     var mindfulness: Mindfulness!
-    
-    fileprivate var active: Bool = true
-    
+        
     fileprivate var productIndex: Int = 0
     
     let numberFormatter = NumberFormatter()
@@ -27,6 +29,13 @@ class MindfulnessViewController: FormViewController {
     
     var userNames : [String] = []
     var userNamesString: String = ""
+    
+    //added for CreateActivityViewController
+    var movingBackwards: Bool = false
+    var active: Bool = false
+    var comingFromActivity: Bool = false
+    
+    weak var delegate : UpdateMindfulnessDelegate?
     
     init() {
         super.init(style: .insetGrouped)
@@ -42,9 +51,7 @@ class MindfulnessViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         numberFormatter.numberStyle = .decimal
         
@@ -53,7 +60,7 @@ class MindfulnessViewController: FormViewController {
             active = false
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).childByAutoId().key ?? ""
-                mindfulness = Mindfulness(id: ID, name: nil, startDateTime: nil, endDateTime: nil, lastModifiedDate: Date(), createdDate: Date())
+                mindfulness = Mindfulness(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil)
             }
         } else {
             title = "Mindfulness"
@@ -97,15 +104,10 @@ class MindfulnessViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-        } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
-            }
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+        navigationItem.rightBarButtonItem = addBarButton
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
     }
     

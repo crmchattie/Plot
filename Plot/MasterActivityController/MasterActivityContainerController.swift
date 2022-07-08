@@ -128,6 +128,10 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         return plotLogoView
     }()
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return ThemeManager.currentTheme().statusBarStyle
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         if self.traitCollection.userInterfaceStyle == .dark {
@@ -177,8 +181,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     }
 
     func setupViews() {
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
         navigationController?.navigationBar.layoutIfNeeded()
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .always

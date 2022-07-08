@@ -83,9 +83,7 @@ class ChooseChatTableViewController: UITableViewController {
     }
     
     fileprivate func configureTableView() {
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
 
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(UserCell.self, forCellReuseIdentifier: userCellID)

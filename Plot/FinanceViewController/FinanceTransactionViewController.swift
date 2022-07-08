@@ -56,9 +56,7 @@ class FinanceTransactionViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "E, MMM dd, yyyy"
@@ -119,7 +117,7 @@ class FinanceTransactionViewController: FormViewController {
             title = "New Transaction"
             let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
-            transaction = Transaction(description: "Transaction Name", amount: 0.0, created_at: date, guid: ID, user_guid: currentUser, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: currentUser)
+            transaction = Transaction(description: "Name", amount: 0.0, created_at: date, guid: ID, user_guid: currentUser, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
         }
         
@@ -155,17 +153,16 @@ class FinanceTransactionViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+        
         if active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
             let dotsBarButton = UIBarButtonItem(image: UIImage(named: "dots"), style: .plain, target: self, action: #selector(goToExtras))
             navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
         } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
             if navigationItem.leftBarButtonItem != nil {
                 navigationItem.leftBarButtonItem?.action = #selector(cancel)
             }
+            navigationItem.rightBarButtonItem = addBarButton
         }
     }
     
@@ -403,8 +400,10 @@ class FinanceTransactionViewController: FormViewController {
                     row.options?.append($0.name.capitalized)
                 }
             }.onPresent { from, to in
+                to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
                     to.title = "Accounts"
+                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

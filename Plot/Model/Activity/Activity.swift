@@ -67,6 +67,11 @@ class Activity: NSObject, NSCopying, Codable {
     var hkSampleID: String?
     var completed: Bool?
     var isTask: Bool?
+    var mealIDs: [String]?
+    var workoutIDs: [String]?
+    var mindfulnessIDs: [String]?
+    var scheduleIDs: [String]?
+    var isSchedule: Bool?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -103,6 +108,11 @@ class Activity: NSObject, NSCopying, Codable {
         case completed
         case hkSampleID
         case isTask
+        case mealIDs
+        case workoutIDs
+        case mindfulnessIDs
+        case isSchedule
+        case scheduleIDs
     }
     
     init(dictionary: [String: AnyObject]?) {
@@ -213,6 +223,11 @@ class Activity: NSObject, NSCopying, Codable {
         completed = dictionary?["completed"] as? Bool
         isTask = dictionary?["isTask"] as? Bool
         hkSampleID = dictionary?["hkSampleID"] as? String
+        mealIDs = dictionary?["mealIDs"] as? [String]
+        workoutIDs = dictionary?["workoutIDs"] as? [String]
+        mindfulnessIDs = dictionary?["mindfulnessIDs"] as? [String]
+        isSchedule = dictionary?["isSchedule"] as? Bool
+        scheduleIDs = dictionary?["scheduleIDs"] as? [String]
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -410,6 +425,26 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.hkSampleID as AnyObject? {
             dictionary["hkSampleID"] = value
+        }
+        
+        if let value = self.mealIDs as AnyObject? {
+            dictionary["mealIDs"] = value
+        }
+        
+        if let value = self.workoutIDs as AnyObject? {
+            dictionary["workoutIDs"] = value
+        }
+        
+        if let value = self.mindfulnessIDs as AnyObject? {
+            dictionary["mindfulnessIDs"] = value
+        }
+        
+        if let value = self.isSchedule as AnyObject? {
+            dictionary["isSchedule"] = value
+        }
+        
+        if let value = self.scheduleIDs as AnyObject? {
+            dictionary["scheduleIDs"] = value
         }
         
         return dictionary

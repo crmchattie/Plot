@@ -12,6 +12,10 @@ import SplitRow
 import Firebase
 import CodableFirebase
 
+protocol UpdateMealDelegate: AnyObject {
+    func updateMeal(meal: Meal)
+}
+
 class MealViewController: FormViewController {
     var meal: Meal!
     
@@ -21,9 +25,7 @@ class MealViewController: FormViewController {
         
     var userNames : [String] = []
     var userNamesString: String = ""
-    
-    fileprivate var active: Bool = false
-    
+        
     fileprivate var productIndex: Int = 0
     
     let numberFormatter = NumberFormatter()
@@ -32,6 +34,14 @@ class MealViewController: FormViewController {
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
+    
+    //added for CreateActivityViewController
+    var movingBackwards: Bool = false
+    var active: Bool = false
+    var comingFromActivity: Bool = false
+    
+    
+    weak var delegate : UpdateMealDelegate?
     
     init() {
         super.init(style: .insetGrouped)
@@ -45,11 +55,7 @@ class MealViewController: FormViewController {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
-        navigationItem.largeTitleDisplayMode = .never
-        
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        navigationItem.largeTitleDisplayMode = .never        
         
         configureTableView()
         
@@ -78,7 +84,7 @@ class MealViewController: FormViewController {
             title = "New Meal"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userMealsEntity).child(currentUserID).childByAutoId().key ?? ""
-                meal = Meal(id: ID, name: "MealName", admin: currentUserID)
+                meal = Meal(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil)
             }
         }
         setupRightBarButton()
@@ -99,15 +105,10 @@ class MealViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        if active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-        } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
-            }
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+        navigationItem.rightBarButtonItem = addBarButton
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
     }
     

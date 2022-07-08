@@ -44,9 +44,7 @@ class AccountSettingsController: UITableViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.layoutIfNeeded()
+        
         
         configureTableView()
         configureContainerView()
