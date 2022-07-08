@@ -34,7 +34,7 @@ struct GroceryProduct: Codable, Equatable, Hashable {
     let servings: Servings?
     let serving_size: String?
     let number_of_servings: Double?
-    let spoonacularScore: Int?
+    let spoonacularScore: Double?
     let image: String?
     var recipe: [String: Double]?
     var bool: Bool?

@@ -45,7 +45,6 @@ class IngredientDetailViewController: FormViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         if self.movingBackwards && active {
             let foodProductContainer = FoodProductContainer(groceryProduct: nil, menuProduct: nil, recipeProduct: nil, complexIngredient: ingredient, basicIngredient: nil)
             delegate?.updateFoodProductContainer(foodProductContainer: foodProductContainer, close: false)
@@ -176,11 +175,13 @@ class IngredientDetailViewController: FormViewController {
                 }
                 self.ingredient.amount = row.value
                 
-                timer?.invalidate()
+                self.fetchProductInfo(ingredientID: self.ingredient.id!, amount: self.ingredient.amount, unit: self.ingredient.unit)
                 
-                timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (_) in
-                    self.fetchProductInfo(ingredientID: self.ingredient.id!, amount: self.ingredient.amount, unit: self.ingredient.unit)
-                })
+//                timer?.invalidate()
+//
+//                timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (_) in
+//
+//                })
             }
         
         if active, let ingredient = ingredient, let recipe = self.ingredient.recipe, recipe["No Recipe"] == nil {
@@ -213,11 +214,13 @@ class IngredientDetailViewController: FormViewController {
                 }.onChange() { [unowned self] row in
                     row.updateCell()
                     self.ingredient.unit = row.value
-                    timer?.invalidate()
-                    
-                    timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-                        self.fetchProductInfo(ingredientID: self.ingredient.id!, amount: self.ingredient.amount, unit: self.ingredient.unit)
-                    })
+                    if let id = self.ingredient.id {
+                        self.fetchProductInfo(ingredientID: id, amount: self.ingredient.amount, unit: self.ingredient.unit)
+                    }
+//                    timer?.invalidate()
+//                    timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+//
+//                    })
                 }
         }
         
@@ -278,9 +281,9 @@ class IngredientDetailViewController: FormViewController {
             }
             
             var section = self.form.sectionBy(tag: "Nutrition")
-            let nutrients = nutrition.nutrients!.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
+            let nutrients = nutrition.nutrients!.sorted(by: { $0.name!.compare($1.name!, options: .caseInsensitive) == .orderedAscending })
             for nutrient in nutrients {
-                if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
+                if let title = nutrient.name, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
                     section!.insert(LabelRow() {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

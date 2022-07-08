@@ -238,112 +238,158 @@ extension CreateActivityViewController: ChooseActivityDelegate {
 
 extension CreateActivityViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
-        if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
-            let purchaseRow = mvs.allRows[purchaseIndex]
-            if transaction.description != "Name" {
-                purchaseRow.baseValue = transaction
-                purchaseRow.updateCell()
-                if purchaseList.indices.contains(purchaseIndex) {
-                    purchaseList[purchaseIndex] = transaction
-                } else {
-                    purchaseList.append(transaction)
-                }
-                updateLists(type: "purchases")
+        var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
+        if transaction.description != "Name" {
+            if mvs.allRows.count - 1 == purchaseIndex {
+                mvs.insert(PurchaseRow() {
+                $0.value = transaction
+                }.onCellSelection() { cell, row in
+                    self.purchaseIndex = row.indexPath!.row
+                    self.openPurchases()
+                    cell.cellResignFirstResponder()
+                }, at: purchaseIndex)
+            } else {
+                let row = mvs.allRows[purchaseIndex]
+                row.baseValue = transaction
+                row.updateCell()
             }
-            else if mvs.allRows.count > 1 {
-                mvs.remove(at: purchaseIndex)
+            if purchaseList.indices.contains(purchaseIndex) {
+                purchaseList[purchaseIndex] = transaction
+            } else {
+                purchaseList.append(transaction)
             }
+            updateLists(type: "purchases")
         }
+        else if mvs.allRows.count - 1 > purchaseIndex {
+            mvs.remove(at: purchaseIndex)
+        }
+//            purchaseBreakdown()
     }
 }
 
 extension CreateActivityViewController: ChooseTransactionDelegate {
     func chosenTransaction(transaction: Transaction) {
-        if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
-            let purchaseRow = mvs.allRows[purchaseIndex]
-            if transaction.description != "Name" {
-                purchaseRow.baseValue = transaction
-                purchaseRow.updateCell()
-                if purchaseList.indices.contains(purchaseIndex) {
-                    purchaseList[purchaseIndex] = transaction
-                } else {
-                    purchaseList.append(transaction)
-                }
-                updateLists(type: "purchases")
+        var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
+        if transaction.description != "Name" {
+            if mvs.allRows.count - 1 == purchaseIndex {
+                mvs.insert(PurchaseRow() {
+                $0.value = transaction
+                }.onCellSelection() { cell, row in
+                    self.purchaseIndex = row.indexPath!.row
+                    self.openPurchases()
+                    cell.cellResignFirstResponder()
+                }, at: purchaseIndex)
+            } else {
+                let row = mvs.allRows[purchaseIndex]
+                row.baseValue = transaction
+                row.updateCell()
             }
-            else if mvs.allRows.count > 1 {
-                mvs.remove(at: purchaseIndex)
+            if purchaseList.indices.contains(purchaseIndex) {
+                purchaseList[purchaseIndex] = transaction
+            } else {
+                purchaseList.append(transaction)
             }
-//            purchaseBreakdown()
+            updateLists(type: "purchases")
         }
+        else if mvs.allRows.count - 1 > purchaseIndex {
+            mvs.remove(at: purchaseIndex)
+        }
+//            purchaseBreakdown()
     }
 }
 
 extension CreateActivityViewController: UpdateMealDelegate {
     func updateMeal(meal: Meal) {
-        if let mvs = self.form.sectionBy(tag: "healthfields") as? MultivaluedSection {
-            let row = mvs.allRows[healthIndex]
-            if meal.name != "Name" {
-                row.baseValue = meal
-                row.title = meal.name
+        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
+        if meal.name != "Name" {
+            if healthList.indices.contains(healthIndex) {
+                healthList[healthIndex].meal = meal
+            } else {
+                var health = HealthContainer()
+                health.meal = meal
+                healthList.append(health)
+            }
+            if mvs.allRows.count - 1 == healthIndex {
+                mvs.insert(HealthRow() {
+                    $0.value = healthList[healthIndex]
+                    }.onCellSelection() { cell, row in
+                        self.scheduleIndex = row.indexPath!.row
+                        self.openSchedule()
+                        cell.cellResignFirstResponder()
+                }, at: healthIndex)
+            } else {
+                let row = mvs.allRows[healthIndex]
+                row.baseValue = healthList[healthIndex]
                 row.updateCell()
-                if healthList.indices.contains(healthIndex) {
-                    healthList[healthIndex].meal = meal
-                } else {
-                    var list = HealthContainer()
-                    list.meal = meal
-                    healthList.append(list)
-                }
             }
-            else if mvs.allRows.count > 1 {
-                mvs.remove(at: healthIndex)
-            }
+            updateLists(type: "health")
+        }
+        else if mvs.allRows.count - 1 > healthIndex {
+            mvs.remove(at: healthIndex)
         }
     }
 }
 
 extension CreateActivityViewController: UpdateWorkoutDelegate {
     func updateWorkout(workout: Workout) {
-        if let mvs = self.form.sectionBy(tag: "healthfields") as? MultivaluedSection {
-            let row = mvs.allRows[healthIndex]
-            if workout.name != "Name" {
-                row.baseValue = workout
-                row.title = workout.name
+        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
+        if workout.name != "Name" {
+            if healthList.indices.contains(healthIndex) {
+                healthList[healthIndex].workout = workout
+            } else {
+                var health = HealthContainer()
+                health.workout = workout
+                healthList.append(health)
+            }
+            if mvs.allRows.count - 1 == healthIndex {
+                mvs.insert(HealthRow() {
+                    $0.value = healthList[healthIndex]
+                    }.onCellSelection() { cell, row in
+                        self.scheduleIndex = row.indexPath!.row
+                        self.openSchedule()
+                        cell.cellResignFirstResponder()
+                }, at: healthIndex)
+            } else {
+                let row = mvs.allRows[healthIndex]
+                row.baseValue = healthList[healthIndex]
                 row.updateCell()
-                if healthList.indices.contains(healthIndex) {
-                    healthList[healthIndex].workout = workout
-                } else {
-                    var list = HealthContainer()
-                    list.workout = workout
-                    healthList.append(list)
-                }
             }
-            else if mvs.allRows.count > 1 {
-                mvs.remove(at: healthIndex)
-            }
+            updateLists(type: "health")
+        }
+        else if mvs.allRows.count - 1 > healthIndex {
+            mvs.remove(at: healthIndex)
         }
     }
 }
 
 extension CreateActivityViewController: UpdateMindfulnessDelegate {
     func updateMindfulness(mindfulness: Mindfulness) {
-        if let mvs = self.form.sectionBy(tag: "healthfields") as? MultivaluedSection {
-            let row = mvs.allRows[healthIndex]
-            if mindfulness.name != "Name" {
-                row.baseValue = mindfulness
-                row.title = mindfulness.name
+        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
+        if mindfulness.name != "Name" {
+            if healthList.indices.contains(healthIndex) {
+                healthList[healthIndex].mindfulness = mindfulness
+            } else {
+                var health = HealthContainer()
+                health.mindfulness = mindfulness
+                healthList.append(health)
+            }
+            if mvs.allRows.count - 1 == healthIndex {
+                mvs.insert(HealthRow() {
+                    $0.value = healthList[healthIndex]
+                    }.onCellSelection() { cell, row in
+                        self.scheduleIndex = row.indexPath!.row
+                        self.openSchedule()
+                        cell.cellResignFirstResponder()
+                }, at: healthIndex)
+            } else {
+                let row = mvs.allRows[healthIndex]
+                row.baseValue = healthList[healthIndex]
                 row.updateCell()
-                if healthList.indices.contains(healthIndex) {
-                    healthList[healthIndex].mindfulness = mindfulness
-                } else {
-                    var list = HealthContainer()
-                    list.mindfulness = mindfulness
-                    healthList.append(list)
-                }
             }
-            else if mvs.allRows.count > 1 {
-                mvs.remove(at: healthIndex)
-            }
+            updateLists(type: "health")
+        }
+        else if mvs.allRows.count - 1 > healthIndex {
+            mvs.remove(at: healthIndex)
         }
     }
 }

@@ -184,9 +184,9 @@ class MenuProductDetailViewController: FormViewController {
             }
             
             var section = self.form.sectionBy(tag: "Nutrition")
-            let nutrients = nutrition.nutrients!.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
+            let nutrients = nutrition.nutrients!.sorted(by: { $0.name!.compare($1.name!, options: .caseInsensitive) == .orderedAscending })
             for nutrient in nutrients {
-                if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
+                if let title = nutrient.name, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
                     section!.insert(LabelRow() {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

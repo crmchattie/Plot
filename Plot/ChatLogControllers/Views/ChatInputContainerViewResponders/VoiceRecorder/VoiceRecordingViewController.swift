@@ -35,7 +35,7 @@ class VoiceRecordingViewController: UIViewController {
     if #available(iOS 11.0, *) {
       voiceRecordingContainerView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
       voiceRecordingContainerView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
-      voiceRecordingContainerView.bottomAnchor.constraint(equalTo:view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+      voiceRecordingContainerView.bottomAnchor.constraint(equalTo:view.bottomAnchor).isActive = true
     } else {
       voiceRecordingContainerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
       voiceRecordingContainerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true

@@ -38,7 +38,7 @@ struct Recipe: Codable, Equatable, Hashable {
     let lowFodmap: Bool?
     let sourceUrl: String?
     let spoonacularSourceUrl: String?
-    let aggregateLikes, spoonacularScore, healthScore: Int?
+    let aggregateLikes, spoonacularScore, healthScore: Double?
     let creditsText, license, sourceName: String?
     let pricePerServing: Double?
     var extendedIngredients: [ExtendedIngredient]?
@@ -297,7 +297,7 @@ struct Ient: Codable, Equatable, Hashable {
 
 // MARK: - Nutrient
 struct Nutrient: Codable, Equatable, Hashable {
-    var title: String?
+    var name: String?
     var amount: Double?
     var unit: String?
     var percentOfDailyNeeds: Double?

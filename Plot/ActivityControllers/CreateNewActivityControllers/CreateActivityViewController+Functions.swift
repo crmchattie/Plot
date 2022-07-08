@@ -115,7 +115,7 @@ extension CreateActivityViewController {
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard indexPath.row == 5, let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
+        guard let row: ButtonRow = form.rowBy(tag: "Location"), indexPath == row.indexPath, let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
             return
         }
         
@@ -354,6 +354,18 @@ extension CreateActivityViewController {
             var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
                 $0.value = schedule
+                }.onCellSelection() { cell, row in
+                    self.scheduleIndex = row.indexPath!.row
+                    self.openSchedule()
+                    cell.cellResignFirstResponder()
+            }, at: mvs.count - 1)
+            
+        }
+        
+        for health in healthList {
+            var mvs = (form.sectionBy(tag: "healthfields") as! MultivaluedSection)
+            mvs.insert(HealthRow() {
+                $0.value = health
                 }.onCellSelection() { cell, row in
                     self.scheduleIndex = row.indexPath!.row
                     self.openSchedule()

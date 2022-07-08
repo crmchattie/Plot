@@ -30,7 +30,7 @@ struct MenuProduct: Codable, Equatable, Hashable {
     let numberOfServings: Int?
     let readableServingSize, servingSize: String?
     let price: Double?
-    let spoonacularScore: Int?
+    let spoonacularScore: Double?
     let image: String?
     var amount: Double?
 }

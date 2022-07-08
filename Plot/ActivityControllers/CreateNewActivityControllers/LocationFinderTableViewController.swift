@@ -17,8 +17,10 @@ class LocationFinderTableViewController: UIViewController {
 
     var searchCompleter = MKLocalSearchCompleter()
     var searchResults = [MKLocalSearchCompletion]()
+    
     var searchBar: UISearchBar?
     let searchResultsTableView = UITableView(frame: .zero, style: .insetGrouped)
+    
     weak var delegate : UpdateLocationDelegate?
     
     var locationName = "Location"
@@ -62,8 +64,6 @@ class LocationFinderTableViewController: UIViewController {
     }
     
     fileprivate func setupTableView() {
-
-        
         view.addSubview(searchResultsTableView)
         searchResultsTableView.translatesAutoresizingMaskIntoConstraints = false
         searchResultsTableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -71,7 +71,7 @@ class LocationFinderTableViewController: UIViewController {
         if #available(iOS 11.0, *) {
             searchResultsTableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true
             searchResultsTableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
-            searchResultsTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+            searchResultsTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
         } else {
             searchResultsTableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
             searchResultsTableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
@@ -83,6 +83,7 @@ class LocationFinderTableViewController: UIViewController {
         searchResultsTableView.sectionIndexBackgroundColor = view.backgroundColor
         searchResultsTableView.backgroundColor = view.backgroundColor
         searchResultsTableView.separatorStyle = .none
+        searchResultsTableView.keyboardDismissMode = .onDrag
 
     }
     
@@ -153,6 +154,20 @@ extension LocationFinderTableViewController: UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return " "
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        10
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        if let headerTitle = view as? UITableViewHeaderFooterView {
+            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+    }
 
 }
 

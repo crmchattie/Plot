@@ -9,10 +9,6 @@
 import UIKit
 import Firebase
 
-//protocol UpdateInvitees {
-//    func updateInvitees(selectedFalconUsers : [User])
-//}
-
 class SelectParticipantsViewController: UIViewController {
     
     let falconUsersCellID = "falconUsersCellID"
@@ -120,7 +116,7 @@ class SelectParticipantsViewController: UIViewController {
             sortedFirstLetters = uniqueFirstLetters.sorted()
             sections = sortedFirstLetters.map { firstLetter in
                 return self.filteredUsers
-                    .filter { $0.titleFirstLetter == firstLetter }
+                    .filter { $0.titleFirstLetter == firstLetter && $0.titleFirstLetter != "" }
                     .sorted { $0.name ?? "" < $1.name ?? "" }
             }
         }
@@ -249,7 +245,7 @@ class SelectParticipantsViewController: UIViewController {
         if #available(iOS 11.0, *) {
             tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true
             tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
         } else {
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true

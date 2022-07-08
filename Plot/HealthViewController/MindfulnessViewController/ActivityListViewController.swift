@@ -227,10 +227,165 @@ class ActivityListViewController: FormViewController {
 
 extension ActivityListViewController: UpdateChecklistDelegate {
     func updateChecklist(checklist: Checklist) {
-        if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
+        var mvs = self.form.sectionBy(tag: "listsfields") as! MultivaluedSection
+        if checklist.name != "CheckListName" {
+            if mvs.allRows.count - 1 == listIndex {
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }.onCellSelection({ cell, row in
+                    self.listIndex = row.indexPath!.row
+                    self.openList()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textAlignment = .left
+                }, at: listIndex)
+            }
             let listRow = mvs.allRows[listIndex]
+            listRow.title = checklist.name
+            listRow.updateCell()
+            if listList.indices.contains(listIndex) {
+                listList[listIndex].checklist = checklist
+            } else {
+                var list = ListContainer()
+                list.checklist = checklist
+                listList.append(list)
+            }
+        }
+        else if mvs.allRows.count - 1 > listIndex {
+            mvs.remove(at: listIndex)
+        }
+    }
+}
+
+extension ActivityListViewController: UpdateActivitylistDelegate {
+    func updateActivitylist(activitylist: Activitylist) {
+        var mvs = self.form.sectionBy(tag: "listsfields") as! MultivaluedSection
+        if activitylist.name != "ActivityListName" {
+            if mvs.allRows.count - 1 == listIndex {
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }.onCellSelection({ cell, row in
+                    self.listIndex = row.indexPath!.row
+                    self.openList()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textAlignment = .left
+                }, at: listIndex)
+            }
+            let listRow = mvs.allRows[listIndex]
+            listRow.title = activitylist.name
+            listRow.updateCell()
+            if listList.indices.contains(listIndex) {
+                listList[listIndex].activitylist = activitylist
+            } else {
+                var list = ListContainer()
+                list.activitylist = activitylist
+                listList.append(list)
+            }
+        }
+        else if mvs.allRows.count - 1 > listIndex {
+            mvs.remove(at: listIndex)
+        }
+    }
+}
+
+extension ActivityListViewController: UpdatePackinglistDelegate {
+    func updatePackinglist(packinglist: Packinglist) {
+        var mvs = self.form.sectionBy(tag: "listsfields") as! MultivaluedSection
+        if packinglist.name != "PackingListName" {
+            if mvs.allRows.count - 1 == listIndex {
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }.onCellSelection({ cell, row in
+                    self.listIndex = row.indexPath!.row
+                    self.openList()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textAlignment = .left
+                }, at: listIndex)
+            }
+            let listRow = mvs.allRows[listIndex]
+            listRow.title = packinglist.name
+            listRow.updateCell()
+            if listList.indices.contains(listIndex) {
+                listList[listIndex].packinglist = packinglist
+            } else {
+                var list = ListContainer()
+                list.packinglist = packinglist
+                listList.append(list)
+            }
+        }
+        else if mvs.allRows.count - 1 > listIndex {
+            mvs.remove(at: listIndex)
+        }
+    }
+}
+
+extension ActivityListViewController: UpdateGrocerylistDelegate {
+    func updateGrocerylist(grocerylist: Grocerylist) {
+        var mvs = self.form.sectionBy(tag: "listsfields") as! MultivaluedSection
+        if grocerylist.name != "GroceryListName" {
+            if mvs.allRows.count - 1 == listIndex {
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    self.grocerylistIndex = listIndex
+                }.onCellSelection({ cell, row in
+                    self.listIndex = row.indexPath!.row
+                    self.openList()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textAlignment = .left
+                }, at: listIndex)
+            }
+            let listRow = mvs.allRows[listIndex]
+            listRow.title = grocerylist.name
+            listRow.updateCell()
+            if listList.indices.contains(listIndex) {
+                listList[listIndex].grocerylist = grocerylist
+            } else {
+                var list = ListContainer()
+                list.grocerylist = grocerylist
+                listList.append(list)
+            }
+        }
+        else if mvs.allRows.count - 1 > listIndex {
+            mvs.remove(at: listIndex)
+        }
+    }
+}
+
+extension ActivityListViewController: ChooseListDelegate {
+    func chosenList(list: ListContainer) {
+        if let checklist = list.checklist {
+            var mvs = self.form.sectionBy(tag: "listsfields") as! MultivaluedSection
             if checklist.name != "CheckListName" {
-                listRow.baseValue = checklist
+                if mvs.allRows.count - 1 == listIndex {
+                    mvs.insert(ButtonRow() { row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.textLabel?.textAlignment = .left
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }.onCellSelection({ cell, row in
+                        self.listIndex = row.indexPath!.row
+                        self.openList()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: listIndex)
+                }
+                let listRow = mvs.allRows[listIndex]
                 listRow.title = checklist.name
                 listRow.updateCell()
                 if listList.indices.contains(listIndex) {
@@ -241,19 +396,27 @@ extension ActivityListViewController: UpdateChecklistDelegate {
                     listList.append(list)
                 }
             }
-            else if mvs.allRows.count > 1 {
+            else if mvs.allRows.count - 1 > listIndex {
                 mvs.remove(at: listIndex)
             }
-        }
-    }
-}
-
-extension ActivityListViewController: UpdateActivitylistDelegate {
-    func updateActivitylist(activitylist: Activitylist) {
-        if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
-            let listRow = mvs.allRows[listIndex]
+        } else if let activitylist = list.activitylist {
+            var mvs = self.form.sectionBy(tag: "listsfields") as! MultivaluedSection
             if activitylist.name != "ActivityListName" {
-                listRow.baseValue = activitylist
+                if mvs.allRows.count - 1 == listIndex {
+                    mvs.insert(ButtonRow() { row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.textLabel?.textAlignment = .left
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }.onCellSelection({ cell, row in
+                        self.listIndex = row.indexPath!.row
+                        self.openList()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: listIndex)
+                }
+                let listRow = mvs.allRows[listIndex]
                 listRow.title = activitylist.name
                 listRow.updateCell()
                 if listList.indices.contains(listIndex) {
@@ -264,20 +427,60 @@ extension ActivityListViewController: UpdateActivitylistDelegate {
                     listList.append(list)
                 }
             }
-            else if mvs.allRows.count > 1 {
+            else if mvs.allRows.count - 1 > listIndex {
                 mvs.remove(at: listIndex)
             }
-        }
-    }
-}
-
-extension ActivityListViewController: UpdatePackinglistDelegate {
-    func updatePackinglist(packinglist: Packinglist) {
-        if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
-            let listRow = mvs.allRows[listIndex]
+        } else if let grocerylist = list.grocerylist {
+            var mvs = self.form.sectionBy(tag: "listsfields") as! MultivaluedSection
+            if grocerylist.name != "GroceryListName" {
+                if mvs.allRows.count - 1 == listIndex {
+                    mvs.insert(ButtonRow() { row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.textLabel?.textAlignment = .left
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        self.grocerylistIndex = listIndex
+                    }.onCellSelection({ cell, row in
+                        self.listIndex = row.indexPath!.row
+                        self.openList()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: listIndex)
+                }
+                let listRow = mvs.allRows[listIndex]
+                listRow.title = grocerylist.name
+                listRow.updateCell()
+                if listList.indices.contains(listIndex) {
+                    listList[listIndex].grocerylist = grocerylist
+                } else {
+                    var list = ListContainer()
+                    list.grocerylist = grocerylist
+                    listList.append(list)
+                }
+            }
+            else if mvs.allRows.count - 1 > listIndex {
+                mvs.remove(at: listIndex)
+            }
+        } else if let packinglist = list.packinglist {
+            var mvs = self.form.sectionBy(tag: "listsfields") as! MultivaluedSection
             if packinglist.name != "PackingListName" {
+                if mvs.allRows.count - 1 == listIndex {
+                    mvs.insert(ButtonRow() { row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.textLabel?.textAlignment = .left
+                        row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }.onCellSelection({ cell, row in
+                        self.listIndex = row.indexPath!.row
+                        self.openList()
+                    }).cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textAlignment = .left
+                    }, at: listIndex)
+                }
+                let listRow = mvs.allRows[listIndex]
                 listRow.title = packinglist.name
-                listRow.baseValue = packinglist
                 listRow.updateCell()
                 if listList.indices.contains(listIndex) {
                     listList[listIndex].packinglist = packinglist
@@ -286,114 +489,12 @@ extension ActivityListViewController: UpdatePackinglistDelegate {
                     list.packinglist = packinglist
                     listList.append(list)
                 }
-            } else if mvs.allRows.count > 1 {
+            }
+            else if mvs.allRows.count - 1 > listIndex {
                 mvs.remove(at: listIndex)
             }
-        }
-    }
-}
-
-extension ActivityListViewController: UpdateGrocerylistDelegate {
-    func updateGrocerylist(grocerylist: Grocerylist) {
-        if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
-            if grocerylist.name != "GroceryListName" {
-                let listRow = mvs.allRows[grocerylistIndex]
-                listRow.baseValue = grocerylist
-                listRow.title = grocerylist.name
-                listRow.updateCell()
-                if listList.indices.contains(grocerylistIndex) {
-                    listList[grocerylistIndex].grocerylist = grocerylist
-                } else {
-                    var list = ListContainer()
-                    list.grocerylist = grocerylist
-                    listList.append(list)
-                }
-            } else if mvs.allRows.count > 1 {
-                mvs.remove(at: grocerylistIndex)
-            }
-        }
-    }
-}
-
-extension ActivityListViewController: ChooseListDelegate {
-    func chosenList(list: ListContainer) {
-        if let checklist = list.checklist {
-            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
-                let listRow = mvs.allRows[listIndex]
-                if checklist.name != "CheckListName" {
-                    listRow.baseValue = checklist
-                    listRow.title = checklist.name
-                    listRow.updateCell()
-                    if listList.indices.contains(listIndex) {
-                        listList[listIndex].checklist = checklist
-                    } else {
-                        var list = ListContainer()
-                        list.checklist = checklist
-                        listList.append(list)
-                    }
-                }
-                else if mvs.allRows.count > 1 {
-                    mvs.remove(at: listIndex)
-                }
-            }
-        } else if let activitylist = list.activitylist {
-            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
-                let listRow = mvs.allRows[listIndex]
-                if activitylist.name != "ActivityListName" {
-                    listRow.baseValue = activitylist
-                    listRow.title = activitylist.name
-                    listRow.updateCell()
-                    if listList.indices.contains(listIndex) {
-                        listList[listIndex].activitylist = activitylist
-                    } else {
-                        var list = ListContainer()
-                        list.activitylist = activitylist
-                        listList.append(list)
-                    }
-                }
-                else if mvs.allRows.count > 1 {
-                    mvs.remove(at: listIndex)
-                }
-            }
-        } else if let grocerylist = list.grocerylist {
-            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
-                let listRow = mvs.allRows[listIndex]
-                if grocerylist.name != "GroceryListName" {
-                    listRow.title = grocerylist.name
-                    listRow.baseValue = grocerylist
-                    listRow.updateCell()
-                    if listList.indices.contains(listIndex) {
-                        listList[listIndex].grocerylist = grocerylist
-                    } else {
-                        var list = ListContainer()
-                        list.grocerylist = grocerylist
-                        listList.append(list)
-                    }
-                    grocerylistIndex = listIndex
-                } else if mvs.allRows.count > 1 {
-                    mvs.remove(at: listIndex)
-                }
-            }
-        } else if let packinglist = list.packinglist {
-            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection {
-                let listRow = mvs.allRows[listIndex]
-                if packinglist.name != "PackingListName" {
-                    listRow.title = packinglist.name
-                    listRow.baseValue = packinglist
-                    listRow.updateCell()
-                    if listList.indices.contains(listIndex) {
-                        listList[listIndex].packinglist = packinglist
-                    } else {
-                        var list = ListContainer()
-                        list.packinglist = packinglist
-                        listList.append(list)
-                    }
-                } else if mvs.allRows.count > 1 {
-                    mvs.remove(at: listIndex)
-                }
-            }
         } else {
-            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection, mvs.allRows.count > 1 {
+            if let mvs = self.form.sectionBy(tag: "listsfields") as? MultivaluedSection, mvs.allRows.count - 1 > listIndex {
                 mvs.remove(at: listIndex)
             }
         }

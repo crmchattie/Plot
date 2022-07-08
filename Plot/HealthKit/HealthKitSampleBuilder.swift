@@ -49,32 +49,32 @@ class HealthKitSampleBuilder {
         
         var samples: [HKQuantitySample] = []
         
-        if let dietaryEnergyConsumed = HKQuantityType.quantityType(forIdentifier: .dietaryEnergyConsumed), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.title == "Calories"}), let cals = nutrient.amount {
+        if let dietaryEnergyConsumed = HKQuantityType.quantityType(forIdentifier: .dietaryEnergyConsumed), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.name == "Calories"}), let cals = nutrient.amount {
             let calsQuantity = HKQuantity(unit: .jouleUnit(with: .kilo), doubleValue: cals)
             let calsSample = HKQuantitySample(type: dietaryEnergyConsumed, quantity: calsQuantity, start: start, end: end)
             samples.append(calsSample)
         }
         
-        if let dietaryFatTotal = HKQuantityType.quantityType(forIdentifier: .dietaryFatTotal), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.title == "Fat"}), let fats = nutrient.amount {
+        if let dietaryFatTotal = HKQuantityType.quantityType(forIdentifier: .dietaryFatTotal), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.name == "Fat"}), let fats = nutrient.amount {
             let fatQuantity = HKQuantity(unit: .gram(), doubleValue: fats)
             let fatSample = HKQuantitySample(type: dietaryFatTotal, quantity: fatQuantity, start: start, end: end)
             samples.append(fatSample)
         }
         
-        if let dietaryProtein = HKQuantityType.quantityType(forIdentifier: .dietaryProtein), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.title == "Protein"}), let protien = nutrient.amount {
+        if let dietaryProtein = HKQuantityType.quantityType(forIdentifier: .dietaryProtein), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.name == "Protein"}), let protien = nutrient.amount {
             let protienQuantity = HKQuantity(unit: .gram(), doubleValue: protien)
             let protienSample = HKQuantitySample(type: dietaryProtein, quantity: protienQuantity, start: start, end: end)
             samples.append(protienSample)
         }
         
-        if let dietaryCarbohydrates = HKQuantityType.quantityType(forIdentifier: .dietaryCarbohydrates), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.title == "Carbohydrates"}), let carbs = nutrient.amount {
+        if let dietaryCarbohydrates = HKQuantityType.quantityType(forIdentifier: .dietaryCarbohydrates), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.name == "Carbohydrates"}), let carbs = nutrient.amount {
             let quantity = HKQuantity(unit: .gram(), doubleValue: carbs)
             let sample = HKQuantitySample(type: dietaryCarbohydrates, quantity: quantity, start: start, end: end)
             samples.append(sample)
         }
         
         //sugar?
-        if let dietarySugar = HKQuantityType.quantityType(forIdentifier: .dietarySugar), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.title == "Sugar"}), let sugar = nutrient.amount {
+        if let dietarySugar = HKQuantityType.quantityType(forIdentifier: .dietarySugar), let nutrient = meal.nutrition?.nutrients?.first(where: {$0.name == "Sugar"}), let sugar = nutrient.amount {
             let quantity = HKQuantity(unit: .gram(), doubleValue: sugar)
             let sample = HKQuantitySample(type: dietarySugar, quantity: quantity, start: start, end: end)
             samples.append(sample)

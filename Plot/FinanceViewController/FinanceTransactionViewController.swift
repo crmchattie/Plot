@@ -272,7 +272,7 @@ class FinanceTransactionViewController: FormViewController {
                 inlineRow.cellUpdate() { cell, row in
                     row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.datePicker.datePickerMode = .date
+                    cell.datePicker.datePickerMode = .dateAndTime
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
                     }

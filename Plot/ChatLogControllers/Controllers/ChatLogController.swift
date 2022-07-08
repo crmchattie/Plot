@@ -471,7 +471,7 @@ class ChatLogController: UICollectionViewController {
             collectionView?.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
             collectionView?.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
             collectionView?.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
-            collectionView?.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+            collectionView?.bottomAnchor.constraint(equalTo: view.bottomAnchor,
                                                     constant: -inputContainerView.frame.height).isActive = true
         } else {
             let frameHeight = view.frame.height - inputContainerView.frame.height

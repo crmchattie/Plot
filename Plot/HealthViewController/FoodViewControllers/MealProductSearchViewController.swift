@@ -37,11 +37,7 @@ class MealProductSearchViewController: UIViewController {
     var conversations = [Conversation]()
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        navigationController?.isNavigationBarHidden = false
-        navigationController?.navigationBar.isHidden = false
-        navigationItem.largeTitleDisplayMode = .never
-        
+        super.viewDidLoad()        
         // Do any additional setup after loading the view, typically from a nib.
         setupSearchController()
         setupMainView()
@@ -49,7 +45,6 @@ class MealProductSearchViewController: UIViewController {
         
         if #available(iOS 11.0, *) {
             let cancelBarButton =  UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-            
             navigationItem.rightBarButtonItem = cancelBarButton
         } else {
             let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancel))
@@ -67,7 +62,6 @@ class MealProductSearchViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         if self.movingBackwards {
             if foodProductContainer == nil {
                 delegate?.updateFoodProductContainer(foodProductContainer: nil, close: nil)
@@ -90,26 +84,23 @@ class MealProductSearchViewController: UIViewController {
         searchBar?.placeholder = "Search"
         searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
         searchResultsTableView.tableHeaderView = searchBar
+        searchBar?.becomeFirstResponder()
     }
     
     fileprivate func setupMainView() {
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
         navigationItem.title = "Food Item Search"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        extendedLayoutIncludesOpaqueBars = true
     }
     
     fileprivate func setupTableView() {
-        
         view.addSubview(searchResultsTableView)
         searchResultsTableView.translatesAutoresizingMaskIntoConstraints = false
         searchResultsTableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        
         if #available(iOS 11.0, *) {
             searchResultsTableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true
             searchResultsTableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
-            searchResultsTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+            searchResultsTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
         } else {
             searchResultsTableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
             searchResultsTableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
@@ -144,7 +135,7 @@ class MealProductSearchViewController: UIViewController {
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
         Service.shared.fetchGroceryProducts(query: query) { (search, err) in
-            if let products = search?.products {
+            if let products = search?.products, !products.isEmpty {
                 let sortedProducts = products.sorted(by: { $0.title.compare($1.title , options: .caseInsensitive) == .orderedAscending })
                 self.sections.append(.groceryItems)
                 self.groups[.groceryItems] = sortedProducts
@@ -154,7 +145,7 @@ class MealProductSearchViewController: UIViewController {
         
         dispatchGroup.enter()
         Service.shared.fetchMenuProducts(query: query) { (search, err) in
-            if let products = search?.menuItems {
+            if let products = search?.menuItems, !products.isEmpty {
                 let sortedProducts = products.sorted(by: { $0.title.compare($1.title , options: .caseInsensitive) == .orderedAscending })
                 self.sections.append(.restaurantItems)
                 self.groups[.restaurantItems] = sortedProducts
@@ -284,7 +275,7 @@ extension MealProductSearchViewController: UITableViewDataSource, UITableViewDel
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        tableView.deselectRow(at: indexPath, animated: true)
         let section = sections[indexPath.section]
         if let object = groups[section] as? [GroceryProduct] {
             fetchProductInfo(groceryID: object[indexPath.item].id, menuID: nil, recipeID: nil, ingredientID: nil)

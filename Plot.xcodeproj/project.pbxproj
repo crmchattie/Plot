@@ -1153,10 +1153,10 @@
 				10B541E125479D3100CC9023 /* MealViewController.swift */,
 				10DFC3F8255CC64000565DAD /* MealFetcher.swift */,
 				10DFC3EA255CC3EA00565DAD /* MealActions.swift */,
+				10B541DD25479D0700CC9023 /* MealProductSearchViewController.swift */,
 				10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */,
 				10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */,
 				10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */,
-				10B541DD25479D0700CC9023 /* MealProductSearchViewController.swift */,
 				10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */,
 			);
 			path = FoodViewControllers;
@@ -2223,17 +2223,6 @@
 				2680A0332360C0BD00C4C287 /* Invitation.swift */,
 				10CD68782486AEE400DC02E0 /* PLNotification.swift */,
 				10D340FF24ABD741009269B7 /* ActivityContainer.swift */,
-				26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */,
-				10B541C925476D8B00CC9023 /* GroceryProduct.swift */,
-				10B541CF25476DA700CC9023 /* MenuProduct.swift */,
-				103946892549FD4B005CED3A /* FoodProductContainer.swift */,
-				102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */,
-				10C8333F249AC2F00037F638 /* SygicPlacesSearchResult.swift */,
-				10C83341249ACC8F0037F638 /* SygicToursSearchResult.swift */,
-				10C8334724A3A43F0037F638 /* SygicCollectionsSearchResult.swift */,
-				10C83343249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift */,
-				10C83345249AD8EA0037F638 /* FoursquareVenueSearchResult.swift */,
-				10C8334924A400620037F638 /* FlightSearchResult.swift */,
 				10F3032924EC6FBC00C04B8F /* MXUser.swift */,
 				10F3032B24EC6FD300C04B8F /* MXInstitution.swift */,
 				10F3032D24EC6FE500C04B8F /* MXMember.swift */,
@@ -2243,6 +2232,10 @@
 				1017D32E24F2B8E5001D7CBE /* MXMerchantLocation.swift */,
 				10F3033124EC700C00C04B8F /* Transaction.swift */,
 				10B541D3254780B800CC9023 /* Meal.swift */,
+				26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */,
+				10B541C925476D8B00CC9023 /* GroceryProduct.swift */,
+				10B541CF25476DA700CC9023 /* MenuProduct.swift */,
+				103946892549FD4B005CED3A /* FoodProductContainer.swift */,
 				105F66EA2415942B00F6EDB6 /* Workout.swift */,
 				10970B0D25803F450027A9EF /* Mindfulness.swift */,
 				10B2BBAA257ACC7200E3A798 /* Scheduler.swift */,
@@ -2252,6 +2245,13 @@
 				10737F8424912BDD00D146D6 /* Preview.swift */,
 				10B656CD24AFB0E7006686FA /* SectionType.swift */,
 				F916C763260E66170062F952 /* DateRange.swift */,
+				102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */,
+				10C8333F249AC2F00037F638 /* SygicPlacesSearchResult.swift */,
+				10C83341249ACC8F0037F638 /* SygicToursSearchResult.swift */,
+				10C8334724A3A43F0037F638 /* SygicCollectionsSearchResult.swift */,
+				10C83343249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift */,
+				10C83345249AD8EA0037F638 /* FoursquareVenueSearchResult.swift */,
+				10C8334924A400620037F638 /* FlightSearchResult.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2326,7 +2326,6 @@
 				4BAEE578212735E50045AB10 /* FlowLayout */,
 				4BAEE57A212735E50045AB10 /* SelectParticipantsViewController.swift */,
 				4BAEE57B212735E50045AB10 /* SelectedParticipantsCollectionView.swift */,
-				4BAEE57C212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift */,
 			);
 			path = MultipleSelectionControllers;
 			sourceTree = "<group>";
@@ -2335,6 +2334,7 @@
 			isa = PBXGroup;
 			children = (
 				4BAEE575212735E50045AB10 /* ParticipantTableViewCell.swift */,
+				4BAEE57C212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";

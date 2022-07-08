@@ -15,13 +15,12 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
         return sortedFirstLetters[section]
     }
     
-    func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        if userInvitationStatus.count == 0 {
-            return sortedFirstLetters
-        }
-        
-        return nil
-    }
+//    func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+//        if userInvitationStatus.count == 0 {
+//            return sortedFirstLetters
+//        }
+//        return nil
+//    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count

@@ -210,12 +210,10 @@ class MealViewController: FormViewController {
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
-        print("shareButtonTapped")
         
     }
     
     func initializeForm() {
-        print("initializing form")
         form +++
             Section()
             
@@ -376,13 +374,13 @@ class MealViewController: FormViewController {
         
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Ingredients",
-                               footer: "Add an Ingredient") {
+                               header: "Items",
+                               footer: "Add an Item") {
                 $0.tag = "itemfields"
                 $0.addButtonProvider = { section in
                     return ButtonRow(){
                         $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.title = "Add New Ingredient"
+                        $0.title = "Add New Item"
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textAlignment = .left
@@ -495,7 +493,7 @@ class MealViewController: FormViewController {
                         nutrients = product.nutrition?.nutrients ?? []
                     } else if let productNutrients = product.nutrition?.nutrients {
                         for nutrient in productNutrients {
-                            if let index = nutrients.firstIndex(where: {$0.title == nutrient.title}) {
+                            if let index = nutrients.firstIndex(where: {$0.name == nutrient.name}) {
                                 nutrients[index].amount! += nutrient.amount ?? 0
                                 nutrients[index].percentOfDailyNeeds = (nutrients[index].percentOfDailyNeeds ?? 0) + (nutrient.percentOfDailyNeeds ?? 0)
                             } else {
@@ -508,7 +506,7 @@ class MealViewController: FormViewController {
                         nutrients = product.nutrition?.nutrients ?? []
                     } else if let productNutrients = product.nutrition?.nutrients {
                         for nutrient in productNutrients {
-                            if let index = nutrients.firstIndex(where: {$0.title == nutrient.title}) {
+                            if let index = nutrients.firstIndex(where: {$0.name == nutrient.name}) {
                                 nutrients[index].amount! += nutrient.amount ?? 0
                                 nutrients[index].percentOfDailyNeeds = (nutrients[index].percentOfDailyNeeds ?? 0) + (nutrient.percentOfDailyNeeds ?? 0)
                             } else {
@@ -521,7 +519,7 @@ class MealViewController: FormViewController {
                         nutrients = product.nutrition?.nutrients ?? []
                     } else if let productNutrients = product.nutrition?.nutrients {
                         for nutrient in productNutrients {
-                            if let index = nutrients.firstIndex(where: {$0.title == nutrient.title}) {
+                            if let index = nutrients.firstIndex(where: {$0.name == nutrient.name}) {
                                 nutrients[index].amount! += nutrient.amount ?? 0
                                 nutrients[index].percentOfDailyNeeds = (nutrients[index].percentOfDailyNeeds ?? 0) + (nutrient.percentOfDailyNeeds ?? 0)
                             } else {
@@ -559,9 +557,9 @@ class MealViewController: FormViewController {
             }
             
             var section = self.form.sectionBy(tag: "Nutrition")
-            nutrients = nutrients.sorted(by: { $0.title!.compare($1.title!, options: .caseInsensitive) == .orderedAscending })
+            nutrients = nutrients.sorted(by: { $0.name!.compare($1.name!, options: .caseInsensitive) == .orderedAscending })
             for nutrient in nutrients {
-                if let title = nutrient.title, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
+                if let title = nutrient.name, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
                     section!.insert(LabelRow() {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -697,30 +695,44 @@ extension MealViewController: UpdateInvitees {
 
 extension MealViewController: UpdateFoodProductContainerDelegate {
     func updateFoodProductContainer(foodProductContainer: FoodProductContainer?, close: Bool?) {
-        if let mvs = self.form.sectionBy(tag: "itemfields") as? MultivaluedSection {
-            if let foodProductContainer = foodProductContainer {
-                let row = mvs.allRows[productIndex]
-                if foodProductContainer.groceryProduct != nil {
-                    row.title = "\(foodProductContainer.groceryProduct!.amount ?? 0) \(foodProductContainer.groceryProduct!.title.capitalized)"
-                } else if foodProductContainer.menuProduct != nil {
-                    row.title = "\(foodProductContainer.menuProduct!.amount ?? 0) \(foodProductContainer.menuProduct!.title.capitalized)"
-                } else if foodProductContainer.complexIngredient != nil {
-                    row.title = "\(foodProductContainer.complexIngredient!.amount ?? 0.0) \(foodProductContainer.complexIngredient!.unit?.capitalized ?? "") of \(foodProductContainer.complexIngredient!.name?.capitalized ?? "")"
-                }
-                row.updateCell()
-                if let productContainer = meal.productContainer {
-                    if productContainer.indices.contains(productIndex) {
-                        self.meal.productContainer![productIndex] = foodProductContainer
-                    } else {
-                        self.meal.productContainer!.append(foodProductContainer)
-                    }
-                } else {
-                    self.meal.productContainer = [foodProductContainer]
-                }
-                calcNutrition()
-            } else {
-                mvs.remove(at: productIndex)
+        var mvs = self.form.sectionBy(tag: "itemfields") as! MultivaluedSection
+        if let foodProductContainer = foodProductContainer {
+            if mvs.allRows.count - 1 == productIndex {
+                mvs.insert(ButtonRow() { row in
+                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.textLabel?.textAlignment = .left
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }.onCellSelection({ cell, row in
+                    self.productIndex = row.indexPath!.row
+                    self.openProduct()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textAlignment = .left
+                }, at: productIndex)
             }
+            
+            let row = mvs.allRows[productIndex]
+            if foodProductContainer.groceryProduct != nil {
+                row.title = "\(foodProductContainer.groceryProduct!.amount ?? 0) \(foodProductContainer.groceryProduct!.title.capitalized)"
+            } else if foodProductContainer.menuProduct != nil {
+                row.title = "\(foodProductContainer.menuProduct!.amount ?? 0) \(foodProductContainer.menuProduct!.title.capitalized)"
+            } else if foodProductContainer.complexIngredient != nil {
+                row.title = "\(foodProductContainer.complexIngredient!.amount ?? 0.0) \(foodProductContainer.complexIngredient!.unit?.capitalized ?? "") of \(foodProductContainer.complexIngredient!.name?.capitalized ?? "")"
+            }
+            row.updateCell()
+            if let productContainer = meal.productContainer {
+                if productContainer.indices.contains(productIndex) {
+                    self.meal.productContainer![productIndex] = foodProductContainer
+                } else {
+                    self.meal.productContainer!.append(foodProductContainer)
+                }
+            } else {
+                self.meal.productContainer = [foodProductContainer]
+            }
+            calcNutrition()
+        } else if mvs.allRows.count - 1 > productIndex {
+            mvs.remove(at: productIndex)
         }
     }
 }
