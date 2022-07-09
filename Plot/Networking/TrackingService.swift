@@ -19,7 +19,7 @@ class TrackingService {
                 case .authorized:
                     // Tracking authorization dialog was shown
                     // and we are authorized
-                    print("Authorized")
+                    print("TrackingService Authorized")
                     Settings.setAdvertiserTrackingEnabled(true)
                     
                     // Now that we are authorized we can get the IDFA
@@ -27,17 +27,17 @@ class TrackingService {
                 case .denied:
                     // Tracking authorization dialog was
                     // shown and permission is denied
-                    print("Denied")
+                    print("TrackingService Denied")
                     Settings.setAdvertiserTrackingEnabled(false)
                 case .notDetermined:
                     // Tracking authorization dialog has not been shown
-                    print("Not Determined")
+                    print("TrackingService Not Determined")
                     Settings.setAdvertiserTrackingEnabled(false)
                 case .restricted:
-                    print("Restricted")
+                    print("TrackingService Restricted")
                     Settings.setAdvertiserTrackingEnabled(false)
                 @unknown default:
-                    print("Unknown")
+                    print("TrackingService Unknown")
                 }
             }
         }

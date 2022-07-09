@@ -200,7 +200,6 @@ extension ActivityDetailShowing {
                 }
             }
         } else {
-            print("transactions \(self.networkController.financeService.transactions.count)")
             self.hideActivityIndicator()
             let destination = CreateActivityViewController()
             destination.hidesBottomBarWhenPushed = true

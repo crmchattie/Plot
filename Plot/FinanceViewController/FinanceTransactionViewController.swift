@@ -249,10 +249,10 @@ class FinanceTransactionViewController: FormViewController {
                     $0.value = date
                 }
             }.onChange { row in
-                if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
+                if let value = row.value {
                     let date = self.isodateFormatter.string(from: value)
                     self.transaction.transacted_at = date
-                    let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("transacted_at")
+                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transacted_at")
                     reference.setValue(date)
                 }
             }
@@ -660,6 +660,7 @@ extension FinanceTransactionViewController: UpdateInvitees {
                 inviteesRow.title = "1 participant"
                 inviteesRow.updateCell()
             }
+            
             if active {
                 self.showActivityIndicator()
                 let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
@@ -671,6 +672,7 @@ extension FinanceTransactionViewController: UpdateInvitees {
             if transaction.admin == currentUser {
                 transaction.participantsIDs!.append(currentUser)
             }
+            
             for selectedUser in selectedFalconUsers {
                 guard let id = selectedUser.id else { continue }
                 transaction.participantsIDs!.append(id)
