@@ -233,12 +233,12 @@ class FinanceHoldingViewController: FormViewController {
                     row.options?.append($0.name)
                 }
             }.onPresent { from, to in
+                to.title = "Type"
                 to.tableViewStyle = .insetGrouped
                 to.dismissOnSelection = false
                 to.dismissOnChange = false
                 to.enableDeselection = false
                 to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Type"
                     to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
@@ -405,9 +405,9 @@ class FinanceHoldingViewController: FormViewController {
                     row.options?.append($0.name.capitalized)
                 }
             }.onPresent { from, to in
+                to.title = "Accounts"
                 to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Accounts"
                     to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
@@ -423,11 +423,9 @@ class FinanceHoldingViewController: FormViewController {
                     row.cell.accessoryType = .none
                 }
             }.onChange({ row in
-                if let currentUser = Auth.auth().currentUser?.uid {
-                    self.holding.account_name = row.value
-                    let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("account_name")
-                    reference.setValue(row.value)
-                }
+                self.holding.account_name = row.value
+                let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("account_name")
+                reference.setValue(row.value)
             })
         
             <<< LabelRow("Tags") { row in

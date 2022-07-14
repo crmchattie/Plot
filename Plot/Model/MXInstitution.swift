@@ -13,14 +13,16 @@ struct MXInstitutionResult: Codable {
 }
 
 struct MXInstitution: Codable, Equatable {
-    let code: String
-    let medium_logo_url: String
-    let name: String
-    let small_logo_url: String
-    let supports_account_identification: Bool
-    let supports_account_statement: Bool
-    let supports_account_verification: Bool
-    let supports_transaction_history: Bool
-    let url: String
+    var code: String
+    var instructional_text: String
+    var medium_logo_url: String
+    var name: String
+    var small_logo_url: String
+    var supports_account_identification: Bool
+    var supports_account_statement: Bool
+    var supports_account_verification: Bool
+    var supports_oauth: Bool
+    var supports_transaction_history: Bool
+    var url: String
     
 }

@@ -203,23 +203,23 @@ class FinanceAccountViewController: FormViewController {
                 }
             }
             
-            //            <<< TextAreaRow("Description") {
-            //                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            //                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            //                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-            //                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            //                $0.placeholder = $0.tag
-            //                $0.value = account.description
-            //                }.cellUpdate({ (cell, row) in
-            //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            //                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-            //                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            //                }).onChange { row in
-            //                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("description")
-            //                    reference.setValue(row.value)
-            //                    self.account.description = row.value
-            //                }
+//            <<< TextAreaRow("Description") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.placeholder = $0.tag
+//                $0.value = account.description
+//                }.cellUpdate({ (cell, row) in
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                }).onChange { row in
+//                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("description")
+//                    reference.setValue(row.value)
+//                    self.account.description = row.value
+//                }
             
             <<< PushRow<String>("Type") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -232,12 +232,12 @@ class FinanceAccountViewController: FormViewController {
                     row.options?.append($0.name)
                 }
             }.onPresent { from, to in
+                to.title = "Type"
                 to.tableViewStyle = .insetGrouped
                 to.dismissOnSelection = false
                 to.dismissOnChange = false
                 to.enableDeselection = false
                 to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Type"
                     to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
@@ -273,15 +273,14 @@ class FinanceAccountViewController: FormViewController {
                         row.options?.append($0.name)
                     }
                 }.onPresent { from, to in
+                    to.title = "Subtype"
                     to.tableViewStyle = .insetGrouped
                     to.dismissOnSelection = false
                     to.dismissOnChange = false
                     to.enableDeselection = false
                     to.selectableRowCellUpdate = { cell, row in
-                        to.title = "Subtype"
                         to.tableView.separatorStyle = .none
                         to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                        to.tableViewStyle = .insetGrouped
                         to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

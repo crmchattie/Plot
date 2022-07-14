@@ -17,7 +17,7 @@ struct MXMerchantLocationResult: Codable {
 struct MXMerchantLocation: Codable, Equatable {
     let city: String?
     let country: String?
-    let guid: String?
+    let guid: String
     let latitude: Double?
     let longitude: Double?
     let merchant_guid: String?

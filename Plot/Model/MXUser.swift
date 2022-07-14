@@ -15,11 +15,14 @@ struct MXUserResult: Codable {
 }
 
 struct MXUser: Codable, Equatable {
-    let guid: String
+    var guid: String
+    //atrium API
     var identifier: String?
+    //platform API
+    var id: String?
     var is_disabled: Bool?
-    let metadata: String?
-    let connect_widget_url: String?
+    var metadata: String?
+    var connect_widget_url: String?
     
 }
 

@@ -284,6 +284,7 @@ class WorkoutViewController: FormViewController {
             }.onPresent { from, to in
                 to.title = "Type"
                 to.tableViewStyle = .insetGrouped
+                to.enableDeselection = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

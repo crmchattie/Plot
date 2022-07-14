@@ -400,9 +400,9 @@ class FinanceTransactionViewController: FormViewController {
                     row.options?.append($0.name.capitalized)
                 }
             }.onPresent { from, to in
+                to.title = "Accounts"
                 to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
-                    to.title = "Accounts"
                     to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
                     to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                     to.tableView.separatorStyle = .none
@@ -418,11 +418,9 @@ class FinanceTransactionViewController: FormViewController {
                     row.cell.accessoryType = .none
                 }
             }.onChange({ row in
-                if let currentUser = Auth.auth().currentUser?.uid {
-                    self.transaction.account_name = row.value
-                    let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("account_name")
-                    reference.setValue(row.value)
-                }
+                self.transaction.account_name = row.value
+                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("account_name")
+                reference.setValue(row.value)
             })
             
             <<< LabelRow("Group") { row in

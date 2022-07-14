@@ -108,11 +108,7 @@ class ChooseActivityTableViewController: UITableViewController {
         return ThemeManager.currentTheme().statusBarStyle
     }
     
-    fileprivate func configureTableView() {
-//        navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
-//        navigationController?.navigationBar.shadowImage = UIImage()
-//        navigationController?.navigationBar.layoutIfNeeded()
-        
+    fileprivate func configureTableView() {        
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 105

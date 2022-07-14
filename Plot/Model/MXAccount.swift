@@ -32,26 +32,42 @@ struct MXAccount: Codable, Equatable, Hashable {
     var death_benefit: Double?
     var guid: String
     var holdings_value: Double?
+    //atrium API
+    var identifier: String?
+    //platform API
+    var id: String?
+    var imported_at: String?
     var institution_code: String?
+    var insured_name: String?
     var interest_rate: Double?
     var is_closed: Bool?
+    var is_hidden: Bool?
     var last_payment: Double?
     var last_payment_at: String?
+    var loan_amount: Double?
     var loan_balance: Double?
     var matures_on: String?
     var member_guid: String?
+    var member_id: String?
+    var member_is_managed_by_user: Bool?
+    var meta: String?
     var minimum_balance: Double?
     var minimum_payment: Double?
     var name: String
+    var nickname: String?
     var original_balance: Double?
+    var pay_out_amount: Double?
     var payment_due_at: String?
     var payoff_balance: Double?
+    var premium_amount: Double?
+    var routing_number: String?
     var started_on: String?
     var subtype: MXAccountSubType?
     var total_account_value: Double?
     var type: MXAccountType
     var updated_at: String
     var user_guid: String
+    var user_id: String?
     var should_link: Bool?
     var tags: [String]?
     var participantsIDs: [String]?

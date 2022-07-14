@@ -28,6 +28,10 @@ struct MXHolding: Codable, Equatable, Hashable {
     var description: String
     var guid: String
     var holding_type: MXHoldingType?
+    var holding_type_id: String?
+    //atrium API
+    var identifier: String?
+    //platform API
     var id: String?
     var market_value: Double?
     var member_guid: String?
@@ -45,6 +49,7 @@ struct MXHolding: Codable, Equatable, Hashable {
     var pinned: Bool?
     var muted: Bool?
     var user_created: Bool?
+    var holdingDescription: String?
     
     init(description: String, market_value: Double, created_at: String, guid: String, user_guid: String, holding_type: MXHoldingType, user_created: Bool?, admin: String) {
         self.description = description

@@ -39,6 +39,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var account_name: String?
     var amount: Double
     var category: String
+    var category_guid: String?
     var check_number: Int?
     var check_number_string: String?
     var created_at: String
@@ -46,6 +47,10 @@ struct Transaction: Codable, Equatable, Hashable {
     var date: String
     var description: String
     var guid: String
+    //atrium API
+    var identifier: String?
+    //platform API
+    var id: String?
     var is_bill_pay: Bool?
     var is_direct_deposit: Bool?
     var is_expense: Bool?
@@ -54,13 +59,16 @@ struct Transaction: Codable, Equatable, Hashable {
     var is_international: Bool?
     var is_overdraft_fee: Bool?
     var is_payroll_advance: Bool?
+    var is_recurring: Bool?
     var is_subscription: Bool?
     var latitude: Double?
     var longitude: Double?
     var member_guid: String?
-    var memo: String?
+    var member_is_managed_by_user: Bool?
+    var memo: Bool?
     var merchant_category_code: Int?
     var merchant_guid: String?
+    var merchant_location_guid: String?
     var original_description: String?
     var posted_at: String?
     var status: TransactionStatus
@@ -69,6 +77,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var type: String?
     var updated_at: String
     var user_guid: String
+    var user_id: String?
     var participantsIDs: [String]?
     var date_for_reports: String?
     var user_created: Bool?

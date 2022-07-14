@@ -10,24 +10,30 @@ let userFinancialMembersEntity = "user-financial-members"
 let financialMembersEntity = "financial-members"
 
 struct MXMemberResult: Codable {
-    let member: MXMember?
-    let members: [MXMember]?
-    let pagination: MXPagination?
+    var member: MXMember?
+    var members: [MXMember]?
+    var pagination: MXPagination?
 }
 
 struct MXMember: Codable, Equatable, Hashable {
-    let aggregated_at: String
-    let connection_status: ConnectionStatus
-    let guid: String
-    let identifier: String?
-    let institution_code: String
-    let is_being_aggregated: Bool
-    let metadata: String?
-    let name: String
-    let status: String?
-    let successfully_aggregated_at: String?
-    let user_guid: String
-    let oauth_window_uri: String?
+    var aggregated_at: String
+    var connection_status: ConnectionStatus
+    var guid: String
+    //atrium API
+    var identifier: String?
+    //platform API
+    var id: String?
+    var institution_code: String
+    var is_being_aggregated: Bool
+    var is_managed_by_user: Bool?
+    var is_oauth: Bool?
+    var metadata: String?
+    var name: String
+    var status: String?
+    var successfully_aggregated_at: String?
+    var user_guid: String
+    var user_id: String?
+    var oauth_window_uri: String?
     var participantsIDs: [String]?
 }
 
