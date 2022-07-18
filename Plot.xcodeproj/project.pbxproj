@@ -32,7 +32,6 @@
 		10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196EF924411B5600B6AFDF /* ChooseChatTableViewController.swift */; };
 		10196F0B24411B5600B6AFDF /* MediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196EFB24411B5600B6AFDF /* MediaViewController.swift */; };
 		10196F0D24411C2800B6AFDF /* ChooseActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */; };
-		101999D72883221A009F556C /* RepeatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101999D62883221A009F556C /* RepeatViewController.swift */; };
 		101999D92885BFD0009F556C /* CustomRepeatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101999D82885BFD0009F556C /* CustomRepeatViewController.swift */; };
 		101B90902457999600EDDB90 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B908F2457999600EDDB90 /* Weather.swift */; };
 		101B90932458809000EDDB90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101B90922458809000EDDB90 /* Assets.xcassets */; };
@@ -78,6 +77,28 @@
 		105CB18C25129F130000D3D8 /* FinanceTransactionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */; };
 		105CB18E2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105CB18D2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift */; };
 		105E12532447955500A278D0 /* ActivityDetailCellDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */; };
+		105F34A52885EF79007531EB /* RecurrenceRule+Definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F348A2885EF76007531EB /* RecurrenceRule+Definition.swift */; };
+		105F34A62885EF7A007531EB /* PickerViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 105F348B2885EF76007531EB /* PickerViewCell.xib */; };
+		105F34A72885EF7A007531EB /* RecurrenceRule+Generator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F348C2885EF76007531EB /* RecurrenceRule+Generator.swift */; };
+		105F34A82885EF7A007531EB /* RecurrencePicker.strings in Resources */ = {isa = PBXBuildFile; fileRef = 105F348F2885EF76007531EB /* RecurrencePicker.strings */; };
+		105F34A92885EF7A007531EB /* RecurrencePicker.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 105F34952885EF76007531EB /* RecurrencePicker.xcassets */; };
+		105F34AA2885EF7A007531EB /* PickerViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34962885EF76007531EB /* PickerViewCell.swift */; };
+		105F34AB2885EF7A007531EB /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34972885EF77007531EB /* String+Extension.swift */; };
+		105F34AC2885EF7A007531EB /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34982885EF77007531EB /* Constants.swift */; };
+		105F34AD2885EF7A007531EB /* MonthOrDaySelectorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34992885EF77007531EB /* MonthOrDaySelectorCell.swift */; };
+		105F34AE2885EF7A007531EB /* SelectorItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F349A2885EF77007531EB /* SelectorItemCell.swift */; };
+		105F34AF2885EF7A007531EB /* SelectorItemCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 105F349B2885EF77007531EB /* SelectorItemCell.xib */; };
+		105F34B02885EF7A007531EB /* GridSelectorLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F349C2885EF78007531EB /* GridSelectorLayout.swift */; };
+		105F34B12885EF7A007531EB /* RecurrencePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F349D2885EF78007531EB /* RecurrencePicker.swift */; };
+		105F34B22885EF7A007531EB /* InternationalControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F349E2885EF78007531EB /* InternationalControl.swift */; };
+		105F34B32885EF7A007531EB /* RecurrenceRule+Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F349F2885EF78007531EB /* RecurrenceRule+Text.swift */; };
+		105F34B42885EF7A007531EB /* RecurrencePickerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A02885EF79007531EB /* RecurrencePickerDelegate.swift */; };
+		105F34B52885EF7A007531EB /* RecurrenceFrequency+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A12885EF79007531EB /* RecurrenceFrequency+Sequence.swift */; };
+		105F34B62885EF7A007531EB /* MonthOrDaySelectorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 105F34A22885EF79007531EB /* MonthOrDaySelectorCell.xib */; };
+		105F34B72885EF7A007531EB /* CustomRecurrenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A32885EF79007531EB /* CustomRecurrenceViewController.swift */; };
+		105F34B82885EF7A007531EB /* EKWeekday+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A42885EF79007531EB /* EKWeekday+Sequence.swift */; };
+		105F34B92885F29A007531EB /* RRuleSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 105F34522885D649007531EB /* RRuleSwift.xcframework */; };
+		105F34BA2885F29A007531EB /* RRuleSwift.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 105F34522885D649007531EB /* RRuleSwift.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66E824149DC600F6EDB6 /* EventDetailCell.swift */; };
 		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
 		105F66F32415A83300F6EDB6 /* EventTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F22415A83300F6EDB6 /* EventTypeViewController.swift */; };
@@ -524,6 +545,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		105F34BB2885F29A007531EB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				105F34BA2885F29A007531EB /* RRuleSwift.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4B9AF38E1F3B9B6E00A3934D /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -563,7 +595,6 @@
 		10196EF924411B5600B6AFDF /* ChooseChatTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseChatTableViewController.swift; sourceTree = "<group>"; };
 		10196EFB24411B5600B6AFDF /* MediaViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaViewController.swift; sourceTree = "<group>"; };
 		10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseActivityTableViewController.swift; sourceTree = "<group>"; };
-		101999D62883221A009F556C /* RepeatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatViewController.swift; sourceTree = "<group>"; };
 		101999D82885BFD0009F556C /* CustomRepeatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRepeatViewController.swift; sourceTree = "<group>"; };
 		101B908F2457999600EDDB90 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		101B90922458809000EDDB90 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -613,6 +644,32 @@
 		105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionViewController.swift; sourceTree = "<group>"; };
 		105CB18D2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceLineChartDetailViewController.swift; sourceTree = "<group>"; };
 		105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCellDelegates.swift; sourceTree = "<group>"; };
+		105F34512885D649007531EB /* RecurrencePicker.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RecurrencePicker.xcframework; path = Carthage/Build/RecurrencePicker.xcframework; sourceTree = "<group>"; };
+		105F34522885D649007531EB /* RRuleSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RRuleSwift.xcframework; path = Carthage/Build/RRuleSwift.xcframework; sourceTree = "<group>"; };
+		105F348A2885EF76007531EB /* RecurrenceRule+Definition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RecurrenceRule+Definition.swift"; sourceTree = "<group>"; };
+		105F348B2885EF76007531EB /* PickerViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PickerViewCell.xib; sourceTree = "<group>"; };
+		105F348C2885EF76007531EB /* RecurrenceRule+Generator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RecurrenceRule+Generator.swift"; sourceTree = "<group>"; };
+		105F34902885EF76007531EB /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/RecurrencePicker.strings"; sourceTree = "<group>"; };
+		105F34912885EF76007531EB /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/RecurrencePicker.strings; sourceTree = "<group>"; };
+		105F34922885EF76007531EB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/RecurrencePicker.strings; sourceTree = "<group>"; };
+		105F34932885EF76007531EB /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/RecurrencePicker.strings; sourceTree = "<group>"; };
+		105F34942885EF76007531EB /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/RecurrencePicker.strings"; sourceTree = "<group>"; };
+		105F34952885EF76007531EB /* RecurrencePicker.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = RecurrencePicker.xcassets; sourceTree = "<group>"; };
+		105F34962885EF76007531EB /* PickerViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerViewCell.swift; sourceTree = "<group>"; };
+		105F34972885EF77007531EB /* String+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		105F34982885EF77007531EB /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		105F34992885EF77007531EB /* MonthOrDaySelectorCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonthOrDaySelectorCell.swift; sourceTree = "<group>"; };
+		105F349A2885EF77007531EB /* SelectorItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectorItemCell.swift; sourceTree = "<group>"; };
+		105F349B2885EF77007531EB /* SelectorItemCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SelectorItemCell.xib; sourceTree = "<group>"; };
+		105F349C2885EF78007531EB /* GridSelectorLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GridSelectorLayout.swift; sourceTree = "<group>"; };
+		105F349D2885EF78007531EB /* RecurrencePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecurrencePicker.swift; sourceTree = "<group>"; };
+		105F349E2885EF78007531EB /* InternationalControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InternationalControl.swift; sourceTree = "<group>"; };
+		105F349F2885EF78007531EB /* RecurrenceRule+Text.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RecurrenceRule+Text.swift"; sourceTree = "<group>"; };
+		105F34A02885EF79007531EB /* RecurrencePickerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecurrencePickerDelegate.swift; sourceTree = "<group>"; };
+		105F34A12885EF79007531EB /* RecurrenceFrequency+Sequence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RecurrenceFrequency+Sequence.swift"; sourceTree = "<group>"; };
+		105F34A22885EF79007531EB /* MonthOrDaySelectorCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MonthOrDaySelectorCell.xib; sourceTree = "<group>"; };
+		105F34A32885EF79007531EB /* CustomRecurrenceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRecurrenceViewController.swift; sourceTree = "<group>"; };
+		105F34A42885EF79007531EB /* EKWeekday+Sequence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKWeekday+Sequence.swift"; sourceTree = "<group>"; };
 		105F66E824149DC600F6EDB6 /* EventDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailCell.swift; sourceTree = "<group>"; };
 		105F66EA2415942B00F6EDB6 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
 		105F66F22415A83300F6EDB6 /* EventTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTypeViewController.swift; sourceTree = "<group>"; };
@@ -1066,6 +1123,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				105F34B92885F29A007531EB /* RRuleSwift.xcframework in Frameworks */,
 				2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */,
 				10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */,
 				A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */,
@@ -1193,6 +1251,50 @@
 				1082C89924F16E2A00CF6491 /* Cells */,
 			);
 			path = ListViewController;
+			sourceTree = "<group>";
+		};
+		105F345A2885EB2F007531EB /* RepeatControllers */ = {
+			isa = PBXGroup;
+			children = (
+				101999D82885BFD0009F556C /* CustomRepeatViewController.swift */,
+				105F349D2885EF78007531EB /* RecurrencePicker.swift */,
+				105F34A02885EF79007531EB /* RecurrencePickerDelegate.swift */,
+				105F34A32885EF79007531EB /* CustomRecurrenceViewController.swift */,
+				105F34982885EF77007531EB /* Constants.swift */,
+				105F34A42885EF79007531EB /* EKWeekday+Sequence.swift */,
+				105F349C2885EF78007531EB /* GridSelectorLayout.swift */,
+				105F349E2885EF78007531EB /* InternationalControl.swift */,
+				105F34992885EF77007531EB /* MonthOrDaySelectorCell.swift */,
+				105F34A22885EF79007531EB /* MonthOrDaySelectorCell.xib */,
+				105F34962885EF76007531EB /* PickerViewCell.swift */,
+				105F348B2885EF76007531EB /* PickerViewCell.xib */,
+				105F34A12885EF79007531EB /* RecurrenceFrequency+Sequence.swift */,
+				105F348A2885EF76007531EB /* RecurrenceRule+Definition.swift */,
+				105F348C2885EF76007531EB /* RecurrenceRule+Generator.swift */,
+				105F349F2885EF78007531EB /* RecurrenceRule+Text.swift */,
+				105F349A2885EF77007531EB /* SelectorItemCell.swift */,
+				105F349B2885EF77007531EB /* SelectorItemCell.xib */,
+				105F34972885EF77007531EB /* String+Extension.swift */,
+				105F348D2885EF76007531EB /* Resources */,
+			);
+			path = RepeatControllers;
+			sourceTree = "<group>";
+		};
+		105F348D2885EF76007531EB /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				105F348E2885EF76007531EB /* LocalizedStrings */,
+				105F34952885EF76007531EB /* RecurrencePicker.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		105F348E2885EF76007531EB /* LocalizedStrings */ = {
+			isa = PBXGroup;
+			children = (
+				105F348F2885EF76007531EB /* RecurrencePicker.strings */,
+			);
+			path = LocalizedStrings;
 			sourceTree = "<group>";
 		};
 		1067753425E1AB04002F78E7 /* ChangeEmail */ = {
@@ -1427,8 +1529,6 @@
 				10A18D392458E1A5006990F2 /* PurchasesViewController.swift */,
 				10196EF224411B5500B6AFDF /* MapActivityViewController.swift */,
 				10196EFB24411B5600B6AFDF /* MediaViewController.swift */,
-				101999D62883221A009F556C /* RepeatViewController.swift */,
-				101999D82885BFD0009F556C /* CustomRepeatViewController.swift */,
 				10DFAFCD28777C1B00D38016 /* ActivityListViewController.swift */,
 				102618C825771FE300CF6F0A /* ActivityCategoryViewController.swift */,
 				102618CC257721D100CF6F0A /* NewActivityCategoryViewController.swift */,
@@ -1686,6 +1786,8 @@
 		2AF4427B37282913090A248D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				105F34512885D649007531EB /* RecurrencePicker.xcframework */,
+				105F34522885D649007531EB /* RRuleSwift.xcframework */,
 				2623AA8C24FA2A250020A316 /* HealthKit.framework */,
 				E53D0336E7A51EFB22060D82 /* libPods-Plot.a */,
 				286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */,
@@ -1728,6 +1830,7 @@
 				10E93D5B24BE47A600F6EE18 /* MapViewController */,
 				1051AC99244F8C470066761C /* ListViewController */,
 				10C50F932273818D00111033 /* ActivityControllers */,
+				105F345A2885EB2F007531EB /* RepeatControllers */,
 				1024ABA523C1255900A5875D /* ActivityTypeControllers */,
 				4BAEE4A421272D880045AB10 /* ChatsControllers */,
 				4BAEE4AB21272D880045AB10 /* ChatLogControllers */,
@@ -2658,6 +2761,7 @@
 				4B4F45291F32230C00A6FF96 /* Resources */,
 				4B9AF38E1F3B9B6E00A3934D /* Embed App Extensions */,
 				F12AFB3F9F7ACA543353B20B /* [CP] Copy Pods Resources */,
+				105F34BB2885F29A007531EB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2724,6 +2828,10 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
+				ja,
+				ko,
+				"zh-Hant",
 			);
 			mainGroup = 4B4F45221F32230C00A6FF96;
 			packageReferences = (
@@ -2756,13 +2864,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				26CDFB22239E278200567666 /* NewUserActivities.json in Resources */,
+				105F34AF2885EF7A007531EB /* SelectorItemCell.xib in Resources */,
+				105F34A92885EF7A007531EB /* RecurrencePicker.xcassets in Resources */,
 				4BAEE5C0212735E50045AB10 /* sent.caf in Resources */,
 				4BAEE52521272D890045AB10 /* typingindicatorDark.gif in Resources */,
+				105F34A82885EF7A007531EB /* RecurrencePicker.strings in Resources */,
+				105F34A62885EF7A007531EB /* PickerViewCell.xib in Resources */,
 				4BAEE51721272D890045AB10 /* TimestampView.xib in Resources */,
 				4BAEE5EB212735E50045AB10 /* CallingCodes.plist in Resources */,
 				4B4F45381F32230C00A6FF96 /* Assets.xcassets in Resources */,
 				4BAEE5B9212735E50045AB10 /* INSPhotoGallery.bundle in Resources */,
 				4BCB128C224ADD450046DFF3 /* GoogleService-Info.plist in Resources */,
+				105F34B62885EF7A007531EB /* MonthOrDaySelectorCell.xib in Resources */,
 				26B975E52363F992003BFBE3 /* Invitations.storyboard in Resources */,
 				26B915212383B9B0007536E0 /* LaunchScreen.storyboard in Resources */,
 				4BAEE52421272D890045AB10 /* typingIndicator.gif in Resources */,
@@ -2859,6 +2972,7 @@
 				4BAEE49521272C5E0045AB10 /* ContactsTableViewCell.swift in Sources */,
 				4BAEE5DD212735E50045AB10 /* ImagePickerAction.swift in Sources */,
 				10B541D4254780B800CC9023 /* Meal.swift in Sources */,
+				105F34B42885EF7A007531EB /* RecurrencePickerDelegate.swift in Sources */,
 				10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */,
 				10C8334824A3A43F0037F638 /* SygicCollectionsSearchResult.swift in Sources */,
 				105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */,
@@ -2947,6 +3061,7 @@
 				10F5CFFE25CB7E5A0078C821 /* GCalendarActivityOp.swift in Sources */,
 				26336E172593FA1A001A3071 /* HealthKitSampleBuilder.swift in Sources */,
 				4BAEE49721272C5E0045AB10 /* FalconUsersFetcher.swift in Sources */,
+				105F34A72885EF7A007531EB /* RecurrenceRule+Generator.swift in Sources */,
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
 				4BA1E7832152582F00391BCB /* ChatLogController+DataSource.swift in Sources */,
 				103F492C286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift in Sources */,
@@ -3013,6 +3128,7 @@
 				102076CC23C2D3B5009AEAA4 /* Service.swift in Sources */,
 				108087232585058100FB9BB0 /* MoodFetcher.swift in Sources */,
 				4BAEE4F521272D890045AB10 /* GroupProfileTableViewController.swift in Sources */,
+				105F34B32885EF7A007531EB /* RecurrenceRule+Text.swift in Sources */,
 				4BAEE5E6212735E50045AB10 /* EnterVerificationContainerView.swift in Sources */,
 				10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */,
 				4BAEE52021272D890045AB10 /* GroupAdminControlsPictureAvatarOpenerDelegate.swift in Sources */,
@@ -3025,8 +3141,10 @@
 				10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */,
 				109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */,
 				4BAEE5BB212735E50045AB10 /* INSPhotosOverlayView.swift in Sources */,
+				105F34AC2885EF7A007531EB /* Constants.swift in Sources */,
 				26036778256DC76900FE9142 /* EKSyncCalendarEventsOp.swift in Sources */,
 				F983298C2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift in Sources */,
+				105F34B82885EF7A007531EB /* EKWeekday+Sequence.swift in Sources */,
 				10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */,
 				4BAEE50C21272D890045AB10 /* UserInfoTableViewController+handlers.swift in Sources */,
 				4BAEE50921272D890045AB10 /* SelectedMediaCollectionCell+timerHandlers.swift in Sources */,
@@ -3044,6 +3162,7 @@
 				10C50FA42274EF9100111033 /* Activity.swift in Sources */,
 				106618AF24BA37D6003C3F36 /* PlaceDetailViewController.swift in Sources */,
 				4BAEE48621272C4F0045AB10 /* OnboardingController.swift in Sources */,
+				105F34B02885EF7A007531EB /* GridSelectorLayout.swift in Sources */,
 				260C87D02500BFDF00715A64 /* AnnualAverageStepsOperation.swift in Sources */,
 				10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
@@ -3068,7 +3187,6 @@
 				4BAEE4EB21272D890045AB10 /* OutgoingTextMessageCell.swift in Sources */,
 				26036766256CC88900FE9142 /* EventKitService.swift in Sources */,
 				2603676C256CD9A000FE9142 /* EventKitManager.swift in Sources */,
-				101999D72883221A009F556C /* RepeatViewController.swift in Sources */,
 				4B6521F8219B3A0A00FF655E /* ChatLogController+GroupMembersDelegate.swift in Sources */,
 				10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */,
 				10C83346249AD8EA0037F638 /* FoursquareVenueSearchResult.swift in Sources */,
@@ -3080,6 +3198,7 @@
 				10FBC8B924BFECD500D0E6B5 /* ActivitylistViewController.swift in Sources */,
 				10CD68792486AEE400DC02E0 /* PLNotification.swift in Sources */,
 				10E93D4E24BE41B500F6EE18 /* MapViewController.swift in Sources */,
+				105F34B52885EF7A007531EB /* RecurrenceFrequency+Sequence.swift in Sources */,
 				10BA3D64257D6F7D00A81227 /* SchedulerViewController.swift in Sources */,
 				269105FA2549D66800A02C5F /* HealthDetailViewModel.swift in Sources */,
 				108841D2257004F10064C5F8 /* SummaryViewController.swift in Sources */,
@@ -3131,6 +3250,7 @@
 				10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */,
 				26B975ED2365374A003BFBE3 /* InvitationsFetcher.swift in Sources */,
 				4BAEE47121272B380045AB10 /* AccountSettingsAvatarOpenerDelegate.swift in Sources */,
+				105F34AD2885EF7A007531EB /* MonthOrDaySelectorCell.swift in Sources */,
 				10B6B31625410D37008037AD /* FinanceTagsViewController.swift in Sources */,
 				265D4313259D203C00755EC2 /* ActivityBuilder.swift in Sources */,
 				10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */,
@@ -3234,6 +3354,7 @@
 				4BAEE4FC21272D890045AB10 /* ChatLogController+ImageZoomHandlers.swift in Sources */,
 				26836B4F251338BD00AFC2D7 /* AnnualAverageHeartRateOperation.swift in Sources */,
 				105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */,
+				105F34B22885EF7A007531EB /* InternationalControl.swift in Sources */,
 				10F3032E24EC6FE500C04B8F /* MXMember.swift in Sources */,
 				269105EE253E8DD700A02C5F /* RadarMarkerView.swift in Sources */,
 				4BAEE51221272D890045AB10 /* UserInfoPhoneNumberTableViewCell.swift in Sources */,
@@ -3244,6 +3365,7 @@
 				10F3033224EC700C00C04B8F /* Transaction.swift in Sources */,
 				10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */,
 				F9DD16C52613D57A00B8374D /* MonthAxisValueFormatter.swift in Sources */,
+				105F34B12885EF7A007531EB /* RecurrencePicker.swift in Sources */,
 				106F22E72426FBF300AD3158 /* WorkoutTypeViewController.swift in Sources */,
 				4BAEE4ED21272D890045AB10 /* LeaveGroupAndChangeAdminController.swift in Sources */,
 				2603677E256DC86300FE9142 /* EKCalendarActivityOp.swift in Sources */,
@@ -3271,6 +3393,7 @@
 				1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */,
 				10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */,
 				4BAEE47F21272C4F0045AB10 /* UserProfileContainerView.swift in Sources */,
+				105F34AE2885EF7A007531EB /* SelectorItemCell.swift in Sources */,
 				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,
 				F9773A5A2601339A00D1B204 /* ActivityAnalyticsDataSource.swift in Sources */,
 				4BAEE5DC212735E50045AB10 /* AnimationController.swift in Sources */,
@@ -3278,6 +3401,7 @@
 				106774C825D96757002F78E7 /* FinancialHoldingFetcher.swift in Sources */,
 				106774FC25DAFA8D002F78E7 /* FinancialHoldingActions.swift in Sources */,
 				1080871B2583E73D00FB9BB0 /* SummaryLineChartCell.swift in Sources */,
+				105F34AA2885EF7A007531EB /* PickerViewCell.swift in Sources */,
 				4BAEE5DB212735E50045AB10 /* ImageCell.swift in Sources */,
 				10F3032524EB746E00C04B8F /* AccountsTableViewController.swift in Sources */,
 				F9C05FAE25F7D720009E892A /* RuleConstants.swift in Sources */,
@@ -3295,6 +3419,7 @@
 				10DFC3E7255CC3DA00565DAD /* WorkoutActions.swift in Sources */,
 				10DFAFCE28777C1B00D38016 /* ActivityListViewController.swift in Sources */,
 				10E0D7A32594D0AA00B0F83C /* NetworkController.swift in Sources */,
+				105F34B72885EF7A007531EB /* CustomRecurrenceViewController.swift in Sources */,
 				10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */,
 				10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */,
 				10F3032724EC622000C04B8F /* FinancialAccountsViewController.swift in Sources */,
@@ -3308,6 +3433,7 @@
 				1026185025756B2400CF6F0A /* SummaryHKChartCell.swift in Sources */,
 				F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */,
 				108BDE6924B5104900BE2CBA /* FoodTypeViewController.swift in Sources */,
+				105F34AB2885EF7A007531EB /* String+Extension.swift in Sources */,
 				1080871F2585057400FB9BB0 /* MoodActions.swift in Sources */,
 				4BAEE46C21272B380045AB10 /* SwitchTableViewCell.swift in Sources */,
 				2670E33A252D2023007A6194 /* UserHealth.swift in Sources */,
@@ -3324,6 +3450,7 @@
 				4BAEE5BD212735E50045AB10 /* INSPhoto.swift in Sources */,
 				4BAEE49921272C5E0045AB10 /* ContactsController+SearchHandlers.swift in Sources */,
 				F9C05FA825F7D608009E892A /* NotificationConstants.swift in Sources */,
+				105F34A52885EF79007531EB /* RecurrenceRule+Definition.swift in Sources */,
 				F9773A862601453500D1B204 /* HourAxisValueFormatter.swift in Sources */,
 				103CB7E025363DF9005752B2 /* FinanceTransactionLevelViewController.swift in Sources */,
 				4BAEE5CF212735E50045AB10 /* CollectionViewLeftAlignFlowLayout.swift in Sources */,
@@ -3352,6 +3479,18 @@
 				1031410E230D712E00DB471B /* Base */,
 			);
 			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
+		105F348F2885EF76007531EB /* RecurrencePicker.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				105F34902885EF76007531EB /* zh-Hans */,
+				105F34912885EF76007531EB /* ja */,
+				105F34922885EF76007531EB /* en */,
+				105F34932885EF76007531EB /* ko */,
+				105F34942885EF76007531EB /* zh-Hant */,
+			);
+			name = RecurrencePicker.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

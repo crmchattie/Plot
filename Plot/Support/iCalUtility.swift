@@ -7,7 +7,7 @@
 //
 
 import Foundation
-//import RRuleSwift
+import RRuleSwift
 
 /*
  Supported rules according to the RFC5545 standard:
@@ -17,18 +17,18 @@ import Foundation
 struct iCalUtility {
     
     func recurringDates(forRules rules: [String], startDate: Date) -> [Date] {
-        let recurringDates: [Date] = []
+        var recurringDates: [Date] = []
 
         for rule in rules {
             if rule.starts(with: "RRULE") {
-//                guard var rule = RecurrenceRule(rruleString: rule) else { continue }
-//                rule.startDate = startDate
-//                recurringDates += rule.allOccurrences()
+                guard var rule = RecurrenceRule(rruleString: rule) else { continue }
+                rule.startDate = startDate
+                recurringDates += rule.allOccurrences()
             } else if rule.starts(with: "EXRULE") {
 
             } else if rule.starts(with: "RDATE") {
-//                guard let rule = InclusionDate(rdateString: rule) else { continue }
-//                recurringDates += rule.dates
+                guard let rule = InclusionDate(rdateString: rule) else { continue }
+                recurringDates += rule.dates
             } else if rule.starts(with: "EXDATE") {
                 
             } else {

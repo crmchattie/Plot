@@ -324,11 +324,12 @@ class ScheduleViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
             
-            <<< LabelRow("startTimeZone") { row in
+            <<< ButtonRow("startTimeZone") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {
@@ -343,6 +344,7 @@ class ScheduleViewController: FormViewController {
                     cell.accessoryType = .disclosureIndicator
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textAlignment = .left
                 }
             
             <<< DateTimeInlineRow("Ends") {
@@ -419,11 +421,12 @@ class ScheduleViewController: FormViewController {
                     
                 }
             
-            <<< LabelRow("endTimeZone") { row in
+            <<< ButtonRow("endTimeZone") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {
@@ -438,6 +441,7 @@ class ScheduleViewController: FormViewController {
                     cell.accessoryType = .disclosureIndicator
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textAlignment = .left
                 }
         
             <<< AlertRow<EventAlert>("Reminder") {

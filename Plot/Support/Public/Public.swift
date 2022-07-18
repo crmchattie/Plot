@@ -832,7 +832,7 @@ public func rearrange<T>(array: Array<T>, fromIndex: Int, toIndex: Int) -> Array
 extension UISearchBar {
     func changeBackgroundColor(to color: UIColor) {
         if let textfield = self.value(forKey: "searchField") as? UITextField {
-            textfield.textColor = UIColor.blue
+            textfield.textColor = FalconPalette.defaultBlue
             if let backgroundview = textfield.subviews.first {
                 backgroundview.backgroundColor = color
                 backgroundview.layer.cornerRadius = 10

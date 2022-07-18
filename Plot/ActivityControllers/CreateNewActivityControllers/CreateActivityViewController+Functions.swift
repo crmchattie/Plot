@@ -15,6 +15,7 @@ import ViewRow
 import EventKit
 import UserNotifications
 import CodableFirebase
+import RRuleSwift
 
 extension CreateActivityViewController {
     
@@ -638,9 +639,34 @@ extension CreateActivityViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        let destination = RepeatViewController()
-        destination.delegate = self
-        self.navigationController?.pushViewController(destination, animated: true)
+//        let destination = RepeatViewController()
+//        destination.delegate = self
+//        self.navigationController?.pushViewController(destination, animated: true)
+        
+        // prepare a recurrence rule and an occurrence date
+        // occurrence date is the date which the repeat event occurs this time
+        let recurrences = activity.recurrences
+        let occurrenceDate = activity.startDate ?? Date()
+
+        // initialization and configuration
+        // RecurrencePicker can be initialized with a recurrence rule or nil, nil means "never repeat"
+        var recurrencePicker = RecurrencePicker(recurrenceRule: nil)
+        if let recurrences = recurrences {
+            let recurrenceRule = RecurrenceRule(rruleString: recurrences[0])
+            recurrencePicker = RecurrencePicker(recurrenceRule: recurrenceRule)
+        }
+        recurrencePicker.language = .english
+        recurrencePicker.calendar = Calendar.current
+        recurrencePicker.tableView = UITableView(frame: .zero, style: .insetGrouped)
+        recurrencePicker.tableView.separatorStyle = .none
+        recurrencePicker.tintColor = FalconPalette.defaultBlue
+        recurrencePicker.occurrenceDate = occurrenceDate
+
+        // assign delegate
+        recurrencePicker.delegate = self
+
+        // push to the picker scene
+        navigationController?.pushViewController(recurrencePicker, animated: true)
     }
     
     func openMedia() {

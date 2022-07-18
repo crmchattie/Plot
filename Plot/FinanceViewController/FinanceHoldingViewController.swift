@@ -423,11 +423,12 @@ class FinanceHoldingViewController: FormViewController {
 //                reference.setValue(row.value)
             })
         
-            <<< LabelRow("Tags") { row in
+            <<< ButtonRow("Tags") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
                 row.title = row.tag
             }.onCellSelection({ _, row in
                 self.openTags()
@@ -436,6 +437,7 @@ class FinanceHoldingViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textAlignment = .left
             }
         
             

@@ -423,11 +423,12 @@ class FinanceTransactionViewController: FormViewController {
 //                reference.setValue(row.value)
             })
             
-            <<< LabelRow("Group") { row in
+            <<< ButtonRow("Group") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
                 row.title = row.tag
                 row.value = transaction.group
             }.onCellSelection({ _, row in
@@ -437,15 +438,17 @@ class FinanceTransactionViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
             }
         
-            <<< LabelRow("Category") { row in
+            <<< ButtonRow("Category") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
                 row.title = row.tag
-                row.value = transaction.top_level_category
+                row.value = transaction.group
             }.onCellSelection({ _, row in
                 self.openLevel(level: row.tag!, value: row.value!)
             }).cellUpdate { cell, row in
@@ -453,15 +456,17 @@ class FinanceTransactionViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
             }
         
-            <<< LabelRow("Subcategory") { row in
+            <<< ButtonRow("Subcategory") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
                 row.title = row.tag
-                row.value = transaction.category
+                row.value = transaction.group
             }.onCellSelection({ _, row in
                 self.openLevel(level: row.tag!, value: row.value!)
             }).cellUpdate { cell, row in
@@ -469,13 +474,15 @@ class FinanceTransactionViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
             }
         
-            <<< LabelRow("Tags") { row in
+            <<< ButtonRow("Tags") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
                 row.title = row.tag
             }.onCellSelection({ _, row in
                 self.openTags()
@@ -484,6 +491,7 @@ class FinanceTransactionViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textAlignment = .left
             }
         
             

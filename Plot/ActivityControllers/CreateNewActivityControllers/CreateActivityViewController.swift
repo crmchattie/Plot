@@ -15,7 +15,7 @@ import ViewRow
 import EventKit
 import UserNotifications
 import CodableFirebase
-
+import RRuleSwift
 
 class CreateActivityViewController: FormViewController {
     var activity: Activity!
@@ -272,7 +272,7 @@ class CreateActivityViewController: FormViewController {
 //                    }
                 }
             
-            <<< LabelRow("Category") { row in
+            <<< ButtonRow("Category") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
