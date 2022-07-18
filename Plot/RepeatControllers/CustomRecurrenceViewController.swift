@@ -24,6 +24,7 @@ internal class CustomRecurrenceViewController: UITableViewController {
     internal var supportedFrequencies = Constant.frequencies
     internal var maximumInterval = Constant.pickerMaxRowCount
 
+    fileprivate var movingBackwards = true
     fileprivate var isShowingPickerView = false
     fileprivate var pickerViewStyle: PickerViewCellStyle = .frequency
     fileprivate var isShowingFrequencyPicker: Bool {
@@ -46,9 +47,20 @@ internal class CustomRecurrenceViewController: UITableViewController {
     }
 
     override func didMove(toParent parent: UIViewController?) {
-        if parent == nil {
+        if parent == nil && movingBackwards {
             // navigation is popped
             delegate?.customRecurrenceViewController(self, didPickRecurrence: recurrenceRule)
+        }
+    }
+    
+    // MARK: - Actions
+    @objc func doneButtonTapped(_ sender: UIBarButtonItem) {
+        movingBackwards = false
+        delegate?.customRecurrenceViewController(self, didPickRecurrence: recurrenceRule)
+        if navigationItem.leftBarButtonItem != nil {
+            self.dismiss(animated: true)
+        } else {
+            self.navigationController?.popViewController(animated: true)
         }
     }
 }
@@ -179,6 +191,7 @@ extension CustomRecurrenceViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if isPickerViewCell(at: indexPath) {
             let cell = tableView.dequeueReusableCell(withIdentifier: CellID.pickerViewCell, for: indexPath) as! PickerViewCell
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.delegate = self
             cell.style = pickerViewStyle
             cell.frequency = recurrenceRule.frequency
@@ -193,19 +206,19 @@ extension CustomRecurrenceViewController {
             return cell
         } else if isSelectorViewCell(at: indexPath) {
             let cell = tableView.dequeueReusableCell(withIdentifier: CellID.monthOrDaySelectorCell, for: indexPath) as! MonthOrDaySelectorCell
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.delegate = self
-
             cell.tintColor = tintColor
             cell.style = recurrenceRule.frequency == .monthly ? .day : .month
             cell.bymonthday = recurrenceRule.bymonthday
             cell.bymonth = recurrenceRule.bymonth
-
             return cell
         } else if indexPath.section == 0 {
             var cell = tableView.dequeueReusableCell(withIdentifier: CellID.customRecurrenceViewCell)
             if cell == nil {
                 cell = UITableViewCell(style: .value1, reuseIdentifier: CellID.customRecurrenceViewCell)
             }
+            cell?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell?.accessoryType = .none
 
             if indexPath.row == 0 {
@@ -224,7 +237,7 @@ extension CustomRecurrenceViewController {
             if cell == nil {
                 cell = UITableViewCell(style: .default, reuseIdentifier: CellID.commonCell)
             }
-
+            cell?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell?.textLabel?.text = Constant.weekdaySymbols()[indexPath.row]
             if recurrenceRule.byweekday.contains(Constant.weekdays[indexPath.row]) {
                 cell?.accessoryType = .checkmark
@@ -314,14 +327,9 @@ extension CustomRecurrenceViewController {
     // MARK: - Helper
     fileprivate func commonInit() {
         navigationItem.title = LocalizedString("RecurrencePicker.textLabel.custom")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: LocalizedString("Done"), style: .done, target: self, action: #selector(doneButtonTapped(_:)))
         tableView.tintColor = tintColor
-        if let backgroundColor = backgroundColor {
-            tableView.backgroundColor = backgroundColor
-        }
-        if let separatorColor = separatorColor {
-            tableView.separatorColor = separatorColor
-        }
-
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         let bundle = Bundle.main
         tableView.register(UINib(nibName: "PickerViewCell", bundle: bundle), forCellReuseIdentifier: CellID.pickerViewCell)
         tableView.register(UINib(nibName: "MonthOrDaySelectorCell", bundle: bundle), forCellReuseIdentifier: CellID.monthOrDaySelectorCell)

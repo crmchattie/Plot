@@ -657,8 +657,6 @@ extension CreateActivityViewController {
         }
         recurrencePicker.language = .english
         recurrencePicker.calendar = Calendar.current
-        recurrencePicker.tableView = UITableView(frame: .zero, style: .insetGrouped)
-        recurrencePicker.tableView.separatorStyle = .none
         recurrencePicker.tintColor = FalconPalette.defaultBlue
         recurrencePicker.occurrenceDate = occurrenceDate
 

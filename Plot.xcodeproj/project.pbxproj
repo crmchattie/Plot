@@ -32,7 +32,6 @@
 		10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196EF924411B5600B6AFDF /* ChooseChatTableViewController.swift */; };
 		10196F0B24411B5600B6AFDF /* MediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196EFB24411B5600B6AFDF /* MediaViewController.swift */; };
 		10196F0D24411C2800B6AFDF /* ChooseActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */; };
-		101999D92885BFD0009F556C /* CustomRepeatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101999D82885BFD0009F556C /* CustomRepeatViewController.swift */; };
 		101B90902457999600EDDB90 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B908F2457999600EDDB90 /* Weather.swift */; };
 		101B90932458809000EDDB90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101B90922458809000EDDB90 /* Assets.xcassets */; };
 		101B90972458DA2D00EDDB90 /* WeatherRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B90962458DA2D00EDDB90 /* WeatherRow.swift */; };
@@ -95,7 +94,6 @@
 		105F34B42885EF7A007531EB /* RecurrencePickerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A02885EF79007531EB /* RecurrencePickerDelegate.swift */; };
 		105F34B52885EF7A007531EB /* RecurrenceFrequency+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A12885EF79007531EB /* RecurrenceFrequency+Sequence.swift */; };
 		105F34B62885EF7A007531EB /* MonthOrDaySelectorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 105F34A22885EF79007531EB /* MonthOrDaySelectorCell.xib */; };
-		105F34B72885EF7A007531EB /* CustomRecurrenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A32885EF79007531EB /* CustomRecurrenceViewController.swift */; };
 		105F34B82885EF7A007531EB /* EKWeekday+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A42885EF79007531EB /* EKWeekday+Sequence.swift */; };
 		105F34B92885F29A007531EB /* RRuleSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 105F34522885D649007531EB /* RRuleSwift.xcframework */; };
 		105F34BA2885F29A007531EB /* RRuleSwift.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 105F34522885D649007531EB /* RRuleSwift.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -186,6 +184,7 @@
 		10BA3BCE259BEDF9005D98EC /* SetupCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3BCD259BEDF9005D98EC /* SetupCell.swift */; };
 		10BA3D64257D6F7D00A81227 /* SchedulerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */; };
 		10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */; };
+		10C0CC662885FED4007CC9F3 /* CustomRecurrenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C0CC652885FED4007CC9F3 /* CustomRecurrenceViewController.swift */; };
 		10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */; };
 		10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */; };
 		10C32861248D8B9300E4475B /* ChatsTableViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */; };
@@ -595,7 +594,6 @@
 		10196EF924411B5600B6AFDF /* ChooseChatTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseChatTableViewController.swift; sourceTree = "<group>"; };
 		10196EFB24411B5600B6AFDF /* MediaViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaViewController.swift; sourceTree = "<group>"; };
 		10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseActivityTableViewController.swift; sourceTree = "<group>"; };
-		101999D82885BFD0009F556C /* CustomRepeatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRepeatViewController.swift; sourceTree = "<group>"; };
 		101B908F2457999600EDDB90 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		101B90922458809000EDDB90 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		101B90962458DA2D00EDDB90 /* WeatherRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherRow.swift; sourceTree = "<group>"; };
@@ -668,7 +666,6 @@
 		105F34A02885EF79007531EB /* RecurrencePickerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecurrencePickerDelegate.swift; sourceTree = "<group>"; };
 		105F34A12885EF79007531EB /* RecurrenceFrequency+Sequence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RecurrenceFrequency+Sequence.swift"; sourceTree = "<group>"; };
 		105F34A22885EF79007531EB /* MonthOrDaySelectorCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MonthOrDaySelectorCell.xib; sourceTree = "<group>"; };
-		105F34A32885EF79007531EB /* CustomRecurrenceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRecurrenceViewController.swift; sourceTree = "<group>"; };
 		105F34A42885EF79007531EB /* EKWeekday+Sequence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKWeekday+Sequence.swift"; sourceTree = "<group>"; };
 		105F66E824149DC600F6EDB6 /* EventDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailCell.swift; sourceTree = "<group>"; };
 		105F66EA2415942B00F6EDB6 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
@@ -757,6 +754,7 @@
 		10BA3BCD259BEDF9005D98EC /* SetupCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupCell.swift; sourceTree = "<group>"; };
 		10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerViewController.swift; sourceTree = "<group>"; };
 		10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseTransactionTableViewController.swift; sourceTree = "<group>"; };
+		10C0CC652885FED4007CC9F3 /* CustomRecurrenceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRecurrenceViewController.swift; sourceTree = "<group>"; };
 		10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
 		10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatsTableViewController+Migration.swift"; sourceTree = "<group>"; };
@@ -1256,10 +1254,9 @@
 		105F345A2885EB2F007531EB /* RepeatControllers */ = {
 			isa = PBXGroup;
 			children = (
-				101999D82885BFD0009F556C /* CustomRepeatViewController.swift */,
 				105F349D2885EF78007531EB /* RecurrencePicker.swift */,
 				105F34A02885EF79007531EB /* RecurrencePickerDelegate.swift */,
-				105F34A32885EF79007531EB /* CustomRecurrenceViewController.swift */,
+				10C0CC652885FED4007CC9F3 /* CustomRecurrenceViewController.swift */,
 				105F34982885EF77007531EB /* Constants.swift */,
 				105F34A42885EF79007531EB /* EKWeekday+Sequence.swift */,
 				105F349C2885EF78007531EB /* GridSelectorLayout.swift */,
@@ -2989,6 +2986,7 @@
 				101B90972458DA2D00EDDB90 /* WeatherRow.swift in Sources */,
 				10E93D5924BE43B700F6EE18 /* BetterSnappingLayout.swift in Sources */,
 				1075ED21256C175A00AB2B0A /* DiscoverViewController.swift in Sources */,
+				10C0CC662885FED4007CC9F3 /* CustomRecurrenceViewController.swift in Sources */,
 				269105F7253E8E2E00A02C5F /* DateValueFormatter.swift in Sources */,
 				1080873B2585073500FB9BB0 /* MindfulnessFetcher.swift in Sources */,
 				102618C925771FE300CF6F0A /* ActivityCategoryViewController.swift in Sources */,
@@ -3373,7 +3371,6 @@
 				10737F8524912BDD00D146D6 /* Preview.swift in Sources */,
 				1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */,
 				10DC5C4025AF35C600D52722 /* FinancialMemberFetcher.swift in Sources */,
-				101999D92885BFD0009F556C /* CustomRepeatViewController.swift in Sources */,
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,
 				4BAEE51421272D890045AB10 /* VoiceRecordingViewController.swift in Sources */,
 				F9B82C8A25FAB1F40072BE74 /* StackedBarChartCell.swift in Sources */,
@@ -3419,7 +3416,6 @@
 				10DFC3E7255CC3DA00565DAD /* WorkoutActions.swift in Sources */,
 				10DFAFCE28777C1B00D38016 /* ActivityListViewController.swift in Sources */,
 				10E0D7A32594D0AA00B0F83C /* NetworkController.swift in Sources */,
-				105F34B72885EF7A007531EB /* CustomRecurrenceViewController.swift in Sources */,
 				10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */,
 				10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */,
 				10F3032724EC622000C04B8F /* FinancialAccountsViewController.swift in Sources */,

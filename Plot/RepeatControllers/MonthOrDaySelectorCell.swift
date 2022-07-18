@@ -13,7 +13,7 @@ internal enum MonthOrDaySelectorStyle {
     case month
 }
 
-internal protocol MonthOrDaySelectorCellDelegate: class {
+internal protocol MonthOrDaySelectorCellDelegate: AnyObject {
     func monthOrDaySelectorCell(_ cell: MonthOrDaySelectorCell, didSelectMonthday monthday: Int)
     func monthOrDaySelectorCell(_ cell: MonthOrDaySelectorCell, didDeselectMonthday monthday: Int)
     func monthOrDaySelectorCell(_ cell: MonthOrDaySelectorCell, shouldDeselectMonthday monthday: Int) -> Bool
@@ -137,7 +137,6 @@ extension MonthOrDaySelectorCell: UICollectionViewDataSource, UICollectionViewDe
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellID.selectorItemCell, for: indexPath) as! SelectorItemCell
-
         cell.tintColor = tintColor
         switch style {
         case .day:

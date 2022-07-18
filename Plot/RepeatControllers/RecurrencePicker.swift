@@ -54,8 +54,11 @@ open class RecurrencePicker: UITableViewController {
 
     // MARK: - Actions
     @objc func doneButtonTapped(_ sender: UIBarButtonItem) {
-        dismiss(animated: true) {
-            self.recurrencePickerDidPickRecurrence()
+        self.recurrencePickerDidPickRecurrence()
+        if navigationItem.leftBarButtonItem != nil {
+            self.dismiss(animated: true)
+        } else {
+            self.navigationController?.popViewController(animated: true)
         }
     }
 
@@ -91,7 +94,7 @@ extension RecurrencePicker {
         if cell == nil {
             cell = UITableViewCell(style: .default, reuseIdentifier: CellID.basicRecurrenceCell)
         }
-
+        cell?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         if indexPath.section == 0 {
             cell?.accessoryType = .none
             cell?.textLabel?.text = Constant.basicRecurrenceStrings()[indexPath.row]
@@ -163,17 +166,13 @@ extension RecurrencePicker {
     // MARK: - Helper
     fileprivate func commonInit() {
         navigationItem.title = LocalizedString("RecurrencePicker.navigation.title")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: LocalizedString("Done"), style: .done, target: self, action: #selector(doneButtonTapped(_:)))
         if isModal {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: LocalizedString("Done"), style: .done, target: self, action: #selector(doneButtonTapped(_:)))
-            navigationItem.leftBarButtonItem = UIBarButtonItem(title: LocalizedString("Close"), style: .done, target: self, action: #selector(closeButtonTapped(_:)))
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: LocalizedString("Cancel"), style: .plain, target: self, action: #selector(closeButtonTapped(_:)))
         }
+        tableView.separatorStyle = .none
         tableView.tintColor = tintColor
-        if let backgroundColor = backgroundColor {
-            tableView.backgroundColor = backgroundColor
-        }
-        if let separatorColor = separatorColor {
-            tableView.separatorColor = separatorColor
-        }
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         updateSelectedIndexPath(withRule: recurrenceRule)
     }
 
