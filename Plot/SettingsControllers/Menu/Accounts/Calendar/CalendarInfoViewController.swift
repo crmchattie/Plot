@@ -81,7 +81,7 @@ class CalendarInfoViewController: UITableViewController {
         }
         
         if !calendars.keys.contains(googleString) {
-            alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance()?.signIn()
             }))
         }

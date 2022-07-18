@@ -408,6 +408,20 @@ extension CreateActivityViewController: UpdateActivityMediaDelegate {
     }
 }
 
+extension CreateActivityViewController: UpdateRepeatDelegate {
+    func updateRepeat(repeat: EventRepeat) {
+//        activity.activityPhotos = activityPhotos
+//        activity.activityFiles = activityFiles
+//        if let mediaRow: ButtonRow = form.rowBy(tag: "Media") {
+//            if self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty || self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty {
+//                mediaRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            } else {
+//                mediaRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            }
+//        }
+    }
+}
+
 extension CreateActivityViewController: UpdateActivityListDelegate {
     func updateActivityList(listList: [ListContainer]) {
         if let row: ButtonRow = form.rowBy(tag: "Checklist") {

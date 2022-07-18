@@ -51,7 +51,7 @@ class ActivityListViewController: FormViewController {
         
         extendedLayoutIncludesOpaqueBars = true
                 
-        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
+        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
         navigationItem.rightBarButtonItem = plusBarButton
                 
     }
@@ -169,41 +169,26 @@ class ActivityListViewController: FormViewController {
             let destination = GrocerylistViewController()
             destination.grocerylist = grocerylist
             destination.delegate = self
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(destination, animated: true)
         } else if listList.indices.contains(listIndex), let checklist = listList[listIndex].checklist {
             let destination = ChecklistViewController()
             destination.checklist = checklist
             destination.delegate = self
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(destination, animated: true)
         } else if listList.indices.contains(listIndex), let activitylist = listList[listIndex].activitylist {
             let destination = ActivitylistViewController()
             destination.activitylist = activitylist
             destination.delegate = self
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(destination, animated: true)
         } else if listList.indices.contains(listIndex), let packinglist = listList[listIndex].packinglist {
             let destination = PackinglistViewController()
             destination.packinglist = packinglist
             destination.delegate = self
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let destination = ChecklistViewController()
             destination.delegate = self
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(destination, animated: true)
         }
     }
     

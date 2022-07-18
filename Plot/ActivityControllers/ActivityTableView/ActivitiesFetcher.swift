@@ -55,22 +55,22 @@ class ActivitiesFetcher: NSObject {
 
                             
                             // Handles recurring events.
-//                            if let rules = activity.recurrences, !rules.isEmpty {
-//                                let dates = iCalUtility()
-//                                    .recurringDates(forRules: rules, startDate: activity.startDate!)
-//                                print(rules, dates)
-//
+                            if let rules = activity.recurrences, !rules.isEmpty {
+                                let dates = iCalUtility()
+                                    .recurringDates(forRules: rules, startDate: activity.startDate!)
+                                print(rules, dates)
+
 //                                let duration = activity.endDate!.timeIntervalSince(activity.endDate!)
-//
+
 //                                for date in dates {
 //                                    let newActivity = activity.copy() as! Activity
 //                                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
 //                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
 //                                    activities.append(newActivity)
 //                                }
-//                            } else {
+                            } else {
 //                                activities.append(activity)
-//                            }
+                            }
                         }
                         group.leave()
                     })

@@ -456,7 +456,7 @@ class ScheduleViewController: FormViewController {
                         self.schedule.reminder = reminder
                     }
                 }
-                $0.options = EventAlert.allValues
+                $0.options = EventAlert.allCases
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -523,7 +523,13 @@ class ScheduleViewController: FormViewController {
                                 
         }
                             if !checklist.isEmpty, let items = checklist[0].items {
-                                for item in items {
+                                let sortedItems = items.sorted { item1, item2 in
+                                    if item1.value == item2.value {
+                                        return item1.key < item2.key
+                                    }
+                                    return item1.value && !item2.value
+                                }
+                                for item in sortedItems {
                                     var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
                                     mvs.insert(SplitRow<TextRow, CheckRow>() {
                                         $0.rowLeftPercentage = 0.75
@@ -760,7 +766,7 @@ class ScheduleViewController: FormViewController {
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard indexPath.row == 3, let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
+        guard let row: ButtonRow = form.rowBy(tag: "Location"), indexPath == row.indexPath,let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
             return
         }
         let ceo: CLGeocoder = CLGeocoder()

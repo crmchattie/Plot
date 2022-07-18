@@ -1309,7 +1309,11 @@ extension String {
 }
 
 // MARK: - Reminder Frequency
-enum EventAlert : String, CustomStringConvertible {
+enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
+    static func < (lhs: EventAlert, rhs: EventAlert) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+    
     case None = "None"
     case At_time_of_event = "At time of activity"
     case Five_Minutes = "5 minutes before"
@@ -1322,7 +1326,7 @@ enum EventAlert : String, CustomStringConvertible {
     
     var description : String { return rawValue }
     
-    static let allValues = [None, At_time_of_event, Fifteen_Minutes, Half_Hour, One_Hour, One_Day, One_Week, One_Month]
+//    static let allValues = [None, At_time_of_event, Fifteen_Minutes, Half_Hour, One_Hour, One_Day, One_Week, One_Month]
     
     var timeInterval: Double {
         switch self {
@@ -1368,6 +1372,24 @@ enum EventAlert : String, CustomStringConvertible {
         }
     }
     
+}
+
+// MARK: - Repeat Frequency
+enum EventRepeat : String, Comparable, CustomStringConvertible, CaseIterable {
+    static func < (lhs: EventRepeat, rhs: EventRepeat) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+    
+    case Never = "Never"
+    case Every_Day = "Every Day"
+    case Every_Week = "Every Week"
+    case Every_Two_Week = "Every Two Weeks"
+    case Every_Month = "Every Month"
+    case Every_Year = "Every Year"
+    case Custom = "Custom"
+    
+    var description : String { return rawValue }
+        
 }
 
 public func runUserBadgeUpdate(firstChild: String) {

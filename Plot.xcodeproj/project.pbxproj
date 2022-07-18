@@ -32,6 +32,8 @@
 		10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196EF924411B5600B6AFDF /* ChooseChatTableViewController.swift */; };
 		10196F0B24411B5600B6AFDF /* MediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196EFB24411B5600B6AFDF /* MediaViewController.swift */; };
 		10196F0D24411C2800B6AFDF /* ChooseActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */; };
+		101999D72883221A009F556C /* RepeatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101999D62883221A009F556C /* RepeatViewController.swift */; };
+		101999D92885BFD0009F556C /* CustomRepeatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101999D82885BFD0009F556C /* CustomRepeatViewController.swift */; };
 		101B90902457999600EDDB90 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B908F2457999600EDDB90 /* Weather.swift */; };
 		101B90932458809000EDDB90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101B90922458809000EDDB90 /* Assets.xcassets */; };
 		101B90972458DA2D00EDDB90 /* WeatherRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B90962458DA2D00EDDB90 /* WeatherRow.swift */; };
@@ -561,6 +563,8 @@
 		10196EF924411B5600B6AFDF /* ChooseChatTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseChatTableViewController.swift; sourceTree = "<group>"; };
 		10196EFB24411B5600B6AFDF /* MediaViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaViewController.swift; sourceTree = "<group>"; };
 		10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseActivityTableViewController.swift; sourceTree = "<group>"; };
+		101999D62883221A009F556C /* RepeatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatViewController.swift; sourceTree = "<group>"; };
+		101999D82885BFD0009F556C /* CustomRepeatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRepeatViewController.swift; sourceTree = "<group>"; };
 		101B908F2457999600EDDB90 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		101B90922458809000EDDB90 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		101B90962458DA2D00EDDB90 /* WeatherRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherRow.swift; sourceTree = "<group>"; };
@@ -1423,6 +1427,8 @@
 				10A18D392458E1A5006990F2 /* PurchasesViewController.swift */,
 				10196EF224411B5500B6AFDF /* MapActivityViewController.swift */,
 				10196EFB24411B5600B6AFDF /* MediaViewController.swift */,
+				101999D62883221A009F556C /* RepeatViewController.swift */,
+				101999D82885BFD0009F556C /* CustomRepeatViewController.swift */,
 				10DFAFCD28777C1B00D38016 /* ActivityListViewController.swift */,
 				102618C825771FE300CF6F0A /* ActivityCategoryViewController.swift */,
 				102618CC257721D100CF6F0A /* NewActivityCategoryViewController.swift */,
@@ -3062,6 +3068,7 @@
 				4BAEE4EB21272D890045AB10 /* OutgoingTextMessageCell.swift in Sources */,
 				26036766256CC88900FE9142 /* EventKitService.swift in Sources */,
 				2603676C256CD9A000FE9142 /* EventKitManager.swift in Sources */,
+				101999D72883221A009F556C /* RepeatViewController.swift in Sources */,
 				4B6521F8219B3A0A00FF655E /* ChatLogController+GroupMembersDelegate.swift in Sources */,
 				10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */,
 				10C83346249AD8EA0037F638 /* FoursquareVenueSearchResult.swift in Sources */,
@@ -3244,6 +3251,7 @@
 				10737F8524912BDD00D146D6 /* Preview.swift in Sources */,
 				1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */,
 				10DC5C4025AF35C600D52722 /* FinancialMemberFetcher.swift in Sources */,
+				101999D92885BFD0009F556C /* CustomRepeatViewController.swift in Sources */,
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,
 				4BAEE51421272D890045AB10 /* VoiceRecordingViewController.swift in Sources */,
 				F9B82C8A25FAB1F40072BE74 /* StackedBarChartCell.swift in Sources */,

@@ -153,16 +153,16 @@ class FinanceTransactionViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-        
         if active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             let dotsBarButton = UIBarButtonItem(image: UIImage(named: "dots"), style: .plain, target: self, action: #selector(goToExtras))
             navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
         } else {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
             if navigationItem.leftBarButtonItem != nil {
                 navigationItem.leftBarButtonItem?.action = #selector(cancel)
             }
-            navigationItem.rightBarButtonItem = addBarButton
         }
     }
     
@@ -252,8 +252,8 @@ class FinanceTransactionViewController: FormViewController {
                 if let value = row.value {
                     let date = self.isodateFormatter.string(from: value)
                     self.transaction.transacted_at = date
-                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transacted_at")
-                    reference.setValue(date)
+//                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transacted_at")
+//                    reference.setValue(date)
                 }
             }
             
@@ -304,8 +304,8 @@ class FinanceTransactionViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value {
                     self.transaction.amount = value
-                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("amount")
-                    reference.setValue(value)
+//                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("amount")
+//                    reference.setValue(value)
                 }
             }
             
@@ -419,8 +419,8 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }.onChange({ row in
                 self.transaction.account_name = row.value
-                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("account_name")
-                reference.setValue(row.value)
+//                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("account_name")
+//                reference.setValue(row.value)
             })
             
             <<< LabelRow("Group") { row in

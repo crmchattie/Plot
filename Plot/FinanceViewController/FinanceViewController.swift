@@ -180,9 +180,19 @@ class FinanceViewController: UIViewController {
             self.present(navigationViewController, animated: true, completion: nil)
         }))
         
+        alert.addAction(UIAlertAction(title: "Investment", style: .default, handler: { (_) in
+            let destination = FinanceHoldingViewController()
+            destination.users = self.networkController.userService.users
+            destination.filteredUsers = self.networkController.userService.users
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
         alert.addAction(UIAlertAction(title: "Account", style: .default, handler: { (_) in
             print("User click Edit button")
-            self.openMXConnect(current_member_guid: nil)
+            self.newAccount()
         }))
         
         alert.addAction(UIAlertAction(title: "Transaction Rule", style: .default, handler: { (_) in
@@ -211,6 +221,29 @@ class FinanceViewController: UIViewController {
         destination.filters = filters
         destination.filterDictionary = filterDictionary
         self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    @objc func newAccount() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Connect To Account", style: .default, handler: { (_) in
+            self.openMXConnect(current_member_guid: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
+            let destination = FinanceAccountViewController()
+            destination.users = self.networkController.userService.users
+            destination.filteredUsers = self.networkController.userService.users
+            self.navigationController?.pushViewController(destination, animated: true)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     func openMXConnect(current_member_guid: String?) {

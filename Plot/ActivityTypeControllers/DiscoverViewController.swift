@@ -20,8 +20,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
-    var customTypes: [CustomType] = [.basic, .meal, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
-    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mindfulness, .customTransaction, .customFinancialAccount, .customTransactionRule]
+    var customTypes: [CustomType] = [.basic, .meal, .workout, .mindfulness, .transaction, .investment, .financialAccount, .transactionRule]
+    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mindfulness, .customTransaction, .investment, .customFinancialAccount, .customTransactionRule]
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0
@@ -224,8 +224,13 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 destination.users = self.networkController.userService.users
                 destination.filteredUsers = self.networkController.userService.users
                 self.navigationController?.pushViewController(destination, animated: true)
+            case .investment:
+                let destination = FinanceHoldingViewController()
+                destination.users = self.networkController.userService.users
+                destination.filteredUsers = self.networkController.userService.users
+                self.navigationController?.pushViewController(destination, animated: true)
             case .financialAccount:
-                self.openMXConnect(current_member_guid: nil)
+                self.newAccount()
             case .transactionRule:
                 let destination = FinanceTransactionRuleViewController()
                 self.navigationController?.pushViewController(destination, animated: true)
@@ -262,6 +267,29 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         }
     }
     
+    @objc func newAccount() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Connect To Account", style: .default, handler: { (_) in
+            self.openMXConnect(current_member_guid: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
+            let destination = FinanceAccountViewController()
+            destination.users = self.networkController.userService.users
+            destination.filteredUsers = self.networkController.userService.users
+            self.navigationController?.pushViewController(destination, animated: true)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+    }
+    
     func openMXConnect(current_member_guid: String?) {
         let destination = WebViewController()
         destination.current_member_guid = current_member_guid
@@ -282,7 +310,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         }
         
         if !networkController.activityService.calendars.keys.contains(googleString) {
-            alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance()?.signIn()
             }))
         }

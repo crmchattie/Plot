@@ -321,6 +321,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             destination.transactions = self.networkController.financeService.transactions
             destination.startDateTime = calendar.date(from: dateComponents)
             destination.endDateTime = calendar.date(from: dateComponents)
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -336,7 +338,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         
         if !networkController.activityService.calendars.keys.contains(googleString) {
-            alert.addAction(UIAlertAction(title: "Google", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance()?.signIn()
             }))
         }

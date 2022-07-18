@@ -54,9 +54,7 @@ class ChecklistViewController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        
-        
-        
+                
         configureTableView()
                 
         if checklist != nil {
@@ -602,7 +600,13 @@ class ChecklistViewController: FormViewController {
         }
         
         if let items = self.checklist.items {
-            for item in items {
+            let sortedItems = items.sorted { item1, item2 in
+                if item1.value == item2.value {
+                    return item1.key < item2.key
+                }
+                return item1.value && !item2.value
+            }
+            for item in sortedItems {
                 var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
                 mvs.insert(SplitRow<TextRow, CheckRow>() {
                     $0.rowLeftPercentage = 0.75

@@ -633,6 +633,16 @@ extension CreateActivityViewController {
         
     }
     
+    func openRepeat() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        let destination = RepeatViewController()
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
     func openMedia() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
@@ -763,8 +773,7 @@ extension CreateActivityViewController {
                             self.getParticipants(forActivity: scheduleItem) { (participants) in
                                 destination.selectedFalconUsers = participants
                                 self.hideActivityIndicator()
-                                let navigationViewController = UINavigationController(rootViewController: destination)
-                                self.present(navigationViewController, animated: true, completion: nil)
+                                self.navigationController?.pushViewController(destination, animated: true)
                             }
                         }
                     } else {
@@ -797,8 +806,7 @@ extension CreateActivityViewController {
                             self.getParticipants(forActivity: scheduleItem) { (participants) in
                                 destination.selectedFalconUsers = participants
                                 self.hideActivityIndicator()
-                                let navigationViewController = UINavigationController(rootViewController: destination)
-                                self.present(navigationViewController, animated: true, completion: nil)
+                                self.navigationController?.pushViewController(destination, animated: true)
                             }
                         }
                     } else {
@@ -833,8 +841,7 @@ extension CreateActivityViewController {
                             self.getParticipants(forActivity: scheduleItem) { (participants) in
                                 destination.selectedFalconUsers = participants
                                 self.hideActivityIndicator()
-                                let navigationViewController = UINavigationController(rootViewController: destination)
-                                self.present(navigationViewController, animated: true, completion: nil)
+                                self.navigationController?.pushViewController(destination, animated: true)
                             }
                         }
                     }
@@ -860,8 +867,7 @@ extension CreateActivityViewController {
                             self.getParticipants(forActivity: scheduleItem) { (participants) in
                                 destination.selectedFalconUsers = participants
                                 self.hideActivityIndicator()
-                                let navigationViewController = UINavigationController(rootViewController: destination)
-                                self.present(navigationViewController, animated: true, completion: nil)
+                                self.navigationController?.pushViewController(destination, animated: true)
                             }
                         }
                     } else {
@@ -893,8 +899,7 @@ extension CreateActivityViewController {
                             self.getParticipants(forActivity: scheduleItem) { (participants) in
                                 destination.selectedFalconUsers = participants
                                 self.hideActivityIndicator()
-                                let navigationViewController = UINavigationController(rootViewController: destination)
-                                self.present(navigationViewController, animated: true, completion: nil)
+                                self.navigationController?.pushViewController(destination, animated: true)
                             }
                         }
                     } else {
@@ -936,8 +941,7 @@ extension CreateActivityViewController {
                 destination.delegate = self
                 destination.startDateTime = self.startDateTime
                 destination.endDateTime = self.endDateTime
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
@@ -950,8 +954,7 @@ extension CreateActivityViewController {
                 destination.activities = self.activities
                 destination.filteredActivities = self.activities
                 destination.activity = self.activity
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
@@ -976,10 +979,7 @@ extension CreateActivityViewController {
             destination.transaction = purchaseList[purchaseIndex]
             self.getParticipants(transaction: purchaseList[purchaseIndex]) { (participants) in
                 destination.selectedFalconUsers = participants
-                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                destination.navigationItem.leftBarButtonItem = cancelBarButton
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -989,10 +989,7 @@ extension CreateActivityViewController {
                 destination.movingBackwards = true
                 destination.users = self.acceptedParticipant
                 destination.filteredUsers = self.acceptedParticipant
-                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                destination.navigationItem.leftBarButtonItem = cancelBarButton
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
                 print("Existing")
@@ -1001,8 +998,7 @@ extension CreateActivityViewController {
                 destination.movingBackwards = true
                 destination.existingTransactions = self.purchaseList
                 destination.transactions = self.transactions
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
@@ -1018,28 +1014,19 @@ extension CreateActivityViewController {
             let destination = WorkoutViewController()
             destination.workout = workout
             destination.delegate = self
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(destination, animated: true)
         } else if healthList.indices.contains(healthIndex), let meal = healthList[healthIndex].meal {
             let destination = MealViewController()
             destination.meal = meal
             destination.delegate = self
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(destination, animated: true)
         } else if healthList.indices.contains(healthIndex), let mindfulness = healthList[healthIndex].mindfulness {
             let destination = MindfulnessViewController()
             destination.mindfulness = mindfulness
             destination.users = self.users
             destination.filteredUsers = self.users
             destination.delegate = self
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Workout", style: .default, handler: { (_) in
@@ -1048,10 +1035,7 @@ extension CreateActivityViewController {
                 destination.movingBackwards = true
                 destination.users = self.users
                 destination.filteredUsers = self.users
-                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                destination.navigationItem.leftBarButtonItem = cancelBarButton
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "New Meal", style: .default, handler: { (_) in
                 let destination = MealViewController()
@@ -1059,10 +1043,7 @@ extension CreateActivityViewController {
                 destination.movingBackwards = true
                 destination.users = self.users
                 destination.filteredUsers = self.users
-                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                destination.navigationItem.leftBarButtonItem = cancelBarButton
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "New Mindfulness", style: .default, handler: { (_) in
                 let destination = MindfulnessViewController()
@@ -1070,10 +1051,7 @@ extension CreateActivityViewController {
                 destination.movingBackwards = true
                 destination.users = self.users
                 destination.filteredUsers = self.users
-                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                destination.navigationItem.leftBarButtonItem = cancelBarButton
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {

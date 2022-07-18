@@ -116,7 +116,7 @@ class CreateActivityViewController: FormViewController {
             title = "New Event"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
-                activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+                activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                 activity = Activity(dictionary: ["activityID": activityID as AnyObject])
                 setupRightBarButton(with: "Create")
             }
@@ -264,6 +264,12 @@ class CreateActivityViewController: FormViewController {
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.activityDescription = row.value
+                    
+                    //doesn't remove node on database
+//                    let reference = Database.database().reference().child(activitiesEntity).child(messageMetaDataFirebaseFolder).child(self.activityID).child("activityDescription")
+//                    if row.value == nil {
+//                        reference.removeValue()
+//                    }
                 }
             
             <<< LabelRow("Category") { row in
@@ -288,28 +294,25 @@ class CreateActivityViewController: FormViewController {
             <<< ButtonRow("Location") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
                 if self.active, let localName = activity.locationName, localName != "locationName" {
                     row.cell.accessoryType = .detailDisclosureButton
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     row.title = localName
                 }
                 }.onCellSelection({ _,_ in
                     self.openLocationFinder()
                 }).cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.textLabel?.textAlignment = .left
                     if row.title == "Location" {
                         cell.accessoryType = .disclosureIndicator
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     } else if let value = row.title, !value.isEmpty {
                         cell.accessoryType = .detailDisclosureButton
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     } else {
                         cell.accessoryType = .disclosureIndicator
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                         cell.textLabel?.text = "Location"
                     }
                 }
@@ -337,48 +340,6 @@ class CreateActivityViewController: FormViewController {
 //                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                    }
 //                }
-        
-            <<< ButtonRow("Checklists") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                if self.activity.checklistIDs != nil || self.activity.grocerylistID != nil || self.activity.activitylistIDs != nil {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                } else {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                }
-                }.onCellSelection({ _,_ in
-                    self.openList()
-                }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.accessoryType = .disclosureIndicator
-                    cell.textLabel?.textAlignment = .left
-                    if let _ = self.activity.checklistIDs {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    } else {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    }
-                }
-            
-            <<< ButtonRow("Media") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                }.onCellSelection({ _,_ in
-                    self.openMedia()
-                }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.accessoryType = .disclosureIndicator
-                    cell.textLabel?.textAlignment = .left
-                    if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    } else {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
-                }
             
             <<< SwitchRow("All-day") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -626,35 +587,130 @@ class CreateActivityViewController: FormViewController {
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
-            
-            <<< AlertRow<EventAlert>("Reminder") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.selectorTitle = $0.tag
+        
+//            <<< ButtonRow("Repeat") { row in
+//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                row.cell.textLabel?.textAlignment = .left
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                row.cell.accessoryType = .disclosureIndicator
+//                row.title = row.tag
+//                if self.active && self.activity.recurrences != nil {
+//                    row.value = "Custom"
+//                } else {
+//                    row.value = "Never"
+//                }
+//                }.onCellSelection({ _,_ in
+//                    self.openRepeat()
+//                }).cellUpdate { cell, row in
+//                    cell.textLabel?.textAlignment = .left
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    cell.accessoryType = .disclosureIndicator
+//                }
+        
+        
+            <<< LabelRow("Repeat") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
+                if self.active && self.activity.recurrences != nil {
+                    row.value = "Custom"
+                } else {
+                    row.value = "Never"
+                }
+            }.onCellSelection({ _, row in
+                self.openRepeat()
+            }).cellUpdate { cell, row in
+                cell.textLabel?.textAlignment = .left
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.accessoryType = .disclosureIndicator
+            }
+        
+            <<< PushRow<EventAlert>("Reminder") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.title = row.tag
                 if self.active && self.activity.reminder != nil {
                     if let value = self.activity.reminder {
-                        $0.value = EventAlert(rawValue: value)
+                        row.value = EventAlert(rawValue: value)
                     }
                 } else {
-                    $0.value = .None
-                    if let reminder = $0.value?.description {
+                    row.value = EventAlert.None
+                    if let reminder = row.value?.description {
                         self.activity.reminder = reminder
                     }
                 }
-                $0.options = EventAlert.allValues
-                }.cellUpdate { cell, row in
+                row.options = EventAlert.allCases
+            }.onPresent { from, to in
+                to.title = "Reminder"
+                to.tableViewStyle = .insetGrouped
+                to.selectableRowCellUpdate = { cell, row in
+                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    
-                }.onChange() { [unowned self] row in
-                    if let reminder = row.value?.description {
-                        self.activity.reminder = reminder
-                        if self.active {
-                            self.scheduleReminder()
-                        }
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }.onChange() { [unowned self] row in
+                if let reminder = row.value?.description {
+                    self.activity.reminder = reminder
+                    if self.active {
+                        self.scheduleReminder()
+                    }
+                }
+            }
+        
+            <<< ButtonRow("Checklists") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
+                if self.activity.checklistIDs != nil || self.activity.grocerylistID != nil || self.activity.activitylistIDs != nil {
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                } else {
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }
+                }.onCellSelection({ _,_ in
+                    self.openList()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.accessoryType = .disclosureIndicator
+                    cell.textLabel?.textAlignment = .left
+                    if let _ = self.activity.checklistIDs {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    } else {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    }
+                }
+            
+            <<< ButtonRow("Media") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
+                }.onCellSelection({ _,_ in
+                    self.openMedia()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.accessoryType = .disclosureIndicator
+                    cell.textLabel?.textAlignment = .left
+                    if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    } else {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     }
                 }
 
@@ -673,6 +729,12 @@ class CreateActivityViewController: FormViewController {
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.notes = row.value
+                    
+                    //doesn't remove node on database
+//                    let reference = Database.database().reference().child(activitiesEntity).child(messageMetaDataFirebaseFolder).child(self.activityID).child("notes")
+//                    if row.value == nil {
+//                        reference.removeValue()
+//                    }
                 }
         
 //        <<< SwitchRow("showExtras") { row in

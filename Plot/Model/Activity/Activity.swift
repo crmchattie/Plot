@@ -547,7 +547,7 @@ class Activity: NSObject, NSCopying, Codable {
 }
 
 enum CustomType: String, Equatable, Hashable {
-    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness, calendar, googleCalendarEvent
+    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness, calendar, googleCalendarEvent, investment
     
     var name: String {
         switch self {
@@ -567,6 +567,7 @@ enum CustomType: String, Equatable, Hashable {
         case .googleCalendarEvent: return "Google Calendar Event"
         case .mindfulness: return "Mindfulness"
         case .calendar: return "Calendar"
+        case .investment: return "Investment"
         }
     }
     
@@ -588,6 +589,7 @@ enum CustomType: String, Equatable, Hashable {
         case .googleCalendarEvent: return "Google Calendar Event"
         case .mindfulness: return "Add mindfulness minutes"
         case .calendar: return "Add new calendar"
+        case .investment: return "Add new investment"
         }
     }
     
@@ -601,7 +603,7 @@ enum CustomType: String, Equatable, Hashable {
         case .flight: return "Look up your flight details based on flight number, airline or airport"
         case .sleep: return "Wake Up"
         case .work: return "End of Work"
-        case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent, .mindfulness, .calendar, .googleCalendarEvent: return ""
+        case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent, .mindfulness, .calendar, .googleCalendarEvent, .investment: return ""
         }
     }
     
@@ -623,6 +625,7 @@ enum CustomType: String, Equatable, Hashable {
         case .googleCalendarEvent: return ""
         case .mindfulness: return "mindfulness"
         case .calendar: return "calendar"
+        case .investment: return "investment"
         }
     }
 }

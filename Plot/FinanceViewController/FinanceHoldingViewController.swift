@@ -81,7 +81,7 @@ class FinanceHoldingViewController: FormViewController {
     
     fileprivate func setupVariables() {
         if let _ = holding {
-            title = "Holding"
+            title = "Investment"
             active = true
             numberFormatter.currencyCode = holding.currency_code
             
@@ -102,7 +102,7 @@ class FinanceHoldingViewController: FormViewController {
                 inviteesRow.updateCell()
             }
         } else if let currentUser = Auth.auth().currentUser?.uid {
-            title = "New Holding"
+            title = "New Investment"
             let ID = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
             holding = MXHolding(description: "Holding Name", market_value: 0, created_at: date, guid: ID, user_guid: currentUser, holding_type: .unknownType, user_created: true, admin: currentUser)
@@ -220,14 +220,14 @@ class FinanceHoldingViewController: FormViewController {
             }
         }
         
-        if let type = holding.holding_type {
+        if (holding.holding_type != nil) || (holding.user_created != nil && holding.user_created ?? false) {
             form.last!
             <<< PushRow<String>("Type") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.title = row.tag
-                row.value = type.name
+                row.value = holding.holding_type?.name
                 row.options = []
                 MXHoldingType.allCases.forEach {
                     row.options?.append($0.name)
@@ -235,8 +235,8 @@ class FinanceHoldingViewController: FormViewController {
             }.onPresent { from, to in
                 to.title = "Type"
                 to.tableViewStyle = .insetGrouped
-                to.dismissOnSelection = false
-                to.dismissOnChange = false
+                to.dismissOnSelection = true
+                to.dismissOnChange = true
                 to.enableDeselection = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
@@ -256,8 +256,8 @@ class FinanceHoldingViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value, let type = MXHoldingType(rawValue: value) {
                     self.holding.holding_type = type
-                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.holding.guid).child("holding_type")
-                    reference.setValue(value)
+//                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.holding.guid).child("holding_type")
+//                    reference.setValue(value)
                 }
             }
         }
@@ -281,25 +281,19 @@ class FinanceHoldingViewController: FormViewController {
 //                }
             
         form.last!
-            <<< DateInlineRow("Last Updated") {
+            <<< TextRow("Last Updated") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
-                $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
                 if let date = isodateFormatter.date(from: holding.updated_at) {
-                    $0.value = date
+                    $0.value = dateFormatterPrint.string(from: date)
                 }
-            }.onChange { row in
-                if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
-                    let date = self.isodateFormatter.string(from: value)
-                    self.holding.updated_at = date
-                    let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("updated_at")
-                    reference.setValue(date)
-                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-        if let costBasis = holding.cost_basis, costBasis != 0 {
+        if (holding.cost_basis != nil) || (holding.user_created != nil && holding.user_created ?? false) {
             form.last!
             <<< DecimalRow("Cost Basis") {
                 $0.cell.isUserInteractionEnabled = holding.user_created ?? false
@@ -307,15 +301,16 @@ class FinanceHoldingViewController: FormViewController {
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
-                $0.value = costBasis
+                $0.value = holding.cost_basis ?? 0
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
+                    self.updateTheDate()
                     self.holding.cost_basis = value
-                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("cost_basis")
-                    reference.setValue(value)
+//                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("cost_basis")
+//                    reference.setValue(value)
                 }
             }
         }
@@ -333,9 +328,10 @@ class FinanceHoldingViewController: FormViewController {
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
+                    self.updateTheDate()
                     self.holding.market_value = value
-                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("market_value")
-                    reference.setValue(value)
+//                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("market_value")
+//                    reference.setValue(value)
                 }
             }
             
@@ -347,7 +343,6 @@ class FinanceHoldingViewController: FormViewController {
                     percentFormatter.positivePrefix = percentFormatter.plusSign
                     percentFormatter.maximumFractionDigits = 0
                     percentFormatter.minimumFractionDigits = 0
-                    
                     $0.cell.isUserInteractionEnabled = holding.user_created ?? false
                     $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = $0.tag
@@ -424,8 +419,8 @@ class FinanceHoldingViewController: FormViewController {
                 }
             }.onChange({ row in
                 self.holding.account_name = row.value
-                let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("account_name")
-                reference.setValue(row.value)
+//                let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("account_name")
+//                reference.setValue(row.value)
             })
         
             <<< LabelRow("Tags") { row in
@@ -465,6 +460,16 @@ class FinanceHoldingViewController: FormViewController {
 //                    cell.textLabel?.textAlignment = .left
 //                }
         
+    }
+    
+    fileprivate func updateTheDate() {
+        if let row: TextRow = form.rowBy(tag: "Last Updated On") {
+            let date = self.isodateFormatter.string(from: Date())
+            row.value = date
+            row.updateCell()
+            self.holding.updated_at = date
+//            Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("updated_at").setValue(date)
+        }
     }
     
     @objc fileprivate func openTags() {
