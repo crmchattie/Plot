@@ -86,4 +86,24 @@ public extension RecurrenceRule {
             !isMonthlyRecurrence(occurrence: occurrenceDate) &&
             !isYearlyRecurrence(occurrence: occurrenceDate)
     }
+    func typeOfRecurrence(language: RecurrencePickerLanguage = InternationalControl.shared.language, occurrence occurrenceDate: Date) -> String {
+        let internationalControl = InternationalControl(language: language)
+        if isDailyRecurrence() {
+            return internationalControl.localizedString("basicRecurrence.everyDay")
+        } else if isWeeklyRecurrence(occurrence: occurrenceDate) {
+            return internationalControl.localizedString("basicRecurrence.everyWeek")
+        } else if isBiWeeklyRecurrence(occurrence: occurrenceDate) {
+            return internationalControl.localizedString("basicRecurrence.everyTwoWeeks")
+        } else if isMonthlyRecurrence(occurrence: occurrenceDate) {
+            return internationalControl.localizedString("basicRecurrence.everyMonth")
+        } else if isYearlyRecurrence(occurrence: occurrenceDate) {
+            return internationalControl.localizedString("basicRecurrence.everyYear")
+        } else if isWeekdayRecurrence() {
+            return internationalControl.localizedString("basicRecurrence.everyWeekday")
+        } else if isCustomRecurrence(occurrence: occurrenceDate) {
+            return internationalControl.localizedString("RecurrencePicker.textLabel.custom")
+        } else {
+            return internationalControl.localizedString("basicRecurrence.never")
+        }
+    }
 }

@@ -48,7 +48,6 @@ class Activity: NSObject, NSCopying, Codable {
     var checklistIDs: [String]?
     var activitylistIDs: [String]?
     var packinglistIDs: [String]?
-    var transactionIDs: [String]?
     var grocerylistID: String?
     var isGroupActivity: Bool?
     var admin: String?
@@ -67,6 +66,7 @@ class Activity: NSObject, NSCopying, Codable {
     var hkSampleID: String?
     var completed: Bool?
     var isTask: Bool?
+    var transactionIDs: [String]?
     var mealIDs: [String]?
     var workoutIDs: [String]?
     var mindfulnessIDs: [String]?

@@ -426,7 +426,24 @@ extension CreateActivityViewController: UpdateActivityListDelegate {
 extension CreateActivityViewController: RecurrencePickerDelegate {
     func recurrencePicker(_ picker: RecurrencePicker, didPickRecurrence recurrenceRule: RecurrenceRule?) {
         // do something, if recurrenceRule is nil, that means "never repeat".
-        print("recurrenceRule \(recurrenceRule)")
+//        let recurrenceRuleText = recurrenceRule?.toText(of: .english, occurrenceDate: activity.startDate!)
+//        let recurrenceRuleRowText = recurrenceRule?.typeOfRecurrence(language: .english, occurrence: activity.startDate!)
+//        print("recurrenceRuleText \(recurrenceRuleText)")
+//        print("recurrenceRuleRowText \(recurrenceRuleRowText)")
+        if let row: LabelRow = form.rowBy(tag: "Repeat"), let startDate = activity.startDate {
+            if let recurrenceRule = recurrenceRule {
+                let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
+                row.value = rowText
+                row.updateCell()
+                activity.recurrences = [recurrenceRule.toRRuleString()]
+            } else {
+                row.value = "Never"
+                row.updateCell()
+                activity.recurrences = nil
+                let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("recurrences")
+                reference.removeValue()
+            }
+        }
     }
 }
 

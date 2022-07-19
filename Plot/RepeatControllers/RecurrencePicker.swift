@@ -19,11 +19,12 @@ open class RecurrencePicker: UITableViewController {
     open weak var delegate: RecurrencePickerDelegate?
     open var tintColor = FalconPalette.defaultBlue
     open var calendar = Calendar.current
-    open var occurrenceDate = Date()
+    open var occurrenceDate: Date!
     open var backgroundColor: UIColor?
     open var separatorColor: UIColor?
     open var supportedCustomRecurrenceFrequencies = Constant.frequencies
     open var customRecurrenceMaximumInterval = Constant.pickerMaxRowCount
+    fileprivate var movingBackwards = true
 
     fileprivate var isModal: Bool {
         return presentingViewController?.presentedViewController == self
@@ -46,7 +47,7 @@ open class RecurrencePicker: UITableViewController {
     }
 
     open override func didMove(toParent parent: UIViewController?) {
-        if parent == nil {
+        if parent == nil && movingBackwards {
             // navigation is popped
             recurrencePickerDidPickRecurrence()
         }
@@ -54,6 +55,7 @@ open class RecurrencePicker: UITableViewController {
 
     // MARK: - Actions
     @objc func doneButtonTapped(_ sender: UIBarButtonItem) {
+        movingBackwards = false
         self.recurrencePickerDidPickRecurrence()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true)
@@ -165,6 +167,7 @@ extension RecurrencePicker {
 extension RecurrencePicker {
     // MARK: - Helper
     fileprivate func commonInit() {
+        extendedLayoutIncludesOpaqueBars = true
         navigationItem.title = LocalizedString("RecurrencePicker.navigation.title")
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: LocalizedString("Done"), style: .done, target: self, action: #selector(doneButtonTapped(_:)))
         if isModal {
@@ -263,7 +266,7 @@ extension RecurrencePicker {
                 break
             }
         }
-        recurrenceRule?.startDate = Date()
+        recurrenceRule?.startDate = occurrenceDate
 
         delegate?.recurrencePicker(self, didPickRecurrence: recurrenceRule)
     }

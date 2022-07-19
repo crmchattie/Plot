@@ -45,8 +45,8 @@ class ActivityActions: NSObject {
         let membersIDs = fetchMembersIDs()
         
         for memberID in membersIDs.0 {
-        Database.database().reference().child("user-activities").child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
-        Database.database().reference().child("user-activities").child(memberID).child(activityID).removeValue()
+        Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+        Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).removeValue()
         }
                 
         let center = UNUserNotificationCenter.current()
@@ -97,7 +97,7 @@ class ActivityActions: NSObject {
         }
         let membersIDs = fetchMembersIDs()
         if Set(activity.participantsIDs!) != Set(membersIDs.0) {
-            let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+            let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
             updateParticipants(membersIDs: membersIDs)
             groupActivityReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
         }
@@ -113,7 +113,7 @@ class ActivityActions: NSObject {
             return
         }
         
-        let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         groupActivityReference.updateChildValues(firebaseDictionary)
         
         
@@ -124,7 +124,7 @@ class ActivityActions: NSObject {
             return
         }
                                 
-        let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                 
         self.dispatchGroup.enter()
         self.dispatchGroup.enter()
@@ -143,7 +143,7 @@ class ActivityActions: NSObject {
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(event.calendarItemIdentifier)
         let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
         reference.updateChildValues(calendarEventActivityValue)
-        let userReference = Database.database().reference().child("user-activities").child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
         let values:[String : Any] = ["calendarExport": true]
         userReference.updateChildValues(values)
     }
@@ -182,7 +182,7 @@ class ActivityActions: NSObject {
             self.dispatchGroup.leave()
         })
         for memberID in memberIDs {
-            let userReference = Database.database().reference().child("user-activities").child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
+            let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : Any] = ["isGroupActivity": true]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
@@ -210,7 +210,7 @@ class ActivityActions: NSObject {
         let difference = participantsSet.symmetricDifference(membersSet)
         for member in difference {
             if participantsSet.contains(member) {
-                Database.database().reference().child("user-activities").child(member).child(activityID).removeValue()
+                Database.database().reference().child(userActivitiesEntity).child(member).child(activityID).removeValue()
             }
             if let chatID = activity.conversationID { Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("chatParticipantsIDs").updateChildValues(membersIDs.1)
             }
@@ -249,7 +249,7 @@ class ActivityActions: NSObject {
         }
         
         if let currentUserID = Auth.auth().currentUser?.uid {
-            let userReference = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
+            let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : AnyObject] = ["reminder": activity.reminder as AnyObject]
             userReference.updateChildValues(values)
             scheduleReminder()
@@ -299,7 +299,7 @@ class ActivityActions: NSObject {
     }
 
     func runActivityBadgeUpdate(firstChild: String, secondChild: String) {
-        var ref = Database.database().reference().child("user-activities").child(firstChild).child(secondChild)
+        var ref = Database.database().reference().child(userActivitiesEntity).child(firstChild).child(secondChild)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             
             guard snapshot.hasChild(messageMetaDataFirebaseFolder) else {

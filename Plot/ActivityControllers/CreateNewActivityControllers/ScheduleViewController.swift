@@ -72,10 +72,12 @@ class ScheduleViewController: FormViewController {
             if schedule.checklist != nil {
                 checklist = schedule.checklist!
             }
+            schedule.isSchedule = true
         } else {
             title = "New Activity"
             scheduleID = UUID().uuidString
             schedule = Activity(dictionary: ["activityID": scheduleID as AnyObject])
+            schedule.isSchedule = true
         }
         
         setupMainView()
@@ -324,7 +326,7 @@ class ScheduleViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
             
-            <<< ButtonRow("startTimeZone") { row in
+            <<< LabelRow("startTimeZone") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -421,7 +423,7 @@ class ScheduleViewController: FormViewController {
                     
                 }
             
-            <<< ButtonRow("endTimeZone") { row in
+            <<< LabelRow("endTimeZone") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor

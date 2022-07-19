@@ -90,6 +90,7 @@ class GoogleCalService {
         event.summary = name
         event.start = start
         event.end = end
+        event.recurrence = activity.recurrences
         
         if let value = UserDefaults.standard.string(forKey: "PlotCalendar") {
             let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: value)

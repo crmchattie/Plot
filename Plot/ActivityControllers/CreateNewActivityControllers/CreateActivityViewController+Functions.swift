@@ -646,7 +646,7 @@ extension CreateActivityViewController {
         // prepare a recurrence rule and an occurrence date
         // occurrence date is the date which the repeat event occurs this time
         let recurrences = activity.recurrences
-        let occurrenceDate = activity.startDate ?? Date()
+        let occurrenceDate = activity.startDate!
 
         // initialization and configuration
         // RecurrencePicker can be initialized with a recurrence rule or nil, nil means "never repeat"
@@ -654,7 +654,7 @@ extension CreateActivityViewController {
         if let recurrences = recurrences {
             let recurrenceRule = RecurrenceRule(rruleString: recurrences[0])
             recurrencePicker = RecurrencePicker(recurrenceRule: recurrenceRule)
-        }
+        }        
         recurrencePicker.language = .english
         recurrencePicker.calendar = Calendar.current
         recurrencePicker.tintColor = FalconPalette.defaultBlue
@@ -1102,7 +1102,8 @@ extension CreateActivityViewController {
     }
     
     @objc func createNewActivity() {
-        if !active || sentActivity {
+        // do not want to have in duplicate functionality
+        if !active || sentActivity || true {
             self.createActivity()
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)

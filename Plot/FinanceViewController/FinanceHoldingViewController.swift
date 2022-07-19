@@ -281,16 +281,16 @@ class FinanceHoldingViewController: FormViewController {
 //                }
             
         form.last!
-            <<< TextRow("Last Updated") {
+            <<< LabelRow("Last Updated") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 if let date = isodateFormatter.date(from: holding.updated_at) {
                     $0.value = dateFormatterPrint.string(from: date)
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
         if (holding.cost_basis != nil) || (holding.user_created != nil && holding.user_created ?? false) {
@@ -423,7 +423,7 @@ class FinanceHoldingViewController: FormViewController {
 //                reference.setValue(row.value)
             })
         
-            <<< ButtonRow("Tags") { row in
+            <<< LabelRow("Tags") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -465,7 +465,7 @@ class FinanceHoldingViewController: FormViewController {
     }
     
     fileprivate func updateTheDate() {
-        if let row: TextRow = form.rowBy(tag: "Last Updated On") {
+        if let row: TextRow = form.rowBy(tag: "Last Updated") {
             let date = self.isodateFormatter.string(from: Date())
             row.value = date
             row.updateCell()

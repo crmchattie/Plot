@@ -302,14 +302,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         self.mapView.addAnnotation(annotation)
                         
                         // tell my locationsCarouselController
-                        let locationStruct = LocationStruct(name: name, address: address, type: type, category: category, subcategory: subcategory, lat: array[0], lon: array[1])
+                        let locationStruct = LocationStruct(name: name, address: address, type: type, category: category, subcategory: subcategory, lat: latitude, lon: longitude)
                         self.locationsController.items.append(locationStruct)
                     }
                 }
             }
-            
-            print("done with locations")
-            
         }
             
         if locations.count != 0 {

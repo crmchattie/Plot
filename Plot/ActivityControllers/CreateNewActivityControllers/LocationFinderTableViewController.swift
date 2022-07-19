@@ -111,7 +111,6 @@ class LocationFinderTableViewController: UIViewController {
 extension LocationFinderTableViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
         searchCompleter.queryFragment = searchText
     }
 }
@@ -181,7 +180,7 @@ extension LocationFinderTableViewController: UITableViewDelegate {
         var longitude = Double()
         
         locationName = String(completion.title)
-        
+                                
         let searchRequest = MKLocalSearch.Request(completion: completion)
         let search = MKLocalSearch(request: searchRequest)
         search.start { (response, error) in

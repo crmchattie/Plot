@@ -31,6 +31,7 @@ struct Workout: Codable, Equatable, Hashable {
     var activityID: String?
     var healthExport: Bool?
     var user_created: Bool?
+    var recurrences: [String]?
 
 }
 

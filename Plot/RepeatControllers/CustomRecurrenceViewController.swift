@@ -326,6 +326,7 @@ extension CustomRecurrenceViewController {
 extension CustomRecurrenceViewController {
     // MARK: - Helper
     fileprivate func commonInit() {
+        extendedLayoutIncludesOpaqueBars = true
         navigationItem.title = LocalizedString("RecurrencePicker.textLabel.custom")
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: LocalizedString("Done"), style: .done, target: self, action: #selector(doneButtonTapped(_:)))
         tableView.tintColor = tintColor

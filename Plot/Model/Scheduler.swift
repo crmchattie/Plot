@@ -21,6 +21,7 @@ struct Scheduler: Codable, Equatable, Hashable {
     var schedulerDate: Date?
     var lastModifiedDate: Date?
     var createdDate: Date?
+    var recurrences: [String]?
 }
 
 func ==(lhs: Scheduler, rhs: Scheduler) -> Bool {

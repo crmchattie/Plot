@@ -7,6 +7,7 @@
 //
 
 import EventKit
+import RRuleSwift
 
 class EventKitService {
     
@@ -59,6 +60,39 @@ class EventKitService {
         event.endDate = endDate
         event.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
         event.notes = activity.activityDescription ?? ""
+        if let recurrences = activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let frequency = EKRecurrenceFrequency(rawValue: recurrenceRule.frequency.number) {
+            var daysOfTheWeek = [EKRecurrenceDayOfWeek]()
+            for dayy in recurrenceRule.byweekday {
+                daysOfTheWeek.append(EKRecurrenceDayOfWeek.init(dayy))
+            }
+            
+            var daysOfTheMonth = [NSNumber]()
+            for dayy in recurrenceRule.bymonthday {
+                daysOfTheMonth.append(NSNumber(value: dayy))
+            }
+            
+            var monthsOfTheYear = [NSNumber]()
+            for month in recurrenceRule.bymonth {
+                monthsOfTheYear.append(NSNumber(value: month))
+            }
+            
+            var weeksOfTheYear = [NSNumber]()
+            for week in recurrenceRule.byweekno {
+                weeksOfTheYear.append(NSNumber(value: week))
+            }
+            
+            var daysOfTheYear = [NSNumber]()
+            for dayy in recurrenceRule.byyearday {
+                daysOfTheYear.append(NSNumber(value: dayy))
+            }
+            
+            var setPositions = [NSNumber]()
+            for setPos in recurrenceRule.bysetpos {
+                setPositions.append(NSNumber(value: setPos))
+            }
+                        
+            event.recurrenceRules = [EKRecurrenceRule(recurrenceWith: frequency, interval: recurrenceRule.interval, daysOfTheWeek: daysOfTheWeek, daysOfTheMonth: daysOfTheMonth, monthsOfTheYear: monthsOfTheYear, weeksOfTheYear: weeksOfTheYear, daysOfTheYear: daysOfTheYear, setPositions: setPositions, end: recurrenceRule.recurrenceEnd)]
+        }
         if let value = UserDefaults.standard.string(forKey: "PlotCalendar"), let calendar = eventStore.calendar(withIdentifier: value) {
             event.calendar = calendar
             do {

@@ -193,7 +193,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 self.transactionRule.should_link = row.value!
             }
             
-            <<< ButtonRow("Group") { row in
+            <<< LabelRow("Group") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -216,7 +216,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 cell.textLabel?.textAlignment = .left
             }
         
-            <<< ButtonRow("Category") { row in
+            <<< LabelRow("Category") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -239,7 +239,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 cell.textLabel?.textAlignment = .left
             }
         
-            <<< ButtonRow("Subcategory") { row in
+            <<< LabelRow("Subcategory") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor

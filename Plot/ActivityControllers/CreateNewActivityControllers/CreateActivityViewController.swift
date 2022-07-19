@@ -264,12 +264,10 @@ class CreateActivityViewController: FormViewController {
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.activityDescription = row.value
-                    
-                    //doesn't remove node on database
-//                    let reference = Database.database().reference().child(activitiesEntity).child(messageMetaDataFirebaseFolder).child(self.activityID).child("activityDescription")
-//                    if row.value == nil {
-//                        reference.removeValue()
-//                    }
+                    if row.value == nil {
+                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("activityDescription")
+                        reference.removeValue()
+                    }
                 }
             
             <<< ButtonRow("Category") { row in
@@ -588,28 +586,6 @@ class CreateActivityViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
         
-//            <<< ButtonRow("Repeat") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.title = row.tag
-//                if self.active && self.activity.recurrences != nil {
-//                    row.value = "Custom"
-//                } else {
-//                    row.value = "Never"
-//                }
-//                }.onCellSelection({ _,_ in
-//                    self.openRepeat()
-//                }).cellUpdate { cell, row in
-//                    cell.textLabel?.textAlignment = .left
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                    cell.accessoryType = .disclosureIndicator
-//                }
-        
         
             <<< LabelRow("Repeat") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -617,8 +593,8 @@ class CreateActivityViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
-                if self.active && self.activity.recurrences != nil {
-                    row.value = "Custom"
+                if self.active, let recurrences = self.activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let startDate = activity.startDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
                 } else {
                     row.value = "Never"
                 }
@@ -729,12 +705,10 @@ class CreateActivityViewController: FormViewController {
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.notes = row.value
-                    
-                    //doesn't remove node on database
-//                    let reference = Database.database().reference().child(activitiesEntity).child(messageMetaDataFirebaseFolder).child(self.activityID).child("notes")
-//                    if row.value == nil {
-//                        reference.removeValue()
-//                    }
+                    if row.value == nil {
+                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("notes")
+                        reference.removeValue()
+                    }
                 }
         
 //        <<< SwitchRow("showExtras") { row in

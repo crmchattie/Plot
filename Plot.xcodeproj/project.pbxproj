@@ -642,7 +642,6 @@
 		105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionViewController.swift; sourceTree = "<group>"; };
 		105CB18D2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceLineChartDetailViewController.swift; sourceTree = "<group>"; };
 		105E12522447955500A278D0 /* ActivityDetailCellDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailCellDelegates.swift; sourceTree = "<group>"; };
-		105F34512885D649007531EB /* RecurrencePicker.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RecurrencePicker.xcframework; path = Carthage/Build/RecurrencePicker.xcframework; sourceTree = "<group>"; };
 		105F34522885D649007531EB /* RRuleSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RRuleSwift.xcframework; path = Carthage/Build/RRuleSwift.xcframework; sourceTree = "<group>"; };
 		105F348A2885EF76007531EB /* RecurrenceRule+Definition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RecurrenceRule+Definition.swift"; sourceTree = "<group>"; };
 		105F348B2885EF76007531EB /* PickerViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PickerViewCell.xib; sourceTree = "<group>"; };
@@ -1783,7 +1782,6 @@
 		2AF4427B37282913090A248D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				105F34512885D649007531EB /* RecurrencePicker.xcframework */,
 				105F34522885D649007531EB /* RRuleSwift.xcframework */,
 				2623AA8C24FA2A250020A316 /* HealthKit.framework */,
 				E53D0336E7A51EFB22060D82 /* libPods-Plot.a */,
