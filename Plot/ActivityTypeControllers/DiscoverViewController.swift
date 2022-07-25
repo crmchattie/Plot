@@ -89,8 +89,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         managePresense()
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance()?.presentingViewController = self
+        
     }
     
     @IBAction func done(_ sender: AnyObject) {
@@ -311,6 +310,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         
         if !networkController.activityService.calendars.keys.contains(googleString) {
             alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance().delegate = self
+                GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
             }))
         }

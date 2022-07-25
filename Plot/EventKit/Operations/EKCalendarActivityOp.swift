@@ -53,7 +53,7 @@ class EKCalendarActivityOp: AsyncOperation {
                     let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                         let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values: [String : Any] = ["isGroupActivity": false, "badge": 0]
+                        let values: [String : Any] = ["isGroupActivity": false, "badge": 0, "calendarExport": true]
                         userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                             self?.finish()
                         })
@@ -69,18 +69,24 @@ class EKCalendarActivityOp: AsyncOperation {
     private func createActivity(for activityID: String) -> Activity {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         update(activity: activity)
-        activity.category = ActivityCategory.categorize(activity).rawValue
-        activity.activityType = CustomType.iOSCalendarEvent.categoryText
         return activity
     }
     
     private func update(activity: Activity) {
         activity.name = event.title
         activity.activityDescription = event.notes
-        activity.locationName = event.location
+        if let structuredLocation = event.structuredLocation, let geoLocation = structuredLocation.geoLocation, let location = event.location {
+            let coordinates = geoLocation.coordinate
+            let latitude = coordinates.latitude
+            let longitude = coordinates.longitude
+            activity.locationName = location.removeCharacters()
+            activity.locationAddress = [location.removeCharacters(): [latitude, longitude]]
+        }
+        activity.category = ActivityCategory.categorize(activity).rawValue
+        activity.activityType = CustomType.iOSCalendarEvent.categoryText
         activity.allDay = event.isAllDay
-        activity.startTimeZone = event.timeZone?.identifier ?? TimeZone.current.identifier
-        activity.endTimeZone = event.timeZone?.identifier ?? TimeZone.current.identifier
+        activity.startTimeZone = event.timeZone?.identifier
+        activity.endTimeZone = event.timeZone?.identifier
         activity.recurrences = event.recurrenceRules?.map { $0.iCalRuleString() }
         activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)

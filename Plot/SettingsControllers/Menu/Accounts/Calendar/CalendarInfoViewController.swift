@@ -42,9 +42,6 @@ class CalendarInfoViewController: UITableViewController {
             navigationItem.rightBarButtonItem = barButton
         }
         
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance()?.presentingViewController = self
-        
         addObservers()
         
     }
@@ -82,6 +79,8 @@ class CalendarInfoViewController: UITableViewController {
         
         if !calendars.keys.contains(googleString) {
             alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance().delegate = self
+                GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
             }))
         }

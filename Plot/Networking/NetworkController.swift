@@ -38,19 +38,26 @@ class NetworkController {
         
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
+        print("start grabActivities")
         activityService.grabActivities {
+            print("done grabActivities")
             dispatchGroup.leave()
         }
         dispatchGroup.enter()
+        print("start grabFinances")
         financeService.grabFinances {
+            print("done grabFinances")
             dispatchGroup.leave()
         }
         dispatchGroup.enter()
+        print("start grabHealth")
         healthService.grabHealth {
+            print("done grabHealth")
             dispatchGroup.leave()
         }
         
         dispatchGroup.notify(queue: .main) {
+            print("done grabbing stuff")
             self.isRunning = false
             completion()
         }

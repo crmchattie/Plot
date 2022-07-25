@@ -93,10 +93,6 @@ class FinanceViewController: UIViewController {
     
     var filters: [filter] = [.financeLevel, .financeAccount]
     var filterDictionary = [String: [String]]()
-    
-    @objc fileprivate func handleDismiss(button: UIButton) {
-        dismiss(animated: true, completion: nil)
-    }
             
     override func viewDidLoad() {
         super.viewDidLoad()

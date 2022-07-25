@@ -21,7 +21,8 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = sections[indexPath.section]
         if section == .calendar {
-            if networkController.activityService.askedforAuthorization {
+            //
+            if !sortedActivities.isEmpty || networkController.activityService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.activities = sortedActivities
@@ -36,7 +37,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 return cell
             }
         } else if section == .health {
-            if networkController.healthService.askedforAuthorization {
+            if !healthMetrics.isEmpty || networkController.healthService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.healthMetricSections = healthMetricSections
@@ -73,7 +74,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         var height: CGFloat = 0
         let section = sections[indexPath.section]
         if section == .calendar {
-            if !sortedActivities.isEmpty && networkController.activityService.askedforAuthorization {
+            if !sortedActivities.isEmpty || networkController.activityService.askedforAuthorization {
                 for activity in sortedActivities {
                     let dummyCell = ActivityCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
                     var invitation: Invitation? = nil
@@ -90,7 +91,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 return CGSize(width: self.collectionView.frame.size.width - 30, height: 300)
             }
         } else if section == .health {
-            if !healthMetrics.isEmpty && networkController.healthService.askedforAuthorization {
+            if !healthMetrics.isEmpty || networkController.healthService.askedforAuthorization {
                 height += CGFloat(healthMetricSections.count * 40)
                 for key in healthMetricSections {
                     if let metrics = healthMetrics[key] {

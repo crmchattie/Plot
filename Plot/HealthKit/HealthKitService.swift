@@ -16,12 +16,19 @@ class HealthKitService {
         return HealthKitSetupAssistant.healthStore
     }
     
-    class func syncEventsFromHealthKitData() {
-        authorizeHealthKit { result in
-            if result {
-                
-            }
+    class func checkHealthAuthorizationStatus() {
+        let status = healthStore.authorizationStatus(for: .workoutType())
+        switch (status) {
+        case .notDetermined:
+            print("notDetermined")
+        case .sharingDenied:
+            print("sharingDenied")
+        case .sharingAuthorized:
+            print("sharingAuthorized")
+        @unknown default:
+            print("default")
         }
+        
     }
     
     class func authorizeHealthKit(completion: @escaping (Bool) -> Void) {

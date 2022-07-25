@@ -73,33 +73,38 @@ class FinanceService {
     let dateFormatterPrint = DateFormatter()
     
     func grabFinances(_ completion: @escaping () -> Void) {
-        DispatchQueue.main.async { [unowned self] in
-            memberFetcher.fetchMembers { (firebaseMembers) in
-                self.members = firebaseMembers
-//                self.setupMembersDict()
-                self.observeMembersForCurrentUser()
+        DispatchQueue.main.async { [weak self] in
+            self?.accountFetcher.fetchAccounts { (firebaseAccounts) in
+                self?.accounts = firebaseAccounts
+                self?.observeAccountsForCurrentUser()
             }
             
-            accountFetcher.fetchAccounts { (firebaseAccounts) in
-                self.accounts = firebaseAccounts
-                self.setupMembersAccountsDict()
-                self.observeAccountsForCurrentUser()
-            }
-            
-            transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
-                self.transactionRules = firebaseTransactionRules
-                self.observeTransactionRulesForCurrentUser()
-                self.transactionFetcher.fetchTransactions { (firebaseTransactions) in
-                    self.transactions = firebaseTransactions
-                    self.removePendingTransactions()
-                    self.observeTransactionsForCurrentUser()
+            self?.transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
+                self?.transactionRules = firebaseTransactionRules
+                self?.observeTransactionRulesForCurrentUser()
+                self?.transactionFetcher.fetchTransactions { (firebaseTransactions) in
                     completion()
+                    self?.transactions = firebaseTransactions
+                    self?.removePendingTransactions()
+                    self?.observeTransactionsForCurrentUser()
+                    self?.grabOtherFinances()
                 }
             }
             
-            holdingFetcher.fetchHoldings { (firebaseHoldings) in
-                self.holdings = firebaseHoldings
-                self.observeHoldingsForCurrentUser()
+            self?.holdingFetcher.fetchHoldings { (firebaseHoldings) in
+                self?.holdings = firebaseHoldings
+                self?.observeHoldingsForCurrentUser()
+            }
+
+        }
+    }
+    
+    func grabOtherFinances() {
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            self?.memberFetcher.fetchMembers { (firebaseMembers) in
+                self?.members = firebaseMembers
+                self?.setupMembersAccountsDict()
+                self?.observeMembersForCurrentUser()
             }
         }
     }

@@ -28,7 +28,7 @@ class ActivitiesFetcher: NSObject {
             completion([])
             return
         }
-        
+                
         let ref = Database.database().reference()
         userActivitiesDatabaseRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID)
         userActivitiesDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
@@ -52,25 +52,7 @@ class ActivitiesFetcher: NSObject {
                             activity.pinned = userActivity.pinned
                             
                             activities.append(activity)
-
                             
-                            // Handles recurring events.
-                            if let rules = activity.recurrences, !rules.isEmpty {
-                                let dates = iCalUtility()
-                                    .recurringDates(forRules: rules, startDate: activity.startDate!)
-                                print(rules, dates)
-
-//                                let duration = activity.endDate!.timeIntervalSince(activity.endDate!)
-
-//                                for date in dates {
-//                                    let newActivity = activity.copy() as! Activity
-//                                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
-//                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
-//                                    activities.append(newActivity)
-//                                }
-                            } else {
-//                                activities.append(activity)
-                            }
                         }
                         group.leave()
                     })
@@ -110,14 +92,14 @@ class ActivitiesFetcher: NSObject {
             }
         })
         
-        currentUserActivitiesChangeHandle = userActivitiesDatabaseRef.observe(.childChanged, with: { snapshot in
-            if let completion = self.activitiesChanged {
+        currentUserActivitiesRemoveHandle = userActivitiesDatabaseRef.observe(.childRemoved, with: { snapshot in
+            if let completion = self.activitiesRemoved {
                 self.getActivitiesFromSnapshot(snapshot: snapshot, completion: completion)
             }
         })
         
-        currentUserActivitiesRemoveHandle = userActivitiesDatabaseRef.observe(.childRemoved, with: { snapshot in
-            if let completion = self.activitiesRemoved {
+        currentUserActivitiesChangeHandle = userActivitiesDatabaseRef.observe(.childChanged, with: { snapshot in
+            if let completion = self.activitiesChanged {
                 self.getActivitiesFromSnapshot(snapshot: snapshot, completion: completion)
             }
         })

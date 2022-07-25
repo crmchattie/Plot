@@ -19,6 +19,7 @@ import RRuleSwift
 
 class CreateActivityViewController: FormViewController {
     var activity: Activity!
+    var activityOld: Activity!
     var invitation: Invitation?
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -91,6 +92,7 @@ class CreateActivityViewController: FormViewController {
         if activity != nil {
             title = "Event"
             active = true
+            activityOld = activity
             if activity.activityID != nil {
                 activityID = activity.activityID!
             }
@@ -197,12 +199,8 @@ class CreateActivityViewController: FormViewController {
         } else {
             let dotsImage = UIImage(named: "dots")
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
-            if let localName = activity.locationName, localName != "locationName", let _ = activity.locationAddress {
-                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-            } else {
-                navigationItem.rightBarButtonItem = plusBarButton
-            }
+            let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+            navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
     }
@@ -264,10 +262,10 @@ class CreateActivityViewController: FormViewController {
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.activityDescription = row.value
-                    if row.value == nil {
-                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("activityDescription")
-                        reference.removeValue()
-                    }
+//                    if row.value == nil {
+//                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("activityDescription")
+//                        reference.removeValue()
+//                    }
                 }
             
             <<< ButtonRow("Category") { row in
@@ -705,10 +703,10 @@ class CreateActivityViewController: FormViewController {
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.notes = row.value
-                    if row.value == nil {
-                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("notes")
-                        reference.removeValue()
-                    }
+//                    if row.value == nil {
+//                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("notes")
+//                        reference.removeValue()
+//                    }
                 }
         
 //        <<< SwitchRow("showExtras") { row in

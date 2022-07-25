@@ -36,18 +36,14 @@ class EKPlotActivityOp: AsyncOperation {
                 let values = value.values
                 let activitiesIDs = values.compactMap { $0["activityID"] }
                 for activity in self!.activities {
-                    if !(activity.calendarExport ?? false) {
+                    if !(activity.calendarExport ?? false), let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
                         dispatchGroup.enter()
-                        if let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
-                            if let event = self?.eventKitService.storeEvent(for: activity) {
-                                let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                                reference.child(event.calendarItemIdentifier).updateChildValues(calendarEventActivityValue) { (_, _) in
-                                    let userReference = Database.database().reference().child("user-activities").child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                                    let values:[String : Any] = ["calendarExport": true]
-                                    userReference.updateChildValues(values)
-                                    dispatchGroup.leave()
-                                }
-                            } else {
+                        if let event = self?.eventKitService.storeEvent(for: activity) {
+                            let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                            reference.child(event.calendarItemIdentifier).updateChildValues(calendarEventActivityValue) { (_, _) in
+                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                                let values:[String : Any] = ["calendarExport": true]
+                                userReference.updateChildValues(values)
                                 dispatchGroup.leave()
                             }
                         } else {

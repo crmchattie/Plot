@@ -17,8 +17,6 @@ class ChooseEmailController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         configureChangeEmailView()
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
     func configureChangeEmailView() {
@@ -44,6 +42,8 @@ class ChooseEmailController: UIViewController {
     }
     
     @objc func signInToGoogle() {
+        GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance()?.signIn()
     }
 }

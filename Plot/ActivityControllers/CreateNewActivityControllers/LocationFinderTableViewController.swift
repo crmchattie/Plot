@@ -23,9 +23,6 @@ class LocationFinderTableViewController: UIViewController {
     
     weak var delegate : UpdateLocationDelegate?
     
-    var locationName = "Location"
-    var locationAddress = ["locationAddress": [0.0]]
-    
     var viewPlaceholder = ViewPlaceholder()
     
     override func viewDidLoad() {
@@ -173,29 +170,26 @@ extension LocationFinderTableViewController: UITableViewDataSource {
 extension LocationFinderTableViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        
         let completion = searchResults[indexPath.row]
-        var latitude = Double()
-        var longitude = Double()
-        
-        locationName = String(completion.title)
-                                
         let searchRequest = MKLocalSearch.Request(completion: completion)
         let search = MKLocalSearch(request: searchRequest)
         search.start { (response, error) in
-            let coordinates = response?.mapItems[0].placemark.coordinate
-            latitude = coordinates!.latitude
-            longitude = coordinates!.longitude
-            
-            let zipcode = response?.mapItems[0].placemark.postalCode ?? ""
-            let city = response?.mapItems[0].placemark.locality ?? ""
-            let state = response?.mapItems[0].placemark.administrativeArea ?? ""
-            let countryCode = response?.mapItems[0].placemark.countryCode ?? ""
-            
-            self.locationAddress = [self.locationName: [latitude, longitude]]
-            self.delegate?.updateLocation(locationName: self.locationName, locationAddress: self.locationAddress, zipcode: zipcode, city: city, state: state, country: countryCode)
-            self.navigationController?.popViewController(animated: true)
+            if let res = response {
+                
+                let placemark = res.mapItems[0].placemark
+                let coordinates = placemark.coordinate
+                let latitude = coordinates.latitude
+                let longitude = coordinates.longitude
+                let zipcode = placemark.postalCode ?? ""
+                let city = placemark.locality ?? ""
+                let state = placemark.administrativeArea ?? ""
+                let countryCode = placemark.countryCode ?? ""
+                let locationName = String(completion.title).removeCharacters()
+                let locationAddress = [locationName: [latitude, longitude]]
+                
+                self.delegate?.updateLocation(locationName: locationName, locationAddress: locationAddress, zipcode: zipcode, city: city, state: state, country: countryCode)
+                self.navigationController?.popViewController(animated: true)
+            }
         }
 
     }

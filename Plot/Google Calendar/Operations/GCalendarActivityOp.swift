@@ -35,10 +35,11 @@ class GCalendarActivityOp: AsyncOperation {
                         self?.finish()
                         return
                     }
-                    self?.update(activity: activity)
-                    let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                    activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                        self?.finish()
+                    self?.update(activity: activity, completion: { activity in
+                        let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+                        activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
+                            self?.finish()
+                        })
                     })
                 })
             }
@@ -50,15 +51,16 @@ class GCalendarActivityOp: AsyncOperation {
                 
                 let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                 reference.updateChildValues(calendarEventActivityValue) { (_, _) in
-                    let activity = weakSelf.createActivity(for: activityID)
-                    let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                    activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                        let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values: [String : Any] = ["isGroupActivity": false, "badge": 0]
-                        userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
-                            self?.finish()
+                    weakSelf.createActivity(for: activityID) { activity in
+                        let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+                        activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
+                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                            let values: [String : Any] = ["isGroupActivity": false, "badge": 0, "calendarExport": true]
+                            userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
+                                self?.finish()
+                            })
                         })
-                    })
+                    }
                 }
             }
             else {
@@ -67,18 +69,18 @@ class GCalendarActivityOp: AsyncOperation {
         })
     }
     
-    private func createActivity(for activityID: String) -> Activity {
+    private func createActivity(for activityID: String, completion: @escaping (Activity) -> Void) {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-        update(activity: activity)
-        activity.category = ActivityCategory.categorize(activity).rawValue
-        activity.activityType = CustomType.googleCalendarEvent.categoryText
-        return activity
+        update(activity: activity) { activity in
+            activity.category = ActivityCategory.categorize(activity).rawValue
+            activity.activityType = CustomType.googleCalendarEvent.categoryText
+            completion(activity)
+        }
     }
     
-    private func update(activity: Activity) {
+    private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
         activity.name = event.summary
         activity.activityDescription = event.descriptionProperty
-        activity.locationName = event.location
         activity.recurrences = event.recurrence
         if let start = event.start?.date, let end = event.end?.date {
             activity.allDay = true
@@ -92,6 +94,19 @@ class GCalendarActivityOp: AsyncOperation {
             activity.startTimeZone = event.start?.timeZone ?? TimeZone.current.identifier
             activity.endDateTime = NSNumber(value: end.date.timeIntervalSince1970)
             activity.endTimeZone = event.end?.timeZone ?? TimeZone.current.identifier
+        }
+        if let location = event.location {
+            lookupLocation(for: location) { coordinates in
+                if let coordinates = coordinates {
+                    let latitude = coordinates.latitude
+                    let longitude = coordinates.longitude
+                    activity.locationName = location.removeCharacters()
+                    activity.locationAddress = [location.removeCharacters(): [latitude, longitude]]
+                    completion(activity)
+                } else {
+                    completion(activity)
+                }
+            }
         }
     }
     

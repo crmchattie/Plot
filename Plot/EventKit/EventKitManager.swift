@@ -31,12 +31,16 @@ class EventKitManager {
         }
     }
     
+    func checkEventAuthorizationStatus(_ completion: @escaping () -> Void) {
+        eventKitService.checkEventAuthorizationStatus()
+    }
+    
     func syncEventKitActivities(existingActivities: [Activity], completion: @escaping () -> Void) {
         guard !isRunning, isAuthorized else {
             completion()
             return
         }
-        
+                        
         activities = []
         isRunning = true
         

@@ -49,13 +49,7 @@ class HealthViewController: UIViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
-    
-    @objc fileprivate func handleDismiss(button: UIButton) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    var closeButtonConstraint: CGFloat = 0
-        
+            
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never

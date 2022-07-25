@@ -36,12 +36,12 @@ class GPlotActivityOp: AsyncOperation {
                 let values = value.values
                 let activitiesIDs = values.compactMap { $0["activityID"] }
                 for activity in self!.activities {
-                    dispatchGroup.enter()
-                    if let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
+                    if !(activity.calendarExport ?? false), let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
+                        dispatchGroup.enter()
                         if let event = self?.googleCalService.storeEvent(for: activity), let id = event.identifier {
                             let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                             reference.child(id).updateChildValues(calendarEventActivityValue) { (_, _) in
-                                let userReference = Database.database().reference().child("user-activities").child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
                                 let values:[String : Any] = ["calendarExport": true]
                                 userReference.updateChildValues(values)
                                 dispatchGroup.leave()
@@ -49,8 +49,6 @@ class GPlotActivityOp: AsyncOperation {
                         } else {
                             dispatchGroup.leave()
                         }
-                    } else {
-                        dispatchGroup.leave()
                     }
                 }
                 dispatchGroup.notify(queue: .global()) {

@@ -1491,6 +1491,7 @@
 				10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */,
 				265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */,
 				10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */,
+				106D758A2442447C0039B534 /* ActivityActions.swift */,
 				26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */,
 			);
 			path = ActivityTableView;
@@ -1530,7 +1531,6 @@
 				102618CC257721D100CF6F0A /* NewActivityCategoryViewController.swift */,
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
 				10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */,
-				106D758A2442447C0039B534 /* ActivityActions.swift */,
 			);
 			path = CreateNewActivityControllers;
 			sourceTree = "<group>";
@@ -1665,8 +1665,8 @@
 				26C4431B250F0C9200A9533C /* Model */,
 				260C87C924FF5FE900715A64 /* HealthKitManager.swift */,
 				2623AA9124FB67BF0020A316 /* HealthKitService.swift */,
-				26336E162593FA1A001A3071 /* HealthKitSampleBuilder.swift */,
 				2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */,
+				26336E162593FA1A001A3071 /* HealthKitSampleBuilder.swift */,
 			);
 			path = HealthKit;
 			sourceTree = "<group>";
@@ -2382,7 +2382,6 @@
 				4BAEE5AE212735E50045AB10 /* CenteredCollectionViewFlowLayout */,
 				4BAEE5B0212735E50045AB10 /* NavigationControllerActivityIndicator */,
 				4BAEE5B2212735E50045AB10 /* UserProfilePictureOpener */,
-				F99E45AF262F22B600F59D0E /* iCalUtility.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -2690,6 +2689,7 @@
 				1069B2D3243115950048244C /* ActivityObject.swift */,
 				10C50FA32274EF9000111033 /* Activity.swift */,
 				F98329942602B25100EB51F7 /* ActivityCategory.swift */,
+				F99E45AF262F22B600F59D0E /* iCalUtility.swift */,
 			);
 			path = Activity;
 			sourceTree = "<group>";

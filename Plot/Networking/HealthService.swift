@@ -49,9 +49,10 @@ class HealthService {
     var askedforAuthorization: Bool = false
     
     func grabHealth(_ completion: @escaping () -> Void) {
+        healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
             self?.askedforAuthorization = askedforAuthorization
-            self?.healhKitManager.loadHealthKitActivities { metrics, shouldFetchActivities in
+            self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
                 if !metrics.isEmpty {
                     HealthKitService.authorized = true
                     DispatchQueue.main.async {

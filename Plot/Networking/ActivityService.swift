@@ -38,7 +38,6 @@ class ActivityService {
     var activities = [Activity]() {
         didSet {
             if oldValue != activities {
-                print("oldValue != activities")
                 activities.sort { (activity1, activity2) -> Bool in
                     return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
                 }
@@ -46,6 +45,8 @@ class ActivityService {
             }
         }
     }
+    //for Apple/Google Calendar functions
+    var activitiesNoRepeats = [Activity]()
     var invitations: [String: Invitation] = [:] {
         didSet {
             if oldValue != invitations {
@@ -71,9 +72,20 @@ class ActivityService {
     
     func grabActivities(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [weak self] in
-            self?.activitiesFetcher.fetchActivities { (activities) in
+            self?.activitiesFetcher.fetchActivities { [weak self] activities in
                 self?.activities = activities
-                self?.fetchInvitations()
+                self?.activitiesNoRepeats = activities
+                self?.grabOtherActivities()
+                completion()
+            }
+        }
+    }
+    
+    func grabOtherActivities() {
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            self?.fetchInvitations()
+            self?.addRepeatingActivities(activities: self?.activities ?? [], completion: { newActivities in
+                self?.activities = newActivities
                 self?.grabPrimaryCalendar({ (calendar) in
                     if calendar == icloudString {
                         self?.grabEventKit {
@@ -91,8 +103,7 @@ class ActivityService {
                     }
                     self?.grabCalendars()
                 })
-                completion()
-            }
+            })
         }
     }
     
@@ -100,11 +111,12 @@ class ActivityService {
         guard Auth.auth().currentUser != nil else {
             return completion()
         }
+        self.eventKitManager.checkEventAuthorizationStatus {}
         self.eventKitManager.authorizeEventKit({ askedforAuthorization in
             self.askedforAuthorization = askedforAuthorization
-            self.eventKitManager.syncEventKitActivities(existingActivities: self.activities, completion: {
-                self.eventKitManager.syncActivitiesToEventKit(activities: self.activities, completion: {
-                    completion()
+            self.eventKitManager.syncEventKitActivities(existingActivities: self.activitiesNoRepeats, completion: {
+                self.eventKitManager.syncActivitiesToEventKit(activities: self.activitiesNoRepeats, completion: {
+                  completion()
                 })
             })
         })
@@ -116,8 +128,8 @@ class ActivityService {
         }
         self.googleCalManager.setupGoogle { askedforAuthorization in
             self.askedforAuthorization = askedforAuthorization
-            self.googleCalManager.syncGoogleCalActivities(existingActivities: self.activities, completion: {
-                self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activities, completion: {
+            self.googleCalManager.syncGoogleCalActivities(existingActivities: self.activitiesNoRepeats, completion: {
+                self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activitiesNoRepeats, completion: {
                     completion()
                 })
             })
@@ -221,25 +233,58 @@ extension ActivityService {
     
     func observeActivitiesForCurrentUser() {
         activitiesFetcher.observeActivityForCurrentUser(activitiesAdded: { [weak self] activitiesAdded in
+            print("activitiesAdded")
                 for activity in activitiesAdded {
-                    if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self?.activities[index] = activity
+                    if activity.recurrences != nil {
+                        if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
+                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID}))!
+                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                                self?.activities.append(contentsOf: activities)
+                            })
+                        } else {
+                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                                self?.activities.append(contentsOf: activities)
+                            })
+                        }
                     } else {
-                        self?.activities.append(activity)
+                        if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                            self?.activities[index] = activity
+                        } else {
+                            self?.activities.append(activity)
+                        }
                     }
                 }
             }, activitiesRemoved: { [weak self] activitiesRemoved in
+                print("activitiesRemoved")
                 for activity in activitiesRemoved {
-                    if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                    if activity.recurrences != nil {
+                        if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
+                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID}))!
+                        }
+                    } else if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
                         self?.activities.remove(at: index)
                     }
                 }
             }, activitiesChanged: { [weak self] activitiesChanged in
+                print("activitiesChanged")
                 for activity in activitiesChanged {
-                    if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self?.activities[index] = activity
+                    if activity.recurrences != nil {
+                        if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
+                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID}))!
+                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                                self?.activities.append(contentsOf: activities)
+                            })
+                        } else {
+                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                                self?.activities.append(contentsOf: activities)
+                            })
+                        }
                     } else {
-                        self?.activities.append(activity)
+                        if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                            self?.activities[index] = activity
+                        } else {
+                            self?.activities.append(activity)
+                        }
                     }
                 }
             }
@@ -256,5 +301,33 @@ extension ActivityService {
                 self?.invitations.removeValue(forKey: invitation.activityID)
             }
         }
+    }
+    
+    func addRepeatingActivities(activities: [Activity], completion: @escaping ([Activity])->()) {
+        let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
+        var newActivities = [Activity]()
+        for activity in activities {
+            // Handles recurring events.
+            if let rules = activity.recurrences, !rules.isEmpty {
+                let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
+                let dates = iCalUtility()
+                    .recurringDates(forRules: rules, ruleStartDate: activity.startDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
+                if activity.name == "Test three" {
+                    print("rules \(rules)")
+                    print("dayBeforeNowDate \(dayBeforeNowDate)")
+                    print("dates \(dates)")
+                }
+                for date in dates {
+                    let newActivity = activity.copy() as! Activity
+                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                    newActivities.append(newActivity)
+                }
+            } else {
+                newActivities.append(activity)
+            }
+        }
+        completion(newActivities)
     }
 }

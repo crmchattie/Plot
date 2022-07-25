@@ -61,7 +61,7 @@ extension CreateActivityViewController: UITextFieldDelegate {
 
 extension CreateActivityViewController: UpdateActivityCategoryDelegate {
     func update(value: String) {
-        if let row: LabelRow = form.rowBy(tag: "Category") {
+        if let row = form.rowBy(tag: "Category") {
             row.title = value
             row.updateCell()
             self.activity.category = value
@@ -426,10 +426,7 @@ extension CreateActivityViewController: UpdateActivityListDelegate {
 extension CreateActivityViewController: RecurrencePickerDelegate {
     func recurrencePicker(_ picker: RecurrencePicker, didPickRecurrence recurrenceRule: RecurrenceRule?) {
         // do something, if recurrenceRule is nil, that means "never repeat".
-//        let recurrenceRuleText = recurrenceRule?.toText(of: .english, occurrenceDate: activity.startDate!)
-//        let recurrenceRuleRowText = recurrenceRule?.typeOfRecurrence(language: .english, occurrence: activity.startDate!)
-//        print("recurrenceRuleText \(recurrenceRuleText)")
-//        print("recurrenceRuleRowText \(recurrenceRuleRowText)")
+
         if let row: LabelRow = form.rowBy(tag: "Repeat"), let startDate = activity.startDate {
             if let recurrenceRule = recurrenceRule {
                 let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
@@ -440,8 +437,8 @@ extension CreateActivityViewController: RecurrencePickerDelegate {
                 row.value = "Never"
                 row.updateCell()
                 activity.recurrences = nil
-                let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("recurrences")
-                reference.removeValue()
+//                let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("recurrences")
+//                reference.removeValue()
             }
         }
     }

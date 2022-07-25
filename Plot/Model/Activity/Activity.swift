@@ -546,6 +546,10 @@ class Activity: NSObject, NSCopying, Codable {
     }
 }
 
+//func ==(lhs: Activity, rhs: Activity) -> Bool {
+//    return lhs.activityID == rhs.activityID
+//}
+
 enum CustomType: String, Equatable, Hashable {
     case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness, calendar, googleCalendarEvent, investment
     

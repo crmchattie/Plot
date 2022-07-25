@@ -192,13 +192,13 @@ class ListsViewController: UIViewController {
 
 extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        
-        let delete = setupDeleteAction(at: indexPath)
-        let mute = setupMuteAction(at: indexPath)
-        
-        return [delete, mute]
-    }
+//    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+//        
+//        let delete = setupDeleteAction(at: indexPath)
+//        let mute = setupMuteAction(at: indexPath)
+//        
+//        return [delete, mute]
+//    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1

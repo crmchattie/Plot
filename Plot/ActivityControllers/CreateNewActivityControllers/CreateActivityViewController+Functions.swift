@@ -275,7 +275,7 @@ extension CreateActivityViewController {
         }
         
         dispatchGroup.notify(queue: .main) {
-//            self.listRow()
+            self.listRow()
 //            self.decimalRowFunc()
 //            self.purchaseBreakdown()
         }
@@ -464,7 +464,7 @@ extension CreateActivityViewController {
     }
     
     func updateLists(type: String) {
-        let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+//        let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
         if type == "schedule" {
             var scheduleIDs = [String]()
             for schedule in scheduleList {
@@ -474,10 +474,10 @@ extension CreateActivityViewController {
             }
             if !scheduleIDs.isEmpty {
                 activity.scheduleIDs = scheduleIDs
-                groupActivityReference.updateChildValues(["scheduleIDs": scheduleIDs as AnyObject])
+//                groupActivityReference.updateChildValues(["scheduleIDs": scheduleIDs as AnyObject])
             } else {
                 activity.scheduleIDs = nil
-                groupActivityReference.child("scheduleIDs").removeValue()
+//                groupActivityReference.child("scheduleIDs").removeValue()
             }
         } else if type == "purchases" {
             var transactionIDs = [String]()
@@ -486,19 +486,19 @@ extension CreateActivityViewController {
             }
             if !transactionIDs.isEmpty {
                 activity.transactionIDs = transactionIDs
-                groupActivityReference.updateChildValues(["transactionIDs": transactionIDs as AnyObject])
+//                groupActivityReference.updateChildValues(["transactionIDs": transactionIDs as AnyObject])
             } else {
                 activity.transactionIDs = nil
-                groupActivityReference.child("transactionIDs").removeValue()
+//                groupActivityReference.child("transactionIDs").removeValue()
             }
         } else if type == "health" {
             if healthList.isEmpty {
                 activity.workoutIDs = nil
-                groupActivityReference.child("workoutIDs").removeValue()
+//                groupActivityReference.child("workoutIDs").removeValue()
                 activity.mealIDs = nil
-                groupActivityReference.child("mealIDs").removeValue()
+//                groupActivityReference.child("mealIDs").removeValue()
                 activity.mindfulnessIDs = nil
-                groupActivityReference.child("mindfulnessIDs").removeValue()
+//                groupActivityReference.child("mindfulnessIDs").removeValue()
             } else {
                 var workoutIDs = [String]()
                 var mealIDs = [String]()
@@ -514,36 +514,36 @@ extension CreateActivityViewController {
                 }
                 if !workoutIDs.isEmpty {
                     activity.workoutIDs = workoutIDs
-                    groupActivityReference.updateChildValues(["workoutIDs": workoutIDs as AnyObject])
+//                    groupActivityReference.updateChildValues(["workoutIDs": workoutIDs as AnyObject])
                 } else {
                     activity.workoutIDs = nil
-                    groupActivityReference.child("workoutIDs").removeValue()
+//                    groupActivityReference.child("workoutIDs").removeValue()
                 }
                 if !mealIDs.isEmpty {
                     activity.mealIDs = mealIDs
-                    groupActivityReference.updateChildValues(["mealIDs": mealIDs as AnyObject])
+//                    groupActivityReference.updateChildValues(["mealIDs": mealIDs as AnyObject])
                 } else {
                     activity.mealIDs = nil
-                    groupActivityReference.child("mealIDs").removeValue()
+//                    groupActivityReference.child("mealIDs").removeValue()
                 }
                 if !mindfulnessIDs.isEmpty {
                     activity.packinglistIDs = mindfulnessIDs
-                    groupActivityReference.updateChildValues(["mindfulnessIDs": mindfulnessIDs as AnyObject])
+//                    groupActivityReference.updateChildValues(["mindfulnessIDs": mindfulnessIDs as AnyObject])
                 } else {
                     activity.mindfulnessIDs = nil
-                    groupActivityReference.child("mindfulnessIDs").removeValue()
+//                    groupActivityReference.child("mindfulnessIDs").removeValue()
                 }
             }
         } else {
             if listList.isEmpty {
                 activity.checklistIDs = nil
-                groupActivityReference.child("checklistIDs").removeValue()
+//                groupActivityReference.child("checklistIDs").removeValue()
                 activity.grocerylistID = nil
-                groupActivityReference.child("grocerylistID").removeValue()
+//                groupActivityReference.child("grocerylistID").removeValue()
                 activity.packinglistIDs = nil
-                groupActivityReference.child("packinglistIDs").removeValue()
+//                groupActivityReference.child("packinglistIDs").removeValue()
                 activity.activitylistIDs = nil
-                groupActivityReference.child("activitylistIDs").removeValue()
+//                groupActivityReference.child("activitylistIDs").removeValue()
             } else {
                 var checklistIDs = [String]()
                 var packinglistIDs = [String]()
@@ -562,31 +562,31 @@ extension CreateActivityViewController {
                 }
                 if !checklistIDs.isEmpty {
                     activity.checklistIDs = checklistIDs
-                    groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
+//                    groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
                 } else {
                     activity.checklistIDs = nil
-                    groupActivityReference.child("checklistIDs").removeValue()
+//                    groupActivityReference.child("checklistIDs").removeValue()
                 }
                 if !activitylistIDs.isEmpty {
                     activity.activitylistIDs = activitylistIDs
-                    groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
+//                    groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
                 } else {
                     activity.activitylistIDs = nil
-                    groupActivityReference.child("activitylistIDs").removeValue()
+//                    groupActivityReference.child("activitylistIDs").removeValue()
                 }
                 if grocerylistID != "nothing" {
                     activity.grocerylistID = grocerylistID
-                    groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
+//                    groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
                 } else {
                     activity.grocerylistID = nil
-                    groupActivityReference.child("grocerylistID").removeValue()
+//                    groupActivityReference.child("grocerylistID").removeValue()
                 }
                 if !packinglistIDs.isEmpty {
                     activity.packinglistIDs = packinglistIDs
-                    groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
+//                    groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
                 } else {
                     activity.packinglistIDs = nil
-                    groupActivityReference.child("packinglistIDs").removeValue()
+//                    groupActivityReference.child("packinglistIDs").removeValue()
                 }
             }
         }
@@ -1102,20 +1102,88 @@ extension CreateActivityViewController {
     }
     
     @objc func createNewActivity() {
+        //need to look into equatable protocol for activities
+        if activity.recurrences != nil && !(activity != activityOld) {
+            let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
+                print("Save for this event only")
+                //update activity's recurrence to skip repeat on this date
+                if let recurrences = self.activityOld.recurrences {
+                    if let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
+                        var rule = RecurrenceRule(rruleString: recurrence)
+                        if rule != nil {
+//                          duplicate updated activity w/ new ID and no recurrence rule
+                            self.duplicateActivity(recurrenceRule: nil)
+    //                      update existing activity with exlusion date that fall's on this date
+                            rule!.exdate = ExclusionDate(dates: [self.activity.startDate ?? Date()], granularity: .day)
+                            self.activityOld.recurrences?.append(rule!.exdate!.toExDateString()!)
+                            self.updateRecurrences(recurrences: self.activityOld.recurrences!)
+                        }
+                    }
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Save For Future Events", style: .default, handler: { (_) in
+                print("Save for future events")
+                //update activity's recurrence to stop repeating just before this event
+                if let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
+                    var oldActivityRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex])
+                    //will equal true if first instance of repeating event
+                    if oldActivityRule?.startDate == self.activityOld.startDate {
+                        //update all instances of activity
+                        self.createActivity(activity: nil)
+                    } else if oldActivityRule != nil, let dateIndex = oldActivityRule!.allOccurrences().firstIndex(of: self.activityOld.startDate ?? Date()), let newRecurrences = self.activity.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
+                        
+                        //update only future instances of activity
+                        var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
+                        newActivityRule!.startDate = self.activity.startDate ?? Date()
+                        
+                        var newRecurrences = oldRecurrences
+                        newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
+                        
+                        for recurrence in newRecurrences {
+                            print(recurrence)
+                        }
+                        //duplicate activity w/ new ID and same recurrence rule starting from this event's date
+                        self.duplicateActivity(recurrenceRule: newRecurrences)
+                        
+                        //update existing activity with end date equaling ocurrence before this date
+                        oldActivityRule!.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
+                        
+                        self.activityOld.recurrences![oldRecurranceIndex] = oldActivityRule!.toRRuleString()
+                        
+                        for recurrence in self.activityOld.recurrences! {
+                            print(recurrence)
+                        }
+                        
+                        self.updateRecurrences(recurrences: self.activityOld.recurrences!)
+                    }
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+        }
         // do not want to have in duplicate functionality
-        if !active || sentActivity || true {
-            self.createActivity()
+        else if !active || sentActivity || true {
+            self.createActivity(activity: nil)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Update Event", style: .default, handler: { (_) in
                 print("User click Edit button")
-                self.createActivity()
+                self.createActivity(activity: nil)
             }))
             
             alert.addAction(UIAlertAction(title: "Duplicate Event", style: .default, handler: { (_) in
                 print("User click Edit button")
-                self.duplicateActivity()
+                self.duplicateActivity(recurrenceRule: nil)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -1129,10 +1197,22 @@ extension CreateActivityViewController {
         }
     }
     
-    func createActivity() {
+    func updateRecurrences(recurrences: [String]) {
+        showActivityIndicator()
+        let createActivity = ActivityActions(activity: self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
+        createActivity.updateRecurrences(recurrences: recurrences)
+        hideActivityIndicator()
+        if navigationItem.leftBarButtonItem != nil {
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    func createActivity(activity: Activity?) {
         if sentActivity {
             showActivityIndicator()
-            let createActivity = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+            let createActivity = ActivityActions(activity: activity ?? self.activity, active: false, selectedFalconUsers: [])
             createActivity.createNewActivity()
             hideActivityIndicator()
             if navigationItem.leftBarButtonItem != nil {
@@ -1142,7 +1222,7 @@ extension CreateActivityViewController {
             }
         } else {
             showActivityIndicator()
-            let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+            let createActivity = ActivityActions(activity: activity ?? self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
             createActivity.createNewActivity()
             hideActivityIndicator()
             if navigationItem.leftBarButtonItem != nil {
@@ -1191,32 +1271,35 @@ extension CreateActivityViewController {
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        //        if activity.conversationID == nil {
-        //            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
-        //                print("User click Approve button")
-        //                self.goToChat()
-        //
-        //            }))
-        //        } else {
-        //            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
-        //                print("User click Approve button")
-        //                self.goToChat()
-        //
-        //
-        //            }))
-        //        }
+//        if activity.conversationID == nil {
+//            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
+//                print("User click Approve button")
+//                self.goToChat()
+//
+//            }))
+//        } else {
+//            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
+//                print("User click Approve button")
+//                self.goToChat()
+//
+//
+//            }))
+//        }
+        
+        alert.addAction(UIAlertAction(title: "Delete Event", style: .default, handler: { (_) in
+            self.deleteActivity()
+        }))
         
         if let localName = activity.locationName, localName != "locationName", let _ = activity.locationAddress {
             alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
-                print("User click Edit button")
                 self.goToMap()
             }))
         }
         
-        //        alert.addAction(UIAlertAction(title: "Share Event", style: .default, handler: { (_) in
-        //            print("User click Edit button")
-        //            self.share()
-        //        }))
+//                alert.addAction(UIAlertAction(title: "Share Event", style: .default, handler: { (_) in
+//                    print("User click Edit button")
+//                    self.share()
+//                }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -1267,6 +1350,75 @@ extension CreateActivityViewController {
             destination.locations = [.activity: locations]
         }
         navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    func deleteActivity() {
+        //need to look into equatable protocol for activities
+        if activity.recurrences != nil {
+            let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "Delete This Event Only", style: .default, handler: { (_) in
+                print("Save for this event only")
+                //update activity's recurrence to skip repeat on this date
+                if let recurrences = self.activity.recurrences {
+                    if let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
+                        var rule = RecurrenceRule(rruleString: recurrence)
+                        if rule != nil {
+    //                      update existing activity with exlusion date that fall's on this date
+                            rule!.exdate = ExclusionDate(dates: [self.activity.startDate ?? Date()], granularity: .day)
+                            self.activity.recurrences!.append(rule!.exdate!.toExDateString()!)
+                            self.updateRecurrences(recurrences: self.activity.recurrences!)
+                        }
+                    }
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Delete All Future Events", style: .default, handler: { (_) in
+                print("Save for future events")
+                //update activity's recurrence to stop repeating at this event
+                if let recurrences = self.activity.recurrences {
+                    if let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
+                        var rule = RecurrenceRule(rruleString: recurrence)
+                        if rule != nil, let index = rule!.allOccurrences().firstIndex(of: self.activity.startDate ?? Date()) {
+                            if index > 0 {
+                                //update existing activity with end date equaling ocurrence of this date
+                                rule!.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: index)
+                                self.activity.recurrences = [rule!.toRRuleString()]
+                                self.updateRecurrences(recurrences: self.activity.recurrences!)
+                            } else {
+                                self.showActivityIndicator()
+                                let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                                deleteActivity.deleteActivity()
+                                self.hideActivityIndicator()
+                                if self.navigationItem.leftBarButtonItem != nil {
+                                    self.dismiss(animated: true, completion: nil)
+                                } else {
+                                    self.navigationController?.popViewController(animated: true)
+                                }
+                            }
+                        }
+                    }
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+        } else {
+            self.showActivityIndicator()
+            let deleteActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+            deleteActivity.deleteActivity()
+            self.hideActivityIndicator()
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+        }
     }
     
     func share() {
@@ -1337,29 +1489,21 @@ extension CreateActivityViewController {
         
     }
     
-    func duplicateActivity() {
-        
+    func duplicateActivity(recurrenceRule: [String]?) {
         if let activity = activity, let currentUserID = Auth.auth().currentUser?.uid {
             var newActivityID: String!
-            
-            newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+            newActivityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
             
             let newActivity = activity.copy() as! Activity
             newActivity.activityID = newActivityID
-            newActivity.admin = currentUserID
-            newActivity.participantsIDs = nil
-            newActivity.activityPhotos = nil
-            newActivity.activityFiles = nil
-            newActivity.activityOriginalPhotoURL = nil
-            newActivity.activityThumbnailPhotoURL = nil
-            newActivity.conversationID = nil
+            if let recurrenceRule = recurrenceRule {
+                newActivity.recurrences = recurrenceRule
+            } else {
+                newActivity.recurrences = nil
+            }
             
-            self.showActivityIndicator()
-            let createActivity = ActivityActions(activity: newActivity, active: !self.active, selectedFalconUsers: [])
+            let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: selectedFalconUsers)
             createActivity.createNewActivity()
-            self.hideActivityIndicator()
-            self.navigationController?.popViewController(animated: true)
-            
         }
     }
     

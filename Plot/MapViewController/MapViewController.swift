@@ -42,6 +42,20 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.delegate = self
     }
     
+    let closeButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "close"), for: .normal)
+        button.tintColor = .systemBlue
+        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+        return button
+    }()
+    
+    @objc fileprivate func handleDismiss(button: UIButton) {
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        self.navigationController?.popViewController(animated: true)
+    }
+    
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
         case .authorizedWhenInUse:
@@ -55,8 +69,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.isNavigationBarHidden = false
-        navigationController?.navigationBar.isHidden = false
+        navigationController?.isNavigationBarHidden = true
+        navigationController?.navigationBar.isHidden = true
         navigationItem.largeTitleDisplayMode = .never
         
         requestUserLocation()
@@ -67,18 +81,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         mapView.fillSuperview()
                 
         addAnnotations()
-        setupLocationsCarousel()
+        setupViews()
         locationsController.mapViewController = self
         
-        extendedLayoutIncludesOpaqueBars = true
     }
-    
+
     let locationsController = LocationsCarouselController(scrollDirection: .horizontal)
     
-    fileprivate func setupLocationsCarousel() {
+    fileprivate func setupViews() {
         let locationsView = locationsController.view!
         view.addSubview(locationsView)
-        locationsView.anchor(top: nil, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 10, right: 0), size: .init(width: 0, height: 100))
+        view.addSubview(closeButton)
+        locationsView.anchor(top: nil, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 20, right: 0), size: .init(width: 0, height: 100))
+        closeButton.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: nil, bottom: nil, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 25), size: .init(width: 50, height: 50))
     }
     
     var listener: Any!
@@ -203,6 +218,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
             } else if let activities = locations[section] as? [Activity] {
                 for activity in activities {
                     if let na = activity.name, let add = activity.locationName, let locationAddress = activity.locationAddress, let array = locationAddress[add], let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval, let allDay = activity.allDay {
+                        
                         category = ""
                         subcategory = ""
                         let startDate = Date(timeIntervalSince1970: startDate)
@@ -289,7 +305,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         default:
                             type = "activity"
                         }
-                                            
+                        
                         let annotation = CustomMapItemAnnotation()
                         let placemark = MKPlacemark(coordinate: .init(latitude: latitude, longitude: longitude))
                         let mapItem = MKMapItem(placemark: placemark)
@@ -304,6 +320,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         // tell my locationsCarouselController
                         let locationStruct = LocationStruct(name: name, address: address, type: type, category: category, subcategory: subcategory, lat: latitude, lon: longitude)
                         self.locationsController.items.append(locationStruct)
+
                     }
                 }
             }
@@ -342,5 +359,16 @@ struct MapPreview: PreviewProvider {
         }
         
         typealias UIViewControllerType = MapViewController
+    }
+}
+
+public func lookupLocation(for address: String, completion: @escaping (CLLocationCoordinate2D?) -> Void) {
+    let searchRequest = MKLocalSearch.Request()
+    searchRequest.naturalLanguageQuery = address
+    let search = MKLocalSearch(request: searchRequest)
+    search.start { (response, error) in
+        if let res = response {
+            completion(res.mapItems[0].placemark.coordinate)
+        }
     }
 }

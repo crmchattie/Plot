@@ -32,17 +32,16 @@ extension MasterActivityContainerController {
         
         let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
 //        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
+        UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
         //if new user, do nothing; if existing user with old version of app, load other variables
         //if existing user with current version, load everything
         if !isNewUser {
-            UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
             networkController.setupKeyVariables {
-                self.networkController.setupOtherVariables()
                 self.collectionView.reloadData()
                 self.removeLaunchScreenView()
+                self.networkController.setupOtherVariables()
             }
         } else {
-            UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
             self.removeLaunchScreenView()
             self.presentOnboardingController()
         }

@@ -143,7 +143,6 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         }
         
         appDelegate.loadNotifications()
-        
         showLaunchScreen()
         setOnlineStatus()
         loadVariables()
@@ -153,8 +152,6 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         manageAppearanceHome(didFinishLoadingWith: true)
         setApplicationBadge()
         
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -169,7 +166,11 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         }
         onceToken = 1
         managePresense()
-        collectionView.reloadData()
+        
+        //for when a new user signs on and onboarding screen is dismissed
+        if isNewUser {
+            collectionView.reloadData()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -237,7 +238,6 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     }
     
     @objc fileprivate func activitiesUpdated() {
-        print("activitiesUpdated")
         self.updatingActivities = false
         scrollToFirstActivityWithDate({ (activities) in
             if self.sortedActivities != activities {
@@ -525,6 +525,8 @@ extension MasterActivityContainerController: GIDSignInDelegate {
         
         if !networkController.activityService.calendars.keys.contains(googleString) {
             alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance().delegate = self
+                GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
             }))
         }
@@ -541,6 +543,7 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
             self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+            self.collectionView.reloadData()
         } else {
           print("\(error.localizedDescription)")
         }
@@ -836,7 +839,6 @@ extension MasterActivityContainerController: MessagesDelegate {
     }
     
     func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-        
         chatLogController?.hidesBottomBarWhenPushed = true
         chatLogController?.messagesFetcher = messagesFetcher
         chatLogController?.messages = messages
@@ -937,7 +939,6 @@ extension MasterActivityContainerController: ChooseChatDelegate {
 extension MasterActivityContainerController: DeleteAndExitDelegate {
     
     func deleteAndExit(from otherActivityID: String) {
-        
 //        let pinnedIDs = pinnedActivities.map({$0.activityID ?? ""})
 //        let section = pinnedIDs.contains(otherActivityID) ? 0 : 1
 //        guard let row = activityIndex(for: otherActivityID, at: section) else { return }

@@ -14,6 +14,6 @@ extension EKRecurrenceRule {
     // but there's not other way to access the RULE set of `EKRecurrenceRule`.
     func iCalRuleString() -> String {
         let ret = self.description
-        return "RRULE " + ret.components(separatedBy: " RRULE ")[1]
+        return "RRULE:" + ret.components(separatedBy: " RRULE ")[1]
     }
 }

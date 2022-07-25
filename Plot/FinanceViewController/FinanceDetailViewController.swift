@@ -70,10 +70,6 @@ class FinanceDetailViewController: UIViewController {
     var hasViewAppeared = false
     
     var participants: [String: [User]] = [:]
-    
-    @objc fileprivate func handleDismiss(button: UIButton) {
-        dismiss(animated: true, completion: nil)
-    }
             
     override func viewDidLoad() {
         super.viewDidLoad()

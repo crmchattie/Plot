@@ -224,6 +224,10 @@ class HealthKitManager {
             self?.saveActivitiesDispatchGroup.leave()
         })
     }
+    
+    func checkHealthAuthorizationStatus(_ completion: @escaping () -> Void) {
+        HealthKitService.checkHealthAuthorizationStatus()
+    }
 }
 
 extension HealthKitManager: MetricOperationDelegate {

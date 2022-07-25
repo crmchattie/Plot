@@ -132,18 +132,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         return panGesture
     }()
     
-    //    let closeButton: UIButton = {
-    //        let button = UIButton(type: .system)
-    //        button.setImage(UIImage(named: "close"), for: .normal)
-    //        button.tintColor = .systemBlue
-    //        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
-    //        return button
-    //    }()
-    
-    @objc fileprivate func handleDismiss(button: UIButton) {
-        dismiss(animated: true, completion: nil)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -158,8 +146,6 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         handleReloadTable()
         
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     
     deinit {
@@ -339,6 +325,8 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         if !networkController.activityService.calendars.keys.contains(googleString) {
             alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance().delegate = self
+                GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
             }))
         }
@@ -651,13 +639,13 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         return UITableView.automaticDimension
     }
     
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        let delete = setupDeleteAction(at: indexPath)
-        //        let pin = setupPinAction(at: indexPath)
-        let mute = setupMuteAction(at: indexPath)
-        
-        return [delete, mute]
-    }
+//    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+//        let delete = setupDeleteAction(at: indexPath)
+//        let pin = setupPinAction(at: indexPath)
+//        let mute = setupMuteAction(at: indexPath)
+//
+//        return [delete, mute]
+//    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2

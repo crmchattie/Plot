@@ -19,6 +19,23 @@ class EventKitService {
         EventKitSetupAssistant.authorizeEventKit(completion: completion)
     }
     
+    func checkEventAuthorizationStatus() {
+        let status = EKEventStore.authorizationStatus(for: .event)
+        switch (status) {
+        case EKAuthorizationStatus.notDetermined:
+            // This happens on first-run
+            print("notDetermined")
+        case EKAuthorizationStatus.authorized:
+            // Things are in line with being able to show the calendars in the table view
+            print("authorized")
+        case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
+            // We need to help them give us permission
+            print("restricted")
+        default:
+            print("default")
+        }
+    }
+    
     func fetchEventsForCertainTime() -> [EKEvent] {
         // Get the appropriate calendar.
         let calendar = Calendar.current

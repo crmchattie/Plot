@@ -231,14 +231,14 @@ class ChatsTableViewController: UITableViewController {
         return 0
     }
     
-    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+//    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         
-        let delete = setupDeleteAction(at: indexPath)
-        //    let pin = setupPinAction(at: indexPath)
-        let mute = setupMuteAction(at: indexPath)
+//        let delete = setupDeleteAction(at: indexPath)
+//    let pin = setupPinAction(at: indexPath)
+//        let mute = setupMuteAction(at: indexPath)
         
-        return [delete, mute]
-    }
+//        return [delete, mute]
+//    }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension

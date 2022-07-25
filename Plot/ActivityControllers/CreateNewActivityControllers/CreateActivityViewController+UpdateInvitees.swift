@@ -9,7 +9,6 @@
 import Foundation
 import Eureka
 import Firebase
-import CodableFirebase
 
 extension CreateActivityViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {

@@ -1304,6 +1304,9 @@ extension String {
         if self.contains("]") {
             updatedSelf = self.replacingOccurrences(of: "]", with: "")
         }
+        if self.contains("\n") {
+            updatedSelf = self.replacingOccurrences(of: "\n", with: " ")
+        }
         return updatedSelf
     }
 }
