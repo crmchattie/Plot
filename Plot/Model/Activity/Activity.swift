@@ -17,6 +17,9 @@ let userActivityCategoriesEntity = "user-activities-categories"
 class Activity: NSObject, NSCopying, Codable {
     var activityID: String?
     var name: String?
+    var calendarID: String?
+    var calendarName: String?
+    var calendarColor: String?
     var activityType: String?
     var category: String?
     var activityDescription: String?
@@ -40,11 +43,7 @@ class Activity: NSObject, NSCopying, Codable {
     var recurrences: [String]?
     var reminder: String?
     var notes: String?
-    var schedule: [Activity]?
-    var purchases: [Purchase]?
     var checklist: [Checklist]?
-    var packinglist: [Packinglist]?
-    var grocerylist: Grocerylist?
     var checklistIDs: [String]?
     var activitylistIDs: [String]?
     var packinglistIDs: [String]?
@@ -64,7 +63,7 @@ class Activity: NSObject, NSCopying, Codable {
     var attractionID: String?
     var showExtras: Bool?
     var hkSampleID: String?
-    var completed: Bool?
+    var isComplete: Bool?
     var isTask: Bool?
     var transactionIDs: [String]?
     var mealIDs: [String]?
@@ -75,6 +74,9 @@ class Activity: NSObject, NSCopying, Codable {
     
     enum CodingKeys: String, CodingKey {
         case name
+        case calendarID
+        case calendarName
+        case calendarColor
         case activityType
         case category
         case activityDescription
@@ -87,11 +89,7 @@ class Activity: NSObject, NSCopying, Codable {
         case reminder
         case recurrences
         case notes
-        case schedule
-        case purchases
         case checklist
-        case packinglist
-        case grocerylist
         case checklistIDs
         case activitylistIDs
         case packinglistIDs
@@ -105,8 +103,8 @@ class Activity: NSObject, NSCopying, Codable {
         case attractionID
         case placeID
         case showExtras
-        case completed
         case hkSampleID
+        case isComplete
         case isTask
         case mealIDs
         case workoutIDs
@@ -120,6 +118,9 @@ class Activity: NSObject, NSCopying, Codable {
         
         activityID = dictionary?["activityID"] as? String
         name = dictionary?["name"] as? String
+        calendarID = dictionary?["calendarID"] as? String
+        calendarName = dictionary?["calendarName"] as? String
+        calendarColor = dictionary?["calendarColor"] as? String
         activityType = dictionary?["activityType"] as? String
         category = dictionary?["category"] as? String
         activityDescription = dictionary?["activityDescription"] as? String
@@ -132,26 +133,6 @@ class Activity: NSObject, NSCopying, Codable {
             participantsIDs = participantsIDsArray
         } else {
             participantsIDs = []
-        }
-        
-        if let scheduleFirebaseList = dictionary?["schedule"] as? [AnyObject] {
-            var scheduleList = [Activity]()
-            for schedule in scheduleFirebaseList {
-                let sche = Activity(dictionary: schedule as? [String : AnyObject])
-                if sche.name == "nothing" { continue }
-                scheduleList.append(sche)
-            }
-            schedule = scheduleList
-        }
-        
-        if let purchasesFirebaseList = dictionary?["purchases"] as? [AnyObject] {
-            var purchasesList = [Purchase]()
-            for purchase in purchasesFirebaseList {
-                let purch = Purchase(dictionary: purchase as? [String : AnyObject])
-                if purch.name == "nothing" { continue }
-                purchasesList.append(purch)
-            }
-            purchases = purchasesList
         }
         
         if let checklistFirebaseList = dictionary?["checklist"] as? [Any] {
@@ -171,21 +152,6 @@ class Activity: NSObject, NSCopying, Codable {
             }
             check.items = checklistItems
             checklist = [check]
-        }
-        
-        if let packinglistFirebaseList = dictionary?["packinglist"] as? [Any] {
-            var packinglistList = [Packinglist]()
-            for packinglist in packinglistFirebaseList {
-                if let pack = try? FirebaseDecoder().decode(Packinglist.self, from: packinglist) {
-                    if pack.name == "nothing" { continue }
-                    packinglistList.append(pack)
-                }
-            }
-            packinglist = packinglistList
-        }
-        
-        if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: dictionary?["grocerylist"] as Any) {
-            self.grocerylist = grocerylist
         }
         
         transportation = dictionary?["transportation"] as? String
@@ -220,7 +186,7 @@ class Activity: NSObject, NSCopying, Codable {
         attractionID = dictionary?["attractionID"] as? String
         placeID = dictionary?["placeID"] as? String
         showExtras = dictionary?["showExtras"] as? Bool
-        completed = dictionary?["completed"] as? Bool
+        isComplete = dictionary?["isComplete"] as? Bool
         isTask = dictionary?["isTask"] as? Bool
         hkSampleID = dictionary?["hkSampleID"] as? String
         mealIDs = dictionary?["mealIDs"] as? [String]
@@ -237,7 +203,6 @@ class Activity: NSObject, NSCopying, Codable {
     
     func toAnyObject() -> [String: AnyObject] {
         var dictionary = [String: AnyObject]()
-        
         if let value = self.activityID as AnyObject? {
             dictionary["activityID"] = value
         }
@@ -248,6 +213,18 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.admin as AnyObject? {
             dictionary["admin"] = value
+        }
+        
+        if let value = self.calendarID as AnyObject? {
+            dictionary["calendarID"] = value
+        }
+        
+        if let value = self.calendarName as AnyObject? {
+            dictionary["calendarName"] = value
+        }
+        
+        if let value = self.calendarColor as AnyObject? {
+            dictionary["calendarColor"] = value
         }
         
         if let value = self.activityType as AnyObject? {
@@ -326,24 +303,6 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["conversationID"] = value
         }
         
-        if let value = self.schedule {
-            var firebaseScheduleList = [[String: AnyObject?]]()
-            for schedule in value {
-                let firebaseSchedule = schedule.scheduleToAnyObject()
-                firebaseScheduleList.append(firebaseSchedule)
-            }
-            dictionary["schedule"] = firebaseScheduleList as AnyObject
-        }
-        
-        if let value = self.purchases {
-            var firebasePurchasesList = [[String: AnyObject?]]()
-            for purchase in value {
-                let firebasePurchases = purchase.toAnyObject()
-                firebasePurchasesList.append(firebasePurchases)
-            }
-            dictionary["purchases"] = firebasePurchasesList as AnyObject
-        }
-        
         if let value = self.checklist {
             var firebaseChecklistList = [[String: AnyObject?]]()
             for checklist in value {
@@ -351,20 +310,6 @@ class Activity: NSObject, NSCopying, Codable {
                 firebaseChecklistList.append(firebaseChecklist)
             }
             dictionary["checklist"] = firebaseChecklistList as AnyObject
-        }
-        
-        if let value = self.packinglist {
-            var firebasePackinglistList = [[String: AnyObject?]]()
-            for packinglist in value {
-                let firebasePackinglist = packinglist.toAnyObject()
-                firebasePackinglistList.append(firebasePackinglist)
-            }
-            dictionary["packinglist"] = firebasePackinglistList as AnyObject
-        }
-        
-        if let value = self.grocerylist {
-            let firebase = value.toAnyObject()
-            dictionary["grocerylist"] = firebase as AnyObject
         }
         
         if let value = self.grocerylistID as AnyObject? {
@@ -415,8 +360,8 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["showExtras"] = value
         }
         
-        if let value = self.completed as AnyObject? {
-            dictionary["completed"] = value
+        if let value = self.isComplete as AnyObject? {
+            dictionary["isComplete"] = value
         }
         
         if let value = self.isTask as AnyObject? {
@@ -450,105 +395,31 @@ class Activity: NSObject, NSCopying, Codable {
         return dictionary
     }
     
-    func scheduleToAnyObject() -> [String: AnyObject] {
-        var dictionary = [String: AnyObject]()
-        
-        if let value = self.name as AnyObject? {
-            dictionary["name"] = value
-        }
-        
-        if let value = self.activityID as AnyObject? {
-            dictionary["activityID"] = value
-        }
-        
-        if let value = self.activityType as AnyObject? {
-            dictionary["activityType"] = value
-        }
-        
-        if let value = self.activityDescription as AnyObject? {
-            dictionary["activityDescription"] = value
-        }
-        
-        if let value = self.locationName as AnyObject? {
-            dictionary["locationName"] = value
-        }
-        
-        if let value = self.locationAddress as AnyObject? {
-            dictionary["locationAddress"] = value
-        }
-        
-        if let value = self.participantsIDs as AnyObject? {
-            dictionary["participantsIDs"] = value
-        }
-        
-        if let value = self.transportation as AnyObject? {
-            dictionary["transportation"] = value
-        }
-        
-        if let value = self.allDay as AnyObject? {
-            dictionary["allDay"] = value
-        }
-        
-        if let value = self.startDateTime as AnyObject? {
-            dictionary["startDateTime"] = value
-        }
-        
-        if let value = self.startTimeZone as AnyObject? {
-            dictionary["startTimeZone"] = value
-        }
-        
-        if let value = self.endDateTime as AnyObject? {
-            dictionary["endDateTime"] = value
-        }
-        
-        if let value = self.endTimeZone as AnyObject? {
-            dictionary["endTimeZone"] = value
-        }
-        
-        if let value = self.recurrences as AnyObject? {
-            dictionary["recurrences"] = value
-        }
-        
-        if let value = self.reminder as AnyObject? {
-            dictionary["reminder"] = value
-        }
-        
-        if let value = self.checklist {
-            var firebaseChecklistList = [[String: AnyObject?]]()
-            for checklist in value {
-                let firebaseChecklist = checklist.toAnyObject()
-                firebaseChecklistList.append(firebaseChecklist)
-            }
-            dictionary["checklist"] = firebaseChecklistList as AnyObject
-        }
-        
-        if let value = self.recipeID as AnyObject? {
-            dictionary["recipeID"] = value
-        }
-        
-        if let value = self.servings as AnyObject? {
-            dictionary["servings"] = value
-        }
-        
-        if let value = self.workoutID as AnyObject? {
-            dictionary["workoutID"] = value
-        }
-        
-        if let value = self.eventID as AnyObject? {
-            dictionary["eventID"] = value
-        }
-        
-        if let value = self.placeID as AnyObject? {
-            dictionary["placeID"] = value
-        }
-        
-        return dictionary
+    static func == (lhs: Activity, rhs: Activity) -> Bool {
+        return lhs.activityID == rhs.activityID &&
+            lhs.name == rhs.name &&
+            lhs.calendarID == rhs.calendarID &&
+            lhs.activityType == rhs.activityType &&
+            lhs.activityDescription == rhs.activityDescription &&
+            lhs.category == rhs.category &&
+            lhs.locationName == rhs.locationName &&
+            lhs.allDay == rhs.allDay &&
+            lhs.startDateTime == rhs.startDateTime &&
+            lhs.endDateTime == rhs.endDateTime &&
+            lhs.recurrences == rhs.recurrences &&
+            lhs.reminder == rhs.reminder &&
+            lhs.checklistIDs == rhs.checklistIDs &&
+            lhs.activityPhotos == rhs.activityPhotos &&
+            lhs.activityFiles == rhs.activityFiles &&
+            lhs.notes == rhs.notes &&
+            lhs.scheduleIDs == rhs.scheduleIDs &&
+            lhs.workoutIDs == rhs.workoutIDs &&
+            lhs.mindfulnessIDs == rhs.mindfulnessIDs &&
+            lhs.mealIDs == rhs.mealIDs &&
+            lhs.transactionIDs == rhs.transactionIDs &&
+            lhs.participantsIDs == rhs.participantsIDs
     }
 }
-
-//func ==(lhs: Activity, rhs: Activity) -> Bool {
-//    return lhs.activityID == rhs.activityID
-//}
 
 enum CustomType: String, Equatable, Hashable {
     case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness, calendar, googleCalendarEvent, investment

@@ -149,10 +149,8 @@ class InAppNotificationManager: NSObject {
             UIApplication.topViewController() is CropViewController ||
             UIApplication.topViewController() is ChatLogController ||
             UIApplication.topViewController() is INSPhotosViewController ||
-            UIApplication.topViewController() is CreateActivityViewController ||
-            UIApplication.topViewController() is  RecipeDetailViewController ||
-            UIApplication.topViewController() is  EventDetailViewController ||
-            UIApplication.topViewController() is  WorkoutDetailViewController { return }
+            UIApplication.topViewController() is CreateActivityViewController
+        { return }
         
         var message = String()
         

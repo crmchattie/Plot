@@ -130,7 +130,7 @@ public extension HKWorkoutActivityType {
         case .fitnessGaming:                return "Fitness Gaming"
             
         // Catch-all
-        default:                            return "Exercise"
+        default:                            return "Workout"
         }
     }
 }

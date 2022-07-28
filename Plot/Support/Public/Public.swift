@@ -1326,6 +1326,7 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
     case One_Day = "1 day before"
     case One_Week = "1 week before"
     case One_Month = "1 month before"
+    case One_Year = "1 year before"
     
     var description : String { return rawValue }
     
@@ -1349,6 +1350,8 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             return -604800
         case .One_Month:
             return -2419200
+        case .One_Year:
+            return -31536000
         default:
             return 0
         }
@@ -1370,6 +1373,8 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             return .One_Week
         case 2419200:
             return .One_Month
+        case 31536000:
+            return .One_Year
         default:
             return .None
         }

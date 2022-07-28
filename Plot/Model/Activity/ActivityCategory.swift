@@ -9,12 +9,13 @@
 import Foundation
 import UIKit
 
-private let keywordsMap = ["Exercise": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
+private let keywordsMap = ["Workout": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
                            "Work": ["meeting", "assignment", "project", "standup", "work"],
                            "Social": ["party", "birthday"],
                            "Family": ["family"],
-                           "Personal": ["appointment", "consultation", "therapy", "haircut"],
-                           "Meal": ["dinner", "lunch", "meal", "breakfast"],
+                           "Personal": ["appointment", "consultation", "therapy", "haircut", "dr", "doctor"],
+                           "Errands": ["groceries", "to-dos", "tasks"],
+                           "Meal": ["dinner", "lunch", "meal", "breakfast", "reservation"],
                            "Leisure": ["trip", "vacation"]
 ]
 
@@ -24,10 +25,12 @@ enum ActivityCategory: String, CaseIterable {
     case work = "Work"
     case social = "Social"
     case leisure = "Leisure"
-    case excercise = "Exercise"
+    case workout = "Workout"
     case family = "Family"
     case personal = "Personal"
     case uncategorized = "Uncategorized"
+    case todo = "To-do"
+    case school = "School"
     /// Same as uncategorized by not included in the analytics
     case notApplicable = "Not Applicable"
     
@@ -38,9 +41,11 @@ enum ActivityCategory: String, CaseIterable {
         case .work: return UIImage(named: "work")!
         case .social: return UIImage(named: "nightlife")!
         case .leisure: return UIImage(named: "leisure")!
-        case .excercise: return UIImage(named: "workout")!
+        case .workout: return UIImage(named: "workout")!
         case .family: return UIImage(named: "family")!
         case .personal: return UIImage(named: "personal")!
+        case .todo: return UIImage(named: "todo")!
+        case .school: return UIImage(named: "school")!
         case .uncategorized,
              .notApplicable:
             return UIImage(named: "activity")!
@@ -54,9 +59,11 @@ enum ActivityCategory: String, CaseIterable {
         case .work: return ChartColors.palette()[2]
         case .social: return ChartColors.palette()[4]
         case .leisure: return ChartColors.palette()[6]
-        case .excercise: return ChartColors.palette()[7]
+        case .workout: return ChartColors.palette()[7]
         case .family: return ChartColors.palette()[8]
         case .personal: return ChartColors.palette()[9]
+        case .todo: return ChartColors.palette()[10]
+        case .school: return ChartColors.palette()[11]
         case .uncategorized,
              .notApplicable:
             return UIColor.systemBlue

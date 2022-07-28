@@ -233,7 +233,6 @@ extension ActivityService {
     
     func observeActivitiesForCurrentUser() {
         activitiesFetcher.observeActivityForCurrentUser(activitiesAdded: { [weak self] activitiesAdded in
-            print("activitiesAdded")
                 for activity in activitiesAdded {
                     if activity.recurrences != nil {
                         if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
@@ -255,7 +254,6 @@ extension ActivityService {
                     }
                 }
             }, activitiesRemoved: { [weak self] activitiesRemoved in
-                print("activitiesRemoved")
                 for activity in activitiesRemoved {
                     if activity.recurrences != nil {
                         if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
@@ -266,7 +264,6 @@ extension ActivityService {
                     }
                 }
             }, activitiesChanged: { [weak self] activitiesChanged in
-                print("activitiesChanged")
                 for activity in activitiesChanged {
                     if activity.recurrences != nil {
                         if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
@@ -313,11 +310,6 @@ extension ActivityService {
                 let dates = iCalUtility()
                     .recurringDates(forRules: rules, ruleStartDate: activity.startDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
                 let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
-                if activity.name == "Test three" {
-                    print("rules \(rules)")
-                    print("dayBeforeNowDate \(dayBeforeNowDate)")
-                    print("dates \(dates)")
-                }
                 for date in dates {
                     let newActivity = activity.copy() as! Activity
                     newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)

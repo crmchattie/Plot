@@ -62,7 +62,6 @@ class MindfulnessOperation: AsyncOperation {
                         }
                         
                         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-                        activity.activityType = "Mindfulness"
                         activity.category = "Mindfulness"
                         activity.name = "Mindfulness Session"
                         

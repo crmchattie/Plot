@@ -62,8 +62,7 @@ class WorkoutOperation: AsyncOperation {
                                 }
 
                                 let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-                                activity.activityType = "Workout"
-                                activity.category = "Exercise"
+                                activity.category = "Workout"
                                 activity.name = workout.workoutActivityType.name
                                 activity.activityDescription = "\(totalEnergyBurned.clean) calories"
                                 

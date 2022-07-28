@@ -58,7 +58,7 @@ enum HealthMetricType {
             case .nutrition(let value):
                 return value
             case .workout:
-                return "Exercise"
+                return "Workout"
             case .heartRate:
                 return "Heart Rate"
             case .weight:

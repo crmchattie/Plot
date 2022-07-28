@@ -22,7 +22,7 @@ class ActivityBuilder {
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.activityType = "Workout"
-        activity.category = "Exercise"
+        activity.category = "Workout"
         activity.name = workout.name
         if let totalEnergyBurned = workout.totalEnergyBurned, let type = workout.type {
             activity.activityDescription = "\(String(describing: type)) - \(totalEnergyBurned.clean) calories"

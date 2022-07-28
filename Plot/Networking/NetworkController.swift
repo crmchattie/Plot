@@ -120,57 +120,57 @@ extension NetworkController {
                 activity.endDateTime = NSNumber(value: Int((endDateTime).timeIntervalSince1970))
                 activity.allDay = true
                 
-                for schedule in activity.schedule! {
-                    dispatchGroup.enter()
-                    switch schedule.name {
-                    case "Flight from EWR to DUB":
-                        schedule.startDateTime = activity.startDateTime
-                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(41400)).timeIntervalSince1970))
-                        schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID!]
-                    case "Flight from DUB to EDI":
-                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(79500)).timeIntervalSince1970))
-                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(84300)).timeIntervalSince1970))
-                        schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID!]
-                    case "Edinburgh":
-                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(172800)).timeIntervalSince1970))
-                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(345600)).timeIntervalSince1970))
-                        schedule.allDay = true
-                        schedule.participantsIDs = [currentUserID!]
-                    case "Aizle Reservation":
-                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(182400)).timeIntervalSince1970))
-                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(189600)).timeIntervalSince1970))
-                        schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID!]
-                    case "Kitchin Reservation":
-                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(268800)).timeIntervalSince1970))
-                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(276000)).timeIntervalSince1970))
-                        schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID!]
-                    case "St. Andrews":
-                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(353400)).timeIntervalSince1970))
-                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(526200)).timeIntervalSince1970))
-                        schedule.allDay = true
-                        schedule.participantsIDs = [currentUserID!]
-                    case "Flight from EDI to DUB":
-                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(490200)).timeIntervalSince1970))
-                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(495000)).timeIntervalSince1970))
-                        schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID!]
-                    case "Flight from DUB to EWR":
-                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(502800)).timeIntervalSince1970))
-                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(512100)).timeIntervalSince1970))
-                        schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID!]
-                    default:
-                        schedule.startDateTime = activity.startDateTime
-                        schedule.endDateTime = activity.endDateTime
-                        schedule.allDay = false
-                        schedule.participantsIDs = [currentUserID!]
-                    }
-                    dispatchGroup.leave()
-                }
+//                for schedule in activity.schedule! {
+//                    dispatchGroup.enter()
+//                    switch schedule.name {
+//                    case "Flight from EWR to DUB":
+//                        schedule.startDateTime = activity.startDateTime
+//                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(41400)).timeIntervalSince1970))
+//                        schedule.allDay = false
+//                        schedule.participantsIDs = [currentUserID!]
+//                    case "Flight from DUB to EDI":
+//                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(79500)).timeIntervalSince1970))
+//                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(84300)).timeIntervalSince1970))
+//                        schedule.allDay = false
+//                        schedule.participantsIDs = [currentUserID!]
+//                    case "Edinburgh":
+//                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(172800)).timeIntervalSince1970))
+//                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(345600)).timeIntervalSince1970))
+//                        schedule.allDay = true
+//                        schedule.participantsIDs = [currentUserID!]
+//                    case "Aizle Reservation":
+//                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(182400)).timeIntervalSince1970))
+//                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(189600)).timeIntervalSince1970))
+//                        schedule.allDay = false
+//                        schedule.participantsIDs = [currentUserID!]
+//                    case "Kitchin Reservation":
+//                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(268800)).timeIntervalSince1970))
+//                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(276000)).timeIntervalSince1970))
+//                        schedule.allDay = false
+//                        schedule.participantsIDs = [currentUserID!]
+//                    case "St. Andrews":
+//                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(353400)).timeIntervalSince1970))
+//                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(526200)).timeIntervalSince1970))
+//                        schedule.allDay = true
+//                        schedule.participantsIDs = [currentUserID!]
+//                    case "Flight from EDI to DUB":
+//                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(490200)).timeIntervalSince1970))
+//                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(495000)).timeIntervalSince1970))
+//                        schedule.allDay = false
+//                        schedule.participantsIDs = [currentUserID!]
+//                    case "Flight from DUB to EWR":
+//                        schedule.startDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(502800)).timeIntervalSince1970))
+//                        schedule.endDateTime = NSNumber(value: Int((startDateTime.addingTimeInterval(512100)).timeIntervalSince1970))
+//                        schedule.allDay = false
+//                        schedule.participantsIDs = [currentUserID!]
+//                    default:
+//                        schedule.startDateTime = activity.startDateTime
+//                        schedule.endDateTime = activity.endDateTime
+//                        schedule.allDay = false
+//                        schedule.participantsIDs = [currentUserID!]
+//                    }
+//                    dispatchGroup.leave()
+//                }
                 
                 
                 let activityDict = activity.toAnyObject()
