@@ -144,11 +144,11 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     }
     
     @objc func updateSections() {
-        if !networkController.activityService.calendars.keys.contains(icloudString) && !networkController.activityService.calendars.keys.contains(googleString) {
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) && !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
             customTypes.removeAll(where: {$0 == .calendar})
             sections.removeAll(where: {$0 == .calendar})
             fetchData()
-        } else if (!networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString)) && !sections.contains(.calendar) {
+        } else if (!networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name)) && !sections.contains(.calendar) {
             customTypes.insert(.calendar, at: 1)
             sections.insert(.calendar, at: 1)
             fetchData()
@@ -181,10 +181,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         if let activityType = object as? CustomType {
             switch activityType {
             case .basic:
-                let destination = CreateActivityViewController()
-                destination.users = self.networkController.userService.users
-                destination.filteredUsers = self.networkController.userService.users
-                destination.activities = self.networkController.activityService.activities
+                let destination = CreateActivityViewController(networkController: networkController)
                 self.navigationController?.pushViewController(destination, animated: true)
             case .calendar:
                 self.newCalendar()
@@ -299,14 +296,14 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     @objc func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !networkController.activityService.calendars.keys.contains(icloudString) {
-            alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: icloudString)
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) {
+            alert.addAction(UIAlertAction(title: CalendarOptions.apple.name, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
             }))
         }
         
-        if !networkController.activityService.calendars.keys.contains(googleString) {
-            alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
+            alert.addAction(UIAlertAction(title: CalendarOptions.google.name, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance().delegate = self
                 GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
@@ -378,7 +375,7 @@ extension DiscoverViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         print("signed in")
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
         } else {
           print("\(error.localizedDescription)")
         }

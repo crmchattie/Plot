@@ -62,6 +62,8 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var lat: Double?
     var lon: Double?
     
+    var networkController = NetworkController()
+    
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
     init() {
@@ -379,7 +381,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
                     self.navigationController?.pushViewController(destination, animated: true)
                 } else {
-                    let destination = CreateActivityViewController()
+                    let destination = CreateActivityViewController(networkController: networkController)
                     destination.hidesBottomBarWhenPushed = true
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers

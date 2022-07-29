@@ -71,15 +71,9 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     var filteredActivities = [Activity]()
     var pinnedActivities = [Activity]()
     var filteredPinnedActivities = [Activity]()
-    var users: [User] {
-        return networkController.userService.users
-    }
-    var filteredUsers: [User] {
-        return networkController.userService.users
-    }
-    var conversations: [Conversation] {
-        return networkController.conversationService.conversations
-    }
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var conversations: [Conversation] = networkController.conversationService.conversations
     
     let viewPlaceholder = ViewPlaceholder()
     
@@ -259,7 +253,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func newItem() {
-        if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
@@ -268,12 +262,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 dateComponents.hour = calendar.component(.hour, from: Date())
                 dateComponents.minute = calendar.component(.minute, from: Date())
                 
-                let destination = CreateActivityViewController()
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
-                destination.activities = self.filteredActivities + self.filteredPinnedActivities
-                destination.conversations = self.conversations
-                destination.transactions = self.networkController.financeService.transactions
+                let destination = CreateActivityViewController(networkController: self.networkController)
                 destination.startDateTime = calendar.date(from: dateComponents)
                 destination.endDateTime = calendar.date(from: dateComponents)
                 let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
@@ -299,12 +288,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             dateComponents.hour = calendar.component(.hour, from: Date())
             dateComponents.minute = calendar.component(.minute, from: Date())
             
-            let destination = CreateActivityViewController()
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.activities = self.filteredActivities + self.filteredPinnedActivities
-            destination.conversations = self.conversations
-            destination.transactions = self.networkController.financeService.transactions
+            let destination = CreateActivityViewController(networkController: networkController)
             destination.startDateTime = calendar.date(from: dateComponents)
             destination.endDateTime = calendar.date(from: dateComponents)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
@@ -317,14 +301,14 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     @objc func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !networkController.activityService.calendars.keys.contains(icloudString) {
-            alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) {
+            alert.addAction(UIAlertAction(title: CalendarOptions.apple.name, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
             }))
         }
         
-        if !networkController.activityService.calendars.keys.contains(googleString) {
-            alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
+            alert.addAction(UIAlertAction(title: CalendarOptions.google.name, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance().delegate = self
                 GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
@@ -700,15 +684,10 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func loadActivity(activity: Activity) {
-        let destination = CreateActivityViewController()
+        let destination = CreateActivityViewController(networkController: networkController)
         destination.hidesBottomBarWhenPushed = true
         destination.activity = activity
         destination.invitation = invitations[activity.activityID ?? ""]
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        destination.activities = filteredActivities + filteredPinnedActivities
-        destination.conversations = conversations
-        destination.transactions = networkController.financeService.transactions
         self.getParticipants(forActivity: activity) { (participants) in
             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                 destination.acceptedParticipant = acceptedParticipant
@@ -943,7 +922,7 @@ extension ActivityViewController: ChooseChatDelegate {
 extension ActivityViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
         } else {
             print("\(error.localizedDescription)")
         }

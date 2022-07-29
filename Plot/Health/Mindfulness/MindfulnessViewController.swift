@@ -63,6 +63,7 @@ class MindfulnessViewController: FormViewController {
                 mindfulness = Mindfulness(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil)
             }
         } else {
+            active = true
             title = "Mindfulness"
             var participantCount = self.selectedFalconUsers.count
             
@@ -418,6 +419,7 @@ class MindfulnessViewController: FormViewController {
         var selectedFalconUsers = [User]()
         let group = DispatchGroup()
         for id in participantsIDs {
+            
             // Only if the current user is created this activity
             if mindfulness.admin == currentUserID && id == currentUserID {
                 continue

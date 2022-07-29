@@ -37,7 +37,7 @@ class CalendarInfoViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
-        if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
             let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newCalendar))
             navigationItem.rightBarButtonItem = barButton
         }
@@ -71,14 +71,14 @@ class CalendarInfoViewController: UITableViewController {
     @objc func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !calendars.keys.contains(icloudString) {
-            alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: icloudString)
+        if !calendars.keys.contains(CalendarOptions.apple.name) {
+            alert.addAction(UIAlertAction(title: CalendarOptions.apple.name, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
             }))
         }
         
-        if !calendars.keys.contains(googleString) {
-            alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
+        if !calendars.keys.contains(CalendarOptions.google.name) {
+            alert.addAction(UIAlertAction(title: CalendarOptions.google.name, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance().delegate = self
                 GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
@@ -111,19 +111,31 @@ class CalendarInfoViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = CalendarAccountView()
-        let sections = Array(calendars.keys)
-        headerView.nameLabel.text = sections[section]
-        headerView.accountImageView.image = sections[section] == icloudString ? UIImage(named: "iCloud") : UIImage(named: "googleCalendar")
-        if sections[section] == primaryCalendar {
-            headerView.statusImageView.image =  UIImage(systemName: "checkmark")
-            headerView.infoLabel.text = "Primary Calendar Account"
-        } else {
-            headerView.statusImageView.image =  .none
-            headerView.infoLabel.text = "Not Primary Calendar Account"
+        let sections = Array(calendars.keys).sorted { s1, s2 in
+            if s1 == CalendarOptions.plot.name {
+                return true
+            } else if s2 == CalendarOptions.plot.name {
+                return false
+            }
+            return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
         }
-        let tap = TapGesture(target: self, action: #selector(updatePrimaryCalendar(_:)))
-        tap.item = section
-        headerView.addGestureRecognizer(tap)
+        if let calendar = CalendarOptions(rawValue: sections[section]) {
+            headerView.nameLabel.text = calendar.name
+            headerView.accountImageView.image = calendar.image
+            if calendar.name == primaryCalendar {
+                headerView.statusImageView.image =  UIImage(systemName: "checkmark")
+                headerView.infoLabel.text = "External Calendar Account"
+            } else if calendar.name == "Plot" {
+                headerView.statusImageView.image =  UIImage(systemName: "checkmark")
+                headerView.infoLabel.text = "Internal Calendar Account"
+            } else {
+                headerView.statusImageView.image =  .none
+                headerView.infoLabel.text = "External Calendar Account"
+            }
+            let tap = TapGesture(target: self, action: #selector(updatePrimaryCalendar(_:)))
+            tap.item = section
+            headerView.addGestureRecognizer(tap)
+        }
         return headerView
     }
     
@@ -159,7 +171,7 @@ extension CalendarInfoViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         print("signed in")
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
         } else {
           print("\(error.localizedDescription)")
         }

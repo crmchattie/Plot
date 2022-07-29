@@ -10,10 +10,14 @@ import UIKit
 import Firebase
 import CodableFirebase
 
-let calendarEntity = "calendar"
-let userCalendarEntity = "user-calendar"
+let calendarEntity = "calendars"
+let userCalendarEntity = "user-calendars"
 
-struct CalendarType: Codable, Equatable, Hashable {
+struct CalendarType: Codable, Equatable, Hashable, Comparable {
+    static func < (lhs: CalendarType, rhs: CalendarType) -> Bool {
+        lhs.name ?? "" < rhs.name ?? ""
+    }
+    
         
     var name: String?
     var id: String?
@@ -37,9 +41,32 @@ struct CalendarType: Codable, Equatable, Hashable {
     }
 }
 
-let prebuiltCalendars: [CalendarType] = [personal, home, work, social]
+let prebuiltCalendars: [CalendarType] = [calendarDefault, personal, home, work, social]
 
-let personal = CalendarType(id: UUID().uuidString, name: "Personal", color: CIColor(color: ChartColors.palette()[0]).stringRepresentation)
+let calendarDefault = CalendarType(id: UUID().uuidString, name: "Calendar", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation)
 let home = CalendarType(id: UUID().uuidString, name: "Home", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation)
-let work = CalendarType(id: UUID().uuidString, name: "Work", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation)
+let personal = CalendarType(id: UUID().uuidString, name: "Personal", color: CIColor(color: ChartColors.palette()[0]).stringRepresentation)
 let social = CalendarType(id: UUID().uuidString, name: "Social", color: CIColor(color: ChartColors.palette()[3]).stringRepresentation)
+let work = CalendarType(id: UUID().uuidString, name: "Work", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation)
+
+enum CalendarOptions:String, CaseIterable {
+    case plot = "Plot"
+    case apple = "iCloud"
+    case google = "Google"
+    
+    var image: UIImage {
+            switch self {
+            case .plot: return UIImage(named: "plotLogo")!
+            case .apple: return UIImage(named: "iCloud")!
+            case .google: return UIImage(named: "googleCalendar")!
+        }
+    }
+        
+    var name: String {
+            switch self {
+            case .plot: return "Plot"
+            case .apple: return "iCloud"
+            case .google: return "Google"
+        }
+    }
+}

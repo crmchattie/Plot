@@ -10,9 +10,6 @@ import Foundation
 import Firebase
 import GoogleSignIn
 
-let icloudString = "iCloud"
-let googleString = "Google"
-
 extension NSNotification.Name {
     static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
     static let invitationsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".invitationsUpdated")
@@ -22,6 +19,7 @@ extension NSNotification.Name {
 class ActivityService {
     let activitiesFetcher = ActivitiesFetcher()
     let invitationsFetcher = InvitationsFetcher()
+    let calendarFetcher = CalendarFetcher()
     
     var askedforAuthorization: Bool = false
     
@@ -87,12 +85,12 @@ class ActivityService {
             self?.addRepeatingActivities(activities: self?.activities ?? [], completion: { newActivities in
                 self?.activities = newActivities
                 self?.grabPrimaryCalendar({ (calendar) in
-                    if calendar == icloudString {
+                    if calendar == CalendarOptions.apple.name {
                         self?.grabEventKit {
                             self?.observeActivitiesForCurrentUser()
                             self?.observeInvitationForCurrentUser()
                         }
-                    } else if calendar == googleString {
+                    } else if calendar == CalendarOptions.google.name {
                         self?.grabGoogle {
                             self?.observeActivitiesForCurrentUser()
                             self?.observeInvitationForCurrentUser()
@@ -138,15 +136,18 @@ class ActivityService {
     
     func grabCalendars() {
         if let _ = Auth.auth().currentUser {
+            self.calendarFetcher.fetchCalendar { calendars in
+                self.calendars[CalendarOptions.plot.name] = calendars.map({ $0.name ?? "" })
+            }
             self.eventKitManager.authorizeEventKit({ _ in
                 if let calendars = self.eventKitManager.grabCalendars() {
-                    self.calendars[icloudString] = calendars
+                    self.calendars[CalendarOptions.apple.name] = calendars
                 }
             })
             self.googleCalManager.setupGoogle { _ in
                 self.googleCalManager.grabCalendars() { calendars in
                     if let calendars = calendars {
-                        self.calendars[googleString] = calendars
+                        self.calendars[CalendarOptions.google.name] = calendars
                     }
                 }
             }
@@ -184,9 +185,9 @@ class ActivityService {
         if !askedforAuthorization {
             grabActivities {}
         } else {
-            if value == primaryCalendar && value == icloudString {
+            if value == primaryCalendar && value == CalendarOptions.apple.name {
                 grabEventKit {}
-            } else if value == primaryCalendar && value == googleString {
+            } else if value == primaryCalendar && value == CalendarOptions.google.name {
                 grabGoogle {}
             }
             grabCalendars()
@@ -254,6 +255,7 @@ extension ActivityService {
                     }
                 }
             }, activitiesRemoved: { [weak self] activitiesRemoved in
+                print("activitiesRemoved")
                 for activity in activitiesRemoved {
                     if activity.recurrences != nil {
                         if self!.activities.contains(where: {$0.activityID == activity.activityID}) {

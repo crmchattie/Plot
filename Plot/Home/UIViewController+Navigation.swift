@@ -22,15 +22,10 @@ protocol ActivityDetailShowing: UIViewController {
 extension ActivityDetailShowing {
     
     func showActivityDetail(activity: Activity) {
-        let destination = CreateActivityViewController()
+        let destination = CreateActivityViewController(networkController: networkController)
         destination.hidesBottomBarWhenPushed = true
         destination.activity = activity
         destination.invitation = self.networkController.activityService.invitations[activity.activityID ?? ""]
-        destination.users = self.networkController.userService.users
-        destination.filteredUsers = self.networkController.userService.users
-        destination.activities = self.networkController.activityService.activities
-        destination.transactions = self.networkController.financeService.transactions
-        destination.conversations = self.networkController.conversationService.conversations
         self.getParticipants(forActivity: activity) { (participants) in
             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                 destination.acceptedParticipant = acceptedParticipant

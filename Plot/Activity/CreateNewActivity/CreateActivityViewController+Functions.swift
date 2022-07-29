@@ -634,6 +634,7 @@ extension CreateActivityViewController {
         let destination = CalendarListViewController()
         destination.delegate = self
         destination.calendarID = self.activity.calendarID
+//        destination.calendars = self.calendars
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -943,7 +944,7 @@ extension CreateActivityViewController {
     }
     
     @objc func createNewActivity() {
-        if activity.recurrences != nil {
+        if activity.recurrences != nil && active {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
@@ -1251,7 +1252,7 @@ extension CreateActivityViewController {
         } else {
             let alert = UIAlertController(title: nil, message: "Are you sure?", preferredStyle: .actionSheet)
             
-            alert.addAction(UIAlertAction(title: "Delete Event", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
                 print("Save for this event only")
                 self.showActivityIndicator()
                 let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
@@ -1263,6 +1264,13 @@ extension CreateActivityViewController {
                     self.navigationController?.popViewController(animated: true)
                 }
             }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
         }
     }
     

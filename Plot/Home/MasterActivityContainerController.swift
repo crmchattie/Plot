@@ -482,13 +482,11 @@ extension MasterActivityContainerController: HeaderContainerCellDelegate {
 
 extension MasterActivityContainerController: GIDSignInDelegate {
     func newCalendarItem() {
-        if !networkController.activityService.calendars.keys.contains(icloudString) || !networkController.activityService.calendars.keys.contains(googleString) {
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
-                let destination = CreateActivityViewController()
-                destination.users = self.networkController.userService.users
-                destination.filteredUsers = self.networkController.userService.users
+                let destination = CreateActivityViewController(networkController: self.networkController)
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             }))
@@ -505,9 +503,7 @@ extension MasterActivityContainerController: GIDSignInDelegate {
                 print("completion block")
             })
         } else {
-            let destination = CreateActivityViewController()
-            destination.users = self.networkController.userService.users
-            destination.filteredUsers = self.networkController.userService.users
+            let destination = CreateActivityViewController(networkController: networkController)
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -516,15 +512,15 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !networkController.activityService.calendars.keys.contains(icloudString) {
-            alert.addAction(UIAlertAction(title: icloudString, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: icloudString)
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) {
+            alert.addAction(UIAlertAction(title: CalendarOptions.apple.name, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
                 self.collectionView.reloadData()
             }))
         }
         
-        if !networkController.activityService.calendars.keys.contains(googleString) {
-            alert.addAction(UIAlertAction(title: googleString, style: .default, handler: { (_) in
+        if !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
+            alert.addAction(UIAlertAction(title: CalendarOptions.google.name, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance().delegate = self
                 GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
@@ -542,7 +538,7 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: googleString)
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
             self.collectionView.reloadData()
         } else {
           print("\(error.localizedDescription)")

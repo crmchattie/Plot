@@ -346,14 +346,14 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         
                         let activity = Activity(dictionary: dictionary)
                         
-                        let destination = CreateActivityViewController()
-                        destination.hidesBottomBarWhenPushed = true
-                        destination.activity = activity
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                                destination.acceptedParticipant = acceptedParticipant
-                                destination.selectedFalconUsers = participants
                                 if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                    let destination = CreateActivityViewController(networkController: tabBarController.networkController)
+                                    destination.acceptedParticipant = acceptedParticipant
+                                    destination.selectedFalconUsers = participants
+                                    destination.hidesBottomBarWhenPushed = true
+                                    destination.activity = activity
                                     tabBarController.selectedIndex = 1
                                     tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
                                     if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {

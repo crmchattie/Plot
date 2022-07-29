@@ -313,13 +313,15 @@ class FinanceAccountViewController: FormViewController {
             <<< LabelRow("Last Updated") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 if let date = isodateFormatter.date(from: account.updated_at) {
                     $0.value = dateFormatterPrint.string(from: date)
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
             <<< CheckRow("Should Link") {
@@ -407,6 +409,20 @@ class FinanceAccountViewController: FormViewController {
                     if let paymentDueDate = account.payment_due_at, let date = isodateFormatter.date(from: paymentDueDate) {
                         $0.value = date
                     }
+                }.onExpandInlineRow { cell, row, inlineRow in
+                    inlineRow.cellUpdate() { cell, row in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.datePicker.datePickerMode = .dateAndTime
+                        if #available(iOS 13.4, *) {
+                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        }
+                    }
+                    let color = cell.detailTextLabel?.textColor
+                    row.onCollapseInlineRow { cell, _, _ in
+                        cell.detailTextLabel?.textColor = color
+                    }
+                    cell.detailTextLabel?.textColor = cell.tintColor
                 }.onChange { row in
                     if let value = row.value {
                         self.updateTheDate()

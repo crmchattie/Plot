@@ -1,15 +1,15 @@
 //
-//  ActivityCategory.swift
+//  ActivitySubcategory.swift
 //  Plot
 //
-//  Created by Botond Magyarosi on 17.03.2021.
-//  Copyright © 2021 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 7/29/22.
+//  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-let userActivityCategoriesEntity = "user-activities-categories"
+let userActivitySubcategoriesEntity = "user-activities-subcategories"
 
 private let keywordsMap = ["Workout": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
                            "To-do": ["meeting", "assignment", "project", "standup", "work", "groceries", "to-dos", "tasks"],
@@ -20,7 +20,7 @@ private let keywordsMap = ["Workout": ["fitness", "workout", "run", "training", 
                            "Leisure": ["trip", "vacation"]
 ]
 
-enum ActivityCategory: String, CaseIterable {
+enum ActivitySubcategory: String, CaseIterable {
     case sleep = "Sleep"
     case meal = "Meal"
     case work = "Work"
@@ -32,6 +32,7 @@ enum ActivityCategory: String, CaseIterable {
     case uncategorized = "Uncategorized"
     case todo = "To-do"
     /// Same as uncategorized by not included in the analytics
+    case notApplicable = "Not Applicable"
     
     var icon: UIImage {
         switch self {
@@ -44,7 +45,9 @@ enum ActivityCategory: String, CaseIterable {
         case .family: return UIImage(named: "family")!
         case .personal: return UIImage(named: "personal")!
         case .todo: return UIImage(named: "todo")!
-        case .uncategorized: return UIImage(named: "activity")!
+        case .uncategorized,
+             .notApplicable:
+            return UIImage(named: "activity")!
         }
     }
     
@@ -59,7 +62,9 @@ enum ActivityCategory: String, CaseIterable {
         case .family: return ChartColors.palette()[8]
         case .personal: return ChartColors.palette()[9]
         case .todo: return ChartColors.palette()[10]
-        case .uncategorized: return UIColor.systemBlue
+        case .uncategorized,
+             .notApplicable:
+            return UIColor.systemBlue
         }
     }
     

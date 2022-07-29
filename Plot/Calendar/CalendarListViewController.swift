@@ -22,6 +22,8 @@ class CalendarListViewController: FormViewController {
     var calendar: CalendarType!
     var calendarID: String?
     
+    var calendarFetcher = CalendarFetcher()
+    
     init() {
         super.init(style: .insetGrouped)
     }
@@ -35,50 +37,18 @@ class CalendarListViewController: FormViewController {
         self.title = "Calendars"
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
-        activityIndicatorView.startAnimating()
         configureTableView()
-        grabCalendars()
     }
     
     fileprivate func grabCalendars() {
         form.removeAll()
-        guard let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-                
-        let group = DispatchGroup()
-        let ref = Database.database().reference()
-        
-        group.enter()
-        Database.database().reference().child(userCalendarEntity).child(currentUserID).observeSingleEvent(of: .value, with: { snapshot in
-            if snapshot.exists(), let calendarIDs = snapshot.value as? [String: AnyObject] {
-                for (calendarID, userCalendarInfo) in calendarIDs {
-                    if let userCalendar = try? FirebaseDecoder().decode(CalendarType.self, from: userCalendarInfo) {
-                        group.enter()
-                        ref.child(calendarEntity).child(calendarID).observeSingleEvent(of: .value, with: { snapshot in
-                            if snapshot.exists(), let snapshotValue = snapshot.value {
-                                if let calendar = try? FirebaseDecoder().decode(CalendarType.self, from: snapshotValue) {
-                                    var _calendar = calendar
-                                    _calendar.color = userCalendar.color
-                                    self.calendars.append(_calendar)
-                                }
-                            }
-                            group.leave()
-                        })
-                    }
-                }
-            } else {
-                self.calendars = prebuiltCalendars
-//                for calendar in prebuiltCalendars {
-//
-//                }
+        activityIndicatorView.startAnimating()
+        calendarFetcher.fetchCalendar { calendars in
+            self.calendars = calendars.sorted()
+            DispatchQueue.main.async {
+              activityIndicatorView.stopAnimating()
+              self.initializeForm()
             }
-            group.leave()
-        })
-        
-        DispatchQueue.main.async {
-          activityIndicatorView.stopAnimating()
-          self.initializeForm()
         }
     }
     
@@ -92,31 +62,31 @@ class CalendarListViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        let barButton = UIBarButtonItem(title: "New Category", style: .plain, target: self, action: #selector(newCategory))
+        let barButton = UIBarButtonItem(title: "New Calendar", style: .plain, target: self, action: #selector(newCategory))
         navigationItem.rightBarButtonItem = barButton
     }
     
     @objc func newCategory(_ item:UIBarButtonItem) {
         let destination = CalendarDetailViewController()
-//        destination.delegate = self
+        destination.delegate = self
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
     fileprivate func initializeForm() {
-        form +++ SelectableSection<ListCheckRow<String>>("Category", selectionType: .singleSelection(enableDeselection: false))
+        form +++ SelectableSection<ListCheckRow<String>>("Calendar", selectionType: .singleSelection(enableDeselection: false))
         
-        for index in 0...calendars.count - 1 {
+        for calendar in calendars {
             form.last!
                 <<< ListCheckRow<String>() {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     $0.cell.tintColor = FalconPalette.defaultBlue
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.title = calendars[index].name
-                    $0.selectableValue = calendars[index].name
-                    if let calendarID = self.calendarID, calendars[index].id == calendarID {
-                        $0.value = calendars[index].name
+                    $0.title = calendar.name
+                    $0.selectableValue = calendar.name
+                    if let calendarID = self.calendarID, calendar.id == calendarID {
+                        $0.value = calendar.name
                     }
                 }.cellSetup { cell, row in
                     cell.accessoryType = .checkmark
@@ -125,8 +95,10 @@ class CalendarListViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }.onChange({ (row) in
-                    self.delegate?.update(calendar: self.calendars[index])
-                    self.navigationController?.popViewController(animated: true)
+                    if let _ = row.value {
+                        self.delegate?.update(calendar: calendar)
+                        self.navigationController?.popViewController(animated: true)
+                    }
                 })
         }
         

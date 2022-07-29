@@ -19,6 +19,9 @@
 		100FE7032892D91200D3124C /* CalendarListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100FE7022892D91200D3124C /* CalendarListViewController.swift */; };
 		100FE7062892DB7F00D3124C /* ActivityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100FE7052892DB7F00D3124C /* ActivityListViewController.swift */; };
 		100FE7082892DCE000D3124C /* CalendarDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100FE7072892DCE000D3124C /* CalendarDetailViewController.swift */; };
+		100FE70A28931CFF00D3124C /* CalendarFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100FE70928931CFF00D3124C /* CalendarFetcher.swift */; };
+		100FE70C28931D2100D3124C /* CalendarActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100FE70B28931D2100D3124C /* CalendarActions.swift */; };
+		100FE70E2894407600D3124C /* ActivitySubcategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100FE70D2894407600D3124C /* ActivitySubcategory.swift */; };
 		1011466925A8E6C5007B51AF /* TimeZoneFinderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1011466825A8E6C5007B51AF /* TimeZoneFinderViewController.swift */; };
 		10173606251924120073D283 /* FinancialAccountFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10173605251924120073D283 /* FinancialAccountFetcher.swift */; };
 		1017D32B24F2B746001D7CBE /* MXHolding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1017D32A24F2B746001D7CBE /* MXHolding.swift */; };
@@ -567,6 +570,9 @@
 		100FE7022892D91200D3124C /* CalendarListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarListViewController.swift; sourceTree = "<group>"; };
 		100FE7052892DB7F00D3124C /* ActivityListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ActivityListViewController.swift; path = Plot/Health/Mindfulness/ActivityListViewController.swift; sourceTree = SOURCE_ROOT; };
 		100FE7072892DCE000D3124C /* CalendarDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDetailViewController.swift; sourceTree = "<group>"; };
+		100FE70928931CFF00D3124C /* CalendarFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarFetcher.swift; sourceTree = "<group>"; };
+		100FE70B28931D2100D3124C /* CalendarActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarActions.swift; sourceTree = "<group>"; };
+		100FE70D2894407600D3124C /* ActivitySubcategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySubcategory.swift; sourceTree = "<group>"; };
 		1011466825A8E6C5007B51AF /* TimeZoneFinderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneFinderViewController.swift; sourceTree = "<group>"; };
 		10173605251924120073D283 /* FinancialAccountFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialAccountFetcher.swift; sourceTree = "<group>"; };
 		1017D32A24F2B746001D7CBE /* MXHolding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MXHolding.swift; sourceTree = "<group>"; };
@@ -1108,8 +1114,20 @@
 			children = (
 				100FE7022892D91200D3124C /* CalendarListViewController.swift */,
 				100FE7072892DCE000D3124C /* CalendarDetailViewController.swift */,
+				100FE70928931CFF00D3124C /* CalendarFetcher.swift */,
+				100FE70B28931D2100D3124C /* CalendarActions.swift */,
 			);
 			path = Calendar;
+			sourceTree = "<group>";
+		};
+		100FE70F28945B2900D3124C /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */,
+				106D758A2442447C0039B534 /* ActivityActions.swift */,
+				26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 		1024ABA523C1255900A5875D /* ActivityType */ = {
@@ -1441,6 +1459,7 @@
 				26E8EFE5237F38D500B9067E /* Map */,
 				10C50F982274E7C300111033 /* ActivityTableView */,
 				10C50F9C2274E87500111033 /* CreateNewActivity */,
+				100FE70F28945B2900D3124C /* Support */,
 				10C50F992274E7D500111033 /* Cells */,
 			);
 			path = Activity;
@@ -1455,9 +1474,6 @@
 				10C50F962274E21900111033 /* ActivityViewController+SearchHandlers.swift */,
 				10C50FA12274ED9200111033 /* ActivityViewController+TableRowActionHandlers.swift */,
 				265AA95D23A362CD00DBB10A /* ActivityViewController+Migration.swift */,
-				10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */,
-				106D758A2442447C0039B534 /* ActivityActions.swift */,
-				26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */,
 			);
 			path = ActivityTableView;
 			sourceTree = "<group>";
@@ -2277,12 +2293,12 @@
 			isa = PBXGroup;
 			children = (
 				F983298F2602AB3200EB51F7 /* Activity */,
+				109FEB3C22A7003000621D2F /* CalendarType.swift */,
 				2670E339252D2023007A6194 /* UserHealth.swift */,
 				4BAEE549212735880045AB10 /* Conversation.swift */,
 				4BAEE54A212735880045AB10 /* Message.swift */,
 				4BAEE54B212735880045AB10 /* User.swift */,
 				4BAEE54C212735880045AB10 /* MediaObject.swift */,
-				109FEB3C22A7003000621D2F /* CalendarType.swift */,
 				109FEB4122A9C3DD00621D2F /* Purchase.swift */,
 				10EE27EE245C5B8000C80AAF /* Checklist.swift */,
 				10FBC8B624BFE58F00D0E6B5 /* Activitylist.swift */,
@@ -2655,6 +2671,7 @@
 				1069B2D3243115950048244C /* ActivityObject.swift */,
 				10C50FA32274EF9000111033 /* Activity.swift */,
 				F98329942602B25100EB51F7 /* ActivityCategory.swift */,
+				100FE70D2894407600D3124C /* ActivitySubcategory.swift */,
 				F99E45AF262F22B600F59D0E /* iCalUtility.swift */,
 			);
 			path = Activity;
@@ -3050,6 +3067,7 @@
 				26BDCDCC2582097700E850CF /* SleepOperation.swift in Sources */,
 				10B541E225479D3100CC9023 /* MealViewController.swift in Sources */,
 				4BAEE48721272C4F0045AB10 /* OnboardingContainerView.swift in Sources */,
+				100FE70C28931D2100D3124C /* CalendarActions.swift in Sources */,
 				4BAEE5CE212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift in Sources */,
 				4BAEE4EA21272D890045AB10 /* InformationMessageSender.swift in Sources */,
 				4BAEE5F3212735E50045AB10 /* SwiftSiriWaveformView.swift in Sources */,
@@ -3128,6 +3146,7 @@
 				10B541DE25479D0700CC9023 /* MealProductSearchViewController.swift in Sources */,
 				1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */,
 				102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */,
+				100FE70A28931CFF00D3124C /* CalendarFetcher.swift in Sources */,
 				4B4F452F1F32230C00A6FF96 /* AppDelegate.swift in Sources */,
 				1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */,
 				F932E05B261CE1FB007E4336 /* UIViewController+Navigation.swift in Sources */,
@@ -3321,6 +3340,7 @@
 				2603677E256DC86300FE9142 /* EKCalendarActivityOp.swift in Sources */,
 				10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */,
 				10737F8524912BDD00D146D6 /* Preview.swift in Sources */,
+				100FE70E2894407600D3124C /* ActivitySubcategory.swift in Sources */,
 				1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */,
 				10DC5C4025AF35C600D52722 /* FinancialMemberFetcher.swift in Sources */,
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,

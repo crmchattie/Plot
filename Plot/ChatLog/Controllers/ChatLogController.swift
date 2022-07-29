@@ -25,6 +25,7 @@ class ChatLogController: UICollectionViewController {
     var messagesFetcher: MessagesFetcher!
     let chatLogHistoryFetcher = ChatLogHistoryFetcher()
     let groupMembersManager = GroupMembersManager()
+    var networkController = NetworkController()
     
     var reference = Database.database().reference()
     var membersReference: DatabaseReference!
@@ -636,12 +637,9 @@ class ChatLogController: UICollectionViewController {
                 newActivity.activityOriginalPhotoURL = nil
                 newActivity.activityThumbnailPhotoURL = nil
                 newActivity.conversationID = nil
-                let destination = CreateActivityViewController()
+                let destination = CreateActivityViewController(networkController: self.networkController)
                 destination.sentActivity = true
                 destination.activity = newActivity
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
-                destination.conversations = self.conversations
                 self.navigationController?.pushViewController(destination, animated: true)
             })
         }

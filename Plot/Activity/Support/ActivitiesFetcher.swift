@@ -45,6 +45,9 @@ class ActivitiesFetcher: NSObject {
                         if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
                             let activity = Activity(dictionary: activitySnapshotValue)
                             activity.showExtras = userActivity.showExtras
+                            activity.calendarID = userActivity.calendarID
+                            activity.calendarName = userActivity.calendarName
+                            activity.calendarColor = userActivity.calendarColor
                             activity.calendarExport = userActivity.calendarExport
                             activity.reminder = userActivity.reminder
                             activity.badge = userActivity.badge
@@ -122,6 +125,9 @@ class ActivitiesFetcher: NSObject {
                         if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
                             let activity = Activity(dictionary: activitySnapshotValue)
                             activity.showExtras = userActivity.showExtras
+                            activity.calendarID = userActivity.calendarID
+                            activity.calendarName = userActivity.calendarName
+                            activity.calendarColor = userActivity.calendarColor
                             activity.calendarExport = userActivity.calendarExport
                             activity.reminder = userActivity.reminder
                             activity.badge = userActivity.badge

@@ -23,6 +23,7 @@ class NotificationsViewController: UIViewController {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     let invitationsFetcher = InvitationsFetcher()
+    var networkController = NetworkController()
     
     var invitations = [String: Invitation]()
     var users = [User]()
@@ -414,14 +415,10 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     func loadActivity(activity: Activity) {
-        let destination = CreateActivityViewController()
+        let destination = CreateActivityViewController(networkController: networkController)
         destination.hidesBottomBarWhenPushed = true
         destination.activity = activity
         destination.invitation = invitations[activity.activityID ?? ""]
-        destination.users = users
-        destination.filteredUsers = filteredUsers
-        destination.activities = notificationActivities
-        destination.conversations = conversations
         self.getParticipants(forActivity: activity) { (participants) in
             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                 destination.acceptedParticipant = acceptedParticipant

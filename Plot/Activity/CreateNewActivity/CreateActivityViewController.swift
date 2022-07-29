@@ -24,14 +24,27 @@ class CreateActivityViewController: FormViewController {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
-    var users = [User]()
-    var filteredUsers = [User]()
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var activities: [Activity] = networkController.activityService.activities
+    lazy var calendars: [String: [String]] = networkController.activityService.calendars
+    lazy var conversations: [Conversation] = networkController.conversationService.conversations
+    lazy var transactions: [Transaction] = networkController.financeService.transactions
+    
     var selectedFalconUsers = [User]()
     var purchaseUsers = [User]()
     var userInvitationStatus: [String: Status] = [:]
-    var conversations = [Conversation]()
-    var activities = [Activity]()
-    var transactions = [Transaction]()
     var conversation: Conversation!
     let avatarOpener = AvatarOpener()
     var locationName : String = "locationName"
@@ -74,14 +87,6 @@ class CreateActivityViewController: FormViewController {
                 viewRow.cell.view!.hideActivityIndicator()
             })
         }
-    }
-    
-    init() {
-        super.init(style: .insetGrouped)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -244,58 +249,66 @@ class CreateActivityViewController: FormViewController {
                     }
                 }
         
-            <<< ButtonRow("Calendar") { row in
+            <<< LabelRow("Calendar") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
                 if self.active && self.activity.calendarName != nil {
-                    row.title = self.activity.calendarName
+                    row.value = self.activity.calendarName
                 } else {
-                    row.title = row.tag
+                    row.value = row.tag
                 }
             }.onCellSelection({ _, row in
                 self.openCalendar(value: row.title ?? "Calendar")
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textAlignment = .left
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
             }
             
-            <<< ButtonRow("Category") { row in
+            <<< LabelRow("Category") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
                 if self.active && self.activity.category != nil {
-                    row.title = self.activity.category
+                    row.value = self.activity.category
                 } else {
-                    row.title = "Uncategorized"
+                    row.value = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
                 self.openCategory(value: row.title ?? "Uncategorized")
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textAlignment = .left
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
             }
         
-            <<< TextRow("Type") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.placeholder = $0.tag
-                if self.active && self.activity.activityType != "nothing" && self.activity.activityType != nil {
-                    $0.value = self.activity.activityType!
-                }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }.onChange() { [unowned self] row in
-                    self.activity.activityType = row.value
-                }
+//            <<< LabelRow("Subcategory") { row in
+//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                row.cell.accessoryType = .disclosureIndicator
+//                row.title = row.tag
+//                if self.active && self.activity.activityType != "nothing" && self.activity.activityType != nil {
+//                    row.value = self.activity.activityType!
+//                }
+//            }.onCellSelection({ _, row in
+////                self.openCategory(value: row.title ?? "Uncategorized")
+//            }).cellUpdate { cell, row in
+//                cell.accessoryType = .disclosureIndicator
+//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                cell.textLabel?.textAlignment = .left
+//            }
             
             <<< ButtonRow("Location") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -738,7 +751,7 @@ class CreateActivityViewController: FormViewController {
 //                    segmentRow.value = self!.segmentRowValue
 //                }
 //                guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-//                let userReference = Database.database().reference().child("user-activities").child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
+//                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
 //                let values:[String : Any] = ["showExtras": row.value ?? false]
 //                userReference.updateChildValues(values)
 //            }.cellUpdate { cell, row in
