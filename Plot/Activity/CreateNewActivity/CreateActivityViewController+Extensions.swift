@@ -61,8 +61,8 @@ extension CreateActivityViewController: UITextFieldDelegate {
 
 extension CreateActivityViewController: UpdateActivityCategoryDelegate {
     func update(value: String) {
-        if let row = form.rowBy(tag: "Category") {
-            row.title = value
+        if let row: LabelRow = form.rowBy(tag: "Category") {
+            row.value = value
             row.updateCell()
             self.activity.category = value
         }
@@ -71,8 +71,8 @@ extension CreateActivityViewController: UpdateActivityCategoryDelegate {
 
 extension CreateActivityViewController: UpdateCalendarDelegate {
     func update(calendar: CalendarType) {
-        if let row = form.rowBy(tag: "Calendar") {
-            row.title = calendar.name
+        if let row: LabelRow = form.rowBy(tag: "Calendar") {
+            row.value = calendar.name
             row.updateCell()
             self.activity.calendarID = calendar.id
             self.activity.calendarName = calendar.name

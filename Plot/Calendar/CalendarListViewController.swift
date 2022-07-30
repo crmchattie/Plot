@@ -38,6 +38,7 @@ class CalendarListViewController: FormViewController {
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
         configureTableView()
+        initializeForm()
     }
     
     fileprivate func grabCalendars() {
@@ -46,7 +47,6 @@ class CalendarListViewController: FormViewController {
         calendarFetcher.fetchCalendar { calendars in
             self.calendars = calendars.sorted()
             DispatchQueue.main.async {
-              activityIndicatorView.stopAnimating()
               self.initializeForm()
             }
         }
@@ -74,6 +74,7 @@ class CalendarListViewController: FormViewController {
     }
     
     fileprivate func initializeForm() {
+        activityIndicatorView.stopAnimating()
         form +++ SelectableSection<ListCheckRow<String>>("Calendar", selectionType: .singleSelection(enableDeselection: false))
         
         for calendar in calendars {

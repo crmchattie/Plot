@@ -18,12 +18,13 @@ struct CalendarType: Codable, Equatable, Hashable, Comparable {
         lhs.name ?? "" < rhs.name ?? ""
     }
     
-        
     var name: String?
     var id: String?
     var description: String?
     var type: String?
+    //CIColor(color: UIcolor).stringRepresentation
     var color: String?
+    var source: String?
     var locationName: String?
     var locationAddress: [String : [Double]]?
     var participantsIDs: [String]?
@@ -34,20 +35,21 @@ struct CalendarType: Codable, Equatable, Hashable, Comparable {
     var pinned: Bool?
     var muted: Bool?
     
-    init(id: String, name: String, color: String) {
+    init(id: String, name: String, color: String, source: String) {
         self.id = id
         self.name = name
         self.color = color
+        self.source = source
     }
 }
 
 let prebuiltCalendars: [CalendarType] = [calendarDefault, personal, home, work, social]
 
-let calendarDefault = CalendarType(id: UUID().uuidString, name: "Calendar", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation)
-let home = CalendarType(id: UUID().uuidString, name: "Home", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation)
-let personal = CalendarType(id: UUID().uuidString, name: "Personal", color: CIColor(color: ChartColors.palette()[0]).stringRepresentation)
-let social = CalendarType(id: UUID().uuidString, name: "Social", color: CIColor(color: ChartColors.palette()[3]).stringRepresentation)
-let work = CalendarType(id: UUID().uuidString, name: "Work", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation)
+let calendarDefault = CalendarType(id: UUID().uuidString, name: "Calendar", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
+let home = CalendarType(id: UUID().uuidString, name: "Home", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
+let personal = CalendarType(id: UUID().uuidString, name: "Personal", color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: CalendarOptions.plot.name)
+let social = CalendarType(id: UUID().uuidString, name: "Social", color: CIColor(color: ChartColors.palette()[3]).stringRepresentation, source: CalendarOptions.plot.name)
+let work = CalendarType(id: UUID().uuidString, name: "Work", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: CalendarOptions.plot.name)
 
 enum CalendarOptions:String, CaseIterable {
     case plot = "Plot"

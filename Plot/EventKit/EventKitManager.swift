@@ -7,6 +7,9 @@
 //
 
 import Foundation
+import EventKit
+import CoreImage
+import UIKit
 
 class EventKitManager {
     private let eventKitService: EventKitService
@@ -105,11 +108,20 @@ class EventKitManager {
         }
     }
     
-    func grabCalendars() -> [String]? {
+    func grabCalendars() -> [CalendarType]? {
         guard isAuthorized else {
             return nil
         }
         let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.title != "Plot" }
-        return calendars.map({ $0.title })
+        return convertCalendarsToPlot(calendars: calendars)
+    }
+    
+    func convertCalendarsToPlot(calendars: [EKCalendar]) -> [CalendarType] {
+        var calendarTypes = [CalendarType]()
+        for calendar in calendars {
+            let calendarType = CalendarType(id: calendar.calendarIdentifier, name: calendar.title, color: CIColor(cgColor: calendar.cgColor).stringRepresentation, source: CalendarOptions.apple.name)
+            calendarTypes.append(calendarType)
+        }
+        return calendarTypes
     }
 }

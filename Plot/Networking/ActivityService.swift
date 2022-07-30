@@ -23,7 +23,7 @@ class ActivityService {
     
     var askedforAuthorization: Bool = false
     
-    var calendars = [String: [String]]() {
+    var calendars = [String: [CalendarType]]() {
         didSet {
             if oldValue != calendars {
                 NotificationCenter.default.post(name: .calendarsUpdated, object: nil)
@@ -137,7 +137,7 @@ class ActivityService {
     func grabCalendars() {
         if let _ = Auth.auth().currentUser {
             self.calendarFetcher.fetchCalendar { calendars in
-                self.calendars[CalendarOptions.plot.name] = calendars.map({ $0.name ?? "" })
+                self.calendars[CalendarOptions.plot.name] = calendars
             }
             self.eventKitManager.authorizeEventKit({ _ in
                 if let calendars = self.eventKitManager.grabCalendars() {

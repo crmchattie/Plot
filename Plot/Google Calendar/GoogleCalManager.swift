@@ -102,7 +102,7 @@ class GoogleCalManager {
         }
     }
     
-    func grabCalendars(completion: @escaping ([String]?) -> Swift.Void) {
+    func grabCalendars(completion: @escaping ([CalendarType]?) -> Swift.Void) {
         guard isAuthorized else {
             completion(nil)
             return

@@ -634,7 +634,7 @@ extension CreateActivityViewController {
         let destination = CalendarListViewController()
         destination.delegate = self
         destination.calendarID = self.activity.calendarID
-//        destination.calendars = self.calendars
+        destination.calendars = self.calendars[CalendarOptions.plot.name] ?? []
         self.navigationController?.pushViewController(destination, animated: true)
     }
     

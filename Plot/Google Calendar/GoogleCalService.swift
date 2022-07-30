@@ -135,21 +135,29 @@ class GoogleCalService {
         })
     }
     
-    func grabCalendars(completion: @escaping ([String]?) -> Swift.Void) {
+    func grabCalendars(completion: @escaping ([CalendarType]?) -> Swift.Void) {
         guard let service = self.calendarService else {
             completion(nil)
             return
         }
         
-        var calendars = [String]()
         let query = GTLRCalendarQuery_CalendarListList.query()
         service.executeQuery(query) { (ticket, result, error) in
             guard error == nil, let items = (result as? GTLRCalendar_CalendarList)?.items else {
                 completion(nil)
                 return
             }
-            calendars = items.filter { $0.summary != "Plot" }.map { $0.summary ?? "" }
-            completion(calendars)
+            let calendars = items.filter { $0.summary != "Plot" }
+            completion(self.convertCalendarsToPlot(calendars: calendars))
         }
+    }
+    
+    func convertCalendarsToPlot(calendars: [GTLRCalendar_CalendarListEntry]) -> [CalendarType] {
+        var calendarTypes = [CalendarType]()
+        for calendar in calendars {
+            let calendarType = CalendarType(id: calendar.identifier ?? UUID().uuidString, name: calendar.summary ?? "Google", color:  CIColor(color: UIColor(calendar.backgroundColor ?? "#007AFF")).stringRepresentation, source: CalendarOptions.google.name)
+            calendarTypes.append(calendarType)
+        }
+        return calendarTypes
     }
 }

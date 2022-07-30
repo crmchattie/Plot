@@ -38,7 +38,7 @@ class CreateActivityViewController: FormViewController {
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
     lazy var activities: [Activity] = networkController.activityService.activities
-    lazy var calendars: [String: [String]] = networkController.activityService.calendars
+    lazy var calendars: [String: [CalendarType]] = networkController.activityService.calendars
     lazy var conversations: [Conversation] = networkController.conversationService.conversations
     lazy var transactions: [Transaction] = networkController.financeService.transactions
     

@@ -22,9 +22,11 @@ class CalendarInfoViewController: UITableViewController {
         return networkController.activityService.primaryCalendar
     }
     
-    var calendars: [String: [String]] {
+    var calendars: [String: [CalendarType]] {
         return networkController.activityService.calendars
     }
+    
+    var sections = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +42,15 @@ class CalendarInfoViewController: UITableViewController {
         if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
             let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newCalendar))
             navigationItem.rightBarButtonItem = barButton
+        }
+        
+        sections = Array(calendars.keys).sorted { s1, s2 in
+            if s1 == CalendarOptions.plot.name {
+                return true
+            } else if s2 == CalendarOptions.plot.name {
+                return false
+            }
+            return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
         }
         
         addObservers()
@@ -104,21 +115,12 @@ class CalendarInfoViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let sections = Array(calendars.keys)
         let section = sections[section]
         return calendars[section]?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = CalendarAccountView()
-        let sections = Array(calendars.keys).sorted { s1, s2 in
-            if s1 == CalendarOptions.plot.name {
-                return true
-            } else if s2 == CalendarOptions.plot.name {
-                return false
-            }
-            return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
-        }
         if let calendar = CalendarOptions(rawValue: sections[section]) {
             headerView.nameLabel.text = calendar.name
             headerView.accountImageView.image = calendar.image
@@ -151,9 +153,9 @@ class CalendarInfoViewController: UITableViewController {
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        let sections = Array(calendars.keys)
         let section = sections[indexPath.section]
-        cell.textLabel?.text = calendars[section]?.sorted()[indexPath.row]
+        let calendarNames = calendars[section]?.map({ $0.name ?? "" })
+        cell.textLabel?.text = calendarNames?.sorted()[indexPath.row]
         cell.isUserInteractionEnabled = false
         return cell
     }
