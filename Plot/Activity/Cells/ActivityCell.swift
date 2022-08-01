@@ -136,7 +136,6 @@ class ActivityCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         selectionStyle = .default
-        activityImageView.backgroundColor = .tertiarySystemBackground
         contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
 
         contentView.addSubview(activityImageView)
@@ -209,7 +208,7 @@ class ActivityCell: UITableViewCell {
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        activityImageView.backgroundColor = UIColor.tertiarySystemBackground.withAlphaComponent(highlighted ? 0.7 : 1)
+        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)
     }
     
     @objc func indexChangedSegmentedControl(_ sender: UISegmentedControl) {

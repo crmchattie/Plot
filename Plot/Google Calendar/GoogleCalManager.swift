@@ -43,7 +43,7 @@ class GoogleCalManager {
         let eventsOp = GFetchCalendarEventsOp(googleCalService: googleCalService)
         let syncEventsOp = GSyncCalendarEventsOp(existingActivities: existingActivities)
         let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
-            syncEventsOp.events = eventsOp.events
+            syncEventsOp.calendarEventsDict = eventsOp.calendarEventsDict
         }
         eventsOpAdapter.addDependency(eventsOp)
         syncEventsOp.addDependency(eventsOpAdapter)

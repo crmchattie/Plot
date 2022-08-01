@@ -45,7 +45,7 @@ struct CalendarType: Codable, Equatable, Hashable, Comparable {
 
 let prebuiltCalendars: [CalendarType] = [calendarDefault, personal, home, work, social]
 
-let calendarDefault = CalendarType(id: UUID().uuidString, name: "Calendar", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
+let calendarDefault = CalendarType(id: UUID().uuidString, name: "Default", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
 let home = CalendarType(id: UUID().uuidString, name: "Home", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
 let personal = CalendarType(id: UUID().uuidString, name: "Personal", color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: CalendarOptions.plot.name)
 let social = CalendarType(id: UUID().uuidString, name: "Social", color: CIColor(color: ChartColors.palette()[3]).stringRepresentation, source: CalendarOptions.plot.name)

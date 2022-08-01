@@ -18,6 +18,12 @@ class BaseContainerCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override var isHighlighted: Bool {
+        didSet {
+            self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(isHighlighted ? 0.7 : 1)
+        }
+    }
+        
     func setupViews() {
         self.backgroundView = UIView()
         addSubview(self.backgroundView!)
@@ -30,7 +36,7 @@ class BaseContainerCollectionViewCell: UICollectionViewCell {
         self.backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
         self.backgroundView?.layer.shouldRasterize = true
     }
-    
+            
     override func prepareForReuse() {
         super.prepareForReuse()
         self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -64,5 +70,10 @@ class BaseContainerTableViewCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    }
+    
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        super.setHighlighted(highlighted, animated: animated)
+        self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)
     }
 }

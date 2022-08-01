@@ -10,7 +10,7 @@ import Foundation
 
 class GFetchCalendarEventsOp: AsyncOperation {
     private let googleCalService: GoogleCalService
-    var events: [GTLRCalendar_Event] = []
+    var calendarEventsDict: [GTLRCalendar_CalendarListEntry: [GTLRCalendar_Event]] = [:]
     
     init(googleCalService: GoogleCalService) {
         self.googleCalService = googleCalService
@@ -21,8 +21,8 @@ class GFetchCalendarEventsOp: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        googleCalService.fetchEventsForCertainTime { events in
-            self.events = events
+        googleCalService.fetchEventsForCertainTime { calendarEventsDict in
+            self.calendarEventsDict = calendarEventsDict
             self.finish()
         }
     }

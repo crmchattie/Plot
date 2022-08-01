@@ -15,7 +15,6 @@ final class ActiveDaysCell: Cell<[Int]>, CellType {
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
         textLabel?.textColor = .clear
-        selectionStyle = .none
         backgroundColor = .clear
 
         let stackView = UIStackView(arrangedSubviews: [customSegmentControl])

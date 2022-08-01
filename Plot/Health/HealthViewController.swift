@@ -185,7 +185,6 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
             let metric = metrics[indexPath.row]
             cell.configure(metric)
         }
-        
         return cell
     }
     

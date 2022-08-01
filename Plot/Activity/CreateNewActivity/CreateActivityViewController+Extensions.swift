@@ -77,9 +77,10 @@ extension CreateActivityViewController: UpdateCalendarDelegate {
             self.activity.calendarID = calendar.id
             self.activity.calendarName = calendar.name
             self.activity.calendarColor = calendar.color
+            self.activity.calendarSource = calendar.source
             guard let currentUserID = Auth.auth().currentUser?.uid else { return }
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["calendarID": calendar.id as Any, "calendarName": calendar.name as Any, "calendarColor": calendar.color as Any]
+            let values:[String : Any] = ["calendarID": calendar.id as Any, "calendarName": calendar.name as Any, "calendarColor": calendar.color as Any, "calendarSource": calendar.source as Any]
             userReference.updateChildValues(values)
         }
     }

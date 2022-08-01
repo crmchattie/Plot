@@ -443,6 +443,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = row.tag
                 row.value = transaction.group
             }.onCellSelection({ _, row in
@@ -461,6 +462,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = row.tag
                 row.value = transaction.group
             }.onCellSelection({ _, row in
@@ -479,6 +481,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = row.tag
                 row.value = transaction.group
             }.onCellSelection({ _, row in
@@ -497,6 +500,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = row.tag
             }.onCellSelection({ _, row in
                 self.openTags()

@@ -336,7 +336,6 @@ extension AccountSettingsController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         if indexPath.section == 0 {
             if indexPath.row == 0 {
                 let destination = CalendarInfoViewController()

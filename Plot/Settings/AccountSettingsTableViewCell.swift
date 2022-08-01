@@ -27,13 +27,6 @@ class AccountSettingsTableViewCell: UITableViewCell {
     }()
     
     
-    let separator: UIView = {
-        let separator = UIView()
-        separator.translatesAutoresizingMaskIntoConstraints = false
-        separator.backgroundColor = UIColor.clear
-        return separator
-    }()
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         
@@ -50,11 +43,6 @@ class AccountSettingsTableViewCell: UITableViewCell {
         title.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15).isActive = true
         title.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
-        addSubview(separator)
-        separator.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
-        separator.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16).isActive = true
-        separator.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15).isActive = true
-        separator.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
     }
     
     
@@ -64,12 +52,7 @@ class AccountSettingsTableViewCell: UITableViewCell {
     
     fileprivate func setColor() {
         backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        accessoryView?.backgroundColor = backgroundColor
-        title.backgroundColor = backgroundColor
-        icon.backgroundColor = backgroundColor
         title.textColor = ThemeManager.currentTheme().generalTitleColor
-        selectionColor = ThemeManager.currentTheme().cellBackgroundColor
-        contentView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
     }
     
     override func prepareForReuse() {

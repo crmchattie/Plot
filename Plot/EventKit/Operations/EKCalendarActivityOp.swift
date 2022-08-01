@@ -90,6 +90,10 @@ class EKCalendarActivityOp: AsyncOperation {
         activity.recurrences = event.recurrenceRules?.map { $0.iCalRuleString() }
         activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
+        activity.calendarID = event.calendar.calendarIdentifier
+        activity.calendarName = event.calendar.title
+        activity.calendarColor = CIColor(cgColor: event.calendar.cgColor).stringRepresentation
+        activity.calendarSource = CalendarOptions.apple.name
     }
     
     private func deleteActivity() {

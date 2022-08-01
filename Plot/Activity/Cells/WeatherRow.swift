@@ -45,7 +45,6 @@ final class WeatherCell: Cell<[DailyWeatherElement]>, CellType, UICollectionView
         height = { 130 }
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
-        selectionStyle = .none
         backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         
         contentView.addSubview(activityIndicatorView)

@@ -26,8 +26,8 @@ class GoogleCalService {
         }
     }
     
-    func fetchEventsForCertainTime(completion: @escaping ([GTLRCalendar_Event]) -> Swift.Void) {
-        var events: [GTLRCalendar_Event] = []
+    func fetchEventsForCertainTime(completion: @escaping ([GTLRCalendar_CalendarListEntry: [GTLRCalendar_Event]]) -> Swift.Void) {
+        var events: [GTLRCalendar_CalendarListEntry: [GTLRCalendar_Event]] = [:]
         guard let service = self.calendarService else {
             completion(events)
             return
@@ -64,7 +64,7 @@ class GoogleCalService {
                                 dispatchGroup.leave()
                                 return
                             }
-                            events.append(contentsOf: items)
+                            events[calendar] = items
                             dispatchGroup.leave()
                         })
                     }

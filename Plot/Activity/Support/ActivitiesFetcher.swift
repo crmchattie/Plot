@@ -48,6 +48,7 @@ class ActivitiesFetcher: NSObject {
                             activity.calendarID = userActivity.calendarID
                             activity.calendarName = userActivity.calendarName
                             activity.calendarColor = userActivity.calendarColor
+                            activity.calendarSource = userActivity.calendarSource
                             activity.calendarExport = userActivity.calendarExport
                             activity.reminder = userActivity.reminder
                             activity.badge = userActivity.badge
@@ -129,6 +130,7 @@ class ActivitiesFetcher: NSObject {
                             activity.calendarName = userActivity.calendarName
                             activity.calendarColor = userActivity.calendarColor
                             activity.calendarExport = userActivity.calendarExport
+                            activity.calendarSource = userActivity.calendarSource
                             activity.reminder = userActivity.reminder
                             activity.badge = userActivity.badge
                             activity.muted = userActivity.muted

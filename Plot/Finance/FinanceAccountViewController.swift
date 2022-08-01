@@ -460,6 +460,7 @@ class FinanceAccountViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
                 row.cell.textLabel?.textAlignment = .left
                 row.title = row.tag
             }.onCellSelection({ _, row in

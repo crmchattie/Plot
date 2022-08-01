@@ -370,6 +370,12 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     var bottomHeightConstraint: CGFloat = 0
     var firstPosition: Bool = false
     var lastPosition: Bool = false
+    
+    override var isHighlighted: Bool {
+        didSet {
+            self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(isHighlighted ? 0.7 : 1)
+        }
+    }
         
     func setupViews() {
         backgroundColor = .clear

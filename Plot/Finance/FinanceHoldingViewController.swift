@@ -431,6 +431,7 @@ class FinanceHoldingViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = row.tag
             }.onCellSelection({ _, row in
                 self.openTags()

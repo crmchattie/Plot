@@ -199,6 +199,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = row.tag
                 if let string = transactionRule.group {
                     row.value = string
@@ -222,6 +223,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = row.tag
                 if let string = transactionRule.top_level_category {
                     row.value = string
@@ -245,6 +247,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = row.tag
                 if let string = transactionRule.top_level_category {
                     row.value = string

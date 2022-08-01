@@ -57,6 +57,12 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override var isHighlighted: Bool {
+        didSet {
+            self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(isHighlighted ? 0.7 : 1)
+        }
+    }
+    
     func setupViews() {
         backgroundColor = .clear
         backgroundView = UIView()

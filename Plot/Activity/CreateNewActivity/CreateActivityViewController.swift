@@ -254,6 +254,7 @@ class CreateActivityViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
                 row.title = row.tag
                 if self.active && self.activity.calendarName != nil {
                     row.value = self.activity.calendarName
@@ -275,6 +276,7 @@ class CreateActivityViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
                 row.title = row.tag
                 if self.active && self.activity.category != nil {
                     row.value = self.activity.category
@@ -282,7 +284,7 @@ class CreateActivityViewController: FormViewController {
                     row.value = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
-                self.openCategory(value: row.title ?? "Uncategorized")
+                self.openCategory(value: row.value ?? "Uncategorized")
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -296,6 +298,7 @@ class CreateActivityViewController: FormViewController {
 //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                row.cell.accessoryType = .disclosureIndicator
+//                row.cell.selectionStyle = .default
 //                row.title = row.tag
 //                if self.active && self.activity.activityType != "nothing" && self.activity.activityType != nil {
 //                    row.value = self.activity.activityType!
@@ -486,6 +489,7 @@ class CreateActivityViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {
@@ -591,6 +595,7 @@ class CreateActivityViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {
@@ -613,6 +618,7 @@ class CreateActivityViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
                 row.title = row.tag
                 if self.active, let recurrences = self.activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let startDate = activity.startDate {
                     row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)

@@ -19,6 +19,7 @@ class Activity: NSObject, NSCopying, Codable {
     var calendarID: String?
     var calendarName: String?
     var calendarColor: String?
+    var calendarSource: String?
     var activityType: String?
     var category: String?
     var activityDescription: String?
@@ -76,6 +77,7 @@ class Activity: NSObject, NSCopying, Codable {
         case calendarID
         case calendarName
         case calendarColor
+        case calendarSource
         case activityType
         case category
         case activityDescription
@@ -112,6 +114,19 @@ class Activity: NSObject, NSCopying, Codable {
         case scheduleIDs
     }
     
+    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String) {
+        self.activityID = activityID
+        self.admin = admin
+        self.calendarID = calendarID
+        self.calendarName = calendarName
+        self.calendarColor = calendarColor
+        self.calendarSource = calendarSource
+        self.startDateTime = startDateTime
+        self.startTimeZone = startTimeZone
+        self.endDateTime = endDateTime
+        self.endTimeZone = endTimeZone
+    }
+    
     init(dictionary: [String: AnyObject]?) {
         super.init()
         
@@ -120,6 +135,7 @@ class Activity: NSObject, NSCopying, Codable {
         calendarID = dictionary?["calendarID"] as? String
         calendarName = dictionary?["calendarName"] as? String
         calendarColor = dictionary?["calendarColor"] as? String
+        calendarSource = dictionary?["calendarSource"] as? String
         activityType = dictionary?["activityType"] as? String
         category = dictionary?["category"] as? String
         activityDescription = dictionary?["activityDescription"] as? String
@@ -224,6 +240,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.calendarColor as AnyObject? {
             dictionary["calendarColor"] = value
+        }
+        
+        if let value = self.calendarSource as AnyObject? {
+            dictionary["calendarSource"] = value
         }
         
         if let value = self.activityType as AnyObject? {

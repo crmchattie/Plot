@@ -332,6 +332,7 @@ class ScheduleViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {
@@ -429,6 +430,7 @@ class ScheduleViewController: FormViewController {
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {

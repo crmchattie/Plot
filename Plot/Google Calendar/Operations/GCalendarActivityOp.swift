@@ -11,9 +11,11 @@ import Firebase
 import CodableFirebase
 
 class GCalendarActivityOp: AsyncOperation {
+    private var calendar: GTLRCalendar_CalendarListEntry
     private var event: GTLRCalendar_Event
     
-    init(event: GTLRCalendar_Event) {
+    init(calendar: GTLRCalendar_CalendarListEntry,event: GTLRCalendar_Event) {
+        self.calendar = calendar
         self.event = event
     }
     
@@ -78,10 +80,14 @@ class GCalendarActivityOp: AsyncOperation {
         }
     }
     
-    private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
+    private func update(activity: Activity, completion: @escaping (Activity) -> Void) {        
         activity.name = event.summary
         activity.activityDescription = event.descriptionProperty
         activity.recurrences = event.recurrence
+        activity.calendarID = calendar.identifier ?? UUID().uuidString
+        activity.calendarName = calendar.summary ?? "Google"
+        activity.calendarColor = CIColor(color: UIColor(calendar.backgroundColor ?? "#007AFF")).stringRepresentation
+        activity.calendarSource = CalendarOptions.google.name
         if let start = event.start?.date, let end = event.end?.date {
             activity.allDay = true
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)
