@@ -11,7 +11,7 @@ import Firebase
 import ViewRow
 
 
-extension CreateActivityViewController: AvatarOpenerDelegate {
+extension EventViewController: AvatarOpenerDelegate {
     func avatarOpener(avatarPickerDidPick image: UIImage) {
         navigationController?.view.isUserInteractionEnabled = false
         let viewRow: ViewRow<UIImageView> = form.rowBy(tag: "Activity Image")!
@@ -51,7 +51,7 @@ extension CreateActivityViewController: AvatarOpenerDelegate {
     }
 }
 
-extension CreateActivityViewController { // delete
+extension EventViewController { // delete
     
     typealias CurrentPictureDeletionCompletionHandler = (_ success: Bool) -> Void
     func deleteCurrentPhoto(completion: @escaping CurrentPictureDeletionCompletionHandler) {
@@ -59,7 +59,7 @@ extension CreateActivityViewController { // delete
         print("activityAvatarURL does not equal nil")
         let storage = Storage.storage()
         let storageReference = storage.reference(forURL: activityAvatarURL)
-        let activityMetaReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        let activityMetaReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         self.activityAvatarURL = ""
         self.thumbnailImage = ""
         self.activity.activityOriginalPhotoURL = self.activityAvatarURL
@@ -75,11 +75,11 @@ extension CreateActivityViewController { // delete
     }
 }
 
-extension CreateActivityViewController { // update
+extension EventViewController { // update
     
     typealias UpdateActivityImageCompletionHandler = (_ success: Bool) -> Void
     func updateActivityImage(with image: UIImage, completion: @escaping UpdateActivityImageCompletionHandler) {
-        let userReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        let userReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         let thumbnailImage = createImageThumbnail(image)
         var images = [(image: UIImage, quality: CGFloat, key: String)]()
         images.append((image: image, quality: 0.5, key: "activityOriginalPhotoURL"))
@@ -93,7 +93,7 @@ extension CreateActivityViewController { // update
         })
     
         for imageElement in images {
-            uploadAvatarForActivityToFirebaseStorageUsingImage(imageElement.image, quality: imageElement.quality) { (url) in
+            uploadImageToFirebaseStorage(imageElement.image, quality: imageElement.quality) { (url) in
                 userReference.updateChildValues([imageElement.key: url], withCompletionBlock: { (_, _) in
                     photoUpdatingGroup.leave()
                 })

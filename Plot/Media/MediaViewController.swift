@@ -11,13 +11,16 @@ import SDWebImage
 import MobileCoreServices
 import QuickLook
 
-protocol UpdateActivityMediaDelegate: AnyObject {
-    func updateActivityMedia(activityPhotos: [String], activityFiles: [String])
+let documentsEntity = "documents"
+let imagesEntity = "images"
+
+protocol UpdateMediaDelegate: AnyObject {
+    func updateMedia(imageURLs: [String], fileURLs: [String])
 }
 
 class MediaViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    weak var delegate : UpdateActivityMediaDelegate?
+    weak var delegate : UpdateMediaDelegate?
     
     let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
@@ -31,7 +34,6 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     var segmentedControl: UISegmentedControl!
     let previewVC = QLPreviewController()
     
-    var activityID = String()
     var imageURLs = [String]()
     var selectedImageURL = String()
     var images = [UIImage]()
@@ -55,6 +57,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
         
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
+        activityIndicatorView.stopAnimating()
         
         fetchPhotos()
         fetchFiles()
@@ -63,7 +66,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.isToolbarHidden = true
-        delegate?.updateActivityMedia(activityPhotos: imageURLs, activityFiles: fileURLs)
+        delegate?.updateMedia(imageURLs: imageURLs, fileURLs: fileURLs)
     }
     
     fileprivate func setupMainView() {
@@ -96,7 +99,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
         collectionView.setCollectionViewLayout(layout, animated: true)
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(ActivityImageCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.register(MediaImageCell.self, forCellWithReuseIdentifier: cellId)
         collectionView.isUserInteractionEnabled = true
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -115,6 +118,10 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
         }
         setupNav()
         updateBottomBar()
+        selectedImages.removeAll()
+        selectedImagesArray.removeAll()
+        selectedFiles.removeAll()
+        selectedFilesArray.removeAll()
         self.collectionView.reloadData()
     }
     
@@ -207,7 +214,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
                 return
             }
             DispatchQueue.global().async {
-                let ref = Storage.storage().reference().child("activityDocs").child(url.deletingPathExtension().lastPathComponent)
+                let ref = Storage.storage().reference().child(documentsEntity).child(url.deletingPathExtension().lastPathComponent)
                 // Get metadata properties
                 ref.getMetadata { metadata, error in
                   if let _ = error {
@@ -279,7 +286,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
         if segmentedControl.selectedSegmentIndex == 0 {
             if navigationItem.rightBarButtonItem?.title != "Cancel" {
                 selectedImageURL = imageURLs[indexPath.item]
-                let imageView = (collectionView.cellForItem(at: indexPath) as! ActivityImageCell).photoImageView
+                let imageView = (collectionView.cellForItem(at: indexPath) as! MediaImageCell).photoImageView
                 avatarOpener.handleAvatarOpening(avatarView: imageView, at: self,
                                                  isEditButtonEnabled: true, title: .activities)
             } else {
@@ -333,16 +340,14 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         checkIfThereAnyItems()
         if segmentedControl.selectedSegmentIndex == 0 {
-            print("images.count \(images.count)")
             return images.count
         } else {
-            print("files.count \(files.count)")
             return files.count
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ActivityImageCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! MediaImageCell
         //        cell.photoImageView.sd_setImage(with: URL(string:imageURLs[indexPath.item]), placeholderImage: nil, options: [.continueInBackground, .scaleDownLargeImages], completed: { (image, error, cacheType, url) in
         //        })
         if segmentedControl.selectedSegmentIndex == 0 {
@@ -366,26 +371,14 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     }
     
     fileprivate func updateBottomBar() {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            if selectedImagesArray.count > 0 {
-                navigationController?.isToolbarHidden = false
-                let item = UIBarButtonItem(image: UIImage(named: "ShareExternalIcon"), style: .plain, target: self, action: #selector(toolbarTouchHandler))
-                let trash = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteItems))
-                let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-                navigationController?.toolbar.setItems([item, flexibleSpace, trash], animated: true)
-            } else {
-                navigationController?.isToolbarHidden = true
-            }
+        if navigationItem.rightBarButtonItem?.title != "Cancel" {
+            navigationController?.isToolbarHidden = true
         } else {
-            if selectedFilesArray.count > 0 {
-                navigationController?.isToolbarHidden = false
-                let item = UIBarButtonItem(image: UIImage(named: "ShareExternalIcon"), style: .plain, target: self, action: #selector(toolbarTouchHandler))
-                let trash = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteItems))
-                let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-                navigationController?.toolbar.setItems([item, flexibleSpace, trash], animated: true)
-            } else {
-                navigationController?.isToolbarHidden = true
-            }
+            navigationController?.isToolbarHidden = false
+            let item = UIBarButtonItem(image: UIImage(named: "ShareExternalIcon"), style: .plain, target: self, action: #selector(toolbarTouchHandler))
+            let trash = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteItems))
+            let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+            navigationController?.toolbar.setItems([item, flexibleSpace, trash], animated: true)
         }
     }
     
@@ -409,30 +402,40 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     @objc fileprivate func download() {
         let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelDownload))
         navigationItem.rightBarButtonItems = [cancelBarButton]
+        updateBottomBar()
     }
     
     @objc fileprivate func cancelDownload() {
         setupNav()
         if segmentedControl.selectedSegmentIndex == 0 {
-            selectedImagesArray = [IndexPath]()
-            selectedImages = [UIImage]()
+            selectedImagesArray.removeAll()
+            selectedImages.removeAll()
         } else {
-            selectedFilesArray = [IndexPath]()
-            selectedFiles = [Preview]()
+            selectedFilesArray.removeAll()
+            selectedFiles.removeAll()
         }
         navigationController?.isToolbarHidden = true
         collectionView.reloadData()
     }
     
     @objc fileprivate func toolbarTouchHandler() {
-        let activity = UIActivityViewController(activityItems: selectedImages, applicationActivities: nil) //possible error
-        self.present(activity, animated: true, completion: nil)
+        if segmentedControl.selectedSegmentIndex == 0 {
+            let activity = UIActivityViewController(activityItems: selectedImages, applicationActivities: nil) //possible error
+            self.present(activity, animated: true, completion: nil)
+        } else {
+            var urls = [URL]()
+            for file in selectedFiles {
+                let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(file.formattedFileName)
+                urls.append(url)
+            }
+            let activity = UIActivityViewController(activityItems: urls, applicationActivities: nil) //possible error
+            self.present(activity, animated: true, completion: nil)
+        }
     }
     
     @objc fileprivate func deleteItems() {
         if segmentedControl.selectedSegmentIndex == 0 {
             let storage = Storage.storage()
-            let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             let photoUpdatingGroup = DispatchGroup()
             for image in selectedImages {
                 photoUpdatingGroup.enter()
@@ -445,14 +448,11 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
                 }
                 photoUpdatingGroup.leave()
             }
-//            checkIfThereAnyItems()
             collectionView.reloadData()
             setupNav()
-            activityReference.updateChildValues(["activityPhotos": self.imageURLs as AnyObject])
             cancelDownload()
         } else {
             let storage = Storage.storage()
-            let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
             let fileUpdatingGroup = DispatchGroup()
             for file in selectedFiles {
                 fileUpdatingGroup.enter()
@@ -465,10 +465,8 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
                 }
                 fileUpdatingGroup.leave()
             }
-//            checkIfThereAnyItems()
             collectionView.reloadData()
             setupNav()
-            activityReference.updateChildValues(["activityFiles": self.fileURLs as AnyObject])
             cancelDownload()
         }
     }
@@ -476,10 +474,9 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
 
 extension MediaViewController: AvatarOpenerDelegate {
     func avatarOpener(avatarPickerDidPick image: UIImage) {
-        print("avatar opening delegate")
         navigationController?.view.isUserInteractionEnabled = false
         deleteCurrentPhoto { (_) in
-            self.updateActivityImage(with: image, completion: { (isUpdated) in
+            self.updateImage(with: image, completion: { (isUpdated) in
                 self.navigationController?.view.isUserInteractionEnabled = true
                 guard isUpdated else {
                     basicErrorAlertWith(title: basicErrorTitleForAlert, message: thumbnailUploadError, controller: self)
@@ -490,7 +487,6 @@ extension MediaViewController: AvatarOpenerDelegate {
         images.append(image)
         collectionView.reloadData()
         setupNav()
-//        checkIfThereAnyItems()
         let lastItemIndex = NSIndexPath(item: images.count - 1, section: 0)
         collectionView.scrollToItem(at: lastItemIndex as IndexPath, at: .bottom, animated: true)
     }
@@ -504,7 +500,6 @@ extension MediaViewController: AvatarOpenerDelegate {
                 return
             }
         }
-//        checkIfThereAnyItems()
         collectionView.reloadData()
         setupNav()
     }
@@ -516,29 +511,23 @@ extension MediaViewController { // delete
         guard self.selectedImageURL != "" else { completion(true); return }
         let storage = Storage.storage()
         let storageReference = storage.reference(forURL: self.selectedImageURL)
-        let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-        
         if let index = imageURLs.firstIndex(of: self.selectedImageURL) {
             imageURLs.remove(at: index)
             images.remove(at: index)
-//            checkIfThereAnyItems()
             collectionView.reloadData()
             setupNav()
         }
-        
         storageReference.delete { _ in
-            activityReference.updateChildValues(["activityPhotos": self.imageURLs as AnyObject])
             completion(true)
         }
     }
 }
 
 extension MediaViewController { // update
-    typealias UpdateActivityImageCompletionHandler = (_ success: Bool) -> Void
-    func updateActivityImage(with image: UIImage, completion: @escaping UpdateActivityImageCompletionHandler) {
-        let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+    typealias UpdateImageCompletionHandler = (_ success: Bool) -> Void
+    func updateImage(with image: UIImage, completion: @escaping UpdateImageCompletionHandler) {
         var images = [(image: UIImage, quality: CGFloat, key: String)]()
-        images.append((image: image, quality: 0.5, key: "activityPhotos"))
+        images.append((image: image, quality: 0.5, key: imagesEntity))
         
         let photoUpdatingGroup = DispatchGroup()
         for _ in images {
@@ -546,12 +535,9 @@ extension MediaViewController { // update
         }
         
         for imageElement in images {
-            uploadAvatarForActivityToFirebaseStorageUsingImage(imageElement.image, quality: imageElement.quality) { (url) in
+            uploadImageToFirebaseStorage(imageElement.image, quality: imageElement.quality) { (url) in
                 self.imageURLs.append(url)
-//                self.checkIfThereAnyItems()
-                activityReference.updateChildValues([imageElement.key: self.imageURLs], withCompletionBlock: { (_, _) in
-                    photoUpdatingGroup.leave()
-                })
+                photoUpdatingGroup.leave()
             }
         }
         
@@ -567,8 +553,6 @@ extension MediaViewController: UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
         let fileUpdatingGroup = DispatchGroup()
         fileUpdatingGroup.enter()
-        let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-        print("picked url \(url.deletingPathExtension().lastPathComponent)")
         let file = Preview(url: url, displayName: url.deletingPathExtension().lastPathComponent, fileName: url.deletingPathExtension().lastPathComponent, fileExtension: url.pathExtension)
         if #available(iOS 13.0, *) {
             let previewGenerator = QLThumbnailGenerator()
@@ -591,9 +575,7 @@ extension MediaViewController: UIDocumentPickerDelegate {
         fileUpdatingGroup.enter()
         uploadDocToFirebaseStorage(url, contentType: mimeTypeForPath(pathExtension: url.pathExtension), name: url.deletingPathExtension().lastPathComponent) { (url) in
             self.fileURLs.append(url)
-            activityReference.updateChildValues(["activityFiles": self.fileURLs], withCompletionBlock: { (_, _) in
-                fileUpdatingGroup.leave()
-            })
+            fileUpdatingGroup.leave()
         }
         
         fileUpdatingGroup.notify(queue: DispatchQueue.main, execute: {
@@ -618,18 +600,13 @@ extension MediaViewController {
     func deleteDocs(completion: @escaping CurrentFileDeletionCompletionHandler) {
         let storage = Storage.storage()
         let storageReference = storage.reference(forURL: self.selectedFileURL)
-        let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
-        
         if let index = fileURLs.firstIndex(of: self.selectedFileURL) {
             fileURLs.remove(at: index)
             files.remove(at: index)
-//            checkIfThereAnyItems()
             collectionView.reloadData()
         }
         
-        storageReference.delete { _ in
-            activityReference.updateChildValues(["activityFiles": self.fileURLs as AnyObject])
-        }
+        storageReference.delete { _ in }
     }
 }
 

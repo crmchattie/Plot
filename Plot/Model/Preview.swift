@@ -29,7 +29,7 @@ class Preview: NSObject, QLPreviewItem {
     }
     
     var formattedFileName: String {
-        return "\(fileName).\(fileExtension)"
+        return "\(displayName).\(fileExtension)"
     }
     
     var previewItemURL: URL? {

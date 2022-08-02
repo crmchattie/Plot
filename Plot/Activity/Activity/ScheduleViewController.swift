@@ -124,7 +124,7 @@ class ScheduleViewController: FormViewController {
         form +++
             Section()
         
-            <<< TextRow("Activity Name") {
+            <<< TextRow("Name") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -148,7 +148,7 @@ class ScheduleViewController: FormViewController {
                     row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-            <<< TextRow("Activity Type") {
+            <<< TextRow("Type") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -750,9 +750,6 @@ class ScheduleViewController: FormViewController {
         destination.locations = [.activity: schedule]
         navigationController?.pushViewController(destination, animated: true)
         
-//        let destination = MapActivityViewController()
-//        destination.locationAddress = locationAddress
-//        navigationController?.pushViewController(destination, animated: true)
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
@@ -890,15 +887,14 @@ extension ScheduleViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let _: ButtonRow = form.rowBy(tag: "Participants") {
             if !selectedFalconUsers.isEmpty {
-                self.selectedFalconUsers = selectedFalconUsers
 //                self.userNamesString = "\(self.selectedFalconUsers.count + 1) participants"
 //                inviteesRow.title = self.userNamesString
 //                inviteesRow.updateCell()
             } else {
-                self.selectedFalconUsers = selectedFalconUsers
 //                inviteesRow.title = "Participants"
 //                inviteesRow.updateCell()
             }
+            self.selectedFalconUsers = selectedFalconUsers
         }
     }
 }

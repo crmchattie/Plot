@@ -943,8 +943,7 @@ func uiImageFromAsset(phAsset: PHAsset) -> UIImage? {
     options.deliveryMode = .fastFormat
     options.resizeMode = .exact
     options.isSynchronous = true
-    manager.requestImageData(for: phAsset, options: options) { data, _, _, _ in
-        
+    manager.requestImageDataAndOrientation(for: phAsset, options: options) { data, _, _, _ in
         if let data = data {
             img = UIImage(data: data)
         }
@@ -962,10 +961,9 @@ func dataFromAsset(asset: PHAsset) -> Data? {
     options.isSynchronous = true
     options.resizeMode = .exact
     options.normalizedCropRect = CGRect(x: 0, y: 0, width: 1000, height: 1000)
-    manager.requestImageData(for: asset, options: options) { data, _, _, _ in
+    manager.requestImageDataAndOrientation(for: asset, options: options) { data, _, _, _ in
         finalData = data
     }
-    
     return finalData
 }
 
@@ -1056,9 +1054,9 @@ func uploadAvatarForUserToFirebaseStorageUsingImage(_ image: UIImage, quality: C
     }
 }
 
-func uploadAvatarForActivityToFirebaseStorageUsingImage(_ image: UIImage, quality: CGFloat, completion: @escaping (_  imageUrl: String) -> ()) {
+func uploadImageToFirebaseStorage(_ image: UIImage, quality: CGFloat, completion: @escaping (_  imageUrl: String) -> ()) {
     let imageName = UUID().uuidString
-    let ref = Storage.storage().reference().child("activityImages").child(imageName)
+    let ref = Storage.storage().reference().child(imagesEntity).child(imageName)
     
     if let uploadData = image.jpegData(compressionQuality: quality) {
         ref.putData(uploadData, metadata: nil) { (metadata, error) in
@@ -1074,7 +1072,7 @@ func uploadAvatarForActivityToFirebaseStorageUsingImage(_ image: UIImage, qualit
 
 func uploadDocToFirebaseStorage(_ url: URL, contentType: String, name: String, completion: @escaping (_  url: String) -> ()) {
     let fileName = UUID().uuidString
-    let ref = Storage.storage().reference().child("activityDocs").child(fileName)
+    let ref = Storage.storage().reference().child(documentsEntity).child(fileName)
 
     let localFile = url
     // Create the file metadata

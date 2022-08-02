@@ -1,5 +1,5 @@
 //
-//  CreateActivityViewController+Functions.swift
+//  EventViewController+Functions.swift
 //  Plot
 //
 //  Created by Cory McHattie on 7/5/22.
@@ -17,7 +17,7 @@ import UserNotifications
 import CodableFirebase
 import RRuleSwift
 
-extension CreateActivityViewController {
+extension EventViewController {
     
     func decimalRowFunc() {
         var mvs = form.sectionBy(tag: "Balances")
@@ -623,10 +623,11 @@ extension CreateActivityViewController {
         })
     }
     
-    func openCategory(value: String) {
-        let destination = ActivityCategoryViewController()
+    func openLevel(value: String, level: String) {
+        let destination = ActivityLevelViewController()
         destination.delegate = self
         destination.value = value
+        destination.level = level
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -678,14 +679,12 @@ extension CreateActivityViewController {
         }
         let destination = MediaViewController()
         destination.delegate = self
-        destination.activityID = activityID
         if let imageURLs = activity.activityPhotos {
             destination.imageURLs = imageURLs
         }
         if let fileURLs = activity.activityFiles {
             destination.fileURLs = fileURLs
         }
-        
         self.navigationController?.pushViewController(destination, animated: true)
     }
     

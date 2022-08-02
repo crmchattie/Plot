@@ -63,8 +63,9 @@ class Activity: NSObject, NSCopying, Codable {
     var attractionID: String?
     var showExtras: Bool?
     var hkSampleID: String?
-    var isComplete: Bool?
+    //task will key off of isTask and isComplete
     var isTask: Bool?
+    var isComplete: Bool?
     var transactionIDs: [String]?
     var mealIDs: [String]?
     var workoutIDs: [String]?

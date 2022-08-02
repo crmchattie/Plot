@@ -17,9 +17,7 @@ protocol UpdateTransactionLevelDelegate: AnyObject {
 class FinanceTransactionLevelViewController: FormViewController {
     weak var delegate : UpdateTransactionLevelDelegate?
     
-    var categories = [String]()
-    var topLevelCategories = [String]()
-    var groups = [String]()
+    var levels = [String]()
     
     var oldValue = String()
     var value = String()
@@ -52,35 +50,35 @@ class FinanceTransactionLevelViewController: FormViewController {
             let dispatchGroup = DispatchGroup()
             let reference = Database.database().reference()
             if level == "Subcategory" {
-                categories = financialTransactionsCategories.sorted()
+                levels = financialTransactionsCategories.sorted()
                 dispatchGroup.enter()
                 reference.child(userFinancialTransactionsCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
                         let array = Array(values.values)
-                        self.categories.append(contentsOf: array)
-                        self.categories = self.categories.sorted()
+                        self.levels.append(contentsOf: array)
+                        self.levels = self.levels.sorted()
                     }
                     dispatchGroup.leave()
                 })
             } else if level == "Category" {
-                topLevelCategories = financialTransactionsTopLevelCategories.sorted()
+                levels = financialTransactionsTopLevelCategories.sorted()
                 dispatchGroup.enter()
                 reference.child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
                         let array = Array(values.values)
-                        self.topLevelCategories.append(contentsOf: array)
-                        self.topLevelCategories = self.topLevelCategories.sorted()
+                        self.levels.append(contentsOf: array)
+                        self.levels = self.levels.sorted()
                     }
                     dispatchGroup.leave()
                 })
             } else if level == "Group" {
-                groups = financialTransactionsGroups.sorted()
+                levels = financialTransactionsGroups.sorted()
                 dispatchGroup.enter()
                 reference.child(userFinancialTransactionsGroupsEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
                         let array = Array(values.values)
-                        self.groups.append(contentsOf: array)
-                        self.groups = self.groups.sorted()
+                        self.levels.append(contentsOf: array)
+                        self.levels = self.levels.sorted()
                     }
                     dispatchGroup.leave()
                 })
@@ -117,84 +115,30 @@ class FinanceTransactionLevelViewController: FormViewController {
     fileprivate func initializeForm() {
         form +++ SelectableSection<ListCheckRow<String>>(level, selectionType: .singleSelection(enableDeselection: false))
         
-        if level == "Subcategory" {
-            for title in categories {
-                form.last!
-                    <<< ListCheckRow<String>() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.cell.tintColor = FalconPalette.defaultBlue
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.title = title
-                        $0.selectableValue = title
-                        if title == self.value {
-                            $0.value = self.value
-                        }
-                    }.cellSetup { cell, row in
-                        cell.accessoryType = .checkmark
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.tintColor = FalconPalette.defaultBlue
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }.onChange({ (row) in
-                        if let value = row.value {
-                            self.delegate?.update(value: value, level: self.level)
-                            self.navigationController?.popViewController(animated: true)
-                        }
-                    })
-            }
-        } else if level == "Category" {
-            for title in topLevelCategories {
-                form.last!
-                    <<< ListCheckRow<String>() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.cell.tintColor = FalconPalette.defaultBlue
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.title = title
-                        $0.selectableValue = title
-                        if title == self.value {
-                            $0.value = self.value
-                        }
-                    }.cellSetup { cell, row in
-                        cell.accessoryType = .checkmark
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.tintColor = FalconPalette.defaultBlue
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }.onChange({ (row) in
-                        if let value = row.value {
-                            self.delegate?.update(value: value, level: self.level)
-                            self.navigationController?.popViewController(animated: true)
-                        }
-                    })
-            }
-        } else if level == "Group" {
-            for title in groups {
-                form.last!
-                    <<< ListCheckRow<String>() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.cell.tintColor = FalconPalette.defaultBlue
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.title = title
-                        $0.selectableValue = title
-                        if title == self.value {
-                            $0.value = self.value
-                        }
-                    }.cellSetup { cell, row in
-                        cell.accessoryType = .checkmark
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.tintColor = FalconPalette.defaultBlue
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }.onChange({ (row) in
-                        if let value = row.value {
-                            self.delegate?.update(value: value, level: self.level)
-                            self.navigationController?.popViewController(animated: true)
-                        }
-                    })
-            }
+        for level in levels {
+            form.last!
+                <<< ListCheckRow<String>() {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.tintColor = FalconPalette.defaultBlue
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.title = title
+                    $0.selectableValue = title
+                    if level == self.value {
+                        $0.value = self.value
+                    }
+                }.cellSetup { cell, row in
+                    cell.accessoryType = .checkmark
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.tintColor = FalconPalette.defaultBlue
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }.onChange({ (row) in
+                    if let value = row.value {
+                        self.delegate?.update(value: value, level: self.level)
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                })
         }
         
     }

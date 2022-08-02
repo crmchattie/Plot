@@ -22,7 +22,7 @@ protocol ActivityDetailShowing: UIViewController {
 extension ActivityDetailShowing {
     
     func showActivityDetail(activity: Activity) {
-        let destination = CreateActivityViewController(networkController: networkController)
+        let destination = EventViewController(networkController: networkController)
         destination.hidesBottomBarWhenPushed = true
         destination.activity = activity
         destination.invitation = self.networkController.activityService.invitations[activity.activityID ?? ""]

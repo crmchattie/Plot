@@ -1,5 +1,5 @@
 //
-//  CreateActivityViewController+Extensions.swift
+//  EventViewController+Extensions.swift
 //  Plot
 //
 //  Created by Cory McHattie on 7/5/22.
@@ -17,7 +17,7 @@ import UserNotifications
 import CodableFirebase
 import RRuleSwift
 
-extension CreateActivityViewController: UITextFieldDelegate {
+extension EventViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -33,7 +33,7 @@ extension CreateActivityViewController: UITextFieldDelegate {
 }
 
 
-//extension CreateActivityViewController: UITextViewDelegate {
+//extension EventViewController: UITextViewDelegate {
 //
 //    func textViewDidBeginEditing(_ textView: UITextView) {
 //        //        createActivityView.activityDescriptionPlaceholderLabel.isHidden = true
@@ -59,17 +59,21 @@ extension CreateActivityViewController: UITextFieldDelegate {
 //
 //}
 
-extension CreateActivityViewController: UpdateActivityCategoryDelegate {
-    func update(value: String) {
-        if let row: LabelRow = form.rowBy(tag: "Category") {
+extension EventViewController: UpdateActivityLevelDelegate {
+    func update(value: String, level: String) {
+        if let row: LabelRow = form.rowBy(tag: level) {
             row.value = value
             row.updateCell()
-            self.activity.category = value
+            if level == "Category" {
+                self.activity.category = value
+            } else if level == "Subcategory" {
+                self.activity.activityType = value
+            }
         }
     }
 }
 
-extension CreateActivityViewController: UpdateCalendarDelegate {
+extension EventViewController: UpdateCalendarDelegate {
     func update(calendar: CalendarType) {
         if let row: LabelRow = form.rowBy(tag: "Calendar") {
             row.value = calendar.name
@@ -86,7 +90,7 @@ extension CreateActivityViewController: UpdateCalendarDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateLocationDelegate {
+extension EventViewController: UpdateLocationDelegate {
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
         if let locationRow: ButtonRow = form.rowBy(tag: "Location") {
             self.locationAddress[self.locationName] = nil
@@ -113,7 +117,7 @@ extension CreateActivityViewController: UpdateLocationDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateTimeZoneDelegate {
+extension EventViewController: UpdateTimeZoneDelegate {
     func updateTimeZone(startOrEndTimeZone: String, timeZone: TimeZone) {
         if startOrEndTimeZone == "startTimeZone" {
             if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone"), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts") {
@@ -139,7 +143,7 @@ extension CreateActivityViewController: UpdateTimeZoneDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateScheduleDelegate {
+extension EventViewController: UpdateScheduleDelegate {
     func updateSchedule(schedule: Activity) {
         if let _ = schedule.name {
             if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
@@ -182,7 +186,7 @@ extension CreateActivityViewController: UpdateScheduleDelegate {
     }
 }
 
-extension CreateActivityViewController: ChooseActivityDelegate {
+extension EventViewController: ChooseActivityDelegate {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
         guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -254,7 +258,7 @@ extension CreateActivityViewController: ChooseActivityDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateTransactionDelegate {
+extension EventViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
         if transaction.description != "Name" {
@@ -285,7 +289,7 @@ extension CreateActivityViewController: UpdateTransactionDelegate {
     }
 }
 
-extension CreateActivityViewController: ChooseTransactionDelegate {
+extension EventViewController: ChooseTransactionDelegate {
     func chosenTransaction(transaction: Transaction) {
         var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
         if transaction.description != "Name" {
@@ -316,7 +320,7 @@ extension CreateActivityViewController: ChooseTransactionDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateMealDelegate {
+extension EventViewController: UpdateMealDelegate {
     func updateMeal(meal: Meal) {
         var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
         if meal.name != "Name" {
@@ -348,7 +352,7 @@ extension CreateActivityViewController: UpdateMealDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateWorkoutDelegate {
+extension EventViewController: UpdateWorkoutDelegate {
     func updateWorkout(workout: Workout) {
         var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
         if workout.name != "Name" {
@@ -380,7 +384,7 @@ extension CreateActivityViewController: UpdateWorkoutDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateMindfulnessDelegate {
+extension EventViewController: UpdateMindfulnessDelegate {
     func updateMindfulness(mindfulness: Mindfulness) {
         var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
         if mindfulness.name != "Name" {
@@ -412,10 +416,13 @@ extension CreateActivityViewController: UpdateMindfulnessDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateActivityMediaDelegate {
-    func updateActivityMedia(activityPhotos: [String], activityFiles: [String]) {
-        activity.activityPhotos = activityPhotos
-        activity.activityFiles = activityFiles
+extension EventViewController: UpdateMediaDelegate {
+    func updateMedia(imageURLs: [String], fileURLs: [String]) {
+        activity.activityPhotos = imageURLs
+        activity.activityFiles = fileURLs
+        let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+        activityReference.updateChildValues(["activityPhotos": imageURLs as AnyObject])
+        activityReference.updateChildValues(["activityFiles": fileURLs as AnyObject])
         if let mediaRow: ButtonRow = form.rowBy(tag: "Media") {
             if self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty || self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty {
                 mediaRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -426,7 +433,7 @@ extension CreateActivityViewController: UpdateActivityMediaDelegate {
     }
 }
 
-extension CreateActivityViewController: UpdateActivityListDelegate {
+extension EventViewController: UpdateActivityListDelegate {
     func updateActivityList(listList: [ListContainer]) {
         if let row: ButtonRow = form.rowBy(tag: "Checklist") {
             if listList.isEmpty {
@@ -440,10 +447,9 @@ extension CreateActivityViewController: UpdateActivityListDelegate {
     }
 }
 
-extension CreateActivityViewController: RecurrencePickerDelegate {
+extension EventViewController: RecurrencePickerDelegate {
     func recurrencePicker(_ picker: RecurrencePicker, didPickRecurrence recurrenceRule: RecurrenceRule?) {
         // do something, if recurrenceRule is nil, that means "never repeat".
-
         if let row: LabelRow = form.rowBy(tag: "Repeat"), let startDate = activity.startDate {
             if let recurrenceRule = recurrenceRule {
                 let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
@@ -461,7 +467,7 @@ extension CreateActivityViewController: RecurrencePickerDelegate {
     }
 }
 
-extension CreateActivityViewController: ChooseChatDelegate {
+extension EventViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
         if let activityID = activityID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
@@ -538,7 +544,7 @@ extension CreateActivityViewController: ChooseChatDelegate {
     }
 }
 
-extension CreateActivityViewController: MessagesDelegate {
+extension EventViewController: MessagesDelegate {
     
     func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
         chatLogController?.updateMessageStatus(messageRef: reference)

@@ -35,7 +35,7 @@ class MealViewController: FormViewController {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
-    //added for CreateActivityViewController
+    //added for EventViewController
     var movingBackwards: Bool = false
     var active: Bool = false
     var comingFromActivity: Bool = false

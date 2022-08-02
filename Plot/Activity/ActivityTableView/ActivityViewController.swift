@@ -262,7 +262,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
                 dateComponents.hour = calendar.component(.hour, from: Date())
                 dateComponents.minute = calendar.component(.minute, from: Date())
                 
-                let destination = CreateActivityViewController(networkController: self.networkController)
+                let destination = EventViewController(networkController: self.networkController)
                 destination.startDateTime = calendar.date(from: dateComponents)
                 destination.endDateTime = calendar.date(from: dateComponents)
                 let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
@@ -288,7 +288,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
             dateComponents.hour = calendar.component(.hour, from: Date())
             dateComponents.minute = calendar.component(.minute, from: Date())
             
-            let destination = CreateActivityViewController(networkController: networkController)
+            let destination = EventViewController(networkController: networkController)
             destination.startDateTime = calendar.date(from: dateComponents)
             destination.endDateTime = calendar.date(from: dateComponents)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
@@ -303,7 +303,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
         
         if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) {
             alert.addAction(UIAlertAction(title: CalendarOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
+                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
             }))
         }
         
@@ -684,7 +684,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func loadActivity(activity: Activity) {
-        let destination = CreateActivityViewController(networkController: networkController)
+        let destination = EventViewController(networkController: networkController)
         destination.hidesBottomBarWhenPushed = true
         destination.activity = activity
         destination.invitation = invitations[activity.activityID ?? ""]

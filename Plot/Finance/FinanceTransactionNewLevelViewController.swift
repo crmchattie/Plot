@@ -33,6 +33,8 @@ class FinanceTransactionNewLevelViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
+        title = "New \(level)"
+        
         configureTableView()
         initializeForm()
     }

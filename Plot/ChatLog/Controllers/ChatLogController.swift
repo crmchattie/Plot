@@ -341,7 +341,7 @@ class ChatLogController: UICollectionViewController {
         if self.navigationController?.visibleViewController is UserInfoTableViewController ||
             self.navigationController?.visibleViewController is  GroupAdminControlsTableViewController ||
             topViewController(rootViewController: self) is CropViewController ||
-            self.navigationController?.visibleViewController is  CreateActivityViewController ||
+            self.navigationController?.visibleViewController is  EventViewController ||
             self.navigationController?.visibleViewController is  SelectActivityTableViewController {
             return
         }
@@ -637,7 +637,7 @@ class ChatLogController: UICollectionViewController {
                 newActivity.activityOriginalPhotoURL = nil
                 newActivity.activityThumbnailPhotoURL = nil
                 newActivity.conversationID = nil
-                let destination = CreateActivityViewController(networkController: self.networkController)
+                let destination = EventViewController(networkController: self.networkController)
                 destination.sentActivity = true
                 destination.activity = newActivity
                 self.navigationController?.pushViewController(destination, animated: true)

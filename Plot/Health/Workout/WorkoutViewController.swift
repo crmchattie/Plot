@@ -33,7 +33,7 @@ class WorkoutViewController: FormViewController {
     var timer: Timer?
     var workoutActions: WorkoutActions?
     
-    //added for CreateActivityViewController
+    //added for EventViewController
     var movingBackwards: Bool = false
     var active: Bool = false
     var comingFromActivity: Bool = false

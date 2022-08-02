@@ -30,7 +30,7 @@ class MindfulnessViewController: FormViewController {
     var userNames : [String] = []
     var userNamesString: String = ""
     
-    //added for CreateActivityViewController
+    //added for EventViewController
     var movingBackwards: Bool = false
     var active: Bool = false
     var comingFromActivity: Bool = false

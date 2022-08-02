@@ -1,5 +1,5 @@
 //
-//  CreateActivityViewController+UpdateInvitees.swift
+//  EventViewController+UpdateInvitees.swift
 //  Plot
 //
 //  Created by Hafiz Usama on 10/23/19.
@@ -10,7 +10,7 @@ import Foundation
 import Eureka
 import Firebase
 
-extension CreateActivityViewController: UpdateInvitees {
+extension EventViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
             if !selectedFalconUsers.isEmpty {

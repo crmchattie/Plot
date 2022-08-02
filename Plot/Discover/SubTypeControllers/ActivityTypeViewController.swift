@@ -173,7 +173,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        if movingBackwards && navigationController?.visibleViewController is CreateActivityViewController {
+        if movingBackwards && navigationController?.visibleViewController is EventViewController {
             let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
             delegate?.updateSchedule(schedule: activity)
         } else if movingBackwards && activeList && navigationController?.visibleViewController is ActivitylistViewController {
@@ -381,7 +381,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
                     self.navigationController?.pushViewController(destination, animated: true)
                 } else {
-                    let destination = CreateActivityViewController(networkController: networkController)
+                    let destination = EventViewController(networkController: networkController)
                     destination.hidesBottomBarWhenPushed = true
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
@@ -1165,23 +1165,6 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             navigationController?.pushViewController(destination, animated: true)
 
         }
-        
-        
-        
-//        var locationAddress = [String : [Double]]()
-//        if let event = type as? Event {
-//            if let add = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let lat = Double(latitude), let longitude = event.embedded?.venues?[0].location?.longitude, let lon = Double(longitude) {
-//                locationAddress[add] = [lat, lon]
-//            }
-//        } else if let place = type as? FSVenue {
-//            if let location = place.location, let add = location.address, let lat = location.lat, let lon = location.lng {
-//                locationAddress[add] = [lat, lon]
-//            }
-//        }
-//
-//        let destination = MapActivityViewController()
-//        destination.locationAddress = locationAddress
-//        navigationController?.pushViewController(destination, animated: true)
     }
 }
 

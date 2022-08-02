@@ -17,13 +17,13 @@ class CalendarAccountView: UIView {
         return label
     }()
     
-    let infoLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.font = UIFont.preferredFont(forTextStyle: .callout)
-        label.numberOfLines = 1
-        return label
-    }()
+//    let infoLabel: UILabel = {
+//        let label = UILabel()
+//        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//        label.font = UIFont.preferredFont(forTextStyle: .callout)
+//        label.numberOfLines = 1
+//        return label
+//    }()
     
     let accountImageView = UIImageView(cornerRadius: 8)
     let statusImageView = UIImageView(cornerRadius: 8)
@@ -44,13 +44,13 @@ class CalendarAccountView: UIView {
         statusImageView.constrainWidth(25)
         statusImageView.constrainHeight(25)
         
-        let labelStack = VerticalStackView(arrangedSubviews: [nameLabel, infoLabel], spacing: 2)
+//        let labelStack = VerticalStackView(arrangedSubviews: [nameLabel], spacing: 0)
         
-        let stackView = UIStackView(arrangedSubviews: [accountImageView, labelStack, UIView(), statusImageView])
+        let stackView = UIStackView(arrangedSubviews: [accountImageView, nameLabel, UIView(), statusImageView])
         stackView.spacing = 10
         stackView.alignment = .center
         addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 10, left: 10, bottom: 10, right: 10))
+        stackView.fillSuperview(padding: .init(top: 5, left: 10, bottom: 5, right: 10))
 
     }
     

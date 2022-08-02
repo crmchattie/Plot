@@ -349,7 +349,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         self.getParticipants(forActivity: activity) { (participants) in
                             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                    let destination = CreateActivityViewController(networkController: tabBarController.networkController)
+                                    let destination = EventViewController(networkController: tabBarController.networkController)
                                     destination.acceptedParticipant = acceptedParticipant
                                     destination.selectedFalconUsers = participants
                                     destination.hidesBottomBarWhenPushed = true

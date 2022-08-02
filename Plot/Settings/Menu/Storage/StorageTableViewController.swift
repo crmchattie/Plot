@@ -50,7 +50,6 @@ class StorageTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let identifier = "cell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -126,5 +125,6 @@ class StorageTableViewController: UITableViewController {
             self.present(alert, animated: true, completion: nil)
             
         }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }

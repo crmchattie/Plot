@@ -10,12 +10,13 @@ import UIKit
 import Eureka
 import Firebase
 
-protocol NewActivityCategoryDelegate: AnyObject {
+protocol ActivityNewLevelDelegate: AnyObject {
     func update()
 }
 
-class NewActivityCategoryViewController: FormViewController {
-    weak var delegate : NewActivityCategoryDelegate?
+class ActivityNewLevelViewController: FormViewController {
+    weak var delegate : ActivityNewLevelDelegate?
+    var level = String()
     var name: String? = nil
     
     init() {
@@ -28,7 +29,7 @@ class NewActivityCategoryViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "New Category"
+        title = "New \(level)"
         configureTableView()
         initializeForm()
     }
@@ -54,7 +55,11 @@ class NewActivityCategoryViewController: FormViewController {
     
     @IBAction func create(_ sender: AnyObject) {
         if let row: TextRow = self.form.rowBy(tag: "Name"), let value = row.value, let currentUser = Auth.auth().currentUser?.uid {
-            Database.database().reference().child(userActivityCategoriesEntity).child(currentUser).child(value).setValue(value)
+            if level == "Category" {
+                Database.database().reference().child(userActivityCategoriesEntity).child(currentUser).child(value).setValue(value)
+            } else if level == "Subcategory" {
+                Database.database().reference().child(userActivitySubcategoriesEntity).child(currentUser).child(value).setValue(value)
+            }
         }
         self.delegate?.update()
         self.dismiss(animated: true, completion: nil)

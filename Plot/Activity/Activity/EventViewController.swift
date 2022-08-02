@@ -1,5 +1,5 @@
 //
-//  CreateActivityViewController.swift
+//  EventViewController.swift
 //  Pigeon-project
 //
 //  Created by Cory McHattie on 4/28/19.
@@ -17,7 +17,7 @@ import UserNotifications
 import CodableFirebase
 import RRuleSwift
 
-class CreateActivityViewController: FormViewController {
+class EventViewController: FormViewController {
     var activity: Activity!
     var activityOld: Activity!
     var invitation: Invitation?
@@ -93,6 +93,7 @@ class CreateActivityViewController: FormViewController {
         super.viewDidLoad()
         
         setupMainView()
+        
         
         if activity != nil {
             title = "Event"
@@ -284,7 +285,7 @@ class CreateActivityViewController: FormViewController {
                     row.value = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
-                self.openCategory(value: row.value ?? "Uncategorized")
+                self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -304,7 +305,7 @@ class CreateActivityViewController: FormViewController {
 //                    row.value = self.activity.activityType!
 //                }
 //            }.onCellSelection({ _, row in
-////                self.openCategory(value: row.title ?? "Uncategorized")
+//                self.openLevel(value: row.value ?? "Uncategorized", level: "Subcategory")
 //            }).cellUpdate { cell, row in
 //                cell.accessoryType = .disclosureIndicator
 //                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

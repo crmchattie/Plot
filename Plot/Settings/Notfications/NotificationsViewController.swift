@@ -415,7 +415,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     func loadActivity(activity: Activity) {
-        let destination = CreateActivityViewController(networkController: networkController)
+        let destination = EventViewController(networkController: networkController)
         destination.hidesBottomBarWhenPushed = true
         destination.activity = activity
         destination.invitation = invitations[activity.activityID ?? ""]

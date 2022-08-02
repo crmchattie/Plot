@@ -10,16 +10,16 @@ import UIKit
 import Eureka
 import Firebase
 
-protocol UpdateActivityCategoryDelegate: AnyObject {
-    func update(value: String)
+protocol UpdateActivityLevelDelegate: AnyObject {
+    func update(value: String, level: String)
 }
 
-class ActivityCategoryViewController: FormViewController {
-    weak var delegate : UpdateActivityCategoryDelegate?
-    
-    var categories = ActivityCategory.allCases.map({ $0.rawValue }).sorted()
+class ActivityLevelViewController: FormViewController {
+    weak var delegate : UpdateActivityLevelDelegate?
     var oldValue = String()
     var value = String()
+    var level = String()
+    var levels = [String]()
     
     init() {
         super.init(style: .insetGrouped)
@@ -37,23 +37,39 @@ class ActivityCategoryViewController: FormViewController {
         activityIndicatorView.startAnimating()
         configureTableView()
         oldValue = value
-        updateCategories()
+        updateLevels()
     }
     
-    fileprivate func updateCategories() {
+    fileprivate func updateLevels() {
         form.removeAll()
         if let currentUser = Auth.auth().currentUser?.uid {
-            Database.database().reference().child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                    let array = Array(values.values)
-                    self.categories.append(contentsOf: array)
-                    self.categories = self.categories.sorted()
-                }
-                DispatchQueue.main.async {
-                    activityIndicatorView.stopAnimating()
-                    self.initializeForm()
-                }
-            })
+            if level == "Category" {
+                levels = ActivitySubcategory.allCases.map({ $0.rawValue }).sorted()
+                Database.database().reference().child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
+                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                        let array = Array(values.values)
+                        self.levels.append(contentsOf: array)
+                        self.levels = self.levels.sorted()
+                    }
+                    DispatchQueue.main.async {
+                        activityIndicatorView.stopAnimating()
+                        self.initializeForm()
+                    }
+                })
+            } else if level == "Subcategory" {
+                levels = ActivityCategory.allCases.map({ $0.rawValue }).sorted()
+                Database.database().reference().child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
+                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                        let array = Array(values.values)
+                        self.levels.append(contentsOf: array)
+                        self.levels = self.levels.sorted()
+                    }
+                    DispatchQueue.main.async {
+                        activityIndicatorView.stopAnimating()
+                        self.initializeForm()
+                    }
+                })
+            }
         }
     }
     
@@ -67,12 +83,13 @@ class ActivityCategoryViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        let barButton = UIBarButtonItem(title: "New Category", style: .plain, target: self, action: #selector(newCategory))
+        let barButton = UIBarButtonItem(title: "New Category", style: .plain, target: self, action: #selector(newLevel))
         navigationItem.rightBarButtonItem = barButton
     }
     
-    @objc func newCategory(_ item:UIBarButtonItem) {
-        let destination = NewActivityCategoryViewController()
+    @objc func newLevel(_ item:UIBarButtonItem) {
+        let destination = ActivityNewLevelViewController()
+        destination.level = level
         destination.delegate = self
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
@@ -81,7 +98,7 @@ class ActivityCategoryViewController: FormViewController {
     fileprivate func initializeForm() {
         form +++ SelectableSection<ListCheckRow<String>>("Category", selectionType: .singleSelection(enableDeselection: false))
         
-        for title in categories {
+        for level in levels {
             form.last!
                 <<< ListCheckRow<String>() {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -90,7 +107,7 @@ class ActivityCategoryViewController: FormViewController {
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.title = title
                     $0.selectableValue = title
-                    if title == self.value {
+                    if level == self.value {
                         $0.value = self.value
                     }
                 }.cellSetup { cell, row in
@@ -101,7 +118,7 @@ class ActivityCategoryViewController: FormViewController {
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }.onChange({ (row) in
                     if let value = row.value {
-                        self.delegate?.update(value: value)
+                        self.delegate?.update(value: value, level: self.level)
                         self.navigationController?.popViewController(animated: true)
                     }
                 })
@@ -111,8 +128,8 @@ class ActivityCategoryViewController: FormViewController {
     
 }
 
-extension ActivityCategoryViewController: NewActivityCategoryDelegate {
+extension ActivityLevelViewController: ActivityNewLevelDelegate {
     func update() {
-        updateCategories()
+        updateLevels()
     }
 }

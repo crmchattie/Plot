@@ -486,7 +486,7 @@ extension MasterActivityContainerController: GIDSignInDelegate {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
-                let destination = CreateActivityViewController(networkController: self.networkController)
+                let destination = EventViewController(networkController: self.networkController)
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             }))
@@ -503,7 +503,7 @@ extension MasterActivityContainerController: GIDSignInDelegate {
                 print("completion block")
             })
         } else {
-            let destination = CreateActivityViewController(networkController: networkController)
+            let destination = EventViewController(networkController: networkController)
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }

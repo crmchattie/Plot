@@ -181,7 +181,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         if let activityType = object as? CustomType {
             switch activityType {
             case .basic:
-                let destination = CreateActivityViewController(networkController: networkController)
+                let destination = EventViewController(networkController: networkController)
                 self.navigationController?.pushViewController(destination, animated: true)
             case .calendar:
                 self.newCalendar()

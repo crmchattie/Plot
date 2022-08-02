@@ -126,23 +126,26 @@ class CalendarInfoViewController: UITableViewController {
             headerView.accountImageView.image = calendar.image
             if calendar.name == primaryCalendar {
                 headerView.statusImageView.image =  UIImage(systemName: "checkmark")
-                headerView.infoLabel.text = "External Calendar Account"
+//                headerView.infoLabel.text = "External Calendar Account"
+                let tap = TapGesture(target: self, action: #selector(updatePrimaryCalendar(_:)))
+                tap.item = section
+                headerView.addGestureRecognizer(tap)
             } else if calendar.name == "Plot" {
                 headerView.statusImageView.image =  UIImage(systemName: "checkmark")
-                headerView.infoLabel.text = "Internal Calendar Account"
+//                headerView.infoLabel.text = "Internal Calendar Account"
             } else {
                 headerView.statusImageView.image =  .none
-                headerView.infoLabel.text = "External Calendar Account"
+//                headerView.infoLabel.text = "External Calendar Account"
+                let tap = TapGesture(target: self, action: #selector(updatePrimaryCalendar(_:)))
+                tap.item = section
+                headerView.addGestureRecognizer(tap)
             }
-            let tap = TapGesture(target: self, action: #selector(updatePrimaryCalendar(_:)))
-            tap.item = section
-            headerView.addGestureRecognizer(tap)
         }
         return headerView
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 60
+        return 50
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

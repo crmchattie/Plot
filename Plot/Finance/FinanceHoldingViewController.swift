@@ -29,7 +29,7 @@ class FinanceHoldingViewController: FormViewController {
     
     var active: Bool = false
     
-    //added for CreateActivityViewController
+    //added for EventViewController
     var movingBackwards: Bool = false
     
     weak var delegate : UpdateHoldingDelegate?

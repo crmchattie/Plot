@@ -136,16 +136,30 @@ class ActivityActions: NSObject {
         })
         
         // Save to calendar
-        guard let currentUserId = Auth.auth().currentUser?.uid, let event = eventKitService.storeEvent(for: activity) else {
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
             return
         }
         
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(event.calendarItemIdentifier)
-        let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-        reference.updateChildValues(calendarEventActivityValue)
-        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-        let values:[String : Any] = ["calendarExport": true]
-        userReference.updateChildValues(values)
+        var reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let value = snapshot.value as? String {
+                if value == CalendarOptions.apple.name, let event = self.eventKitService.storeEvent(for: activity) {
+                    reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(event.calendarItemIdentifier)
+                    let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                    reference.updateChildValues(calendarEventActivityValue)
+                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                    let values:[String : Any] = ["calendarExport": true]
+                    userReference.updateChildValues(values)
+                } else if value == CalendarOptions.google.name, let event = self.googleCalService.storeEvent(for: activity), let id = event.identifier {
+                    reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(id)
+                    let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                    reference.updateChildValues(calendarEventActivityValue)
+                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                    let values:[String : Any] = ["calendarExport": true]
+                    userReference.updateChildValues(values)
+                }
+            }
+        })
     }
     
     func updateRecurrences(recurrences: [String]) {
