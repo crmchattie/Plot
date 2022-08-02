@@ -144,7 +144,7 @@
 		10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10868D6C246314C700D6BB4F /* Grocerylist.swift */; };
 		108841D2257004F10064C5F8 /* SummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108841D1257004F10064C5F8 /* SummaryViewController.swift */; };
 		108C37EE2899708B00DC4998 /* TaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37ED2899708B00DC4998 /* TaskViewController.swift */; };
-		108C37F12899722700DC4998 /* ActivityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F02899722600DC4998 /* ActivityListViewController.swift */; };
+		108C37F328997CBF00DC4998 /* ActivityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F228997CBF00DC4998 /* ActivityListViewController.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -702,7 +702,7 @@
 		10868D6C246314C700D6BB4F /* Grocerylist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grocerylist.swift; sourceTree = "<group>"; };
 		108841D1257004F10064C5F8 /* SummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewController.swift; sourceTree = "<group>"; };
 		108C37ED2899708B00DC4998 /* TaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewController.swift; sourceTree = "<group>"; };
-		108C37F02899722600DC4998 /* ActivityListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ActivityListViewController.swift; path = ../../../../../Desktop/ActivityListViewController.swift; sourceTree = "<group>"; };
+		108C37F228997CBF00DC4998 /* ActivityListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListViewController.swift; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -1540,7 +1540,7 @@
 				10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */,
 				10196EF224411B5500B6AFDF /* MapActivityViewController.swift */,
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
-				108C37F02899722600DC4998 /* ActivityListViewController.swift */,
+				108C37F228997CBF00DC4998 /* ActivityListViewController.swift */,
 			);
 			path = Activity;
 			sourceTree = "<group>";
@@ -3321,7 +3321,7 @@
 				10F5CFF625CB7E3B0078C821 /* GFetchCalendarEventsOp.swift in Sources */,
 				10E93D4F24BE41B500F6EE18 /* LocationsCarouselController.swift in Sources */,
 				10196F0524411B5600B6AFDF /* EventViewController.swift in Sources */,
-				108C37F12899722700DC4998 /* ActivityListViewController.swift in Sources */,
+				108C37F328997CBF00DC4998 /* ActivityListViewController.swift in Sources */,
 				4BAEE5B8212735E50045AB10 /* INSPhotosInteractionAnimator.swift in Sources */,
 				1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */,
 				10E8E4F725923B320076BE42 /* ActivitiesControllerCell.swift in Sources */,
