@@ -36,6 +36,7 @@ class FinanceTransactionLevelViewController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
+        title = level
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
         activityIndicatorView.startAnimating()
@@ -122,8 +123,8 @@ class FinanceTransactionLevelViewController: FormViewController {
                     $0.cell.tintColor = FalconPalette.defaultBlue
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.title = title
-                    $0.selectableValue = title
+                    $0.title = level
+                    $0.selectableValue = level
                     if level == self.value {
                         $0.value = self.value
                     }

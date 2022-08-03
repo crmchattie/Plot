@@ -71,7 +71,7 @@ class MindfulnessOperation: AsyncOperation {
                         activity.endTimeZone = TimeZone.current.identifier
 
                         activity.allDay = false
-                        activity.hkSampleID = sample.uuid.uuidString
+                        activity.hkSampleID = [sample.uuid.uuidString]
                         activities.append(activity)
                     }
                 }
@@ -81,6 +81,7 @@ class MindfulnessOperation: AsyncOperation {
                 
                 if let last = sortedDates.last?.key, let val = map[last] {
                     var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
+                    metric.hkSample = samples.last
                     metric.average = average
 
                     _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue, activities)

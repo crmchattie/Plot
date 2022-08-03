@@ -7,6 +7,7 @@
 //
 
 import Eureka
+import HealthKit
 
 final class HealthCell: Cell<HealthContainer>, CellType {
         
@@ -67,42 +68,42 @@ final class HealthCell: Cell<HealthContainer>, CellType {
     }
     
     override func update() {
+        height = { 60 }
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
 
         guard let healthMetric = row.value else { return }
         
         nameLabel.text = healthMetric.name
-
         
-//        switch schedule.activityType?.lowercased() {
-//        case "recipe":
-//            activityTypeButton.setImage(UIImage(named: "recipe"), for: .normal)
-//        case "workout":
-//            activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
-//        case "event":
-//            activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
-//        case "sleep":
-//            activityTypeButton.setImage(UIImage(named: "sleep"), for: .normal)
-//        case "work":
-//            activityTypeButton.setImage(UIImage(named: "work"), for: .normal)
-//        case "food":
-//            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
-//        case "meal":
-//            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
-//        case "nightlife":
-//            activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
-//        case "recreation":
-//            activityTypeButton.setImage(UIImage(named: "recreation"), for: .normal)
-//        case "shopping":
-//            activityTypeButton.setImage(UIImage(named: "shopping"), for: .normal)
-//        case "sightseeing":
-//            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
-//        case "mindfulness":
-//            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
-//        default:
-//            activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
-//        }
+        let isToday = NSCalendar.current.isDateInToday(healthMetric.date)
+        
+        var imageName = "activity"
+        
+        if let workout = healthMetric.workout {
+            let total = "\(Int(healthMetric.total))"
+            subLabel.text = "\(total) \(healthMetric.unitName)"
+            if let type = workout.type {
+                if type == "Running" {
+                    imageName = "running"
+                }
+                else if type == "Cycling" {
+                    imageName = "cycling"
+                }
+                else if type == "High Intensity Interval Training" {
+                    imageName = "jump"
+                }
+                else {
+                    imageName = "dumbell"
+                }
+            }
+        } else if let _ = healthMetric.mindfulness {
+            let total = TimeInterval(healthMetric.total).stringTimeShort
+            subLabel.text = "\(total)"
+            imageName = "mindfulness"
+        }
+        
+        activityTypeButton.setImage(UIImage(named: imageName), for: .normal)
         
     }
 }

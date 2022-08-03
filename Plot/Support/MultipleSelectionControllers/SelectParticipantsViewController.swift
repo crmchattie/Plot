@@ -132,6 +132,7 @@ class SelectParticipantsViewController: UIViewController {
     }
     
     fileprivate func setupMainView() {
+        extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     }
@@ -240,7 +241,7 @@ class SelectParticipantsViewController: UIViewController {
         
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         
         if #available(iOS 11.0, *) {
             tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true

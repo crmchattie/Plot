@@ -43,7 +43,6 @@ class Activity: NSObject, NSCopying, Codable {
     var recurrences: [String]?
     var reminder: String?
     var notes: String?
-    var checklist: [Checklist]?
     var checklistIDs: [String]?
     var activitylistIDs: [String]?
     var packinglistIDs: [String]?
@@ -62,14 +61,12 @@ class Activity: NSObject, NSCopying, Codable {
     var placeID: String?
     var attractionID: String?
     var showExtras: Bool?
-    var hkSampleID: String?
+    var hkSampleID: [String]?
     //task will key off of isTask and isComplete
     var isTask: Bool?
     var isComplete: Bool?
     var transactionIDs: [String]?
     var mealIDs: [String]?
-    var workoutIDs: [String]?
-    var mindfulnessIDs: [String]?
     var scheduleIDs: [String]?
     var isSchedule: Bool?
     
@@ -81,6 +78,9 @@ class Activity: NSObject, NSCopying, Codable {
         case calendarSource
         case activityType
         case category
+        case allDay
+        case startTimeZone
+        case endTimeZone
         case activityDescription
         case isGroupActivity
         case locationName
@@ -91,7 +91,6 @@ class Activity: NSObject, NSCopying, Codable {
         case reminder
         case recurrences
         case notes
-        case checklist
         case checklistIDs
         case activitylistIDs
         case packinglistIDs
@@ -109,19 +108,18 @@ class Activity: NSObject, NSCopying, Codable {
         case isComplete
         case isTask
         case mealIDs
-        case workoutIDs
-        case mindfulnessIDs
         case isSchedule
         case scheduleIDs
     }
     
-    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String) {
+    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String) {
         self.activityID = activityID
         self.admin = admin
         self.calendarID = calendarID
         self.calendarName = calendarName
         self.calendarColor = calendarColor
         self.calendarSource = calendarSource
+        self.allDay = allDay
         self.startDateTime = startDateTime
         self.startTimeZone = startTimeZone
         self.endDateTime = endDateTime
@@ -149,25 +147,6 @@ class Activity: NSObject, NSCopying, Codable {
             participantsIDs = participantsIDsArray
         } else {
             participantsIDs = []
-        }
-        
-        if let checklistFirebaseList = dictionary?["checklist"] as? [Any] {
-            var checklistList = [Checklist]()
-            for checklist in checklistFirebaseList {
-                if let check = try? FirebaseDecoder().decode(Checklist.self, from: checklist) {
-                    if check.name == "nothing" { continue }
-                    checklistList.append(check)
-                }
-            }
-            checklist = checklistList
-        } else if let items = dictionary?["checklist"] as? [String : [String : Bool]] {
-            let check = Checklist(dictionary: ["name": "Checklist" as AnyObject])
-            var checklistItems = [String: Bool]()
-            for item in items.values {
-                checklistItems[item.keys.first!] = item.values.first
-            }
-            check.items = checklistItems
-            checklist = [check]
         }
         
         transportation = dictionary?["transportation"] as? String
@@ -204,10 +183,14 @@ class Activity: NSObject, NSCopying, Codable {
         showExtras = dictionary?["showExtras"] as? Bool
         isComplete = dictionary?["isComplete"] as? Bool
         isTask = dictionary?["isTask"] as? Bool
-        hkSampleID = dictionary?["hkSampleID"] as? String
+        
+        if let hkSampleIDList = dictionary?["hkSampleID"] as? [String] {
+            hkSampleID = hkSampleIDList
+        } else if let hkSampleIDString = dictionary?["hkSampleID"] as? String {
+            hkSampleID = [hkSampleIDString]
+        }
+        
         mealIDs = dictionary?["mealIDs"] as? [String]
-        workoutIDs = dictionary?["workoutIDs"] as? [String]
-        mindfulnessIDs = dictionary?["mindfulnessIDs"] as? [String]
         isSchedule = dictionary?["isSchedule"] as? Bool
         scheduleIDs = dictionary?["scheduleIDs"] as? [String]
     }
@@ -323,15 +306,6 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["conversationID"] = value
         }
         
-        if let value = self.checklist {
-            var firebaseChecklistList = [[String: AnyObject?]]()
-            for checklist in value {
-                let firebaseChecklist = checklist.toAnyObject()
-                firebaseChecklistList.append(firebaseChecklist)
-            }
-            dictionary["checklist"] = firebaseChecklistList as AnyObject
-        }
-        
         if let value = self.grocerylistID as AnyObject? {
             dictionary["grocerylistID"] = value
         }
@@ -396,14 +370,6 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["mealIDs"] = value
         }
         
-        if let value = self.workoutIDs as AnyObject? {
-            dictionary["workoutIDs"] = value
-        }
-        
-        if let value = self.mindfulnessIDs as AnyObject? {
-            dictionary["mindfulnessIDs"] = value
-        }
-        
         if let value = self.isSchedule as AnyObject? {
             dictionary["isSchedule"] = value
         }
@@ -433,8 +399,7 @@ class Activity: NSObject, NSCopying, Codable {
             lhs.activityFiles == rhs.activityFiles &&
             lhs.notes == rhs.notes &&
             lhs.scheduleIDs == rhs.scheduleIDs &&
-            lhs.workoutIDs == rhs.workoutIDs &&
-            lhs.mindfulnessIDs == rhs.mindfulnessIDs &&
+            lhs.hkSampleID == rhs.hkSampleID &&
             lhs.mealIDs == rhs.mealIDs &&
             lhs.transactionIDs == rhs.transactionIDs &&
             lhs.participantsIDs == rhs.participantsIDs

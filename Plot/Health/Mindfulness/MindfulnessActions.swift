@@ -94,17 +94,18 @@ class MindfulnessActions: NSObject {
         if let hkMindfulness = HealthKitSampleBuilder.createHKMindfulness(from: mindfulness) {
             hkSampleID = hkMindfulness.uuid.uuidString
             HealthKitService.storeSample(sample: hkMindfulness) { (_, _) in
-            }
-        }
-        
-        if let activity = ActivityBuilder.createActivity(from: mindfulness) {
-            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-            activityActions.createNewActivity()
-            
-            // Update that the activity is created for mindfulness
-            if let hkSampleID = hkSampleID, let currentUserId = Auth.auth().currentUser?.uid, let activityID = activity.activityID {
-                let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
-                healthkitWorkoutsReference.setValue(activityID)
+                if let activity = ActivityBuilder.createActivity(from: self.mindfulness), let hkSampleID = hkSampleID {
+                    activity.hkSampleID = [hkSampleID]
+                    let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                    activityActions.createNewActivity()
+                    
+                    // Update that the activity is created for mindfulness
+                    if let currentUserId = Auth.auth().currentUser?.uid, let activityID = activity.activityID {
+                        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+                        healthkitWorkoutsReference.setValue(activityID)
+                    }
+                }
+                
             }
         }
     }

@@ -92,7 +92,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
         textLabel?.text = nil
 
         guard let schedule = row.value else { return }
-        
+                
         if let startDate = schedule.startDateTime as? TimeInterval, let endDate = schedule.endDateTime as? TimeInterval, let allDay = schedule.allDay {
             let startTimeZone = schedule.startTimeZone ?? "UTC"
             let endTimeZone = schedule.endTimeZone ?? "UTC"

@@ -72,7 +72,7 @@ class WorkoutOperation: AsyncOperation {
                                 activity.endTimeZone = TimeZone.current.identifier
 
                                 activity.allDay = false
-                                activity.hkSampleID = workout.uuid.uuidString
+                                activity.hkSampleID = [workout.uuid.uuidString]
                                 activities.append(activity)
                                 
                             }

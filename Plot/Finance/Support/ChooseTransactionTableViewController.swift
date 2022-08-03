@@ -41,7 +41,6 @@ class ChooseTransactionTableViewController: UITableViewController {
         super.viewDidLoad()
         title = "Choose Transaction"
         
-        
         view.addSubview(activityIndicator)
         
         activityIndicator.center = view.center
@@ -63,20 +62,21 @@ class ChooseTransactionTableViewController: UITableViewController {
         handleReloadTable()
         setupSearchController()
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeTransaction))
-        print("viewLoaded")
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        }
         
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         if movingBackwards {
-            let transaction = Transaction(description: "Transaction Name", amount: 0.0, created_at: "", guid: "", user_guid: "", status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
+            let transaction = Transaction(description: "Name", amount: 0.0, created_at: "", guid: "", user_guid: "", status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
             self.delegate?.chosenTransaction(transaction: transaction)
         }
     }
     
-    @objc fileprivate func closeTransaction() {
-        let transaction = Transaction(description: "Transaction Name", amount: 0.0, created_at: "", guid: "", user_guid: "", status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
+    @objc fileprivate func cancel() {
+        let transaction = Transaction(description: "Name", amount: 0.0, created_at: "", guid: "", user_guid: "", status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
         self.delegate?.chosenTransaction(transaction: transaction)
         movingBackwards = false
         dismiss(animated: true, completion: nil)
@@ -103,7 +103,7 @@ class ChooseTransactionTableViewController: UITableViewController {
     func handleReloadTable() {
         if transactions != nil {
             DispatchQueue.global(qos: .background).async {
-                self.filteredTransactions = self.transactions.filter{ !self.existingTransactions.contains($0) }
+                self.filteredTransactions = self.transactions.filter{ !self.existingTransactions.contains($0) && $0.status != .pending }
                 self.filteredTransactions.sort { (transaction1, transaction2) -> Bool in
                     if transaction1.should_link ?? true == transaction2.should_link ?? true {
                         if let date1 = self.isodateFormatter.date(from: transaction1.transacted_at), let date2 = self.isodateFormatter.date(from: transaction2.transacted_at) {
@@ -160,7 +160,11 @@ class ChooseTransactionTableViewController: UITableViewController {
         let transaction = filteredTransactions[indexPath.row]
         delegate?.chosenTransaction(transaction: transaction)
         movingBackwards = false
-        self.dismiss(animated: true, completion: nil)
+        if navigationItem.leftBarButtonItem != nil {
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
     }
 }
 

@@ -72,7 +72,7 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         nameLabel.text = transaction.description
         costLabel.text = String(format: "$%.02f", transaction.amount)
 //        if let purchaseRowCount = transaction.splitNumber {
-//            participantsLabal.text = "Purchase split among \(purchaseRowCount) participants"
+//            participantsLabal.text = "Purchase split by \(purchaseRowCount)"
 //        } else if let participants = transaction.participantsIDs, participants.count > 1 {
 //            participantsLabal.text = "Purchase split among \(participants.count) participants"
 //        } else {

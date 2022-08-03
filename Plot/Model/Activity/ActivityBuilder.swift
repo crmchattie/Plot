@@ -27,7 +27,6 @@ class ActivityBuilder {
         if let totalEnergyBurned = workout.totalEnergyBurned, let type = workout.type {
             activity.activityDescription = "\(String(describing: type)) - \(totalEnergyBurned.clean) calories"
         }
-        activity.workoutIDs = [workout.id]
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
@@ -50,7 +49,6 @@ class ActivityBuilder {
         activity.activityType = "Mindfulness"
         activity.category = "Mindfulness"
         activity.name = mindfulness.name
-        activity.mindfulnessIDs = [mindfulness.id]
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)

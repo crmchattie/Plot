@@ -255,7 +255,6 @@ extension ActivityService {
                     }
                 }
             }, activitiesRemoved: { [weak self] activitiesRemoved in
-                print("activitiesRemoved")
                 for activity in activitiesRemoved {
                     if activity.recurrences != nil {
                         if self!.activities.contains(where: {$0.activityID == activity.activityID}) {

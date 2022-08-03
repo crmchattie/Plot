@@ -18,7 +18,19 @@ protocol UpdateCalendarDelegate: AnyObject {
 class CalendarListViewController: FormViewController {
     weak var delegate : UpdateCalendarDelegate?
     
-    var calendars = [CalendarType]()
+    var calendars = [String: [CalendarType]]() {
+        didSet {
+            sections = Array(calendars.keys).sorted { s1, s2 in
+                if s1 == CalendarOptions.plot.name {
+                    return true
+                } else if s2 == CalendarOptions.plot.name {
+                    return false
+                }
+                return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
+            }
+        }
+    }
+    var sections = [String]()
     var calendar: CalendarType!
     var calendarID: String?
     
@@ -45,7 +57,7 @@ class CalendarListViewController: FormViewController {
         form.removeAll()
         activityIndicatorView.startAnimating()
         calendarFetcher.fetchCalendar { calendars in
-            self.calendars = calendars.sorted()
+            self.calendars[CalendarOptions.plot.name] = calendars.sorted()
             DispatchQueue.main.async {
               self.initializeForm()
             }
@@ -75,32 +87,33 @@ class CalendarListViewController: FormViewController {
     
     fileprivate func initializeForm() {
         activityIndicatorView.stopAnimating()
-        form +++ SelectableSection<ListCheckRow<String>>("Calendar", selectionType: .singleSelection(enableDeselection: false))
-        
-        for calendar in calendars {
-            form.last!
-                <<< ListCheckRow<String>() {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.tintColor = FalconPalette.defaultBlue
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.title = calendar.name
-                    $0.selectableValue = calendar.name
-                    if let calendarID = self.calendarID, calendar.id == calendarID {
-                        $0.value = calendar.name
-                    }
-                }.cellSetup { cell, row in
-                    cell.accessoryType = .checkmark
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.tintColor = FalconPalette.defaultBlue
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }.onChange({ (row) in
-                    if let _ = row.value {
-                        self.delegate?.update(calendar: calendar)
-                        self.navigationController?.popViewController(animated: true)
-                    }
-                })
+        for section in sections {
+            form +++ SelectableSection<ListCheckRow<String>>(section, selectionType: .singleSelection(enableDeselection: false))
+            for calendar in calendars[section]! {
+                form.last!
+                    <<< ListCheckRow<String>() {
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.tintColor = FalconPalette.defaultBlue
+                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.title = calendar.name
+                        $0.selectableValue = calendar.name
+                        if let calendarID = self.calendarID, calendar.id == calendarID {
+                            $0.value = calendar.name
+                        }
+                    }.cellSetup { cell, row in
+                        cell.accessoryType = .checkmark
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.tintColor = FalconPalette.defaultBlue
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }.onChange({ (row) in
+                        if let _ = row.value {
+                            self.delegate?.update(calendar: calendar)
+                            self.navigationController?.popViewController(animated: true)
+                        }
+                    })
+            }
         }
         
     }

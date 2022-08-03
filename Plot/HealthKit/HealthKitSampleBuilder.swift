@@ -7,6 +7,7 @@
 //
 
 import HealthKit
+import Firebase
 
 class HealthKitSampleBuilder {
     class func createHKWorkout(from workout: Workout) -> HKWorkout? {
@@ -33,6 +34,25 @@ class HealthKitSampleBuilder {
         return workout
     }
     
+    class func createWorkoutFromHKWorkout(from hkWorkout: HKWorkout, completion: @escaping (Workout?)->()) {
+        var workout: Workout!
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
+            return completion(workout)
+        }
+        
+        workout = Workout(from: hkWorkout)
+        let hkSampleID = hkWorkout.uuid.uuidString
+        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+        healthkitWorkoutsReference.observeSingleEvent(of: .value) { snapshot in
+            if snapshot.exists(), let activityID = snapshot.value as? String {
+                workout.activityID = activityID
+                completion(workout)
+            } else {
+                completion(workout)
+            }
+        }
+    }
+    
     class func createHKMindfulness(from mindfulness: Mindfulness) -> HKCategorySample? {
         guard let start = mindfulness.startDateTime, let end = mindfulness.endDateTime, let mindfulSessionType = HKObjectType.categoryType(forIdentifier: .mindfulSession) else {
             return nil
@@ -40,6 +60,25 @@ class HealthKitSampleBuilder {
         
         let hkMindfulness = HKCategorySample(type: mindfulSessionType, value: 0, start: start, end: end)
         return hkMindfulness
+    }
+    
+    class func createMindfulnessFromHKMindfulness(from hkMindfulness: HKCategorySample, completion: @escaping (Mindfulness?)->()) {
+        var mindfulness: Mindfulness!
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
+            return completion(mindfulness)
+        }
+        
+        mindfulness = Mindfulness(from: hkMindfulness)
+        let hkSampleID = hkMindfulness.uuid.uuidString
+        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+        healthkitWorkoutsReference.observeSingleEvent(of: .value) { snapshot in
+            if snapshot.exists(), let activityID = snapshot.value as? String {
+                mindfulness.activityID = activityID
+                completion(mindfulness)
+            } else {
+                completion(mindfulness)
+            }
+        }
     }
     
     class func createHKNutritions(from meal: Meal) -> [HKQuantitySample]? {

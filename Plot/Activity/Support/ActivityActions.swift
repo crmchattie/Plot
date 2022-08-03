@@ -41,12 +41,12 @@ class ActivityActions: NSObject {
         guard let _ = active, let _ = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
-                          
+                                  
         let membersIDs = fetchMembersIDs()
         
         for memberID in membersIDs.0 {
-        Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
-        Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).removeValue()
+            Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+            Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).removeValue()
         }
                 
         let center = UNUserNotificationCenter.current()
@@ -81,7 +81,7 @@ class ActivityActions: NSObject {
                 "activity_name": activity.name ?? "name" as NSObject,
                 "activity_type": activity.activityType ?? "basic" as NSObject
             ])
-            updateActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
+            updateActivity(firebaseDictionary: firebaseDictionary)
         } else {
             Analytics.logEvent("new_activity", parameters: [
                 "activity_name": activity.name ?? "name" as NSObject,
@@ -89,6 +89,16 @@ class ActivityActions: NSObject {
             ])
             newActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
         }
+    }
+    
+    func createSchedule() {
+        guard let activity = activity, let _ = activityID, let _ = selectedFalconUsers else {
+            return
+        }
+        scheduleReminder()
+    
+        let firebaseDictionary = activity.toAnyObject()
+        updateActivity(firebaseDictionary: firebaseDictionary)
     }
     
     func updateActivityParticipants() {
@@ -108,7 +118,7 @@ class ActivityActions: NSObject {
         })
     }
     
-    func updateActivity(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
+    func updateActivity(firebaseDictionary: [String: AnyObject]) {
         guard let activityID = activityID else {
             return
         }
@@ -179,7 +189,7 @@ class ActivityActions: NSObject {
         }
         
         guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
-        
+                
         // Only append current user when admin/creator of the activity
         if activity.admin == currentUserID {
             membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)

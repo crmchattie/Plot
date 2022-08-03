@@ -55,6 +55,7 @@ class WorkoutActions: NSObject {
             return
         }
         
+        
         if !active {
             if workout.createdDate == nil {
                 workout.createdDate = Date()
@@ -95,17 +96,17 @@ class WorkoutActions: NSObject {
         if let hkWorkout = HealthKitSampleBuilder.createHKWorkout(from: workout) {
             hkSampleID = hkWorkout.uuid.uuidString
             HealthKitService.storeSample(sample: hkWorkout) { (_, _) in
-            }
-        }
-        
-        if let activity = ActivityBuilder.createActivity(from: workout) {
-            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-            activityActions.createNewActivity()
-            
-            // Update that the activity is created for workout/hkworkout
-            if let hkSampleID = hkSampleID, let currentUserId = Auth.auth().currentUser?.uid, let activityID = activity.activityID {
-                let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
-                healthkitWorkoutsReference.setValue(activityID)
+                if let activity = ActivityBuilder.createActivity(from: self.workout), let hkSampleID = hkSampleID {
+                    activity.hkSampleID = [hkSampleID]
+                    let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                    activityActions.createNewActivity()
+                    
+                    // Update that the activity is created for workout/hkworkout
+                    if let currentUserId = Auth.auth().currentUser?.uid, let activityID = activity.activityID {
+                        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+                        healthkitWorkoutsReference.setValue(activityID)
+                    }
+                }
             }
         }
     }

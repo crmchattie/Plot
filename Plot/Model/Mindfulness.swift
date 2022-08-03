@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import HealthKit
 
 let userMindfulnessEntity = "user-mindfulness"
 let mindfulnessEntity = "mindfulness"
@@ -15,7 +16,7 @@ struct Mindfulness: Codable, Equatable, Hashable {
     var id: String
     var name: String
     var admin: String?
-    var length: Int?
+    var length: Double?
     var lastModifiedDate: Date?
     var createdDate: Date?
     var startDateTime: Date?
@@ -29,6 +30,23 @@ struct Mindfulness: Codable, Equatable, Hashable {
     var healthExport: Bool?
     var user_created: Bool?
     var recurrences: [String]?
+    
+    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, startDateTime: Date?, endDateTime: Date?) {
+        self.id = id
+        self.name = name
+        self.admin = admin
+        self.lastModifiedDate = lastModifiedDate
+        self.createdDate = createdDate
+        self.startDateTime = startDateTime
+        self.endDateTime = endDateTime
+    }
+        
+    init(from mindfuless: HKCategorySample) {
+        self.id = mindfuless.uuid.uuidString
+        self.name = "Mindfulness"
+        self.startDateTime = mindfuless.startDate
+        self.endDateTime = mindfuless.endDate
+    }
 }
 
 func ==(lhs: Mindfulness, rhs: Mindfulness) -> Bool {

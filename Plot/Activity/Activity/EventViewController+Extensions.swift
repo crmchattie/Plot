@@ -320,38 +320,6 @@ extension EventViewController: ChooseTransactionDelegate {
     }
 }
 
-extension EventViewController: UpdateMealDelegate {
-    func updateMeal(meal: Meal) {
-        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
-        if meal.name != "Name" {
-            if healthList.indices.contains(healthIndex) {
-                healthList[healthIndex].meal = meal
-            } else {
-                var health = HealthContainer()
-                health.meal = meal
-                healthList.append(health)
-            }
-            if mvs.allRows.count - 1 == healthIndex {
-                mvs.insert(HealthRow() {
-                    $0.value = healthList[healthIndex]
-                    }.onCellSelection() { cell, row in
-                        self.scheduleIndex = row.indexPath!.row
-                        self.openSchedule()
-                        cell.cellResignFirstResponder()
-                }, at: healthIndex)
-            } else {
-                let row = mvs.allRows[healthIndex]
-                row.baseValue = healthList[healthIndex]
-                row.updateCell()
-            }
-            updateLists(type: "health")
-        }
-        else if mvs.allRows.count - 1 > healthIndex {
-            mvs.remove(at: healthIndex)
-        }
-    }
-}
-
 extension EventViewController: UpdateWorkoutDelegate {
     func updateWorkout(workout: Workout) {
         var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection

@@ -74,6 +74,8 @@ class ChooseActivityTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.title = "Choose Activity"
+
         if let activity = activity {
             if let index = activities.firstIndex(of: activity) {
                 activities.remove(at: index)
@@ -117,17 +119,17 @@ class ChooseActivityTableViewController: UITableViewController {
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.backgroundColor = view.backgroundColor
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeActivity))
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        }
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Choose Activity"
     }
     
-    @objc fileprivate func closeActivity() {
+    @objc fileprivate func cancel() {
         if needDelegate {
-            print("closeActivity")
             let activity = Activity(dictionary: ["activityID": "" as AnyObject])
             delegate?.chosenActivity(mergeActivity: activity)
         }
@@ -239,7 +241,11 @@ class ChooseActivityTableViewController: UITableViewController {
         let activity = filteredActivities[indexPath.row]
         delegate?.chosenActivity(mergeActivity: activity)
         movingBackwards = false
-        self.dismiss(animated: true, completion: nil)
+        if navigationItem.leftBarButtonItem != nil {
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
     }
 }
 

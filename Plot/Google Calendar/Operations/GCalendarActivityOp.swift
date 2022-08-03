@@ -88,6 +88,8 @@ class GCalendarActivityOp: AsyncOperation {
         activity.calendarName = calendar.summary ?? "Google"
         activity.calendarColor = CIColor(color: UIColor(calendar.backgroundColor ?? "#007AFF")).stringRepresentation
         activity.calendarSource = CalendarOptions.google.name
+        activity.admin = Auth.auth().currentUser?.uid
+        activity.showExtras = false
         if let start = event.start?.date, let end = event.end?.date {
             activity.allDay = true
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)

@@ -91,6 +91,18 @@ class MealViewController: FormViewController {
         initializeForm()
         calcNutrition()
         
+        if active {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
+        
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        if movingBackwards {
+            self.delegate?.updateMeal(meal: meal)
+        }
     }
     
     fileprivate func configureTableView() {
@@ -105,8 +117,10 @@ class MealViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-        navigationItem.rightBarButtonItem = addBarButton
+        if !active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
+        }
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
@@ -185,6 +199,7 @@ class MealViewController: FormViewController {
             let createMeal = MealActions(meal: self.meal, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createMeal.createNewMeal()
             self.hideActivityIndicator()
+            self.delegate?.updateMeal(meal: meal)
             if navigationItem.leftBarButtonItem != nil {
                 self.dismiss(animated: true, completion: nil)
             } else {

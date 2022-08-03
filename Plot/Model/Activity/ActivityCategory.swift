@@ -31,6 +31,7 @@ enum ActivityCategory: String, CaseIterable {
     case personal = "Personal"
     case uncategorized = "Uncategorized"
     case todo = "To-do"
+    case mindfulness = "Mindfulness"
     /// Same as uncategorized by not included in the analytics
     
     var icon: UIImage {
@@ -45,6 +46,7 @@ enum ActivityCategory: String, CaseIterable {
         case .personal: return UIImage(named: "personal")!
         case .todo: return UIImage(named: "todo")!
         case .uncategorized: return UIImage(named: "activity")!
+        case .mindfulness: return UIImage(named: "mindfulness")!
         }
     }
     
@@ -59,6 +61,7 @@ enum ActivityCategory: String, CaseIterable {
         case .family: return ChartColors.palette()[8]
         case .personal: return ChartColors.palette()[9]
         case .todo: return ChartColors.palette()[10]
+        case .mindfulness: return ChartColors.palette()[11]
         case .uncategorized: return UIColor.systemBlue
         }
     }

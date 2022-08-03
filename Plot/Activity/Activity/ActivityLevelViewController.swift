@@ -31,7 +31,7 @@ class ActivityLevelViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Category"
+        self.title = level
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
         activityIndicatorView.startAnimating()
@@ -44,7 +44,7 @@ class ActivityLevelViewController: FormViewController {
         form.removeAll()
         if let currentUser = Auth.auth().currentUser?.uid {
             if level == "Category" {
-                levels = ActivitySubcategory.allCases.map({ $0.rawValue }).sorted()
+                levels = ActivityCategory.allCases.map({ $0.rawValue }).sorted()
                 Database.database().reference().child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
                         let array = Array(values.values)
@@ -57,7 +57,7 @@ class ActivityLevelViewController: FormViewController {
                     }
                 })
             } else if level == "Subcategory" {
-                levels = ActivityCategory.allCases.map({ $0.rawValue }).sorted()
+                levels = ActivitySubcategory.allCases.map({ $0.rawValue }).sorted()
                 Database.database().reference().child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
                     if snapshot.exists(), let values = snapshot.value as? [String: String] {
                         let array = Array(values.values)
@@ -96,7 +96,7 @@ class ActivityLevelViewController: FormViewController {
     }
     
     fileprivate func initializeForm() {
-        form +++ SelectableSection<ListCheckRow<String>>("Category", selectionType: .singleSelection(enableDeselection: false))
+        form +++ SelectableSection<ListCheckRow<String>>(level, selectionType: .singleSelection(enableDeselection: false))
         
         for level in levels {
             form.last!
@@ -105,8 +105,8 @@ class ActivityLevelViewController: FormViewController {
                     $0.cell.tintColor = FalconPalette.defaultBlue
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.title = title
-                    $0.selectableValue = title
+                    $0.title = level
+                    $0.selectableValue = level
                     if level == self.value {
                         $0.value = self.value
                     }

@@ -343,4 +343,53 @@ class HealthKitService {
     class func storeSamples(samples: [HKSample], completion: @escaping (Bool, Error?) -> Void) {
         healthStore.save(samples, withCompletion: completion)
     }
+    
+    class func grabSpecificWorkoutSample(uuid: UUID, completion: @escaping ([HKWorkout]?, Error?) -> Void) {
+        
+        let predicate = HKQuery.predicateForObject(with: uuid)
+        let workoutQuery = HKSampleQuery(
+            sampleType: .workoutType(),
+            predicate: predicate,
+            limit: 1,
+            sortDescriptors: nil) { (query, samples, error) in
+                DispatchQueue.main.async {
+                    
+                    // Cast the samples as HKWorkout
+                    guard let samples = samples as? [HKWorkout], error == nil else {
+                        completion(nil, error)
+                        return
+                    }
+                    
+                    completion(samples, nil)
+                }
+            }
+        
+        healthStore.execute(workoutQuery)
+    }
+    
+    class func grabSpecificCategorySample(uuid: UUID, identifier: HKCategoryTypeIdentifier, completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
+        guard let type = HKObjectType.categoryType(forIdentifier: identifier) else {
+            completion(nil, nil)
+            return
+        }
+        
+        let predicate = HKQuery.predicateForObject(with: uuid)
+        let workoutQuery = HKSampleQuery(
+            sampleType: type,
+            predicate: predicate,
+            limit: 1,
+            sortDescriptors: nil) { (query, samples, error) in
+                DispatchQueue.main.async {
+                    // Cast the samples as HKWorkout
+                    guard let samples = samples as? [HKCategorySample], error == nil else {
+                        completion(nil, error)
+                        return
+                    }
+                    
+                    completion(samples, nil)
+                }
+            }
+        
+        healthStore.execute(workoutQuery)
+    }
 }

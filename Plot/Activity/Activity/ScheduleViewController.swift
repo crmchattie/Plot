@@ -12,6 +12,7 @@ import SplitRow
 import Firebase
 import Contacts
 import EventKit
+import CodableFirebase
 
 
 protocol UpdateScheduleDelegate: AnyObject {
@@ -30,7 +31,7 @@ class ScheduleViewController: FormViewController {
     var selectedFalconUsers = [User]()
     var locationName: String = "locationName"
     var locationAddress = [String : [Double]]()
-    var checklist = [Checklist]()
+    var checklist: Checklist!
     var startDateTime: Date?
     var endDateTime: Date?
     var userNames : [String] = []
@@ -59,25 +60,26 @@ class ScheduleViewController: FormViewController {
                 schedule.activityID = UUID().uuidString
             }
             userNamesString = "Participants"
-            for ID in schedule!.participantsIDs! {
-                // users equals ACTIVITY selected falcon users
-                if let user = users.first(where: {$0.id == ID}) {
-                    selectedFalconUsers.append(user)
+            if let participants = schedule.participantsIDs {
+                for ID in participants {
+                    // users equals ACTIVITY selected falcon users
+                    if let user = users.first(where: {$0.id == ID}) {
+                        selectedFalconUsers.append(user)
+                    }
                 }
             }
             if let localName = schedule.locationName, localName != "locationName", let localAddress = schedule.locationAddress  {
                 locationName = localName
                 locationAddress = localAddress
             }
-            if schedule.checklist != nil {
-                checklist = schedule.checklist!
-            }
+            setupLists()
             schedule.isSchedule = true
         } else {
             title = "New Activity"
             scheduleID = UUID().uuidString
             schedule = Activity(dictionary: ["activityID": scheduleID as AnyObject])
             schedule.isSchedule = true
+            schedule.admin = Auth.auth().currentUser?.uid
         }
         
         setupMainView()
@@ -98,8 +100,9 @@ class ScheduleViewController: FormViewController {
         if !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
             navigationItem.rightBarButtonItem = plusBarButton
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-            navigationItem.leftBarButtonItem = cancelBarButton
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
         } else {
             if let localName = schedule.locationName, localName != "locationName" {
                 let dotsImage = UIImage(named: "dots")
@@ -148,19 +151,19 @@ class ScheduleViewController: FormViewController {
                     row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-            <<< TextRow("Type") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.placeholder = $0.tag
-                if self.active && self.schedule.activityType != nil && self.schedule.activityType != "nothing" {
-                    $0.value = self.schedule.activityType
-                }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
+//            <<< TextRow("Type") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.placeholder = $0.tag
+//                if self.active && self.schedule.activityType != nil && self.schedule.activityType != "nothing" {
+//                    $0.value = self.schedule.activityType
+//                }
+//                }.cellUpdate { cell, row in
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+//            }
             
             <<< TextAreaRow("Description") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -178,29 +181,34 @@ class ScheduleViewController: FormViewController {
                     cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 })
             
-            <<< ButtonRow("Location") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
+        <<< ButtonRow("Location") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textAlignment = .left
+            if self.active, let localName = schedule.locationName, localName != "locationName" {
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.accessoryType = .detailDisclosureButton
+                row.title = localName
+            } else {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
-                if self.active, let localName = schedule.locationName, localName != "locationName" {
-                    row.cell.accessoryType = .detailDisclosureButton
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = localName
+            }
+            }.onCellSelection({ _,_ in
+                self.openLocationFinder()
+            }).cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textAlignment = .left
+                if row.title == "Location" {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.accessoryType = .disclosureIndicator
+                } else if let value = row.title, !value.isEmpty {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.accessoryType = .detailDisclosureButton
+                } else {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.accessoryType = .disclosureIndicator
+                    cell.textLabel?.text = "Location"
                 }
-                }.onCellSelection({ _,_ in
-                    self.openLocationFinder()
-                }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textAlignment = .left
-                    if row.title == "Location" {
-                        cell.accessoryType = .disclosureIndicator
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    } else {
-                        cell.accessoryType = .detailDisclosureButton
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
             }
             
 //            <<< ButtonRow("Participants") { row in
@@ -448,34 +456,43 @@ class ScheduleViewController: FormViewController {
                     cell.textLabel?.textAlignment = .left
                 }
         
-            <<< AlertRow<EventAlert>("Reminder") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.selectorTitle = $0.tag
-                if self.active && self.schedule.reminder != nil {
-                    if let value = self.schedule.reminder {
-                        $0.value = EventAlert(rawValue: value)
-                    }
+            <<< PushRow<EventAlert>("Reminder") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.title = row.tag
+                if self.active, let value = self.schedule.reminder {
+                    row.value = EventAlert(rawValue: value)
                 } else {
-                    $0.value = .None
-                    if let reminder = $0.value?.description {
+                    row.value = EventAlert.None
+                    if let reminder = row.value?.description {
                         self.schedule.reminder = reminder
                     }
                 }
-                $0.options = EventAlert.allCases
-                }.cellUpdate { cell, row in
+                row.options = EventAlert.allCases
+            }.onPresent { from, to in
+                to.title = "Reminder"
+                to.tableViewStyle = .insetGrouped
+                to.selectableRowCellUpdate = { cell, row in
+                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.tableView.separatorStyle = .none
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    
-                }.onChange() { [unowned self] row in
-                    if let reminder = row.value?.description {
-                        self.schedule.reminder = reminder
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }.onChange() { [unowned self] row in
+                if let reminder = row.value?.description {
+                    self.schedule.reminder = reminder
+                    if self.active {
                         self.scheduleReminder()
                     }
                 }
+            }
 
         
         form +++
@@ -530,50 +547,6 @@ class ScheduleViewController: FormViewController {
                                 }
                                 
         }
-                            if !checklist.isEmpty, let items = checklist[0].items {
-                                let sortedItems = items.sorted { item1, item2 in
-                                    if item1.value == item2.value {
-                                        return item1.key < item2.key
-                                    }
-                                    return item1.value && !item2.value
-                                }
-                                for item in sortedItems {
-                                    var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
-                                    mvs.insert(SplitRow<TextRow, CheckRow>() {
-                                        $0.rowLeftPercentage = 0.75
-                                        $0.rowLeft = TextRow(){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                            $0.value = item.key
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                                        }
-                                        $0.rowRight = CheckRow() {
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                            $0.cell.tintColor = FalconPalette.defaultBlue
-                                            $0.value = item.value
-                                            $0.cell.accessoryType = .checkmark
-                                            $0.cell.tintAdjustmentMode = .dimmed
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                                cell.tintColor = FalconPalette.defaultBlue
-                                                if row.value == false {
-                                                    cell.accessoryType = .checkmark
-                                                    cell.tintAdjustmentMode = .dimmed
-                                                } else {
-                                                    cell.tintAdjustmentMode = .automatic
-                                                }
-                                        }
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                    }, at: mvs.count - 1)
-                                    
-                                }
-                            }
-
     }
     
     @objc fileprivate func rightBarButtonTapped() {
@@ -586,24 +559,34 @@ class ScheduleViewController: FormViewController {
                     checklistDict[newText] = state
                 }
             }
-            if schedule.checklist != nil {
-                schedule.checklist![0].items = checklistDict
+            
+            if schedule.checklistIDs == nil, let currentUserID = Auth.auth().currentUser?.uid {
+                let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
+                checklist = Checklist(dictionary: ["ID": ID as AnyObject])
+                checklist.name = "CheckList"
+                checklist.createdDate = Date()
+                checklist.activityID = schedule.activityID
+                checklist.items = checklistDict
+                schedule.checklistIDs = [checklist.ID ?? ""]
+                
+                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
+                createChecklist.createNewChecklist()
             } else {
-                let check = Checklist(dictionary: ["name" : "ScheduleChecklist" as AnyObject])
-                check.items = checklistDict
-                schedule.checklist = [check]
+                checklist.items = checklistDict
+                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
+                createChecklist.createNewChecklist()
             }
         } else {
-            schedule.checklist = nil
+            schedule.checklistIDs = []
         }
         
         let valuesDictionary = form.values()
         
         schedule.activityID = scheduleID
 
-        schedule.name = valuesDictionary["Activity Name"] as? String
+        schedule.name = valuesDictionary["Name"] as? String
 
-        if let value = valuesDictionary["Activity Type"] as? String {
+        if let value = valuesDictionary["Type"] as? String {
             schedule.activityType = value
         }
         
@@ -629,15 +612,85 @@ class ScheduleViewController: FormViewController {
         let membersIDs = fetchMembersIDs()
 
         schedule.participantsIDs = membersIDs.0
-
+        
+        let createActivity = ActivityActions(activity: schedule, active: false, selectedFalconUsers: [])
+        createActivity.createSchedule()
+        
         delegate?.updateSchedule(schedule: schedule)
         
-        if active {
-            self.navigationController?.popViewController(animated: true)
-        } else {
+        if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    func setupLists() {
+        let dispatchGroup = DispatchGroup()
+        if schedule.checklistIDs != nil {
+            for checklistID in schedule.checklistIDs! {
+                dispatchGroup.enter()
+                let checklistDataReference = Database.database().reference().child(checklistsEntity).child(checklistID)
+                checklistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), let checklistSnapshotValue = snapshot.value {
+                        if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                            self.checklist = checklist
+                        }
+                    }
+                    dispatchGroup.leave()
+                })
+            }
         }
         
+        dispatchGroup.notify(queue: .main) {
+            self.listRow()
+        }
+    }
+    
+    func listRow() {
+        if let checklist = checklist, let items = checklist.items  {
+            let sortedItems = items.sorted { item1, item2 in
+                if item1.value == item2.value {
+                    return item1.key < item2.key
+                }
+                return item1.value && !item2.value
+            }
+            for item in sortedItems {
+                var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)
+                mvs.insert(SplitRow<TextRow, CheckRow>() {
+                    $0.rowLeftPercentage = 0.75
+                    $0.rowLeft = TextRow(){
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.value = item.key
+                        }.cellUpdate { cell, row in
+                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                            row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                    }
+                    $0.rowRight = CheckRow() {
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.tintColor = FalconPalette.defaultBlue
+                        $0.value = item.value
+                        $0.cell.accessoryType = .checkmark
+                        $0.cell.tintAdjustmentMode = .dimmed
+                        }.cellUpdate { cell, row in
+                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                            cell.tintColor = FalconPalette.defaultBlue
+                            if row.value == false {
+                                cell.accessoryType = .checkmark
+                                cell.tintAdjustmentMode = .dimmed
+                            } else {
+                                cell.tintAdjustmentMode = .automatic
+                            }
+                    }
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                }, at: mvs.count - 1)
+                
+            }
+        }
     }
     
     func scheduleReminder() {

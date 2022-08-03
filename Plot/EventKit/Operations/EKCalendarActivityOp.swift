@@ -94,6 +94,8 @@ class EKCalendarActivityOp: AsyncOperation {
         activity.calendarName = event.calendar.title
         activity.calendarColor = CIColor(cgColor: event.calendar.cgColor).stringRepresentation
         activity.calendarSource = CalendarOptions.apple.name
+        activity.admin = Auth.auth().currentUser?.uid
+        activity.showExtras = false
     }
     
     private func deleteActivity() {

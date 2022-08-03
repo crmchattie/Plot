@@ -22,6 +22,26 @@ struct HealthContainer: Codable, Equatable {
         return meal?.name ?? workout?.name ?? mindfulness?.name  ?? ""
     }
     
+    var date: Date {
+        return meal?.startDateTime ?? workout?.startDateTime ?? mindfulness?.startDateTime ?? Date.distantPast
+    }
+    
+    var total: Double {
+        return meal?.nutrition?.calories ?? workout?.totalEnergyBurned ?? mindfulness?.endDateTime?.timeIntervalSince(mindfulness?.startDateTime ?? Date()) ?? 0
+    }
+    
+    var unitName: String {
+        if meal != nil {
+            return "calories"
+        } else if workout != nil {
+            return "calories"
+        } else if mindfulness != nil {
+            return "minutes"
+        } else {
+            return "none"
+        }
+    }
+        
     var lastModifiedDate: Date {
         return meal?.lastModifiedDate ?? workout?.lastModifiedDate ?? mindfulness?.lastModifiedDate ?? Date.distantPast
     }

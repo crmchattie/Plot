@@ -128,10 +128,11 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         }
         else if case HealthMetricType.sleep = healthMetric.type {
             total = TimeInterval(healthMetric.total).stringTimeShort
-            subtitleLabelText = "\(total) \(timeAgo)"
+            subtitleLabelText = "\(total)\(timeAgo)"
         }
-        else if case HealthMetricType.mindfulness = healthMetric.type {
-            total = TimeInterval(healthMetric.total).stringTimeShort
+        if case HealthMetricType.mindfulness = healthMetric.type, let hkCategorySample = healthMetric.hkSample as? HKCategorySample {
+            total = hkCategorySample.endDate.timeIntervalSince(hkCategorySample.startDate).stringTimeShort
+            timeAgo = NSCalendar.current.isDateInToday(hkCategorySample.endDate) ? "today" : timeAgoSinceDate(hkCategorySample.endDate)
             subtitleLabelText = "\(total) \(timeAgo)"
         }
         

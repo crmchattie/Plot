@@ -50,13 +50,12 @@ class ActivitiesFetcher: NSObject {
                             activity.calendarColor = userActivity.calendarColor
                             activity.calendarSource = userActivity.calendarSource
                             activity.calendarExport = userActivity.calendarExport
+                            activity.isComplete = userActivity.isComplete
                             activity.reminder = userActivity.reminder
                             activity.badge = userActivity.badge
                             activity.muted = userActivity.muted
                             activity.pinned = userActivity.pinned
-                            
                             activities.append(activity)
-                            
                         }
                         group.leave()
                     })
@@ -131,6 +130,7 @@ class ActivitiesFetcher: NSObject {
                             activity.calendarColor = userActivity.calendarColor
                             activity.calendarExport = userActivity.calendarExport
                             activity.calendarSource = userActivity.calendarSource
+                            activity.isComplete = userActivity.isComplete
                             activity.reminder = userActivity.reminder
                             activity.badge = userActivity.badge
                             activity.muted = userActivity.muted

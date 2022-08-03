@@ -51,8 +51,6 @@ class MindfulnessViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        
-        
         numberFormatter.numberStyle = .decimal
         
         if mindfulness == nil {
@@ -65,6 +63,7 @@ class MindfulnessViewController: FormViewController {
         } else {
             active = true
             title = "Mindfulness"
+            
             var participantCount = self.selectedFalconUsers.count
             
             // If user is creating this activity (admin)
@@ -87,6 +86,18 @@ class MindfulnessViewController: FormViewController {
         setupRightBarButton()
         initializeForm()
         updateLength()
+        
+        if active {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        if movingBackwards {
+            self.delegate?.updateMindfulness(mindfulness: mindfulness)
+        }
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -105,8 +116,10 @@ class MindfulnessViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-        navigationItem.rightBarButtonItem = addBarButton
+        if !active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
+        }
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
@@ -184,6 +197,7 @@ class MindfulnessViewController: FormViewController {
             let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             createMindfulness.createNewMindfulness()
             self.hideActivityIndicator()
+            self.delegate?.updateMindfulness(mindfulness: mindfulness)
             if navigationItem.leftBarButtonItem != nil {
                 self.dismiss(animated: true, completion: nil)
             } else {
@@ -351,7 +365,7 @@ class MindfulnessViewController: FormViewController {
     fileprivate func updateLength() {
         if let lengthRow : TextRow = form.rowBy(tag: "Length"), let startRow: DateTimeInlineRow = form.rowBy(tag: "Starts"), let startValue = startRow.value, let endRow: DateTimeInlineRow = form.rowBy(tag: "Ends"), let endValue = endRow.value {
             let length = Calendar.current.dateComponents([.second], from: startValue, to: endValue).second ?? 0
-            mindfulness.length = length
+            mindfulness.length = Double(length)
             let hour = length / 3600
             let minutes = (length % 3600) / 60
             if minutes > 0 && hour > 0 {

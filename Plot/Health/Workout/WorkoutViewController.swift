@@ -82,14 +82,25 @@ class WorkoutViewController: FormViewController {
             title = "New Workout"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
-                workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil)
+                workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: nil, startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil)
             }
         }
         configureTableView()
         setupRightBarButton()
         initializeForm()
-        
         updateLength()
+        
+        if active {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        if movingBackwards {
+            self.delegate?.updateWorkout(workout: workout)
+        }
     }
     
     fileprivate func configureTableView() {
@@ -104,8 +115,10 @@ class WorkoutViewController: FormViewController {
     }
     
     func setupRightBarButton() {
-        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-        navigationItem.rightBarButtonItem = addBarButton
+        if !active {
+            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = addBarButton
+        }
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
@@ -182,6 +195,7 @@ class WorkoutViewController: FormViewController {
             workoutActions = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
             workoutActions?.createNewWorkout()
             self.hideActivityIndicator()
+            self.delegate?.updateWorkout(workout: workout)
             if navigationItem.leftBarButtonItem != nil {
                 self.dismiss(animated: true, completion: nil)
             } else {
@@ -311,6 +325,9 @@ class WorkoutViewController: FormViewController {
                 $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
+                if let calories = workout.totalEnergyBurned {
+                    $0.value = calories
+                }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -445,7 +462,7 @@ class WorkoutViewController: FormViewController {
     fileprivate func updateLength() {
         if let lengthRow : TextRow = form.rowBy(tag: "Length"), let startRow: DateTimeInlineRow = form.rowBy(tag: "Starts"), let startValue = startRow.value, let endRow: DateTimeInlineRow = form.rowBy(tag: "Ends"), let endValue = endRow.value {
             let length = Calendar.current.dateComponents([.second], from: startValue, to: endValue).second ?? 0
-            workout.length = length
+            workout.length = Double(length)
             let hour = length / 3600
             let minutes = (length % 3600) / 60
             if minutes > 0 && hour > 0 {

@@ -9,6 +9,7 @@
 import UIKit
 import Charts
 import HealthKit
+import Firebase
 
 fileprivate let healthDetailSampleCellID = "HealthDetailSampleCellID"
 fileprivate let chartViewHeight: CGFloat = 200
@@ -90,8 +91,6 @@ class HealthDetailViewController: UIViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        
-        
         
         extendedLayoutIncludesOpaqueBars = true
         
@@ -205,7 +204,6 @@ class HealthDetailViewController: UIViewController {
         chartView.isHidden = hidden
         backgroundChartViewHeightAnchor?.constant = hidden ? 0 : chartViewHeight
         backgroundChartViewTopAnchor?.constant = hidden ? 0 : chartViewTopMargin
-        
         barButton.title = chartView.isHidden ? "Show Chart" : "Hide Chart"
     }
     
@@ -232,6 +230,42 @@ class HealthDetailViewController: UIViewController {
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)
             weakSelf.activityIndicator.stopAnimating()
             weakSelf.tableView.reloadData()
+        }
+    }
+    
+    func openSample(sample: HKSample, type: HealthMetricType) {
+        switch type {
+        case .steps:
+            print("steps")
+        case .nutrition(_):
+            print("steps")
+        case .workout:
+            if let hkWorkout = sample as? HKWorkout {
+                HealthKitSampleBuilder.createWorkoutFromHKWorkout(from: hkWorkout) { workout in
+                    guard workout != nil else { return }
+                    let destination = WorkoutViewController()
+                    destination.workout = workout
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
+            }
+        case .heartRate:
+            print("steps")
+        case .weight:
+            print("steps")
+        case .sleep:
+            print("steps")
+        case .mindfulness:
+            print("steps")
+            if let hkMindfulness = sample as? HKCategorySample {
+                HealthKitSampleBuilder.createMindfulnessFromHKMindfulness(from: hkMindfulness, completion: { mindfulness in
+                    guard mindfulness != nil else { return }
+                    let destination = MindfulnessViewController()
+                    destination.mindfulness = mindfulness
+                    self.navigationController?.pushViewController(destination, animated: true)
+                })
+            }
+        case .activeEnergy:
+            print("steps")
         }
     }
 }
@@ -269,7 +303,14 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: healthDetailSampleCellID, for: indexPath) as! HealthDetailSampleCell
-        cell.selectionStyle = .none
+        if case .workout = viewModel.healthMetric.type {
+            cell.selectionStyle = .default
+        } else if case .mindfulness = viewModel.healthMetric.type {
+            cell.selectionStyle = .default
+
+        } else {
+            cell.selectionStyle = .none
+        }
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         cell.healthMetric = viewModel.healthMetric
         let sample = viewModel.samples[indexPath.row]
@@ -278,6 +319,13 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if case .workout = viewModel.healthMetric.type {
+            let sample = viewModel.samples[indexPath.row]
+            openSample(sample: sample, type: viewModel.healthMetric.type)
+        } else if case .mindfulness = viewModel.healthMetric.type {
+            let sample = viewModel.samples[indexPath.row]
+            openSample(sample: sample, type: viewModel.healthMetric.type)
+        }
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }

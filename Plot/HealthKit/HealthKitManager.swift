@@ -197,13 +197,15 @@ class HealthKitManager {
         
         for activity in activities {
             if let activityID = activity.activityID {
-                
+
                 let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
                 activityActions.createNewActivity()
                 
-                if let hkSampleID = activity.hkSampleID {
-                    let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
-                    healthkitWorkoutsReference.setValue(activityID)
+                if let hkSampleIDs = activity.hkSampleID {
+                    for hkSampleID in hkSampleIDs {
+                        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+                        healthkitWorkoutsReference.setValue(activityID)
+                    }
                 }
             }
         }

@@ -22,7 +22,7 @@ struct Workout: Codable, Equatable, Hashable {
     var createdDate: Date?
     var startDateTime: Date?
     var endDateTime: Date?
-    var length: Int?
+    var length: Double?
     var totalEnergyBurned: Double?
     var badge: Int?
     var pinned: Bool?
@@ -32,7 +32,29 @@ struct Workout: Codable, Equatable, Hashable {
     var healthExport: Bool?
     var user_created: Bool?
     var recurrences: [String]?
-
+    
+    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, type: String?, startDateTime: Date?, endDateTime: Date?, length: Double?, totalEnergyBurned: Double?) {
+        self.id = id
+        self.name = name
+        self.admin = admin
+        self.lastModifiedDate = lastModifiedDate
+        self.createdDate = createdDate
+        self.type = type
+        self.startDateTime = startDateTime
+        self.endDateTime = endDateTime
+        self.length = length
+        self.totalEnergyBurned = totalEnergyBurned
+    }
+    
+    init(from hkWorkout: HKWorkout) {
+        self.id = hkWorkout.uuid.uuidString
+        self.name = hkWorkout.workoutActivityType.name
+        self.type = hkWorkout.workoutActivityType.name
+        self.startDateTime = hkWorkout.startDate
+        self.endDateTime = hkWorkout.endDate
+        self.length = hkWorkout.duration
+        self.totalEnergyBurned = hkWorkout.totalEnergyBurned?.doubleValue(for: .kilocalorie())
+    }
 }
 
 func ==(lhs: Workout, rhs: Workout) -> Bool {

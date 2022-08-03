@@ -20,8 +20,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
-    var customTypes: [CustomType] = [.basic, .meal, .workout, .mindfulness, .transaction, .investment, .financialAccount, .transactionRule]
-    var sections: [SectionType] = [.activity, .customMeal, .customWorkout, .mindfulness, .customTransaction, .investment, .customFinancialAccount, .customTransactionRule]
+    var customTypes: [CustomType] = [.basic, .workout, .mindfulness, .transaction, .investment, .financialAccount, .transactionRule]
+    var sections: [SectionType] = [.activity, .customWorkout, .mindfulness, .customTransaction, .investment, .customFinancialAccount, .customTransactionRule]
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0

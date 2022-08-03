@@ -16,6 +16,7 @@ import EventKit
 import UserNotifications
 import CodableFirebase
 import RRuleSwift
+import HealthKit
 
 extension EventViewController {
     
@@ -185,12 +186,12 @@ extension EventViewController {
         if activity.scheduleIDs != nil {
             for scheduleID in activity.scheduleIDs! {
                 dispatchGroup.enter()
-                let dataReference = Database.database().reference().child(activitiesEntity).child(scheduleID)
+                let dataReference = Database.database().reference().child(activitiesEntity).child(scheduleID).child(messageMetaDataFirebaseFolder)
                 dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), let snapshotValue = snapshot.value {
-                        if let schedule = try? FirebaseDecoder().decode(Activity.self, from: snapshotValue) {
-                            self.scheduleList.append(schedule)
-                        }
+                    if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject] {
+                        let schedule = Activity(dictionary: snapshotValue)
+                        self.scheduleList.append(schedule)
+
                     }
                     self.dispatchGroup.leave()
                 })
@@ -273,7 +274,36 @@ extension EventViewController {
                 })
             }
         }
-        
+        if activity.hkSampleID != nil {
+            print(activity.hkSampleID as Any)
+            for hksample in activity.hkSampleID! {
+                dispatchGroup.enter()
+                if let uuid = UUID(uuidString: hksample) {
+                    HealthKitService.grabSpecificWorkoutSample(uuid: uuid) { samples, err in
+                        if let sample = samples?.first {
+                            HealthKitSampleBuilder.createWorkoutFromHKWorkout(from: sample) { workout in
+                                guard workout != nil else {
+                                    self.dispatchGroup.leave()
+                                    return }
+                                self.healthList.append(HealthContainer(meal: nil, workout: workout, mindfulness: nil))
+                                self.dispatchGroup.leave()
+                            }
+                        }
+                    }
+                    HealthKitService.grabSpecificCategorySample(uuid: uuid, identifier: .mindfulSession) { samples, err in
+                        if let sample = samples?.first {
+                            HealthKitSampleBuilder.createMindfulnessFromHKMindfulness(from: sample) { mindfulness in
+                                guard mindfulness != nil else {
+                                    self.dispatchGroup.leave()
+                                    return }
+                                self.healthList.append(HealthContainer(meal: nil, workout: nil, mindfulness: mindfulness))
+                                self.dispatchGroup.leave()
+                            }
+                        }
+                    }
+                }
+            }
+        }
         dispatchGroup.notify(queue: .main) {
             self.listRow()
 //            self.decimalRowFunc()
@@ -368,8 +398,8 @@ extension EventViewController {
             mvs.insert(HealthRow() {
                 $0.value = health
                 }.onCellSelection() { cell, row in
-                    self.scheduleIndex = row.indexPath!.row
-                    self.openSchedule()
+                    self.healthIndex = row.indexPath!.row
+                    self.openHealth()
                     cell.cellResignFirstResponder()
             }, at: mvs.count - 1)
             
@@ -464,7 +494,7 @@ extension EventViewController {
     }
     
     func updateLists(type: String) {
-//        let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
         if type == "schedule" {
             var scheduleIDs = [String]()
             for schedule in scheduleList {
@@ -474,10 +504,10 @@ extension EventViewController {
             }
             if !scheduleIDs.isEmpty {
                 activity.scheduleIDs = scheduleIDs
-//                groupActivityReference.updateChildValues(["scheduleIDs": scheduleIDs as AnyObject])
+                groupActivityReference.updateChildValues(["scheduleIDs": scheduleIDs as AnyObject])
             } else {
                 activity.scheduleIDs = nil
-//                groupActivityReference.child("scheduleIDs").removeValue()
+                groupActivityReference.child("scheduleIDs").removeValue()
             }
         } else if type == "purchases" {
             var transactionIDs = [String]()
@@ -486,64 +516,33 @@ extension EventViewController {
             }
             if !transactionIDs.isEmpty {
                 activity.transactionIDs = transactionIDs
-//                groupActivityReference.updateChildValues(["transactionIDs": transactionIDs as AnyObject])
+                groupActivityReference.updateChildValues(["transactionIDs": transactionIDs as AnyObject])
             } else {
                 activity.transactionIDs = nil
-//                groupActivityReference.child("transactionIDs").removeValue()
+                groupActivityReference.child("transactionIDs").removeValue()
             }
         } else if type == "health" {
             if healthList.isEmpty {
-                activity.workoutIDs = nil
-//                groupActivityReference.child("workoutIDs").removeValue()
-                activity.mealIDs = nil
-//                groupActivityReference.child("mealIDs").removeValue()
-                activity.mindfulnessIDs = nil
-//                groupActivityReference.child("mindfulnessIDs").removeValue()
+                activity.hkSampleID = nil
+                groupActivityReference.child("hkSampleID").removeValue()
             } else {
-                var workoutIDs = [String]()
-                var mealIDs = [String]()
-                var mindfulnessIDs = [String]()
+                var hkSampleID = [String]()
                 for healthItem in healthList {
-                    if let workout = healthItem.workout {
-                        workoutIDs.append(workout.id)
-                    } else if let meal = healthItem.meal {
-                        mealIDs.append(meal.id)
-                    } else if let mindfulness = healthItem.mindfulness {
-                        mindfulnessIDs.append(mindfulness.id)
-                    }
+                    hkSampleID.append(healthItem.ID)
                 }
-                if !workoutIDs.isEmpty {
-                    activity.workoutIDs = workoutIDs
-//                    groupActivityReference.updateChildValues(["workoutIDs": workoutIDs as AnyObject])
-                } else {
-                    activity.workoutIDs = nil
-//                    groupActivityReference.child("workoutIDs").removeValue()
-                }
-                if !mealIDs.isEmpty {
-                    activity.mealIDs = mealIDs
-//                    groupActivityReference.updateChildValues(["mealIDs": mealIDs as AnyObject])
-                } else {
-                    activity.mealIDs = nil
-//                    groupActivityReference.child("mealIDs").removeValue()
-                }
-                if !mindfulnessIDs.isEmpty {
-                    activity.packinglistIDs = mindfulnessIDs
-//                    groupActivityReference.updateChildValues(["mindfulnessIDs": mindfulnessIDs as AnyObject])
-                } else {
-                    activity.mindfulnessIDs = nil
-//                    groupActivityReference.child("mindfulnessIDs").removeValue()
-                }
+                activity.hkSampleID = hkSampleID
+                groupActivityReference.updateChildValues(["hkSampleID": hkSampleID as AnyObject])
             }
         } else {
             if listList.isEmpty {
                 activity.checklistIDs = nil
-//                groupActivityReference.child("checklistIDs").removeValue()
+                groupActivityReference.child("checklistIDs").removeValue()
                 activity.grocerylistID = nil
-//                groupActivityReference.child("grocerylistID").removeValue()
+                groupActivityReference.child("grocerylistID").removeValue()
                 activity.packinglistIDs = nil
-//                groupActivityReference.child("packinglistIDs").removeValue()
+                groupActivityReference.child("packinglistIDs").removeValue()
                 activity.activitylistIDs = nil
-//                groupActivityReference.child("activitylistIDs").removeValue()
+                groupActivityReference.child("activitylistIDs").removeValue()
             } else {
                 var checklistIDs = [String]()
                 var packinglistIDs = [String]()
@@ -562,31 +561,31 @@ extension EventViewController {
                 }
                 if !checklistIDs.isEmpty {
                     activity.checklistIDs = checklistIDs
-//                    groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
+                    groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
                 } else {
                     activity.checklistIDs = nil
-//                    groupActivityReference.child("checklistIDs").removeValue()
+                    groupActivityReference.child("checklistIDs").removeValue()
                 }
                 if !activitylistIDs.isEmpty {
                     activity.activitylistIDs = activitylistIDs
-//                    groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
+                    groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
                 } else {
                     activity.activitylistIDs = nil
-//                    groupActivityReference.child("activitylistIDs").removeValue()
+                    groupActivityReference.child("activitylistIDs").removeValue()
                 }
                 if grocerylistID != "nothing" {
                     activity.grocerylistID = grocerylistID
-//                    groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
+                    groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
                 } else {
                     activity.grocerylistID = nil
-//                    groupActivityReference.child("grocerylistID").removeValue()
+                    groupActivityReference.child("grocerylistID").removeValue()
                 }
                 if !packinglistIDs.isEmpty {
                     activity.packinglistIDs = packinglistIDs
-//                    groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
+                    groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
                 } else {
                     activity.packinglistIDs = nil
-//                    groupActivityReference.child("packinglistIDs").removeValue()
+                    groupActivityReference.child("packinglistIDs").removeValue()
                 }
             }
         }
@@ -635,7 +634,7 @@ extension EventViewController {
         let destination = CalendarListViewController()
         destination.delegate = self
         destination.calendarID = self.activity.calendarID
-        destination.calendars = self.calendars[self.activity.calendarSource ?? CalendarOptions.plot.name] ?? []
+        destination.calendars = self.calendars
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -880,11 +879,6 @@ extension EventViewController {
             destination.workout = workout
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
-        } else if healthList.indices.contains(healthIndex), let meal = healthList[healthIndex].meal {
-            let destination = MealViewController()
-            destination.meal = meal
-            destination.delegate = self
-            self.navigationController?.pushViewController(destination, animated: true)
         } else if healthList.indices.contains(healthIndex), let mindfulness = healthList[healthIndex].mindfulness {
             let destination = MindfulnessViewController()
             destination.mindfulness = mindfulness
@@ -902,14 +896,6 @@ extension EventViewController {
                 destination.filteredUsers = self.users
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
-            alert.addAction(UIAlertAction(title: "New Meal", style: .default, handler: { (_) in
-                let destination = MealViewController()
-                destination.delegate = self
-                destination.movingBackwards = true
-                destination.users = self.users
-                destination.filteredUsers = self.users
-                self.navigationController?.pushViewController(destination, animated: true)
-            }))
             alert.addAction(UIAlertAction(title: "New Mindfulness", style: .default, handler: { (_) in
                 let destination = MindfulnessViewController()
                 destination.delegate = self
@@ -919,8 +905,8 @@ extension EventViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
-                    mvs.remove(at: self.purchaseIndex)
+                if let mvs = self.form.sectionBy(tag: "healthfields") as? MultivaluedSection {
+                    mvs.remove(at: self.healthIndex)
                 }
             }))
             self.present(alert, animated: true)
@@ -935,6 +921,7 @@ extension EventViewController {
         let destination = ActivityListViewController()
         destination.delegate = self
         destination.listList = listList
+        destination.activity = activity
         self.navigationController?.pushViewController(destination, animated: true)
     }
     

@@ -25,6 +25,7 @@ class ActivityListViewController: FormViewController {
     var listList: [ListContainer]!
     var listIndex: Int = 0
     var grocerylistIndex: Int = -1
+    var activity: Activity!
         
     init() {
         super.init(style: .insetGrouped)
@@ -168,25 +169,30 @@ class ActivityListViewController: FormViewController {
         if listIndex == grocerylistIndex, let grocerylist = listList[listIndex].grocerylist {
             let destination = GrocerylistViewController()
             destination.grocerylist = grocerylist
+            destination.activity = activity
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if listList.indices.contains(listIndex), let checklist = listList[listIndex].checklist {
             let destination = ChecklistViewController()
             destination.checklist = checklist
+            destination.activity = activity
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if listList.indices.contains(listIndex), let activitylist = listList[listIndex].activitylist {
             let destination = ActivitylistViewController()
             destination.activitylist = activitylist
+            destination.activity = activity
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if listList.indices.contains(listIndex), let packinglist = listList[listIndex].packinglist {
             let destination = PackinglistViewController()
             destination.packinglist = packinglist
+            destination.activity = activity
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let destination = ChecklistViewController()
+            destination.activity = activity
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         }
