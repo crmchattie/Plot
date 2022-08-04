@@ -60,9 +60,12 @@ class HealthDetailViewController: UIViewController {
     }()
     
     lazy var barButton = UIBarButtonItem()
+    
+    var networkController: NetworkController
         
-    init(viewModel: HealthDetailViewModelInterface) {
+    init(viewModel: HealthDetailViewModelInterface, networkController: NetworkController) {
         self.viewModel = viewModel
+        self.networkController = networkController
         super.init(nibName: nil, bundle: nil)
         //self.viewModel.delegate = self
     }
@@ -243,7 +246,7 @@ class HealthDetailViewController: UIViewController {
             if let hkWorkout = sample as? HKWorkout {
                 HealthKitSampleBuilder.createWorkoutFromHKWorkout(from: hkWorkout) { workout in
                     guard workout != nil else { return }
-                    let destination = WorkoutViewController()
+                    let destination = WorkoutViewController(networkController: self.networkController)
                     destination.workout = workout
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
@@ -259,7 +262,7 @@ class HealthDetailViewController: UIViewController {
             if let hkMindfulness = sample as? HKCategorySample {
                 HealthKitSampleBuilder.createMindfulnessFromHKMindfulness(from: hkMindfulness, completion: { mindfulness in
                     guard mindfulness != nil else { return }
-                    let destination = MindfulnessViewController()
+                    let destination = MindfulnessViewController(networkController: self.networkController)
                     destination.mindfulness = mindfulness
                     self.navigationController?.pushViewController(destination, animated: true)
                 })

@@ -61,31 +61,31 @@ func ==(lhs: Workout, rhs: Workout) -> Bool {
     return lhs.id == rhs.id
 }
 
-enum WorkoutTypes: String, Comparable, CaseIterable {
-    static func < (lhs: WorkoutTypes, rhs: WorkoutTypes) -> Bool {
-        return lhs.rawValue < rhs.rawValue
-    }
-    
-    case weightLiftingGeneral = "Weight Lifting: General"
+//enum WorkoutTypes: String, Comparable, CaseIterable {
+//    static func < (lhs: WorkoutTypes, rhs: WorkoutTypes) -> Bool {
+//        return lhs.rawValue < rhs.rawValue
+//    }
+//    
+//    case weightLiftingGeneral = "Weight Lifting: General"
 //    case aerobicsWater = "Aerobics: Water"
 //    case stretchingHathaYoga = "Stretching/Hatha/Yoga"
-    case calisthenicsModerate = "Calisthenics: Moderate"
+//    case calisthenicsModerate = "Calisthenics: Moderate"
 //    case aerobicsLowImpact = "Aerobics: Low Impact"
 //    case stairStepMachineGeneral = "Stair Step Machine: General"
 //    case teachingAerobics = "Teaching Aerobics"
-    case weightLiftingVigorous = "Weight Lifting: Vigorous"
+//    case weightLiftingVigorous = "Weight Lifting: Vigorous"
 //    case aerobicsStepLowImpact = "Aerobics Step: Low Impact"
 //    case aerobicsHighImpact = "Aerobics: High Impact"
-    case bicyclingStationaryModerate = "Bicycling Stationary: Moderate"
+//    case bicyclingStationaryModerate = "Bicycling Stationary: Moderate"
 //    case rowingStationaryModerate = "Rowing Stationary: Moderate"
-    case calisthenicsVigorous = "Calisthenics: Vigorous"
+//    case calisthenicsVigorous = "Calisthenics: Vigorous"
 //    case circuitTrainingGeneral = "Circuit Training: General"
-    case highIntensityIntervalTraining = "High Intensity Interval Training"
+//    case highIntensityIntervalTraining = "High Intensity Interval Training"
 //    case rowingStationaryVigorous = "Rowing Stationary: Vigorous"
 //    case ellipticalTrainerGeneral = "Elliptical Trainer: General"
 //    case skiMachineGeneral = "Ski Machine: General"
 //    case aerobicsStepHighImpact = "Aerobics: Step High Impact"
-    case bicyclingStationaryVigorous = "Bicycling: Stationary Vigorous"
+//    case bicyclingStationaryVigorous = "Bicycling: Stationary Vigorous"
 //    case billiards = "Billiards"
 //    case bowling = "Bowling"
 //    case dancingSlowWaltzFoxtrot = "Dancing: Slow/Waltz/Foxtrot"
@@ -129,64 +129,64 @@ enum WorkoutTypes: String, Comparable, CaseIterable {
 //    case soccerGeneral = "Soccer: General"
 //    case tennisGeneral = "Tennis: General"
 //    case basketballPlayingAGame = "Basketball: Playing A Game"
-    case bicyclingLessThanFourteen = "Bicycling: 12-13.9 Mph"
+//    case bicyclingLessThanFourteen = "Bicycling: 12-13.9 Mph"
 //    case footballTouchFlagGeneral = "Football: Touch/Flag/General"
 //    case iceFieldHockey = "Ice/Field Hockey"
 //    case rockClimbingRappelling = "Rock Climbing: Rappelling"
-    case runningFive = "Running: 5 Mph (12 Min/Mile)"
-    case runningPushingWheelchairMarathonWheeling = "Running: Pushing Wheelchair/Marathon Wheeling"
+//    case runningFive = "Running: 5 Mph (12 Min/Mile)"
+//    case runningPushingWheelchairMarathonWheeling = "Running: Pushing Wheelchair/Marathon Wheeling"
 //    case skiingCrosscountry = "Skiing: Crosscountry"
 //    case snowShoeing = "Snow Shoeing"
 //    case swimmingBackstroke = "Swimming: Backstroke"
 //    case volleyballBeach = "Volleyball: Beach"
-    case bicyclingBmxOrMountain = "Bicycling: BMX Or Mountain"
+//    case bicyclingBmxOrMountain = "Bicycling: BMX Or Mountain"
 //    case boxingSparring = "Boxing: Sparring"
 //    case footballCompetitive = "Football: Competitive"
 //    case orienteering = "Orienteering"
-    case runningFiveTwo = "Running: 5.2 Mph (11.5 Min/Mile)"
-    case runningCrosscountry = "Running: Crosscountry"
-    case bicyclingLessThanFifteen = "Bicycling: 14-15.9 Mph"
+//    case runningFiveTwo = "Running: 5.2 Mph (11.5 Min/Mile)"
+//    case runningCrosscountry = "Running: Crosscountry"
+//    case bicyclingLessThanFifteen = "Bicycling: 14-15.9 Mph"
 //    case martialArtsJudoKarateKickbox = "Martial Arts: Judo/Karate/Kickbox"
 //    case racquetballCompetitive = "Racquetball: Competitive"
 //    case ropeJumping = "Rope Jumping"
-    case runningSix = "Running: 6 Mph (10 Min/Mile)"
+//    case runningSix = "Running: 6 Mph (10 Min/Mile)"
 //    case swimmingBreaststroke = "Swimming: Breaststroke"
 //    case swimmingLapsVigorous = "Swimming: Laps Vigorous"
 //    case swimmingTreadingVigorous = "Swimming Treading: Vigorous"
 //    case waterPolo = "Water Polo"
 //    case rockClimbingAscending = "Rock Climbing: Ascending"
-    case running6SixSeven = "Running: 6.7 Mph (9 Min/Mile)"
+//    case running6SixSeven = "Running: 6.7 Mph (9 Min/Mile)"
 //    case swimmingButterfly = "Swimming: Butterfly"
 //    case swimmingCrawl = "Swimming: Crawl"
-    case bicyclingSixteenNineteen = "Bicycling: 16-19.9 Mph"
+//    case bicyclingSixteenNineteen = "Bicycling: 16-19.9 Mph"
 //    case handballGeneral = "Handball: General"
-    case runningSevenFive = "Running: 7.5 Mph (8 Min/Mile)"
-    case runningEightSix = "Running: 8.6 Mph (7 Min/Mile)"
-    case bicyclingGreaterThanTwenty = "Bicycling: > 20 Mph"
-    case runningTen = "Running: 10 Mph (6 Min/Mile)"
-    
-    var caloriesBurned: Double {
-        switch self {
-        case .weightLiftingGeneral: return 0.024
+//    case runningSevenFive = "Running: 7.5 Mph (8 Min/Mile)"
+//    case runningEightSix = "Running: 8.6 Mph (7 Min/Mile)"
+//    case bicyclingGreaterThanTwenty = "Bicycling: > 20 Mph"
+//    case runningTen = "Running: 10 Mph (6 Min/Mile)"
+//    
+//    var caloriesBurned: Double {
+//        switch self {
+//        case .weightLiftingGeneral: return 0.024
 //        case .aerobicsWater: return 0.032
 //        case .stretchingHathaYoga: return 0.032
-        case .calisthenicsModerate: return 0.036
+//        case .calisthenicsModerate: return 0.036
 //        case .aerobicsLowImpact: return 0.044
 //        case .stairStepMachineGeneral: return 0.048
 //        case .teachingAerobics: return 0.048
-        case .weightLiftingVigorous: return 0.048
+//        case .weightLiftingVigorous: return 0.048
 //        case .aerobicsStepLowImpact: return 0.056
 //        case .aerobicsHighImpact: return 0.056
-        case .bicyclingStationaryModerate: return 0.056
+//        case .bicyclingStationaryModerate: return 0.056
 //        case .rowingStationaryModerate: return 0.056
-        case .calisthenicsVigorous: return 0.064
+//        case .calisthenicsVigorous: return 0.064
 //        case .circuitTrainingGeneral: return 0.064
-        case .highIntensityIntervalTraining: return 0.064
+//        case .highIntensityIntervalTraining: return 0.064
 //        case .rowingStationaryVigorous: return 0.068
 //        case .ellipticalTrainerGeneral: return 0.072
 //        case .skiMachineGeneral: return 0.076
 //        case .aerobicsStepHighImpact: return 0.080
-        case .bicyclingStationaryVigorous: return 0.084
+//        case .bicyclingStationaryVigorous: return 0.084
 //        case .billiards: return 0.020
 //        case .bowling: return 0.024
 //        case .dancingSlowWaltzFoxtrot: return 0.024
@@ -230,41 +230,136 @@ enum WorkoutTypes: String, Comparable, CaseIterable {
 //        case .soccerGeneral: return 0.056
 //        case .tennisGeneral: return 0.056
 //        case .basketballPlayingAGame: return 0.064
-        case .bicyclingLessThanFourteen: return 0.064
+//        case .bicyclingLessThanFourteen: return 0.064
 //        case .footballTouchFlagGeneral: return 0.064
 //        case .iceFieldHockey: return 0.064
 //        case .rockClimbingRappelling: return 0.064
-        case .runningFive: return 0.064
-        case .runningPushingWheelchairMarathonWheeling: return 0.064
+//        case .runningFive: return 0.064
+//        case .runningPushingWheelchairMarathonWheeling: return 0.064
 //        case .skiingCrosscountry: return 0.064
 //        case .snowShoeing: return 0.064
 //        case .swimmingBackstroke: return 0.064
 //        case .volleyballBeach: return 0.064
-        case .bicyclingBmxOrMountain: return 0.068
+//        case .bicyclingBmxOrMountain: return 0.068
 //        case .boxingSparring: return 0.072
 //        case .footballCompetitive: return 0.072
 //        case .orienteering: return 0.072
-        case .runningFiveTwo: return 0.072
-        case .runningCrosscountry: return 0.072
-        case .bicyclingLessThanFifteen: return 0.080
+//        case .runningFiveTwo: return 0.072
+//        case .runningCrosscountry: return 0.072
+//        case .bicyclingLessThanFifteen: return 0.080
 //        case .martialArtsJudoKarateKickbox: return 0.080
 //        case .racquetballCompetitive: return 0.080
 //        case .ropeJumping: return 0.080
-        case .runningSix: return 0.080
+//        case .runningSix: return 0.080
 //        case .swimmingBreaststroke: return 0.080
 //        case .swimmingLapsVigorous: return 0.080
 //        case .swimmingTreadingVigorous: return 0.080
 //        case .waterPolo: return 0.080
 //        case .rockClimbingAscending: return 0.088
-        case .running6SixSeven: return 0.088
+//        case .running6SixSeven: return 0.088
 //        case .swimmingButterfly: return 0.088
 //        case .swimmingCrawl: return 0.088
-        case .bicyclingSixteenNineteen: return 0.096
+//        case .bicyclingSixteenNineteen: return 0.096
 //        case .handballGeneral: return 0.096
-        case .runningSevenFive: return 0.100
-        case .runningEightSix: return 0.116
-        case .bicyclingGreaterThanTwenty: return 0.132
-        case .runningTen: return 0.132
+//        case .runningSevenFive: return 0.100
+//        case .runningEightSix: return 0.116
+//        case .bicyclingGreaterThanTwenty: return 0.132
+//        case .runningTen: return 0.132
+//        }
+//    }
+//}
+
+extension Workout {
+    var hkWorkoutActivityType: HKWorkoutActivityType {
+        guard let type = self.type else {
+            return .traditionalStrengthTraining
+        }
+        
+        switch type {
+        case "American Football":           return .americanFootball
+        case "Archery":                     return .archery
+        case "Australian Football":         return .australianFootball
+        case "Badminton":                   return .badminton
+        case "Baseball":                    return .baseball
+        case "Basketball":                  return .basketball
+        case "Bowling":                     return .bowling
+        case "Boxing":                      return .boxing
+        case "Climbing":                    return .climbing
+        case "Cross Training":              return .crossTraining
+        case "Curling":                     return .curling
+        case "Cycling":                     return .cycling
+        case "Dance":                       return .dance
+        case "Dance Inspired Training":     return .danceInspiredTraining
+        case "Elliptical":                  return .elliptical
+        case "Equestrian Sports":           return .equestrianSports
+        case "Fencing":                     return .fencing
+        case "Fishing":                     return .fishing
+        case "Functional Strength Training":return .functionalStrengthTraining
+        case "Golf":                        return .golf
+        case "Gymnastics":                  return .gymnastics
+        case "Handball":                    return .handball
+        case "Hiking":                      return .hiking
+        case "Hockey":                      return .hockey
+        case "Hunting":                     return .hunting
+        case "Lacrosse":                    return .lacrosse
+        case "Martial Arts":                return .martialArts
+        case "Mind and Body":               return .mindAndBody
+        case "Mixed Metabolic Cardio Training":return .mixedMetabolicCardioTraining
+        case "Paddle Sports":               return .paddleSports
+        case "Play":                        return .play
+        case "Preparation and Recovery":    return .preparationAndRecovery
+        case "Racquetball":                 return .racquetball
+        case "Rowing":                      return .rowing
+        case "Rugby":                       return .rugby
+        case "Running":                     return .running
+        case "Sailing":                     return .sailing
+        case "Skating Sports":              return .skatingSports
+        case "Snow Sports":                 return .snowSports
+        case "Soccer":                      return .soccer
+        case "Softball":                    return .softball
+        case "Squash":                      return .squash
+        case "Stair Climbing":              return .stairClimbing
+        case "Surfing Sports":              return .surfingSports
+        case "Swimming":                    return .swimming
+        case "Table Tennis":                return .tableTennis
+        case "Tennis":                      return .tennis
+        case "Track and Field":             return .trackAndField
+        case "Traditional Strength Training":return .traditionalStrengthTraining
+        case "Volleyball":                  return .volleyball
+        case "Walking":                     return .walking
+        case "Water Fitness":               return .waterFitness
+        case "Water Polo":                  return .waterPolo
+        case "Water Sports":                return .waterSports
+        case "Wrestling":                   return .wrestling
+        case "Yoga":                        return .yoga
+            
+        // iOS 10
+        case "Barre":                       return .barre
+        case "Core Training":               return .coreTraining
+        case "Cross Country Skiing":        return .crossCountrySkiing
+        case "Downhill Skiing":             return .downhillSkiing
+        case "Flexibility":                 return .flexibility
+        case "High Intensity Interval Training": return .highIntensityIntervalTraining
+        case "Jump Rope":                   return .jumpRope
+        case "Kickboxing":                  return .kickboxing
+        case "Pilates":                     return .pilates
+        case "Snowboarding":                return .snowboarding
+        case "Stairs":                      return .stairs
+        case "Step Training":               return .stepTraining
+        case "Wheelchair Walk Pace":        return .wheelchairWalkPace
+        case "Wheelchair Run Pace":         return .wheelchairRunPace
+            
+        // iOS 11
+        case "Tai Chi":                     return .taiChi
+        case "Mixed Cardio":                return .mixedCardio
+        case "Hand Cycling":                return .handCycling
+            
+        // iOS 13
+        case "Disc Sports":                 return .discSports
+        case "Fitness Gaming":              return .fitnessGaming
+            
+        // Catch-all
+        default:                            return .running
         }
     }
 }
@@ -371,114 +466,5 @@ struct DiagramImgs: Codable, Equatable, Hashable {
         case muscleGroups = "muscle_groups"
         case muscleGroupsSecondary = "muscle_groups_secondary"
         case background
-    }
-}
-
-extension Workout {
-    var hkWorkoutActivityType: HKWorkoutActivityType {
-        guard let type = self.type, let workoutType = WorkoutTypes(rawValue: type) else {
-            return .traditionalStrengthTraining
-        }
-        
-        switch workoutType {
-        case .weightLiftingGeneral: return .traditionalStrengthTraining
-//        case .aerobicsWater: return.waterSports
-//        case .stretchingHathaYoga: return .yoga
-        case .calisthenicsModerate: return .functionalStrengthTraining
-//        case .aerobicsLowImpact: return .waterSports
-//        case .stairStepMachineGeneral: return .stairs
-//        case .teachingAerobics: return .waterSports
-        case .weightLiftingVigorous: return .traditionalStrengthTraining
-//        case .aerobicsStepLowImpact: return .waterSports
-//        case .aerobicsHighImpact: return .waterSports
-        case .bicyclingStationaryModerate: return .cycling
-//        case .rowingStationaryModerate: return .rowing
-        case .calisthenicsVigorous: return .functionalStrengthTraining
-//        case .circuitTrainingGeneral: return .highIntensityIntervalTraining
-        case .highIntensityIntervalTraining: return .highIntensityIntervalTraining
-//        case .rowingStationaryVigorous: return .rowing
-//        case .ellipticalTrainerGeneral: return .elliptical
-//        case .skiMachineGeneral: return .highIntensityIntervalTraining
-//        case .aerobicsStepHighImpact: return .waterSports
-        case .bicyclingStationaryVigorous: return .cycling
-//        case .billiards: return .walking
-//        case .bowling: return .bowling
-//        case .dancingSlowWaltzFoxtrot: return .walking
-//        case .frisbee: return .running
-//        case .volleyballNoncompetitiveGeneralPlay: return .volleyball
-//        case .waterVolleyball: return .waterSports
-//        case .archeryNonhunting: return .archery
-//        case .golfUsingCart: return .golf
-//        case .hangGliding: return .flexibility
-//        case .curling: return .curling
-//        case .gymnasticsGeneral: return .gymnastics
-//        case .horsebackRidingGeneral: return .jumpRope
-//        case .taiChi: return .taiChi
-//        case .volleyballCompetitiveGymnasiumPlay: return .volleyball
-//        case .walkingThreeHalf: return .walking
-//        case .badmintonGeneral: return .badminton
-//        case .walkingFour: return .walking
-//        case .kayaking: return .rowing
-//        case .skateboarding: return .skatingSports
-//        case .snorkeling: return .swimming
-//        case .softballGeneralPlay: return .softball
-//        case .walkingFourHalf: return .walking
-//        case .whitewaterRaftingKayaking: return .rowing
-//        case .dancingDiscoBallroomSquare: return .dance
-//        case .golfCarryingClubs: return .golf
-//        case .dancingFastBalletTwist: return .dance
-//        case .fencing: return .fencing
-////        case .hikingCrosscountry: return .hiking
-//        case .skiingDownhill: return .downhillSkiing
-//        case .swimmingGeneral: return .swimming
-//        case .walkJogLessThanTen: return .walking
-//        case .waterSkiing: return .waterSports
-//        case .wrestling: return .wrestling
-//        case .basketballWheelchair: return .basketball
-//        case .raceWalking: return .walking
-//        case .iceSkatingGeneral: return .skatingSports
-//        case .racquetballCasualGeneral: return .racquetball
-//        case .rollerbladeSkating: return .skatingSports
-//        case .scubaOrSkinDiving: return .waterSports
-//        case .sleddingLugeToboggan: return .rowing
-//        case .soccerGeneral: return .soccer
-//        case .tennisGeneral: return .tennis
-//        case .basketballPlayingAGame: return .basketball
-        case .bicyclingLessThanFourteen: return .cycling
-//        case .footballTouchFlagGeneral: return .americanFootball
-//        case .iceFieldHockey: return .hockey
-//        case .rockClimbingRappelling: return .climbing
-        case .runningFive: return .running
-        case .runningPushingWheelchairMarathonWheeling: return .running
-//        case .skiingCrosscountry: return .crossCountrySkiing
-//        case .snowShoeing: return .snowboarding
-//        case .swimmingBackstroke: return .swimming
-//        case .volleyballBeach: return .volleyball
-        case .bicyclingBmxOrMountain: return .cycling
-//        case .boxingSparring: return .boxing
-//        case .footballCompetitive: return .americanFootball
-//        case .orienteering: return .coreTraining
-        case .runningFiveTwo: return .running
-        case .runningCrosscountry: return .running
-        case .bicyclingLessThanFifteen: return .cycling
-//        case .martialArtsJudoKarateKickbox: return .martialArts
-//        case .racquetballCompetitive: return .racquetball
-//        case .ropeJumping: return .jumpRope
-        case .runningSix: return .running
-//        case .swimmingBreaststroke: return .swimming
-//        case .swimmingLapsVigorous: return .swimming
-//        case .swimmingTreadingVigorous: return .swimming
-//        case .waterPolo: return .waterSports
-//        case .rockClimbingAscending: return .climbing
-        case .running6SixSeven: return .running
-//        case .swimmingButterfly: return .swimming
-//        case .swimmingCrawl: return .swimming
-        case .bicyclingSixteenNineteen: return .cycling
-//        case .handballGeneral: return .handball
-        case .runningSevenFive: return .running
-        case .runningEightSix: return .running
-        case .bicyclingGreaterThanTwenty: return .cycling
-        case .runningTen: return .running
-        }
     }
 }

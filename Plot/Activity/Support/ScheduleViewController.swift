@@ -938,17 +938,17 @@ extension ScheduleViewController: UpdateTimeZoneDelegate {
 
 extension ScheduleViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-        if let _: ButtonRow = form.rowBy(tag: "Participants") {
-            if !selectedFalconUsers.isEmpty {
+//        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
+//            if !selectedFalconUsers.isEmpty {
 //                self.userNamesString = "\(self.selectedFalconUsers.count + 1) participants"
 //                inviteesRow.title = self.userNamesString
 //                inviteesRow.updateCell()
-            } else {
+//            } else {
 //                inviteesRow.title = "Participants"
 //                inviteesRow.updateCell()
-            }
-            self.selectedFalconUsers = selectedFalconUsers
-        }
+//            }
+//            self.selectedFalconUsers = selectedFalconUsers
+//        }
     }
 }
 

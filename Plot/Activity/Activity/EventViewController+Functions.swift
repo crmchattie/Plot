@@ -835,20 +835,15 @@ extension EventViewController {
             return
         }
         if purchaseList.indices.contains(purchaseIndex) {
-            let destination = FinanceTransactionViewController()
+            let destination = FinanceTransactionViewController(networkController: networkController)
             destination.delegate = self
             destination.movingBackwards = true
-            destination.users = self.acceptedParticipant
-            destination.filteredUsers = self.acceptedParticipant
             destination.transaction = purchaseList[purchaseIndex]
-            self.getParticipants(transaction: purchaseList[purchaseIndex]) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
+            self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Transaction", style: .default, handler: { (_) in
-                let destination = FinanceTransactionViewController()
+                let destination = FinanceTransactionViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
                 destination.users = self.acceptedParticipant
@@ -875,33 +870,27 @@ extension EventViewController {
     
     func openHealth() {
         if healthList.indices.contains(healthIndex), let workout = healthList[healthIndex].workout {
-            let destination = WorkoutViewController()
+            let destination = WorkoutViewController(networkController: networkController)
             destination.workout = workout
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else if healthList.indices.contains(healthIndex), let mindfulness = healthList[healthIndex].mindfulness {
-            let destination = MindfulnessViewController()
+            let destination = MindfulnessViewController(networkController: networkController)
             destination.mindfulness = mindfulness
-            destination.users = self.users
-            destination.filteredUsers = self.users
             destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Workout", style: .default, handler: { (_) in
-                let destination = WorkoutViewController()
+                let destination = WorkoutViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
-                destination.users = self.users
-                destination.filteredUsers = self.users
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "New Mindfulness", style: .default, handler: { (_) in
-                let destination = MindfulnessViewController()
+                let destination = MindfulnessViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
-                destination.users = self.users
-                destination.filteredUsers = self.users
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -1056,6 +1045,7 @@ extension EventViewController {
                 self.dismiss(animated: true, completion: nil)
             } else {
                 self.navigationController?.popViewController(animated: true)
+                self.updateDiscoverDelegate?.itemCreated()
             }
         }
     }

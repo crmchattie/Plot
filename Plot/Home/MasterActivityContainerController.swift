@@ -567,7 +567,7 @@ extension MasterActivityContainerController: ActivitiesControllerCellDelegate {
 extension MasterActivityContainerController: HealthControllerCellDelegate {
     func cellTapped(metric: HealthMetric) {
         let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
-        let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel)
+        let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel, networkController: networkController)
         healthDetailViewController.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(healthDetailViewController, animated: true)
     }
@@ -577,29 +577,23 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     func openTransactionDetails(transactionDetails: TransactionDetails) {
         let accounts = networkController.financeService.transactions.compactMap({ $0.account_guid })
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: networkController.financeService.transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: accounts, financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
+        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
 //        financeDetailViewController.delegate = self
-        financeDetailViewController.users = networkController.userService.users
-        financeDetailViewController.filteredUsers = networkController.userService.users
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
     
     func openAccountDetails(accountDetails: AccountDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: networkController.financeService.accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
+        let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
 //        financeDetailViewController.delegate = self
-        financeDetailViewController.users = networkController.userService.users
-        financeDetailViewController.filteredUsers = networkController.userService.users
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
     
     func openHolding(holding: MXHolding) {
-        let destination = FinanceHoldingViewController()
+        let destination = FinanceHoldingViewController(networkController: networkController)
         destination.holding = holding
-        destination.users = networkController.userService.users
-        destination.filteredUsers = networkController.userService.users
         destination.hidesBottomBarWhenPushed = true
         self.getParticipants(transaction: nil, account: nil, holding: holding) { (participants) in
             destination.selectedFalconUsers = participants

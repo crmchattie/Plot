@@ -13,7 +13,12 @@ import CodableFirebase
 import SwiftUI
 import GoogleSignIn
 
+protocol UpdateDiscover: AnyObject {
+    func itemCreated()
+}
+
 class DiscoverViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+    
         
     fileprivate var reference: DatabaseReference!
     
@@ -182,24 +187,23 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             switch activityType {
             case .basic:
                 let destination = EventViewController(networkController: networkController)
+                destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             case .calendar:
                 self.newCalendar()
             case .flight:
                 print("flight")
             case .meal:
-                let destination = MealViewController()
-                destination.users = self.networkController.userService.users
+                let destination = MealViewController(networkController: self.networkController)
+                destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             case .workout:
-                let destination = WorkoutViewController()
-                destination.users = self.networkController.userService.users
-                destination.filteredUsers = self.networkController.userService.users
+                let destination = WorkoutViewController(networkController: self.networkController)
+                destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mindfulness:
-                let destination = MindfulnessViewController()
-                destination.users = self.networkController.userService.users
-                destination.filteredUsers = self.networkController.userService.users
+                let destination = MindfulnessViewController(networkController: self.networkController)
+                destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mood:
                 let destination = MoodViewController()
@@ -213,19 +217,18 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 destination.type = activityType
                 self.navigationController?.pushViewController(destination, animated: true)
             case .transaction:
-                let destination = FinanceTransactionViewController()
-                destination.users = self.networkController.userService.users
-                destination.filteredUsers = self.networkController.userService.users
+                let destination = FinanceTransactionViewController(networkController: self.networkController)
+                destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             case .investment:
-                let destination = FinanceHoldingViewController()
-                destination.users = self.networkController.userService.users
-                destination.filteredUsers = self.networkController.userService.users
+                let destination = FinanceHoldingViewController(networkController: self.networkController)
+                destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             case .financialAccount:
                 self.newAccount()
             case .transactionRule:
                 let destination = FinanceTransactionRuleViewController()
+                destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             default:
                 print("default")
@@ -268,9 +271,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         }))
         
         alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
-            let destination = FinanceAccountViewController()
-            destination.users = self.networkController.userService.users
-            destination.filteredUsers = self.networkController.userService.users
+            let destination = FinanceAccountViewController(networkController: self.networkController)
+            destination.updateDiscoverDelegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         }))
         
@@ -379,6 +381,12 @@ extension DiscoverViewController: GIDSignInDelegate {
         } else {
           print("\(error.localizedDescription)")
         }
+    }
+}
+
+extension DiscoverViewController: UpdateDiscover {
+    func itemCreated() {
+        self.dismiss(animated: true)
     }
 }
 

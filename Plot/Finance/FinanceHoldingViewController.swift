@@ -17,11 +17,14 @@ protocol UpdateHoldingDelegate: AnyObject {
 
 class FinanceHoldingViewController: FormViewController {
     var holding: MXHolding!
-    var accounts = [MXAccount]()
-    var accountFetcher = FinancialAccountFetcher()
     
-    var users = [User]()
-    var filteredUsers = [User]()
+    var accounts: [MXAccount] {
+        return networkController.financeService.accounts
+    }
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var activities: [Activity] = networkController.activityService.activities
+    
     var selectedFalconUsers = [User]()
     
     var userNames : [String] = []
@@ -33,6 +36,7 @@ class FinanceHoldingViewController: FormViewController {
     var movingBackwards: Bool = false
     
     weak var delegate : UpdateHoldingDelegate?
+    weak var updateDiscoverDelegate : UpdateDiscover?
     
     var status = false
     
@@ -42,7 +46,10 @@ class FinanceHoldingViewController: FormViewController {
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
-    init() {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         super.init(style: .insetGrouped)
     }
     
@@ -108,24 +115,6 @@ class FinanceHoldingViewController: FormViewController {
             holding = MXHolding(description: "Holding Name", market_value: 0, created_at: date, guid: ID, user_guid: currentUser, holding_type: .unknownType, user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
         }
-        
-        accountFetcher.fetchAccounts { (firebaseAccounts) in
-            self.accounts = firebaseAccounts
-            self.accounts.sort { (account1, account2) -> Bool in
-                return account1.name < account2.name
-            }
-            if let row: PushRow<String> = self.form.rowBy(tag: "Account") {
-                self.accounts.forEach {
-                    row.options?.append($0.name.capitalized)
-                }
-                if self.holding.account_name == nil, let value = self.holding.account_guid {
-                    if let account = self.accounts.first(where: { $0.guid == value }) {
-                        row.value = account.name
-                    }
-                }
-                row.updateCell()
-            }
-        }
     }
     
     fileprivate func configureTableView() {
@@ -168,6 +157,7 @@ class FinanceHoldingViewController: FormViewController {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
+            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     
@@ -396,6 +386,10 @@ class FinanceHoldingViewController: FormViewController {
                 row.title = row.tag
                 if let value = holding.account_name {
                     row.value = value
+                } else if holding.account_name == nil, let value = holding.account_guid {
+                    if let account = self.accounts.first(where: { $0.guid == value }) {
+                        row.value = account.name
+                    }
                 }
                 row.options = []
                 accounts.forEach {

@@ -167,9 +167,7 @@ class FinanceViewController: UIViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 
         alert.addAction(UIAlertAction(title: "Transaction", style: .default, handler: { (_) in
-            let destination = FinanceTransactionViewController()
-            destination.users = self.networkController.userService.users
-            destination.filteredUsers = self.networkController.userService.users
+            let destination = FinanceTransactionViewController(networkController: self.networkController)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
@@ -177,9 +175,7 @@ class FinanceViewController: UIViewController {
         }))
         
         alert.addAction(UIAlertAction(title: "Investment", style: .default, handler: { (_) in
-            let destination = FinanceHoldingViewController()
-            destination.users = self.networkController.userService.users
-            destination.filteredUsers = self.networkController.userService.users
+            let destination = FinanceHoldingViewController(networkController: self.networkController)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
@@ -227,9 +223,7 @@ class FinanceViewController: UIViewController {
         }))
         
         alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
-            let destination = FinanceAccountViewController()
-            destination.users = self.networkController.userService.users
-            destination.filteredUsers = self.networkController.userService.users
+            let destination = FinanceAccountViewController(networkController: self.networkController)
             self.navigationController?.pushViewController(destination, animated: true)
         }))
         
@@ -507,22 +501,18 @@ class FinanceViewController: UIViewController {
             accounts = transactions.compactMap({ $0.account_guid })
         }
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: accounts,  financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel)
+        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex
 //        financeDetailViewController.delegate = self
-        financeDetailViewController.users = users
-        financeDetailViewController.filteredUsers = filteredUsers
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
     
     func openAccountDetails(accountDetails: AccountDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel)
+        let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex
 //        financeDetailViewController.delegate = self
-        financeDetailViewController.users = users
-        financeDetailViewController.filteredUsers = filteredUsers
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
@@ -694,10 +684,8 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             }
         } else if let object = object as? [Transaction] {
             if section.subType == "Transactions" {
-                let destination = FinanceTransactionViewController()
+                let destination = FinanceTransactionViewController(networkController: self.networkController)
                 destination.transaction = object[indexPath.item]
-                destination.users = users
-                destination.filteredUsers = filteredUsers
                 self.getParticipants(transaction: object[indexPath.item], account: nil, holding: nil) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
@@ -705,10 +693,8 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             }
         } else if let object = object as? [MXAccount] {
             if section.subType == "Accounts" {
-                let destination = FinanceAccountViewController()
+                let destination = FinanceAccountViewController(networkController: self.networkController)
                 destination.account = object[indexPath.item]
-                destination.users = users
-                destination.filteredUsers = filteredUsers
                 self.getParticipants(transaction: nil, account: object[indexPath.item], holding: nil) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
@@ -716,11 +702,8 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             }
         } else if let object = object as? [MXHolding] {
             if section.subType == "Investments" {
-                let destination = FinanceHoldingViewController()
+                let destination = FinanceHoldingViewController(networkController: self.networkController)
                 destination.holding = object[indexPath.item]
-                destination.accounts = accounts
-                destination.users = users
-                destination.filteredUsers = filteredUsers
                 self.getParticipants(transaction: nil, account: nil, holding: object[indexPath.item]) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
@@ -737,7 +720,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
 
 extension FinanceViewController: HeaderCellDelegate {
     func viewTapped(sectionType: SectionType) {
-        let destination = FinanceDetailViewController()
+        let destination = FinanceDetailViewController(networkController: networkController)
         destination.title = sectionType.name
         destination.networkController = networkController
         destination.setSections = [sectionType]

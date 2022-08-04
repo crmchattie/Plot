@@ -19,8 +19,10 @@ protocol UpdateMealDelegate: AnyObject {
 class MealViewController: FormViewController {
     var meal: Meal!
     
-    var users = [User]()
-    var filteredUsers = [User]()
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var activities: [Activity] = networkController.activityService.activities
+    
     var selectedFalconUsers = [User]()
         
     var userNames : [String] = []
@@ -42,8 +44,12 @@ class MealViewController: FormViewController {
     
     
     weak var delegate : UpdateMealDelegate?
+    weak var updateDiscoverDelegate : UpdateDiscover?
     
-    init() {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         super.init(style: .insetGrouped)
     }
     
@@ -204,6 +210,7 @@ class MealViewController: FormViewController {
                 self.dismiss(animated: true, completion: nil)
             } else {
                 self.navigationController?.popViewController(animated: true)
+                self.updateDiscoverDelegate?.itemCreated()
             }
         }
     }

@@ -67,9 +67,7 @@ class FinancialAccountsViewController: UITableViewController {
         }))
         
         alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
-            let destination = FinanceAccountViewController()
-            destination.users = self.networkController.userService.users
-            destination.filteredUsers = self.networkController.userService.users
+            let destination = FinanceAccountViewController(networkController: self.networkController)
             self.navigationController?.pushViewController(destination, animated: true)
         }))
         
@@ -163,7 +161,7 @@ class FinancialAccountsViewController: UITableViewController {
         let member = members[indexPath.section]
         if let accounts = memberAccountsDict[member] {
             let account = accounts[indexPath.row - 1]
-            let destination = FinanceAccountViewController()
+            let destination = FinanceAccountViewController(networkController: self.networkController)
             destination.account = account
             self.navigationController?.pushViewController(destination, animated: true)
         }

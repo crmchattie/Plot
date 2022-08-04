@@ -22,9 +22,6 @@ class FinanceBarChartViewController: UIViewController {
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
-    var users = [User]()
-    var filteredUsers = [User]()
-        
     var participants: [String: [User]] = [:]
     
     private var viewModel: FinanceDetailViewModelInterface
@@ -75,8 +72,11 @@ class FinanceBarChartViewController: UIViewController {
     
     var selectedIndex = 2
     
-    init(viewModel: FinanceDetailViewModelInterface) {
+    var networkController: NetworkController
+    
+    init(viewModel: FinanceDetailViewModelInterface, networkController: NetworkController) {
         self.viewModel = viewModel
+        self.networkController = networkController
         super.init(nibName: nil, bundle: nil)
         //self.viewModel.delegate = self
     }
@@ -409,10 +409,8 @@ extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSou
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let transactions = viewModel.transactions, !transactions.isEmpty {
             let transaction = transactions[indexPath.row]
-            let destination = FinanceTransactionViewController()
+            let destination = FinanceTransactionViewController(networkController: networkController)
             destination.transaction = transaction
-            destination.users = users
-            destination.filteredUsers = filteredUsers
             destination.delegate = self
             self.getParticipants(transaction: transaction, account: nil) { (participants) in
                 destination.selectedFalconUsers = participants
@@ -420,10 +418,8 @@ extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSou
             }
         } else if let accounts = viewModel.accounts, !accounts.isEmpty {
             let account = accounts[indexPath.row]
-            let destination = FinanceAccountViewController()
+            let destination = FinanceAccountViewController(networkController: networkController)
             destination.account = account
-            destination.users = users
-            destination.filteredUsers = filteredUsers
             destination.delegate = self
             self.getParticipants(transaction: nil, account: account) { (participants) in
                 destination.selectedFalconUsers = participants

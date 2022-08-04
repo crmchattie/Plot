@@ -78,6 +78,8 @@ class EventViewController: FormViewController {
     var active = false
     var sentActivity = false
     
+    weak var updateDiscoverDelegate : UpdateDiscover?
+    
     typealias CompletionHandler = (_ success: Bool) -> Void
     
     var activityAvatarURL = String() {
@@ -645,30 +647,28 @@ class EventViewController: FormViewController {
                 cell.textLabel?.textAlignment = .left
             }
             
-//        if activity.category != nil {
-//            form.last!
-//            <<< LabelRow("Category") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.cell.selectionStyle = .default
-//                row.title = row.tag
-//                if self.active && self.activity.category != nil {
-//                    row.value = self.activity.category
-//                } else {
-//                    row.value = "Uncategorized"
-//                }
-//            }.onCellSelection({ _, row in
-//                self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
-//            }).cellUpdate { cell, row in
-//                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                cell.textLabel?.textAlignment = .left
-//            }
-//        }
+            
+            <<< LabelRow("Category") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if self.active && self.activity.category != nil {
+                    row.value = self.activity.category
+                } else {
+                    row.value = "Uncategorized"
+                }
+            }.onCellSelection({ _, row in
+                self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
+            }
         
 //        if let _ = activity.activityType {
 //            form.last!
@@ -722,11 +722,6 @@ class EventViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }
         
-        
-        +++ Section(header: "Extras", footer: nil) { section in
-            section.hidden = "$showExtras == false"
-        }
-        
             <<< ButtonRow("Checklists") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textAlignment = .left
@@ -771,27 +766,27 @@ class EventViewController: FormViewController {
                     }
                 }
 
-            <<< TextAreaRow("Notes") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.placeholder = $0.tag
-                $0.hidden = "$showExtras == false"
-                if self.active && self.activity.notes != "nothing" && self.activity.notes != nil {
-                    $0.value = self.activity.notes
-                }
-                }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }).onChange() { [unowned self] row in
-                    self.activity.notes = row.value
-                    if row.value == nil {
-                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("notes")
-                        reference.removeValue()
-                    }
-                }
+//            <<< TextAreaRow("Notes") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.placeholder = $0.tag
+//                $0.hidden = "$showExtras == false"
+//                if self.active && self.activity.notes != "nothing" && self.activity.notes != nil {
+//                    $0.value = self.activity.notes
+//                }
+//                }.cellUpdate({ (cell, row) in
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                }).onChange() { [unowned self] row in
+//                    self.activity.notes = row.value
+//                    if row.value == nil {
+//                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("notes")
+//                        reference.removeValue()
+//                    }
+//                }
 
         <<< SegmentedRow<String>("sections"){
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

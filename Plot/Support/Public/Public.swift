@@ -1738,7 +1738,7 @@ extension TimeInterval {
     var stringTimeShort: String {
         var time = ""
         if hours > 0 {
-            time = "\(hours)h "
+            time = "\(hours)h"
         }
         if minutes > 0 {
             time += "\(minutes)m"

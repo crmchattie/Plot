@@ -24,6 +24,8 @@ class FinanceTransactionRuleViewController: FormViewController {
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
+    weak var updateDiscoverDelegate : UpdateDiscover?
+    
     init() {
         super.init(style: .insetGrouped)
     }
@@ -98,6 +100,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 self.dismiss(animated: true, completion: nil)
             } else {
                 self.navigationController?.popViewController(animated: true)
+                self.updateDiscoverDelegate?.itemCreated()
             }
         }
     }

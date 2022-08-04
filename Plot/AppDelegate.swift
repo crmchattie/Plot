@@ -443,18 +443,17 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                     ref.child(financialTransactionsEntity).child(transactionID).observeSingleEvent(of: .value, with: { snapshot in
                         if snapshot.exists(), let snapshotValue = snapshot.value {
                             if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue) {
-                                let destination = FinanceTransactionViewController()
-                                destination.transaction = transaction
-                                self.getParticipants(transaction: transaction, account: nil) { (participants) in
-                                    destination.selectedFalconUsers = participants
-                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                    let destination = FinanceTransactionViewController(networkController: tabBarController.networkController)
+                                    destination.transaction = transaction
+                                    self.getParticipants(transaction: transaction, account: nil) { (participants) in
+                                        destination.selectedFalconUsers = participants
                                         tabBarController.selectedIndex = 1
                                         tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
                                         if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
                                             homeNavigationController.pushViewController(destination, animated: true)
                                             
                                         }
-                                        
                                     }
                                 }
                             }
@@ -465,18 +464,17 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                     ref.child(financialAccountsEntity).child(accountID).observeSingleEvent(of: .value, with: { snapshot in
                         if snapshot.exists(), let snapshotValue = snapshot.value {
                             if let account = try? FirebaseDecoder().decode(MXAccount.self, from: snapshotValue) {
-                                let destination = FinanceAccountViewController()
-                                destination.account = account
-                                self.getParticipants(transaction: nil, account: account) { (participants) in
-                                    destination.selectedFalconUsers = participants
-                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
+                                    let destination = FinanceAccountViewController(networkController: tabBarController.networkController)
+                                    destination.account = account
+                                    self.getParticipants(transaction: nil, account: account) { (participants) in
+                                        destination.selectedFalconUsers = participants
                                         tabBarController.selectedIndex = 1
                                         tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
                                         if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
                                             homeNavigationController.pushViewController(destination, animated: true)
                                             
                                         }
-                                        
                                     }
                                 }
                             }

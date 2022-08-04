@@ -11,6 +11,7 @@ import Eureka
 import SplitRow
 import Firebase
 import CodableFirebase
+import HealthKit
 
 protocol UpdateWorkoutDelegate: AnyObject {
     func updateWorkout(workout: Workout)
@@ -19,8 +20,10 @@ protocol UpdateWorkoutDelegate: AnyObject {
 class WorkoutViewController: FormViewController {    
     var workout: Workout!
     
-    var users = [User]()
-    var filteredUsers = [User]()
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var activities: [Activity] = networkController.activityService.activities
+    
     var selectedFalconUsers = [User]()
     
     var userNames : [String] = []
@@ -39,8 +42,12 @@ class WorkoutViewController: FormViewController {
     var comingFromActivity: Bool = false
     
     weak var delegate : UpdateWorkoutDelegate?
+    weak var updateDiscoverDelegate : UpdateDiscover?
     
-    init() {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         super.init(style: .insetGrouped)
     }
     
@@ -200,6 +207,7 @@ class WorkoutViewController: FormViewController {
                 self.dismiss(animated: true, completion: nil)
             } else {
                 self.navigationController?.popViewController(animated: true)
+                self.updateDiscoverDelegate?.itemCreated()
             }
 
         }
@@ -292,8 +300,16 @@ class WorkoutViewController: FormViewController {
                 row.title = row.tag
                 row.value = workout.type?.capitalized
                 row.options = []
-                WorkoutTypes.allCases.sorted().forEach {
-                    row.options?.append($0.rawValue.capitalized)
+                if #available(iOS 14.0, *) {
+                    HKWorkoutActivityType.allCases.forEach {
+                        print($0.name)
+                        row.options?.append($0.name)
+                    }
+                } else {
+                    HKWorkoutActivityType.oldAllCases.forEach {
+                        print($0.name)
+                        row.options?.append($0.name)
+                    }
                 }
             }.onPresent { from, to in
                 to.title = "Type"
@@ -485,8 +501,9 @@ class WorkoutViewController: FormViewController {
     }
     
     fileprivate func updateCalories() {
-        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Body Weight"), let weightValue = weightRow.value, let workoutType = WorkoutTypes(rawValue: self.workout.type ?? ""), let length = workout.length {
-            self.workout.totalEnergyBurned = Double(length / 60) * workoutType.caloriesBurned * Double(weightValue)
+        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Body Weight"), let weightValue = weightRow.value, let length = workout.length {
+            let workoutType = workout.hkWorkoutActivityType
+            self.workout.totalEnergyBurned = Double(length / 60) * workoutType.calories * Double(weightValue)
             caloriesRow.value = self.workout.totalEnergyBurned
             caloriesRow.updateCell()
         }

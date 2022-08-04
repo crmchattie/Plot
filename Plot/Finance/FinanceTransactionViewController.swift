@@ -17,11 +17,14 @@ protocol UpdateTransactionDelegate: AnyObject {
 
 class FinanceTransactionViewController: FormViewController {
     var transaction: Transaction!
-    var accounts = [MXAccount]()
-    var accountFetcher = FinancialAccountFetcher()
     
-    var users = [User]()
-    var filteredUsers = [User]()
+    var accounts: [MXAccount] {
+        return networkController.financeService.accounts
+    }
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var activities: [Activity] = networkController.activityService.activities
+    
     var selectedFalconUsers = [User]()
     
     var userNames : [String] = []
@@ -33,6 +36,7 @@ class FinanceTransactionViewController: FormViewController {
     var movingBackwards: Bool = false
     
     weak var delegate : UpdateTransactionDelegate?
+    weak var updateDiscoverDelegate : UpdateDiscover?
     
     var status = false
     
@@ -42,7 +46,10 @@ class FinanceTransactionViewController: FormViewController {
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
-    init() {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         super.init(style: .insetGrouped)
     }
     
@@ -55,8 +62,6 @@ class FinanceTransactionViewController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        
-        
         
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "E, MMM dd, yyyy"
@@ -123,24 +128,6 @@ class FinanceTransactionViewController: FormViewController {
         
         status = transaction.status == .posted
         
-        accountFetcher.fetchAccounts { (firebaseAccounts) in
-            self.accounts = firebaseAccounts
-            self.accounts.sort { (account1, account2) -> Bool in
-                return account1.name < account2.name
-            }
-            if let row: PushRow<String> = self.form.rowBy(tag: "Account") {
-                self.accounts.forEach {
-                    row.options?.append($0.name.capitalized)
-                }
-                if self.transaction.account_name == nil, let value = self.transaction.account_guid {
-                    if let account = self.accounts.first(where: { $0.guid == value }) {
-                        row.value = account.name
-                    }
-                }
-                row.updateCell()
-            }
-        }
-        
     }
     
     fileprivate func configureTableView() {
@@ -183,6 +170,7 @@ class FinanceTransactionViewController: FormViewController {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
+            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     
@@ -408,6 +396,10 @@ class FinanceTransactionViewController: FormViewController {
                 row.title = row.tag
                 if let value = transaction.account_name {
                     row.value = value
+                } else if transaction.account_name == nil, let value = transaction.account_guid {
+                    if let account = accounts.first(where: { $0.guid == value }) {
+                        row.value = account.name
+                    }
                 }
                 row.options = []
                 accounts.forEach {

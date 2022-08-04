@@ -383,22 +383,15 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                 } else {
                     let destination = EventViewController(networkController: networkController)
                     destination.hidesBottomBarWhenPushed = true
-                    destination.users = self.users
-                    destination.filteredUsers = self.filteredUsers
-                    destination.conversations = self.conversations
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
             case "meal":
-                let destination = MealViewController()
+                let destination = MealViewController(networkController: networkController)
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
                 self.navigationController?.pushViewController(destination, animated: true)
             case "workout":
-                let destination = WorkoutViewController()
+                let destination = WorkoutViewController(networkController: networkController)
                 destination.hidesBottomBarWhenPushed = true
-                destination.users = self.users
-                destination.filteredUsers = self.filteredUsers
                 self.navigationController?.pushViewController(destination, animated: true)
             default:
                 print("default")

@@ -19,8 +19,10 @@ class FinanceAccountViewController: FormViewController {
     var holdings = [MXHolding]()
     var holdingFetcher = FinancialHoldingFetcher()
     
-    var users = [User]()
-    var filteredUsers = [User]()
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var activities: [Activity] = networkController.activityService.activities
+    
     var selectedFalconUsers = [User]()
     
     var userNames : [String] = []
@@ -29,6 +31,7 @@ class FinanceAccountViewController: FormViewController {
     var active: Bool = false
     
     weak var delegate : UpdateAccountDelegate?
+    weak var updateDiscoverDelegate : UpdateDiscover?
     
     let numberFormatter = NumberFormatter()
     
@@ -36,7 +39,10 @@ class FinanceAccountViewController: FormViewController {
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
-    init() {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         super.init(style: .insetGrouped)
     }
     
@@ -172,6 +178,7 @@ class FinanceAccountViewController: FormViewController {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
+            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     

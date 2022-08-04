@@ -126,10 +126,8 @@ class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
     // MARK: - Actions
     
     private func showTranscationDetail(transaction: Transaction) {
-        let destination = FinanceTransactionViewController()
+        let destination = FinanceTransactionViewController(networkController: self.networkController)
         destination.transaction = transaction
-        destination.users = users
-        destination.filteredUsers = filteredUsers
         destination.delegate = self
         self.getParticipants(transaction: transaction, account: nil) { (participants) in
             destination.selectedFalconUsers = participants
@@ -138,10 +136,8 @@ class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
     }
     
     private func showAccountDetail(account: MXAccount) {
-        let destination = FinanceAccountViewController()
+        let destination = FinanceAccountViewController(networkController: self.networkController)
         destination.account = account
-        destination.users = users
-        destination.filteredUsers = filteredUsers
         destination.delegate = self
         self.getParticipants(transaction: nil, account: account) { (participants) in
             destination.selectedFalconUsers = participants

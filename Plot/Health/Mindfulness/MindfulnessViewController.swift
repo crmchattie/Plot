@@ -23,8 +23,10 @@ class MindfulnessViewController: FormViewController {
     
     let numberFormatter = NumberFormatter()
         
-    var users = [User]()
-    var filteredUsers = [User]()
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var activities: [Activity] = networkController.activityService.activities
+    
     var selectedFalconUsers = [User]()
     
     var userNames : [String] = []
@@ -36,8 +38,12 @@ class MindfulnessViewController: FormViewController {
     var comingFromActivity: Bool = false
     
     weak var delegate : UpdateMindfulnessDelegate?
+    weak var updateDiscoverDelegate : UpdateDiscover?
     
-    init() {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         super.init(style: .insetGrouped)
     }
     
@@ -202,6 +208,7 @@ class MindfulnessViewController: FormViewController {
                 self.dismiss(animated: true, completion: nil)
             } else {
                 self.navigationController?.popViewController(animated: true)
+                self.updateDiscoverDelegate?.itemCreated()
             }
 
         }
