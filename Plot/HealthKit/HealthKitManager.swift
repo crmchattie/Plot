@@ -9,6 +9,7 @@
 import Foundation
 import Firebase
 import CodableFirebase
+import HealthKit
 
 class HealthKitManager {
     
@@ -95,25 +96,42 @@ class HealthKitManager {
             activeEnergyOp.delegate = self
             
             let futureDay = today.dayAfter
-            let functionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .functionalStrengthTraining, rank: 2)
-            functionalStrengthTrainingOp.delegate = self
-            functionalStrengthTrainingOp.lastSyncDate = lastSyncDate
-
-            let traditionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .traditionalStrengthTraining, rank: 3)
-            traditionalStrengthTrainingOp.delegate = self
-            traditionalStrengthTrainingOp.lastSyncDate = lastSyncDate
+            if #available(iOS 14.0, *) {
+                for workout in HKWorkoutActivityType.allCases {
+                    let op = WorkoutOperation(date: futureDay, workoutActivityType: workout, rank: Int(workout.rawValue))
+                    op.delegate = self
+                    op.lastSyncDate = lastSyncDate
+                    self?.queue.addOperations([op], waitUntilFinished: false)
+                }
+            } else {
+                // Fallback on earlier versions
+                for workout in HKWorkoutActivityType.oldAllCases {
+                    let op = WorkoutOperation(date: futureDay, workoutActivityType: workout, rank: Int(workout.rawValue))
+                    op.delegate = self
+                    op.lastSyncDate = lastSyncDate
+                    self?.queue.addOperations([op], waitUntilFinished: false)
+                }
+            }
             
-            let runningOp = WorkoutOperation(date: futureDay, workoutActivityType: .running, rank: 4)
-            runningOp.delegate = self
-            runningOp.lastSyncDate = lastSyncDate
-            
-            let cyclingOp = WorkoutOperation(date: futureDay, workoutActivityType: .cycling, rank: 5)
-            cyclingOp.delegate = self
-            cyclingOp.lastSyncDate = lastSyncDate
-
-            let hiitOp = WorkoutOperation(date: futureDay, workoutActivityType: .highIntensityIntervalTraining, rank: 6)
-            hiitOp.delegate = self
-            hiitOp.lastSyncDate = lastSyncDate
+//            let functionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .functionalStrengthTraining, rank: 2)
+//            functionalStrengthTrainingOp.delegate = self
+//            functionalStrengthTrainingOp.lastSyncDate = lastSyncDate
+//
+//            let traditionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .traditionalStrengthTraining, rank: 3)
+//            traditionalStrengthTrainingOp.delegate = self
+//            traditionalStrengthTrainingOp.lastSyncDate = lastSyncDate
+//
+//            let runningOp = WorkoutOperation(date: futureDay, workoutActivityType: .running, rank: 4)
+//            runningOp.delegate = self
+//            runningOp.lastSyncDate = lastSyncDate
+//
+//            let cyclingOp = WorkoutOperation(date: futureDay, workoutActivityType: .cycling, rank: 5)
+//            cyclingOp.delegate = self
+//            cyclingOp.lastSyncDate = lastSyncDate
+//
+//            let hiitOp = WorkoutOperation(date: futureDay, workoutActivityType: .highIntensityIntervalTraining, rank: 6)
+//            hiitOp.delegate = self
+//            hiitOp.lastSyncDate = lastSyncDate
             
             // Nutrition
             let dietaryEnergyConsumedOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryEnergyConsumed, unit: .kilocalorie(), unitTitle: "calories", rank: 1)
@@ -133,7 +151,7 @@ class HealthKitManager {
             dietarySugarOp.delegate = self
             
             // Setup queue
-            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, activeEnergyOp, functionalStrengthTrainingOp, traditionalStrengthTrainingOp, runningOp, cyclingOp, hiitOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
+            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, activeEnergyOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
             
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in
@@ -197,7 +215,7 @@ class HealthKitManager {
         
         for activity in activities {
             if let activityID = activity.activityID {
-
+                
                 let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
                 activityActions.createNewActivity()
                 

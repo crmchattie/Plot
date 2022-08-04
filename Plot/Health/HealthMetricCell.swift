@@ -172,18 +172,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         case .workout:
             if let hkWorkout = healthMetric.hkSample as? HKWorkout {
                 let workoutActivityType = hkWorkout.workoutActivityType
-                if workoutActivityType == .running {
-                    imageName = "running"
-                }
-                else if workoutActivityType == .cycling {
-                    imageName = "cycling"
-                }
-                else if workoutActivityType == .highIntensityIntervalTraining {
-                    imageName = "jump"
-                }
-                else {
-                    imageName = "dumbell"
-                }
+                imageName = workoutActivityType.image
             }
         case .heartRate:
             imageName = "heart-filled"

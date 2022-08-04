@@ -142,7 +142,7 @@ public extension HKWorkoutActivityType {
         case .other:
             return "Other"
         @unknown default:
-            return "Workout"
+            return "Running"
         }
     }
     
@@ -312,6 +312,175 @@ public extension HKWorkoutActivityType {
             return 0.024
         @unknown default:
             return 0.024
+        }
+    }
+    
+    var image: String {
+        switch self {
+        case .americanFootball:
+            return "americanFootball"
+        case .archery:
+            return "archery"
+        case .australianFootball:
+            return "rugby"
+        case .badminton:
+            return "badminton"
+        case .baseball:
+            return "baseball"
+        case .basketball:
+            return "basketball"
+        case .bowling:
+            return "bowling"
+        case .boxing:
+            return "boxing"
+        case .climbing:
+            return "climbing"
+        case .cricket:
+            return "cricket"
+        case .crossTraining:
+            return "running"
+        case .curling:
+            return "curling"
+        case .cycling:
+            return "cycling"
+        case .dance:
+            return "dance"
+        case .danceInspiredTraining:
+            return "dance"
+        case .elliptical:
+            return "running"
+        case .equestrianSports:
+            return "equestrian"
+        case .fencing:
+            return "fencing"
+        case .fishing:
+            return "fishing"
+        case .functionalStrengthTraining:
+            return "workout"
+        case .golf:
+            return "golf"
+        case .gymnastics:
+            return "gymnastics"
+        case .handball:
+            return "handball"
+        case .hiking:
+            return "hiking"
+        case .hockey:
+            return "hockey"
+        case .hunting:
+            return "hunting"
+        case .lacrosse:
+            return "lacrosse"
+        case .martialArts:
+            return "wrestling"
+        case .mindAndBody:
+            return "mindfulness"
+        case .mixedMetabolicCardioTraining:
+            return "running"
+        case .paddleSports:
+            return "paddle"
+        case .play:
+            return "jump"
+        case .preparationAndRecovery:
+            return "jump"
+        case .racquetball:
+            return "paddle"
+        case .rowing:
+            return "rowing"
+        case .rugby:
+            return "rugby"
+        case .running:
+            return "running"
+        case .sailing:
+            return "sailing"
+        case .skatingSports:
+            return "skating"
+        case .snowSports:
+            return "skiing"
+        case .soccer:
+            return "soccer"
+        case .softball:
+            return "baseball"
+        case .squash:
+            return "paddle"
+        case .stairClimbing:
+            return "stairs"
+        case .surfingSports:
+            return "surfing"
+        case .swimming:
+            return "swimming"
+        case .tableTennis:
+            return "tableTennis"
+        case .tennis:
+            return "tennis"
+        case .trackAndField:
+            return "jump"
+        case .traditionalStrengthTraining:
+            return "workout"
+        case .volleyball:
+            return "volleyball"
+        case .walking:
+            return "walking"
+        case .waterFitness:
+            return "waterFitness"
+        case .waterPolo:
+            return "waterFitness"
+        case .waterSports:
+            return "waterFitness"
+        case .wrestling:
+            return "wrestling"
+        case .yoga:
+            return "mindfulness"
+        case .barre:
+            return "jump"
+        case .coreTraining:
+            return "jump"
+        case .crossCountrySkiing:
+            return "skiing"
+        case .downhillSkiing:
+            return "skiing"
+        case .flexibility:
+            return "mindfulness"
+        case .highIntensityIntervalTraining:
+            return "jump"
+        case .jumpRope:
+            return "jumpRope"
+        case .kickboxing:
+            return "boxing"
+        case .pilates:
+            return "jump"
+        case .snowboarding:
+            return "snowboarding"
+        case .stairs:
+            return "stairs"
+        case .stepTraining:
+            return "jump"
+        case .wheelchairWalkPace:
+            return "wheelchair"
+        case .wheelchairRunPace:
+            return "wheelchair"
+        case .taiChi:
+            return "mindfulness"
+        case .mixedCardio:
+            return "running"
+        case .handCycling:
+            return "jump"
+        case .discSports:
+            return "frisbee"
+        case .fitnessGaming:
+            return "jump"
+        case .cardioDance:
+            return "dance"
+        case .socialDance:
+            return "dance"
+        case .pickleball:
+            return "paddle"
+        case .cooldown:
+            return "jump"
+        case .other:
+            return "jump"
+        @unknown default:
+            return "jump"
         }
     }
     

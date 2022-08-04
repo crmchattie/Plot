@@ -83,20 +83,8 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         if let workout = healthMetric.workout {
             let total = "\(Int(healthMetric.total))"
             subLabel.text = "\(total) \(healthMetric.unitName)"
-            if let type = workout.type {
-                if type == "Running" {
-                    imageName = "running"
-                }
-                else if type == "Cycling" {
-                    imageName = "cycling"
-                }
-                else if type == "High Intensity Interval Training" {
-                    imageName = "jump"
-                }
-                else {
-                    imageName = "dumbell"
-                }
-            }
+            let workoutActivityType = workout.hkWorkoutActivityType
+            imageName = workoutActivityType.image
         } else if let _ = healthMetric.mindfulness {
             let total = TimeInterval(healthMetric.total).stringTimeShort
             subLabel.text = "\(total)"

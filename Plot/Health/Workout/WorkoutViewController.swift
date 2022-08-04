@@ -302,12 +302,10 @@ class WorkoutViewController: FormViewController {
                 row.options = []
                 if #available(iOS 14.0, *) {
                     HKWorkoutActivityType.allCases.forEach {
-                        print($0.name)
                         row.options?.append($0.name)
                     }
                 } else {
                     HKWorkoutActivityType.oldAllCases.forEach {
-                        print($0.name)
                         row.options?.append($0.name)
                     }
                 }

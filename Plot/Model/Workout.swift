@@ -357,9 +357,36 @@ extension Workout {
         // iOS 13
         case "Disc Sports":                 return .discSports
         case "Fitness Gaming":              return .fitnessGaming
-            
-        // Catch-all
-        default:                            return .running
+        case "Cricket":
+            return .cricket
+        case "Cardio Dance":
+            if #available(iOS 14.0, *) {
+                return .cardioDance
+            } else {
+                return .running
+            }
+        case "Social Dance":
+            if #available(iOS 14.0, *) {
+                return .socialDance
+            } else {
+                return .running
+            }
+        case "Pickleball":
+            if #available(iOS 14.0, *) {
+                return .pickleball
+            } else {
+                return .running
+            }
+        case "Cooldown":
+            if #available(iOS 14.0, *) {
+                return .cooldown
+            } else {
+                return .running
+            }
+        case "Other":
+            return .other
+        default:
+            return .running
         }
     }
 }
