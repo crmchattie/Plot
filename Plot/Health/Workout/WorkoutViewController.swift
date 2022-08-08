@@ -19,6 +19,11 @@ protocol UpdateWorkoutDelegate: AnyObject {
 
 class WorkoutViewController: FormViewController {    
     var workout: Workout!
+    var container: Container!
+    var eventList = [Activity]()
+    var purchaseList = [Transaction]()
+    var eventIndex: Int = 0
+    var purchaseIndex: Int = 0
     
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
@@ -28,7 +33,7 @@ class WorkoutViewController: FormViewController {
     
     var userNames : [String] = []
     var userNamesString: String = ""
-        
+    
     fileprivate var productIndex: Int = 0
     
     let numberFormatter = NumberFormatter()
@@ -36,7 +41,7 @@ class WorkoutViewController: FormViewController {
     var timer: Timer?
     var workoutActions: WorkoutActions?
     
-    //added for EventViewController
+    //added for WorkoutViewController
     var movingBackwards: Bool = false
     var active: Bool = false
     var comingFromActivity: Bool = false
@@ -65,7 +70,7 @@ class WorkoutViewController: FormViewController {
         
         if workout != nil {
             title = "Workout"
-
+            
             active = true
             
             var participantCount = self.selectedFalconUsers.count
@@ -96,10 +101,13 @@ class WorkoutViewController: FormViewController {
         setupRightBarButton()
         initializeForm()
         updateLength()
+        setupLists()
         
         if active {
-            for row in form.rows {
-                row.baseCell.isUserInteractionEnabled = false
+            for row in form.allRows {
+                if row.tag != "sections" && row.tag != "schedulefields" && row.tag != "purchasefields" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
+                    row.baseCell.isUserInteractionEnabled = false
+                }
             }
         }
     }
@@ -138,7 +146,7 @@ class WorkoutViewController: FormViewController {
     @objc fileprivate func create() {
         if active {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-
+            
             alert.addAction(UIAlertAction(title: "Update Workout", style: .default, handler: { (_) in
                 print("User click Approve button")
                 
@@ -196,22 +204,51 @@ class WorkoutViewController: FormViewController {
             self.present(alert, animated: true, completion: {
                 print("completion block")
             })
-            
         } else {
-            self.showActivityIndicator()
-            workoutActions = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            workoutActions?.createNewWorkout()
-            self.hideActivityIndicator()
-            self.delegate?.updateWorkout(workout: workout)
-            if navigationItem.leftBarButtonItem != nil {
-                self.dismiss(animated: true, completion: nil)
-            } else {
-                self.navigationController?.popViewController(animated: true)
-                self.updateDiscoverDelegate?.itemCreated()
+            createHealthKit() { hkSampleID in
+                self.showActivityIndicator()
+                self.workout.hkSampleID = hkSampleID
+                let createNewWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createNewWorkout.createNewWorkout()
+                self.hideActivityIndicator()
+                self.delegate?.updateWorkout(workout: self.workout)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                    self.updateDiscoverDelegate?.itemCreated()
+                }
             }
-
         }
         
+    }
+    
+    func createHealthKit(completion: @escaping (String?) -> Void) {
+        var hkSampleID: String?
+        if let hkWorkout = HealthKitSampleBuilder.createHKWorkout(from: workout) {
+            hkSampleID = hkWorkout.uuid.uuidString
+            HealthKitService.storeSample(sample: hkWorkout) { (_, _) in
+                if let hkSampleID = hkSampleID, self.delegate == nil {
+                    self.createActivity(hkSampleID: hkSampleID) {
+                        completion(hkSampleID)
+                    }
+                } else {
+                    completion(hkSampleID)
+                }
+            }
+        }
+    }
+    
+    func createActivity(hkSampleID: String, completion: @escaping () -> Void) {
+        if let activity = ActivityBuilder.createActivity(from: self.workout), let activityID = activity.activityID {
+            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+            activityActions.createNewActivity()
+            
+            //will update activity.containerID and workout.containerID
+            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+            let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: [hkSampleID], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
+        }
     }
     
     @objc func goToExtras() {
@@ -238,239 +275,312 @@ class WorkoutViewController: FormViewController {
     func initializeForm() {
         print("initializing form")
         form +++
-            Section(header: nil, footer: "Calories burned is based on estimates and subject to error as a result")
-            
-            <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.placeholder = $0.tag
-                if active, let workout = workout {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-                    $0.value = workout.name
-                } else {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = false
-                    $0.cell.textField.becomeFirstResponder()
-                }
-            }.onChange() { [unowned self] row in
-                if let rowValue = row.value {
-                    self.workout.name = rowValue
-                }
-                if row.value == nil {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = false
-                } else if self.workout.type != nil {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-            
-            <<< IntRow("Body Weight") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.title = row.tag
-                row.formatter = numberFormatter
-                if let currentUser = Auth.auth().currentUser?.uid {
-                    let weightReference = Database.database().reference().child("users").child(currentUser).child("weight")
-                    weightReference.observe(.value, with: { (snapshot) in
-                        if let weight = snapshot.value as? Int {
-                            row.value = weight
-                            row.updateCell()
-                        }
-                    })
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange({ row in
-                self.updateCalories()
-                if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
-                    Database.database().reference().child("users").child(currentUser).child("weight").setValue(value)
-                }
-            })
-            
-            <<< PushRow<String>("Type") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.title = row.tag
-                row.value = workout.type?.capitalized
-                row.options = []
-                if #available(iOS 14.0, *) {
-                    HKWorkoutActivityType.allCases.forEach {
-                        row.options?.append($0.name)
-                    }
-                } else {
-                    HKWorkoutActivityType.oldAllCases.forEach {
-                        row.options?.append($0.name)
-                    }
-                }
-            }.onPresent { from, to in
-                to.title = "Type"
-                to.tableViewStyle = .insetGrouped
-                to.enableDeselection = false
-                to.selectableRowCellUpdate = { cell, row in
-                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }.onChange({ row in
-                self.workout.type = row.value
-                self.updateCalories()
-                if row.value == nil {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = false
-                } else if self.workout.name != "WorkoutName" {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-                }
-            })
-            
-            <<< DecimalRow("Calories Burned") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.formatter = numberFormatter
-                if let calories = workout.totalEnergyBurned {
-                    $0.value = calories
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-            
-            <<< DateTimeInlineRow("Starts") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.dateFormatter?.dateStyle = .medium
-                $0.dateFormatter?.timeStyle = .short
-                if self.active {
-                    $0.value = self.workout!.startDateTime
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.workout.startDateTime = $0.value
-                }
-            }.onChange { [weak self] row in
-                let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
-                if row.value?.compare(endRow.value!) == .orderedDescending {
-                    endRow.value = Date(timeInterval: 0, since: row.value!)
-                    endRow.updateCell()
-                }
-                self!.updateLength()
-                self!.workout.startDateTime = row.value
-            }.onExpandInlineRow { cell, row, inlineRow in
-                inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.datePicker.datePickerMode = .dateAndTime
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
-                    }
-                }
-                let color = cell.detailTextLabel?.textColor
-                row.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = color
-                }
-                cell.detailTextLabel?.textColor = cell.tintColor
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                
-            }
-            
-            <<< DateTimeInlineRow("Ends"){
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.dateFormatter?.dateStyle = .medium
-                $0.dateFormatter?.timeStyle = .short
-                if self.active {
-                    $0.value = self.workout!.endDateTime
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.workout.endDateTime = $0.value
-                }
-            }.onChange { [weak self] row in
-                let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
-                if row.value?.compare(startRow.value!) == .orderedAscending {
-                    startRow.value = Date(timeInterval: 0, since: row.value!)
-                    startRow.updateCell()
-                }
-                self!.updateLength()
-                self!.workout.endDateTime = row.value
-            }.onExpandInlineRow { cell, row, inlineRow in
-                inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.datePicker.datePickerMode = .dateAndTime
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
-                    }
-                }
-                let color = cell.detailTextLabel?.textColor
-                row.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = color
-                }
-                cell.detailTextLabel?.textColor = cell.tintColor
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                
-            }
+        Section()
+        //"Calories burned is based on estimates and subject to error as a result"
         
-            <<< TextRow("Length") {
-                $0.cell.isUserInteractionEnabled = false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-            }.cellUpdate { cell, row in
+        <<< TextRow("Name") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.placeholder = $0.tag
+            if active, let workout = workout {
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+                $0.value = workout.name
+            } else {
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
+                $0.cell.textField.becomeFirstResponder()
+            }
+        }.onChange() { [unowned self] row in
+            if let rowValue = row.value {
+                self.workout.name = rowValue
+            }
+            if row.value == nil {
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
+            } else if self.workout.type != nil {
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+        }
+        
+        <<< IntRow("Body Weight") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.title = row.tag
+            row.formatter = numberFormatter
+            if let currentUser = Auth.auth().currentUser?.uid {
+                let weightReference = Database.database().reference().child("users").child(currentUser).child("weight")
+                weightReference.observe(.value, with: { (snapshot) in
+                    if let weight = snapshot.value as? Int {
+                        row.value = weight
+                        row.updateCell()
+                    }
+                })
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        }.onChange({ row in
+            self.updateCalories()
+            if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
+                Database.database().reference().child("users").child(currentUser).child("weight").setValue(value)
+            }
+        })
+        
+        <<< PushRow<String>("Type") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.title = row.tag
+            row.value = workout.type?.capitalized
+            row.options = []
+            if #available(iOS 14.0, *) {
+                HKWorkoutActivityType.allCases.forEach {
+                    row.options?.append($0.name)
+                }
+            } else {
+                HKWorkoutActivityType.oldAllCases.forEach {
+                    row.options?.append($0.name)
+                }
+            }
+        }.onPresent { from, to in
+            to.title = "Type"
+            to.tableViewStyle = .insetGrouped
+            to.enableDeselection = false
+            to.selectableRowCellUpdate = { cell, row in
+                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                to.tableView.separatorStyle = .none
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange({ _ in
-                self.updateCalories()
-            })
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }.onChange({ row in
+            self.workout.type = row.value
+            self.updateCalories()
+            if row.value == nil {
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
+            } else if self.workout.name != "WorkoutName" {
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            }
+        })
+        
+        <<< DecimalRow("Calories Burned") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.title = $0.tag
+            $0.formatter = numberFormatter
+            if let calories = workout.totalEnergyBurned {
+                $0.value = calories
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        }
+        
+        <<< DateTimeInlineRow("Starts") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.title = $0.tag
+            $0.dateFormatter?.dateStyle = .medium
+            $0.dateFormatter?.timeStyle = .short
+            if self.active {
+                $0.value = self.workout!.startDateTime
+            } else {
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                $0.value = rounded
+                self.workout.startDateTime = $0.value
+            }
+        }.onChange { [weak self] row in
+            let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
+            if row.value?.compare(endRow.value!) == .orderedDescending {
+                endRow.value = Date(timeInterval: 0, since: row.value!)
+                endRow.updateCell()
+            }
+            self!.updateLength()
+            self!.workout.startDateTime = row.value
+        }.onExpandInlineRow { cell, row, inlineRow in
+            inlineRow.cellUpdate() { cell, row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.datePicker.datePickerMode = .dateAndTime
+                if #available(iOS 13.4, *) {
+                    cell.datePicker.preferredDatePickerStyle = .wheels
+                }
+            }
+            let color = cell.detailTextLabel?.textColor
+            row.onCollapseInlineRow { cell, _, _ in
+                cell.detailTextLabel?.textColor = color
+            }
+            cell.detailTextLabel?.textColor = cell.tintColor
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             
-//            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.title = row.tag
-//                if active {
-//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.title = self.userNamesString
-//                }
-//            }.onCellSelection({ _,_ in
-//                self.openParticipantsInviter()
-//            }).cellUpdate { cell, row in
-//                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                cell.textLabel?.textAlignment = .left
-//                if row.title == "Participants" {
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                } else {
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                }
-//            }
+        }
+        
+        <<< DateTimeInlineRow("Ends"){
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.title = $0.tag
+            $0.dateFormatter?.dateStyle = .medium
+            $0.dateFormatter?.timeStyle = .short
+            if self.active {
+                $0.value = self.workout!.endDateTime
+            } else {
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                $0.value = rounded
+                self.workout.endDateTime = $0.value
+            }
+        }.onChange { [weak self] row in
+            let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
+            if row.value?.compare(startRow.value!) == .orderedAscending {
+                startRow.value = Date(timeInterval: 0, since: row.value!)
+                startRow.updateCell()
+            }
+            self!.updateLength()
+            self!.workout.endDateTime = row.value
+        }.onExpandInlineRow { cell, row, inlineRow in
+            inlineRow.cellUpdate() { cell, row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.datePicker.datePickerMode = .dateAndTime
+                if #available(iOS 13.4, *) {
+                    cell.datePicker.preferredDatePickerStyle = .wheels
+                }
+            }
+            let color = cell.detailTextLabel?.textColor
+            row.onCollapseInlineRow { cell, _, _ in
+                cell.detailTextLabel?.textColor = color
+            }
+            cell.detailTextLabel?.textColor = cell.tintColor
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            
+        }
+        
+        <<< TextRow("Length") {
+            $0.cell.isUserInteractionEnabled = false
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.title = $0.tag
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        }.onChange({ _ in
+            self.updateCalories()
+        })
+        
+        //            <<< ButtonRow("Participants") { row in
+        //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                row.cell.textLabel?.textAlignment = .left
+        //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                row.cell.accessoryType = .disclosureIndicator
+        //                row.title = row.tag
+        //                if active {
+        //                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                    row.title = self.userNamesString
+        //                }
+        //            }.onCellSelection({ _,_ in
+        //                self.openParticipantsInviter()
+        //            }).cellUpdate { cell, row in
+        //                cell.accessoryType = .disclosureIndicator
+        //                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                cell.textLabel?.textAlignment = .left
+        //                if row.title == "Participants" {
+        //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                } else {
+        //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                }
+        //            }
+        
+        if delegate == nil {
+            form.last!
+            <<< SegmentedRow<String>("sections"){
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    if #available(iOS 13.0, *) {
+                        $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+                    } else {
+                        // Fallback on earlier versions
+                    }
+                    $0.options = ["Event", "Transactions"]
+                    $0.value = "Event"
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }
+
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Event",
+                                   footer: "Connect an event") {
+                                    $0.tag = "schedulefields"
+                                    $0.hidden = "!$sections == 'Event'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow("scheduleButton"){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Event"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                            }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.eventIndex = index
+                                        self.openEvent()
+                                        return ScheduleRow("label"){
+                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        }
+                                    }
+
+                                }
+
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Transactions",
+                                   footer: "Connect a transaction") {
+                                    $0.tag = "purchasefields"
+                                    $0.hidden = "$sections != 'Transactions'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow("transactionButton"){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Transaction"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                        }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.purchaseIndex = index
+                                        self.openTransaction()
+                                        return PurchaseRow()
+                                            .onCellSelection() { cell, row in
+                                                self.purchaseIndex = index
+                                                self.openTransaction()
+                                                cell.cellResignFirstResponder()
+                                        }
+
+                                    }
+                }
+        }
     }
     
     fileprivate func updateLength() {
@@ -516,7 +626,7 @@ class WorkoutViewController: FormViewController {
         var uniqueUsers = users
         for participant in selectedFalconUsers {
             if let userIndex = users.firstIndex(where: { (user) -> Bool in
-                                                    return user.id == participant.id }) {
+                return user.id == participant.id }) {
                 uniqueUsers[userIndex] = participant
             } else {
                 uniqueUsers.append(participant)

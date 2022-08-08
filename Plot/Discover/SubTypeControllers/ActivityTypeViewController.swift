@@ -19,7 +19,7 @@ protocol UpdateListDelegate: AnyObject {
 
 class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, CLLocationManagerDelegate {
     
-    weak var delegate : UpdateScheduleDelegate?
+    weak var delegate : UpdateActivityDelegate?
     weak var listDelegate : UpdateListDelegate?
     
     fileprivate var reference: DatabaseReference!
@@ -175,7 +175,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         
         if movingBackwards && navigationController?.visibleViewController is EventViewController {
             let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
-            delegate?.updateSchedule(schedule: activity)
+            delegate?.updateActivity(activity: activity)
         } else if movingBackwards && activeList && navigationController?.visibleViewController is ActivitylistViewController {
             self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: nil, activityType: nil)
         }
@@ -642,16 +642,9 @@ extension ActivityTypeViewController: CompositionalHeaderDelegate {
     }
 }
 
-extension ActivityTypeViewController: UpdateScheduleDelegate {
-    func updateSchedule(schedule: Activity) {
-        delegate?.updateSchedule(schedule: schedule)
-    }
-    func updateIngredients(recipe: Recipe?, recipeID: String?) {
-        if let recipeID = recipeID {
-            self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
-        } else if let recipe = recipe {
-            self.delegate?.updateIngredients(recipe: recipe, recipeID: nil)
-        }
+extension ActivityTypeViewController: UpdateActivityDelegate {
+    func updateActivity(activity: Activity) {
+        delegate?.updateActivity(activity: activity)
     }
 }
 
@@ -713,197 +706,6 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 let activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
                 activity = Activity(dictionary: ["activityID": activityID as AnyObject])
             }
-        }
-        if let recipe = type as? Recipe {
-            activity.name = recipe.title
-            activity.recipeID = "\(recipe.id)"
-            activity.activityType = section?.image
-            if schedule, let umbrellaActivity = umbrellaActivity {
-                if let startDate = umbrellaActivity.startDateTime {
-                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
-                    endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    startDateTime = rounded.addingTimeInterval(seconds)
-                    endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
-                }
-                if let localName = umbrellaActivity.locationName, localName != "locationName", let localAddress = umbrellaActivity.locationAddress {
-                    activity.locationName = localName
-                    activity.locationAddress = localAddress
-                }
-            } else if !schedule {
-                let original = Date()
-                let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                let timezone = TimeZone.current
-                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                startDateTime = rounded.addingTimeInterval(seconds)
-                endDateTime = startDateTime!.addingTimeInterval(Double(recipe.readyInMinutes ?? 0) * 60)
-            }
-            activity.allDay = false
-            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
-            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
-        } else if let workout = type as? PreBuiltWorkout {
-            activity.name = workout.title
-            activity.activityType = section?.image
-            activity.workoutID = "\(workout.identifier)"
-            if schedule, let umbrellaActivity = umbrellaActivity {
-                if let startDate = umbrellaActivity.startDateTime {
-                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
-                    if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
-                        endDateTime = startDateTime!.addingTimeInterval(duration * 60)
-                    } else {
-                        endDateTime = startDateTime
-                    }
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    startDateTime = rounded.addingTimeInterval(seconds)
-                    if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
-                        endDateTime = startDateTime!.addingTimeInterval(duration * 60)
-                    } else {
-                        endDateTime = startDateTime!
-                    }
-                }
-                if let localName = umbrellaActivity.locationName, localName != "locationName", let localAddress = umbrellaActivity.locationAddress {
-                    activity.locationName = localName
-                    activity.locationAddress = localAddress
-                }
-            } else if !schedule {
-                let original = Date()
-                let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                let timezone = TimeZone.current
-                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                startDateTime = rounded.addingTimeInterval(seconds)
-                if let workoutDuration = workout.workoutDuration, let duration = Double(workoutDuration) {
-                    endDateTime = startDateTime!.addingTimeInterval(duration * 60)
-                } else {
-                    endDateTime = startDateTime!
-                }
-            }
-            activity.allDay = false
-            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
-            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
-        } else if let event = type as? Event {
-            activity.name = event.name
-            activity.activityType = section?.image
-            activity.eventID = "\(event.id)"
-            if schedule, let umbrellaActivity = umbrellaActivity {
-                if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
-                    startDateTime = date
-                    endDateTime = date
-                } else if let startDate = umbrellaActivity.startDateTime {
-                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
-                    endDateTime = startDateTime
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    startDateTime = rounded.addingTimeInterval(seconds)
-                    endDateTime = startDateTime
-                }
-            } else if !schedule {
-                if let startDate = event.dates?.start?.dateTime, let date = startDate.toDate() {
-                    startDateTime = date
-                    endDateTime = date
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    startDateTime = rounded.addingTimeInterval(seconds)
-                    endDateTime = startDateTime
-                }
-            }
-            activity.allDay = false
-            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
-            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
-            if let locationName = event.embedded?.venues?[0].address?.line1, let latitude = event.embedded?.venues?[0].location?.latitude, let longitude = event.embedded?.venues?[0].location?.longitude {
-                let newLocationName = locationName.removeCharacters()
-                activity.locationName = newLocationName
-                activity.locationAddress = [newLocationName: [Double(latitude)!, Double(longitude)!]]
-            }
-        } else if let attraction = type as? Attraction {
-            activity.name = attraction.name
-        } else if let place = type as? FSVenue {
-            activity.name = place.name
-            activity.activityType = section?.image
-            activity.placeID = "\(place.id)"
-            if schedule, let umbrellaActivity = umbrellaActivity {
-                if let startDate = umbrellaActivity.startDateTime {
-                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
-                    endDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    startDateTime = rounded.addingTimeInterval(seconds)
-                    endDateTime = rounded.addingTimeInterval(seconds)
-                }
-            } else if !schedule {
-                let original = Date()
-                let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                let timezone = TimeZone.current
-                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                startDateTime = rounded.addingTimeInterval(seconds)
-                endDateTime = rounded.addingTimeInterval(seconds)
-            }
-            if let locationName = place.location?.address, let latitude = place.location?.lat, let longitude = place.location?.lng {
-                let newLocationName = locationName.removeCharacters()
-                activity.locationName = newLocationName
-                activity.locationAddress = [newLocationName: [latitude, longitude]]
-            }
-            activity.allDay = false
-            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
-            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
-        } else if let groupItem = type as? GroupItem, let place = groupItem.venue {
-            activity.name = place.name
-            activity.activityType = section?.image
-            activity.placeID = "\(place.id)"
-            if schedule, let umbrellaActivity = umbrellaActivity {
-                if let startDate = umbrellaActivity.startDateTime {
-                    startDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
-                    endDateTime = Date(timeIntervalSince1970: startDate as! TimeInterval)
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    let timezone = TimeZone.current
-                    let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                    startDateTime = rounded.addingTimeInterval(seconds)
-                    endDateTime = rounded.addingTimeInterval(seconds)
-                }
-            } else if !schedule {
-                let original = Date()
-                let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                let timezone = TimeZone.current
-                let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-                startDateTime = rounded.addingTimeInterval(seconds)
-                endDateTime = rounded.addingTimeInterval(seconds)
-            }
-            if let locationName = place.location?.address, let latitude = place.location?.lat, let longitude = place.location?.lng {
-                let newLocationName = locationName.removeCharacters()
-                activity.locationName = newLocationName
-                activity.locationAddress = [newLocationName: [latitude, longitude]]
-            }
-            activity.allDay = false
-            activity.startDateTime = NSNumber(value: Int((startDateTime!).timeIntervalSince1970))
-            activity.endDateTime = NSNumber(value: Int((endDateTime!).timeIntervalSince1970))
         } else {
             return
         }
@@ -914,12 +716,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Schedule", style: .default, handler: { (_) in
                 print("User click Approve button")
                 self.movingBackwards = false
-
-                self.delegate?.updateSchedule(schedule: self.activity)
-                if let recipeID = self.activity.recipeID {
-                    self.delegate?.updateIngredients(recipe: nil, recipeID: recipeID)
-                }
-                
+                self.delegate?.updateActivity(activity: self.activity)
                 self.actAddAlert()
                 self.removeActAddAlert()
             }))
@@ -1165,41 +962,6 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let activity = activity {
             let dispatchGroup = DispatchGroup()
-            if mergeActivity.recipeID != nil || mergeActivity.workoutID != nil || mergeActivity.eventID != nil || mergeActivity.placeID != nil {
-                if let currentUserID = Auth.auth().currentUser?.uid {
-                    let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
-                    let newActivity = mergeActivity.copy() as! Activity
-                    newActivity.activityID = newActivityID
-                    newActivity.recipeID = nil
-                    newActivity.workoutID = nil
-                    newActivity.eventID = nil
-                    newActivity.placeID = nil
-                    
-                    mergeActivity.participantsIDs = newActivity.participantsIDs
-                    activity.participantsIDs = newActivity.participantsIDs
-                    
-//                    let scheduleList = [mergeActivity, activity]
-//                    newActivity.schedule = scheduleList
-//
-                    self.showActivityIndicator()
-                    
-                    // need to delete merge activity
-                    dispatchGroup.enter()
-                    self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-                        let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
-                        deleteActivity.deleteActivity()
-                        dispatchGroup.leave()
-                    }
-                    
-                    dispatchGroup.enter()
-                    self.getSelectedFalconUsers(forActivity: newActivity) { (participants) in
-                        let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: participants)
-                        createActivity.createNewActivity()
-                        self.hideActivityIndicator()
-                        dispatchGroup.leave()
-                    }
-                }
-            } else {
 //                if mergeActivity.schedule != nil {
 //                    var scheduleList = mergeActivity.schedule!
 //                    scheduleList.append(activity)
@@ -1208,15 +970,14 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
 //                    let scheduleList = [activity]
 //                    mergeActivity.schedule = scheduleList
 //                }
-//                
-                dispatchGroup.enter()
-                self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-                    self.showActivityIndicator()
-                    let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
-                    createActivity.createNewActivity()
-                    self.hideActivityIndicator()
-                    dispatchGroup.leave()
-                }
+//
+            dispatchGroup.enter()
+            self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
+                self.showActivityIndicator()
+                let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
+                createActivity.createNewActivity()
+                self.hideActivityIndicator()
+                dispatchGroup.leave()
             }
             
             dispatchGroup.notify(queue: .main) {

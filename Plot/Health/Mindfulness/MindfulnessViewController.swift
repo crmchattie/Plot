@@ -11,6 +11,7 @@ import Eureka
 import SplitRow
 import Firebase
 import CodableFirebase
+import HealthKit
 
 protocol UpdateMindfulnessDelegate: AnyObject {
     func updateMindfulness(mindfulness: Mindfulness)
@@ -199,18 +200,51 @@ class MindfulnessViewController: FormViewController {
             })
             
         } else {
-            self.showActivityIndicator()
-            let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createMindfulness.createNewMindfulness()
-            self.hideActivityIndicator()
-            self.delegate?.updateMindfulness(mindfulness: mindfulness)
-            if navigationItem.leftBarButtonItem != nil {
-                self.dismiss(animated: true, completion: nil)
-            } else {
-                self.navigationController?.popViewController(animated: true)
-                self.updateDiscoverDelegate?.itemCreated()
+            createHealthKit() { hkSampleID in
+                self.showActivityIndicator()
+                self.mindfulness.hkSampleID = hkSampleID
+                let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createMindfulness.createNewMindfulness()
+                self.hideActivityIndicator()
+                self.delegate?.updateMindfulness(mindfulness: self.mindfulness)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                    self.updateDiscoverDelegate?.itemCreated()
+                }
             }
-
+        }
+    }
+    
+    func createHealthKit(completion: @escaping (String?) -> Void) {
+        var hkSampleID: String?
+        if let hkMindfulness = HealthKitSampleBuilder.createHKMindfulness(from: mindfulness) {
+            hkSampleID = hkMindfulness.uuid.uuidString
+            HealthKitService.storeSample(sample: hkMindfulness) { (_, _) in
+                if let hkSampleID = hkSampleID, self.delegate == nil {
+                    self.createActivity(hkSampleID: hkSampleID) {
+                        completion(hkSampleID)
+                    }
+                } else {
+                    completion(hkSampleID)
+                }
+            }
+        }
+    }
+    
+    func createActivity(hkSampleID: String, completion: @escaping () -> Void) {
+        if let activity = ActivityBuilder.createActivity(from: self.mindfulness), let activityID = activity.activityID {
+            
+            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+            activityActions.createNewActivity()
+            
+            
+            //will update activity.containerID and mindfulness.containerID
+            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+            let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: nil, mindfulnessIDs: [hkSampleID], mealIDs: nil, transactionIDs: nil)
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
+            
         }
     }
     

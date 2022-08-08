@@ -143,18 +143,18 @@ extension EventViewController: UpdateTimeZoneDelegate {
     }
 }
 
-extension EventViewController: UpdateScheduleDelegate {
-    func updateSchedule(schedule: Activity) {
-        if let _ = schedule.name {
+extension EventViewController: UpdateActivityDelegate {
+    func updateActivity(activity: Activity) {
+        if let _ = activity.name {
             if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
                 let scheduleRow = mvs.allRows[scheduleIndex]
-                scheduleRow.baseValue = schedule
+                scheduleRow.baseValue = activity
                 scheduleRow.reload()
-                scheduleList[scheduleIndex] = schedule
+                scheduleList[scheduleIndex] = activity
             } else {
                 var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
-                    $0.value = schedule
+                    $0.value = activity
                     }.onCellSelection() { cell, row in
                         self.scheduleIndex = row.indexPath!.row
                         self.openSchedule()
@@ -162,27 +162,20 @@ extension EventViewController: UpdateScheduleDelegate {
                 }, at: mvs.count - 1)
                 
                 Analytics.logEvent("new_schedule", parameters: [
-                    "schedule_name": schedule.name ?? "name" as NSObject,
-                    "schedule_type": schedule.activityType ?? "basic" as NSObject
+                    "schedule_name": activity.name ?? "name" as NSObject,
+                    "schedule_type": activity.activityType ?? "basic" as NSObject
                 ])
-                scheduleList.append(schedule)
+                scheduleList.append(activity)
             }
             
             sortSchedule()
-            if let localAddress = schedule.locationAddress {
+            if let localAddress = activity.locationAddress {
                 for (key, value) in localAddress {
                     locationAddress[key] = value
                 }
             }
             updateLists(type: "schedule")
         }
-    }
-    func updateIngredients(recipe: Recipe?, recipeID: String?) {
-//        if let recipe = recipe {
-//            updateGrocerylist(recipe: recipe, add: true)
-//        } else if let recipeID = recipeID {
-//            lookupRecipe(recipeID: Int(recipeID)!, add: true)
-//        }
     }
 }
 
@@ -280,7 +273,7 @@ extension EventViewController: UpdateTransactionDelegate {
             } else {
                 purchaseList.append(transaction)
             }
-            updateLists(type: "purchases")
+            updateLists(type: "container")
         }
         else if mvs.allRows.count - 1 > purchaseIndex {
             mvs.remove(at: purchaseIndex)
@@ -311,7 +304,7 @@ extension EventViewController: ChooseTransactionDelegate {
             } else {
                 purchaseList.append(transaction)
             }
-            updateLists(type: "purchases")
+            updateLists(type: "container")
         }
         else if mvs.allRows.count - 1 > purchaseIndex {
             mvs.remove(at: purchaseIndex)
@@ -344,7 +337,7 @@ extension EventViewController: UpdateWorkoutDelegate {
                 row.baseValue = healthList[healthIndex]
                 row.updateCell()
             }
-            updateLists(type: "health")
+            updateLists(type: "container")
         }
         else if mvs.allRows.count - 1 > healthIndex {
             mvs.remove(at: healthIndex)
@@ -376,7 +369,7 @@ extension EventViewController: UpdateMindfulnessDelegate {
                 row.baseValue = healthList[healthIndex]
                 row.updateCell()
             }
-            updateLists(type: "health")
+            updateLists(type: "container")
         }
         else if mvs.allRows.count - 1 > healthIndex {
             mvs.remove(at: healthIndex)

@@ -25,6 +25,8 @@ class EventViewController: FormViewController {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
+    weak var delegate : UpdateActivityDelegate?
+    
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -51,6 +53,7 @@ class EventViewController: FormViewController {
     var locationName : String = "locationName"
     var locationAddress = [String : [Double]]()
     var scheduleList = [Activity]()
+    var container: Container!
     var purchaseList = [Transaction]()
     var purchaseDict = [User: Double]()
     var listList = [ListContainer]()
@@ -67,7 +70,6 @@ class EventViewController: FormViewController {
     var thumbnailImage: String = ""
     var segmentRowValue: String = "Schedule"
     var activityID = String()
-    let dispatchGroup = DispatchGroup()
     let informationMessageSender = InformationMessageSender()
     // Participants with accepted invites
     var acceptedParticipant: [User] = []
@@ -76,7 +78,6 @@ class EventViewController: FormViewController {
     fileprivate var reminderDate: Date?
     
     var active = false
-    var sentActivity = false
     
     weak var updateDiscoverDelegate : UpdateDiscover?
     
@@ -97,7 +98,6 @@ class EventViewController: FormViewController {
         
         setupMainView()
         
-        
         if activity != nil {
             title = "Event"
             active = true
@@ -115,7 +115,6 @@ class EventViewController: FormViewController {
 //                self.weatherRow()
             }
             setupLists()
-            setupRightBarButton(with: "Update")
             resetBadgeForSelf()
         } else {
             title = "New Event"
@@ -127,10 +126,10 @@ class EventViewController: FormViewController {
                 let rounded = Date(timeIntervalSinceReferenceDate:
                 (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 activity = Activity(activityID: activityID, admin: currentUserID, calendarID: defaultCalendar?.id ?? "", calendarName: defaultCalendar?.name ?? "", calendarColor: defaultCalendar?.color ?? "", calendarSource: defaultCalendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier)
-                setupRightBarButton(with: "Create")
             }
         }
         
+        setupRightBarButton()
         initializeForm()
         
         var participantCount = self.acceptedParticipant.count
@@ -193,16 +192,18 @@ class EventViewController: FormViewController {
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
     }
     
-    func setupRightBarButton(with title: String) {
-        if title == "Create" || sentActivity {
+    func setupRightBarButton() {
+        if !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
             navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = false
-            
             if navigationItem.leftBarButtonItem != nil {
                 navigationItem.leftBarButtonItem?.action = #selector(cancel)
             }
-            
+        } else if delegate != nil {
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
+            navigationItem.rightBarButtonItem = plusBarButton
+            navigationItem.rightBarButtonItem?.isEnabled = true
         } else {
             let dotsImage = UIImage(named: "dots")
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
@@ -787,32 +788,60 @@ class EventViewController: FormViewController {
 //                        reference.removeValue()
 //                    }
 //                }
+        
+        if delegate == nil {
+            form.last!
+            <<< SegmentedRow<String>("sections"){
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.hidden = "$showExtras == false"
+                    if #available(iOS 13.0, *) {
+                        $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+                    } else {
+                        // Fallback on earlier versions
+                    }
+                    $0.options = ["Schedule", "Health", "Transactions"]
+                    $0.value = "Schedule"
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }
 
-        <<< SegmentedRow<String>("sections"){
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.hidden = "$showExtras == false"
-                if #available(iOS 13.0, *) {
-                    $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-                } else {
-                    // Fallback on earlier versions
-                }
-                $0.options = ["Schedule", "Health", "Transactions"]
-                $0.value = "Schedule"
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Schedule",
+                                   footer: "Add a sub-event to the schedule") {
+                                    $0.tag = "schedulefields"
+                                    $0.hidden = "!$sections == 'Schedule'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow(){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Add Sub-event"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                            }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.scheduleIndex = index
+                                        self.openSchedule()
+                                        return ScheduleRow("label"){
+                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        }
+                                    }
+
+                                }
 
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Schedule",
-                               footer: "Add an activity to the schedule") {
-                                $0.tag = "schedulefields"
-                                $0.hidden = "!$sections == 'Schedule'"
+                               header: "Health",
+                               footer: "Connect a workout and/or mindfulness session") {
+                                $0.tag = "healthfields"
+                                $0.hidden = "$sections != 'Health'"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                        $0.title = "Add Activity Item"
+                                        $0.title = "Connect Health"
                                         }.cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                             cell.textLabel?.textAlignment = .left
@@ -820,73 +849,48 @@ class EventViewController: FormViewController {
                                         }
                                 }
                                 $0.multivaluedRowToInsertAt = { index in
-                                    self.scheduleIndex = index
-                                    self.openSchedule()
-                                    return ScheduleRow("label"){
-                                        $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
-                                    }
-                                }
-
-                            }
-
-    form +++
-        MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                           header: "Health",
-                           footer: "Add a workout and/or mindfulness session") {
-                            $0.tag = "healthfields"
-                            $0.hidden = "$sections != 'Health'"
-                            $0.addButtonProvider = { section in
-                                return ButtonRow(){
-                                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                    $0.title = "Add Health Item"
-                                    }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                        cell.textLabel?.textAlignment = .left
-                                        cell.height = { 60 }
-                                    }
-                            }
-                            $0.multivaluedRowToInsertAt = { index in
-                                self.healthIndex = index
-                                self.openHealth()
-                                return HealthRow()
-                                    .onCellSelection() { cell, row in
-                                        self.healthIndex = index
-                                        self.openHealth()
-                                        cell.cellResignFirstResponder()
-                                }
-
-                            }
-
-    }
-
-        form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Transactions",
-                               footer: "Add a transaction") {
-                                $0.tag = "purchasefields"
-                                $0.hidden = "$sections != 'Transactions'"
-                                $0.addButtonProvider = { section in
-                                    return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                        $0.title = "Add Transaction Item"
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                            cell.textLabel?.textAlignment = .left
-                                            cell.height = { 60 }
-                                    }
-                                }
-                                $0.multivaluedRowToInsertAt = { index in
-                                    self.purchaseIndex = index
-                                    self.openPurchases()
-                                    return PurchaseRow()
+                                    self.healthIndex = index
+                                    self.openHealth()
+                                    return HealthRow()
                                         .onCellSelection() { cell, row in
-                                            self.purchaseIndex = index
-                                            self.openPurchases()
+                                            self.healthIndex = index
+                                            self.openHealth()
                                             cell.cellResignFirstResponder()
                                     }
 
                                 }
-            }
+
+        }
+
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Transactions",
+                                   footer: "Connect a transaction") {
+                                    $0.tag = "purchasefields"
+                                    $0.hidden = "$sections != 'Transactions'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow(){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Transaction"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                        }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.purchaseIndex = index
+                                        self.openPurchases()
+                                        return PurchaseRow()
+                                            .onCellSelection() { cell, row in
+                                                self.purchaseIndex = index
+                                                self.openPurchases()
+                                                cell.cellResignFirstResponder()
+                                        }
+
+                                    }
+                }
+        }
 
 //                                    form +++
 //                                        Section(header: "Balances",

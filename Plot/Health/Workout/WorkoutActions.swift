@@ -84,30 +84,8 @@ class WorkoutActions: NSObject {
             Analytics.logEvent("new_workout", parameters: [String: Any]())
             dispatchGroup.enter()
             connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
-            createActivityAndUpdateHealthKit()
         } else {
             Analytics.logEvent("update_workout", parameters: [String: Any]())
-        }
-    }
-    
-    private func createActivityAndUpdateHealthKit() {
-        // Update healthKit
-        var hkSampleID: String?
-        if let hkWorkout = HealthKitSampleBuilder.createHKWorkout(from: workout) {
-            hkSampleID = hkWorkout.uuid.uuidString
-            HealthKitService.storeSample(sample: hkWorkout) { (_, _) in
-                if let activity = ActivityBuilder.createActivity(from: self.workout), let hkSampleID = hkSampleID {
-                    activity.hkSampleID = [hkSampleID]
-                    let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-                    activityActions.createNewActivity()
-                    
-                    // Update that the activity is created for workout/hkworkout
-                    if let currentUserId = Auth.auth().currentUser?.uid, let activityID = activity.activityID {
-                        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
-                        healthkitWorkoutsReference.setValue(activityID)
-                    }
-                }
-            }
         }
     }
     

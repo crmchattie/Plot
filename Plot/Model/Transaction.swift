@@ -91,9 +91,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var splitNumber: Int?
     var transactionDescription: String?
     var transactionIDs: [String]?
-    var mealID: String?
-    var workoutID: String?
-    var mindfulnessID: String?
+    var containerID: String?
     var cash_flow_type: String {
         if type == "CREDIT" {
             return "Inflow"

@@ -15,14 +15,13 @@ import EventKit
 import CodableFirebase
 
 
-protocol UpdateScheduleDelegate: AnyObject {
-    func updateSchedule(schedule: Activity)
-    func updateIngredients(recipe: Recipe?, recipeID: String?)
+protocol UpdateActivityDelegate: AnyObject {
+    func updateActivity(activity: Activity)
 }
 
 class ScheduleViewController: FormViewController {
     
-    weak var delegate : UpdateScheduleDelegate?
+    weak var delegate : UpdateActivityDelegate?
     
     var schedule: Activity!
     
@@ -616,7 +615,7 @@ class ScheduleViewController: FormViewController {
         let createActivity = ActivityActions(activity: schedule, active: false, selectedFalconUsers: [])
         createActivity.createSchedule()
         
-        delegate?.updateSchedule(schedule: schedule)
+        delegate?.updateActivity(activity: schedule)
         
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)

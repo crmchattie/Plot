@@ -39,7 +39,7 @@ class MindfulnessOperation: AsyncOperation {
                     existingWorkoutKeys = dataSnapshotValue
                 }
                 
-                var activities: [Activity] = []
+                var containers: [Container] = []
                 var startDay = startDate.dayBefore
                 var interval = NSDateInterval(start: startDay, duration: 86400)
                 var map: [Date: Double] = [:]
@@ -71,8 +71,14 @@ class MindfulnessOperation: AsyncOperation {
                         activity.endTimeZone = TimeZone.current.identifier
 
                         activity.allDay = false
-                        activity.hkSampleID = [sample.uuid.uuidString]
-                        activities.append(activity)
+                        let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                        activity.containerID = containerID
+                        
+                        let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                        activityActions.createNewActivity()
+                        
+                        let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: nil, mindfulnessIDs: [sample.uuid.uuidString], mealIDs: nil, transactionIDs: nil)
+                        containers.append(container)
                     }
                 }
                 
@@ -84,7 +90,7 @@ class MindfulnessOperation: AsyncOperation {
                     metric.hkSample = samples.last
                     metric.average = average
 
-                    _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue, activities)
+                    _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue, containers)
                     
                 }
             }

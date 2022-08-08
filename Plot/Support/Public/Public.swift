@@ -1737,10 +1737,11 @@ extension TimeInterval {
     
     var stringTimeShort: String {
         var time = ""
-        if hours > 0 {
+        if hours > 0 && minutes > 0 {
+            time = "\(hours)h \(minutes)m"
+        } else if hours > 0 {
             time = "\(hours)h"
-        }
-        if minutes > 0 {
+        } else if minutes > 0 {
             time += "\(minutes)m"
         }
         

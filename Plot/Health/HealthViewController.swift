@@ -108,13 +108,13 @@ class HealthViewController: UIViewController {
     @objc fileprivate func newItem() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 
-        alert.addAction(UIAlertAction(title: "Meal", style: .default, handler: { (_) in
-            let destination = MealViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }))
+//        alert.addAction(UIAlertAction(title: "Meal", style: .default, handler: { (_) in
+//            let destination = MealViewController(networkController: self.networkController)
+//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+//            destination.navigationItem.leftBarButtonItem = cancelBarButton
+//            let navigationViewController = UINavigationController(rootViewController: destination)
+//            self.present(navigationViewController, animated: true, completion: nil)
+//        }))
         
         alert.addAction(UIAlertAction(title: "Workout", style: .default, handler: { (_) in
             let destination = WorkoutViewController(networkController: self.networkController)

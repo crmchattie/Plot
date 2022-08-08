@@ -72,7 +72,6 @@ class ActivityBuilder {
         activity.activityType = "Meal"
         activity.category = "Meal"
         activity.name = meal.name
-        activity.mealIDs = [meal.id]
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
@@ -109,7 +108,6 @@ class ActivityBuilder {
         activity.category = "Transaction"
         activity.name = transaction.description
         activity.activityDescription = "\(String(describing: numberFormatter.string(for: transaction.amount)))"
-        activity.transactionIDs = [transaction.guid]
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)

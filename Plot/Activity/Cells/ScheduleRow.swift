@@ -88,6 +88,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
     }
     
     override func update() {
+        height = { 60 }
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
 

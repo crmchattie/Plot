@@ -47,6 +47,7 @@ class ChooseActivityTableViewController: UITableViewController {
     
     var activities = [Activity]()
     var filteredActivities = [Activity]()
+    var existingActivities = [Activity]()
     
     var activity: Activity?
     var activityID: String?
@@ -76,22 +77,7 @@ class ChooseActivityTableViewController: UITableViewController {
         
         navigationItem.title = "Choose Activity"
 
-        if let activity = activity {
-            if let index = activities.firstIndex(of: activity) {
-                activities.remove(at: index)
-                filteredActivities.remove(at: index)
-            }
-        } else if let activityID = activityID {
-            if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
-                activities.remove(at: index)
-                filteredActivities.remove(at: index)
-            }
-        } else if checklist != nil || grocerylist != nil || activitylist != nil || packinglist != nil {
-            activities = activities.filter({ (activity) in
-                return activity.recipeID == nil && activity.workoutID == nil && activity.eventID == nil && activity.placeID == nil
-            })
-            filteredActivities = activities
-        }
+        handleReloadActivities()
         
         configureTableView()
         setupSearchController()
@@ -169,11 +155,9 @@ class ChooseActivityTableViewController: UITableViewController {
                 activities.remove(at: index)
                 filteredActivities.remove(at: index)
             }
-        } else if checklist != nil || grocerylist != nil || activitylist != nil || packinglist != nil {
-            activities = activities.filter({ (activity) in
-                return activity.recipeID == nil && activity.workoutID == nil && activity.eventID == nil && activity.placeID == nil
-            })
-            filteredActivities = activities
+        } else if !existingActivities.isEmpty {
+            activities = activities.filter { !existingActivities.contains($0) }
+            filteredActivities = filteredActivities.filter { !existingActivities.contains($0) }
         }
     }
     

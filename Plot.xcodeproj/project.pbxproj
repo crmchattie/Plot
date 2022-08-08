@@ -147,6 +147,9 @@
 		108C37F328997CBF00DC4998 /* ActivityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F228997CBF00DC4998 /* ActivityListViewController.swift */; };
 		108C37F5289C085D00DC4998 /* HKWorkoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F4289C085D00DC4998 /* HKWorkoutViewController.swift */; };
 		108C37F7289C089500DC4998 /* HKCategorySampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F6289C089500DC4998 /* HKCategorySampleViewController.swift */; };
+		108C37F928A14DA900DC4998 /* WorkoutViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F828A14DA900DC4998 /* WorkoutViewController+Extensions.swift */; };
+		108C37FB28A14F6E00DC4998 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37FA28A14F6E00DC4998 /* Container.swift */; };
+		108C37FD28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37FC28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -707,6 +710,9 @@
 		108C37F228997CBF00DC4998 /* ActivityListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListViewController.swift; sourceTree = "<group>"; };
 		108C37F4289C085D00DC4998 /* HKWorkoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HKWorkoutViewController.swift; sourceTree = "<group>"; };
 		108C37F6289C089500DC4998 /* HKCategorySampleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HKCategorySampleViewController.swift; sourceTree = "<group>"; };
+		108C37F828A14DA900DC4998 /* WorkoutViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkoutViewController+Extensions.swift"; sourceTree = "<group>"; };
+		108C37FA28A14F6E00DC4998 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
+		108C37FC28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MindfulnessViewController+Extensions.swift"; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -1471,6 +1477,7 @@
 			isa = PBXGroup;
 			children = (
 				10970B13258060860027A9EF /* MindfulnessViewController.swift */,
+				108C37FC28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift */,
 				1080873A2585073500FB9BB0 /* MindfulnessFetcher.swift */,
 				108087362585072300FB9BB0 /* MindfulnessActions.swift */,
 			);
@@ -1555,6 +1562,7 @@
 			isa = PBXGroup;
 			children = (
 				10DFC3B1255A148E00565DAD /* WorkoutViewController.swift */,
+				108C37F828A14DA900DC4998 /* WorkoutViewController+Extensions.swift */,
 				10DFC3F4255CC63000565DAD /* WorkoutFetcher.swift */,
 				10DFC3E6255CC3DA00565DAD /* WorkoutActions.swift */,
 			);
@@ -2332,7 +2340,19 @@
 			children = (
 				F983298F2602AB3200EB51F7 /* Activity */,
 				109FEB3C22A7003000621D2F /* CalendarType.swift */,
+				108C37FA28A14F6E00DC4998 /* Container.swift */,
+				105F66EA2415942B00F6EDB6 /* Workout.swift */,
+				10B541D3254780B800CC9023 /* Meal.swift */,
+				10970B0D25803F450027A9EF /* Mindfulness.swift */,
 				2670E339252D2023007A6194 /* UserHealth.swift */,
+				10F3032924EC6FBC00C04B8F /* MXUser.swift */,
+				10F3032B24EC6FD300C04B8F /* MXInstitution.swift */,
+				10F3032D24EC6FE500C04B8F /* MXMember.swift */,
+				10F3032F24EC6FF800C04B8F /* MXAccount.swift */,
+				1017D32A24F2B746001D7CBE /* MXHolding.swift */,
+				1017D32C24F2B879001D7CBE /* MXMerchant.swift */,
+				1017D32E24F2B8E5001D7CBE /* MXMerchantLocation.swift */,
+				10F3033124EC700C00C04B8F /* Transaction.swift */,
 				4BAEE549212735880045AB10 /* Conversation.swift */,
 				4BAEE54A212735880045AB10 /* Message.swift */,
 				4BAEE54B212735880045AB10 /* User.swift */,
@@ -2344,22 +2364,11 @@
 				10868D6C246314C700D6BB4F /* Grocerylist.swift */,
 				10DE97382475837B00D4A7E8 /* ListContainer.swift */,
 				10DFAFC9287776BE00D38016 /* HealthContainer.swift */,
-				105F66EA2415942B00F6EDB6 /* Workout.swift */,
-				10970B0D25803F450027A9EF /* Mindfulness.swift */,
 				10B2BBAA257ACC7200E3A798 /* Scheduler.swift */,
 				10B2BBAE257ACC9000E3A798 /* Mood.swift */,
 				2680A0332360C0BD00C4C287 /* Invitation.swift */,
 				10CD68782486AEE400DC02E0 /* PLNotification.swift */,
 				10D340FF24ABD741009269B7 /* ActivityContainer.swift */,
-				10F3032924EC6FBC00C04B8F /* MXUser.swift */,
-				10F3032B24EC6FD300C04B8F /* MXInstitution.swift */,
-				10F3032D24EC6FE500C04B8F /* MXMember.swift */,
-				10F3032F24EC6FF800C04B8F /* MXAccount.swift */,
-				1017D32A24F2B746001D7CBE /* MXHolding.swift */,
-				1017D32C24F2B879001D7CBE /* MXMerchant.swift */,
-				1017D32E24F2B8E5001D7CBE /* MXMerchantLocation.swift */,
-				10F3033124EC700C00C04B8F /* Transaction.swift */,
-				10B541D3254780B800CC9023 /* Meal.swift */,
 				26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */,
 				10B541C925476D8B00CC9023 /* GroceryProduct.swift */,
 				10B541CF25476DA700CC9023 /* MenuProduct.swift */,
@@ -3088,6 +3097,7 @@
 				4BAEE5E5212735E50045AB10 /* EnterVerificationCodeController.swift in Sources */,
 				4BAEE49B21272C5E0045AB10 /* ContactsDetailController.swift in Sources */,
 				26A5DDD82394CB2400771DC1 /* RecipeSearchResult.swift in Sources */,
+				108C37F928A14DA900DC4998 /* WorkoutViewController+Extensions.swift in Sources */,
 				1080872B2585064300FB9BB0 /* SleepFetcher.swift in Sources */,
 				26836B552514916B00AFC2D7 /* HealthMetricCell.swift in Sources */,
 				4BAEE46B21272B380045AB10 /* SwitchTableViewController.swift in Sources */,
@@ -3096,6 +3106,7 @@
 				102BE8C4243CB7EF00722E7B /* CustomUIPickers.swift in Sources */,
 				26B975E72363F9C6003BFBE3 /* InvitationsViewController.swift in Sources */,
 				4BAEE48421272C4F0045AB10 /* AuthPhoneNumberController.swift in Sources */,
+				108C37FD28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift in Sources */,
 				4BAEE50B21272D890045AB10 /* UserCell+ConfigureCell.swift in Sources */,
 				4BA1E77A215250F900391BCB /* StorageMediaUploader.swift in Sources */,
 				1082C89524F0A8F500CF6491 /* FinanceViewController.swift in Sources */,
@@ -3463,6 +3474,7 @@
 				4BA1E77F2152518700391BCB /* ChatLogController+MessageSenderDelegate.swift in Sources */,
 				10E0D7C125959D6200B0F83C /* ConversationService.swift in Sources */,
 				269105F6253E8E2E00A02C5F /* DayAxisValueFormatter.swift in Sources */,
+				108C37FB28A14F6E00DC4998 /* Container.swift in Sources */,
 				10B645432578494D00C49A13 /* SectionHeader.swift in Sources */,
 				4BB46C6A2136E6F8005405BB /* ChatLogHistoryFetcher.swift in Sources */,
 			);

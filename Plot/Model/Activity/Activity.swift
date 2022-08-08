@@ -52,19 +52,14 @@ class Activity: NSObject, NSCopying, Codable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var containerID: String?
     var conversationID: String?
     var calendarExport: Bool?
-    var recipeID: String?
-    var servings: Int?
-    var workoutID: String?
-    var eventID: String?
-    var placeID: String?
-    var attractionID: String?
     var showExtras: Bool?
-    var hkSampleID: [String]?
     //task will key off of isTask and isComplete
     var isTask: Bool?
     var isComplete: Bool?
+    var hkSampleID: [String]?
     var transactionIDs: [String]?
     var mealIDs: [String]?
     var scheduleIDs: [String]?
@@ -95,18 +90,13 @@ class Activity: NSObject, NSCopying, Codable {
         case activitylistIDs
         case packinglistIDs
         case grocerylistID
-        case transactionIDs
+        case containerID
         case calendarExport
-        case recipeID
-        case servings
-        case workoutID
-        case eventID
-        case attractionID
-        case placeID
         case showExtras
-        case hkSampleID
         case isComplete
         case isTask
+        case transactionIDs
+        case hkSampleID
         case mealIDs
         case isSchedule
         case scheduleIDs
@@ -172,14 +162,8 @@ class Activity: NSObject, NSCopying, Codable {
         checklistIDs = dictionary?["checklistIDs"] as? [String]
         activitylistIDs = dictionary?["activitylistIDs"] as? [String]
         packinglistIDs = dictionary?["packinglistIDs"] as? [String]
-        transactionIDs = dictionary?["transactionIDs"] as? [String]
         calendarExport = dictionary?["calendarExport"] as? Bool
-        recipeID = dictionary?["recipeID"] as? String
-        servings = dictionary?["servings"] as? Int
-        workoutID = dictionary?["workoutID"] as? String
-        eventID = dictionary?["eventID"] as? String
-        attractionID = dictionary?["attractionID"] as? String
-        placeID = dictionary?["placeID"] as? String
+        containerID = dictionary?["containerID"] as? String
         showExtras = dictionary?["showExtras"] as? Bool
         isComplete = dictionary?["isComplete"] as? Bool
         isTask = dictionary?["isTask"] as? Bool
@@ -190,6 +174,7 @@ class Activity: NSObject, NSCopying, Codable {
             hkSampleID = [hkSampleIDString]
         }
         
+        transactionIDs = dictionary?["transactionIDs"] as? [String]
         mealIDs = dictionary?["mealIDs"] as? [String]
         isSchedule = dictionary?["isSchedule"] as? Bool
         scheduleIDs = dictionary?["scheduleIDs"] as? [String]
@@ -322,32 +307,8 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["packinglistIDs"] = value
         }
         
-        if let value = self.transactionIDs as AnyObject? {
-            dictionary["transactionIDs"] = value
-        }
-        
-        if let value = self.recipeID as AnyObject? {
-            dictionary["recipeID"] = value
-        }
-        
-        if let value = self.servings as AnyObject? {
-            dictionary["servings"] = value
-        }
-        
-        if let value = self.workoutID as AnyObject? {
-            dictionary["workoutID"] = value
-        }
-        
-        if let value = self.eventID as AnyObject? {
-            dictionary["eventID"] = value
-        }
-        
-        if let value = self.attractionID as AnyObject? {
-            dictionary["attractionID"] = value
-        }
-        
-        if let value = self.placeID as AnyObject? {
-            dictionary["placeID"] = value
+        if let value = self.containerID as AnyObject? {
+            dictionary["containerID"] = value
         }
         
         if let value = self.showExtras as AnyObject? {
@@ -360,14 +321,6 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.isTask as AnyObject? {
             dictionary["isTask"] = value
-        }
-        
-        if let value = self.hkSampleID as AnyObject? {
-            dictionary["hkSampleID"] = value
-        }
-        
-        if let value = self.mealIDs as AnyObject? {
-            dictionary["mealIDs"] = value
         }
         
         if let value = self.isSchedule as AnyObject? {
@@ -399,10 +352,8 @@ class Activity: NSObject, NSCopying, Codable {
             lhs.activityFiles == rhs.activityFiles &&
             lhs.notes == rhs.notes &&
             lhs.scheduleIDs == rhs.scheduleIDs &&
-            lhs.hkSampleID == rhs.hkSampleID &&
-            lhs.mealIDs == rhs.mealIDs &&
-            lhs.transactionIDs == rhs.transactionIDs &&
-            lhs.participantsIDs == rhs.participantsIDs
+            lhs.participantsIDs == rhs.participantsIDs &&
+            lhs.containerID == rhs.containerID
     }
 }
 

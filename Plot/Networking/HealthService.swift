@@ -259,7 +259,7 @@ extension HealthService {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-        //this code kinda stinks
+        //this code is inefficient
         userHealthDatabaseRef = Database.database().reference().child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey)
         userHealthDatabaseRef.observeSingleEvent(of: .value) { dataSnapshot in
             if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {

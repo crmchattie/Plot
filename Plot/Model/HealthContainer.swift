@@ -18,6 +18,10 @@ struct HealthContainer: Codable, Equatable {
         return meal?.id ?? workout?.id ?? mindfulness?.id  ?? ""
     }
     
+    var hkSampleID: String {
+        return workout?.hkSampleID ?? mindfulness?.hkSampleID  ?? ""
+    }
+    
     var name: String {
         return meal?.name ?? workout?.name ?? mindfulness?.name  ?? ""
     }

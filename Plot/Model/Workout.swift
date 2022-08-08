@@ -27,11 +27,11 @@ struct Workout: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
-    var transactionID: String?
-    var activityID: String?
     var healthExport: Bool?
     var user_created: Bool?
     var recurrences: [String]?
+    var containerID: String?
+    var hkSampleID: String?
     
     init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, type: String?, startDateTime: Date?, endDateTime: Date?, length: Double?, totalEnergyBurned: Double?) {
         self.id = id

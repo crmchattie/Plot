@@ -25,11 +25,11 @@ struct Mindfulness: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
-    var transactionIDs: [String]?
-    var activityID: String?
     var healthExport: Bool?
     var user_created: Bool?
     var recurrences: [String]?
+    var containerID: String?
+    var hkSampleID: String?
     
     init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, startDateTime: Date?, endDateTime: Date?) {
         self.id = id

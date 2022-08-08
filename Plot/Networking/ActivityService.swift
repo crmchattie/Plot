@@ -323,4 +323,29 @@ extension ActivityService {
         }
         completion(newActivities)
     }
+    
+    func updateActivitiesWithContainer() {
+        for activity in activitiesNoRepeats {
+            if let activityID = activity.activityID {
+                if activity.name == "Daily Meditation", let hkSampleID = activity.hkSampleID {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: nil, mindfulnessIDs: hkSampleID, mealIDs: nil, transactionIDs: nil)
+                    ContainerFunctions.updateContainerAndStuffInside(container: container)
+                } else if let hkSampleID = activity.hkSampleID, let transactionIDs = activity.transactionIDs {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: hkSampleID, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: transactionIDs)
+                    ContainerFunctions.updateContainerAndStuffInside(container: container)
+                } else if let hkSampleID = activity.hkSampleID {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: hkSampleID, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+                    ContainerFunctions.updateContainerAndStuffInside(container: container)
+                    
+                } else if let transactionIDs = activity.transactionIDs {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: transactionIDs)
+                    ContainerFunctions.updateContainerAndStuffInside(container: container)
+                }
+            }
+        }
+    }
 }

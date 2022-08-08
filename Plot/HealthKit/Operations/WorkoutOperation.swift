@@ -47,7 +47,7 @@ class WorkoutOperation: AsyncOperation {
                     var metric = HealthMetric(type: HealthMetricType.workout, total: total, date: _self.startDate, unitName: "calories", rank: _self.rank)
                     metric.hkSample = workout
                     
-                    var activities: [Activity] = []
+                    var containers: [Container] = []
                     var averageEnergyBurned: Double = 0
                     
                         workouts.forEach { workout in
@@ -72,8 +72,16 @@ class WorkoutOperation: AsyncOperation {
                                 activity.endTimeZone = TimeZone.current.identifier
 
                                 activity.allDay = false
-                                activity.hkSampleID = [workout.uuid.uuidString]
-                                activities.append(activity)
+                                
+                                let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                                activity.containerID = containerID
+                                                                
+                                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                                activityActions.createNewActivity()
+                                
+                                let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: [workout.uuid.uuidString], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+                                containers.append(container)
+                                
                                 
                             }
                         }
@@ -83,7 +91,7 @@ class WorkoutOperation: AsyncOperation {
                         metric.average = averageEnergyBurned
                     }
 
-                    _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.workouts.rawValue, activities)
+                    _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.workouts.rawValue, containers)
                 }
 
                 self?.finish()

@@ -183,125 +183,39 @@ extension EventViewController {
     }
     
     func setupLists() {
-        if activity.scheduleIDs != nil {
-            for scheduleID in activity.scheduleIDs! {
-                dispatchGroup.enter()
-                let dataReference = Database.database().reference().child(activitiesEntity).child(scheduleID).child(messageMetaDataFirebaseFolder)
-                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject] {
-                        let schedule = Activity(dictionary: snapshotValue)
-                        self.scheduleList.append(schedule)
-
-                    }
-                    self.dispatchGroup.leave()
-                })
-            }
-        }
-        if activity.checklistIDs != nil {
-            for checklistID in activity.checklistIDs! {
-                dispatchGroup.enter()
-                let checklistDataReference = Database.database().reference().child(checklistsEntity).child(checklistID)
-                checklistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), let checklistSnapshotValue = snapshot.value {
-                        if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
-                            var list = ListContainer()
-                            list.checklist = checklist
-                            self.listList.append(list)
-                        }
-                    }
-                    self.dispatchGroup.leave()
-                })
-            }
-        }
-        if activity.grocerylistID != nil {
+        guard delegate == nil else {return}
+        let dispatchGroup = DispatchGroup()
+        for scheduleID in activity.scheduleIDs ?? [] {
             dispatchGroup.enter()
-            let grocerylistDataReference = Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!)
-            grocerylistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), let grocerylistSnapshotValue = snapshot.value {
-                    if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
-                        var list = ListContainer()
-                        list.grocerylist = grocerylist
-                        self.listList.append(list)
-                        self.grocerylistIndex = self.listList.count - 1
-                    }
+            let dataReference = Database.database().reference().child(activitiesEntity).child(scheduleID).child(messageMetaDataFirebaseFolder)
+            dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject] {
+                    let schedule = Activity(dictionary: snapshotValue)
+                    self.scheduleList.append(schedule)
+
                 }
-                self.dispatchGroup.leave()
+                dispatchGroup.leave()
             })
         }
-        if activity.packinglistIDs != nil {
-            for packinglistID in activity.packinglistIDs! {
-                dispatchGroup.enter()
-                let packinglistDataReference = Database.database().reference().child(packinglistsEntity).child(packinglistID)
-                packinglistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), let packinglistSnapshotValue = snapshot.value {
-                        if let packinglist = try? FirebaseDecoder().decode(Packinglist.self, from: packinglistSnapshotValue) {
-                            var list = ListContainer()
-                            list.packinglist = packinglist
-                            self.listList.append(list)
-                        }
-                    }
-                    self.dispatchGroup.leave()
-                })
-            }
-        }
-        if activity.activitylistIDs != nil {
-            for activitylistID in activity.activitylistIDs! {
-                dispatchGroup.enter()
-                let activitylistDataReference = Database.database().reference().child(activitylistsEntity).child(activitylistID)
-                activitylistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), let activitylistSnapshotValue = snapshot.value {
-                        if let activitylist = try? FirebaseDecoder().decode(Activitylist.self, from: activitylistSnapshotValue) {
-                            var list = ListContainer()
-                            list.activitylist = activitylist
-                            self.listList.append(list)
-                        }
-                    }
-                    self.dispatchGroup.leave()
-                })
-            }
-        }
-        if activity.transactionIDs != nil {
-            for transactionID in activity.transactionIDs! {
-                dispatchGroup.enter()
-                let dataReference = Database.database().reference().child(financialTransactionsEntity).child(transactionID)
-                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), let snapshotValue = snapshot.value {
-                        if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue) {
-                            self.purchaseList.append(transaction)
-                        }
-                    }
-                    self.dispatchGroup.leave()
-                })
-            }
-        }
-        if activity.hkSampleID != nil {
-            print(activity.hkSampleID as Any)
-            for hksample in activity.hkSampleID! {
-                dispatchGroup.enter()
-                if let uuid = UUID(uuidString: hksample) {
-                    HealthKitService.grabSpecificWorkoutSample(uuid: uuid) { samples, err in
-                        if let sample = samples?.first {
-                            HealthKitSampleBuilder.createWorkoutFromHKWorkout(from: sample) { workout in
-                                guard workout != nil else {
-                                    self.dispatchGroup.leave()
-                                    return }
-                                self.healthList.append(HealthContainer(meal: nil, workout: workout, mindfulness: nil))
-                                self.dispatchGroup.leave()
-                            }
-                        }
-                    }
-                    HealthKitService.grabSpecificCategorySample(uuid: uuid, identifier: .mindfulSession) { samples, err in
-                        if let sample = samples?.first {
-                            HealthKitSampleBuilder.createMindfulnessFromHKMindfulness(from: sample) { mindfulness in
-                                guard mindfulness != nil else {
-                                    self.dispatchGroup.leave()
-                                    return }
-                                self.healthList.append(HealthContainer(meal: nil, workout: nil, mindfulness: mindfulness))
-                                self.dispatchGroup.leave()
-                            }
-                        }
-                    }
+        for checklistID in activity.checklistIDs ?? [] {
+            dispatchGroup.enter()
+            let checklistDataReference = Database.database().reference().child(checklistsEntity).child(checklistID)
+            checklistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let checklistSnapshotValue = snapshot.value, let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
+                    var list = ListContainer()
+                    list.checklist = checklist
+                    self.listList.append(list)
                 }
+                dispatchGroup.leave()
+            })
+        }
+        if let containerID = activity.containerID {
+            dispatchGroup.enter()
+            ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, health, transactions in
+                self.container = container
+                self.healthList = health ?? []
+                self.transactions = transactions ?? []
+                dispatchGroup.leave()
             }
         }
         dispatchGroup.notify(queue: .main) {
@@ -509,30 +423,14 @@ extension EventViewController {
                 activity.scheduleIDs = nil
                 groupActivityReference.child("scheduleIDs").removeValue()
             }
-        } else if type == "purchases" {
-            var transactionIDs = [String]()
-            for transaction in purchaseList {
-                transactionIDs.append(transaction.guid)
-            }
-            if !transactionIDs.isEmpty {
-                activity.transactionIDs = transactionIDs
-                groupActivityReference.updateChildValues(["transactionIDs": transactionIDs as AnyObject])
+        } else if type == "container" {
+            if container != nil {
+                container = Container(id: container.id, activityIDs: container.activityIDs, workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.hkSampleID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.hkSampleID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
             } else {
-                activity.transactionIDs = nil
-                groupActivityReference.child("transactionIDs").removeValue()
+                let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                container = Container(id: containerID, activityIDs: [activityID], workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.hkSampleID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.hkSampleID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
             }
-        } else if type == "health" {
-            if healthList.isEmpty {
-                activity.hkSampleID = nil
-                groupActivityReference.child("hkSampleID").removeValue()
-            } else {
-                var hkSampleID = [String]()
-                for healthItem in healthList {
-                    hkSampleID.append(healthItem.ID)
-                }
-                activity.hkSampleID = hkSampleID
-                groupActivityReference.updateChildValues(["hkSampleID": hkSampleID as AnyObject])
-            }
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
         } else {
             if listList.isEmpty {
                 activity.checklistIDs = nil
@@ -795,7 +693,7 @@ extension EventViewController {
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "New Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
@@ -807,7 +705,7 @@ extension EventViewController {
                 destination.endDateTime = self.endDateTime
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
-            alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Merge Existing Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
@@ -987,7 +885,7 @@ extension EventViewController {
             })
         }
         // do not want to have in duplicate functionality
-        else if !active || sentActivity || true {
+        else if !active || true {
             self.createActivity(activity: nil)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -1021,54 +919,23 @@ extension EventViewController {
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
+            self.delegate?.updateActivity(activity: activity ?? self.activity)
             self.navigationController?.popViewController(animated: true)
         }
     }
     
     func createActivity(activity: Activity?) {
-        if sentActivity {
-            showActivityIndicator()
-            let createActivity = ActivityActions(activity: activity ?? self.activity, active: false, selectedFalconUsers: [])
-            createActivity.createNewActivity()
-            hideActivityIndicator()
-            if navigationItem.leftBarButtonItem != nil {
-                self.dismiss(animated: true, completion: nil)
-            } else {
-                self.navigationController?.popViewController(animated: true)
-            }
+        showActivityIndicator()
+        let createActivity = ActivityActions(activity: activity ?? self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
+        createActivity.createNewActivity()
+        hideActivityIndicator()
+        if navigationItem.leftBarButtonItem != nil {
+            self.dismiss(animated: true, completion: nil)
         } else {
-            showActivityIndicator()
-            let createActivity = ActivityActions(activity: activity ?? self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
-            createActivity.createNewActivity()
-            hideActivityIndicator()
-            if navigationItem.leftBarButtonItem != nil {
-                self.dismiss(animated: true, completion: nil)
-            } else {
-                self.navigationController?.popViewController(animated: true)
-                self.updateDiscoverDelegate?.itemCreated()
-            }
+            self.navigationController?.popViewController(animated: true)
+            self.delegate?.updateActivity(activity: activity ?? self.activity)
+            self.updateDiscoverDelegate?.itemCreated()
         }
-    }
-    
-    func fetchMembersIDs() -> ([String], [String:AnyObject]) {
-        var membersIDs = [String]()
-        var membersIDsDictionary = [String:AnyObject]()
-        
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
-        
-        // Only append current user when admin/creator of the activity
-        if self.activity.admin == currentUserID {
-            membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-            membersIDs.append(currentUserID)
-        }
-        
-        for selectedUser in selectedFalconUsers {
-            guard let id = selectedUser.id else { continue }
-            membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
-            membersIDs.append(id)
-        }
-        
-        return (membersIDs, membersIDsDictionary)
     }
     
     func showActivityIndicator() {

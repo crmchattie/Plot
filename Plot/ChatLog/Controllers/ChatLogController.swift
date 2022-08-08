@@ -638,7 +638,6 @@ class ChatLogController: UICollectionViewController {
                 newActivity.activityThumbnailPhotoURL = nil
                 newActivity.conversationID = nil
                 let destination = EventViewController(networkController: self.networkController)
-                destination.sentActivity = true
                 destination.activity = newActivity
                 self.navigationController?.pushViewController(destination, animated: true)
             })

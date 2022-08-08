@@ -42,10 +42,10 @@ class HealthKitSampleBuilder {
         
         workout = Workout(from: hkWorkout)
         let hkSampleID = hkWorkout.uuid.uuidString
-        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child(containerIDEntity)
         healthkitWorkoutsReference.observeSingleEvent(of: .value) { snapshot in
-            if snapshot.exists(), let activityID = snapshot.value as? String {
-                workout.activityID = activityID
+            if snapshot.exists(), let ID = snapshot.value as? String {
+                workout.containerID = ID
                 completion(workout)
             } else {
                 completion(workout)
@@ -70,10 +70,10 @@ class HealthKitSampleBuilder {
         
         mindfulness = Mindfulness(from: hkMindfulness)
         let hkSampleID = hkMindfulness.uuid.uuidString
-        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
+        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child(containerIDEntity)
         healthkitWorkoutsReference.observeSingleEvent(of: .value) { snapshot in
-            if snapshot.exists(), let activityID = snapshot.value as? String {
-                mindfulness.activityID = activityID
+            if snapshot.exists(), let ID = snapshot.value as? String {
+                mindfulness.containerID = ID
                 completion(mindfulness)
             } else {
                 completion(mindfulness)

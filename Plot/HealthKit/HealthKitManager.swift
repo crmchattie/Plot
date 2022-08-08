@@ -16,14 +16,14 @@ class HealthKitManager {
     private let lock = NSLock()
     private var queue: OperationQueue
     private var metrics: [String: [HealthMetric]]
-    private var activities: [Activity]
+    private var containers: [Container]
     private var isRunning: Bool
-    private var saveActivitiesDispatchGroup: DispatchGroup!
+    private var saveContainersDispatchGroup: DispatchGroup!
     
     init() {
         self.isRunning = false
         self.metrics = [:]
-        self.activities = []
+        self.containers = []
         self.queue = OperationQueue()
     }
     
@@ -35,7 +35,7 @@ class HealthKitManager {
         
         // Start clean
         metrics = [:]
-        activities = []
+        containers = []
         isRunning = true
 
         self.getUserHealthLastSyncDate { [weak self] lastSyncDate in
@@ -166,8 +166,8 @@ class HealthKitManager {
                 }
                 
                 // if we properly fetched the items then save
-                if _self.activities.count > 0 {
-                    _self.saveActivitiesOnFirebase(_self.activities, completion: {
+                if _self.containers.count > 0 {
+                    _self.saveContainersOnFirebase(_self.containers, completion: {
                         completion(_self.metrics, true)
                     })
                 }
@@ -201,35 +201,39 @@ class HealthKitManager {
         })
     }
     
-    func saveActivitiesOnFirebase(_ activities: [Activity], completion: @escaping () -> Void) {
-        guard activities.count > 0, let currentUserId = Auth.auth().currentUser?.uid else {
+    func saveContainersOnFirebase(_ containers: [Container], completion: @escaping () -> Void) {
+        guard containers.count > 0, let currentUserId = Auth.auth().currentUser?.uid else {
             completion()
             return
         }
         
-        saveActivitiesDispatchGroup = DispatchGroup()
+        saveContainersDispatchGroup = DispatchGroup()
         
-        saveActivitiesDispatchGroup.notify(queue: DispatchQueue.global(), execute: {
+        saveContainersDispatchGroup.notify(queue: DispatchQueue.global(), execute: {
             completion()
         })
         
-        for activity in activities {
-            if let activityID = activity.activityID {
-                
-                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-                activityActions.createNewActivity()
-                
-                if let hkSampleIDs = activity.hkSampleID {
-                    for hkSampleID in hkSampleIDs {
-                        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child("activityID")
-                        healthkitWorkoutsReference.setValue(activityID)
-                    }
-                }
-            }
+        for container in containers {
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
         }
         
+//        for activity in activities {
+//            if let activityID = activity.activityID {
+//
+//
+//
+//                if let hkSampleIDs = activity.hkSampleID, let containerID = activity.containerID {
+//
+//                    for hkSampleID in hkSampleIDs {
+//                        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child(containerIDEntity)
+//                        healthkitWorkoutsReference.setValue(containerID)
+//                    }
+//                }
+//            }
+//        }
+//
         let reference = Database.database().reference().child(userHealthEntity).child(currentUserId)
-        saveActivitiesDispatchGroup.enter()
+        saveContainersDispatchGroup.enter()
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists() {
                 let values = [lastSyncDateKey: Date().timeIntervalSince1970]
@@ -241,7 +245,7 @@ class HealthKitManager {
                 reference.setValue(values)
             }
             
-            self?.saveActivitiesDispatchGroup.leave()
+            self?.saveContainersDispatchGroup.leave()
         })
     }
     
@@ -256,14 +260,14 @@ extension HealthKitManager: MetricOperationDelegate {
         metrics[category, default: []].append(metric)
     }
     
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String, _ activities: [Activity]) {
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String, _ containers: [Container]) {
         lock.lock(); defer { lock.unlock() }
         metrics[category, default: []].append(metric)
-        self.activities.append(contentsOf: activities)
+        self.containers.append(contentsOf: containers)
     }
 }
 
 protocol MetricOperationDelegate: AnyObject {
     func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String)
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String, _ activities: [Activity])
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String, _ containers: [Container])
 }

@@ -27,10 +27,9 @@ struct Meal: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
-    var transactionID: String?
-    var activityID: String?
     var healthExport: Bool?
     var user_created: Bool?
+    var containerID: String?
 
 }
 

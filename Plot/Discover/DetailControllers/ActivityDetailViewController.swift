@@ -14,7 +14,7 @@ import MapKit
 class ActivityDetailViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     var umbrellaActivity: Activity!
     
-    weak var delegate : UpdateScheduleDelegate?
+    weak var delegate : UpdateActivityDelegate?
     weak var listDelegate : UpdateListDelegate?
 
     var activity: Activity!
