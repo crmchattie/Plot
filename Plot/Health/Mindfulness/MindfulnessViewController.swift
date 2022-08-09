@@ -19,6 +19,11 @@ protocol UpdateMindfulnessDelegate: AnyObject {
 
 class MindfulnessViewController: FormViewController {
     var mindfulness: Mindfulness!
+    var container: Container!
+    var eventList = [Activity]()
+    var purchaseList = [Transaction]()
+    var eventIndex: Int = 0
+    var purchaseIndex: Int = 0
         
     fileprivate var productIndex: Int = 0
     
@@ -27,6 +32,7 @@ class MindfulnessViewController: FormViewController {
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
     lazy var activities: [Activity] = networkController.activityService.activities
+    lazy var transactions: [Transaction] = networkController.financeService.transactions
     
     var selectedFalconUsers = [User]()
     
@@ -36,7 +42,6 @@ class MindfulnessViewController: FormViewController {
     //added for EventViewController
     var movingBackwards: Bool = false
     var active: Bool = false
-    var comingFromActivity: Bool = false
     
     weak var delegate : UpdateMindfulnessDelegate?
     weak var updateDiscoverDelegate : UpdateDiscover?
@@ -93,10 +98,13 @@ class MindfulnessViewController: FormViewController {
         setupRightBarButton()
         initializeForm()
         updateLength()
+        setupLists()
         
         if active {
-            for row in form.rows {
-                row.baseCell.isUserInteractionEnabled = false
+            for row in form.allRows {
+                if row.tag != "sections" && row.tag != "schedulefields" && row.tag != "purchasefields" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
+                    row.baseCell.isUserInteractionEnabled = false
+                }
             }
         }
     }
@@ -145,6 +153,7 @@ class MindfulnessViewController: FormViewController {
                 
                 // update
                 self.showActivityIndicator()
+                self.updateLists()
                 let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createMindfulness.createNewMindfulness()
                 self.hideActivityIndicator()
@@ -166,6 +175,7 @@ class MindfulnessViewController: FormViewController {
                 
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     self.showActivityIndicator()
+                    self.updateLists()
                     let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     createMindfulness.createNewMindfulness()
                     
@@ -200,18 +210,20 @@ class MindfulnessViewController: FormViewController {
             })
             
         } else {
+            showActivityIndicator()
             createHealthKit() { hkSampleID in
-                self.showActivityIndicator()
                 self.mindfulness.hkSampleID = hkSampleID
                 let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createMindfulness.createNewMindfulness()
-                self.hideActivityIndicator()
                 self.delegate?.updateMindfulness(mindfulness: self.mindfulness)
-                if self.navigationItem.leftBarButtonItem != nil {
-                    self.dismiss(animated: true, completion: nil)
-                } else {
-                    self.navigationController?.popViewController(animated: true)
-                    self.updateDiscoverDelegate?.itemCreated()
+                DispatchQueue.main.async {
+                    self.hideActivityIndicator()
+                    if self.navigationItem.leftBarButtonItem != nil {
+                        self.dismiss(animated: true, completion: nil)
+                    } else {
+                        self.navigationController?.popViewController(animated: true)
+                        self.updateDiscoverDelegate?.itemCreated()
+                    }
                 }
             }
         }
@@ -235,16 +247,13 @@ class MindfulnessViewController: FormViewController {
     
     func createActivity(hkSampleID: String, completion: @escaping () -> Void) {
         if let activity = ActivityBuilder.createActivity(from: self.mindfulness), let activityID = activity.activityID {
-            
             let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
             activityActions.createNewActivity()
-            
-            
             //will update activity.containerID and mindfulness.containerID
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
             let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: nil, mindfulnessIDs: [hkSampleID], mealIDs: nil, transactionIDs: nil)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
-            
+            completion()
         }
     }
     
@@ -278,29 +287,6 @@ class MindfulnessViewController: FormViewController {
                 cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }
-            
-//            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.title = row.tag
-//                if active {
-//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.title = self.userNamesString
-//                }
-//            }.onCellSelection({ _,_ in
-//                self.openParticipantsInviter()
-//            }).cellUpdate { cell, row in
-//                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                cell.textLabel?.textAlignment = .left
-//                if row.title == "Participants" {
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                } else {
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                }
-//            }
             
             <<< DateTimeInlineRow("Starts") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -401,6 +387,103 @@ class MindfulnessViewController: FormViewController {
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
+        
+        
+//            <<< ButtonRow("Participants") { row in
+//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                row.cell.textLabel?.textAlignment = .left
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                row.cell.accessoryType = .disclosureIndicator
+//                row.title = row.tag
+//                if active {
+//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    row.title = self.userNamesString
+//                }
+//            }.onCellSelection({ _,_ in
+//                self.openParticipantsInviter()
+//            }).cellUpdate { cell, row in
+//                cell.accessoryType = .disclosureIndicator
+//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                cell.textLabel?.textAlignment = .left
+//                if row.title == "Participants" {
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                } else {
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                }
+//            }
+        
+        
+        if delegate == nil && active {
+            form.last!
+            <<< SegmentedRow<String>("sections"){
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    if #available(iOS 13.0, *) {
+                        $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+                    } else {
+                        // Fallback on earlier versions
+                    }
+                    $0.options = ["Event", "Transactions"]
+                    $0.value = "Event"
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }
+
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Event",
+                                   footer: "Connect an event") {
+                                    $0.tag = "schedulefields"
+                                    $0.hidden = "!$sections == 'Event'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow("scheduleButton"){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Event"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                            }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.eventIndex = index
+                                        self.openEvent()
+                                        return ScheduleRow("label"){
+                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        }
+                                    }
+
+                                }
+
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Transactions",
+                                   footer: "Connect a transaction") {
+                                    $0.tag = "purchasefields"
+                                    $0.hidden = "$sections != 'Transactions'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow("transactionButton"){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Transaction"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                        }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.purchaseIndex = index
+                                        self.openTransaction()
+                                        return PurchaseRow()
+                                            .onCellSelection() { cell, row in
+                                                self.purchaseIndex = index
+                                                self.openTransaction()
+                                                cell.cellResignFirstResponder()
+                                        }
+
+                                    }
+                }
+        }
     }
     
     fileprivate func updateLength() {
@@ -425,6 +508,27 @@ class MindfulnessViewController: FormViewController {
                 lengthRow.value = "\(minutes) minutes"
             }
             lengthRow.updateCell()
+        }
+    }
+    
+    override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
+        super.rowsHaveBeenRemoved(rows, at: indexes)
+        let rowNumber : Int = indexes.first!.row
+        let rowType = rows[0].self
+        
+        DispatchQueue.main.async { [weak self] in
+            if rowType is ScheduleRow {
+                if self!.eventList.indices.contains(self!.eventIndex) {
+                    self!.eventList.remove(at: rowNumber)
+                    self!.updateLists()
+                }
+            }
+            else if rowType is PurchaseRow {
+                if self!.purchaseList.indices.contains(self!.purchaseIndex) {
+                    self!.purchaseList.remove(at: rowNumber)
+                    self!.updateLists()
+                }
+            }
         }
     }
     

@@ -68,7 +68,7 @@ class EventViewController: FormViewController {
     var userNames : [String] = []
     var userNamesString: String = ""
     var thumbnailImage: String = ""
-    var segmentRowValue: String = "Schedule"
+    var segmentRowValue: String = "Health"
     var activityID = String()
     let informationMessageSender = InformationMessageSender()
     // Participants with accepted invites
@@ -256,7 +256,7 @@ class EventViewController: FormViewController {
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 }).onChange() { [unowned self] row in
                     self.activity.activityDescription = row.value
-                    if row.value == nil {
+                    if row.value == nil && self.active {
                         let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("activityDescription")
                         reference.removeValue()
                     }
@@ -714,13 +714,37 @@ class EventViewController: FormViewController {
                     } else if let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
                         segmentRow.value = self!.segmentRowValue
                     }
-                    guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+                    guard let currentUserID = Auth.auth().currentUser?.uid, self!.active else { return }
                     let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
                     let values:[String : Any] = ["showExtras": row.value ?? false]
                     userReference.updateChildValues(values)
                 }.cellUpdate { cell, row in
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+        
+            <<< ButtonRow("Schedule") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.accessoryType = .disclosureIndicator
+                row.title = row.tag
+                row.hidden = "$showExtras == false"
+                if self.activity.scheduleIDs != nil {
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                } else {
+                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }
+                }.onCellSelection({ _,_ in
+                    self.openSchedule()
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.accessoryType = .disclosureIndicator
+                    cell.textLabel?.textAlignment = .left
+                    if let _ = self.activity.scheduleIDs {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    } else {
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    }
                 }
         
             <<< ButtonRow("Checklists") { row in
@@ -783,7 +807,7 @@ class EventViewController: FormViewController {
 //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                }).onChange() { [unowned self] row in
 //                    self.activity.notes = row.value
-//                    if row.value == nil {
+//                    if row.value == nil && self.active {
 //                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("notes")
 //                        reference.removeValue()
 //                    }
@@ -796,41 +820,12 @@ class EventViewController: FormViewController {
                     $0.hidden = "$showExtras == false"
                     if #available(iOS 13.0, *) {
                         $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-                    } else {
-                        // Fallback on earlier versions
                     }
-                    $0.options = ["Schedule", "Health", "Transactions"]
-                    $0.value = "Schedule"
+                    $0.options = ["Health", "Transactions"]
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     }
-
-            form +++
-                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Schedule",
-                                   footer: "Add a sub-event to the schedule") {
-                                    $0.tag = "schedulefields"
-                                    $0.hidden = "!$sections == 'Schedule'"
-                                    $0.addButtonProvider = { section in
-                                        return ButtonRow(){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                            $0.title = "Add Sub-event"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                                cell.textLabel?.textAlignment = .left
-                                                cell.height = { 60 }
-                                            }
-                                    }
-                                    $0.multivaluedRowToInsertAt = { index in
-                                        self.scheduleIndex = index
-                                        self.openSchedule()
-                                        return ScheduleRow("label"){
-                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
-                                        }
-                                    }
-
-                                }
 
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
@@ -906,39 +901,19 @@ class EventViewController: FormViewController {
         let rowType = rows[0].self
         
         DispatchQueue.main.async { [weak self] in
-            if rowType is ScheduleRow {
-                if self!.scheduleList.indices.contains(self!.scheduleIndex) {
-                    if let scheduleLocationAddress = self!.scheduleList[rowNumber].locationAddress {
-                        for (key, _) in scheduleLocationAddress {
-                            self!.locationAddress[key] = nil
-                        }
-                    }
-                    self!.scheduleList.remove(at: rowNumber)
-                    self!.sortSchedule()
-                    self!.updateLists(type: "schedule")
-                }
-            } else if rowType is PurchaseRow {
+            if rowType is PurchaseRow {
                 if self!.purchaseList.indices.contains(self!.purchaseIndex) {
                     self!.purchaseList.remove(at: rowNumber)
+                    self!.updateLists(type: "container")
 //                    self!.purchaseBreakdown()
                 }
-                self!.updateLists(type: "purchases")
             }
             else if rowType is HealthRow {
                 if self!.healthList.indices.contains(self!.healthIndex) {
                     self!.healthList.remove(at: rowNumber)
+                    self!.updateLists(type: "container")
                 }
-                self!.updateLists(type: "health")
             }
-//            else if rowType is ButtonRow, rows[0].title != "Add Activity Item",  rows[0].title != "Add Checklist Item", rows[0].title != "Add Transaction Item" {
-//                if self!.listList.indices.contains(self!.listIndex) {
-//                    self!.listList.remove(at: rowNumber)
-//                }
-//                if rowNumber == self!.grocerylistIndex {
-//                    self!.grocerylistIndex = -1
-//                }
-//                self!.updateLists(type: "lists")
-//            }
         }
     }
 }

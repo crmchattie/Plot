@@ -150,6 +150,8 @@
 		108C37F928A14DA900DC4998 /* WorkoutViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F828A14DA900DC4998 /* WorkoutViewController+Extensions.swift */; };
 		108C37FB28A14F6E00DC4998 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37FA28A14F6E00DC4998 /* Container.swift */; };
 		108C37FD28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37FC28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift */; };
+		108C37FF28A28B0F00DC4998 /* ScheduleListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37FE28A28B0F00DC4998 /* ScheduleListViewController.swift */; };
+		108C380128A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380028A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -713,6 +715,8 @@
 		108C37F828A14DA900DC4998 /* WorkoutViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkoutViewController+Extensions.swift"; sourceTree = "<group>"; };
 		108C37FA28A14F6E00DC4998 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
 		108C37FC28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MindfulnessViewController+Extensions.swift"; sourceTree = "<group>"; };
+		108C37FE28A28B0F00DC4998 /* ScheduleListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListViewController.swift; sourceTree = "<group>"; };
+		108C380028A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FinanceTransactionViewController+Extensions.swift"; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -1135,6 +1139,7 @@
 			children = (
 				10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */,
 				106D758A2442447C0039B534 /* ActivityActions.swift */,
+				108C37FE28A28B0F00DC4998 /* ScheduleListViewController.swift */,
 				10196EF324411B5600B6AFDF /* ScheduleViewController.swift */,
 				10196EF724411B5600B6AFDF /* SelectActivityMembersViewController.swift */,
 				102618C825771FE300CF6F0A /* ActivityLevelViewController.swift */,
@@ -1332,6 +1337,7 @@
 				1024035D2586E92E00A54703 /* FinanceBarChartDetailViewController.swift */,
 				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
 				105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */,
+				108C380028A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift */,
 				106774F725DAF76E002F78E7 /* FinanceHoldingViewController.swift */,
 				10B6B31525410D37008037AD /* FinanceTagsViewController.swift */,
 				103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */,
@@ -3243,6 +3249,7 @@
 				4BAEE5CD212735E50045AB10 /* SelectParticipantsTableView.swift in Sources */,
 				10196F0424411B5600B6AFDF /* EventViewController+AvatarOpenerDelegate.swift in Sources */,
 				4BAEE50221272D890045AB10 /* ChatsTableViewController.swift in Sources */,
+				108C37FF28A28B0F00DC4998 /* ScheduleListViewController.swift in Sources */,
 				10C32861248D8B9300E4475B /* ChatsTableViewController+Migration.swift in Sources */,
 				26B975E92364009C003BFBE3 /* InvitationCell.swift in Sources */,
 				4BAEE5EE212735E50045AB10 /* SelectNewAdminTableViewController+SearchHandlers.swift in Sources */,
@@ -3270,6 +3277,7 @@
 				26C4431D250F0CB000A9533C /* HealthMetric.swift in Sources */,
 				4BAEE4F021272D890045AB10 /* AddGroupMembersController.swift in Sources */,
 				4BAEE51D21272D890045AB10 /* BaseMessageCell.swift in Sources */,
+				108C380128A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift in Sources */,
 				10217A7B23103661004CBA9E /* ActivityViewController.swift in Sources */,
 				4BAEE5D4212735E50045AB10 /* UIView+Extensions.swift in Sources */,
 				10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */,

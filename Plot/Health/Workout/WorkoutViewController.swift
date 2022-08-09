@@ -28,6 +28,7 @@ class WorkoutViewController: FormViewController {
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
     lazy var activities: [Activity] = networkController.activityService.activities
+    lazy var transactions: [Transaction] = networkController.financeService.transactions
     
     var selectedFalconUsers = [User]()
     
@@ -44,7 +45,6 @@ class WorkoutViewController: FormViewController {
     //added for WorkoutViewController
     var movingBackwards: Bool = false
     var active: Bool = false
-    var comingFromActivity: Bool = false
     
     weak var delegate : UpdateWorkoutDelegate?
     weak var updateDiscoverDelegate : UpdateDiscover?
@@ -152,6 +152,7 @@ class WorkoutViewController: FormViewController {
                 
                 // update
                 self.showActivityIndicator()
+                self.updateLists()
                 let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createWorkout.createNewWorkout()
                 self.hideActivityIndicator()
@@ -173,6 +174,7 @@ class WorkoutViewController: FormViewController {
                 
                 if let currentUserID = Auth.auth().currentUser?.uid {
                     self.showActivityIndicator()
+                    self.updateLists()
                     let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     createWorkout.createNewWorkout()
                     
@@ -205,18 +207,20 @@ class WorkoutViewController: FormViewController {
                 print("completion block")
             })
         } else {
+            showActivityIndicator()
             createHealthKit() { hkSampleID in
-                self.showActivityIndicator()
                 self.workout.hkSampleID = hkSampleID
                 let createNewWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createNewWorkout.createNewWorkout()
-                self.hideActivityIndicator()
                 self.delegate?.updateWorkout(workout: self.workout)
-                if self.navigationItem.leftBarButtonItem != nil {
-                    self.dismiss(animated: true, completion: nil)
-                } else {
-                    self.navigationController?.popViewController(animated: true)
-                    self.updateDiscoverDelegate?.itemCreated()
+                DispatchQueue.main.async {
+                    self.hideActivityIndicator()
+                    if self.navigationItem.leftBarButtonItem != nil {
+                        self.dismiss(animated: true, completion: nil)
+                    } else {
+                        self.navigationController?.popViewController(animated: true)
+                        self.updateDiscoverDelegate?.itemCreated()
+                    }
                 }
             }
         }
@@ -248,6 +252,7 @@ class WorkoutViewController: FormViewController {
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
             let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: [hkSampleID], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
+            completion()
         }
     }
     
@@ -487,30 +492,30 @@ class WorkoutViewController: FormViewController {
             self.updateCalories()
         })
         
-        //            <<< ButtonRow("Participants") { row in
-        //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                row.cell.textLabel?.textAlignment = .left
-        //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        //                row.cell.accessoryType = .disclosureIndicator
-        //                row.title = row.tag
-        //                if active {
-        //                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                    row.title = self.userNamesString
-        //                }
-        //            }.onCellSelection({ _,_ in
-        //                self.openParticipantsInviter()
-        //            }).cellUpdate { cell, row in
-        //                cell.accessoryType = .disclosureIndicator
-        //                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                cell.textLabel?.textAlignment = .left
-        //                if row.title == "Participants" {
-        //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        //                } else {
-        //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                }
-        //            }
+//            <<< ButtonRow("Participants") { row in
+//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                row.cell.textLabel?.textAlignment = .left
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                row.cell.accessoryType = .disclosureIndicator
+//                row.title = row.tag
+//                if active {
+//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    row.title = self.userNamesString
+//                }
+//            }.onCellSelection({ _,_ in
+//                self.openParticipantsInviter()
+//            }).cellUpdate { cell, row in
+//                cell.accessoryType = .disclosureIndicator
+//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                cell.textLabel?.textAlignment = .left
+//                if row.title == "Participants" {
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                } else {
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                }
+//            }
         
-        if delegate == nil {
+        if delegate == nil && active {
             form.last!
             <<< SegmentedRow<String>("sections"){
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -614,6 +619,27 @@ class WorkoutViewController: FormViewController {
             self.workout.totalEnergyBurned = Double(length / 60) * workoutType.calories * Double(weightValue)
             caloriesRow.value = self.workout.totalEnergyBurned
             caloriesRow.updateCell()
+        }
+    }
+    
+    override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
+        super.rowsHaveBeenRemoved(rows, at: indexes)
+        let rowNumber : Int = indexes.first!.row
+        let rowType = rows[0].self
+        
+        DispatchQueue.main.async { [weak self] in
+            if rowType is ScheduleRow {
+                if self!.eventList.indices.contains(self!.eventIndex) {
+                    self!.eventList.remove(at: rowNumber)
+                    self!.updateLists()
+                }
+            }
+            else if rowType is PurchaseRow {
+                if self!.purchaseList.indices.contains(self!.purchaseIndex) {
+                    self!.purchaseList.remove(at: rowNumber)
+                    self!.updateLists()
+                }
+            }
         }
     }
     

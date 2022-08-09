@@ -76,24 +76,26 @@ class FinanceService {
         DispatchQueue.main.async { [weak self] in
             self?.accountFetcher.fetchAccounts { (firebaseAccounts) in
                 self?.accounts = firebaseAccounts
-                self?.observeAccountsForCurrentUser()
             }
             
             self?.transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
                 self?.transactionRules = firebaseTransactionRules
                 self?.observeTransactionRulesForCurrentUser()
                 self?.transactionFetcher.fetchTransactions { (firebaseTransactions) in
-                    completion()
                     self?.transactions = firebaseTransactions
                     self?.removePendingTransactions()
-                    self?.observeTransactionsForCurrentUser()
                     self?.grabOtherFinances()
+                    completion()
                 }
             }
             
             self?.holdingFetcher.fetchHoldings { (firebaseHoldings) in
                 self?.holdings = firebaseHoldings
-                self?.observeHoldingsForCurrentUser()
+            }
+            
+            self?.memberFetcher.fetchMembers { (firebaseMembers) in
+                self?.members = firebaseMembers
+                self?.setupMembersAccountsDict()
             }
 
         }
@@ -101,11 +103,10 @@ class FinanceService {
     
     func grabOtherFinances() {
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-            self?.memberFetcher.fetchMembers { (firebaseMembers) in
-                self?.members = firebaseMembers
-                self?.setupMembersAccountsDict()
-                self?.observeMembersForCurrentUser()
-            }
+            self?.observeAccountsForCurrentUser()
+            self?.observeTransactionsForCurrentUser()
+            self?.observeHoldingsForCurrentUser()
+            self?.observeMembersForCurrentUser()
         }
     }
     

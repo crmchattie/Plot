@@ -142,15 +142,16 @@ class AccountActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userFinancialAccountsEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["name": "\(account.name)"]
+            let values:[String : Any] = ["name": "\(account.name)", "groupAccount": false]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                //trigger firebase observer to update
+                userReference.child("groupAccount").setValue(true)
                 connectingMembersGroup.leave()
             })
         }
     }
 
     func createGroupAccountNode(reference: DatabaseReference, childValues: [String: Any]) {
-        print("child values \(childValues)")
         let nodeCreationGroup = DispatchGroup()
         nodeCreationGroup.enter()
         nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {

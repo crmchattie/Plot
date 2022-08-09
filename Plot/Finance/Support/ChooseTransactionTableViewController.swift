@@ -49,8 +49,6 @@ class ChooseTransactionTableViewController: UITableViewController {
                                               .flexibleLeftMargin,
                                               .flexibleRightMargin]
         
-        activityIndicator.startAnimating()
-        
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -58,6 +56,9 @@ class ChooseTransactionTableViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         tableView.register(FinanceTableViewCell.self, forCellReuseIdentifier: kFinanceTableViewCell)
+        
+        self.transactions = self.transactions.filter{ !self.existingTransactions.contains($0) && $0.status != .pending && $0.containerID == nil }
+        
         
         handleReloadTable()
         setupSearchController()
@@ -70,13 +71,13 @@ class ChooseTransactionTableViewController: UITableViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         if movingBackwards {
-            let transaction = Transaction(description: "Name", amount: 0.0, created_at: "", guid: "", user_guid: "", status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
+            let transaction = Transaction(description: "Name", amount: 0.0, created_at: "", guid: "", user_guid: "", type: nil, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
             self.delegate?.chosenTransaction(transaction: transaction)
         }
     }
     
     @objc fileprivate func cancel() {
-        let transaction = Transaction(description: "Name", amount: 0.0, created_at: "", guid: "", user_guid: "", status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
+        let transaction = Transaction(description: "Name", amount: 0.0, created_at: "", guid: "", user_guid: "", type: nil, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
         self.delegate?.chosenTransaction(transaction: transaction)
         movingBackwards = false
         dismiss(animated: true, completion: nil)
@@ -102,8 +103,9 @@ class ChooseTransactionTableViewController: UITableViewController {
     
     func handleReloadTable() {
         if transactions != nil {
-            DispatchQueue.global(qos: .background).async {
-                self.filteredTransactions = self.transactions.filter{ !self.existingTransactions.contains($0) && $0.status != .pending }
+            activityIndicator.startAnimating()
+            DispatchQueue.global(qos: .userInteractive).async {
+                self.filteredTransactions = self.transactions
                 self.filteredTransactions.sort { (transaction1, transaction2) -> Bool in
                     if transaction1.should_link ?? true == transaction2.should_link ?? true {
                         if let date1 = self.isodateFormatter.date(from: transaction1.transacted_at), let date2 = self.isodateFormatter.date(from: transaction2.transacted_at) {
@@ -114,15 +116,16 @@ class ChooseTransactionTableViewController: UITableViewController {
                     return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
                 }
                 DispatchQueue.main.async {
+                    self.activityIndicator.stopAnimating()
                     self.tableView.reloadData()
                 }
             }
         }
-        activityIndicator.stopAnimating()
     }
     
     
     func handleReloadTableAfterSearch() {
+        self.activityIndicator.startAnimating()
         if transactions != nil {
             filteredTransactions.sort { (transaction1, transaction2) -> Bool in
                 if transaction1.should_link ?? true == transaction2.should_link ?? true {
@@ -135,6 +138,7 @@ class ChooseTransactionTableViewController: UITableViewController {
             }
         }
         DispatchQueue.main.async {
+            self.activityIndicator.stopAnimating()
             self.tableView.reloadData()
         }
     }

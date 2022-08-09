@@ -76,9 +76,21 @@ class ChooseActivityTableViewController: UITableViewController {
         super.viewDidLoad()
         
         navigationItem.title = "Choose Activity"
-
-        handleReloadActivities()
         
+        activities = activities.filter { $0.containerID == nil }
+        if let activity = activity {
+            if let index = activities.firstIndex(of: activity) {
+                activities.remove(at: index)
+            }
+        } else if let activityID = activityID {
+            if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
+                activities.remove(at: index)
+            }
+        } else if !existingActivities.isEmpty {
+            activities = activities.filter { !existingActivities.contains($0) }
+        }
+        
+        handleReloadActivities()
         configureTableView()
         setupSearchController()
         
@@ -145,32 +157,21 @@ class ChooseActivityTableViewController: UITableViewController {
     
     
     func handleReloadActivities() {
-        if let activity = activity {
-            if let index = activities.firstIndex(of: activity) {
-                activities.remove(at: index)
-                filteredActivities.remove(at: index)
-            }
-        } else if let activityID = activityID {
-            if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
-                activities.remove(at: index)
-                filteredActivities.remove(at: index)
-            }
-        } else if !existingActivities.isEmpty {
-            activities = activities.filter { !existingActivities.contains($0) }
-            filteredActivities = filteredActivities.filter { !existingActivities.contains($0) }
+        filteredActivities = activities
+        filteredActivities.sort { (activity1, activity2) -> Bool in
+            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
         }
+        self.tableView.reloadData()
     }
     
     func handleReloadTableAftersearchBarCancelButtonClicked() {
         handleReloadActivities()
-        self.tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
         filteredActivities.sort { (activity1, activity2) -> Bool in
             return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
         }
-        
         self.tableView.reloadData()
     }
     

@@ -39,9 +39,7 @@ class MealViewController: FormViewController {
     
     //added for EventViewController
     var movingBackwards: Bool = false
-    var active: Bool = false
-    var comingFromActivity: Bool = false
-    
+    var active: Bool = false    
     
     weak var delegate : UpdateMealDelegate?
     weak var updateDiscoverDelegate : UpdateDiscover?

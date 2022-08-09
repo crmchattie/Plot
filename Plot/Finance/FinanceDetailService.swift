@@ -82,7 +82,7 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                     }
                 }
             } else if let transactionDetails = transactionDetails, let transactions = transactions {
-                transactionDetailsOverTimeChartData(transactions: transactions, transactionDetails: [transactionDetails], start: startDate, end: endDate, segmentType: segmentType, accounts: filterAccounts ?? [""]) { (statisticDict, transactionDict) in
+                transactionDetailsOverTimeChartData(transactions: transactions, transactionDetails: [transactionDetails], start: startDate, end: endDate, segmentType: segmentType, accounts: filterAccounts) { (statisticDict, transactionDict) in
                     if let statistics = statisticDict[transactionDetails], let transactions = transactionDict[transactionDetails] {
                         let isodateFormatter = ISO8601DateFormatter()
                         var sortTransactions = transactions

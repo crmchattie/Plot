@@ -1,8 +1,8 @@
 //
-//  MindfulnessViewController+Extensions.swift
+//  FinanceTransactionViewController+Extensions.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/8/22.
+//  Created by Cory McHattie on 8/9/22.
 //  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
@@ -11,17 +11,17 @@ import Firebase
 import CodableFirebase
 import Eureka
 
-extension MindfulnessViewController {
+extension FinanceTransactionViewController {
     func setupLists() {
         guard delegate == nil && active else { return }
         let dispatchGroup = DispatchGroup()
-        if let containerID = mindfulness.containerID {
+        if let containerID = transaction.containerID {
             print(containerID)
             dispatchGroup.enter()
-            ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, _, transactions in
+            ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, health, _ in
                 self.container = container
                 self.eventList = activities ?? []
-                self.purchaseList = transactions ?? []
+                self.healthList = health ?? []
                 dispatchGroup.leave()
             }
         }
@@ -43,15 +43,16 @@ extension MindfulnessViewController {
                 cell.cellResignFirstResponder()
             }, at: mvs.count - 1)
         }
-        for purchase in purchaseList {
-            var mvs = (form.sectionBy(tag: "purchasefields") as! MultivaluedSection)
-            mvs.insert(PurchaseRow() {
-                $0.value = purchase
-            }.onCellSelection() { cell, row in
-                self.purchaseIndex = row.indexPath!.row
-                self.openTransaction()
-                cell.cellResignFirstResponder()
+        for health in healthList {
+            var mvs = (form.sectionBy(tag: "healthfields") as! MultivaluedSection)
+            mvs.insert(HealthRow() {
+                $0.value = health
+                }.onCellSelection() { cell, row in
+                    self.healthIndex = row.indexPath!.row
+                    self.openHealth()
+                    cell.cellResignFirstResponder()
             }, at: mvs.count - 1)
+            
         }
     }
     
@@ -77,8 +78,10 @@ extension MindfulnessViewController {
                 destination.users = self.selectedFalconUsers
                 destination.filteredUsers = self.selectedFalconUsers
                 destination.delegate = self
-                destination.startDateTime = self.mindfulness.startDateTime
-                destination.endDateTime = self.mindfulness.endDateTime
+                if let date = self.isodateFormatter.date(from: self.transaction.transacted_at) {
+                    destination.startDateTime = date
+                    destination.endDateTime = date
+                }
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
@@ -103,39 +106,34 @@ extension MindfulnessViewController {
         }
     }
     
-    func openTransaction() {
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        if purchaseList.indices.contains(purchaseIndex) {
-            let destination = FinanceTransactionViewController(networkController: networkController)
+    func openHealth() {
+        if healthList.indices.contains(healthIndex), let workout = healthList[healthIndex].workout {
+            let destination = WorkoutViewController(networkController: networkController)
+            destination.workout = workout
             destination.delegate = self
-            destination.movingBackwards = true
-            destination.transaction = purchaseList[purchaseIndex]
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else if healthList.indices.contains(healthIndex), let mindfulness = healthList[healthIndex].mindfulness {
+            let destination = MindfulnessViewController(networkController: networkController)
+            destination.mindfulness = mindfulness
+            destination.delegate = self
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Transaction", style: .default, handler: { (_) in
-                let destination = FinanceTransactionViewController(networkController: self.networkController)
+            alert.addAction(UIAlertAction(title: "New Workout", style: .default, handler: { (_) in
+                let destination = WorkoutViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
-                destination.users = self.selectedFalconUsers
-                destination.filteredUsers = self.selectedFalconUsers
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
-            alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
-                print("Existing")
-                let destination = ChooseTransactionTableViewController()
+            alert.addAction(UIAlertAction(title: "New Mindfulness", style: .default, handler: { (_) in
+                let destination = MindfulnessViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
-                destination.existingTransactions = self.purchaseList
-                destination.transactions = self.transactions
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
+                if let mvs = self.form.sectionBy(tag: "healthfields") as? MultivaluedSection {
+                    mvs.remove(at: self.healthIndex)
                 }
             }))
             self.present(alert, animated: true)
@@ -144,10 +142,10 @@ extension MindfulnessViewController {
     
     func updateLists() {
         if container != nil {
-            container = Container(id: container.id, activityIDs: eventList.map({$0.activityID ?? ""}), workoutIDs: container.workoutIDs, mindfulnessIDs: container.mindfulnessIDs, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+            container = Container(id: container.id, activityIDs: eventList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: container.transactionIDs)
         } else {
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), workoutIDs: nil, mindfulnessIDs: [mindfulness.hkSampleID ?? ""], mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+            container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: [transaction.guid])
         }
         ContainerFunctions.updateContainerAndStuffInside(container: container)
     }
@@ -169,7 +167,7 @@ extension MindfulnessViewController {
     }
 }
 
-extension MindfulnessViewController: UpdateActivityDelegate {
+extension FinanceTransactionViewController: UpdateActivityDelegate {
     func updateActivity(activity: Activity) {
         if let _ = activity.name {
             if eventList.indices.contains(eventIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
@@ -199,7 +197,7 @@ extension MindfulnessViewController: UpdateActivityDelegate {
     }
 }
 
-extension MindfulnessViewController: ChooseActivityDelegate {
+extension FinanceTransactionViewController: ChooseActivityDelegate {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
         guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -256,61 +254,66 @@ extension MindfulnessViewController: ChooseActivityDelegate {
     }
 }
 
-extension MindfulnessViewController: UpdateTransactionDelegate {
-    func updateTransaction(transaction: Transaction) {
-        var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
-        if transaction.description != "Name" {
-            if mvs.allRows.count - 1 == purchaseIndex {
-                mvs.insert(PurchaseRow() {
-                    $0.value = transaction
-                }.onCellSelection() { cell, row in
-                    self.purchaseIndex = row.indexPath!.row
-                    self.openTransaction()
-                    cell.cellResignFirstResponder()
-                }, at: purchaseIndex)
+extension FinanceTransactionViewController: UpdateWorkoutDelegate {
+    func updateWorkout(workout: Workout) {
+        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
+        if workout.name != "Name" {
+            if healthList.indices.contains(healthIndex) {
+                healthList[healthIndex].workout = workout
             } else {
-                let row = mvs.allRows[purchaseIndex]
-                row.baseValue = transaction
+                var health = HealthContainer()
+                health.workout = workout
+                healthList.append(health)
+            }
+            if mvs.allRows.count - 1 == healthIndex {
+                mvs.insert(HealthRow() {
+                    $0.value = healthList[healthIndex]
+                    }.onCellSelection() { cell, row in
+                        self.healthIndex = row.indexPath!.row
+                        self.openHealth()
+                        cell.cellResignFirstResponder()
+                }, at: healthIndex)
+            } else {
+                let row = mvs.allRows[healthIndex]
+                row.baseValue = healthList[healthIndex]
                 row.updateCell()
             }
-            if purchaseList.indices.contains(purchaseIndex) {
-                purchaseList[purchaseIndex] = transaction
-            } else {
-                purchaseList.append(transaction)
-            }
+            updateLists()
         }
-        else if mvs.allRows.count - 1 > purchaseIndex {
-            mvs.remove(at: purchaseIndex)
+        else if mvs.allRows.count - 1 > healthIndex {
+            mvs.remove(at: healthIndex)
         }
-        //            purchaseBreakdown()
     }
 }
 
-extension MindfulnessViewController: ChooseTransactionDelegate {
-    func chosenTransaction(transaction: Transaction) {
-        var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
-        if transaction.description != "Name" {
-            if mvs.allRows.count - 1 == purchaseIndex {
-                mvs.insert(PurchaseRow() {
-                    $0.value = transaction
-                }.onCellSelection() { cell, row in
-                    self.purchaseIndex = row.indexPath!.row
-                    self.openTransaction()
-                    cell.cellResignFirstResponder()
-                }, at: purchaseIndex)
+extension FinanceTransactionViewController: UpdateMindfulnessDelegate {
+    func updateMindfulness(mindfulness: Mindfulness) {
+        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
+        if mindfulness.name != "Name" {
+            if healthList.indices.contains(healthIndex) {
+                healthList[healthIndex].mindfulness = mindfulness
             } else {
-                let row = mvs.allRows[purchaseIndex]
-                row.baseValue = transaction
+                var health = HealthContainer()
+                health.mindfulness = mindfulness
+                healthList.append(health)
+            }
+            if mvs.allRows.count - 1 == healthIndex {
+                mvs.insert(HealthRow() {
+                    $0.value = healthList[healthIndex]
+                    }.onCellSelection() { cell, row in
+                        self.healthIndex = row.indexPath!.row
+                        self.openHealth()
+                        cell.cellResignFirstResponder()
+                }, at: healthIndex)
+            } else {
+                let row = mvs.allRows[healthIndex]
+                row.baseValue = healthList[healthIndex]
                 row.updateCell()
             }
-            if purchaseList.indices.contains(purchaseIndex) {
-                purchaseList[purchaseIndex] = transaction
-            } else {
-                purchaseList.append(transaction)
-            }
+            updateLists()
         }
-        else if mvs.allRows.count - 1 > purchaseIndex {
-            mvs.remove(at: purchaseIndex)
+        else if mvs.allRows.count - 1 > healthIndex {
+            mvs.remove(at: healthIndex)
         }
     }
 }

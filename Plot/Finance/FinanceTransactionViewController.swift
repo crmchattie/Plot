@@ -17,6 +17,11 @@ protocol UpdateTransactionDelegate: AnyObject {
 
 class FinanceTransactionViewController: FormViewController {
     var transaction: Transaction!
+    var container: Container!
+    var eventList = [Activity]()
+    var healthList = [HealthContainer]()
+    var eventIndex: Int = 0
+    var healthIndex: Int = 0
     
     var accounts: [MXAccount] {
         return networkController.financeService.accounts
@@ -122,7 +127,7 @@ class FinanceTransactionViewController: FormViewController {
             title = "New Transaction"
             let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
-            transaction = Transaction(description: "Name", amount: 0.0, created_at: date, guid: ID, user_guid: currentUser, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: currentUser)
+            transaction = Transaction(description: "Name", amount: 0.0, created_at: date, guid: ID, user_guid: currentUser, type: .debit, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
         }
         
@@ -196,8 +201,8 @@ class FinanceTransactionViewController: FormViewController {
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        self.transaction.description = value
+                    self.transaction.description = value
+                    if let currentUser = Auth.auth().currentUser?.uid, self.active {
                         let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("description")
                         reference.setValue(value)
                     }
@@ -285,13 +290,56 @@ class FinanceTransactionViewController: FormViewController {
                 }
                 cell.detailTextLabel?.textColor = cell.tintColor
             }.onChange { row in
-                if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
+                if let value = row.value {
                     let date = self.isodateFormatter.string(from: value)
                     self.transaction.date_for_reports = date
-                    let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("date_for_reports")
-                    reference.setValue(date)
+                    if let currentUser = Auth.auth().currentUser?.uid, self.active {
+                        let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("date_for_reports")
+                        reference.setValue(date)
+                    }
                 }
             }
+        
+        
+            <<< PushRow<String>("Type") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.title = row.tag
+                if let type = transaction.type {
+                    row.value = type.name
+                }
+                row.options = []
+                TransactionType.allCases.forEach {
+                    row.options?.append($0.name.capitalized)
+                }
+            }.onPresent { from, to in
+                to.title = "Type"
+                to.tableViewStyle = .insetGrouped
+                to.selectableRowCellUpdate = { cell, row in
+                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.tableView.separatorStyle = .none
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                if !(self.transaction?.user_created ?? false) {
+                    row.cell.accessoryType = .none
+                }
+            }.onChange({ row in
+                if let value = row.value {
+                    if value == "Income" {
+                        self.transaction.type = .credit
+                    } else {
+                        self.transaction.type = .debit
+                    }
+                }
+            })
             
             <<< DecimalRow("Amount") {
                 $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
@@ -382,8 +430,8 @@ class FinanceTransactionViewController: FormViewController {
             }.onChange { row in
                 row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
                 row.updateCell()
-                if let currentUser = Auth.auth().currentUser?.uid {
-                    self.transaction.should_link = row.value
+                self.transaction.should_link = row.value
+                if let currentUser = Auth.auth().currentUser?.uid, self.active {
                     let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("should_link")
                     reference.setValue(row.value!)
                 }
@@ -526,6 +574,79 @@ class FinanceTransactionViewController: FormViewController {
 //                    cell.textLabel?.textAlignment = .left
 //                }
         
+        if delegate == nil {
+            form.last!
+            <<< SegmentedRow<String>("sections"){
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    if #available(iOS 13.0, *) {
+                        $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+                    } else {
+                        // Fallback on earlier versions
+                    }
+                    $0.options = ["Event", "Health"]
+                    $0.value = "Event"
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }
+
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Event",
+                                   footer: "Connect an event") {
+                                    $0.tag = "schedulefields"
+                                    $0.hidden = "!$sections == 'Event'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow("scheduleButton"){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Event"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                            }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.eventIndex = index
+                                        self.openEvent()
+                                        return ScheduleRow("label"){
+                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        }
+                                    }
+
+                                }
+
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Health",
+                                   footer: "Connect a workout and/or mindfulness session") {
+                                    $0.tag = "healthfields"
+                                    $0.hidden = "$sections != 'Health'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow(){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Health"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                            }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.healthIndex = index
+                                        self.openHealth()
+                                        return HealthRow()
+                                            .onCellSelection() { cell, row in
+                                                self.healthIndex = index
+                                                self.openHealth()
+                                                cell.cellResignFirstResponder()
+                                        }
+
+                                    }
+
+            }
+        }
+        
     }
     
     @objc func goToExtras() {
@@ -618,6 +739,27 @@ class FinanceTransactionViewController: FormViewController {
         }
     }
     
+    override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
+        super.rowsHaveBeenRemoved(rows, at: indexes)
+        let rowNumber : Int = indexes.first!.row
+        let rowType = rows[0].self
+        
+        DispatchQueue.main.async { [weak self] in
+            if rowType is ScheduleRow {
+                if self!.eventList.indices.contains(self!.eventIndex) {
+                    self!.eventList.remove(at: rowNumber)
+                    self!.updateLists()
+                }
+            }
+            else if rowType is HealthRow {
+                if self!.healthList.indices.contains(self!.healthIndex) {
+                    self!.healthList.remove(at: rowNumber)
+                    self!.updateLists()
+                }
+            }
+        }
+    }
+    
     func showActivityIndicator() {
         if let tabController = self.tabBarController {
             self.showSpinner(onView: tabController.view)
@@ -639,13 +781,19 @@ extension FinanceTransactionViewController: UpdateTransactionLevelDelegate {
             row.updateCell()
             if level == "Subcategory" {
                 transaction.category = value
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("category").setValue(value)
+                if active {
+                    Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("category").setValue(value)
+                }
             } else if level == "Category" {
                 transaction.top_level_category = value
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("top_level_category").setValue(value)
+                if active {
+                    Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("top_level_category").setValue(value)
+                }
             } else {
                 transaction.group = value
-                Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("group").setValue(value)
+                if active {
+                    Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("group").setValue(value)
+                }
             }
         }
     }

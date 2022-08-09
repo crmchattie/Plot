@@ -143,111 +143,23 @@ extension EventViewController: UpdateTimeZoneDelegate {
     }
 }
 
-extension EventViewController: UpdateActivityDelegate {
-    func updateActivity(activity: Activity) {
-        if let _ = activity.name {
-            if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
-                let scheduleRow = mvs.allRows[scheduleIndex]
-                scheduleRow.baseValue = activity
-                scheduleRow.reload()
-                scheduleList[scheduleIndex] = activity
+extension EventViewController: UpdateScheduleListDelegate {
+    func updateScheduleList(scheduleList: [Activity]) {
+        if let row: ButtonRow = form.rowBy(tag: "Schedule") {
+            if scheduleList.isEmpty {
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             } else {
-                var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
-                mvs.insert(ScheduleRow() {
-                    $0.value = activity
-                    }.onCellSelection() { cell, row in
-                        self.scheduleIndex = row.indexPath!.row
-                        self.openSchedule()
-                        cell.cellResignFirstResponder()
-                }, at: mvs.count - 1)
-                
-                Analytics.logEvent("new_schedule", parameters: [
-                    "schedule_name": activity.name ?? "name" as NSObject,
-                    "schedule_type": activity.activityType ?? "basic" as NSObject
-                ])
-                scheduleList.append(activity)
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             }
-            
-            sortSchedule()
-            if let localAddress = activity.locationAddress {
-                for (key, value) in localAddress {
-                    locationAddress[key] = value
-                }
+        }
+        self.scheduleList = scheduleList
+        sortSchedule()
+        if let localAddress = activity.locationAddress {
+            for (key, value) in localAddress {
+                locationAddress[key] = value
             }
-            updateLists(type: "schedule")
         }
-    }
-}
-
-extension EventViewController: ChooseActivityDelegate {
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        let group = DispatchGroup()
-        var participants: [User] = []
-        for id in participantsIDs {
-            // Only if the current user is created this activity
-            if activity.admin == currentUserID && id == currentUserID {
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            completion(participants)
-        }
-    }
-    
-    func chosenActivity(mergeActivity: Activity) {
-        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
-            mvs.remove(at: mvs.count - 2)
-        }
-        if let _ = mergeActivity.name, let currentUserID = Auth.auth().currentUser?.uid {
-            self.getParticipants(forActivity: mergeActivity) { (participants) in
-                let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
-                deleteActivity.deleteActivity()
-            }
-            
-            mergeActivity.participantsIDs = [currentUserID]
-            mergeActivity.admin = currentUserID
-            
-            var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
-            mvs.insert(ScheduleRow() {
-                $0.value = mergeActivity
-                }.onCellSelection() { cell, row in
-                    self.scheduleIndex = row.indexPath!.row
-                    self.openSchedule()
-                    cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
-            
-            Analytics.logEvent("new_schedule", parameters: [
-                "schedule_name": mergeActivity.name ?? "name" as NSObject,
-                "schedule_type": mergeActivity.activityType ?? "basic" as NSObject
-            ])
-            
-            scheduleList.append(mergeActivity)
-            
-            sortSchedule()
-            if let localAddress = mergeActivity.locationAddress {
-                for (key, value) in localAddress {
-                    locationAddress[key] = value
-                }
-            }
-            updateLists(type: "schedule")
-        }
+        self.updateLists(type: "schedule")
     }
 }
 
@@ -328,8 +240,8 @@ extension EventViewController: UpdateWorkoutDelegate {
                 mvs.insert(HealthRow() {
                     $0.value = healthList[healthIndex]
                     }.onCellSelection() { cell, row in
-                        self.scheduleIndex = row.indexPath!.row
-                        self.openSchedule()
+                        self.healthIndex = row.indexPath!.row
+                        self.openHealth()
                         cell.cellResignFirstResponder()
                 }, at: healthIndex)
             } else {
@@ -360,8 +272,8 @@ extension EventViewController: UpdateMindfulnessDelegate {
                 mvs.insert(HealthRow() {
                     $0.value = healthList[healthIndex]
                     }.onCellSelection() { cell, row in
-                        self.scheduleIndex = row.indexPath!.row
-                        self.openSchedule()
+                        self.healthIndex = row.indexPath!.row
+                        self.openHealth()
                         cell.cellResignFirstResponder()
                 }, at: healthIndex)
             } else {

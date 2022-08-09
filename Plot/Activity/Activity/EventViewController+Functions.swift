@@ -214,7 +214,15 @@ extension EventViewController {
             ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, health, transactions in
                 self.container = container
                 self.healthList = health ?? []
-                self.transactions = transactions ?? []
+                for list in self.healthList {
+                    print(list.name)
+                    print(list.ID)
+                }
+                self.purchaseList = transactions ?? []
+                for list in self.purchaseList {
+                    print(list.description)
+                    print(list.guid)
+                }
                 dispatchGroup.leave()
             }
         }
@@ -227,86 +235,6 @@ extension EventViewController {
 
     
     func listRow() {
-//        for list in listList {
-//            if let groceryList = list.grocerylist {
-//                var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-//                mvs.insert(ButtonRow() { row in
-//                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    row.cell.textLabel?.textAlignment = .left
-//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.title = groceryList.name
-//                    self.grocerylistIndex = mvs.count - 1
-//                }.onCellSelection({ cell, row in
-//                    self.listIndex = row.indexPath!.row
-//                    self.openList()
-//                }).cellUpdate { cell, row in
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.textLabel?.textAlignment = .left
-//                }, at: mvs.count - 1)
-//            } else if let checklist = list.checklist {
-//                var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-//                mvs.insert(ButtonRow() { row in
-//                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    row.cell.textLabel?.textAlignment = .left
-//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.title = checklist.name
-//                }.onCellSelection({ cell, row in
-//                    self.listIndex = row.indexPath!.row
-//                    self.openList()
-//                }).cellUpdate { cell, row in
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.textLabel?.textAlignment = .left
-//                }, at: mvs.count - 1)
-//            } else if let activitylist = list.activitylist {
-//                var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-//                mvs.insert(ButtonRow() { row in
-//                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    row.cell.textLabel?.textAlignment = .left
-//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.title = activitylist.name
-//                }.onCellSelection({ cell, row in
-//                    self.listIndex = row.indexPath!.row
-//                    self.openList()
-//                }).cellUpdate { cell, row in
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.textLabel?.textAlignment = .left
-//                }, at: mvs.count - 1)
-//            } else if let packinglist = list.packinglist {
-//                var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-//                mvs.insert(ButtonRow() { row in
-//                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    row.cell.textLabel?.textAlignment = .left
-//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.title = packinglist.name
-//                }.onCellSelection({ cell, row in
-//                    self.listIndex = row.indexPath!.row
-//                    self.openList()
-//                }).cellUpdate { cell, row in
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.textLabel?.textAlignment = .left
-//                }, at: mvs.count - 1)
-//            }
-//        }
-        
-        scheduleList.sort { (schedule1, schedule2) -> Bool in
-            return schedule1.startDateTime!.int64Value < schedule2.startDateTime!.int64Value
-        }
-        for schedule in scheduleList {
-            var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
-            mvs.insert(ScheduleRow() {
-                $0.value = schedule
-                }.onCellSelection() { cell, row in
-                    self.scheduleIndex = row.indexPath!.row
-                    self.openSchedule()
-                    cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
-            
-        }
-        
         for health in healthList {
             var mvs = (form.sectionBy(tag: "healthfields") as! MultivaluedSection)
             mvs.insert(HealthRow() {
@@ -425,10 +353,10 @@ extension EventViewController {
             }
         } else if type == "container" {
             if container != nil {
-                container = Container(id: container.id, activityIDs: container.activityIDs, workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.hkSampleID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.hkSampleID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+                container = Container(id: container.id, activityIDs: container.activityIDs, workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
             } else {
                 let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                container = Container(id: containerID, activityIDs: [activityID], workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.hkSampleID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.hkSampleID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+                container = Container(id: containerID, activityIDs: [activityID], workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
             }
             ContainerFunctions.updateContainerAndStuffInside(container: container)
         } else {
@@ -674,57 +602,18 @@ extension EventViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        if scheduleList.indices.contains(scheduleIndex) {
-            showActivityIndicator()
-            let scheduleItem = scheduleList[scheduleIndex]
-            let destination = ScheduleViewController()
-            destination.schedule = scheduleItem
-            destination.users = acceptedParticipant
-            destination.filteredUsers = acceptedParticipant
-            destination.startDateTime = startDateTime
-            destination.endDateTime = endDateTime
-            if let scheduleLocationAddress = scheduleList[scheduleIndex].locationAddress {
-                for (key, _) in scheduleLocationAddress {
-                    locationAddress[key] = nil
-                }
-            }
-            destination.delegate = self
-            self.hideActivityIndicator()
-            self.navigationController?.pushViewController(destination, animated: true)
-        } else {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Event", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-                let destination = ScheduleViewController()
-                destination.users = self.acceptedParticipant
-                destination.filteredUsers = self.acceptedParticipant
-                destination.delegate = self
-                destination.startDateTime = self.startDateTime
-                destination.endDateTime = self.endDateTime
-                self.navigationController?.pushViewController(destination, animated: true)
-            }))
-            alert.addAction(UIAlertAction(title: "Merge Existing Event", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-                let destination = ChooseActivityTableViewController()
-                destination.needDelegate = true
-                destination.movingBackwards = true
-                destination.delegate = self
-                destination.activities = self.activities
-                destination.filteredActivities = self.activities
-                destination.activity = self.activity
-                self.navigationController?.pushViewController(destination, animated: true)
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-            }))
-            self.present(alert, animated: true)
-        }
+        
+        let destination = ScheduleListViewController()
+        destination.delegate = self
+        destination.scheduleList = scheduleList
+        destination.acceptedParticipant = acceptedParticipant
+        destination.startDateTime = startDateTime
+        destination.endDateTime = endDateTime
+        destination.activities = activities
+        destination.activity = activity
+        
+        self.navigationController?.pushViewController(destination, animated: true)
+    
     }
     
     func openPurchases() {
@@ -749,7 +638,6 @@ extension EventViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
-                print("Existing")
                 let destination = ChooseTransactionTableViewController()
                 destination.delegate = self
                 destination.movingBackwards = true
@@ -1202,144 +1090,6 @@ extension EventViewController {
             createActivity.createNewActivity()
         }
     }
-    
-//    func lookupRecipe(recipeID: Int, add: Bool) {
-//        guard currentReachabilityStatus != .notReachable else {
-//            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-//            return
-//        }
-//
-//        let dispatchGroup = DispatchGroup()
-//        dispatchGroup.enter()
-//        Service.shared.fetchRecipesInfo(id: recipeID) { (search, err) in
-//            dispatchGroup.leave()
-//            dispatchGroup.notify(queue: .main) {
-//                if let recipe = search {
-//                    if add {
-//                        self.updateGrocerylist(recipe: recipe, add: true)
-//                    } else {
-//                        self.updateGrocerylist(recipe: recipe, add: false)
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
-//    func updateGrocerylist(recipe: Recipe, add: Bool) {
-//        if self.activity.grocerylistID != nil, let grocerylist = listList[grocerylistIndex].grocerylist, grocerylist.ingredients != nil, let recipeIngredients = recipe.extendedIngredients {
-//            var glIngredients = grocerylist.ingredients!
-//            if let grocerylistServings = grocerylist.servings!["\(recipe.id)"], grocerylistServings != recipe.servings {
-//                grocerylist.servings!["\(recipe.id)"] = recipe.servings
-//                for recipeIngredient in recipeIngredients {
-//                    if let index = glIngredients.firstIndex(where: {$0 == recipeIngredient}) {
-//                        glIngredients[index].recipe![recipe.title] = recipeIngredient.amount ?? 0.0
-//                        if glIngredients[index].amount != nil && recipeIngredient.amount != nil  {
-//                            glIngredients[index].amount! +=  recipeIngredient.amount! - recipeIngredient.amount! * Double(grocerylistServings) / Double(recipe.servings!)
-//                        }
-//                    }
-//                }
-//            } else if grocerylist.recipes!["\(recipe.id)"] != nil && add {
-//                return
-//            } else {
-//                if add {
-//                    if grocerylist.recipes != nil {
-//                        grocerylist.recipes!["\(recipe.id)"] = recipe.title
-//                        grocerylist.servings!["\(recipe.id)"] = recipe.servings
-//                    } else {
-//                        grocerylist.recipes = ["\(recipe.id)": recipe.title]
-//                        grocerylist.servings = ["\(recipe.id)": recipe.servings!]
-//                    }
-//                } else {
-//                    grocerylist.recipes!["\(recipe.id)"] = nil
-//                    grocerylist.servings!["\(recipe.id)"] = nil
-//                }
-//                for recipeIngredient in recipeIngredients {
-//                    if let index = glIngredients.firstIndex(where: {$0 == recipeIngredient}) {
-//                        if add {
-//                            glIngredients[index].recipe![recipe.title] = recipeIngredient.amount ?? 0.0
-//                            if glIngredients[index].amount != nil {
-//                                glIngredients[index].amount! += recipeIngredient.amount ?? 0.0
-//                            }
-//                        } else {
-//                            if glIngredients[index].amount != nil {
-//                                glIngredients[index].amount! -= recipeIngredient.amount ?? 0.0
-//                                if glIngredients[index].amount! == 0 {
-//                                    glIngredients.remove(at: index)
-//                                    continue
-//                                } else {
-//                                    glIngredients[index].recipe![recipe.title] = nil
-//                                }
-//                            }
-//                        }
-//                    } else {
-//                        if add {
-//                            var recIngredient = recipeIngredient
-//                            recIngredient.recipe = [recipe.title: recIngredient.amount ?? 0.0]
-//                            glIngredients.append(recIngredient)
-//                        }
-//                    }
-//                }
-//            }
-//            if glIngredients.isEmpty {
-//                let mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-//                mvs.remove(at: grocerylistIndex)
-//                listList.remove(at: grocerylistIndex)
-//                grocerylistIndex = -1
-//                self.activity.grocerylistID = nil
-//
-//                let deleteGrocerylist = GrocerylistActions(grocerylist: grocerylist, ID: grocerylist.ID, active: true, selectedFalconUsers: self.selectedFalconUsers)
-//                deleteGrocerylist.deleteGrocerylist()
-//
-//            } else {
-//                grocerylist.ingredients = glIngredients
-//                let createGrocerylist = GrocerylistActions(grocerylist: grocerylist, ID: grocerylist.ID, active: true, selectedFalconUsers: self.selectedFalconUsers)
-//                createGrocerylist.createNewGrocerylist()
-//                if listList.indices.contains(grocerylistIndex) {
-//                    listList[grocerylistIndex].grocerylist = grocerylist
-//                }
-//            }
-//        } else if let recipeIngredients = recipe.extendedIngredients, add, let currentUserID = Auth.auth().currentUser?.uid {
-//            let ID = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).childByAutoId().key ?? ""
-//            let grocerylist = Grocerylist(dictionary: ["name" : "\(activity.name ?? "") Grocery List"] as [String: AnyObject])
-//
-//            var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
-//            mvs.insert(ButtonRow() { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                row.title = grocerylist.name
-//                self.grocerylistIndex = mvs.count - 1
-//            }.onCellSelection({ cell, row in
-//                self.listIndex = row.indexPath!.row
-//                self.openList()
-//            }).cellUpdate { cell, row in
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                cell.textLabel?.textAlignment = .left
-//            }, at: mvs.count - 1)
-//
-//            grocerylist.ID = ID
-//            grocerylist.activityID = activityID
-//
-//            grocerylist.ingredients = recipeIngredients
-//            for index in 0...grocerylist.ingredients!.count - 1 {
-//                grocerylist.ingredients![index].recipe = [recipe.title: grocerylist.ingredients![index].amount ?? 0.0]
-//            }
-//            grocerylist.recipes = ["\(recipe.id)": recipe.title]
-//            grocerylist.servings = ["\(recipe.id)": recipe.servings!]
-//
-//            let createGrocerylist = GrocerylistActions(grocerylist: grocerylist, ID: grocerylist.ID, active: false, selectedFalconUsers: self.selectedFalconUsers)
-//            createGrocerylist.createNewGrocerylist()
-//
-//            var list = ListContainer()
-//            list.grocerylist = grocerylist
-//            listList.append(list)
-//
-//            grocerylistIndex = listList.count - 1
-//
-//            self.updateLists(type: "lists")
-//        }
-//    }
     
     func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }

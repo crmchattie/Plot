@@ -147,21 +147,12 @@ class TransactionActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userFinancialTransactionsEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["description": transaction.description]
+            let values:[String : Any] = ["description": transaction.description, "groupTransaction": false]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                //trigger firebase observer to update
+                userReference.child("groupTransaction").setValue(true)
                 connectingMembersGroup.leave()
             })
-        }
-    }
-
-    func createGroupTransactionNode(reference: DatabaseReference, childValues: [String: Any]) {
-        let nodeCreationGroup = DispatchGroup()
-        nodeCreationGroup.enter()
-        nodeCreationGroup.notify(queue: DispatchQueue.main, execute: {
-            self.dispatchGroup.leave()
-        })
-        reference.updateChildValues(childValues) { (error, reference) in
-            nodeCreationGroup.leave()
         }
     }
     

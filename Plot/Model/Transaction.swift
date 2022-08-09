@@ -74,7 +74,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var status: TransactionStatus
     var top_level_category: String
     var transacted_at: String
-    var type: String?
+    var type: TransactionType?
     var updated_at: String
     var user_guid: String
     var user_id: String?
@@ -93,7 +93,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var transactionIDs: [String]?
     var containerID: String?
     var cash_flow_type: String {
-        if type == "CREDIT" {
+        if type == .credit {
             return "Inflow"
         } else {
             return "Outflow"
@@ -144,7 +144,7 @@ struct Transaction: Codable, Equatable, Hashable {
         }
     }
     
-    init(description: String, amount: Double, created_at: String, guid: String, user_guid: String, status: TransactionStatus, category: String, top_level_category: String, user_created: Bool?, admin: String) {
+    init(description: String, amount: Double, created_at: String, guid: String, user_guid: String, type: TransactionType?, status: TransactionStatus, category: String, top_level_category: String, user_created: Bool?, admin: String) {
         self.description = description
         self.amount = amount
         self.created_at = created_at
@@ -153,6 +153,7 @@ struct Transaction: Codable, Equatable, Hashable {
         self.updated_at = created_at
         self.guid = guid
         self.user_guid = user_guid
+        self.type = type
         self.status = status
         self.category = category
         self.top_level_category = top_level_category
@@ -188,6 +189,18 @@ enum TransactionStatus: String, Codable {
         switch self {
         case .pending: return "Pending"
         case .posted: return "Posted"
+        }
+    }
+}
+
+enum TransactionType: String, Codable, CaseIterable {
+    case debit = "DEBIT"
+    case credit = "CREDIT"
+    
+    var name: String {
+        switch self {
+        case .credit: return "Income"
+        case .debit: return "Expense"
         }
     }
 }
@@ -265,7 +278,7 @@ struct TransactionCategoryFull: Codable, Equatable, Hashable {
     let metadata: String?
 }
 
-func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date?, level: TransactionCatLevel?, accounts: [String], completion: @escaping ([TransactionDetails], [TransactionDetails: [Transaction]]) -> ()) {
+func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date?, level: TransactionCatLevel?, accounts: [String]?, completion: @escaping ([TransactionDetails], [TransactionDetails: [Transaction]]) -> ()) {
     var transactionsList = [TransactionDetails]()
     var transactionsDict = [TransactionDetails: [Transaction]]()
     // create dateFormatter with UTC time format
@@ -273,7 +286,9 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     for transaction in transactions {
         guard transaction.should_link ?? true else { continue }
         guard transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
-        guard accounts.contains(transaction.account_guid ?? "") else { continue }
+        if accounts != nil {
+            guard accounts!.contains(transaction.account_guid ?? "") else { continue }
+        }
         if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date), let start = start, let end = end {
             if transactionDate < start || end < transactionDate {
                 continue
@@ -282,9 +297,9 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
             if transactionDate < start || end < transactionDate {
                 continue
             }
-        }        
+        }
         switch transaction.type {
-        case "DEBIT":
+        case .debit:
             switch level {
             case .category:
                 if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.category && $0.level == .category && $0.category == transaction.category && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
@@ -375,7 +390,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                     transactionsDict[transactionDetail] = [transaction]
                 }
             }
-        case "CREDIT":
+        case .credit:
             switch level {
             case .category:
                 if let index = transactionsDict.keys.firstIndex(where: {$0.name == transaction.category && $0.level == .category && $0.category == transaction.category && $0.topLevelCategory == transaction.top_level_category && $0.group == transaction.group}) {
@@ -538,7 +553,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     completion(sortedTransactionsList, transactionsDict)
 }
 
-func transactionDetailsOverTimeChartData(transactions: [Transaction], transactionDetails: [TransactionDetails], start: Date, end: Date, segmentType: TimeSegmentType, accounts: [String], completion: @escaping ([TransactionDetails: [Statistic]], [TransactionDetails: [Transaction]]) -> ()) {
+func transactionDetailsOverTimeChartData(transactions: [Transaction], transactionDetails: [TransactionDetails], start: Date, end: Date, segmentType: TimeSegmentType, accounts: [String]?, completion: @escaping ([TransactionDetails: [Statistic]], [TransactionDetails: [Transaction]]) -> ()) {
     var statistics = [TransactionDetails: [Statistic]]()
     var transactionDict = [TransactionDetails: [Transaction]]()
     let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
@@ -644,14 +659,16 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
     completion(statistics, transactionDict)
 }
 
-func transactionListStats(transactions: [Transaction], transactionDetail: TransactionDetails, start: Date, end: Date, date: Date, nextDate: Date, accounts: [String], completion: @escaping ([Statistic], [Transaction]) -> ()) {
+func transactionListStats(transactions: [Transaction], transactionDetail: TransactionDetails, start: Date, end: Date, date: Date, nextDate: Date, accounts: [String]?, completion: @escaping ([Statistic], [Transaction]) -> ()) {
     var statistics = [Statistic]()
     var transactionList = [Transaction]()
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
         guard transaction.should_link ?? true else { continue }
         guard transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
-        guard accounts.contains(transaction.account_guid ?? "") else { continue }
+        if accounts != nil {
+            guard accounts!.contains(transaction.account_guid ?? "") else { continue }
+        }
         if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
             if transactionDate < start || end < transactionDate {
                 continue
@@ -673,7 +690,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
         
         if transactionDetail.name == "Difference" {
             switch transaction.type {
-            case "DEBIT":
+            case .debit:
                 if statistics.isEmpty {
                     let stat = Statistic(date: nextDate, value: -transaction.amount)
                     statistics.append(stat)
@@ -684,7 +701,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                         transactionList.append(transaction)
                     }
                 }
-            case "CREDIT":
+            case .credit:
                 if statistics.isEmpty {
                     let stat = Statistic(date: nextDate, value: transaction.amount)
                     statistics.append(stat)
@@ -700,7 +717,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
             }
         } else if transactionDetail.name == "Expense" && transaction.group != "Income" {
             switch transaction.type {
-            case "DEBIT":
+            case .debit:
                 if statistics.isEmpty {
                     let stat = Statistic(date: nextDate, value: transaction.amount)
                     statistics.append(stat)
@@ -711,7 +728,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                         transactionList.append(transaction)
                     }
                 }
-            case "CREDIT":
+            case .credit:
                 if statistics.isEmpty {
                     let stat = Statistic(date: nextDate, value: -transaction.amount)
                     statistics.append(stat)
@@ -728,7 +745,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
         } else if transactionDetail.level == .category && transactionDetail.name == transaction.category {
             if transaction.group == "Income" {
                 switch transaction.type {
-                case "DEBIT":
+                case .debit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: -transaction.amount)
                         statistics.append(stat)
@@ -739,7 +756,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                             transactionList.append(transaction)
                         }
                     }
-                case "CREDIT":
+                case .credit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: transaction.amount)
                         statistics.append(stat)
@@ -755,7 +772,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                 }
             } else {
                 switch transaction.type {
-                case "DEBIT":
+                case .debit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: transaction.amount)
                         statistics.append(stat)
@@ -766,7 +783,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                             transactionList.append(transaction)
                         }
                     }
-                case "CREDIT":
+                case .credit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: -transaction.amount)
                         statistics.append(stat)
@@ -784,7 +801,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
         } else if transactionDetail.level == .top && transactionDetail.name == transaction.top_level_category {
             if transaction.group == "Income" {
                 switch transaction.type {
-                case "DEBIT":
+                case .debit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: -transaction.amount)
                         statistics.append(stat)
@@ -795,7 +812,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                             transactionList.append(transaction)
                         }
                     }
-                case "CREDIT":
+                case .credit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: transaction.amount)
                         statistics.append(stat)
@@ -811,7 +828,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                 }
             } else {
                 switch transaction.type {
-                case "DEBIT":
+                case .debit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: transaction.amount)
                         statistics.append(stat)
@@ -822,7 +839,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                             transactionList.append(transaction)
                         }
                     }
-                case "CREDIT":
+                case .credit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: -transaction.amount)
                         statistics.append(stat)
@@ -840,7 +857,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
         } else if transactionDetail.level == .group && transactionDetail.name == transaction.group {
             if transaction.group == "Income" {
                 switch transaction.type {
-                case "DEBIT":
+                case .debit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: -transaction.amount)
                         statistics.append(stat)
@@ -851,7 +868,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                             transactionList.append(transaction)
                         }
                     }
-                case "CREDIT":
+                case .credit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: transaction.amount)
                         statistics.append(stat)
@@ -867,7 +884,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                 }
             } else {
                 switch transaction.type {
-                case "DEBIT":
+                case .debit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: transaction.amount)
                         statistics.append(stat)
@@ -878,7 +895,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                             transactionList.append(transaction)
                         }
                     }
-                case "CREDIT":
+                case .credit:
                     if statistics.isEmpty {
                         let stat = Statistic(date: nextDate, value: -transaction.amount)
                         statistics.append(stat)

@@ -65,7 +65,7 @@ class FinancialMemberFetcher: NSObject {
                 let memberID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(financialMembersEntity).child(memberID).observe(.childChanged) { _ in
+                handle = ref.child(financialMembersEntity).child(memberID).observe(.value) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getMembersFromSnapshot(snapshot: snapshot, completion: completion)
                 }

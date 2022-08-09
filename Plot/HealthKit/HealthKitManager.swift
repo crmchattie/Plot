@@ -95,44 +95,6 @@ class HealthKitManager {
             let activeEnergyOp = ActiveEnergyOperation(date: today)
             activeEnergyOp.delegate = self
             
-            let futureDay = today.dayAfter
-            if #available(iOS 14.0, *) {
-                for workout in HKWorkoutActivityType.allCases {
-                    let op = WorkoutOperation(date: futureDay, workoutActivityType: workout, rank: Int(workout.rawValue))
-                    op.delegate = self
-                    op.lastSyncDate = lastSyncDate
-                    self?.queue.addOperations([op], waitUntilFinished: false)
-                }
-            } else {
-                // Fallback on earlier versions
-                for workout in HKWorkoutActivityType.oldAllCases {
-                    let op = WorkoutOperation(date: futureDay, workoutActivityType: workout, rank: Int(workout.rawValue))
-                    op.delegate = self
-                    op.lastSyncDate = lastSyncDate
-                    self?.queue.addOperations([op], waitUntilFinished: false)
-                }
-            }
-            
-//            let functionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .functionalStrengthTraining, rank: 2)
-//            functionalStrengthTrainingOp.delegate = self
-//            functionalStrengthTrainingOp.lastSyncDate = lastSyncDate
-//
-//            let traditionalStrengthTrainingOp = WorkoutOperation(date: futureDay, workoutActivityType: .traditionalStrengthTraining, rank: 3)
-//            traditionalStrengthTrainingOp.delegate = self
-//            traditionalStrengthTrainingOp.lastSyncDate = lastSyncDate
-//
-//            let runningOp = WorkoutOperation(date: futureDay, workoutActivityType: .running, rank: 4)
-//            runningOp.delegate = self
-//            runningOp.lastSyncDate = lastSyncDate
-//
-//            let cyclingOp = WorkoutOperation(date: futureDay, workoutActivityType: .cycling, rank: 5)
-//            cyclingOp.delegate = self
-//            cyclingOp.lastSyncDate = lastSyncDate
-//
-//            let hiitOp = WorkoutOperation(date: futureDay, workoutActivityType: .highIntensityIntervalTraining, rank: 6)
-//            hiitOp.delegate = self
-//            hiitOp.lastSyncDate = lastSyncDate
-            
             // Nutrition
             let dietaryEnergyConsumedOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryEnergyConsumed, unit: .kilocalorie(), unitTitle: "calories", rank: 1)
             dietaryEnergyConsumedOp.delegate = self
@@ -152,6 +114,24 @@ class HealthKitManager {
             
             // Setup queue
             self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, activeEnergyOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
+            
+            let futureDay = today.dayAfter
+            if #available(iOS 14.0, *) {
+                for workout in HKWorkoutActivityType.allCases {
+                    let op = WorkoutOperation(date: futureDay, workoutActivityType: workout, rank: Int(workout.rawValue))
+                    op.delegate = self
+                    op.lastSyncDate = lastSyncDate
+                    self?.queue.addOperations([op], waitUntilFinished: false)
+                }
+            } else {
+                // Fallback on earlier versions
+                for workout in HKWorkoutActivityType.oldAllCases {
+                    let op = WorkoutOperation(date: futureDay, workoutActivityType: workout, rank: Int(workout.rawValue))
+                    op.delegate = self
+                    op.lastSyncDate = lastSyncDate
+                    self?.queue.addOperations([op], waitUntilFinished: false)
+                }
+            }
             
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in
@@ -217,21 +197,7 @@ class HealthKitManager {
             ContainerFunctions.updateContainerAndStuffInside(container: container)
         }
         
-//        for activity in activities {
-//            if let activityID = activity.activityID {
-//
-//
-//
-//                if let hkSampleIDs = activity.hkSampleID, let containerID = activity.containerID {
-//
-//                    for hkSampleID in hkSampleIDs {
-//                        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child(containerIDEntity)
-//                        healthkitWorkoutsReference.setValue(containerID)
-//                    }
-//                }
-//            }
-//        }
-//
+
         let reference = Database.database().reference().child(userHealthEntity).child(currentUserId)
         saveContainersDispatchGroup.enter()
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in

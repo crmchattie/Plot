@@ -33,7 +33,6 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     
     var networkController = NetworkController() {
         didSet {
-            print("didSet")
             scrollToFirstActivityWithDate({ (activities) in
                 self.sortedActivities = activities
                 self.grabFinancialItems { (sections, groups) in
@@ -396,8 +395,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" {
-                    let accounts = transactions.compactMap({ $0.account_guid })
-                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.endOfMonth, level: transactionLevel, accounts: accounts) { (transactionsList, transactionsDict) in
+                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.endOfMonth, level: transactionLevel, accounts: nil) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
                             sections.append(section)
                             groups[section] = transactionsList
@@ -575,8 +573,7 @@ extension MasterActivityContainerController: HealthControllerCellDelegate {
 
 extension MasterActivityContainerController: FinanceControllerCellDelegate {
     func openTransactionDetails(transactionDetails: TransactionDetails) {
-        let accounts = networkController.financeService.transactions.compactMap({ $0.account_guid })
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: networkController.financeService.transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: accounts, financeDetailService: FinanceDetailService())
+        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: networkController.financeService.transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
 //        financeDetailViewController.delegate = self
         financeDetailViewController.hidesBottomBarWhenPushed = true

@@ -75,9 +75,7 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         guard let healthMetric = row.value else { return }
         
         nameLabel.text = healthMetric.name
-        
-        let isToday = NSCalendar.current.isDateInToday(healthMetric.date)
-        
+                
         var imageName = "activity"
         
         if let workout = healthMetric.workout {

@@ -204,8 +204,8 @@ class FinanceAccountViewController: FormViewController {
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        self.account.name = value
+                    self.account.name = value
+                    if let currentUser = Auth.auth().currentUser?.uid, self.active {
                         let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("name")
                         reference.setValue(value)
                     }
@@ -352,8 +352,8 @@ class FinanceAccountViewController: FormViewController {
             }.onChange { row in
                 row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
                 row.updateCell()
-                if let currentUser = Auth.auth().currentUser?.uid {
-                    self.account.should_link = row.value
+                self.account.should_link = row.value
+                if let currentUser = Auth.auth().currentUser?.uid, self.active {
                     let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("should_link")
                     reference.setValue(row.value!)
                 }

@@ -59,7 +59,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         transactions = networkController.financeService.transactions
             .filter { $0.should_link ?? true }
             .filter { $0.top_level_category != "Investments" && $0.category != "Investments" }
-            .filter { $0.type == "DEBIT" || $0.type == "CREDIT" }
+            .filter { $0.type == .debit || $0.type == .credit }
             .filter { transaction -> Bool in
 //                #warning("This is extremely unoptimal. A stored Date object should be saved inside the Transaction.")
                 guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
@@ -80,7 +80,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             transactions.forEach { transaction in
                 guard let day = dateFormatter.date(from: transaction.transacted_at) else { return }
                 let daysInBetween = day.daysSince(range.startDate)
-                if transaction.type == "CREDIT" {
+                if transaction.type == .credit {
                     incomeValue += transaction.amount
                     values[daysInBetween] += transaction.amount
                 } else {

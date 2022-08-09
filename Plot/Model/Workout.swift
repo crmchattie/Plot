@@ -48,6 +48,7 @@ struct Workout: Codable, Equatable, Hashable {
     
     init(from hkWorkout: HKWorkout) {
         self.id = hkWorkout.uuid.uuidString
+        self.hkSampleID = hkWorkout.uuid.uuidString
         self.name = hkWorkout.workoutActivityType.name
         self.type = hkWorkout.workoutActivityType.name
         self.startDateTime = hkWorkout.startDate

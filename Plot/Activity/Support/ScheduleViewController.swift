@@ -51,7 +51,7 @@ class ScheduleViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()        
         if schedule != nil {
-            title = "Activity"
+            title = "Sub-Event"
             active = true
             if schedule.activityID != nil {
                 scheduleID = schedule.activityID!
@@ -74,7 +74,7 @@ class ScheduleViewController: FormViewController {
             setupLists()
             schedule.isSchedule = true
         } else {
-            title = "New Activity"
+            title = "New Sub-Event"
             scheduleID = UUID().uuidString
             schedule = Activity(dictionary: ["activityID": scheduleID as AnyObject])
             schedule.isSchedule = true
@@ -492,6 +492,29 @@ class ScheduleViewController: FormViewController {
                     }
                 }
             }
+        
+        
+            <<< LabelRow("Category") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if self.active && self.schedule.category != nil {
+                    row.value = self.schedule.category
+                } else {
+                    row.value = "Uncategorized"
+                }
+            }.onCellSelection({ _, row in
+                self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
+            }
 
         
         form +++
@@ -771,6 +794,14 @@ class ScheduleViewController: FormViewController {
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
+    func openLevel(value: String, level: String) {
+        let destination = ActivityLevelViewController()
+        destination.delegate = self
+        destination.value = value
+        destination.level = level
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
@@ -948,6 +979,20 @@ extension ScheduleViewController: UpdateInvitees {
 //            }
 //            self.selectedFalconUsers = selectedFalconUsers
 //        }
+    }
+}
+
+extension ScheduleViewController: UpdateActivityLevelDelegate {
+    func update(value: String, level: String) {
+        if let row: LabelRow = form.rowBy(tag: level) {
+            row.value = value
+            row.updateCell()
+            if level == "Category" {
+                self.schedule.category = value
+            } else if level == "Subcategory" {
+                self.schedule.activityType = value
+            }
+        }
     }
 }
 

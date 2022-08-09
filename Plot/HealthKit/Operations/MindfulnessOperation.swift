@@ -26,7 +26,7 @@ class MindfulnessOperation: AsyncOperation {
     private func startFetchRequest() {
         let endDate = date
         let startDate = endDate.lastYear
-        HealthKitService.getAllCategoryTypeSamples(forIdentifier:.mindfulSession, startDate: startDate, endDate: endDate) { [weak self] samples, error  in
+        HealthKitService.getAllCategoryTypeSamples(forIdentifier: .mindfulSession, startDate: startDate, endDate: endDate) { [weak self] samples, error  in
             guard let samples = samples, samples.count > 0, error == nil, let _self = self, let currentUserID = Auth.auth().currentUser?.uid else {
                 self?.finish()
                 return
@@ -86,10 +86,10 @@ class MindfulnessOperation: AsyncOperation {
                 let average = sum / Double(map.count)
                 
                 if let last = sortedDates.last?.key, let val = map[last] {
+                    print("insert mindfulness metric")
                     var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
                     metric.hkSample = samples.last
                     metric.average = average
-
                     _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue, containers)
                     
                 }

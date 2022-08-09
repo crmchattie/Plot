@@ -30,7 +30,7 @@ class ActivitiesFetcher: NSObject {
         }
                 
         let ref = Database.database().reference()
-        userActivitiesDatabaseRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID)
+        userActivitiesDatabaseRef = ref.child(userActivitiesEntity).child(currentUserID)
         userActivitiesDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists(), let activityIDs = snapshot.value as? [String: AnyObject] else {
                 return completion([])
@@ -102,6 +102,7 @@ class ActivitiesFetcher: NSObject {
         })
         
         currentUserActivitiesChangeHandle = userActivitiesDatabaseRef.observe(.childChanged, with: { snapshot in
+            print(snapshot)
             if let completion = self.activitiesChanged {
                 self.getActivitiesFromSnapshot(snapshot: snapshot, completion: completion)
             }

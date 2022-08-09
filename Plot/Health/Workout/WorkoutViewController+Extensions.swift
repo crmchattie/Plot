@@ -13,7 +13,7 @@ import Eureka
 
 extension WorkoutViewController {
     func setupLists() {
-        guard delegate == nil else { return }
+        guard delegate == nil && active else { return }
         let dispatchGroup = DispatchGroup()
         if let containerID = workout.containerID {
             print(containerID)
@@ -130,7 +130,7 @@ extension WorkoutViewController {
                 destination.delegate = self
                 destination.movingBackwards = true
                 destination.existingTransactions = self.purchaseList
-                destination.transactions = self.networkController.financeService.transactions
+                destination.transactions = self.transactions
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -144,7 +144,7 @@ extension WorkoutViewController {
     
     func updateLists() {
         if container != nil {
-            container = Container(id: container.id, activityIDs: eventList.map({$0.activityID ?? ""}), workoutIDs: container.workoutIDs, mindfulnessIDs: container.workoutIDs, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+            container = Container(id: container.id, activityIDs: eventList.map({$0.activityID ?? ""}), workoutIDs: container.workoutIDs, mindfulnessIDs: container.mindfulnessIDs, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
         } else {
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
             container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), workoutIDs: [workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
@@ -195,7 +195,6 @@ extension WorkoutViewController: UpdateActivityDelegate {
             }
             
             sortSchedule()
-            updateLists()
         }
     }
 }
@@ -253,7 +252,6 @@ extension WorkoutViewController: ChooseActivityDelegate {
             
             eventList.append(mergeActivity)
             sortSchedule()
-            updateLists()
         }
     }
 }
@@ -280,7 +278,6 @@ extension WorkoutViewController: UpdateTransactionDelegate {
             } else {
                 purchaseList.append(transaction)
             }
-            updateLists()
         }
         else if mvs.allRows.count - 1 > purchaseIndex {
             mvs.remove(at: purchaseIndex)
@@ -311,7 +308,6 @@ extension WorkoutViewController: ChooseTransactionDelegate {
             } else {
                 purchaseList.append(transaction)
             }
-            updateLists()
         }
         else if mvs.allRows.count - 1 > purchaseIndex {
             mvs.remove(at: purchaseIndex)

@@ -108,35 +108,13 @@ final class ScheduleCell: Cell<Activity>, CellType {
             locationNameLabel.text = schedule.locationName
         }
         
-        switch schedule.activityType?.lowercased() {
-        case "recipe":
-            activityTypeButton.setImage(UIImage(named: "recipe"), for: .normal)
-        case "workout":
-            activityTypeButton.setImage(UIImage(named: "workout"), for: .normal)
-        case "event":
-            activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
-        case "sleep":
-            activityTypeButton.setImage(UIImage(named: "sleep"), for: .normal)
-        case "work":
-            activityTypeButton.setImage(UIImage(named: "work"), for: .normal)
-        case "food":
-            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
-        case "meal":
-            activityTypeButton.setImage(UIImage(named: "food"), for: .normal)
-        case "nightlife":
-            activityTypeButton.setImage(UIImage(named: "nightlife"), for: .normal)
-        case "recreation":
-            activityTypeButton.setImage(UIImage(named: "recreation"), for: .normal)
-        case "shopping":
-            activityTypeButton.setImage(UIImage(named: "shopping"), for: .normal)
-        case "sightseeing":
-            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
-        case "mindfulness":
-            activityTypeButton.setImage(UIImage(named: "sightseeing"), for: .normal)
-        default:
-            activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
-        }
-        
+        if let categoryValue = schedule.category, let category = ActivityCategory(rawValue: categoryValue) {
+            activityTypeButton.setImage(category.icon, for: .normal)
+            activityTypeButton.tintColor = category.color
+        } else {
+            activityTypeButton.setImage(ActivityCategory.uncategorized.icon, for: .normal)
+            activityTypeButton.tintColor = ActivityCategory.uncategorized.color
+        }        
     }
 }
 
