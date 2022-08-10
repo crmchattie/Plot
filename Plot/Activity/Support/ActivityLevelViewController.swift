@@ -83,8 +83,8 @@ class ActivityLevelViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        let barButton = UIBarButtonItem(title: "New Category", style: .plain, target: self, action: #selector(newLevel))
-        navigationItem.rightBarButtonItem = barButton
+//        let barButton = UIBarButtonItem(title: "New Category", style: .plain, target: self, action: #selector(newLevel))
+//        navigationItem.rightBarButtonItem = barButton
     }
     
     @objc func newLevel(_ item:UIBarButtonItem) {

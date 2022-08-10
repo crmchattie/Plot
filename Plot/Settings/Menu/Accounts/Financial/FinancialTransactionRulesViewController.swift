@@ -42,7 +42,7 @@ class FinancialTransactionRulesViewController: UITableViewController {
     }
     
     @objc func newTransactionRule() {
-        let destination = FinanceTransactionRuleViewController()
+        let destination = FinanceTransactionRuleViewController(networkController: networkController)
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
         let navigationViewController = UINavigationController(rootViewController: destination)
@@ -85,7 +85,7 @@ class FinancialTransactionRulesViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         let rule = transactionRules[indexPath.item]
-        let destination = FinanceTransactionRuleViewController()
+        let destination = FinanceTransactionRuleViewController(networkController: networkController)
         destination.transactionRule = rule
         self.navigationController?.pushViewController(destination, animated: true)
     }

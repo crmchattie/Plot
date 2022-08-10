@@ -177,7 +177,7 @@ class FinanceDetailViewController: UIViewController {
         
         alert.addAction(UIAlertAction(title: "Transaction Rule", style: .default, handler: { (_) in
             print("User click Edit button")
-            let destination = FinanceTransactionRuleViewController()
+            let destination = FinanceTransactionRuleViewController(networkController: self.networkController)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)

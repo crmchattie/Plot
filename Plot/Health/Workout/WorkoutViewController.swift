@@ -346,6 +346,7 @@ class WorkoutViewController: FormViewController {
             if #available(iOS 14.0, *) {
                 HKWorkoutActivityType.allCases.forEach {
                     row.options?.append($0.name)
+                    print($0.name)
                 }
             } else {
                 HKWorkoutActivityType.oldAllCases.forEach {
@@ -529,7 +530,13 @@ class WorkoutViewController: FormViewController {
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
+                    }.onChange({ _ in
+                        if let indexPath = self.form.last?.last?.indexPath {
+                            DispatchQueue.main.async {
+                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+                            }
+                        }
+                    })
 
             form +++
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],

@@ -40,7 +40,22 @@ class GCalendarActivityOp: AsyncOperation {
                     self?.update(activity: activity, completion: { activity in
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                            self?.finish()
+                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                            var values: [String : Any] = ["calendarExport": true,
+                                                          "calendarSource": CalendarOptions.google.name as Any,
+                                                          "showExtras": activity.showExtras as Any]
+                            if let value = self?.calendar.identifier {
+                                values["calendarID"] = value as Any
+                            }
+                            if let value = self?.calendar.summary {
+                                values["calendarName"] = value as Any
+                            }
+                            if let value = self?.calendar.backgroundColor {
+                                values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
+                            }
+                            userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
+                                self?.finish()
+                            })
                         })
                     })
                 })
@@ -57,7 +72,20 @@ class GCalendarActivityOp: AsyncOperation {
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                            let values: [String : Any] = ["isGroupActivity": false, "badge": 0, "calendarExport": true]
+                            var values: [String : Any] = ["isGroupActivity": false,
+                                                          "badge": 0,
+                                                          "calendarExport": true,
+                                                          "calendarSource": CalendarOptions.google.name as Any,
+                                                          "showExtras": activity.showExtras as Any]
+                            if let value = self?.calendar.identifier {
+                                values["calendarID"] = value as Any
+                            }
+                            if let value = self?.calendar.summary {
+                                values["calendarName"] = value as Any
+                            }
+                            if let value = self?.calendar.backgroundColor {
+                                values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
+                            }
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
                             })
@@ -84,12 +112,7 @@ class GCalendarActivityOp: AsyncOperation {
         activity.name = event.summary
         activity.activityDescription = event.descriptionProperty
         activity.recurrences = event.recurrence
-        activity.calendarID = calendar.identifier ?? UUID().uuidString
-        activity.calendarName = calendar.summary ?? "Google"
-        activity.calendarColor = CIColor(color: UIColor(calendar.backgroundColor ?? "#007AFF")).stringRepresentation
-        activity.calendarSource = CalendarOptions.google.name
         activity.admin = Auth.auth().currentUser?.uid
-        activity.showExtras = false
         if let start = event.start?.date, let end = event.end?.date {
             activity.allDay = true
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)

@@ -38,7 +38,17 @@ class EKCalendarActivityOp: AsyncOperation {
                     self?.update(activity: activity)
                     let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                        self?.finish()
+                        let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                        var values: [String : Any] = ["calendarExport": true,
+                                                      "calendarID": self?.event.calendar.calendarIdentifier as Any,
+                                                      "calendarName": self?.event.calendar.title as Any,
+                                                      "calendarSource": CalendarOptions.apple.name as Any]
+                        if let CGColor = self?.event.calendar.cgColor {
+                            values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                        }
+                        userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
+                            self?.finish()
+                        })
                     })
                 })
             }
@@ -53,7 +63,16 @@ class EKCalendarActivityOp: AsyncOperation {
                     let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                         let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values: [String : Any] = ["isGroupActivity": false, "badge": 0, "calendarExport": true]
+                        var values: [String : Any] = ["isGroupActivity": false,
+                                                      "badge": 0,
+                                                      "calendarExport": true,
+                                                      "calendarID": self?.event.calendar.calendarIdentifier as Any,
+                                                      "calendarName": self?.event.calendar.title as Any,
+                                                      "calendarSource": CalendarOptions.apple.name as Any,
+                                                      "showExtras": activity.showExtras as Any]
+                        if let CGColor = self?.event.calendar.cgColor {
+                            values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                        }
                         userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                             self?.finish()
                         })
@@ -90,12 +109,7 @@ class EKCalendarActivityOp: AsyncOperation {
         activity.recurrences = event.recurrenceRules?.map { $0.iCalRuleString() }
         activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
-        activity.calendarID = event.calendar.calendarIdentifier
-        activity.calendarName = event.calendar.title
-        activity.calendarColor = CIColor(cgColor: event.calendar.cgColor).stringRepresentation
-        activity.calendarSource = CalendarOptions.apple.name
         activity.admin = Auth.auth().currentUser?.uid
-        activity.showExtras = false
     }
     
     private func deleteActivity() {

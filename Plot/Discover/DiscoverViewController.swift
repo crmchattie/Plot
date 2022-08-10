@@ -227,7 +227,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             case .financialAccount:
                 self.newAccount()
             case .transactionRule:
-                let destination = FinanceTransactionRuleViewController()
+                let destination = FinanceTransactionRuleViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             default:

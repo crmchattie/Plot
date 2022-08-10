@@ -51,13 +51,18 @@ class CalendarListViewController: FormViewController {
         activityIndicatorView.centerInSuperview()
         configureTableView()
         initializeForm()
+        
+        if calendars.keys.contains(CalendarOptions.apple.name) || calendars.keys.contains(CalendarOptions.google.name) {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
     }
     
     fileprivate func grabCalendars() {
         form.removeAll()
         activityIndicatorView.startAnimating()
         calendarFetcher.fetchCalendar { calendars in
-            self.calendars[CalendarOptions.plot.name] = calendars.sorted()
             DispatchQueue.main.async {
               self.initializeForm()
             }
@@ -74,8 +79,8 @@ class CalendarListViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        let barButton = UIBarButtonItem(title: "New Calendar", style: .plain, target: self, action: #selector(newCategory))
-        navigationItem.rightBarButtonItem = barButton
+//        let barButton = UIBarButtonItem(title: "New Calendar", style: .plain, target: self, action: #selector(newCategory))
+//        navigationItem.rightBarButtonItem = barButton
     }
     
     @objc func newCategory(_ item:UIBarButtonItem) {
@@ -89,7 +94,7 @@ class CalendarListViewController: FormViewController {
         activityIndicatorView.stopAnimating()
         for section in sections {
             form +++ SelectableSection<ListCheckRow<String>>(section, selectionType: .singleSelection(enableDeselection: false))
-            for calendar in calendars[section]! {
+            for calendar in calendars[section]?.sorted(by: { $0.name ?? "" < $1.name ?? "" }) ?? [] {
                 form.last!
                     <<< ListCheckRow<String>() {
                         $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

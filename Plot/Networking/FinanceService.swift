@@ -69,6 +69,14 @@ class FinanceService {
     var institutionDict = [String: String]()
     var mxUser: MXUser!
     
+    var transactionGroups = financialTransactionsGroupsStatic
+    
+    var transactionTopLevelCategoriesDictionary = financialTransactionsTopLevelCategoriesDictionaryStatic
+    var transactionTopLevelCategories = financialTransactionsTopLevelCategoriesStatic
+    
+    var transactionCategoriesDictionary = financialTransactionsCategoriesDictionaryStatic
+    var transactionCategories = financialTransactionsCategoriesStatic
+    
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
@@ -107,6 +115,7 @@ class FinanceService {
             self?.observeTransactionsForCurrentUser()
             self?.observeHoldingsForCurrentUser()
             self?.observeMembersForCurrentUser()
+//            self?.grabTransactionAttributes()
         }
     }
     
@@ -325,6 +334,35 @@ class FinanceService {
                 if let index = self!.holdings.firstIndex(where: {$0.guid == holding.guid}) {
                     self!.holdings[index] = holding
                 }
+            }
+        })
+    }
+    
+    func grabTransactionAttributes() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let reference = Database.database().reference()
+        reference.child(userFinancialTransactionsCategoriesEntity).child(currentUserID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                for (key, value) in values {
+                    self.transactionTopLevelCategoriesDictionary[key, default: []].append(value)
+                    self.transactionCategories.append(key)
+                }
+            }
+        })
+        reference.child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUserID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let values = snapshot.value as? [String: [String]] {
+                for (key, value) in values {
+                    self.transactionTopLevelCategoriesDictionary[key, default: []].append(contentsOf: value)
+                    self.transactionTopLevelCategories.append(key)
+                }
+            }
+        })
+        reference.child(userFinancialTransactionsGroupsEntity).child(currentUserID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                let array = Array(values.keys)
+                self.transactionGroups.append(contentsOf: array)
             }
         })
     }

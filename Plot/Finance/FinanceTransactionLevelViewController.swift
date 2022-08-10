@@ -17,14 +17,16 @@ protocol UpdateTransactionLevelDelegate: AnyObject {
 class FinanceTransactionLevelViewController: FormViewController {
     weak var delegate : UpdateTransactionLevelDelegate?
     
-    var levels = [String]()
-    
+    var levels = [String: [String]]()
     var oldValue = String()
     var value = String()
+    var otherValue: String? = nil
     var level = String()
+    var networkController = NetworkController()
     
-    init() {
+    init(networkController: NetworkController) {
         super.init(style: .insetGrouped)
+        self.networkController = networkController
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -37,9 +39,6 @@ class FinanceTransactionLevelViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         title = level
-        view.addSubview(activityIndicatorView)
-        activityIndicatorView.centerInSuperview()
-        activityIndicatorView.startAnimating()
         configureTableView()
         oldValue = value
         updateLevels()
@@ -47,49 +46,23 @@ class FinanceTransactionLevelViewController: FormViewController {
     
     fileprivate func updateLevels() {
         form.removeAll()
-        if let currentUser = Auth.auth().currentUser?.uid {
-            let dispatchGroup = DispatchGroup()
-            let reference = Database.database().reference()
+        if let otherValue = otherValue {
             if level == "Subcategory" {
-                levels = financialTransactionsCategories.sorted()
-                dispatchGroup.enter()
-                reference.child(userFinancialTransactionsCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
-                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                        let array = Array(values.values)
-                        self.levels.append(contentsOf: array)
-                        self.levels = self.levels.sorted()
-                    }
-                    dispatchGroup.leave()
-                })
+                if let subcategories = networkController.financeService.transactionTopLevelCategoriesDictionary[otherValue] {
+                    self.levels["Current Category's Subcategories"] = subcategories
+                    self.levels["Other Subcategories"] = networkController.financeService.transactionCategories.filter({ !subcategories.contains($0) })
+                }
             } else if level == "Category" {
-                levels = financialTransactionsTopLevelCategories.sorted()
-                dispatchGroup.enter()
-                reference.child(userFinancialTransactionsTopLevelCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
-                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                        let array = Array(values.values)
-                        self.levels.append(contentsOf: array)
-                        self.levels = self.levels.sorted()
-                    }
-                    dispatchGroup.leave()
-                })
-            } else if level == "Group" {
-                levels = financialTransactionsGroups.sorted()
-                dispatchGroup.enter()
-                reference.child(userFinancialTransactionsGroupsEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
-                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                        let array = Array(values.values)
-                        self.levels.append(contentsOf: array)
-                        self.levels = self.levels.sorted()
-                    }
-                    dispatchGroup.leave()
-                })
+                if let category = networkController.financeService.transactionCategoriesDictionary[otherValue] {
+                    self.levels["Current Subcategory's Category"] = [category]
+                    self.levels["Other Categories"] = networkController.financeService.transactionTopLevelCategories.filter({ $0 != category })
+                }
             }
-            
-            dispatchGroup.notify(queue: .main) {
-                activityIndicatorView.stopAnimating()
-                self.initializeForm()
-            }
+        } else {
+            levels[level] = networkController.financeService.transactionGroups
         }
+        
+        self.initializeForm()
     }
     
     fileprivate func configureTableView() {
@@ -101,53 +74,69 @@ class FinanceTransactionLevelViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        let newLevelBarButton = UIBarButtonItem(title: "New \(level)", style: .plain, target: self, action: #selector(newLevel))
-        navigationItem.rightBarButtonItem = newLevelBarButton
+//        let newLevelBarButton = UIBarButtonItem(title: "New \(level)", style: .plain, target: self, action: #selector(newLevel))
+//        navigationItem.rightBarButtonItem = newLevelBarButton
     }
     
     @objc func newLevel(_ item:UIBarButtonItem) {
-        let destination = FinanceTransactionNewLevelViewController()
+        let destination = FinanceTransactionNewLevelViewController(networkController: networkController)
         destination.level = level
         destination.delegate = self
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     fileprivate func initializeForm() {
-        form +++ SelectableSection<ListCheckRow<String>>(level, selectionType: .singleSelection(enableDeselection: false))
-        
-        for level in levels {
-            form.last!
-                <<< ListCheckRow<String>() {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.tintColor = FalconPalette.defaultBlue
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.title = level
-                    $0.selectableValue = level
-                    if level == self.value {
-                        $0.value = self.value
-                    }
-                }.cellSetup { cell, row in
-                    cell.accessoryType = .checkmark
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.tintColor = FalconPalette.defaultBlue
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }.onChange({ (row) in
-                    if let value = row.value {
-                        self.delegate?.update(value: value, level: self.level)
-                        self.navigationController?.popViewController(animated: true)
-                    }
-                })
+        for section in levels.keys.sorted() {
+            form +++ SelectableSection<ListCheckRow<String>>(section, selectionType: .singleSelection(enableDeselection: false))
+            for level in levels[section]?.sorted() ?? [] {
+                form.last!
+                    <<< ListCheckRow<String>() {
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.tintColor = FalconPalette.defaultBlue
+                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.title = level
+                        $0.selectableValue = level
+                        if level == self.value {
+                            $0.value = self.value
+                        }
+                    }.cellSetup { cell, row in
+                        cell.accessoryType = .checkmark
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.tintColor = FalconPalette.defaultBlue
+                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    }.onChange({ (row) in
+                        if let value = row.value {
+                            self.delegate?.update(value: value, level: self.level)
+                            self.navigationController?.popViewController(animated: true)
+                        }
+                    })
+            }
         }
-        
     }
     
 }
 
 extension FinanceTransactionLevelViewController: UpdateTransactionNewLevelDelegate {
-    func update() {
-        updateLevels()
+    func update(level: String, value: String, otherValue: String?) {
+        form.removeAll()
+        if level == "Subcategory", let otherValue = otherValue {
+            if otherValue == otherValue {
+                self.levels["Current Category's Subcategories", default: []].append(value)
+            } else {
+                self.levels["Other Subcategories", default: []].append(value)
+            }
+        } else if level == "Category", let otherValue = otherValue {
+            if otherValue == otherValue {
+                self.levels["Current Subcategory's Category", default: []].append(value)
+            } else {
+                self.levels["Other Categories", default: []].append(value)
+            }
+        } else {
+            levels[level]?.append(value)
+        }
+        initializeForm()
+        networkController.financeService.grabTransactionAttributes()
     }
 }

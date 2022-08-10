@@ -274,7 +274,7 @@ class FinanceAccountViewController: FormViewController {
                 }
             }
         
-        if (account.subtype != nil && account.subtype ?? .none != .none) || (account.user_created != nil && account.user_created ?? false) {
+        if (account.subtype ?? .none != .none) || (account.user_created ?? false) {
             form.last!
                 <<< PushRow<String>("Subtype") { row in
                     row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -405,7 +405,7 @@ class FinanceAccountViewController: FormViewController {
                 }
         }
         
-        if (account.payment_due_at != nil) || (account.user_created != nil && account.user_created ?? false) {
+        if (account.payment_due_at != nil) || (account.user_created ?? false) {
             form.last!
                 <<< DateInlineRow("Payment Due Date") {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -441,7 +441,7 @@ class FinanceAccountViewController: FormViewController {
                 }
         }
         
-        if (account.minimum_payment != nil) || (account.user_created != nil && account.user_created ?? false) {
+        if (account.minimum_payment != nil) || (account.user_created ?? false) {
             form.last!
                 <<< DecimalRow("Minimum Payment Due") {
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

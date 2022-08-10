@@ -102,7 +102,6 @@ class ActivitiesFetcher: NSObject {
         })
         
         currentUserActivitiesChangeHandle = userActivitiesDatabaseRef.observe(.childChanged, with: { snapshot in
-            print(snapshot)
             if let completion = self.activitiesChanged {
                 self.getActivitiesFromSnapshot(snapshot: snapshot, completion: completion)
             }

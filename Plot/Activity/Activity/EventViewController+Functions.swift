@@ -456,11 +456,15 @@ extension EventViewController {
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
-    func openCalendar(value: String) {
+    func openCalendar() {
         let destination = CalendarListViewController()
         destination.delegate = self
-        destination.calendarID = self.activity.calendarID
-        destination.calendars = self.calendars
+        destination.calendarID = self.activity.calendarID ?? self.calendars[CalendarOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
+        if let source = self.activity.calendarSource, let calendars = self.calendars[source] {
+            destination.calendars = [source: calendars]
+        } else {
+            destination.calendars = [CalendarOptions.plot.name: self.calendars[CalendarOptions.plot.name] ?? []]
+        }
         self.navigationController?.pushViewController(destination, animated: true)
     }
     

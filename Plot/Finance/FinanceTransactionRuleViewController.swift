@@ -14,6 +14,7 @@ import CodableFirebase
 class FinanceTransactionRuleViewController: FormViewController {
     var transactionRule: TransactionRule!
     var transaction: Transaction!
+    var networkController = NetworkController()
     
     var active: Bool = true
     
@@ -26,8 +27,9 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     weak var updateDiscoverDelegate : UpdateDiscover?
     
-    init() {
+    init(networkController: NetworkController) {
         super.init(style: .insetGrouped)
+        self.networkController = networkController
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -270,7 +272,7 @@ class FinanceTransactionRuleViewController: FormViewController {
     }
     
     @objc fileprivate func openLevel(level: String, value: String) {
-        let destination = FinanceTransactionLevelViewController()
+        let destination = FinanceTransactionLevelViewController(networkController: networkController)
         destination.delegate = self
         destination.level = level
         destination.value = value

@@ -427,7 +427,13 @@ class MindfulnessViewController: FormViewController {
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
+                    }.onChange({ _ in
+                        if let indexPath = self.form.last?.last?.indexPath {
+                            DispatchQueue.main.async {
+                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+                            }
+                        }
+                    })
 
             form +++
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],

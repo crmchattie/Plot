@@ -112,7 +112,7 @@ class EventViewController: FormViewController {
             if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
                 locationName = localName
                 locationAddress = localAddress
-//                self.weatherRow()
+                //                self.weatherRow()
             }
             setupLists()
             resetBadgeForSelf()
@@ -124,7 +124,7 @@ class EventViewController: FormViewController {
                 let defaultCalendar = calendars[CalendarOptions.plot.name]?.first { $0.name == "Default"}
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
-                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 activity = Activity(activityID: activityID, admin: currentUserID, calendarID: defaultCalendar?.id ?? "", calendarName: defaultCalendar?.name ?? "", calendarColor: defaultCalendar?.color ?? "", calendarSource: defaultCalendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier)
             }
         }
@@ -170,14 +170,12 @@ class EventViewController: FormViewController {
             }
         }
         
-        if let showExtras = activity.showExtras {
-            if !showExtras, let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
-                self.segmentRowValue = segmentRow.value!
-                segmentRow.value = "Hidden"
-            } else if let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
-                segmentRow.value = self.segmentRowValue
-            }
-        }
+        //        if let showExtras = activity.showExtras, !showExtras, let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
+        //            segmentRow.value = "Hidden"
+        //        } else if let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
+        //            segmentRow.value = "Health"
+        //        }
+        
     }
     
     fileprivate func setupMainView() {
@@ -215,684 +213,695 @@ class EventViewController: FormViewController {
     
     fileprivate func initializeForm() {
         form +++
-            Section()
-            
-            <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.placeholder = $0.tag
-                if self.active {
-                    $0.value = self.activity.name
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-                } else {
-                    $0.cell.textField.becomeFirstResponder()
-                }
-                }.onChange() { [unowned self] row in
-                    self.activity.name = row.value
-                    if row.value == nil {
-                        self.navigationItem.rightBarButtonItem?.isEnabled = false
-                    } else {
-                        self.navigationItem.rightBarButtonItem?.isEnabled = true
-                    }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+        Section()
+        
+        <<< TextRow("Name") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.placeholder = $0.tag
+            if self.active {
+                $0.value = self.activity.name
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            } else {
+                $0.cell.textField.becomeFirstResponder()
             }
-            
-            
-            <<< TextAreaRow("Description") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.placeholder = $0.tag
-                if self.active && self.activity.activityDescription != "nothing" && self.activity.activityDescription != nil {
-                    $0.value = self.activity.activityDescription
-                }
-                }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }).onChange() { [unowned self] row in
-                    self.activity.activityDescription = row.value
-                    if row.value == nil && self.active {
-                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("activityDescription")
-                        reference.removeValue()
-                    }
-                }
+        }.onChange() { [unowned self] row in
+            self.activity.name = row.value
+            if row.value == nil {
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
+            } else {
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
         
-            <<< ButtonRow("Location") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                if self.active, let localName = activity.locationName, localName != "locationName" {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.cell.accessoryType = .detailDisclosureButton
-                    row.title = localName
-                } else {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    row.cell.accessoryType = .disclosureIndicator
-                    row.title = row.tag
-                }
-                }.onCellSelection({ _,_ in
-                    self.openLocationFinder()
-                }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textAlignment = .left
-                    if row.title == "Location" {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                        cell.accessoryType = .disclosureIndicator
-                    } else if let value = row.title, !value.isEmpty {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.accessoryType = .detailDisclosureButton
-                    } else {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                        cell.accessoryType = .disclosureIndicator
-                        cell.textLabel?.text = "Location"
-                    }
-                }
-            
         
-//            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.title = row.tag
-//                if self.acceptedParticipant.count > 0 {
-//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.title = self.userNamesString
-//                }
-//                }.onCellSelection({ _,_ in
-//                    self.openParticipantsInviter()
-//                }).cellUpdate { cell, row in
-//                    cell.accessoryType = .disclosureIndicator
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textAlignment = .left
-//                    if row.title == "Participants" {
-//                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                    } else {
-//                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    }
-//                }
+        <<< TextAreaRow("Description") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.placeholder = $0.tag
+            if self.active && self.activity.activityDescription != "nothing" && self.activity.activityDescription != nil {
+                $0.value = self.activity.activityDescription
+            }
+        }.cellUpdate({ (cell, row) in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }).onChange() { [unowned self] row in
+            self.activity.activityDescription = row.value
+            if row.value == nil && self.active {
+                let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("activityDescription")
+                reference.removeValue()
+            }
+        }
         
-            <<< SwitchRow("All-day") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.title = $0.tag
-                if self.active {
-                    $0.value = self.activity.allDay
-                } else {
-                    $0.value = false
-                    self.activity.allDay = false
-                }
-                }.onChange { [weak self] row in
-                    self!.activity.allDay = row.value
-                    
-                    let startDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
-                    let endDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
-                    
-                    if row.value ?? false {
-                        startDate.dateFormatter?.timeStyle = .none
-                        endDate.dateFormatter?.timeStyle = .none
-                    }
-                    else {
-                        startDate.dateFormatter?.timeStyle = .short
-                        endDate.dateFormatter?.timeStyle = .short
-                    }
-                    startDate.updateCell()
-                    endDate.updateCell()
-                    startDate.inlineRow?.updateCell()
-                    endDate.inlineRow?.updateCell()
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            
-            
-            //add Soon option to replace time; will require update to end time as well
-            <<< DateTimeInlineRow("Starts") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.minuteInterval = 5
-                $0.dateFormatter?.dateStyle = .medium
-                $0.dateFormatter?.timeStyle = .short
-                if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
-                    $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
-                    if self.activity.allDay == true {
-                        $0.dateFormatter?.timeStyle = .none
-                    }
-                    else {
-                        $0.dateFormatter?.timeStyle = .short
-                    }
-                    $0.updateCell()
-                } else {
-                    if let startDateTime = startDateTime {
-                        $0.dateFormatter?.timeZone = .current
-                        let original = startDateTime
-                        let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        $0.value = rounded
-                        self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
-                    } else {
-                        $0.dateFormatter?.timeZone = .current
-                        let original = Date()
-                        let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        $0.value = rounded
-                        self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
-                    }
-                }
-                self.startDateTime = $0.value
-                }.onChange { [weak self] row in
-                    let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
-                    if row.value?.compare(endRow.value!) == .orderedDescending {
-                        endRow.value = Date(timeInterval: 0, since: row.value!)
-                        endRow.updateCell()
-                    }
-                    self!.activity.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
-                    self!.startDateTime = row.value
-                    if self!.active {
-                        self!.scheduleReminder()
-                    }
-    //                    self!.weatherRow()
-                }.onExpandInlineRow { [weak self] cell, row, inlineRow in
-                    inlineRow.cellUpdate { (cell, row) in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
-                        if #available(iOS 13.4, *) {
-                            cell.datePicker.preferredDatePickerStyle = .wheels
-                        }
-                        let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
-                        if allRow.value ?? false {
-                            cell.datePicker.datePickerMode = .date
-                        }
-                        else {
-                            cell.datePicker.datePickerMode = .dateAndTime
-                        }
-                        if let startTimeZone = self?.activity.startTimeZone {
-                            cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
-                        } else if self!.active {
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                        } else {
-                            cell.datePicker.timeZone = .current
-                        }
-                    }
-                    cell.detailTextLabel?.textColor = cell.tintColor
-                    if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "startTimeZone") {
-                        timeZoneRow.hidden = false
-                        timeZoneRow.evaluateHidden()
-                    }
-                }.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone") {
-                        timeZoneRow.hidden = true
-                        timeZoneRow.evaluateHidden()
-                    }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            
-            <<< LabelRow("startTimeZone") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        <<< ButtonRow("Location") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textAlignment = .left
+            if self.active, let localName = activity.locationName, localName != "locationName" {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .detailDisclosureButton
+                row.title = localName
+            } else {
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.cell.accessoryType = .disclosureIndicator
-                row.cell.selectionStyle = .default
-                row.title = "Time Zone"
-                row.hidden = true
-                if active {
-                    row.value = activity.startTimeZone ?? "UTC"
-                } else {
-                    row.value = TimeZone.current.identifier
-                    activity.startTimeZone = TimeZone.current.identifier
-                }
-                }.onCellSelection({ _,_ in
-                    self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
-                }).cellUpdate { cell, row in
-                    cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-            
-            <<< DateTimeInlineRow("Ends") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.minuteInterval = 5
-                $0.dateFormatter?.dateStyle = .medium
-                $0.dateFormatter?.timeStyle = .short
-                if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: activity.endTimeZone ?? "UTC")
-                    $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
-                    if self.activity.allDay == true {
-                        $0.dateFormatter?.timeStyle = .none
-                    }
-                    else {
-                        $0.dateFormatter?.timeStyle = .short
-                    }
-                    $0.updateCell()
-                } else {
-                    if let endDateTime = endDateTime {
-                        $0.dateFormatter?.timeZone = .current
-                        let original = endDateTime
-                        let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        $0.value = rounded
-                        self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
-                    } else {
-                        $0.dateFormatter?.timeZone = .current
-                        let original = Date()
-                        let rounded = Date(timeIntervalSinceReferenceDate:
-                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        $0.value = rounded
-                        self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
-                    }
-                }
-                self.endDateTime = $0.value
-                }.onChange { [weak self] row in
-                    let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
-                    if row.value?.compare(startRow.value!) == .orderedAscending {
-                        startRow.value = Date(timeInterval: 0, since: row.value!)
-                        startRow.updateCell()
-                    }
-                    self!.activity.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
-                    self!.endDateTime = row.value
-    //                    self!.weatherRow()
-                }.onExpandInlineRow { [weak self] cell, row, inlineRow in
-                inlineRow.cellUpdate { (cell, row) in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
-                    if let endTimeZone = self?.activity.endTimeZone {
-                        cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
-                    } else if self!.active {
-                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    } else {
-                        cell.datePicker.timeZone = .current
-                    }
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
-                    }
-                    let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
-                    if allRow.value ?? false {
-                        cell.datePicker.datePickerMode = .date
-                    }
-                    else {
-                        cell.datePicker.datePickerMode = .dateAndTime
-                    }
-                }
-                cell.detailTextLabel?.textColor = cell.tintColor
-                if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "endTimeZone") {
-                    timeZoneRow.hidden = false
-                    timeZoneRow.evaluateHidden()
-                }
-                }.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone") {
-                        timeZoneRow.hidden = true
-                        timeZoneRow.evaluateHidden()
-                    }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    
-                }
-            
-            <<< LabelRow("endTimeZone") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.cell.selectionStyle = .default
-                row.title = "Time Zone"
-                row.hidden = true
-                if active {
-                    row.value = activity.endTimeZone ?? "UTC"
-                } else {
-                    row.value = TimeZone.current.identifier
-                    activity.endTimeZone = TimeZone.current.identifier
-                }
-                }.onCellSelection({ _,_ in
-                    self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
-                }).cellUpdate { cell, row in
-                    cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-        
-        
-            <<< LabelRow("Repeat") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.cell.selectionStyle = .default
                 row.title = row.tag
-                if self.active, let recurrences = self.activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let startDate = activity.startDate {
-                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
-                } else {
-                    row.value = "Never"
-                }
-            }.onCellSelection({ _, row in
-                self.openRepeat()
-            }).cellUpdate { cell, row in
-                cell.textLabel?.textAlignment = .left
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }.onCellSelection({ _,_ in
+            self.openLocationFinder()
+        }).cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textAlignment = .left
+            if row.title == "Location" {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 cell.accessoryType = .disclosureIndicator
-            }
-        
-            <<< PushRow<EventAlert>("Reminder") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.title = row.tag
-                if self.active, let value = self.activity.reminder {
-                    row.value = EventAlert(rawValue: value)
-                } else {
-                    row.value = EventAlert.None
-                    if let reminder = row.value?.description {
-                        self.activity.reminder = reminder
-                    }
-                }
-                row.options = EventAlert.allCases
-            }.onPresent { from, to in
-                to.title = "Reminder"
-                to.tableViewStyle = .insetGrouped
-                to.selectableRowCellUpdate = { cell, row in
-                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            } else if let value = row.title, !value.isEmpty {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange() { [unowned self] row in
+                cell.accessoryType = .detailDisclosureButton
+            } else {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.accessoryType = .disclosureIndicator
+                cell.textLabel?.text = "Location"
+            }
+        }
+        
+        
+        //            <<< ButtonRow("Participants") { row in
+        //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                row.cell.textLabel?.textAlignment = .left
+        //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                row.cell.accessoryType = .disclosureIndicator
+        //                row.title = row.tag
+        //                if self.acceptedParticipant.count > 0 {
+        //                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                    row.title = self.userNamesString
+        //                }
+        //                }.onCellSelection({ _,_ in
+        //                    self.openParticipantsInviter()
+        //                }).cellUpdate { cell, row in
+        //                    cell.accessoryType = .disclosureIndicator
+        //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                    cell.textLabel?.textAlignment = .left
+        //                    if row.title == "Participants" {
+        //                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                    } else {
+        //                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                    }
+        //                }
+        
+        <<< SwitchRow("All-day") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.title = $0.tag
+            if self.active {
+                $0.value = self.activity.allDay
+            } else {
+                $0.value = false
+                self.activity.allDay = false
+            }
+        }.onChange { [weak self] row in
+            self!.activity.allDay = row.value
+            
+            let startDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
+            let endDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
+            
+            if row.value ?? false {
+                startDate.dateFormatter?.timeStyle = .none
+                endDate.dateFormatter?.timeStyle = .none
+            }
+            else {
+                startDate.dateFormatter?.timeStyle = .short
+                endDate.dateFormatter?.timeStyle = .short
+            }
+            startDate.updateCell()
+            endDate.updateCell()
+            startDate.inlineRow?.updateCell()
+            endDate.inlineRow?.updateCell()
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+        
+        
+        //add Soon option to replace time; will require update to end time as well
+        <<< DateTimeInlineRow("Starts") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.title = $0.tag
+            $0.minuteInterval = 5
+            $0.dateFormatter?.dateStyle = .medium
+            $0.dateFormatter?.timeStyle = .short
+            if self.active {
+                $0.dateFormatter?.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
+                $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
+                if self.activity.allDay == true {
+                    $0.dateFormatter?.timeStyle = .none
+                }
+                else {
+                    $0.dateFormatter?.timeStyle = .short
+                }
+                $0.updateCell()
+            } else {
+                if let startDateTime = startDateTime {
+                    $0.dateFormatter?.timeZone = .current
+                    let original = startDateTime
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    $0.value = rounded
+                    self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                } else {
+                    $0.dateFormatter?.timeZone = .current
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    $0.value = rounded
+                    self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                }
+            }
+            self.startDateTime = $0.value
+        }.onChange { [weak self] row in
+            let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
+            if row.value?.compare(endRow.value!) == .orderedDescending {
+                endRow.value = Date(timeInterval: 0, since: row.value!)
+                endRow.updateCell()
+            }
+            self!.activity.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
+            self!.startDateTime = row.value
+            if self!.active {
+                self!.scheduleReminder()
+            }
+            //                    self!.weatherRow()
+        }.onExpandInlineRow { [weak self] cell, row, inlineRow in
+            inlineRow.cellUpdate { (cell, row) in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                if #available(iOS 13.4, *) {
+                    cell.datePicker.preferredDatePickerStyle = .wheels
+                }
+                let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
+                if allRow.value ?? false {
+                    cell.datePicker.datePickerMode = .date
+                }
+                else {
+                    cell.datePicker.datePickerMode = .dateAndTime
+                }
+                if let startTimeZone = self?.activity.startTimeZone {
+                    cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
+                } else if self!.active {
+                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                } else {
+                    cell.datePicker.timeZone = .current
+                }
+            }
+            cell.detailTextLabel?.textColor = cell.tintColor
+            if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "startTimeZone") {
+                timeZoneRow.hidden = false
+                timeZoneRow.evaluateHidden()
+            }
+        }.onCollapseInlineRow { cell, _, _ in
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone") {
+                timeZoneRow.hidden = true
+                timeZoneRow.evaluateHidden()
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+        
+        <<< LabelRow("startTimeZone") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = "Time Zone"
+            row.hidden = true
+            if active {
+                row.value = activity.startTimeZone ?? "UTC"
+            } else {
+                row.value = TimeZone.current.identifier
+                activity.startTimeZone = TimeZone.current.identifier
+            }
+        }.onCellSelection({ _,_ in
+            self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+        
+        <<< DateTimeInlineRow("Ends") {
+            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.title = $0.tag
+            $0.minuteInterval = 5
+            $0.dateFormatter?.dateStyle = .medium
+            $0.dateFormatter?.timeStyle = .short
+            if self.active {
+                $0.dateFormatter?.timeZone = TimeZone(identifier: activity.endTimeZone ?? "UTC")
+                $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
+                if self.activity.allDay == true {
+                    $0.dateFormatter?.timeStyle = .none
+                }
+                else {
+                    $0.dateFormatter?.timeStyle = .short
+                }
+                $0.updateCell()
+            } else {
+                if let endDateTime = endDateTime {
+                    $0.dateFormatter?.timeZone = .current
+                    let original = endDateTime
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    $0.value = rounded
+                    self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                } else {
+                    $0.dateFormatter?.timeZone = .current
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    $0.value = rounded
+                    self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                }
+            }
+            self.endDateTime = $0.value
+        }.onChange { [weak self] row in
+            let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
+            if row.value?.compare(startRow.value!) == .orderedAscending {
+                startRow.value = Date(timeInterval: 0, since: row.value!)
+                startRow.updateCell()
+            }
+            self!.activity.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
+            self!.endDateTime = row.value
+            //                    self!.weatherRow()
+        }.onExpandInlineRow { [weak self] cell, row, inlineRow in
+            inlineRow.cellUpdate { (cell, row) in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                if let endTimeZone = self?.activity.endTimeZone {
+                    cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
+                } else if self!.active {
+                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                } else {
+                    cell.datePicker.timeZone = .current
+                }
+                if #available(iOS 13.4, *) {
+                    cell.datePicker.preferredDatePickerStyle = .wheels
+                }
+                let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
+                if allRow.value ?? false {
+                    cell.datePicker.datePickerMode = .date
+                }
+                else {
+                    cell.datePicker.datePickerMode = .dateAndTime
+                }
+            }
+            cell.detailTextLabel?.textColor = cell.tintColor
+            if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "endTimeZone") {
+                timeZoneRow.hidden = false
+                timeZoneRow.evaluateHidden()
+            }
+        }.onCollapseInlineRow { cell, _, _ in
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone") {
+                timeZoneRow.hidden = true
+                timeZoneRow.evaluateHidden()
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            
+        }
+        
+        <<< LabelRow("endTimeZone") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = "Time Zone"
+            row.hidden = true
+            if active {
+                row.value = activity.endTimeZone ?? "UTC"
+            } else {
+                row.value = TimeZone.current.identifier
+                activity.endTimeZone = TimeZone.current.identifier
+            }
+        }.onCellSelection({ _,_ in
+            self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+        
+        
+        <<< LabelRow("Repeat") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if self.active, let recurrences = self.activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let startDate = activity.startDate {
+                row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
+            } else {
+                row.value = "Never"
+            }
+        }.onCellSelection({ _, row in
+            self.openRepeat()
+        }).cellUpdate { cell, row in
+            cell.textLabel?.textAlignment = .left
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.accessoryType = .disclosureIndicator
+        }
+        
+        <<< PushRow<EventAlert>("Reminder") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.title = row.tag
+            if self.active, let value = self.activity.reminder {
+                row.value = EventAlert(rawValue: value)
+            } else {
+                row.value = EventAlert.None
                 if let reminder = row.value?.description {
                     self.activity.reminder = reminder
-                    if self.active {
-                        self.scheduleReminder()
-                    }
                 }
             }
-        
-            <<< LabelRow("Calendar") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.cell.selectionStyle = .default
-                row.title = row.tag
-                if self.active && self.activity.calendarName != nil {
-                    row.value = self.activity.calendarName
-                } else {
-                    row.value = row.tag
-                }
-            }.onCellSelection({ _, row in
-                self.openCalendar(value: row.title ?? "Calendar")
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
+            row.options = EventAlert.allCases
+        }.onPresent { from, to in
+            to.title = "Reminder"
+            to.tableViewStyle = .insetGrouped
+            to.selectableRowCellUpdate = { cell, row in
+                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                to.tableView.separatorStyle = .none
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                cell.textLabel?.textAlignment = .left
             }
-            
-            
-            <<< LabelRow("Category") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.cell.selectionStyle = .default
-                row.title = row.tag
-                if self.active && self.activity.category != nil {
-                    row.value = self.activity.category
-                } else {
-                    row.value = "Uncategorized"
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        }.onChange() { [unowned self] row in
+            if let reminder = row.value?.description {
+                self.activity.reminder = reminder
+                if self.active {
+                    self.scheduleReminder()
                 }
-            }.onCellSelection({ _, row in
-                self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            }
+        }
+        
+        <<< LabelRow("Calendar") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if self.active && self.activity.calendarName != nil {
+                row.value = self.activity.calendarName
+            } else {
+                row.value = "Default"
+            }
+        }.onCellSelection({ _, row in
+            self.openCalendar()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.textLabel?.textAlignment = .left
+        }
+        
+        
+        <<< LabelRow("Category") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if self.active && self.activity.category != nil {
+                row.value = self.activity.category
+            } else {
+                row.value = "Uncategorized"
+            }
+        }.onCellSelection({ _, row in
+            self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.textLabel?.textAlignment = .left
+        }
+        
+        //        if let _ = activity.activityType {
+        //            form.last!
+        //            <<< LabelRow("Subcategory") { row in
+        //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                row.cell.accessoryType = .disclosureIndicator
+        //                row.cell.selectionStyle = .default
+        //                row.title = row.tag
+        //                if self.active && self.activity.activityType != "nothing" && self.activity.activityType != nil {
+        //                    row.value = self.activity.activityType!
+        //                } else {
+        //                    row.value = "Uncategorized"
+        //                }
+        //            }.onCellSelection({ _, row in
+        //                self.openLevel(value: row.value ?? "Uncategorized", level: "Subcategory")
+        //            }).cellUpdate { cell, row in
+        //                cell.accessoryType = .disclosureIndicator
+        //                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                cell.textLabel?.textAlignment = .left
+        //            }
+        //        }
+        
+        <<< SwitchRow("showExtras") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.title = "Show Extras"
+            if let showExtras = activity.showExtras {
+                row.value = showExtras
+            } else {
+                row.value = true
+                self.activity.showExtras = true
+            }
+        }.onChange { [weak self] row in
+            self?.activity.showExtras = row.value
+            if !row.value!, let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
+                self?.segmentRowValue = segmentRow.value ?? "Health"
+                segmentRow.value = "Hidden"
+            } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
+                segmentRow.value = self?.segmentRowValue
+            }
+            guard let currentUserID = Auth.auth().currentUser?.uid, self!.active else { return }
+            let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
+            let values:[String : Any] = ["showExtras": row.value ?? false]
+            userReference.updateChildValues(values)
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        }
+        
+        <<< ButtonRow("Schedule") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textAlignment = .left
+            row.cell.accessoryType = .disclosureIndicator
+            row.title = row.tag
+            row.hidden = "$showExtras == false"
+            if self.activity.scheduleIDs != nil {
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            } else {
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }.onCellSelection({ _,_ in
+            self.openSchedule()
+        }).cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.textAlignment = .left
+            if let _ = self.activity.scheduleIDs {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                cell.textLabel?.textAlignment = .left
+            } else {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
+        }
         
-//        if let _ = activity.activityType {
-//            form.last!
-//            <<< LabelRow("Subcategory") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.cell.selectionStyle = .default
-//                row.title = row.tag
-//                if self.active && self.activity.activityType != "nothing" && self.activity.activityType != nil {
-//                    row.value = self.activity.activityType!
-//                } else {
-//                    row.value = "Uncategorized"
-//                }
-//            }.onCellSelection({ _, row in
-//                self.openLevel(value: row.value ?? "Uncategorized", level: "Subcategory")
-//            }).cellUpdate { cell, row in
-//                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                cell.textLabel?.textAlignment = .left
-//            }
-//        }
-        
-            <<< SwitchRow("showExtras") { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = "Show Extras"
-                    if let showExtras = activity.showExtras {
-                        row.value = showExtras
-                    } else {
-                        row.value = true
-                        self.activity.showExtras = true
-                    }
-                }.onChange { [weak self] row in
-                    self!.activity.showExtras = row.value
-                    if !row.value!, let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
-                        self!.segmentRowValue = segmentRow.value!
-                        segmentRow.value = "Hidden"
-                    } else if let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
-                        segmentRow.value = self!.segmentRowValue
-                    }
-                    guard let currentUserID = Auth.auth().currentUser?.uid, self!.active else { return }
-                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
-                    let values:[String : Any] = ["showExtras": row.value ?? false]
-                    userReference.updateChildValues(values)
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                }
-        
-            <<< ButtonRow("Schedule") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                row.hidden = "$showExtras == false"
-                if self.activity.scheduleIDs != nil {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                } else {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                }
-                }.onCellSelection({ _,_ in
-                    self.openSchedule()
-                }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.accessoryType = .disclosureIndicator
-                    cell.textLabel?.textAlignment = .left
-                    if let _ = self.activity.scheduleIDs {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    } else {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    }
-                }
-        
-            <<< ButtonRow("Checklists") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                row.hidden = "$showExtras == false"
-                if self.activity.checklistIDs != nil || self.activity.grocerylistID != nil || self.activity.activitylistIDs != nil {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                } else {
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                }
-                }.onCellSelection({ _,_ in
-                    self.openList()
-                }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.accessoryType = .disclosureIndicator
-                    cell.textLabel?.textAlignment = .left
-                    if let _ = self.activity.checklistIDs {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    } else {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    }
-                }
-            
-            <<< ButtonRow("Media") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
+        <<< ButtonRow("Checklists") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textAlignment = .left
+            row.cell.accessoryType = .disclosureIndicator
+            row.title = row.tag
+            row.hidden = "$showExtras == false"
+            if self.activity.checklistIDs != nil || self.activity.grocerylistID != nil || self.activity.activitylistIDs != nil {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-                row.hidden = "$showExtras == false"
-                }.onCellSelection({ _,_ in
-                    self.openMedia()
-                }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.accessoryType = .disclosureIndicator
-                    cell.textLabel?.textAlignment = .left
-                    if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    } else {
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
-                }
-
-//            <<< TextAreaRow("Notes") {
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                $0.placeholder = $0.tag
-//                $0.hidden = "$showExtras == false"
-//                if self.active && self.activity.notes != "nothing" && self.activity.notes != nil {
-//                    $0.value = self.activity.notes
-//                }
-//                }.cellUpdate({ (cell, row) in
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                }).onChange() { [unowned self] row in
-//                    self.activity.notes = row.value
-//                    if row.value == nil && self.active {
-//                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("notes")
-//                        reference.removeValue()
-//                    }
-//                }
+            } else {
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }.onCellSelection({ _,_ in
+            self.openList()
+        }).cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.textAlignment = .left
+            if let _ = self.activity.checklistIDs {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            } else {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }
+        
+        <<< ButtonRow("Media") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textAlignment = .left
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.title = row.tag
+            row.hidden = "$showExtras == false"
+        }.onCellSelection({ _,_ in
+            self.openMedia()
+        }).cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.textAlignment = .left
+            if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            } else {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }
+        }
+        
+        //            <<< TextAreaRow("Notes") {
+        //                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                $0.placeholder = $0.tag
+        //                $0.hidden = "$showExtras == false"
+        //                if self.active && self.activity.notes != "nothing" && self.activity.notes != nil {
+        //                    $0.value = self.activity.notes
+        //                }
+        //                }.cellUpdate({ (cell, row) in
+        //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                }).onChange() { [unowned self] row in
+        //                    self.activity.notes = row.value
+        //                    if row.value == nil && self.active {
+        //                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("notes")
+        //                        reference.removeValue()
+        //                    }
+        //                }
         
         if delegate == nil {
             form.last!
             <<< SegmentedRow<String>("sections"){
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.hidden = "$showExtras == false"
-                    if #available(iOS 13.0, *) {
-                        $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.hidden = "$showExtras == false"
+                if #available(iOS 13.0, *) {
+                    $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+                }
+                $0.options = ["Health", "Transactions"]
+                if !(activity.showExtras ?? true) {
+                    $0.value = "Hidden"
+                } else {
+                    $0.value = "Health"
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange({ _ in
+                if let indexPath = self.form.last?.last?.indexPath {
+                    DispatchQueue.main.async {
+                        self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
                     }
-                    $0.options = ["Health", "Transactions"]
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
-
-        form +++
+                }
+            })
+            
+            form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Health",
                                footer: "Connect a workout and/or mindfulness session") {
-                                $0.tag = "healthfields"
-                                $0.hidden = "$sections != 'Health'"
-                                $0.addButtonProvider = { section in
-                                    return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                        $0.title = "Connect Health"
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                            cell.textLabel?.textAlignment = .left
-                                            cell.height = { 60 }
-                                        }
-                                }
-                                $0.multivaluedRowToInsertAt = { index in
-                                    self.healthIndex = index
-                                    self.openHealth()
-                                    return HealthRow()
-                                        .onCellSelection() { cell, row in
-                                            self.healthIndex = index
-                                            self.openHealth()
-                                            cell.cellResignFirstResponder()
-                                    }
-
-                                }
-
-        }
-
-            form +++
-                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Transactions",
-                                   footer: "Connect a transaction") {
-                                    $0.tag = "purchasefields"
-                                    $0.hidden = "$sections != 'Transactions'"
-                                    $0.addButtonProvider = { section in
-                                        return ButtonRow(){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                            $0.title = "Connect Transaction"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                                cell.textLabel?.textAlignment = .left
-                                                cell.height = { 60 }
-                                        }
-                                    }
-                                    $0.multivaluedRowToInsertAt = { index in
-                                        self.purchaseIndex = index
-                                        self.openPurchases()
-                                        return PurchaseRow()
-                                            .onCellSelection() { cell, row in
-                                                self.purchaseIndex = index
-                                                self.openPurchases()
-                                                cell.cellResignFirstResponder()
-                                        }
-
-                                    }
+                $0.tag = "healthfields"
+                $0.hidden = "$sections != 'Health'"
+                $0.addButtonProvider = { section in
+                    return ButtonRow(){
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.title = "Connect Health"
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textAlignment = .left
+                        cell.height = { 60 }
+                    }
                 }
+                $0.multivaluedRowToInsertAt = { index in
+                    self.healthIndex = index
+                    self.openHealth()
+                    return HealthRow()
+                        .onCellSelection() { cell, row in
+                            self.healthIndex = index
+                            self.openHealth()
+                            cell.cellResignFirstResponder()
+                        }
+                    
+                }
+                
+            }
+            
+            form +++
+            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                               header: "Transactions",
+                               footer: "Connect a transaction") {
+                $0.tag = "purchasefields"
+                $0.hidden = "$sections != 'Transactions'"
+                $0.addButtonProvider = { section in
+                    return ButtonRow(){
+                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.title = "Connect Transaction"
+                    }.cellUpdate { cell, row in
+                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.textLabel?.textAlignment = .left
+                        cell.height = { 60 }
+                    }
+                }
+                $0.multivaluedRowToInsertAt = { index in
+                    self.purchaseIndex = index
+                    self.openPurchases()
+                    return PurchaseRow()
+                        .onCellSelection() { cell, row in
+                            self.purchaseIndex = index
+                            self.openPurchases()
+                            cell.cellResignFirstResponder()
+                        }
+                    
+                }
+            }
         }
-
-//                                    form +++
-//                                        Section(header: "Balances",
-//                                                footer: "Positive Balance = Owe; Negative Balance = Owed") {
-//                                                    $0.tag = "Balances"
-//                                                    $0.hidden = "$sections != 'Transactions'"
-//                                    }
+        
+        //                                    form +++
+        //                                        Section(header: "Balances",
+        //                                                footer: "Positive Balance = Owe; Negative Balance = Owed") {
+        //                                                    $0.tag = "Balances"
+        //                                                    $0.hidden = "$sections != 'Transactions'"
+        //                                    }
     }
     
     override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
@@ -905,7 +914,7 @@ class EventViewController: FormViewController {
                 if self!.purchaseList.indices.contains(self!.purchaseIndex) {
                     self!.purchaseList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
-//                    self!.purchaseBreakdown()
+                    //                    self!.purchaseBreakdown()
                 }
             }
             else if rowType is HealthRow {

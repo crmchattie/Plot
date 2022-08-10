@@ -210,7 +210,7 @@ class FinanceHoldingViewController: FormViewController {
             }
         }
         
-        if (holding.holding_type != nil) || (holding.user_created != nil && holding.user_created ?? false) {
+        if (holding.holding_type != nil) || (holding.user_created ?? false) {
             form.last!
             <<< PushRow<String>("Type") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -285,7 +285,7 @@ class FinanceHoldingViewController: FormViewController {
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             
-        if (holding.cost_basis != nil) || (holding.user_created != nil && holding.user_created ?? false) {
+        if (holding.cost_basis != nil) || (holding.user_created ?? false) {
             form.last!
             <<< DecimalRow("Cost Basis") {
                 $0.cell.isUserInteractionEnabled = holding.user_created ?? false

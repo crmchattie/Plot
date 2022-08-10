@@ -487,7 +487,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.title = row.tag
                 row.value = transaction.group
             }.onCellSelection({ _, row in
-                self.openLevel(level: row.tag!, value: row.value!)
+                self.openLevel(level: row.tag!, value: row.value!, otherValue: nil)
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -504,9 +504,9 @@ class FinanceTransactionViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                row.value = transaction.group
+                row.value = transaction.top_level_category
             }.onCellSelection({ _, row in
-                self.openLevel(level: row.tag!, value: row.value!)
+                self.openLevel(level: row.tag!, value: row.value!, otherValue: self.transaction.category)
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -523,9 +523,9 @@ class FinanceTransactionViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                row.value = transaction.group
+                row.value = transaction.category
             }.onCellSelection({ _, row in
-                self.openLevel(level: row.tag!, value: row.value!)
+                self.openLevel(level: row.tag!, value: row.value!, otherValue: self.transaction.top_level_category)
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -588,7 +588,13 @@ class FinanceTransactionViewController: FormViewController {
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }
+                    }.onChange({ _ in
+                        if let indexPath = self.form.last?.last?.indexPath {
+                            DispatchQueue.main.async {
+                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+                            }
+                        }
+                    })
 
             form +++
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
@@ -664,16 +670,17 @@ class FinanceTransactionViewController: FormViewController {
     }
     
     func createRule() {
-        let destination = FinanceTransactionRuleViewController()
+        let destination = FinanceTransactionRuleViewController(networkController: networkController)
         destination.transaction = transaction
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
-    @objc fileprivate func openLevel(level: String, value: String) {
-        let destination = FinanceTransactionLevelViewController()
+    @objc fileprivate func openLevel(level: String, value: String, otherValue: String?) {
+        let destination = FinanceTransactionLevelViewController(networkController: networkController)
         destination.delegate = self
         destination.level = level
         destination.value = value
+        destination.otherValue = otherValue
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
