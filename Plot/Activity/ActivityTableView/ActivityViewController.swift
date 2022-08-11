@@ -326,7 +326,7 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @objc fileprivate func filter() {
         filterDictionary["calendarView"] = [calendarView.rawValue.capitalized]
-        let destination = FilterViewController()
+        let destination = FilterViewController(networkController: networkController)
         let navigationViewController = UINavigationController(rootViewController: destination)
         destination.delegate = self
         destination.filters = filters
@@ -507,12 +507,27 @@ class ActivityViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func handleReloadTableAfterSearch() {
+        let currentDate = NSNumber(value: Int((Date().localTime).timeIntervalSince1970)).int64Value
         filteredPinnedActivities.sort { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
+            if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
+                return currentDate < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < currentDate
+            }
+            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
         }
         
         filteredActivities.sort { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
+            if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
+                return currentDate < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < currentDate
+            }
+            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
         }
         
         self.activityView.tableView.reloadData()

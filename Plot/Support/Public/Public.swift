@@ -1701,6 +1701,19 @@ extension Date {
 
         return TimeInterval(dateSeconds)
     }
+    
+    func isBetween(_ date1: Date, and date2: Date) -> Bool {
+        return (min(date1, date2) ... max(date1, date2)).contains(self)
+    }
+}
+
+extension Int64 {
+    func isBetween(_ number1: Int64, and number2: Int64) -> Bool {
+        if self > number1 && self < number2 {
+            return true
+        }
+        return false
+    }
 }
 
 extension TimeInterval {

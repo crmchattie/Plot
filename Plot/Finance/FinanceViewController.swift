@@ -207,7 +207,7 @@ class FinanceViewController: UIViewController {
     
     @objc fileprivate func filter() {
         filterDictionary["financeLevel"] = [financeLevel.rawValue.capitalized]
-        let destination = FilterViewController()
+        let destination = FilterViewController(networkController: networkController)
         let navigationViewController = UINavigationController(rootViewController: destination)
         destination.delegate = self
         destination.filters = filters

@@ -42,7 +42,8 @@ class EKCalendarActivityOp: AsyncOperation {
                         var values: [String : Any] = ["calendarExport": true,
                                                       "calendarID": self?.event.calendar.calendarIdentifier as Any,
                                                       "calendarName": self?.event.calendar.title as Any,
-                                                      "calendarSource": CalendarOptions.apple.name as Any]
+                                                      "calendarSource": CalendarOptions.apple.name as Any,
+                                                      "externalActivityID": self?.event.calendarItemIdentifier as Any]
                         if let CGColor = self?.event.calendar.cgColor {
                             values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
                         }
@@ -69,6 +70,7 @@ class EKCalendarActivityOp: AsyncOperation {
                                                       "calendarID": self?.event.calendar.calendarIdentifier as Any,
                                                       "calendarName": self?.event.calendar.title as Any,
                                                       "calendarSource": CalendarOptions.apple.name as Any,
+                                                      "externalActivityID": self?.event.calendarItemIdentifier as Any,
                                                       "showExtras": activity.showExtras as Any]
                         if let CGColor = self?.event.calendar.cgColor {
                             values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any

@@ -17,7 +17,6 @@ protocol UpdateAccountDelegate: AnyObject {
 class FinanceAccountViewController: FormViewController {
     var account: MXAccount!
     var holdings = [MXHolding]()
-    var holdingFetcher = FinancialHoldingFetcher()
     
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
@@ -130,11 +129,9 @@ class FinanceAccountViewController: FormViewController {
         }
         
         if account.type == .investment {
-            holdingFetcher.fetchHoldings { (firebaseHoldings) in
-                self.holdings = firebaseHoldings.filter({$0.account_guid == self.account.guid})
-                self.holdings.sort(by: {$0.market_value ?? 0 > $1.market_value ?? 0})
-                self.addHoldingsSection()
-            }
+            self.holdings = networkController.financeService.holdings.filter({$0.account_guid == self.account.guid})
+            self.holdings.sort(by: {$0.market_value ?? 0 > $1.market_value ?? 0})
+            self.addHoldingsSection()
         }
     
     }

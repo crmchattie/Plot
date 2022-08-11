@@ -11,6 +11,9 @@ import Social
 import MobileCoreServices
 import Firebase
 
+let documentsEntity = "documents"
+let imagesEntity = "images"
+
 class ShareViewController: UIViewController {
     
     fileprivate var activitiesArray = [Activity]()
@@ -172,7 +175,7 @@ class ShareViewController: UIViewController {
     
     func uploadAvatarForActivityToFirebaseStorageUsingImage(_ image: UIImage, quality: CGFloat, completion: @escaping (_  imageUrl: String) -> ()) {
         let imageName = UUID().uuidString
-        let ref = Storage.storage().reference().child("activityImages").child(imageName)
+        let ref = Storage.storage().reference().child(imagesEntity).child(imageName)
         
         if let uploadData = image.jpegData(compressionQuality: quality) {
             ref.putData(uploadData, metadata: nil) { (metadata, error) in
@@ -210,7 +213,7 @@ class ShareViewController: UIViewController {
     
     func uploadDocToFirebaseStorage(_ data: Data, contentType: String, type: String, name: String, completion: @escaping (_  url: String) -> ()) {
         let fileName = UUID().uuidString
-        let ref = Storage.storage().reference().child("activityDocs").child(fileName)
+        let ref = Storage.storage().reference().child(documentsEntity).child(fileName)
         
         // Create the file metadata
         let metadata = StorageMetadata()
@@ -249,8 +252,16 @@ class ShareViewController: UIViewController {
     }
     
     func handleReloadTableAfterSearch() {
+        let currentDate = NSNumber(value: Int((Date()).timeIntervalSince1970)).int64Value
         filteredActivities.sort { (activity1, activity2) -> Bool in
-            return activity1.startDateTime!.int64Value < activity2.startDateTime!.int64Value
+            if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
+                return currentDate < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < currentDate
+            }
+            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
         }
         DispatchQueue.main.async {
             self.shareHeaderView.tableView.reloadData()
@@ -390,5 +401,14 @@ extension ShareViewController { /* hiding keyboard */
         } else {
             self.searchBar?.endEditing(true)
         }
+    }
+}
+
+extension Int64 {
+    func isBetween(_ number1: Int64, and number2: Int64) -> Bool {
+        if self > number1 && self < number2 {
+            return true
+        }
+        return false
     }
 }

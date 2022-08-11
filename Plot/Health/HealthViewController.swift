@@ -143,7 +143,7 @@ class HealthViewController: UIViewController {
     }
     
     @objc fileprivate func filter() {
-        let destination = FilterViewController()
+        let destination = FilterViewController(networkController: networkController)
         let navigationViewController = UINavigationController(rootViewController: destination)
         destination.delegate = self
         destination.filters = filters
@@ -158,6 +158,7 @@ class HealthViewController: UIViewController {
         healthDetailService.nutrition = networkController.healthService.nutrition
         let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: healthDetailService)
         let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel, networkController: networkController)
+        healthDetailViewController.segmentedControl.selectedSegmentIndex = metric.grabSegment()
         navigationController?.pushViewController(healthDetailViewController, animated: true)
     }
 }

@@ -21,33 +21,10 @@ class ListService {
     func grabLists() {
         let dispatchGroup = DispatchGroup()
         DispatchQueue.main.async { [unowned self] in
-            dispatchGroup.enter()
-            checklistFetcher.fetchChecklists { (checklists) in
-                for checklist in checklists {
-                    if checklist.name == "nothing" { continue }
-                    if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
-                    self.checklists.append(checklist)
-                }
-                self.observeChecklistsForCurrentUser()
-                dispatchGroup.leave()
-            }
-            dispatchGroup.enter()
-            activitylistFetcher.fetchActivitylists { (activitylists) in
-                for activitylist in activitylists where activitylist.name != "nothing" {
-                    if let items = activitylist.items, Array(items.keys)[0] == "name" { continue }
-                    self.activitylists.append(activitylist)
-                }
-                self.observeActivitylistsForCurrentUser()
-                dispatchGroup.leave()
-            }
-            dispatchGroup.enter()
-            grocerylistFetcher.fetchGrocerylists { (grocerylists) in
-                for grocerylist in grocerylists where grocerylist.name == "nothing" {
-                    self.grocerylists.append(grocerylist)
-                }
-                self.observeGrocerylistsForCurrentUser()
-                dispatchGroup.leave()
-            }
+            self.observeChecklistsForCurrentUser()
+            self.observeActivitylistsForCurrentUser()
+            self.observeGrocerylistsForCurrentUser()
+
             dispatchGroup.notify(queue: .main) {
                 self.listList = (self.checklists.map { ListContainer(grocerylist: nil, checklist: $0, activitylist: nil, packinglist: nil) } + self.activitylists.map { ListContainer(grocerylist: nil, checklist: nil, activitylist: $0, packinglist: nil) } + self.grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, activitylist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
             }

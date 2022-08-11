@@ -566,6 +566,7 @@ extension MasterActivityContainerController: HealthControllerCellDelegate {
     func cellTapped(metric: HealthMetric) {
         let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
         let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel, networkController: networkController)
+        healthDetailViewController.segmentedControl.selectedSegmentIndex = metric.grabSegment()
         healthDetailViewController.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(healthDetailViewController, animated: true)
     }

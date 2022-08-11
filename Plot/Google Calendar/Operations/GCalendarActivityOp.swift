@@ -42,14 +42,11 @@ class GCalendarActivityOp: AsyncOperation {
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
                             var values: [String : Any] = ["calendarExport": true,
+                                                          "calendarID": self?.calendar.identifier as Any,
+                                                          "calendarName": self?.calendar.summary as Any,
                                                           "calendarSource": CalendarOptions.google.name as Any,
+                                                          "externalActivityID": self?.event.identifier as Any,
                                                           "showExtras": activity.showExtras as Any]
-                            if let value = self?.calendar.identifier {
-                                values["calendarID"] = value as Any
-                            }
-                            if let value = self?.calendar.summary {
-                                values["calendarName"] = value as Any
-                            }
                             if let value = self?.calendar.backgroundColor {
                                 values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
                             }
@@ -75,14 +72,11 @@ class GCalendarActivityOp: AsyncOperation {
                             var values: [String : Any] = ["isGroupActivity": false,
                                                           "badge": 0,
                                                           "calendarExport": true,
+                                                          "calendarID": self?.calendar.identifier as Any,
+                                                          "calendarName": self?.calendar.summary as Any,
                                                           "calendarSource": CalendarOptions.google.name as Any,
+                                                          "externalActivityID": self?.event.identifier as Any,
                                                           "showExtras": activity.showExtras as Any]
-                            if let value = self?.calendar.identifier {
-                                values["calendarID"] = value as Any
-                            }
-                            if let value = self?.calendar.summary {
-                                values["calendarName"] = value as Any
-                            }
                             if let value = self?.calendar.backgroundColor {
                                 values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
                             }

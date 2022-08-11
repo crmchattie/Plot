@@ -142,8 +142,6 @@ class HoldingActions: NSObject {
             let userReference = Database.database().reference().child(userFinancialHoldingsEntity).child(memberID).child(ID)
             let values:[String : Any] = ["description": holding.description, "groupHolding": false]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                //trigger firebase observer to update
-                userReference.child("groupHolding").setValue(true)
                 connectingMembersGroup.leave()
             })
         }

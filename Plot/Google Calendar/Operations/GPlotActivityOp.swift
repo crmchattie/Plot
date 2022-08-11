@@ -29,35 +29,25 @@ class GPlotActivityOp: AsyncOperation {
             return
         }
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
-        // @FIX-ME - need a better way to check if event ID exists
-        reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
-            if snapshot.exists(), let value = snapshot.value as? [String: [String:String]] {
-                let dispatchGroup = DispatchGroup()
-                let values = value.values
-                let activitiesIDs = values.compactMap { $0["activityID"] }
-                for activity in self!.activities {
-                    if !(activity.calendarExport ?? false), let activityID = activity.activityID, !activitiesIDs.contains(activityID) {
-                        dispatchGroup.enter()
-                        if let event = self?.googleCalService.storeEvent(for: activity), let id = event.identifier {
-                            let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                            reference.child(id).updateChildValues(calendarEventActivityValue) { (_, _) in
-                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                                let values:[String : Any] = ["calendarExport": true]
-                                userReference.updateChildValues(values)
-                                dispatchGroup.leave()
-                            }
-                        } else {
-                            dispatchGroup.leave()
-                        }
+        let dispatchGroup = DispatchGroup()
+        for activity in activities {
+            if let activityID = activity.activityID {
+                dispatchGroup.enter()
+                if let event = googleCalService.storeEvent(for: activity), let id = event.identifier {
+                    let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                    reference.child(id).updateChildValues(calendarEventActivityValue) { (_, _) in
+                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": id as Any]
+                        userReference.updateChildValues(values)
+                        dispatchGroup.leave()
                     }
-                }
-                dispatchGroup.notify(queue: .global()) {
-                    self?.finish()
+                } else {
+                    dispatchGroup.leave()
                 }
             }
-            else {
-                self?.finish()
-            }
-        })
+        }
+        dispatchGroup.notify(queue: .global()) {
+            self.finish()
+        }
     }
 }

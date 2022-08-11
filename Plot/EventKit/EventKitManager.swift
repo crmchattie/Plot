@@ -64,7 +64,6 @@ class EventKitManager {
                 completion()
                 return
             }
-            print("syncEventKitActivities completion")
             weakSelf.isRunning = false
             completion()
         }
@@ -91,7 +90,7 @@ class EventKitManager {
         let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
 
         //filter old activities out
-        let filterActivities = activities.filter { $0.startDate ?? Date() > timeAgo && $0.startDate ?? Date() < timeFromNow }
+        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) }
                 
         let activitiesOp = EKPlotActivityOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue
@@ -103,6 +102,7 @@ class EventKitManager {
                 completion()
                 return
             }
+            print("syncActivitiesToEventKit completion")
             weakSelf.isRunning = false
             completion()
         }

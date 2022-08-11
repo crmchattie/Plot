@@ -116,7 +116,6 @@ class HealthDetailViewController: UIViewController {
         view.addSubview(activityIndicator)
         
         view.addSubview(segmentedControl)
-        segmentedControl.selectedSegmentIndex = 0
         
         backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         view.addSubview(backgroundChartView)

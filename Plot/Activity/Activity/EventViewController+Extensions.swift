@@ -333,8 +333,6 @@ extension EventViewController: RecurrencePickerDelegate {
                 row.value = "Never"
                 row.updateCell()
                 activity.recurrences = nil
-//                let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("recurrences")
-//                reference.removeValue()
             }
         }
     }

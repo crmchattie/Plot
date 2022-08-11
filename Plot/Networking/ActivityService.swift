@@ -36,7 +36,16 @@ class ActivityService {
     var activities = [Activity]() {
         didSet {
             if oldValue != activities {
+                print("oldValue != activities")
+                let currentDate = NSNumber(value: Int((Date().localTime).timeIntervalSince1970)).int64Value
                 activities.sort { (activity1, activity2) -> Bool in
+                    if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                        return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+                    } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
+                        return currentDate < activity2.startDateTime?.int64Value ?? 0
+                    } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                        return activity1.startDateTime?.int64Value ?? 0 < currentDate
+                    }
                     return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
                 }
                 NotificationCenter.default.post(name: .activitiesUpdated, object: nil)
@@ -237,7 +246,7 @@ extension ActivityService {
                 for activity in activitiesAdded {
                     if activity.recurrences != nil {
                         if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
-                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID}))!
+                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
                             self?.addRepeatingActivities(activities: [activity], completion: { activities in
                                 self?.activities.append(contentsOf: activities)
                             })
@@ -247,28 +256,21 @@ extension ActivityService {
                             })
                         }
                     } else {
-                        if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                            self?.activities[index] = activity
-                        } else {
-                            self?.activities.append(activity)
-                        }
+                        //if recurrence was just made nil, repeating activities could show up so remove and then add back
+                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+                        self?.activities.append(activity)
                     }
                 }
             }, activitiesRemoved: { [weak self] activitiesRemoved in
                 for activity in activitiesRemoved {
-                    if activity.recurrences != nil {
-                        if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
-                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID}))!
-                        }
-                    } else if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self?.activities.remove(at: index)
-                    }
+                    //just filter out activities that match activityID; will capture both recurring and non-recurring
+                    self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
                 }
             }, activitiesChanged: { [weak self] activitiesChanged in
                 for activity in activitiesChanged {
                     if activity.recurrences != nil {
                         if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
-                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID}))!
+                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
                             self?.addRepeatingActivities(activities: [activity], completion: { activities in
                                 self?.activities.append(contentsOf: activities)
                             })
@@ -278,11 +280,9 @@ extension ActivityService {
                             })
                         }
                     } else {
-                        if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                            self?.activities[index] = activity
-                        } else {
-                            self?.activities.append(activity)
-                        }
+                        //if recurrence was just made nil, repeating activities could show up so remove and then add back
+                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+                        self?.activities.append(activity)
                     }
                 }
             }
@@ -322,30 +322,5 @@ extension ActivityService {
             }
         }
         completion(newActivities)
-    }
-    
-    func updateActivitiesWithContainer() {
-        for activity in activitiesNoRepeats {
-            if let activityID = activity.activityID {
-                if activity.name == "Daily Meditation", let hkSampleID = activity.hkSampleID {
-                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                    let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: nil, mindfulnessIDs: hkSampleID, mealIDs: nil, transactionIDs: nil)
-                    ContainerFunctions.updateContainerAndStuffInside(container: container)
-                } else if let hkSampleID = activity.hkSampleID, let transactionIDs = activity.transactionIDs {
-                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                    let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: hkSampleID, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: transactionIDs)
-                    ContainerFunctions.updateContainerAndStuffInside(container: container)
-                } else if let hkSampleID = activity.hkSampleID {
-                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                    let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: hkSampleID, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
-                    ContainerFunctions.updateContainerAndStuffInside(container: container)
-                    
-                } else if let transactionIDs = activity.transactionIDs {
-                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                    let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: transactionIDs)
-                    ContainerFunctions.updateContainerAndStuffInside(container: container)
-                }
-            }
-        }
     }
 }

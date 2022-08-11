@@ -84,7 +84,7 @@ class GoogleCalManager {
         let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
 
         //filter old activities out
-        let filterActivities = activities.filter { $0.startDate ?? Date() > timeAgo && $0.startDate ?? Date() < timeFromNow }
+        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) }
                 
         let activitiesOp = GPlotActivityOp(googleCalService: googleCalService, activities: filterActivities)
         // Setup queue

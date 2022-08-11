@@ -346,7 +346,6 @@ class WorkoutViewController: FormViewController {
             if #available(iOS 14.0, *) {
                 HKWorkoutActivityType.allCases.forEach {
                     row.options?.append($0.name)
-                    print($0.name)
                 }
             } else {
                 HKWorkoutActivityType.oldAllCases.forEach {

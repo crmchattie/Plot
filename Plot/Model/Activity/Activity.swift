@@ -15,6 +15,7 @@ let userActivitiesEntity = "user-activities"
 
 class Activity: NSObject, NSCopying, Codable {
     var activityID: String?
+    var externalActivityID: String?
     var name: String?
     var calendarID: String?
     var calendarName: String?
@@ -59,13 +60,12 @@ class Activity: NSObject, NSCopying, Codable {
     //task will key off of isTask and isComplete
     var isTask: Bool?
     var isComplete: Bool?
-    var hkSampleID: [String]?
-    var transactionIDs: [String]?
-    var mealIDs: [String]?
     var scheduleIDs: [String]?
     var isSchedule: Bool?
     
     enum CodingKeys: String, CodingKey {
+        case activityID
+        case externalActivityID
         case name
         case calendarID
         case calendarName
@@ -95,9 +95,6 @@ class Activity: NSObject, NSCopying, Codable {
         case showExtras
         case isComplete
         case isTask
-        case transactionIDs
-        case hkSampleID
-        case mealIDs
         case isSchedule
         case scheduleIDs
     }
@@ -120,6 +117,7 @@ class Activity: NSObject, NSCopying, Codable {
         super.init()
         
         activityID = dictionary?["activityID"] as? String
+        externalActivityID = dictionary?["externalActivityID"] as? String
         name = dictionary?["name"] as? String
         calendarID = dictionary?["calendarID"] as? String
         calendarName = dictionary?["calendarName"] as? String
@@ -167,15 +165,6 @@ class Activity: NSObject, NSCopying, Codable {
         showExtras = dictionary?["showExtras"] as? Bool
         isComplete = dictionary?["isComplete"] as? Bool
         isTask = dictionary?["isTask"] as? Bool
-        
-        if let hkSampleIDList = dictionary?["hkSampleID"] as? [String] {
-            hkSampleID = hkSampleIDList
-        } else if let hkSampleIDString = dictionary?["hkSampleID"] as? String {
-            hkSampleID = [hkSampleIDString]
-        }
-        
-        transactionIDs = dictionary?["transactionIDs"] as? [String]
-        mealIDs = dictionary?["mealIDs"] as? [String]
         isSchedule = dictionary?["isSchedule"] as? Bool
         scheduleIDs = dictionary?["scheduleIDs"] as? [String]
     }
@@ -189,6 +178,10 @@ class Activity: NSObject, NSCopying, Codable {
         var dictionary = [String: AnyObject]()
         if let value = self.activityID as AnyObject? {
             dictionary["activityID"] = value
+        }
+        
+        if let value = self.externalActivityID as AnyObject? {
+            dictionary["externalActivityID"] = value
         }
         
         if let value = self.name as AnyObject? {
@@ -336,6 +329,7 @@ class Activity: NSObject, NSCopying, Codable {
     
     static func == (lhs: Activity, rhs: Activity) -> Bool {
         return lhs.activityID == rhs.activityID &&
+            lhs.externalActivityID == rhs.externalActivityID &&
             lhs.name == rhs.name &&
             lhs.calendarID == rhs.calendarID &&
             lhs.activityType == rhs.activityType &&
@@ -590,6 +584,7 @@ func activityListStats(
     }
     completion(statistics, activityList)
 }
+
 
 extension Activity {
     var startDate: Date? {

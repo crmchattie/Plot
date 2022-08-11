@@ -86,7 +86,6 @@ class MindfulnessOperation: AsyncOperation {
                 let average = sum / Double(map.count)
                 
                 if let last = sortedDates.last?.key, let val = map[last] {
-                    print("insert mindfulness metric")
                     var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
                     metric.hkSample = samples.last
                     metric.average = average

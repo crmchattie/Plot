@@ -50,6 +50,7 @@ class ActivitiesFetcher: NSObject {
                             activity.calendarColor = userActivity.calendarColor
                             activity.calendarSource = userActivity.calendarSource
                             activity.calendarExport = userActivity.calendarExport
+                            activity.externalActivityID = userActivity.externalActivityID
                             activity.isComplete = userActivity.isComplete
                             activity.reminder = userActivity.reminder
                             activity.badge = userActivity.badge
@@ -88,7 +89,7 @@ class ActivitiesFetcher: NSObject {
                 let activityID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).observe(.childChanged) { _ in
+                handle = ref.child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).observe(.value) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getActivitiesFromSnapshot(snapshot: snapshot, completion: completion)
                 }
@@ -130,6 +131,7 @@ class ActivitiesFetcher: NSObject {
                             activity.calendarColor = userActivity.calendarColor
                             activity.calendarExport = userActivity.calendarExport
                             activity.calendarSource = userActivity.calendarSource
+                            activity.externalActivityID = userActivity.externalActivityID
                             activity.isComplete = userActivity.isComplete
                             activity.reminder = userActivity.reminder
                             activity.badge = userActivity.badge

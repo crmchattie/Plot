@@ -97,6 +97,21 @@ enum HealthMetricType {
     }
 }
 
+extension HealthMetric {
+    func grabSegment() -> Int {
+        let anchorDate = Date().localTime
+        if NSCalendar.current.isDateInToday(self.date) {
+            return 0
+        } else if self.date.isBetween(anchorDate, and: anchorDate.weekBefore) {
+            return 1
+        } else if self.date.isBetween(anchorDate, and: anchorDate.monthBefore) {
+            return 2
+        } else {
+            return 3
+        }
+    }
+}
+
 enum HealthMetricCategory: String {
     case general
     case workouts

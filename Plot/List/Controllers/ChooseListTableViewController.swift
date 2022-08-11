@@ -86,7 +86,6 @@ class ChooseListTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fetchLists()
         configureTableView()
         setupSearchController()
         
@@ -197,46 +196,6 @@ class ChooseListTableViewController: UITableViewController {
             searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
             tableView.tableHeaderView = searchBar
         }
-    }
-    
-    func fetchLists() {
-        if lists.isEmpty {
-            let dispatchGroup = DispatchGroup()
-            dispatchGroup.enter()
-            checklistFetcher.fetchChecklists { (checklists) in
-                for checklist in checklists {
-                    if checklist.name == "nothing" { continue }
-                    if let items = checklist.items, Array(items.keys)[0] == "name" { continue }
-                    self.checklists.append(checklist)
-                }
-                dispatchGroup.leave()
-            }
-            dispatchGroup.enter()
-            activitylistFetcher.fetchActivitylists { (activitylists) in
-                for activitylist in activitylists {
-                    if activitylist.name == "nothing" { continue }
-                    if let items = activitylist.items, Array(items.keys)[0] == "name" { continue }
-                    self.activitylists.append(activitylist)
-                }
-                dispatchGroup.leave()
-            }
-            dispatchGroup.enter()
-            grocerylistFetcher.fetchGrocerylists { (grocerylists) in
-                for grocerylist in grocerylists {
-                    if grocerylist.name == "nothing" { continue }
-                    self.grocerylists.append(grocerylist)
-                }
-                dispatchGroup.leave()
-            }
-            dispatchGroup.notify(queue: .main) {
-                self.lists = (self.checklists.map { ListContainer(grocerylist: nil, checklist: $0, activitylist: nil, packinglist: nil) } + self.activitylists.map { ListContainer(grocerylist: nil, checklist: nil, activitylist: $0, packinglist: nil) } + self.grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, activitylist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
-                self.handleReloadLists()
-                return
-            }
-            
-        }
-        
-        handleReloadLists()
     }
     
     

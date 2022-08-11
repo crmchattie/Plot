@@ -72,6 +72,8 @@ class ChooseActivityTableViewController: UITableViewController {
     
     var movingBackwards = false
     
+    let currentDate = NSNumber(value: Int((Date().localTime).timeIntervalSince1970)).int64Value
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -89,10 +91,10 @@ class ChooseActivityTableViewController: UITableViewController {
         } else if !existingActivities.isEmpty {
             activities = activities.filter { !existingActivities.contains($0) }
         }
+        filteredActivities = activities
         
-        handleReloadActivities()
         configureTableView()
-        setupSearchController()
+        scrollToFirstActivityWithDate(animated: false)
         
     }
     
@@ -120,6 +122,8 @@ class ChooseActivityTableViewController: UITableViewController {
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
+//        let searchBarButton = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
+//        navigationItem.rightBarButtonItem = searchBarButton
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
@@ -135,14 +139,18 @@ class ChooseActivityTableViewController: UITableViewController {
         dismiss(animated: true, completion: nil)
     }
     
+    @objc fileprivate func search() {
+        setupSearchController()
+    }
+    
     fileprivate func setupSearchController() {
-        
         if #available(iOS 11.0, *) {
             searchActivityController = UISearchController(searchResultsController: nil)
             searchActivityController?.searchResultsUpdater = self
             searchActivityController?.obscuresBackgroundDuringPresentation = false
             searchActivityController?.searchBar.delegate = self
             searchActivityController?.definesPresentationContext = true
+            searchActivityController?.searchBar.becomeFirstResponder()
             navigationItem.searchController = searchActivityController
             navigationItem.hidesSearchBarWhenScrolling = true
         } else {
@@ -151,28 +159,75 @@ class ChooseActivityTableViewController: UITableViewController {
             searchBar?.placeholder = "Search"
             searchBar?.searchBarStyle = .minimal
             searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
+            searchBar?.becomeFirstResponder()
             tableView.tableHeaderView = searchBar
         }
     }
     
-    
-    func handleReloadActivities() {
+    func handleReloadTableAftersearchBarCancelButtonClicked() {
         filteredActivities = activities
         filteredActivities.sort { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
+            if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
+                return currentDate < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < currentDate
+            }
+            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
         }
-        self.tableView.reloadData()
-    }
-    
-    func handleReloadTableAftersearchBarCancelButtonClicked() {
-        handleReloadActivities()
+        scrollToFirstActivityWithDate(animated: true)
     }
     
     func handleReloadTableAfterSearch() {
         filteredActivities.sort { (activity1, activity2) -> Bool in
-            return activity1.startDateTime?.int64Value < activity2.startDateTime?.int64Value
+            if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
+                return currentDate < activity2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
+                return activity1.startDateTime?.int64Value ?? 0 < currentDate
+            }
+            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
         }
-        self.tableView.reloadData()
+        scrollToFirstActivityWithDate(animated: true)
+    }
+    
+    func scrollToFirstActivityWithDate(animated: Bool) {
+        let date = Date().localTime
+        var index = 0
+        var activityFound = false
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        for activity in self.filteredActivities {
+            if let endDate = activity.endDateWTZ {
+                if (date < endDate) || (activity.allDay ?? false && calendar.compare(date, to: endDate, toGranularity: .day) != .orderedDescending) {
+                    activityFound = true
+                    break
+                }
+                index += 1
+            }
+        }
+        
+        if activityFound {
+            let numberOfRows = self.tableView.numberOfRows(inSection: 0)
+            if index < numberOfRows {
+                let indexPath = IndexPath(row: index, section: 0)
+                self.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
+                if !animated {
+                    self.tableView.reloadData()
+                }
+            }
+        } else if !activityFound {
+            let numberOfRows = self.tableView.numberOfRows(inSection: 0)
+            if numberOfRows > 0 {
+                let indexPath = IndexPath(row: numberOfRows - 1, section: 0)
+                self.tableView.scrollToRow(at: indexPath, at: .top, animated: animated)
+                if !animated {
+                    self.tableView.reloadData()
+                }
+            }
+        }
     }
     
     // MARK: - Table view data source
@@ -240,12 +295,8 @@ extension ChooseActivityTableViewController: UISearchBarDelegate, UISearchContro
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
-        guard #available(iOS 11.0, *) else {
-            searchBar.setShowsCancelButton(false, animated: true)
-            searchBar.resignFirstResponder()
-            return
-        }
-        
+        searchBar.setShowsCancelButton(false, animated: true)
+        searchBar.resignFirstResponder()
         handleReloadTableAftersearchBarCancelButtonClicked()
     }
     

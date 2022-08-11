@@ -101,7 +101,7 @@ class EventViewController: FormViewController {
         if activity != nil {
             title = "Event"
             active = true
-            activityOld = activity
+            activityOld = activity.copy() as! Activity
             if activity.activityID != nil {
                 activityID = activity.activityID!
                 print(activityID)

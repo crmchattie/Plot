@@ -180,6 +180,14 @@ class ActivityActions: NSObject {
         groupActivityReference.setValue(recurrences)
     }
     
+    func deleteRecurrences() {
+        guard let _ = activity, let activityID = activityID, let _ = selectedFalconUsers else {
+            return
+        }
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).child("recurrences")
+        groupActivityReference.removeValue()
+    }
+    
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()

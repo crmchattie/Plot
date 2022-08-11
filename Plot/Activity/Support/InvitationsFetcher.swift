@@ -24,10 +24,10 @@ class InvitationsFetcher: NSObject {
             completion([:], [])
             return
         }
-        
-        let ref = Database.database().reference()
-        userInvitationsDatabaseRef = Database.database().reference().child(userInvitationsEntity).child(currentUserID)
 
+        let ref = Database.database().reference()
+        userInvitationsDatabaseRef = ref.child(userInvitationsEntity).child(currentUserID)
+        
         userInvitationsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let invitationIDs = snapshot.value as? [String: Int] {
                 var invitations: [String: Invitation] = [:]
@@ -65,9 +65,13 @@ class InvitationsFetcher: NSObject {
     }
     
     func observeInvitationForCurrentUser(invitationsAdded: @escaping ([Invitation])->(), invitationsRemoved: @escaping ([Invitation])->()) {
-        guard (Auth.auth().currentUser?.uid) != nil else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
+        
+        let ref = Database.database().reference()
+        userInvitationsDatabaseRef = ref.child(userInvitationsEntity).child(currentUserID)
+                
         self.invitationsAdded = invitationsAdded
         self.invitationsRemoved = invitationsRemoved
         currentUserInvitationsAddHandle = userInvitationsDatabaseRef.observe(.childAdded, with: { snapshot in
@@ -75,7 +79,7 @@ class InvitationsFetcher: NSObject {
                 let invitationID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(invitationsEntity).child(invitationID).observe(.childAdded) { _ in
+                handle = ref.child(invitationsEntity).child(invitationID).observe(.value) { _ in
                     ref.removeObserver(withHandle: handle)
                     self.getInvitationsFromSnapshot(snapshot: snapshot, completion: completion)
                 }
