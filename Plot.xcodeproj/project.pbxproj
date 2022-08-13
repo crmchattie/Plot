@@ -1628,8 +1628,6 @@
 			isa = PBXGroup;
 			children = (
 				10F3032424EB746E00C04B8F /* AccountsTableViewController.swift */,
-				1034A04325C5ECB9006D3DB8 /* Calendar */,
-				10F3032824EC69C200C04B8F /* Financial */,
 			);
 			path = Accounts;
 			sourceTree = "<group>";
@@ -1940,6 +1938,8 @@
 		4BAEE45021272B380045AB10 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
+				1034A04325C5ECB9006D3DB8 /* Calendar */,
+				10F3032824EC69C200C04B8F /* Financial */,
 				10F3032324EB744500C04B8F /* Accounts */,
 				4BAEE45D21272B380045AB10 /* Model */,
 				4BAEE45A21272B380045AB10 /* Support */,

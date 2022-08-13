@@ -17,30 +17,45 @@ class FinancialAccountFetcher: NSObject {
     fileprivate var currentUserAccountsChangeHandle = DatabaseHandle()
     fileprivate var currentUserAccountsRemoveHandle = DatabaseHandle()
     
+    var accountsInitialAdd: (([MXAccount])->())?
     var accountsAdded: (([MXAccount])->())?
-    var accountsRemoved: (([MXAccount])->())?
     var accountsChanged: (([MXAccount])->())?
     
-    fileprivate var isGroupAlreadyFinished = false
-    
-    func fetchAccounts(completion: @escaping ([MXAccount])->()) {
+    func observeAccountForCurrentUser(accountsInitialAdd: @escaping ([MXAccount])->(), accountsAdded: @escaping ([MXAccount])->(), accountsChanged: @escaping ([MXAccount])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
-            completion([])
             return
         }
                 
         let ref = Database.database().reference()
         userAccountsDatabaseRef = ref.child(userFinancialAccountsEntity).child(currentUserID)
+        
+        self.accountsInitialAdd = accountsInitialAdd
+        self.accountsAdded = accountsAdded
+        self.accountsChanged = accountsChanged
+        
+        var userAccounts: [String: UserAccount] = [:]
+        
         userAccountsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
-            if snapshot.exists(), let accountIDs = snapshot.value as? [String: AnyObject] {
+            guard snapshot.exists() else {
+                accountsInitialAdd([])
+                return
+            }
+            
+            if let completion = self.accountsInitialAdd {
                 var accounts: [MXAccount] = []
                 let group = DispatchGroup()
-                for (accountID, userAccountInfo) in accountIDs {
-                    group.enter()
+                var counter = 0
+                let accountIDs = snapshot.value as? [String: AnyObject] ?? [:]
+                for (ID, userAccountInfo) in accountIDs {
+                    var handle = UInt.max
                     if let userAccount = try? FirebaseDecoder().decode(UserAccount.self, from: userAccountInfo) {
-                        ref.child(financialAccountsEntity).child(accountID).observeSingleEvent(of: .value, with: { accountSnapshot in
-                            if accountSnapshot.exists(), let accountSnapshotValue = accountSnapshot.value {
-                                if let account = try? FirebaseDecoder().decode(MXAccount.self, from: accountSnapshotValue) {
+                        userAccounts[ID] = userAccount
+                        group.enter()
+                        counter += 1
+                        handle = ref.child(financialAccountsEntity).child(ID).observe(.value) { snapshot in
+                            ref.removeObserver(withHandle: handle)
+                            if snapshot.exists(), let snapshotValue = snapshot.value {
+                                if let account = try? FirebaseDecoder().decode(MXAccount.self, from: snapshotValue), let userAccount = userAccounts[ID] {
                                     var _account = account
                                     if let value = userAccount.name {
                                         _account.name = value
@@ -54,107 +69,146 @@ class FinancialAccountFetcher: NSObject {
                                     _account.badge = userAccount.badge
                                     _account.muted = userAccount.muted
                                     _account.pinned = userAccount.pinned
-                                    accounts.append(_account)
+                                    if counter > 0 {
+                                        accounts.append(_account)
+                                        group.leave()
+                                        counter -= 1
+                                    } else {
+                                        accounts = [_account]
+                                        completion(accounts)
+                                    }
+                                }
+                            } else {
+                                if counter > 0 {
+                                    group.leave()
+                                    counter -= 1
                                 }
                             }
-                            group.leave()
-                        })
-                    } else {
-                        ref.child(financialAccountsEntity).child(accountID).observeSingleEvent(of: .value, with: { accountSnapshot in
-                            if accountSnapshot.exists(), let accountSnapshotValue = accountSnapshot.value {
-                                if let account = try? FirebaseDecoder().decode(MXAccount.self, from: accountSnapshotValue) {
-                                    accounts.append(account)
-                                }
-                            }
-                            group.leave()
-                        })
+                        }
                     }
                 }
                 group.notify(queue: .main) {
                     completion(accounts)
                 }
-            } else {
-                completion([])
             }
         })
-    }
-    
-    func observeAccountForCurrentUser(accountsAdded: @escaping ([MXAccount])->(), accountsChanged: @escaping ([MXAccount])->()) {
-        guard let _ = Auth.auth().currentUser?.uid else {
-            return
-        }
-        self.accountsAdded = accountsAdded
-        self.accountsChanged = accountsChanged
+        
         currentUserAccountsAddHandle = userAccountsDatabaseRef.observe(.childAdded, with: { snapshot in
-            if let completion = self.accountsAdded {
-                let accountID = snapshot.key
-                let ref = Database.database().reference()
-                var handle = UInt.max
-                handle = ref.child(financialAccountsEntity).child(accountID).observe(.childChanged) { _ in
-                    ref.removeObserver(withHandle: handle)
-                    self.getAccountsFromSnapshot(snapshot: snapshot, completion: completion)
+            if userAccounts[snapshot.key] == nil {
+                if let completion = self.accountsAdded {
+                    var handle = UInt.max
+                    let ID = snapshot.key
+                    self.getUserDataFromSnapshot(ID: ID) { accountsList in
+                        for userAccount in accountsList {
+                            userAccounts[ID] = userAccount
+                            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                                ref.removeObserver(withHandle: handle)
+                                if snapshot.exists(), let snapshotValue = snapshot.value {
+                                    if let account = try? FirebaseDecoder().decode(MXAccount.self, from: snapshotValue), let userAccount = userAccounts[ID] {
+                                        var _account = account
+                                        if let value = userAccount.name {
+                                            _account.name = value
+                                        }
+                                        if let value = userAccount.should_link {
+                                            _account.should_link = value
+                                        }
+                                        if let value = userAccount.tags {
+                                            _account.tags = value
+                                        }
+                                        _account.badge = userAccount.badge
+                                        _account.muted = userAccount.muted
+                                        _account.pinned = userAccount.pinned
+                                        completion([_account])
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         })
         
         currentUserAccountsChangeHandle = userAccountsDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.accountsChanged {
-                self.getAccountsFromSnapshot(snapshot: snapshot, completion: completion)
+                self.getDataFromSnapshot(ID: snapshot.key) { accountsList in
+                    for account in accountsList {
+                        if let userAccount = try? FirebaseDecoder().decode(UserAccount.self, from: account) {
+                            userAccounts[account.guid] = userAccount
+                        }
+                    }
+                    completion(accountsList)
+                }
             }
         })
     }
     
-    func getAccountsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([MXAccount])->()) {
-        if snapshot.exists() {
-            guard let currentUserID = Auth.auth().currentUser?.uid else {
-                return
-            }
-            let accountID = snapshot.key
-            let ref = Database.database().reference()
-            var accounts: [MXAccount] = []
-            let group = DispatchGroup()
-            group.enter()
-            ref.child(userFinancialAccountsEntity).child(currentUserID).child(accountID).observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let userAccountInfo = snapshot.value {
-                    if let userAccount = try? FirebaseDecoder().decode(UserAccount.self, from: userAccountInfo) {
-                        ref.child(financialAccountsEntity).child(accountID).observeSingleEvent(of: .value, with: { accountSnapshot in
-                            if accountSnapshot.exists(), let accountSnapshotValue = accountSnapshot.value {
-                                if let account = try? FirebaseDecoder().decode(MXAccount.self, from: accountSnapshotValue) {
-                                    var _account = account
-                                    if let value = userAccount.name {
-                                        _account.name = value
-                                    }
-                                    if let value = userAccount.should_link {
-                                        _account.should_link = value
-                                    }
-                                    if let value = userAccount.tags {
-                                        _account.tags = value
-                                    }
-                                    _account.badge = userAccount.badge
-                                    _account.muted = userAccount.muted
-                                    _account.pinned = userAccount.pinned
-                                    accounts.append(_account)
+    func getDataFromSnapshot(ID: String, completion: @escaping ([MXAccount])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference()
+        var accounts: [MXAccount] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userFinancialAccountsEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let userAccountInfo = snapshot.value {
+                if let userAccount = try? FirebaseDecoder().decode(UserAccount.self, from: userAccountInfo) {
+                    ref.child(financialAccountsEntity).child(ID).observeSingleEvent(of: .value, with: { accountSnapshot in
+                        if accountSnapshot.exists(), let accountSnapshotValue = accountSnapshot.value {
+                            if let account = try? FirebaseDecoder().decode(MXAccount.self, from: accountSnapshotValue) {
+                                var _account = account
+                                if let value = userAccount.name {
+                                    _account.name = value
                                 }
-                            }
-                            group.leave()
-                        })
-                    } else {
-                        ref.child(financialAccountsEntity).child(accountID).observeSingleEvent(of: .value, with: { accountSnapshot in
-                            if accountSnapshot.exists(), let accountSnapshotValue = accountSnapshot.value {
-                                if let account = try? FirebaseDecoder().decode(MXAccount.self, from: accountSnapshotValue) {
-                                    accounts.append(account)
+                                if let value = userAccount.should_link {
+                                    _account.should_link = value
                                 }
+                                if let value = userAccount.tags {
+                                    _account.tags = value
+                                }
+                                _account.badge = userAccount.badge
+                                _account.muted = userAccount.muted
+                                _account.pinned = userAccount.pinned
+                                accounts.append(_account)
                             }
-                            group.leave()
-                        })
-                    }
+                        }
+                        group.leave()
+                    })
+                } else {
+                    ref.child(financialAccountsEntity).child(ID).observeSingleEvent(of: .value, with: { accountSnapshot in
+                        if accountSnapshot.exists(), let accountSnapshotValue = accountSnapshot.value {
+                            if let account = try? FirebaseDecoder().decode(MXAccount.self, from: accountSnapshotValue) {
+                                accounts.append(account)
+                            }
+                        }
+                        group.leave()
+                    })
                 }
-            })
-            group.notify(queue: .main) {
-                completion(accounts)
             }
-        } else {
-            completion([])
+        })
+        group.notify(queue: .main) {
+            completion(accounts)
+        }
+    }
+    
+    func getUserDataFromSnapshot(ID: String, completion: @escaping ([UserAccount])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference()
+        var accounts: [UserAccount] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userFinancialAccountsEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let userAccountInfo = snapshot.value {
+                if let userAccount = try? FirebaseDecoder().decode(UserAccount.self, from: userAccountInfo) {
+                    accounts.append(userAccount)
+                    group.leave()
+                }
+            }
+        })
+        group.notify(queue: .main) {
+            completion(accounts)
         }
     }
 }

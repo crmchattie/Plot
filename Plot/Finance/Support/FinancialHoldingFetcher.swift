@@ -18,30 +18,46 @@ class FinancialHoldingFetcher: NSObject {
     fileprivate var currentUserHoldingsRemoveHandle = DatabaseHandle()
     
     
+    var holdingsInitialAdd: (([MXHolding])->())?
     var holdingsAdded: (([MXHolding])->())?
     var holdingsRemoved: (([MXHolding])->())?
     var holdingsChanged: (([MXHolding])->())?
     
-    fileprivate var isGroupAlreadyFinished = false
-    
-    func fetchHoldings(completion: @escaping ([MXHolding])->()) {
+    func observeHoldingForCurrentUser(holdingsInitialAdd: @escaping ([MXHolding])->(), holdingsAdded: @escaping ([MXHolding])->(), holdingsChanged: @escaping ([MXHolding])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
-            completion([])
             return
         }
                 
         let ref = Database.database().reference()
         userHoldingsDatabaseRef = ref.child(userFinancialHoldingsEntity).child(currentUserID)
+        
+        self.holdingsInitialAdd = holdingsInitialAdd
+        self.holdingsAdded = holdingsAdded
+        self.holdingsChanged = holdingsChanged
+        
+        var userHoldings: [String: UserHolding] = [:]
+        
         userHoldingsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
-            if snapshot.exists(), let holdingIDs = snapshot.value as? [String: AnyObject] {
+            guard snapshot.exists() else {
+                holdingsInitialAdd([])
+                return
+            }
+            
+            if let completion = self.holdingsInitialAdd {
                 var holdings: [MXHolding] = []
                 let group = DispatchGroup()
-                for (holdingID, userHoldingInfo) in holdingIDs {
+                var counter = 0
+                let holdingIDs = snapshot.value as? [String: AnyObject] ?? [:]
+                for (ID, userHoldingInfo) in holdingIDs {
+                    var handle = UInt.max
                     if let userHolding = try? FirebaseDecoder().decode(UserHolding.self, from: userHoldingInfo) {
+                        userHoldings[ID] = userHolding
                         group.enter()
-                        ref.child(financialHoldingsEntity).child(holdingID).observeSingleEvent(of: .value, with: { holdingSnapshot in
-                            if holdingSnapshot.exists(), let holdingSnapshotValue = holdingSnapshot.value {
-                                if let holding = try? FirebaseDecoder().decode(MXHolding.self, from: holdingSnapshotValue) {
+                        counter += 1
+                        handle = ref.child(financialHoldingsEntity).child(ID).observe(.value) { snapshot in
+                            ref.removeObserver(withHandle: handle)
+                            if snapshot.exists(), let snapshotValue = snapshot.value {
+                                if let holding = try? FirebaseDecoder().decode(MXHolding.self, from: snapshotValue), let userHolding = userHoldings[ID] {
                                     var _holding = holding
                                     if let value = userHolding.tags {
                                         _holding.tags = value
@@ -52,107 +68,141 @@ class FinancialHoldingFetcher: NSObject {
                                     _holding.badge = userHolding.badge
                                     _holding.muted = userHolding.muted
                                     _holding.pinned = userHolding.pinned
-                                    holdings.append(_holding)
+                                    if counter > 0 {
+                                        holdings.append(_holding)
+                                        group.leave()
+                                        counter -= 1
+                                    } else {
+                                        holdings = [_holding]
+                                        completion(holdings)
+                                    }
+                                }
+                            } else {
+                                if counter > 0 {
+                                    group.leave()
+                                    counter -= 1
                                 }
                             }
-                            group.leave()
-                        })
-                    } else {
-                        print("else")
-                        group.enter()
-                        ref.child(financialHoldingsEntity).child(holdingID).observeSingleEvent(of: .value, with: { holdingSnapshot in
-                            if holdingSnapshot.exists(), let holdingSnapshotValue = holdingSnapshot.value {
-                                if let holding = try? FirebaseDecoder().decode(MXHolding.self, from: holdingSnapshotValue) {
-                                    holdings.append(holding)
-                                }
-                            }
-                            group.leave()
-                        })
+                        }
                     }
                 }
                 group.notify(queue: .main) {
                     completion(holdings)
                 }
-            } else {
-                completion([])
             }
         })
-    }
-    
-    func observeHoldingForCurrentUser(holdingsAdded: @escaping ([MXHolding])->(), holdingsChanged: @escaping ([MXHolding])->()) {
-        guard let _ = Auth.auth().currentUser?.uid else {
-            return
-        }
-        self.holdingsAdded = holdingsAdded
-        self.holdingsChanged = holdingsChanged
+        
         currentUserHoldingsAddHandle = userHoldingsDatabaseRef.observe(.childAdded, with: { snapshot in
-            if let completion = self.holdingsAdded {
-                let holdingID = snapshot.key
-                let ref = Database.database().reference()
-                var handle = UInt.max
-                handle = ref.child(financialHoldingsEntity).child(holdingID).observe(.childChanged) { _ in
-                    ref.removeObserver(withHandle: handle)
-                    self.getHoldingsFromSnapshot(snapshot: snapshot, completion: completion)
+            if userHoldings[snapshot.key] == nil {
+                if let completion = self.holdingsAdded {
+                    var handle = UInt.max
+                    let ID = snapshot.key
+                    self.getUserDataFromSnapshot(ID: ID) { holdingsList in
+                        for userHolding in holdingsList {
+                            userHoldings[ID] = userHolding
+                            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                                ref.removeObserver(withHandle: handle)
+                                if snapshot.exists(), let snapshotValue = snapshot.value {
+                                    if let holding = try? FirebaseDecoder().decode(MXHolding.self, from: snapshotValue), let userHolding = userHoldings[ID] {
+                                        var _holding = holding
+                                        if let value = userHolding.tags {
+                                            _holding.tags = value
+                                        }
+                                        if let value = userHolding.should_link {
+                                            _holding.should_link = value
+                                        }
+                                        _holding.badge = userHolding.badge
+                                        _holding.muted = userHolding.muted
+                                        _holding.pinned = userHolding.pinned
+                                        completion([_holding])
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         })
         
         currentUserHoldingsChangeHandle = userHoldingsDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.holdingsChanged {
-                self.getHoldingsFromSnapshot(snapshot: snapshot, completion: completion)
+                self.getDataFromSnapshot(ID: snapshot.key) { holdingsList in
+                    for holding in holdingsList {
+                        if let userHolding = try? FirebaseDecoder().decode(UserHolding.self, from: holding) {
+                            userHoldings[holding.guid] = userHolding
+                        }
+                    }
+                    completion(holdingsList)
+                }
             }
         })
     }
     
-    func getHoldingsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([MXHolding])->()) {
-        if snapshot.exists() {
-            guard let currentUserID = Auth.auth().currentUser?.uid else {
-                return
-            }
-            let holdingID = snapshot.key
-            let ref = Database.database().reference()
-            var holdings: [MXHolding] = []
-            let group = DispatchGroup()
-            group.enter()
-            ref.child(userFinancialHoldingsEntity).child(currentUserID).child(holdingID).observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let userHoldingInfo = snapshot.value {
-                    if let userHolding = try? FirebaseDecoder().decode(UserHolding.self, from: userHoldingInfo) {
-                        ref.child(financialHoldingsEntity).child(holdingID).observeSingleEvent(of: .value, with: { holdingSnapshot in
-                            if holdingSnapshot.exists(), let holdingSnapshotValue = holdingSnapshot.value {
-                                if let holding = try? FirebaseDecoder().decode(MXHolding.self, from: holdingSnapshotValue) {
-                                    var _holding = holding
-                                    if let value = userHolding.tags {
-                                        _holding.tags = value
-                                    }
-                                    if let value = userHolding.should_link {
-                                        _holding.should_link = value
-                                    }
-                                    _holding.badge = userHolding.badge
-                                    _holding.muted = userHolding.muted
-                                    _holding.pinned = userHolding.pinned
-                                    holdings.append(_holding)
-                                }
-                            }
-                            group.leave()
-                        })
-                    }
-                } else {
-                    ref.child(financialHoldingsEntity).child(holdingID).observeSingleEvent(of: .value, with: { holdingSnapshot in
+    func getDataFromSnapshot(ID: String, completion: @escaping ([MXHolding])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference()
+        var holdings: [MXHolding] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userFinancialHoldingsEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let userHoldingInfo = snapshot.value {
+                if let userHolding = try? FirebaseDecoder().decode(UserHolding.self, from: userHoldingInfo) {
+                    ref.child(financialHoldingsEntity).child(ID).observeSingleEvent(of: .value, with: { holdingSnapshot in
                         if holdingSnapshot.exists(), let holdingSnapshotValue = holdingSnapshot.value {
                             if let holding = try? FirebaseDecoder().decode(MXHolding.self, from: holdingSnapshotValue) {
-                                holdings.append(holding)
+                                var _holding = holding
+                                if let value = userHolding.tags {
+                                    _holding.tags = value
+                                }
+                                if let value = userHolding.should_link {
+                                    _holding.should_link = value
+                                }
+                                _holding.badge = userHolding.badge
+                                _holding.muted = userHolding.muted
+                                _holding.pinned = userHolding.pinned
+                                holdings.append(_holding)
                             }
                         }
                         group.leave()
                     })
                 }
-            })
-            
-            group.notify(queue: .main) {
-                completion(holdings)
+            } else {
+                ref.child(financialHoldingsEntity).child(ID).observeSingleEvent(of: .value, with: { holdingSnapshot in
+                    if holdingSnapshot.exists(), let holdingSnapshotValue = holdingSnapshot.value {
+                        if let holding = try? FirebaseDecoder().decode(MXHolding.self, from: holdingSnapshotValue) {
+                            holdings.append(holding)
+                        }
+                    }
+                    group.leave()
+                })
             }
-        } else {
-            completion([])
+        })
+        
+        group.notify(queue: .main) {
+            completion(holdings)
+        }
+    }
+    
+    func getUserDataFromSnapshot(ID: String, completion: @escaping ([UserHolding])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference()
+        var holdings: [UserHolding] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userFinancialHoldingsEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let userHoldingInfo = snapshot.value {
+                if let userHolding = try? FirebaseDecoder().decode(UserHolding.self, from: userHoldingInfo) {
+                    holdings.append(userHolding)
+                    group.leave()
+                }
+            }
+        })
+        group.notify(queue: .main) {
+            completion(holdings)
         }
     }
 }

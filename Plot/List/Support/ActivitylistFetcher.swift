@@ -85,67 +85,62 @@ class ActivitylistFetcher: NSObject {
                 var handle = UInt.max
                 handle = ref.child(activitylistsEntity).child(activitylistID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
-                    self.getActivitylistsFromSnapshot(snapshot: snapshot, completion: completion)
+                    self.getActivitylistsFromSnapshot(ID: snapshot.key, completion: completion)
                 }
             }
         })
         
         currentUserActivitylistsChangeHandle = userActivitylistsDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.activitylistsChanged {
-                self.getActivitylistsFromSnapshot(snapshot: snapshot, completion: completion)
+                self.getActivitylistsFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
         currentUserActivitylistsRemoveHandle = userActivitylistsDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.activitylistsRemoved {
-                self.getActivitylistsFromSnapshot(snapshot: snapshot, completion: completion)
+                self.getActivitylistsFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
     }
     
-    func getActivitylistsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Activitylist])->()) {
-        if snapshot.exists() {
-            guard let currentUserID = Auth.auth().currentUser?.uid else {
-                return
-            }
-            let activitylistID = snapshot.key
-            let ref = Database.database().reference()
-            var activitylists: [Activitylist] = []
-            let group = DispatchGroup()
-            group.enter()
-            ref.child(userActivitylistsEntity).child(currentUserID).child(activitylistID).observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let userActivitylistInfo = snapshot.value {
-                    if let userActivitylist = try? FirebaseDecoder().decode(Activitylist.self, from: userActivitylistInfo) {
-                        ref.child(activitylistsEntity).child(activitylistID).observeSingleEvent(of: .value, with: { activitylistSnapshot in
-                            if activitylistSnapshot.exists(), let activitylistSnapshotValue = activitylistSnapshot.value {
-                                if let activitylist = try? FirebaseDecoder().decode(Activitylist.self, from: activitylistSnapshotValue) {
-                                    activitylist.badge = userActivitylist.badge
-                                    activitylist.muted = userActivitylist.muted
-                                    activitylist.pinned = userActivitylist.pinned
-                                    activitylists.append(activitylist)
-                                }
-                            }
-                            group.leave()
-                        })
-                    }
-                } else {
-                    ref.child(activitylistsEntity).child(activitylistID).observeSingleEvent(of: .value, with: { activitylistSnapshot in
+    func getActivitylistsFromSnapshot(ID: String, completion: @escaping ([Activitylist])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference()
+        var activitylists: [Activitylist] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userActivitylistsEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let userActivitylistInfo = snapshot.value {
+                if let userActivitylist = try? FirebaseDecoder().decode(Activitylist.self, from: userActivitylistInfo) {
+                    ref.child(activitylistsEntity).child(ID).observeSingleEvent(of: .value, with: { activitylistSnapshot in
                         if activitylistSnapshot.exists(), let activitylistSnapshotValue = activitylistSnapshot.value {
                             if let activitylist = try? FirebaseDecoder().decode(Activitylist.self, from: activitylistSnapshotValue) {
+                                activitylist.badge = userActivitylist.badge
+                                activitylist.muted = userActivitylist.muted
+                                activitylist.pinned = userActivitylist.pinned
                                 activitylists.append(activitylist)
                             }
                         }
                         group.leave()
                     })
                 }
-            })
-            
-            group.notify(queue: .main) {
-                completion(activitylists)
+            } else {
+                ref.child(activitylistsEntity).child(ID).observeSingleEvent(of: .value, with: { activitylistSnapshot in
+                    if activitylistSnapshot.exists(), let activitylistSnapshotValue = activitylistSnapshot.value {
+                        if let activitylist = try? FirebaseDecoder().decode(Activitylist.self, from: activitylistSnapshotValue) {
+                            activitylists.append(activitylist)
+                        }
+                    }
+                    group.leave()
+                })
             }
-        } else {
-            completion([])
+        })
+        
+        group.notify(queue: .main) {
+            completion(activitylists)
         }
     }
 }

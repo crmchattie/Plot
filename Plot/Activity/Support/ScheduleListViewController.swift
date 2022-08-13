@@ -69,7 +69,7 @@ class ScheduleListViewController: FormViewController {
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Schedule",
                                footer: "Add a sub-event to the schedule") {
-                                $0.tag = "schedulefields"
+                                $0.tag = "Events"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -91,7 +91,7 @@ class ScheduleListViewController: FormViewController {
                             }
         
         for schedule in scheduleList {
-            var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
                 $0.value = schedule
                 }.onCellSelection() { cell, row in
@@ -133,7 +133,7 @@ class ScheduleListViewController: FormViewController {
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Event", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
                 let destination = ScheduleViewController()
@@ -145,7 +145,7 @@ class ScheduleListViewController: FormViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Merge Existing Event", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
                 let destination = ChooseActivityTableViewController()
@@ -158,7 +158,7 @@ class ScheduleListViewController: FormViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
             }))
@@ -190,7 +190,7 @@ class ScheduleListViewController: FormViewController {
         scheduleList.sort { (schedule1, schedule2) -> Bool in
             return schedule1.startDateTime!.int64Value < schedule2.startDateTime!.int64Value
         }
-        if let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+        if let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
             if mvs.count == 1 {
                 return
             }
@@ -220,13 +220,13 @@ class ScheduleListViewController: FormViewController {
 extension ScheduleListViewController: UpdateActivityDelegate {
     func updateActivity(activity: Activity) {
         if let _ = activity.name {
-            if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+            if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                 let scheduleRow = mvs.allRows[scheduleIndex]
                 scheduleRow.baseValue = activity
                 scheduleRow.reload()
                 scheduleList[scheduleIndex] = activity
             } else {
-                var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+                var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
                     $0.value = activity
                     }.onCellSelection() { cell, row in
@@ -285,7 +285,7 @@ extension ScheduleListViewController: ChooseActivityDelegate {
     }
     
     func chosenActivity(mergeActivity: Activity) {
-        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
             mvs.remove(at: mvs.count - 2)
         }
         if let _ = mergeActivity.name, let currentUserID = Auth.auth().currentUser?.uid {
@@ -297,7 +297,7 @@ extension ScheduleListViewController: ChooseActivityDelegate {
             mergeActivity.participantsIDs = [currentUserID]
             mergeActivity.admin = currentUserID
             
-            var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
                 $0.value = mergeActivity
                 }.onCellSelection() { cell, row in

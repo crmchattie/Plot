@@ -70,7 +70,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var longitude: Double?
     var member_guid: String?
     var member_is_managed_by_user: Bool?
-    var memo: Bool?
+    var memo: String?
     var merchant_category_code: Int?
     var merchant_guid: String?
     var merchant_location_guid: String?
@@ -97,7 +97,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var transactionDescription: String?
     var transactionIDs: [String]?
     var containerID: String?
-    var cash_flow_type: String {
+    var cash_flow_type: String? {
         if type == .credit {
             return "Inflow"
         } else {

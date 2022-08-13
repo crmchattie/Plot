@@ -15,91 +15,111 @@ class FinancialMemberFetcher: NSObject {
     fileprivate var userMembersDatabaseRef: DatabaseReference!
     fileprivate var currentUserMembersAddHandle = DatabaseHandle()
     fileprivate var currentUserMembersChangeHandle = DatabaseHandle()
-    fileprivate var currentUserMembersRemoveHandle = DatabaseHandle()
     
+    var membersInitialAdd: (([MXMember])->())?
     var membersAdded: (([MXMember])->())?
-    var membersRemoved: (([MXMember])->())?
     var membersChanged: (([MXMember])->())?
-    
-    fileprivate var isGroupAlreadyFinished = false
-    
-    func fetchMembers(completion: @escaping ([MXMember])->()) {
+        
+    func observeMemberForCurrentUser(membersInitialAdd: @escaping ([MXMember])->(), membersAdded: @escaping ([MXMember])->(), membersChanged: @escaping ([MXMember])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
-            completion([])
             return
         }
-                
         let ref = Database.database().reference()
         userMembersDatabaseRef = ref.child(userFinancialMembersEntity).child(currentUserID)
+        
+        self.membersInitialAdd = membersInitialAdd
+        self.membersAdded = membersAdded
+        self.membersChanged = membersChanged
+        
+        var IDs: [String] = []
+        
         userMembersDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
-            if snapshot.exists(), let memberIDs = snapshot.value as? [String: AnyObject] {
+            guard snapshot.exists() else {
+                membersInitialAdd([])
+                return
+            }
+            
+            if let completion = self.membersInitialAdd {
                 var members: [MXMember] = []
+                var counter = 0
                 let group = DispatchGroup()
-                for (memberID, _) in memberIDs {
+                let memberIDs = snapshot.value as? [String: AnyObject] ?? [:]
+                IDs = Array(memberIDs.keys)
+                for (ID, _) in memberIDs {
+                    var handle = UInt.max
                     group.enter()
-                    ref.child(financialMembersEntity).child(memberID).observeSingleEvent(of: .value, with: { memberSnapshot in
-                        if memberSnapshot.exists(), let memberSnapshotValue = memberSnapshot.value {
-                            if let member = try? FirebaseDecoder().decode(MXMember.self, from: memberSnapshotValue) {
-                                members.append(member)
+                    counter += 1
+                    handle = ref.child(financialMembersEntity).child(ID).observe(.value) { snapshot in
+                        ref.removeObserver(withHandle: handle)
+                        if snapshot.exists(), let snapshotValue = snapshot.value {
+                            if let member = try? FirebaseDecoder().decode(MXMember.self, from: snapshotValue) {
+                                if counter > 0 {
+                                    members.append(member)
+                                    group.leave()
+                                    counter -= 1
+                                } else {
+                                    members = [member]
+                                    completion(members)
+                                }
                             }
                         }
-                        group.leave()
-                    })
+                        
+                    }
                 }
                 group.notify(queue: .main) {
                     completion(members)
                 }
-            } else {
-                completion([])
             }
         })
-    }
-    
-    func observeMemberForCurrentUser(membersAdded: @escaping ([MXMember])->()) {
-        guard let _ = Auth.auth().currentUser?.uid else {
-            return
-        }
-        self.membersAdded = membersAdded
+        
         currentUserMembersAddHandle = userMembersDatabaseRef.observe(.childAdded, with: { snapshot in
-            if let completion = self.membersAdded {
-                let memberID = snapshot.key
-                let ref = Database.database().reference()
-                var handle = UInt.max
-                handle = ref.child(financialMembersEntity).child(memberID).observe(.childChanged) { _ in
-                    ref.removeObserver(withHandle: handle)
-                    self.getMembersFromSnapshot(snapshot: snapshot, completion: completion)
-                }
-            }
-        })
-    }
-    
-    func getMembersFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([MXMember])->()) {
-        if snapshot.exists() {
-            guard let currentUserID = Auth.auth().currentUser?.uid else {
-                return
-            }
-            let memberID = snapshot.key
-            let ref = Database.database().reference()
-            var members: [MXMember] = []
-            let group = DispatchGroup()
-            group.enter()
-            ref.child(userFinancialMembersEntity).child(currentUserID).child(memberID).observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let _ = snapshot.value {
-                    ref.child(financialMembersEntity).child(memberID).observeSingleEvent(of: .value, with: { memberSnapshot in
-                        if memberSnapshot.exists(), let memberSnapshotValue = memberSnapshot.value {
-                            if let member = try? FirebaseDecoder().decode(MXMember.self, from: memberSnapshotValue) {
-                                members.append(member)
+            if !IDs.contains(snapshot.key) {
+                if let completion = self.membersAdded {
+                    var handle = UInt.max
+                    let ID = snapshot.key
+                    handle = ref.child(financialMembersEntity).child(ID).observe(.value) { snapshot in
+                        ref.removeObserver(withHandle: handle)
+                        if snapshot.exists(), let snapshotValue = snapshot.value {
+                            if let member = try? FirebaseDecoder().decode(MXMember.self, from: snapshotValue) {
+                                completion([member])
                             }
                         }
-                        group.leave()
-                    })
+                        
+                    }
                 }
-            })
-            group.notify(queue: .main) {
-                completion(members)
             }
-        } else {
-            completion([])
+        })
+        
+        currentUserMembersChangeHandle = userMembersDatabaseRef.observe(.childChanged, with: { snapshot in
+            if let completion = self.membersChanged {
+                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+            }
+        })
+
+    }
+    
+    func getDataFromSnapshot(ID: String, completion: @escaping ([MXMember])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference()
+        var members: [MXMember] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userFinancialMembersEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let _ = snapshot.value {
+                ref.child(financialMembersEntity).child(ID).observeSingleEvent(of: .value, with: { memberSnapshot in
+                    if memberSnapshot.exists(), let memberSnapshotValue = memberSnapshot.value {
+                        if let member = try? FirebaseDecoder().decode(MXMember.self, from: memberSnapshotValue) {
+                            members.append(member)
+                        }
+                    }
+                    group.leave()
+                })
+            }
+        })
+        group.notify(queue: .main) {
+            completion(members)
         }
     }
 }

@@ -201,8 +201,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange { row in
                 if let value = row.value {
-                    self.transaction.description = value
-                    if let currentUser = Auth.auth().currentUser?.uid, self.active {
+                    if let currentUser = Auth.auth().currentUser?.uid {
                         let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("description")
                         reference.setValue(value)
                     }
@@ -292,8 +291,7 @@ class FinanceTransactionViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value {
                     let date = self.isodateFormatter.string(from: value)
-                    self.transaction.date_for_reports = date
-                    if let currentUser = Auth.auth().currentUser?.uid, self.active {
+                    if let currentUser = Auth.auth().currentUser?.uid {
                         let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("date_for_reports")
                         reference.setValue(date)
                     }
@@ -430,8 +428,7 @@ class FinanceTransactionViewController: FormViewController {
             }.onChange { row in
                 row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
                 row.updateCell()
-                self.transaction.should_link = row.value
-                if let currentUser = Auth.auth().currentUser?.uid, self.active {
+                if let currentUser = Auth.auth().currentUser?.uid {
                     let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("should_link")
                     reference.setValue(row.value!)
                 }
@@ -591,7 +588,7 @@ class FinanceTransactionViewController: FormViewController {
                     }.onChange({ _ in
                         if let indexPath = self.form.last?.last?.indexPath {
                             DispatchQueue.main.async {
-                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+//                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
                             }
                         }
                     })
@@ -600,7 +597,7 @@ class FinanceTransactionViewController: FormViewController {
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                    header: "Event",
                                    footer: "Connect an event") {
-                                    $0.tag = "schedulefields"
+                                    $0.tag = "Events"
                                     $0.hidden = "!$sections == 'Event'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("scheduleButton"){
@@ -626,7 +623,7 @@ class FinanceTransactionViewController: FormViewController {
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                    header: "Health",
                                    footer: "Connect a workout and/or mindfulness session") {
-                                    $0.tag = "healthfields"
+                                    $0.tag = "Health"
                                     $0.hidden = "$sections != 'Health'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow(){

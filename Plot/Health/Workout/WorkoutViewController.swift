@@ -105,7 +105,7 @@ class WorkoutViewController: FormViewController {
         
         if active {
             for row in form.allRows {
-                if row.tag != "sections" && row.tag != "schedulefields" && row.tag != "purchasefields" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
+                if row.tag != "sections" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -524,25 +524,25 @@ class WorkoutViewController: FormViewController {
                     } else {
                         // Fallback on earlier versions
                     }
-                    $0.options = ["Event", "Transactions"]
-                    $0.value = "Event"
+                    $0.options = ["Events", "Transactions"]
+                    $0.value = "Events"
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }.onChange({ _ in
-                        if let indexPath = self.form.last?.last?.indexPath {
+                    }.onChange({ row in
+                        if let value = row.value, let section = self.form.sectionBy(tag: value) as? MultivaluedSection, let indexPath = section.last?.indexPath {
                             DispatchQueue.main.async {
-                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+//                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
                             }
                         }
                     })
 
             form +++
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Event",
+                                   header: "Events",
                                    footer: "Connect an event") {
-                                    $0.tag = "schedulefields"
-                                    $0.hidden = "!$sections == 'Event'"
+                                    $0.tag = "Events"
+                                    $0.hidden = "!$sections == 'Events'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("scheduleButton"){
                                             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -561,13 +561,13 @@ class WorkoutViewController: FormViewController {
                                         }
                                     }
 
-                                }
+                }
 
             form +++
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                    header: "Transactions",
                                    footer: "Connect a transaction") {
-                                    $0.tag = "purchasefields"
+                                    $0.tag = "Transactions"
                                     $0.hidden = "$sections != 'Transactions'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("transactionButton"){

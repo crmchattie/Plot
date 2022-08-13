@@ -236,7 +236,7 @@ extension EventViewController {
     
     func listRow() {
         for health in healthList {
-            var mvs = (form.sectionBy(tag: "healthfields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
             mvs.insert(HealthRow() {
                 $0.value = health
                 }.onCellSelection() { cell, row in
@@ -248,7 +248,7 @@ extension EventViewController {
         }
         
         for purchase in purchaseList {
-            var mvs = (form.sectionBy(tag: "purchasefields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Transactions") as! MultivaluedSection)
             mvs.insert(PurchaseRow() {
                 $0.value = purchase
             }.onCellSelection() { cell, row in
@@ -323,7 +323,7 @@ extension EventViewController {
         scheduleList.sort { (schedule1, schedule2) -> Bool in
             return schedule1.startDateTime!.int64Value < schedule2.startDateTime!.int64Value
         }
-        if let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+        if let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
             if mvs.count == 1 {
                 return
             }
@@ -650,7 +650,7 @@ extension EventViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
+                if let mvs = self.form.sectionBy(tag: "Transactions") as? MultivaluedSection {
                     mvs.remove(at: self.purchaseIndex)
                 }
             }))
@@ -684,7 +684,7 @@ extension EventViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let mvs = self.form.sectionBy(tag: "healthfields") as? MultivaluedSection {
+                if let mvs = self.form.sectionBy(tag: "Health") as? MultivaluedSection {
                     mvs.remove(at: self.healthIndex)
                 }
             }))

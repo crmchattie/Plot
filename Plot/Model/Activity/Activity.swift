@@ -328,26 +328,7 @@ class Activity: NSObject, NSCopying, Codable {
     }
     
     static func == (lhs: Activity, rhs: Activity) -> Bool {
-        return lhs.activityID == rhs.activityID &&
-            lhs.externalActivityID == rhs.externalActivityID &&
-            lhs.name == rhs.name &&
-            lhs.calendarID == rhs.calendarID &&
-            lhs.activityType == rhs.activityType &&
-            lhs.activityDescription == rhs.activityDescription &&
-            lhs.category == rhs.category &&
-            lhs.locationName == rhs.locationName &&
-            lhs.allDay == rhs.allDay &&
-            lhs.startDateTime == rhs.startDateTime &&
-            lhs.endDateTime == rhs.endDateTime &&
-            lhs.recurrences == rhs.recurrences &&
-            lhs.reminder == rhs.reminder &&
-            lhs.checklistIDs == rhs.checklistIDs &&
-            lhs.activityPhotos == rhs.activityPhotos &&
-            lhs.activityFiles == rhs.activityFiles &&
-            lhs.notes == rhs.notes &&
-            lhs.scheduleIDs == rhs.scheduleIDs &&
-            lhs.participantsIDs == rhs.participantsIDs &&
-            lhs.containerID == rhs.containerID
+        return lhs.activityID == rhs.activityID
     }
 }
 

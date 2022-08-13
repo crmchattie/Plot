@@ -34,7 +34,7 @@ extension FinanceTransactionViewController {
     
     func listRow() {
         for activity in eventList {
-            var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
                 $0.value = activity
             }.onCellSelection() { cell, row in
@@ -44,7 +44,7 @@ extension FinanceTransactionViewController {
             }, at: mvs.count - 1)
         }
         for health in healthList {
-            var mvs = (form.sectionBy(tag: "healthfields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
             mvs.insert(HealthRow() {
                 $0.value = health
                 }.onCellSelection() { cell, row in
@@ -71,7 +71,7 @@ extension FinanceTransactionViewController {
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Activity", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
                 let destination = EventViewController(networkController: self.networkController)
@@ -85,7 +85,7 @@ extension FinanceTransactionViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
                 let destination = ChooseActivityTableViewController()
@@ -98,7 +98,7 @@ extension FinanceTransactionViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
             }))
@@ -132,7 +132,7 @@ extension FinanceTransactionViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let mvs = self.form.sectionBy(tag: "healthfields") as? MultivaluedSection {
+                if let mvs = self.form.sectionBy(tag: "Health") as? MultivaluedSection {
                     mvs.remove(at: self.healthIndex)
                 }
             }))
@@ -154,7 +154,7 @@ extension FinanceTransactionViewController {
         eventList.sort { (schedule1, schedule2) -> Bool in
             return schedule1.startDateTime!.int64Value < schedule2.startDateTime!.int64Value
         }
-        if let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+        if let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
             if mvs.count == 1 {
                 return
             }
@@ -170,13 +170,13 @@ extension FinanceTransactionViewController {
 extension FinanceTransactionViewController: UpdateActivityDelegate {
     func updateActivity(activity: Activity) {
         if let _ = activity.name {
-            if eventList.indices.contains(eventIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+            if eventList.indices.contains(eventIndex), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                 let scheduleRow = mvs.allRows[eventIndex]
                 scheduleRow.baseValue = activity
                 scheduleRow.reload()
                 eventList[eventIndex] = activity
             } else {
-                var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+                var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
                     $0.value = activity
                 }.onCellSelection() { cell, row in
@@ -230,11 +230,11 @@ extension FinanceTransactionViewController: ChooseActivityDelegate {
     }
     
     func chosenActivity(mergeActivity: Activity) {
-        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
             mvs.remove(at: mvs.count - 2)
         }
         if let _ = mergeActivity.name {
-            var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
                 $0.value = mergeActivity
             }.onCellSelection() { cell, row in
@@ -256,7 +256,7 @@ extension FinanceTransactionViewController: ChooseActivityDelegate {
 
 extension FinanceTransactionViewController: UpdateWorkoutDelegate {
     func updateWorkout(workout: Workout) {
-        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
+        var mvs = self.form.sectionBy(tag: "Health") as! MultivaluedSection
         if workout.name != "Name" {
             if healthList.indices.contains(healthIndex) {
                 healthList[healthIndex].workout = workout
@@ -288,7 +288,7 @@ extension FinanceTransactionViewController: UpdateWorkoutDelegate {
 
 extension FinanceTransactionViewController: UpdateMindfulnessDelegate {
     func updateMindfulness(mindfulness: Mindfulness) {
-        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
+        var mvs = self.form.sectionBy(tag: "Health") as! MultivaluedSection
         if mindfulness.name != "Name" {
             if healthList.indices.contains(healthIndex) {
                 healthList[healthIndex].mindfulness = mindfulness

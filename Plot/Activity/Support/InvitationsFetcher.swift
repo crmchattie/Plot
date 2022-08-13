@@ -79,41 +79,36 @@ class InvitationsFetcher: NSObject {
                 let invitationID = snapshot.key
                 let ref = Database.database().reference()
                 var handle = UInt.max
-                handle = ref.child(invitationsEntity).child(invitationID).observe(.value) { _ in
+                handle = ref.child(invitationsEntity).child(invitationID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
-                    self.getInvitationsFromSnapshot(snapshot: snapshot, completion: completion)
+                    self.getInvitationsFromSnapshot(ID: snapshot.key, completion: completion)
                 }
             }
         })
         
         currentUserInvitationsRemoveHandle = userInvitationsDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.invitationsRemoved {
-                self.getInvitationsFromSnapshot(snapshot: snapshot, completion: completion)
+                self.getInvitationsFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
     }
     
-    func getInvitationsFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Invitation])->()) {
-        if snapshot.exists() {
-            let invitationID = snapshot.key
-            let ref = Database.database().reference()
-            var invitations: [Invitation] = []
-            let group = DispatchGroup()
-            group.enter()
-            ref.child(invitationsEntity).child(invitationID).observeSingleEvent(of: .value, with: { invitationSnapshot in
-                if invitationSnapshot.exists(), let invitationSnapshotValue = invitationSnapshot.value {
-                    if let invitation = try? FirebaseDecoder().decode(Invitation.self, from: invitationSnapshotValue) {
-                        invitations.append(invitation)
-                    }
+    func getInvitationsFromSnapshot(ID: String, completion: @escaping ([Invitation])->()) {
+        let ref = Database.database().reference()
+        var invitations: [Invitation] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(invitationsEntity).child(ID).observeSingleEvent(of: .value, with: { invitationSnapshot in
+            if invitationSnapshot.exists(), let invitationSnapshotValue = invitationSnapshot.value {
+                if let invitation = try? FirebaseDecoder().decode(Invitation.self, from: invitationSnapshotValue) {
+                    invitations.append(invitation)
                 }
-                group.leave()
-            })
-            
-            group.notify(queue: .main) {
-                completion(invitations)
             }
-        } else {
-            completion([])
+            group.leave()
+        })
+        
+        group.notify(queue: .main) {
+            completion(invitations)
         }
     }
     

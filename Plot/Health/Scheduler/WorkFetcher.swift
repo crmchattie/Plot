@@ -15,10 +15,11 @@ class WorkFetcher: NSObject {
     fileprivate var userWorkDatabaseRef: DatabaseReference!
     fileprivate var currentUserWorkAddHandle = DatabaseHandle()
     
+    var workInitialAdd: (([Scheduler])->())?
     var workAdded: (([Scheduler])->())?
     
-    fileprivate var isGroupAlreadyFinished = false
-    
+    var wordIDs: [String] = []
+        
     func fetchWork(completion: @escaping ([Scheduler])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             completion([])
@@ -26,7 +27,7 @@ class WorkFetcher: NSObject {
         }
                 
         let ref = Database.database().reference()
-        userWorkDatabaseRef = Database.database().reference().child(userWorkEntity).child(currentUserID)
+        userWorkDatabaseRef = ref.child(userWorkEntity).child(currentUserID)
         userWorkDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let workIDs = snapshot.value as? [String: AnyObject] {
                 var works: [Scheduler] = []
@@ -63,38 +64,33 @@ class WorkFetcher: NSObject {
                 var handle = UInt.max
                 handle = ref.child(workEntity).child(workID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
-                    self.getWorkFromSnapshot(snapshot: snapshot, completion: completion)
+                    self.getWorkFromSnapshot(ID: snapshot.key, completion: completion)
                 }
             }
         })
     }
     
-    func getWorkFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Scheduler])->()) {
-        if snapshot.exists() {
-            guard let _ = Auth.auth().currentUser?.uid else {
-                return
-            }
-            
-            let workID = snapshot.key
-            let ref = Database.database().reference()
-            var works: [Scheduler] = []
-            let group = DispatchGroup()
-            group.enter()
-            
-            ref.child(workEntity).child(workID).observeSingleEvent(of: .value, with: { workSnapshot in
-                if workSnapshot.exists(), let workSnapshotValue = workSnapshot.value {
-                    if let work = try? FirebaseDecoder().decode(Scheduler.self, from: workSnapshotValue) {
-                        works.append(work)
-                    }
+    func getWorkFromSnapshot(ID: String, completion: @escaping ([Scheduler])->()) {
+        guard let _ = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let ref = Database.database().reference()
+        var works: [Scheduler] = []
+        let group = DispatchGroup()
+        group.enter()
+        
+        ref.child(workEntity).child(ID).observeSingleEvent(of: .value, with: { workSnapshot in
+            if workSnapshot.exists(), let workSnapshotValue = workSnapshot.value {
+                if let work = try? FirebaseDecoder().decode(Scheduler.self, from: workSnapshotValue) {
+                    works.append(work)
                 }
-                group.leave()
-            })
-            
-            group.notify(queue: .main) {
-                completion(works)
             }
-        } else {
-            completion([])
+            group.leave()
+        })
+        
+        group.notify(queue: .main) {
+            completion(works)
         }
     }
 }

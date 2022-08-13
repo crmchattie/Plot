@@ -80,42 +80,25 @@ class FinanceService {
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
+    var isRunning: Bool = true
+    
     func grabFinances(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [weak self] in
-            self?.accountFetcher.fetchAccounts { (firebaseAccounts) in
-                self?.accounts = firebaseAccounts
-            }
-            
-            self?.transactionRuleFetcher.fetchTransactionRules { (firebaseTransactionRules) in
-                self?.transactionRules = firebaseTransactionRules
-                self?.observeTransactionRulesForCurrentUser()
-                self?.transactionFetcher.fetchTransactions { (firebaseTransactions) in
-                    self?.transactions = firebaseTransactions
+            self?.observeAccountsForCurrentUser {}
+            self?.observeTransactionRulesForCurrentUser {
+                self?.observeTransactionsForCurrentUser {
                     self?.removePendingTransactions()
-                    self?.grabOtherFinances()
                     completion()
+//                    self?.grabTransactionAttributes()
                 }
+
             }
             
-            self?.holdingFetcher.fetchHoldings { (firebaseHoldings) in
-                self?.holdings = firebaseHoldings
-            }
-            
-            self?.memberFetcher.fetchMembers { (firebaseMembers) in
-                self?.members = firebaseMembers
+            self?.observeHoldingsForCurrentUser()
+            self?.observeMembersForCurrentUser {
                 self?.setupMembersAccountsDict()
             }
 
-        }
-    }
-    
-    func grabOtherFinances() {
-        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-            self?.observeAccountsForCurrentUser()
-            self?.observeTransactionsForCurrentUser()
-            self?.observeHoldingsForCurrentUser()
-            self?.observeMembersForCurrentUser()
-//            self?.grabTransactionAttributes()
         }
     }
     
@@ -178,15 +161,11 @@ class FinanceService {
     func deleteMXMemberFB(member: MXMember) {
         let current_member_guid = member.guid
         if let currentUserId = Auth.auth().currentUser?.uid, let index = self.members.firstIndex(where: {$0.guid == current_member_guid}) {
-            
             self.members.remove(at: index)
             let reference = Database.database().reference()
             reference.child(userFinancialMembersEntity).child(currentUserId).child(current_member_guid).removeValue()
-            reference.child(financialMembersEntity).child(current_member_guid).removeValue()
-            
-            let accounts = self.memberAccountsDict[member]
             self.memberAccountsDict[member] = nil
-            if let accounts = accounts {
+            if let accounts = self.memberAccountsDict[member] {
                 deleteMXAccountsFB(accounts: accounts)
             } else {
                 var memberAccounts = [MXAccount]()
@@ -208,71 +187,121 @@ class FinanceService {
                     self.accounts.remove(at: index)
                 }
                 reference.child(userFinancialAccountsEntity).child(currentUserId).child(account.guid).removeValue()
-                reference.child(financialAccountsEntity).child(account.guid).removeValue()
             }
         }
     }
     
-    func observeMembersForCurrentUser() {
-        self.memberFetcher.observeMemberForCurrentUser(membersAdded: { [weak self] membersAdded in
+    func observeMembersForCurrentUser(_ completion: @escaping () -> Void) {
+        self.memberFetcher.observeMemberForCurrentUser(membersInitialAdd: { [weak self] membersInitialAdd in
+            if self?.members.isEmpty ?? true {
+                self?.members = membersInitialAdd
+                completion()
+            } else {
+                for member in membersInitialAdd {
+                    if let index = self?.members.firstIndex(where: {$0.guid == member.guid}) {
+                        self?.members[index] = member
+                    } else {
+                        self?.members.append(member)
+                    }
+                }
+            }
+        }, membersAdded: { [weak self] membersAdded in
             for member in membersAdded {
-                if let index = self!.members.firstIndex(where: {$0.guid == member.guid}) {
-                    self!.members[index] = member
+                if let index = self?.members.firstIndex(where: {$0.guid == member.guid}) {
+                    self?.members[index] = member
                 } else {
-                    self!.members.append(member)
+                    self?.members.append(member)
+                }
+            }
+            self?.setupMembersAccountsDict()
+        }, membersChanged: { [weak self] membersChanged in
+            for member in membersChanged {
+                if let index = self?.members.firstIndex(where: {$0.guid == member.guid}) {
+                    self?.members[index] = member
+                } else {
+                    self?.members.append(member)
                 }
             }
         })
     }
     
-    func observeAccountsForCurrentUser() {
-        self.accountFetcher.observeAccountForCurrentUser(accountsAdded: { [weak self] accountsAdded in
-            for account in accountsAdded {
-                if let index = self!.accounts.firstIndex(where: {$0.guid == account.guid}) {
-                    self!.accounts[index] = account
-                } else {
-                    self!.accounts.append(account)
+    func observeAccountsForCurrentUser(_ completion: @escaping () -> Void) {
+        self.accountFetcher.observeAccountForCurrentUser(accountsInitialAdd: { [weak self] accountsInitialAdd in
+            if self?.accounts.isEmpty ?? true {
+                self?.accounts = accountsInitialAdd
+                completion()
+            } else {
+                for account in accountsInitialAdd {
+                    if let index = self?.accounts.firstIndex(where: {$0.guid == account.guid}) {
+                        self?.accounts[index] = account
+                    } else {
+                        self?.accounts.append(account)
+                    }
                 }
             }
+        }, accountsAdded: { [weak self] accountsAdded in
+            for account in accountsAdded {
+                if let index = self?.accounts.firstIndex(where: {$0.guid == account.guid}) {
+                    self?.accounts[index] = account
+                } else {
+                    self?.accounts.append(account)
+                }
+            }
+            self?.setupMembersAccountsDict()
         }, accountsChanged: { [weak self] accountsChanged in
             for account in accountsChanged {
-                if let index = self!.accounts.firstIndex(where: {$0.guid == account.guid}) {
-                    self!.accounts[index] = account
+                if let index = self?.accounts.firstIndex(where: {$0.guid == account.guid}) {
+                    self?.accounts[index] = account
                 } else {
-                    self!.accounts.append(account)
+                    self?.accounts.append(account)
                 }
             }
         })
     }
     
-    func observeTransactionsForCurrentUser() {
-        self.transactionFetcher.observeTransactionForCurrentUser(transactionsAdded: { [weak self] transactionsAdded in
+    func observeTransactionsForCurrentUser(_ completion: @escaping () -> Void) {
+        self.transactionFetcher.observeTransactionForCurrentUser(transactionsInitialAdd: {
+            [weak self] transactionsInitialAdd in
+            print("transactionsInitialAdd")
+            if self!.transactions.isEmpty {
+                self?.transactions = transactionsInitialAdd
+                completion()
+            } else {
+                for transaction in transactionsInitialAdd {
+                    if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
+                        self?.transactions[index] = transaction
+                    } else {
+                        self?.transactions.append(transaction)
+                    }
+                }
+            }
+        }, transactionsAdded: { [weak self] transactionsAdded in
             for transaction in transactionsAdded {
-                if let index = self!.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
-                    self!.transactions[index] = transaction
+                if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
+                    self?.transactions[index] = transaction
                 } else {
-                    self!.transactions.append(transaction)
+                    self?.transactions.append(transaction)
                 }
             }
         }, transactionsChanged: { [weak self] transactionsChanged in
             for transaction in transactionsChanged {
-                if let index = self!.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
-                    self!.transactions[index] = transaction
+                if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
+                    self?.transactions[index] = transaction
                 } else {
-                    self!.transactions.append(transaction)
+                    self?.transactions.append(transaction)
                 }
             }
         })
     }
     
-    func observeTransactionRulesForCurrentUser() {
+    func observeTransactionRulesForCurrentUser(_ completion: @escaping () -> Void) {
         self.transactionRuleFetcher.observeTransactionRuleForCurrentUser(transactionRulesAdded: { [weak self] transactionRulesAdded in
             var newTransactions = [Transaction]()
             for transactionRule in transactionRulesAdded {
-                if let index = self!.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
-                    self!.transactionRules[index] = transactionRule
+                if let index = self?.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
+                    self?.transactionRules[index] = transactionRule
                 } else {
-                    self!.transactionRules.append(transactionRule)
+                    self?.transactionRules.append(transactionRule)
                 }
                 if !self!.transactions.isEmpty {
                     for index in 0...self!.transactions.count - 1 {
@@ -285,28 +314,29 @@ class FinanceService {
                     }
                 }
             }
+            completion()
             if !newTransactions.isEmpty {
-                self!.updateExistingTransactionsFB(transactions: newTransactions)
+                self?.updateExistingTransactionsFB(transactions: newTransactions)
             }
             }, transactionRulesRemoved: { [weak self] transactionRulesRemoved in
                 for transactionRule in transactionRulesRemoved {
-                    if let index = self!.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
-                        self!.transactionRules[index] = transactionRule
+                    if let index = self?.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
+                        self?.transactionRules[index] = transactionRule
                     }
                 }
             }, transactionRulesChanged: { [weak self] transactionRulesChanged in
                 var newTransactions = [Transaction]()
                 for transactionRule in transactionRulesChanged {
-                    if let index = self!.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
-                        self!.transactionRules[index] = transactionRule
+                    if let index = self?.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
+                        self?.transactionRules[index] = transactionRule
                     } else {
-                        self!.transactionRules.append(transactionRule)
+                        self?.transactionRules.append(transactionRule)
                     }
                     if !self!.transactions.isEmpty {
                         for index in 0...self!.transactions.count - 1 {
                             updateTransactionWRule(transaction: self!.transactions[index], transactionRules: self!.transactionRules) { (transaction, bool) in
                                 if bool {
-                                    self!.transactions[index] = transaction
+                                    self?.transactions[index] = transaction
                                     newTransactions.append(transaction)
                                 }
                             }
@@ -314,25 +344,37 @@ class FinanceService {
                     }
                 }
                 if !newTransactions.isEmpty {
-                    self!.updateExistingTransactionsFB(transactions: newTransactions)
+                    self?.updateExistingTransactionsFB(transactions: newTransactions)
                 }
             }
         )
     }
     
     func observeHoldingsForCurrentUser() {
-        self.holdingFetcher.observeHoldingForCurrentUser(holdingsAdded: { [weak self] holdingsAdded in
+        self.holdingFetcher.observeHoldingForCurrentUser(holdingsInitialAdd: { [weak self] holdingsAdded in
+            if self?.holdings.isEmpty ?? true {
+                self?.holdings = holdingsAdded
+            } else {
+                for holding in holdingsAdded {
+                    if let index = self?.holdings.firstIndex(where: {$0.guid == holding.guid}) {
+                        self?.holdings[index] = holding
+                    } else {
+                        self?.holdings.append(holding)
+                    }
+                }
+            }
+        }, holdingsAdded: { [weak self] holdingsAdded in
             for holding in holdingsAdded {
-                if let index = self!.holdings.firstIndex(where: {$0.guid == holding.guid}) {
-                    self!.holdings[index] = holding
+                if let index = self?.holdings.firstIndex(where: {$0.guid == holding.guid}) {
+                    self?.holdings[index] = holding
                 } else {
-                    self!.holdings.append(holding)
+                    self?.holdings.append(holding)
                 }
             }
         }, holdingsChanged: { [weak self] holdingsChanged in
             for holding in holdingsChanged {
-                if let index = self!.holdings.firstIndex(where: {$0.guid == holding.guid}) {
-                    self!.holdings[index] = holding
+                if let index = self?.holdings.firstIndex(where: {$0.guid == holding.guid}) {
+                    self?.holdings[index] = holding
                 }
             }
         })

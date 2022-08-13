@@ -24,10 +24,10 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             //
             if !sortedActivities.isEmpty || networkController.activityService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
+                cell.delegate = self
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.activities = sortedActivities
                 cell.invitations = networkController.activityService.invitations
-                cell.delegate = self
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
@@ -39,10 +39,10 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else if section == .health {
             if !healthMetrics.isEmpty || networkController.healthService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
+                cell.delegate = self
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.healthMetricSections = healthMetricSections
                 cell.healthMetrics = healthMetrics
-                cell.delegate = self
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
@@ -54,11 +54,11 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else {
             if !financeSections.isEmpty {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
+                cell.delegate = self
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.institutionDict = networkController.financeService.institutionDict
                 cell.sections = financeSections
                 cell.groups = financeGroups
-                cell.delegate = self
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell

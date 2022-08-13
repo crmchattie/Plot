@@ -102,7 +102,7 @@ class MindfulnessViewController: FormViewController {
         
         if active {
             for row in form.allRows {
-                if row.tag != "sections" && row.tag != "schedulefields" && row.tag != "purchasefields" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
+                if row.tag != "sections" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -430,7 +430,7 @@ class MindfulnessViewController: FormViewController {
                     }.onChange({ _ in
                         if let indexPath = self.form.last?.last?.indexPath {
                             DispatchQueue.main.async {
-                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+//                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
                             }
                         }
                     })
@@ -439,7 +439,7 @@ class MindfulnessViewController: FormViewController {
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                    header: "Event",
                                    footer: "Connect an event") {
-                                    $0.tag = "schedulefields"
+                                    $0.tag = "Events"
                                     $0.hidden = "!$sections == 'Event'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("scheduleButton"){
@@ -465,7 +465,7 @@ class MindfulnessViewController: FormViewController {
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                    header: "Transactions",
                                    footer: "Connect a transaction") {
-                                    $0.tag = "purchasefields"
+                                    $0.tag = "Transactions"
                                     $0.hidden = "$sections != 'Transactions'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("transactionButton"){

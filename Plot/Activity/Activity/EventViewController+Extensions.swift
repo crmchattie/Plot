@@ -78,10 +78,6 @@ extension EventViewController: UpdateCalendarDelegate {
         if let row: LabelRow = form.rowBy(tag: "Calendar") {
             row.value = calendar.name
             row.updateCell()
-            self.activity.calendarID = calendar.id
-            self.activity.calendarName = calendar.name
-            self.activity.calendarColor = calendar.color
-            self.activity.calendarSource = calendar.source
             guard let currentUserID = Auth.auth().currentUser?.uid else { return }
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : Any] = ["calendarID": calendar.id as Any, "calendarName": calendar.name as Any, "calendarColor": calendar.color as Any, "calendarSource": calendar.source as Any]
@@ -165,7 +161,7 @@ extension EventViewController: UpdateScheduleListDelegate {
 
 extension EventViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
-        var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
+        var mvs = self.form.sectionBy(tag: "Transactions") as! MultivaluedSection
         if transaction.description != "Name" {
             if mvs.allRows.count - 1 == purchaseIndex {
                 mvs.insert(PurchaseRow() {
@@ -196,7 +192,7 @@ extension EventViewController: UpdateTransactionDelegate {
 
 extension EventViewController: ChooseTransactionDelegate {
     func chosenTransaction(transaction: Transaction) {
-        var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
+        var mvs = self.form.sectionBy(tag: "Transactions") as! MultivaluedSection
         if transaction.description != "Name" {
             if mvs.allRows.count - 1 == purchaseIndex {
                 mvs.insert(PurchaseRow() {
@@ -227,7 +223,7 @@ extension EventViewController: ChooseTransactionDelegate {
 
 extension EventViewController: UpdateWorkoutDelegate {
     func updateWorkout(workout: Workout) {
-        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
+        var mvs = self.form.sectionBy(tag: "Health") as! MultivaluedSection
         if workout.name != "Name" {
             if healthList.indices.contains(healthIndex) {
                 healthList[healthIndex].workout = workout
@@ -259,7 +255,7 @@ extension EventViewController: UpdateWorkoutDelegate {
 
 extension EventViewController: UpdateMindfulnessDelegate {
     func updateMindfulness(mindfulness: Mindfulness) {
-        var mvs = self.form.sectionBy(tag: "healthfields") as! MultivaluedSection
+        var mvs = self.form.sectionBy(tag: "Health") as! MultivaluedSection
         if mindfulness.name != "Name" {
             if healthList.indices.contains(healthIndex) {
                 healthList[healthIndex].mindfulness = mindfulness

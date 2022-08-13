@@ -16,7 +16,6 @@ extension WorkoutViewController {
         guard delegate == nil && active else { return }
         let dispatchGroup = DispatchGroup()
         if let containerID = workout.containerID {
-            print(containerID)
             dispatchGroup.enter()
             ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, _, transactions in
                 self.container = container
@@ -34,7 +33,7 @@ extension WorkoutViewController {
     
     func listRow() {
         for activity in eventList {
-            var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
                 $0.value = activity
             }.onCellSelection() { cell, row in
@@ -44,7 +43,7 @@ extension WorkoutViewController {
             }, at: mvs.count - 1)
         }
         for purchase in purchaseList {
-            var mvs = (form.sectionBy(tag: "purchasefields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Transactions") as! MultivaluedSection)
             mvs.insert(PurchaseRow() {
                 $0.value = purchase
             }.onCellSelection() { cell, row in
@@ -70,7 +69,7 @@ extension WorkoutViewController {
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Activity", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
                 let destination = EventViewController(networkController: self.networkController)
@@ -82,7 +81,7 @@ extension WorkoutViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
                 let destination = ChooseActivityTableViewController()
@@ -95,7 +94,7 @@ extension WorkoutViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
             }))
@@ -134,7 +133,7 @@ extension WorkoutViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let mvs = self.form.sectionBy(tag: "purchasefields") as? MultivaluedSection {
+                if let mvs = self.form.sectionBy(tag: "Transactions") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
             }))
@@ -156,7 +155,7 @@ extension WorkoutViewController {
         eventList.sort { (schedule1, schedule2) -> Bool in
             return schedule1.startDateTime!.int64Value < schedule2.startDateTime!.int64Value
         }
-        if let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+        if let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
             if mvs.count == 1 {
                 return
             }
@@ -172,13 +171,13 @@ extension WorkoutViewController {
 extension WorkoutViewController: UpdateActivityDelegate {
     func updateActivity(activity: Activity) {
         if let _ = activity.name {
-            if eventList.indices.contains(eventIndex), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+            if eventList.indices.contains(eventIndex), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                 let scheduleRow = mvs.allRows[eventIndex]
                 scheduleRow.baseValue = activity
                 scheduleRow.reload()
                 eventList[eventIndex] = activity
             } else {
-                var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+                var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
                     $0.value = activity
                 }.onCellSelection() { cell, row in
@@ -232,11 +231,11 @@ extension WorkoutViewController: ChooseActivityDelegate {
     }
     
     func chosenActivity(mergeActivity: Activity) {
-        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "schedulefields") as? MultivaluedSection {
+        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
             mvs.remove(at: mvs.count - 2)
         }
         if let _ = mergeActivity.name {
-            var mvs = (form.sectionBy(tag: "schedulefields") as! MultivaluedSection)
+            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
                 $0.value = mergeActivity
             }.onCellSelection() { cell, row in
@@ -258,7 +257,7 @@ extension WorkoutViewController: ChooseActivityDelegate {
 
 extension WorkoutViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
-        var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
+        var mvs = self.form.sectionBy(tag: "Transactions") as! MultivaluedSection
         if transaction.description != "Name" {
             if mvs.allRows.count - 1 == purchaseIndex {
                 mvs.insert(PurchaseRow() {
@@ -288,7 +287,7 @@ extension WorkoutViewController: UpdateTransactionDelegate {
 
 extension WorkoutViewController: ChooseTransactionDelegate {
     func chosenTransaction(transaction: Transaction) {
-        var mvs = self.form.sectionBy(tag: "purchasefields") as! MultivaluedSection
+        var mvs = self.form.sectionBy(tag: "Transactions") as! MultivaluedSection
         if transaction.description != "Name" {
             if mvs.allRows.count - 1 == purchaseIndex {
                 mvs.insert(PurchaseRow() {

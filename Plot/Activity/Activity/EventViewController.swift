@@ -705,14 +705,13 @@ class EventViewController: FormViewController {
                 self.activity.showExtras = true
             }
         }.onChange { [weak self] row in
-            self?.activity.showExtras = row.value
             if !row.value!, let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
                 self?.segmentRowValue = segmentRow.value ?? "Health"
                 segmentRow.value = "Hidden"
             } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
                 segmentRow.value = self?.segmentRowValue
             }
-            guard let currentUserID = Auth.auth().currentUser?.uid, self!.active else { return }
+            guard let currentUserID = Auth.auth().currentUser?.uid else { return }
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : Any] = ["showExtras": row.value ?? false]
             userReference.updateChildValues(values)
@@ -828,10 +827,10 @@ class EventViewController: FormViewController {
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }.onChange({ _ in
-                if let indexPath = self.form.last?.last?.indexPath {
+            }.onChange({ row in
+                if let value = row.value, value != "Hidden", let indexPath = self.form.last?.last?.indexPath {
                     DispatchQueue.main.async {
-                        self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+//                        self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
                     }
                 }
             })
@@ -840,7 +839,7 @@ class EventViewController: FormViewController {
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Health",
                                footer: "Connect a workout and/or mindfulness session") {
-                $0.tag = "healthfields"
+                $0.tag = "Health"
                 $0.hidden = "$sections != 'Health'"
                 $0.addButtonProvider = { section in
                     return ButtonRow(){
@@ -870,7 +869,7 @@ class EventViewController: FormViewController {
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Transactions",
                                footer: "Connect a transaction") {
-                $0.tag = "purchasefields"
+                $0.tag = "Transactions"
                 $0.hidden = "$sections != 'Transactions'"
                 $0.addButtonProvider = { section in
                     return ButtonRow(){

@@ -15,10 +15,11 @@ class SleepFetcher: NSObject {
     fileprivate var userSleepDatabaseRef: DatabaseReference!
     fileprivate var currentUserSleepAddHandle = DatabaseHandle()
     
+    var sleepInitalAdd: (([Scheduler])->())?
     var sleepAdded: (([Scheduler])->())?
     
-    fileprivate var isGroupAlreadyFinished = false
-    
+    var sleepIDs: [String] = []
+        
     func fetchSleep(completion: @escaping ([Scheduler])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             completion([])
@@ -26,7 +27,7 @@ class SleepFetcher: NSObject {
         }
                 
         let ref = Database.database().reference()
-        userSleepDatabaseRef = Database.database().reference().child(userSleepEntity).child(currentUserID)
+        userSleepDatabaseRef = ref.child(userSleepEntity).child(currentUserID)
         userSleepDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let sleepIDs = snapshot.value as? [String: AnyObject] {
                 var sleeps: [Scheduler] = []
@@ -63,38 +64,33 @@ class SleepFetcher: NSObject {
                 var handle = UInt.max
                 handle = ref.child(sleepEntity).child(sleepID).observe(.childChanged) { _ in
                     ref.removeObserver(withHandle: handle)
-                    self.getSleepFromSnapshot(snapshot: snapshot, completion: completion)
+                    self.getSleepFromSnapshot(ID: snapshot.key, completion: completion)
                 }
             }
         })
     }
     
-    func getSleepFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([Scheduler])->()) {
-        if snapshot.exists() {
-            guard let _ = Auth.auth().currentUser?.uid else {
-                return
-            }
-            
-            let sleepID = snapshot.key
-            let ref = Database.database().reference()
-            var sleeps: [Scheduler] = []
-            let group = DispatchGroup()
-            group.enter()
-            
-            ref.child(sleepEntity).child(sleepID).observeSingleEvent(of: .value, with: { sleepSnapshot in
-                if sleepSnapshot.exists(), let sleepSnapshotValue = sleepSnapshot.value {
-                    if let sleep = try? FirebaseDecoder().decode(Scheduler.self, from: sleepSnapshotValue) {
-                        sleeps.append(sleep)
-                    }
+    func getSleepFromSnapshot(ID: String, completion: @escaping ([Scheduler])->()) {
+        guard let _ = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let ref = Database.database().reference()
+        var sleeps: [Scheduler] = []
+        let group = DispatchGroup()
+        group.enter()
+        
+        ref.child(sleepEntity).child(ID).observeSingleEvent(of: .value, with: { sleepSnapshot in
+            if sleepSnapshot.exists(), let sleepSnapshotValue = sleepSnapshot.value {
+                if let sleep = try? FirebaseDecoder().decode(Scheduler.self, from: sleepSnapshotValue) {
+                    sleeps.append(sleep)
                 }
-                group.leave()
-            })
-            
-            group.notify(queue: .main) {
-                completion(sleeps)
             }
-        } else {
-            completion([])
+            group.leave()
+        })
+        
+        group.notify(queue: .main) {
+            completion(sleeps)
         }
     }
 }

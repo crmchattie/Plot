@@ -225,8 +225,7 @@ extension NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
-//            self.homeController.activitiesVC.handleReloadTable()
-//            self.listService.grabLists()
+            
         }
     }
     

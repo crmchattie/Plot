@@ -13,17 +13,16 @@ import CodableFirebase
 class FinancialTransactionRuleFetcher: NSObject {
         
     fileprivate var userTransactionRulesDatabaseRef: DatabaseReference!
-    fileprivate var currentTransactionRulesAddHandle = DatabaseHandle()
-    fileprivate var currentTransactionRulesChangeHandle = DatabaseHandle()
-    fileprivate var currentTransactionRulesRemoveHandle = DatabaseHandle()
-    
+    fileprivate var currentUserTransactionRulesAddHandle = DatabaseHandle()
+    fileprivate var currentUserTransactionRulesChangeHandle = DatabaseHandle()
+    fileprivate var currentUserTransactionRulesRemoveHandle = DatabaseHandle()
     
     var transactionRulesAdded: (([TransactionRule])->())?
     var transactionRulesRemoved: (([TransactionRule])->())?
     var transactionRulesChanged: (([TransactionRule])->())?
     
-    fileprivate var isGroupAlreadyFinished = false
-    
+    var IDs: [String] = []
+        
     func fetchTransactionRules(completion: @escaping ([TransactionRule])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             completion([])
@@ -36,10 +35,11 @@ class FinancialTransactionRuleFetcher: NSObject {
             if snapshot.exists(), let transactionRuleIDs = snapshot.value as? [String: AnyObject] {
                 var transactionRules: [TransactionRule] = []
                 let group = DispatchGroup()
-                for (_, userTransactionRuleInfo) in transactionRuleIDs {
+                for (ID, userTransactionRuleInfo) in transactionRuleIDs {
                     group.enter()
                     if let userTransactionRule = try? FirebaseDecoder().decode(TransactionRule.self, from: userTransactionRuleInfo) {
                         transactionRules.append(userTransactionRule)
+                        self.IDs.append(ID)
                         group.leave()
                     }
                 }
@@ -54,56 +54,58 @@ class FinancialTransactionRuleFetcher: NSObject {
     }
     
     func observeTransactionRuleForCurrentUser(transactionRulesAdded: @escaping ([TransactionRule])->(), transactionRulesRemoved: @escaping ([TransactionRule])->(), transactionRulesChanged: @escaping ([TransactionRule])->()) {
-        guard let _ = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
+                
+        let ref = Database.database().reference()
+        userTransactionRulesDatabaseRef = ref.child(userFinancialTransactionRulesEntity).child(currentUserID)
+        
         self.transactionRulesAdded = transactionRulesAdded
         self.transactionRulesRemoved = transactionRulesRemoved
         self.transactionRulesChanged = transactionRulesChanged
-        currentTransactionRulesAddHandle = userTransactionRulesDatabaseRef.observe(.childAdded, with: { snapshot in
-            if let completion = self.transactionRulesAdded {
-                let transactionRuleID = snapshot.key
-                let ref = Database.database().reference()
-                var handle = UInt.max
-                handle = ref.child(userFinancialTransactionRulesEntity).child(transactionRuleID).observe(.childChanged) { _ in
-                    ref.removeObserver(withHandle: handle)
-                    self.getTransactionRulesFromSnapshot(snapshot: snapshot, completion: completion)
+        
+        currentUserTransactionRulesAddHandle = userTransactionRulesDatabaseRef.observe(.childAdded, with: { snapshot in
+            if !self.IDs.contains(snapshot.key) {
+                if let completion = self.transactionRulesAdded {
+                    self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
                 }
             }
         })
         
-        currentTransactionRulesChangeHandle = userTransactionRulesDatabaseRef.observe(.childChanged, with: { snapshot in
+        currentUserTransactionRulesChangeHandle = userTransactionRulesDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.transactionRulesChanged {
-                self.getTransactionRulesFromSnapshot(snapshot: snapshot, completion: completion)
+                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+            }
+        })
+        
+        currentUserTransactionRulesRemoveHandle = userTransactionRulesDatabaseRef.observe(.childRemoved, with: { snapshot in
+            if let completion = self.transactionRulesRemoved {
+                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
     }
     
-    func getTransactionRulesFromSnapshot(snapshot: DataSnapshot, completion: @escaping ([TransactionRule])->()) {
-        if snapshot.exists() {
-            guard let currentUserID = Auth.auth().currentUser?.uid else {
-                return
-            }
-            let transactionRuleID = snapshot.key
-            let ref = Database.database().reference()
-            var transactionRules: [TransactionRule] = []
-            let group = DispatchGroup()
-            group.enter()
-            ref.child(userFinancialTransactionRulesEntity).child(currentUserID).child(transactionRuleID).observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists(), let userTransactionRuleInfo = snapshot.value {
-                    if let userTransactionRule = try? FirebaseDecoder().decode(TransactionRule.self, from: userTransactionRuleInfo) {
-                        transactionRules.append(userTransactionRule)
-                        group.leave()
-                    }
+    func getDataFromSnapshot(ID: String, completion: @escaping ([TransactionRule])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference()
+        var transactionRules: [TransactionRule] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userFinancialTransactionRulesEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let userTransactionRuleInfo = snapshot.value {
+                if let userTransactionRule = try? FirebaseDecoder().decode(TransactionRule.self, from: userTransactionRuleInfo) {
+                    transactionRules.append(userTransactionRule)
+                    group.leave()
                 }
-            })
-            
-            group.notify(queue: .main) {
-                completion(transactionRules)
             }
-        } else {
-            completion([])
+        })
+        
+        group.notify(queue: .main) {
+            completion(transactionRules)
         }
     }
 }

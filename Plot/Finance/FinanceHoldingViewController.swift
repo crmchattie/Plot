@@ -372,8 +372,7 @@ class FinanceHoldingViewController: FormViewController {
             }.onChange { row in
                 row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
                 row.updateCell()
-                self.holding.should_link = row.value
-                if let currentUser = Auth.auth().currentUser?.uid, self.active {
+                if let currentUser = Auth.auth().currentUser?.uid {
                     let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("should_link")
                     reference.setValue(row.value!)
                 }

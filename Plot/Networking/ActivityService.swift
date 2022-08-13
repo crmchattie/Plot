@@ -32,11 +32,10 @@ class ActivityService {
     }
     
     var primaryCalendar = String()
-
+    
     var activities = [Activity]() {
         didSet {
             if oldValue != activities {
-                print("oldValue != activities")
                 let currentDate = NSNumber(value: Int((Date().localTime).timeIntervalSince1970)).int64Value
                 activities.sort { (activity1, activity2) -> Bool in
                     if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
@@ -64,7 +63,7 @@ class ActivityService {
     var invitedActivities = [Activity]()
     
     var hasLoadedCalendarEventActivities = false
-        
+    
     var eventKitManager: EventKitManager = {
         let eventKitService = EventKitService()
         let eventKitManager = EventKitManager(eventKitService: eventKitService)
@@ -77,41 +76,112 @@ class ActivityService {
         return googleCalManager
     }()
     
+    var isRunning: Bool = true
+    
     func grabActivities(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [weak self] in
-            self?.activitiesFetcher.fetchActivities { [weak self] activities in
-                self?.activities = activities
-                self?.activitiesNoRepeats = activities
+            self?.observeActivitiesForCurrentUser({
                 self?.grabOtherActivities()
-                completion()
-            }
+                if self?.isRunning ?? true {
+                    completion()
+                    self?.isRunning = false
+                }
+            })
         }
     }
     
     func grabOtherActivities() {
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
             self?.fetchInvitations()
+            self?.observeInvitationForCurrentUser()
             self?.addRepeatingActivities(activities: self?.activities ?? [], completion: { newActivities in
                 self?.activities = newActivities
                 self?.grabPrimaryCalendar({ (calendar) in
+                    self?.grabPlotCalendars()
                     if calendar == CalendarOptions.apple.name {
-                        self?.grabEventKit {
-                            self?.observeActivitiesForCurrentUser()
-                            self?.observeInvitationForCurrentUser()
-                        }
+                        self?.grabEventKit {}
                     } else if calendar == CalendarOptions.google.name {
-                        self?.grabGoogle {
-                            self?.observeActivitiesForCurrentUser()
-                            self?.observeInvitationForCurrentUser()
-                        }
-                    } else {
-                        self?.observeActivitiesForCurrentUser()
-                        self?.observeInvitationForCurrentUser()
+                        self?.grabGoogle {}
                     }
                     self?.grabCalendars()
                 })
             })
         }
+    }
+    
+    func observeActivitiesForCurrentUser(_ completion: @escaping () -> Void) {
+        activitiesFetcher.observeActivityForCurrentUser(activitiesInitialAdd: { [weak self] activitiesInitialAdd in
+            if self?.activities.isEmpty ?? true {
+                self?.activities = activitiesInitialAdd
+                self?.activitiesNoRepeats = activitiesInitialAdd
+                completion()
+            } else {
+                for activity in activitiesInitialAdd {
+                    if activity.recurrences != nil {
+                        if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
+                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                                self?.activities.append(contentsOf: activities)
+                            })
+                        } else {
+                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                                self?.activities.append(contentsOf: activities)
+                            })
+                        }
+                    } else {
+                        //if recurrence was just made nil, repeating activities could show up so remove and then add back
+                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+                        self?.activities.append(activity)
+                    }
+                }
+            }
+        }, activitiesAdded: { [weak self] activitiesAdded in
+            print("activitiesAdded")
+            for activity in activitiesAdded {
+                if activity.recurrences != nil {
+                    if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
+                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+                        self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                            self?.activities.append(contentsOf: activities)
+                        })
+                    } else {
+                        self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                            self?.activities.append(contentsOf: activities)
+                        })
+                    }
+                } else {
+                    //if recurrence was just made nil, repeating activities could show up so remove and then add back
+                    self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+                    self?.activities.append(activity)
+                }
+            }
+        }, activitiesRemoved: { [weak self] activitiesRemoved in
+            print("activitiesRemoved")
+            for activity in activitiesRemoved {
+                //just filter out activities that match activityID; will capture both recurring and non-recurring
+                self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+            }
+        }, activitiesChanged: { [weak self] activitiesChanged in
+            print("activitiesChanged")
+            for activity in activitiesChanged {
+                if activity.recurrences != nil {
+                    if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
+                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+                        self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                            self?.activities.append(contentsOf: activities)
+                        })
+                    } else {
+                        self?.addRepeatingActivities(activities: [activity], completion: { activities in
+                            self?.activities.append(contentsOf: activities)
+                        })
+                    }
+                } else {
+                    //if recurrence was just made nil, repeating activities could show up so remove and then add back
+                    self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+                    self?.activities.append(activity)
+                }
+            }
+        })
     }
     
     func grabEventKit(_ completion: @escaping () -> Void) {
@@ -123,7 +193,7 @@ class ActivityService {
             self.askedforAuthorization = askedforAuthorization
             self.eventKitManager.syncEventKitActivities(existingActivities: self.activitiesNoRepeats, completion: {
                 self.eventKitManager.syncActivitiesToEventKit(activities: self.activitiesNoRepeats, completion: {
-                  completion()
+                    completion()
                 })
             })
         })
@@ -145,9 +215,6 @@ class ActivityService {
     
     func grabCalendars() {
         if let _ = Auth.auth().currentUser {
-            self.calendarFetcher.fetchCalendar { calendars in
-                self.calendars[CalendarOptions.plot.name] = calendars
-            }
             self.eventKitManager.authorizeEventKit({ _ in
                 if let calendars = self.eventKitManager.grabCalendars() {
                     self.calendars[CalendarOptions.apple.name] = calendars
@@ -161,6 +228,52 @@ class ActivityService {
                 }
             }
         }
+    }
+    
+    func grabPlotCalendars() {
+        self.calendarFetcher.observeCalendarForCurrentUser(calendarInitialAdd: { [weak self] calendarInitialAdd in
+            if self?.calendars[CalendarOptions.plot.name] != nil {
+                var plotCalendars = self?.calendars[CalendarOptions.plot.name]
+                for calendar in calendarInitialAdd {
+                    if let index = plotCalendars?.firstIndex(where: { $0.id == calendar.id}) {
+                        plotCalendars?[index] = calendar
+                    }
+                }
+                self?.calendars[CalendarOptions.plot.name] = plotCalendars
+            } else {
+                self?.calendars[CalendarOptions.plot.name] = calendarInitialAdd
+            }
+        }, calendarAdded: { [weak self] calendarAdded in
+            if self?.calendars[CalendarOptions.plot.name] != nil {
+                var plotCalendars = self?.calendars[CalendarOptions.plot.name]
+                for calendar in calendarAdded {
+                    if let index = plotCalendars?.firstIndex(where: { $0.id == calendar.id}) {
+                        plotCalendars?[index] = calendar
+                    }
+                }
+                self?.calendars[CalendarOptions.plot.name] = plotCalendars
+            } else {
+                self?.calendars[CalendarOptions.plot.name] = calendarAdded
+            }
+        }, calendarRemoved: { [weak self] calendarRemoved in
+            if self?.calendars[CalendarOptions.plot.name] != nil {
+                var plotCalendars = self?.calendars[CalendarOptions.plot.name]
+                for calendar in calendarRemoved {
+                    plotCalendars = plotCalendars?.filter({$0.id != calendar.id})
+                }
+                self?.calendars[CalendarOptions.plot.name] = plotCalendars
+            }
+        }, calendarChanged: { [weak self] calendarChanged in
+            if self?.calendars[CalendarOptions.plot.name] != nil {
+                var plotCalendars = self?.calendars[CalendarOptions.plot.name]
+                for calendar in calendarChanged {
+                    if let index = plotCalendars?.firstIndex(where: { $0.id == calendar.id}) {
+                        plotCalendars?[index] = calendar
+                    }
+                }
+                self?.calendars[CalendarOptions.plot.name] = plotCalendars
+            }
+        })
     }
     
     func grabPrimaryCalendar(_ completion: @escaping (String) -> Void) {
@@ -239,54 +352,6 @@ extension ActivityService {
         }
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
         reference.removeValue()
-    }
-    
-    func observeActivitiesForCurrentUser() {
-        activitiesFetcher.observeActivityForCurrentUser(activitiesAdded: { [weak self] activitiesAdded in
-                for activity in activitiesAdded {
-                    if activity.recurrences != nil {
-                        if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
-                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
-                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                                self?.activities.append(contentsOf: activities)
-                            })
-                        } else {
-                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                                self?.activities.append(contentsOf: activities)
-                            })
-                        }
-                    } else {
-                        //if recurrence was just made nil, repeating activities could show up so remove and then add back
-                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
-                        self?.activities.append(activity)
-                    }
-                }
-            }, activitiesRemoved: { [weak self] activitiesRemoved in
-                for activity in activitiesRemoved {
-                    //just filter out activities that match activityID; will capture both recurring and non-recurring
-                    self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
-                }
-            }, activitiesChanged: { [weak self] activitiesChanged in
-                for activity in activitiesChanged {
-                    if activity.recurrences != nil {
-                        if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
-                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
-                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                                self?.activities.append(contentsOf: activities)
-                            })
-                        } else {
-                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                                self?.activities.append(contentsOf: activities)
-                            })
-                        }
-                    } else {
-                        //if recurrence was just made nil, repeating activities could show up so remove and then add back
-                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
-                        self?.activities.append(activity)
-                    }
-                }
-            }
-        )
     }
     
     func observeInvitationForCurrentUser() {
