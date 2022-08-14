@@ -42,6 +42,7 @@ class MindfulnessViewController: FormViewController {
     //added for EventViewController
     var movingBackwards: Bool = false
     var active: Bool = false
+    var sectionChanged: Bool = false
     
     weak var delegate : UpdateMindfulnessDelegate?
     weak var updateDiscoverDelegate : UpdateDiscover?
@@ -428,11 +429,7 @@ class MindfulnessViewController: FormViewController {
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     }.onChange({ _ in
-                        if let indexPath = self.form.last?.last?.indexPath {
-                            DispatchQueue.main.async {
-//                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
-                            }
-                        }
+                        self.sectionChanged = true
                     })
 
             form +++
@@ -514,6 +511,18 @@ class MindfulnessViewController: FormViewController {
                 lengthRow.value = "\(minutes) minutes"
             }
             lengthRow.updateCell()
+        }
+    }
+    
+    override func sectionsHaveBeenAdded(_ sections: [Section], at indexes: IndexSet) {
+        super.sectionsHaveBeenAdded(sections, at: indexes)
+        if sectionChanged, let section = indexes.first {
+            let row = tableView.numberOfRows(inSection: section) - 1
+            let indexPath = IndexPath(row: row, section: section)
+            DispatchQueue.main.async {
+                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+            }
+            sectionChanged = false
         }
     }
     

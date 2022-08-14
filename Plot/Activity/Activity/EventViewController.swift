@@ -78,6 +78,7 @@ class EventViewController: FormViewController {
     fileprivate var reminderDate: Date?
     
     var active = false
+    var sectionChanged: Bool = false
     
     weak var updateDiscoverDelegate : UpdateDiscover?
     
@@ -827,12 +828,8 @@ class EventViewController: FormViewController {
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            }.onChange({ row in
-                if let value = row.value, value != "Hidden", let indexPath = self.form.last?.last?.indexPath {
-                    DispatchQueue.main.async {
-//                        self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
-                    }
-                }
+            }.onChange({ _ in
+                self.sectionChanged = true
             })
             
             form +++
@@ -901,6 +898,18 @@ class EventViewController: FormViewController {
         //                                                    $0.tag = "Balances"
         //                                                    $0.hidden = "$sections != 'Transactions'"
         //                                    }
+    }
+    
+    override func sectionsHaveBeenAdded(_ sections: [Section], at indexes: IndexSet) {
+        super.sectionsHaveBeenAdded(sections, at: indexes)
+        if sectionChanged, let section = indexes.first {
+            let row = tableView.numberOfRows(inSection: section) - 1
+            let indexPath = IndexPath(row: row, section: section)
+            DispatchQueue.main.async {
+                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+            }
+            sectionChanged = false
+        }
     }
     
     override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {

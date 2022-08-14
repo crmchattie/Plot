@@ -45,6 +45,7 @@ class WorkoutViewController: FormViewController {
     //added for WorkoutViewController
     var movingBackwards: Bool = false
     var active: Bool = false
+    var sectionChanged: Bool = false
     
     weak var delegate : UpdateWorkoutDelegate?
     weak var updateDiscoverDelegate : UpdateDiscover?
@@ -529,12 +530,8 @@ class WorkoutViewController: FormViewController {
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    }.onChange({ row in
-                        if let value = row.value, let section = self.form.sectionBy(tag: value) as? MultivaluedSection, let indexPath = section.last?.indexPath {
-                            DispatchQueue.main.async {
-//                                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
-                            }
-                        }
+                    }.onChange({ _ in
+                        self.sectionChanged = true
                     })
 
             form +++
@@ -628,11 +625,23 @@ class WorkoutViewController: FormViewController {
         }
     }
     
+    override func sectionsHaveBeenAdded(_ sections: [Section], at indexes: IndexSet) {
+        super.sectionsHaveBeenAdded(sections, at: indexes)
+        if sectionChanged, let section = indexes.first {
+            let row = tableView.numberOfRows(inSection: section) - 1
+            let indexPath = IndexPath(row: row, section: section)
+            DispatchQueue.main.async {
+                self.tableView?.scrollToRow(at: indexPath, at: .bottom, animated: false)
+            }
+            sectionChanged = false
+        }
+    }
+    
     override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
         super.rowsHaveBeenRemoved(rows, at: indexes)
         let rowNumber : Int = indexes.first!.row
         let rowType = rows[0].self
-        
+                
         DispatchQueue.main.async { [weak self] in
             if rowType is ScheduleRow {
                 if self!.eventList.indices.contains(self!.eventIndex) {
@@ -648,7 +657,7 @@ class WorkoutViewController: FormViewController {
             }
         }
     }
-    
+        
     @objc fileprivate func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
